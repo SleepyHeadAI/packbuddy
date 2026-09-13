@@ -8,6 +8,8 @@ class Expense {
   final String category;
   final DateTime date;
   final String? receiptPath;
+  final String? paymentMethod;
+  final String? notes;
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isDeleted;
@@ -21,6 +23,8 @@ class Expense {
     required this.category,
     required this.date,
     this.receiptPath,
+    this.paymentMethod,
+    this.notes,
     required this.createdAt,
     required this.updatedAt,
     this.isDeleted = false,
@@ -36,6 +40,8 @@ class Expense {
     String? category,
     DateTime? date,
     String? receiptPath,
+    String? paymentMethod,
+    String? notes,
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isDeleted,
@@ -49,6 +55,8 @@ class Expense {
       category: category ?? this.category,
       date: date ?? this.date,
       receiptPath: receiptPath ?? this.receiptPath,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isDeleted: isDeleted ?? this.isDeleted,
@@ -66,6 +74,8 @@ class Expense {
       'category': category,
       'date': date.toIso8601String(),
       'receiptPath': receiptPath,
+      'paymentMethod': paymentMethod,
+      'notes': notes,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
       'isDeleted': isDeleted,
@@ -83,6 +93,8 @@ class Expense {
       category: json['category'] as String? ?? 'General',
       date: DateTime.parse(json['date'] as String),
       receiptPath: json['receiptPath'] as String?,
+      paymentMethod: json['paymentMethod'] as String?,
+      notes: json['notes'] as String?,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'] as String)
           : DateTime.now(),
@@ -104,6 +116,8 @@ class Expense {
       'category': category,
       'date': date.toIso8601String(),
       'receipt_path': receiptPath,
+      'payment_method': paymentMethod,
+      'notes': notes,
       'created_at': createdAt.millisecondsSinceEpoch,
       'updated_at': updatedAt.millisecondsSinceEpoch,
       'is_deleted': isDeleted ? 1 : 0,
@@ -112,18 +126,26 @@ class Expense {
 
   /// Deserialization from local SQLite database
   factory Expense.fromMap(Map<String, dynamic> map) {
+    DateTime parseDate(dynamic val) {
+      if (val is int) return DateTime.fromMillisecondsSinceEpoch(val);
+      if (val is String) return DateTime.parse(val);
+      return DateTime.now();
+    }
+
     return Expense(
-      id: map['id'] as String,
-      tripId: map['trip_id'] as String,
-      title: map['title'] as String,
-      amount: (map['amount'] as num).toDouble(),
-      currency: map['currency'] as String? ?? 'USD',
-      category: map['category'] as String? ?? 'General',
-      date: DateTime.parse(map['date'] as String),
-      receiptPath: map['receipt_path'] as String?,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int),
-      isDeleted: (map['is_deleted'] as int? ?? 0) == 1,
+      id: (map['id'] ?? '') as String,
+      tripId: (map['trip_id'] ?? map['tripId'] ?? '') as String,
+      title: (map['title'] ?? '') as String,
+      amount: ((map['amount'] as num?) ?? 0).toDouble(),
+      currency: (map['currency'] as String?) ?? 'USD',
+      category: (map['category'] as String?) ?? 'General',
+      date: parseDate(map['date']),
+      receiptPath: (map['receipt_path'] ?? map['receiptPath']) as String?,
+      paymentMethod: (map['payment_method'] ?? map['paymentMethod']) as String?,
+      notes: map['notes'] as String?,
+      createdAt: parseDate(map['created_at'] ?? map['createdAt']),
+      updatedAt: parseDate(map['updated_at'] ?? map['updatedAt']),
+      isDeleted: map['is_deleted'] == 1 || map['isDeleted'] == 1 || map['isDeleted'] == true,
     );
   }
 }

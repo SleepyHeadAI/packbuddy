@@ -57,23 +57,26 @@ class PaywallSheet extends ConsumerWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [AppColors.tertiaryContainerLight, AppColors.primaryContainerLight],
+              gradient: LinearGradient(
+                colors: [
+                  theme.colorScheme.tertiaryContainer,
+                  theme.colorScheme.primaryContainer,
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.tertiaryLight.withValues(alpha: 0.25),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.25),
                   blurRadius: 18,
                   offset: const Offset(0, 6),
                 ),
               ],
             ),
-            child: const Icon(
+            child: Icon(
               Icons.auto_awesome_rounded,
-              color: AppColors.tertiaryLight,
+              color: theme.colorScheme.primary,
               size: 32,
             ),
           ),
@@ -227,10 +230,10 @@ class _ProFeatureRow extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppColors.primaryContainerLight.withValues(alpha: 0.6),
+            color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: const Icon(Icons.star_rounded, color: AppColors.primaryLight, size: 18),
+          child: Icon(Icons.star_rounded, color: theme.colorScheme.primary, size: 18),
         ),
         const SizedBox(width: 14),
         Expanded(

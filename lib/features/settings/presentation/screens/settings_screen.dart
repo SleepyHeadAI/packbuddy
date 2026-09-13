@@ -48,7 +48,7 @@ class SettingsScreen extends ConsumerWidget {
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryContainerLight.withValues(alpha: 0.6),
+                  color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
@@ -121,12 +121,12 @@ class SettingsScreen extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: _getSyncIconBg(syncState.status),
+                        color: _getSyncIconBg(syncState.status, theme),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
                         _getSyncIcon(syncState.status),
-                        color: _getSyncIconColor(syncState.status),
+                        color: _getSyncIconColor(syncState.status, theme),
                         size: 24,
                       ),
                     ),
@@ -320,7 +320,7 @@ class SettingsScreen extends ConsumerWidget {
     }
   }
 
-  Color _getSyncIconBg(SyncStatus status) {
+  Color _getSyncIconBg(SyncStatus status, ThemeData theme) {
     switch (status) {
       case SyncStatus.syncing:
         return AppColors.infoPastel.withValues(alpha: 0.2);
@@ -330,11 +330,11 @@ class SettingsScreen extends ConsumerWidget {
         return AppColors.errorPastel.withValues(alpha: 0.2);
       case SyncStatus.noInternet:
       case SyncStatus.idle:
-        return AppColors.secondaryContainerLight;
+        return theme.colorScheme.secondaryContainer;
     }
   }
 
-  Color _getSyncIconColor(SyncStatus status) {
+  Color _getSyncIconColor(SyncStatus status, ThemeData theme) {
     switch (status) {
       case SyncStatus.syncing:
         return AppColors.infoPastel;
@@ -344,7 +344,7 @@ class SettingsScreen extends ConsumerWidget {
         return AppColors.errorPastel;
       case SyncStatus.noInternet:
       case SyncStatus.idle:
-        return AppColors.secondaryLight;
+        return theme.colorScheme.secondary;
     }
   }
 
@@ -408,11 +408,11 @@ class _ProBanner extends StatelessWidget {
             colors: isPro
                 ? [
                     AppColors.successPastel.withValues(alpha: 0.2),
-                    AppColors.primaryContainerLight.withValues(alpha: 0.3),
+                    theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
                   ]
                 : [
-                    AppColors.tertiaryContainerLight,
-                    AppColors.primaryContainerLight,
+                    theme.colorScheme.tertiaryContainer.withValues(alpha: 0.8),
+                    theme.colorScheme.primaryContainer.withValues(alpha: 0.8),
                   ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -431,7 +431,7 @@ class _ProBanner extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.9),
+                color: theme.colorScheme.surface.withValues(alpha: 0.9),
                 shape: BoxShape.circle,
               ),
               child: Icon(

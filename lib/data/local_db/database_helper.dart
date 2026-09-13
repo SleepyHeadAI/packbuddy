@@ -27,6 +27,7 @@ class DatabaseHelper {
       path,
       version: AppConstants.databaseVersion,
       onCreate: _createDB,
+      onUpgrade: _onUpgradeDB,
     );
   }
 
@@ -41,6 +42,9 @@ class DatabaseHelper {
         end_date TEXT NOT NULL,
         default_currency TEXT NOT NULL,
         budget_limit REAL,
+        country_code TEXT,
+        transport_mode TEXT,
+        notes TEXT,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
         is_deleted INTEGER NOT NULL DEFAULT 0
@@ -58,6 +62,8 @@ class DatabaseHelper {
         category TEXT NOT NULL,
         date TEXT NOT NULL,
         receipt_path TEXT,
+        payment_method TEXT,
+        notes TEXT,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
         is_deleted INTEGER NOT NULL DEFAULT 0,
@@ -86,6 +92,21 @@ class DatabaseHelper {
         last_synced_at INTEGER NOT NULL
       )
     ''');
+  }
+
+  Future<void> _onUpgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      try {
+        await db.execute('ALTER TABLE ${AppConstants.tableTrips} ADD COLUMN country_code TEXT');
+        await db.execute('ALTER TABLE ${AppConstants.tableTrips} ADD COLUMN transport_mode TEXT');
+        await db.execute('ALTER TABLE ${AppConstants.tableTrips} ADD COLUMN notes TEXT');
+      } catch (_) {}
+
+      try {
+        await db.execute('ALTER TABLE ${AppConstants.tableExpenses} ADD COLUMN payment_method TEXT');
+        await db.execute('ALTER TABLE ${AppConstants.tableExpenses} ADD COLUMN notes TEXT');
+      } catch (_) {}
+    }
   }
 
   // ==========================================

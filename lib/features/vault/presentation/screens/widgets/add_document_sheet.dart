@@ -181,14 +181,14 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        side: const BorderSide(color: AppColors.primaryLight),
+                        side: BorderSide(color: theme.colorScheme.primary),
                       ),
                       onPressed: () => _pickAndSave(ImageSource.camera),
-                      icon: const Icon(Icons.camera_alt_outlined, color: AppColors.primaryLight),
+                      icon: Icon(Icons.camera_alt_outlined, color: theme.colorScheme.primary),
                       label: Text(
                         l10n.camera,
-                        style: const TextStyle(
-                          color: AppColors.primaryLight,
+                        style: TextStyle(
+                          color: theme.colorScheme.primary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

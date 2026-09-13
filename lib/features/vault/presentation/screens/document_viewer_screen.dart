@@ -97,13 +97,13 @@ class DocumentViewerScreen extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryContainerLight.withValues(alpha: 0.2),
+                        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.image_not_supported_outlined,
                         size: 48,
-                        color: AppColors.primaryLight,
+                        color: theme.colorScheme.primary,
                       ),
                     ),
                     const SizedBox(height: 16),

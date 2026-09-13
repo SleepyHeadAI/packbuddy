@@ -2,8 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'app_colors.dart';
 
-/// Minimalist, elegant Material 3 ThemeData with soft pastel tones
+/// Minimalist, elegant Material 3 ThemeData with soft pastel tones and smooth transitions
 class AppTheme {
+  // Common smooth page transition for 60/120fps fluid navigation
+  static const _smoothPageTransitionsTheme = PageTransitionsTheme(
+    builders: {
+      TargetPlatform.android: ZoomPageTransitionsBuilder(),
+      TargetPlatform.iOS: ZoomPageTransitionsBuilder(),
+      TargetPlatform.windows: ZoomPageTransitionsBuilder(),
+      TargetPlatform.macOS: ZoomPageTransitionsBuilder(),
+      TargetPlatform.linux: ZoomPageTransitionsBuilder(),
+    },
+  );
+
   // Light Theme
   static ThemeData get lightTheme {
     final colorScheme = ColorScheme.light(
@@ -30,6 +41,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
+      pageTransitionsTheme: _smoothPageTransitionsTheme,
       scaffoldBackgroundColor: AppColors.backgroundLight,
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -52,6 +64,19 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
           side: const BorderSide(color: AppColors.outlineVariantLight, width: 1),
+        ),
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: Colors.transparent,
+        modalBackgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.surfaceLight,
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
@@ -121,6 +146,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
+      pageTransitionsTheme: _smoothPageTransitionsTheme,
       scaffoldBackgroundColor: AppColors.backgroundDark,
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -145,6 +171,19 @@ class AppTheme {
           side: const BorderSide(color: AppColors.outlineVariantDark, width: 1),
         ),
       ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: Colors.transparent,
+        modalBackgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.surfaceDark,
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+      ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.primaryDark,
@@ -163,7 +202,7 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surfaceVariantDark.withValues(alpha: 0.5),
+        fillColor: AppColors.surfaceVariantDark.withValues(alpha: 0.6),
         contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),

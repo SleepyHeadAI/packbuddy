@@ -44,8 +44,8 @@ class DashboardScreen extends ConsumerWidget {
       case SyncStatus.upToDate:
         syncLabel = l10n.syncUpToDate;
         syncIcon = Icons.cloud_done_outlined;
-        syncBgColor = AppColors.primaryContainerLight;
-        syncTextColor = AppColors.primaryLight;
+        syncBgColor = theme.colorScheme.primaryContainer;
+        syncTextColor = theme.colorScheme.primary;
         break;
       case SyncStatus.failed:
         syncLabel = l10n.syncFailed;
@@ -56,14 +56,14 @@ class DashboardScreen extends ConsumerWidget {
       case SyncStatus.noInternet:
         syncLabel = l10n.offlineReady;
         syncIcon = Icons.wifi_off_rounded;
-        syncBgColor = AppColors.secondaryContainerLight;
-        syncTextColor = AppColors.secondaryLight;
+        syncBgColor = theme.colorScheme.secondaryContainer;
+        syncTextColor = theme.colorScheme.secondary;
         break;
       case SyncStatus.idle:
         syncLabel = l10n.syncReady;
         syncIcon = Icons.cloud_sync_outlined;
-        syncBgColor = AppColors.secondaryContainerLight;
-        syncTextColor = AppColors.secondaryLight;
+        syncBgColor = theme.colorScheme.secondaryContainer;
+        syncTextColor = theme.colorScheme.secondary;
         break;
     }
 
@@ -138,20 +138,20 @@ class DashboardScreen extends ConsumerWidget {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: AppColors.primaryContainerLight,
+                    color: theme.colorScheme.primaryContainer,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primaryLight.withValues(alpha: 0.12),
+                        color: theme.colorScheme.primary.withValues(alpha: 0.16),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
                     ],
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.luggage_outlined,
                     size: 38,
-                    color: AppColors.primaryLight,
+                    color: theme.colorScheme.primary,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -188,8 +188,8 @@ class DashboardScreen extends ConsumerWidget {
                     StatusBadge(
                       label: l10n.offlineReady,
                       icon: Icons.offline_pin_outlined,
-                      backgroundColor: AppColors.primaryContainerLight,
-                      textColor: AppColors.primaryLight,
+                      backgroundColor: theme.colorScheme.primaryContainer,
+                      textColor: theme.colorScheme.primary,
                     ),
                     // Tap-to-sync dynamic badge bound to Riverpod SyncEngine
                     InkWell(
@@ -207,8 +207,8 @@ class DashboardScreen extends ConsumerWidget {
                     StatusBadge(
                       label: l10n.multiCurrency,
                       icon: Icons.payments_outlined,
-                      backgroundColor: AppColors.tertiaryContainerLight,
-                      textColor: AppColors.tertiaryLight,
+                      backgroundColor: theme.colorScheme.tertiaryContainer,
+                      textColor: theme.colorScheme.tertiary,
                     ),
                   ],
                 ),
@@ -217,8 +217,8 @@ class DashboardScreen extends ConsumerWidget {
                 // Feature Overview Cards (Budget, Vault, Settings)
                 _FeatureRowItem(
                   icon: Icons.account_balance_wallet_outlined,
-                  iconColor: AppColors.primaryLight,
-                  iconBg: AppColors.primaryContainerLight,
+                  iconColor: theme.colorScheme.primary,
+                  iconBg: theme.colorScheme.primaryContainer,
                   title: l10n.budget,
                   subtitle: tripSubtitle,
                   countBadge: tripCount > 0 ? '$tripCount' : null,
@@ -234,8 +234,8 @@ class DashboardScreen extends ConsumerWidget {
 
                 _FeatureRowItem(
                   icon: Icons.shield_outlined,
-                  iconColor: AppColors.secondaryLight,
-                  iconBg: AppColors.secondaryContainerLight,
+                  iconColor: theme.colorScheme.secondary,
+                  iconBg: theme.colorScheme.secondaryContainer,
                   title: l10n.vault,
                   subtitle: vaultSubtitle,
                   countBadge: docCount > 0 ? '$docCount' : null,
@@ -251,8 +251,8 @@ class DashboardScreen extends ConsumerWidget {
 
                 _FeatureRowItem(
                   icon: Icons.tune_rounded,
-                  iconColor: AppColors.tertiaryLight,
-                  iconBg: AppColors.tertiaryContainerLight,
+                  iconColor: theme.colorScheme.tertiary,
+                  iconBg: theme.colorScheme.tertiaryContainer,
                   title: l10n.settings,
                   subtitle: l10n.settingsDescription,
                   onTap: () {

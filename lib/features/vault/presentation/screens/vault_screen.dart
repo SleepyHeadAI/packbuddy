@@ -75,9 +75,9 @@ class VaultScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => AddDocumentSheet.show(context),
-        backgroundColor: AppColors.primaryLight,
-        foregroundColor: Colors.white,
-        elevation: 2,
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
+        elevation: 3,
         icon: const Icon(Icons.add_a_photo_outlined),
         label: Text(l10n.addDocument, style: const TextStyle(fontWeight: FontWeight.w600)),
       ),
@@ -93,13 +93,13 @@ class VaultScreen extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: AppColors.secondaryContainerLight.withValues(alpha: 0.5),
+                            color: theme.colorScheme.secondaryContainer.withValues(alpha: 0.5),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.shield_outlined,
                             size: 44,
-                            color: AppColors.secondaryLight,
+                            color: theme.colorScheme.secondary,
                           ),
                         ),
                         const SizedBox(height: 20),

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
-import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/features/budget/domain/country.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
+import 'country_picker_sheet.dart';
 
-/// Modal bottom sheet to create a new trip with budget limit
+/// Modal bottom sheet to create a new trip with country picker, transport mode, and notes
 class AddTripSheet extends ConsumerStatefulWidget {
   const AddTripSheet({super.key});
 
@@ -14,7 +16,7 @@ class AddTripSheet extends ConsumerStatefulWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const AddTripSheet(),
+      builder: (_) => const AddTripSheet(),
     );
   }
 
@@ -27,22 +29,33 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
   final _titleController = TextEditingController();
   final _destinationController = TextEditingController();
   final _budgetController = TextEditingController();
+  final _notesController = TextEditingController();
 
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now().add(const Duration(days: 5));
-  String _selectedCurrency = 'USD';
+  String _selectedCurrency = 'TRY';
+  Country? _selectedCountry;
+  String _selectedTransport = 'Flight';
 
-  final List<String> _currencies = ['USD', 'EUR', 'TRY', 'GBP', 'JPY'];
+  final List<Map<String, dynamic>> _transportModes = [
+    {'key': 'Flight', 'label': 'Uçak', 'icon': Icons.flight_rounded},
+    {'key': 'Train', 'label': 'Tren', 'icon': Icons.train_rounded},
+    {'key': 'Car', 'label': 'Araba', 'icon': Icons.directions_car_rounded},
+    {'key': 'Ship', 'label': 'Gemi', 'icon': Icons.directions_boat_rounded},
+    {'key': 'Bus', 'label': 'Otobüs', 'icon': Icons.directions_bus_rounded},
+  ];
 
   @override
   void dispose() {
     _titleController.dispose();
     _destinationController.dispose();
     _budgetController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
   Future<void> _pickDateRange() async {
+    final theme = Theme.of(context);
     final picked = await showDateRangePicker(
       context: context,
       firstDate: DateTime(2020),
@@ -50,13 +63,8 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
       initialDateRange: DateTimeRange(start: _startDate, end: _endDate),
       builder: (context, child) {
         return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.primaryLight,
-              onPrimary: AppColors.onPrimaryLight,
-              surface: AppColors.surfaceLight,
-              onSurface: AppColors.onSurfaceLight,
-            ),
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme,
           ),
           child: child!,
         );
@@ -71,10 +79,27 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
     }
   }
 
+  Future<void> _openCountryPicker() async {
+    final country = await CountryPickerSheet.show(context);
+    if (country != null) {
+      setState(() {
+        _selectedCountry = country;
+        _destinationController.text = '${country.flag} ${country.localName}';
+        if (CurrencyFormatter.supportedCurrencies.contains(country.defaultCurrency)) {
+          _selectedCurrency = country.defaultCurrency;
+        }
+      });
+    }
+  }
+
   void _submit() {
     if (_formKey.currentState?.validate() ?? false) {
       final double? budget = _budgetController.text.trim().isNotEmpty
           ? double.tryParse(_budgetController.text.trim())
+          : null;
+
+      final notes = _notesController.text.trim().isNotEmpty
+          ? _notesController.text.trim()
           : null;
 
       ref.read(tripControllerProvider.notifier).addTrip(
@@ -84,6 +109,9 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
             endDate: _endDate,
             defaultCurrency: _selectedCurrency,
             budgetLimit: budget,
+            countryCode: _selectedCountry?.code,
+            transportMode: _selectedTransport,
+            notes: notes,
           );
 
       Navigator.of(context).pop();
@@ -146,27 +174,74 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                 textCapitalization: TextCapitalization.words,
                 decoration: InputDecoration(
                   labelText: l10n.tripName,
-                  prefixIcon: const Icon(Icons.flight_takeoff_rounded, size: 20),
+                  prefixIcon: const Icon(Icons.luggage_rounded, size: 20),
                 ),
                 validator: (value) =>
                     (value == null || value.trim().isEmpty) ? l10n.tripName : null,
               ),
               const SizedBox(height: 12),
 
-              // Destination
+              // Destination & Country Picker Action
               TextFormField(
                 controller: _destinationController,
                 textCapitalization: TextCapitalization.words,
                 decoration: InputDecoration(
                   labelText: l10n.destination,
                   prefixIcon: const Icon(Icons.place_outlined, size: 20),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.travel_explore_rounded),
+                    tooltip: 'Ülke Seç',
+                    onPressed: _openCountryPicker,
+                  ),
                 ),
                 validator: (value) =>
                     (value == null || value.trim().isEmpty) ? l10n.destination : null,
               ),
               const SizedBox(height: 12),
 
-              // Budget Limit & Currency Row
+              // Transport Mode Chips
+              Text(
+                'Ulaşım Türü',
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 6),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: _transportModes.map((m) {
+                    final isSelected = _selectedTransport == m['key'];
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        avatar: Icon(
+                          m['icon'] as IconData,
+                          size: 16,
+                          color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.primary,
+                        ),
+                        label: Text(m['label'] as String),
+                        selected: isSelected,
+                        selectedColor: theme.colorScheme.primary,
+                        labelStyle: TextStyle(
+                          color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                        onSelected: (val) {
+                          if (val) {
+                            setState(() => _selectedTransport = m['key'] as String);
+                          }
+                        },
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(height: 14),
+
+              // Budget Limit & 28+ Currency Selector
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -195,13 +270,17 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                     flex: 2,
                     child: DropdownButtonFormField<String>(
                       initialValue: _selectedCurrency,
+                      isExpanded: true,
                       decoration: const InputDecoration(
                         contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                       ),
-                      items: _currencies.map((curr) {
+                      items: CurrencyFormatter.supportedCurrencies.map((curr) {
                         return DropdownMenuItem(
                           value: curr,
-                          child: Text(curr, style: const TextStyle(fontWeight: FontWeight.w600)),
+                          child: Text(
+                            '$curr (${CurrencyFormatter.getSymbol(curr)})',
+                            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                          ),
                         );
                       }).toList(),
                       onChanged: (val) {
@@ -244,6 +323,19 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                       ),
                     ],
                   ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Travel Notes
+              TextFormField(
+                controller: _notesController,
+                maxLines: 2,
+                textCapitalization: TextCapitalization.sentences,
+                decoration: const InputDecoration(
+                  labelText: 'Gezi Notları (Otel, Rezervasyon, Rota...)',
+                  hintText: 'Örn: Otel girişi saat 14:00, pasaportları unutma...',
+                  prefixIcon: Icon(Icons.notes_rounded, size: 20),
                 ),
               ),
               const SizedBox(height: 24),

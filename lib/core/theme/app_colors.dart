@@ -58,3 +58,15 @@ class AppColors {
   static const Color errorPastel = Color(0xFFD67373);
   static const Color infoPastel = Color(0xFF739DB8);
 }
+
+/// Global smooth animation standards for PackBuddy
+class AppAnimations {
+  static const Duration fast = Duration(milliseconds: 200);
+  static const Duration normal = Duration(milliseconds: 350);
+  static const Duration smooth = Duration(milliseconds: 500);
+  static const Duration relaxed = Duration(milliseconds: 750);
+
+  static const Curve smoothCurve = Curves.easeOutCubic;
+  static const Curve gentleCurve = Curves.easeInOutCubic;
+  static const Curve springCurve = Curves.easeOutBack;
+}

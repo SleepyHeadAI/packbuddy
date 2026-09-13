@@ -8,6 +8,7 @@ import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/expense_controller.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/budget_progress_card.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/add_expense_sheet.dart';
+import 'package:packbuddy/features/budget/presentation/screens/trips_screen.dart';
 
 /// Trip Detail and Budget Dashboard Screen
 class TripDetailScreen extends ConsumerWidget {
@@ -45,12 +46,32 @@ class TripDetailScreen extends ConsumerWidget {
     }
   }
 
+  IconData _getPaymentIcon(String? method) {
+    switch (method?.toLowerCase()) {
+      case 'cash':
+      case 'nakit':
+        return Icons.payments_outlined;
+      case 'credit card':
+      case 'kredi kartı':
+        return Icons.credit_card_rounded;
+      case 'debit card':
+      case 'banka kartı':
+        return Icons.credit_score_rounded;
+      case 'digital wallet':
+      case 'dijital cüzdan':
+        return Icons.account_balance_wallet_outlined;
+      default:
+        return Icons.payment_rounded;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final expenseState = ref.watch(expenseControllerProvider(trip.id));
     final dateFormat = DateFormat.yMMMd(Localizations.localeOf(context).languageCode);
+    final transportIcon = TripsScreen.getTransportIcon(trip.transportMode);
 
     // Listen for database errors and notify user cleanly
     ref.listen<ExpenseState>(expenseControllerProvider(trip.id), (previous, next) {
@@ -84,9 +105,9 @@ class TripDetailScreen extends ConsumerWidget {
             defaultCurrency: trip.defaultCurrency,
           );
         },
-        backgroundColor: AppColors.primaryLight,
-        foregroundColor: Colors.white,
-        elevation: 2,
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
+        elevation: 3,
         icon: const Icon(Icons.add_rounded),
         label: Text(l10n.addExpense, style: const TextStyle(fontWeight: FontWeight.w600)),
       ),
@@ -99,10 +120,10 @@ class TripDetailScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Destination & Date subtitle
+                  // Destination, Transport Mode & Date subtitle
                   Row(
                     children: [
-                      const Icon(Icons.place_outlined, size: 16, color: AppColors.primaryLight),
+                      Icon(Icons.place_outlined, size: 16, color: theme.colorScheme.primary),
                       const SizedBox(width: 4),
                       Flexible(
                         child: Text(
@@ -115,8 +136,33 @@ class TripDetailScreen extends ConsumerWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
+                      if (trip.transportMode != null && trip.transportMode!.isNotEmpty) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(transportIcon, size: 12, color: theme.colorScheme.primary),
+                              const SizedBox(width: 4),
+                              Text(
+                                trip.transportMode!,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                       const SizedBox(width: 8),
-                      const Icon(Icons.calendar_today_rounded, size: 14, color: AppColors.secondaryLight),
+                      Icon(Icons.calendar_today_rounded, size: 14, color: theme.colorScheme.secondary),
                       const SizedBox(width: 4),
                       Text(
                         '${dateFormat.format(trip.startDate)} - ${dateFormat.format(trip.endDate)}',
@@ -127,9 +173,45 @@ class TripDetailScreen extends ConsumerWidget {
                       ),
                     ],
                   ),
+
+                  // Trip Notes Banner if present
+                  if (trip.notes != null && trip.notes!.trim().isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+                        ),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.sticky_note_2_outlined,
+                            size: 16,
+                            color: theme.colorScheme.primary,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              trip.notes!,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurface,
+                                height: 1.3,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 16),
 
-                  // Pastel Budget Progress Card
+                  // Pastel Budget Progress Card (Animated)
                   BudgetProgressCard(
                     budgetLimit: trip.budgetLimit,
                     totalSpent: expenseState.totalSpent,
@@ -167,13 +249,13 @@ class TripDetailScreen extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryContainerLight.withValues(alpha: 0.5),
+                          color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.receipt_long_outlined,
                           size: 40,
-                          color: AppColors.primaryLight,
+                          color: theme.colorScheme.primary,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -205,6 +287,7 @@ class TripDetailScreen extends ConsumerWidget {
                     final expense = expenseState.expenses[index];
                     final color = _getCategoryColor(expense.category);
                     final icon = _getCategoryIcon(expense.category);
+                    final paymentIcon = _getPaymentIcon(expense.paymentMethod);
 
                     return Dismissible(
                       key: ValueKey(expense.id),
@@ -233,49 +316,114 @@ class TripDetailScreen extends ConsumerWidget {
                             color: theme.colorScheme.outlineVariant.withValues(alpha: 0.6),
                           ),
                         ),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: color.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Icon(icon, color: color, size: 20),
-                            ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    expense.title,
-                                    style: theme.textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: color.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    dateFormat.format(expense.date),
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: theme.colorScheme.onSurfaceVariant,
-                                    ),
+                                  child: Icon(icon, color: color, size: 20),
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        expense.title,
+                                        style: theme.textTheme.titleSmall?.copyWith(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            dateFormat.format(expense.date),
+                                            style: theme.textTheme.bodySmall?.copyWith(
+                                              color: theme.colorScheme.onSurfaceVariant,
+                                              fontSize: 11,
+                                            ),
+                                          ),
+                                          if (expense.paymentMethod != null &&
+                                              expense.paymentMethod!.isNotEmpty) ...[
+                                            const SizedBox(width: 8),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                  horizontal: 6, vertical: 1),
+                                              decoration: BoxDecoration(
+                                                color: theme.colorScheme.surfaceContainerHighest
+                                                    .withValues(alpha: 0.5),
+                                                borderRadius: BorderRadius.circular(4),
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(
+                                                    paymentIcon,
+                                                    size: 10,
+                                                    color: theme.colorScheme.onSurfaceVariant,
+                                                  ),
+                                                  const SizedBox(width: 3),
+                                                  Text(
+                                                    expense.paymentMethod!,
+                                                    style: TextStyle(
+                                                      fontSize: 10,
+                                                      fontWeight: FontWeight.w500,
+                                                      color: theme.colorScheme.onSurfaceVariant,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                                Text(
+                                  CurrencyFormatter.format(
+                                    expense.amount,
+                                    currency: expense.currency,
+                                  ),
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: theme.colorScheme.onSurface,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              CurrencyFormatter.format(
-                                expense.amount,
-                                currency: expense.currency,
+                            // Expense Notes if present
+                            if (expense.notes != null && expense.notes!.trim().isNotEmpty) ...[
+                              const SizedBox(height: 8),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.surfaceContainerHighest
+                                      .withValues(alpha: 0.25),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  expense.notes!,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    fontSize: 11,
+                                    fontStyle: FontStyle.italic,
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: theme.colorScheme.onSurface,
-                              ),
-                            ),
+                            ],
                           ],
                         ),
                       ),

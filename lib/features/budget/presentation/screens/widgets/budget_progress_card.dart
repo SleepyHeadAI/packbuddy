@@ -33,7 +33,7 @@ class BudgetProgressCard extends StatelessWidget {
     } else if (progress > 0.7) {
       progressColor = AppColors.warningPastel;
     } else {
-      progressColor = AppColors.primaryLight;
+      progressColor = theme.colorScheme.primary;
     }
 
     return AppCard(
@@ -52,35 +52,49 @@ class BudgetProgressCard extends StatelessWidget {
                 ),
               ),
               if (hasBudget)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: progressColor.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    '%${(progress * 100).toInt()}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: progressColor,
-                    ),
-                  ),
+                TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0.0, end: progress),
+                  duration: const Duration(milliseconds: 750),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, val, _) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: progressColor.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '%${(val * 100).toInt()}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: progressColor,
+                        ),
+                      ),
+                    );
+                  },
                 ),
             ],
           ),
           const SizedBox(height: 16),
 
-          // Progress Bar (Linear)
+          // Smooth Animated Progress Bar (Linear)
           if (hasBudget) ...[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: LinearProgressIndicator(
-                value: progress,
-                minHeight: 10,
-                backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                valueColor: AlwaysStoppedAnimation<Color>(progressColor),
-              ),
+            TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0.0, end: progress),
+              duration: const Duration(milliseconds: 750),
+              curve: Curves.easeOutCubic,
+              builder: (context, val, _) {
+                return ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: LinearProgressIndicator(
+                    value: val,
+                    minHeight: 10,
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                    valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 18),
           ],
@@ -130,7 +144,7 @@ class BudgetProgressCard extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                           color: remaining < 0
                               ? AppColors.errorPastel
-                              : AppColors.primaryLight,
+                              : theme.colorScheme.primary,
                         ),
                       ),
                     ],

@@ -68,6 +68,9 @@ class TripController extends StateNotifier<TripState> {
     required DateTime endDate,
     required String defaultCurrency,
     double? budgetLimit,
+    String? countryCode,
+    String? transportMode,
+    String? notes,
   }) async {
     try {
       final now = DateTime.now();
@@ -79,6 +82,9 @@ class TripController extends StateNotifier<TripState> {
         endDate: endDate,
         defaultCurrency: defaultCurrency,
         budgetLimit: budgetLimit,
+        countryCode: countryCode,
+        transportMode: transportMode,
+        notes: notes,
         createdAt: now,
         updatedAt: now,
         isDeleted: false,
