@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../local_db/database_helper.dart';
 import '../../features/budget/domain/trip.dart';
 import '../../features/budget/domain/expense.dart';
+import '../../features/vault/domain/document.dart';
 
 /// Sync Status enumeration for UI and State Management
 enum SyncStatus {
@@ -123,6 +124,16 @@ class SyncEngine extends StateNotifier<SyncState> {
         processedItems++;
       }
 
+      // 1.3 Soft-deleted Documents
+      final deletedDocs = await _dbHelper.getDeletedDocuments();
+      for (final doc in deletedDocs) {
+        try {
+          await firestore.collection('documents').doc(doc.id).delete();
+        } catch (_) {}
+        await _dbHelper.hardDeleteDocument(doc.id);
+        processedItems++;
+      }
+
       // ===================================================================
       // ALGORITHM STEP 2: Push Local Active Changes to Cloud Firestore
       // ===================================================================
@@ -142,6 +153,16 @@ class SyncEngine extends StateNotifier<SyncState> {
       for (final expense in localExpenses) {
         await firestore.collection('expenses').doc(expense.id).set(
           expense.toJson(),
+          SetOptions(merge: true),
+        );
+        processedItems++;
+      }
+
+      // 2.3 Push active local Documents
+      final localDocs = await _dbHelper.getDocuments(includeDeleted: false);
+      for (final doc in localDocs) {
+        await firestore.collection('documents').doc(doc.id).set(
+          doc.toJson(),
           SetOptions(merge: true),
         );
         processedItems++;
@@ -181,6 +202,22 @@ class SyncEngine extends StateNotifier<SyncState> {
           processedItems++;
         } else if (remoteExpense.updatedAt.isAfter(localExpense.updatedAt)) {
           await _dbHelper.updateExpense(remoteExpense);
+          processedItems++;
+        }
+      }
+
+      // 3.3 Pull Documents from Firestore
+      final remoteDocsSnapshot = await firestore.collection('documents').get();
+      for (final d in remoteDocsSnapshot.docs) {
+        final remoteData = d.data();
+        final remoteDocument = Document.fromJson(remoteData);
+
+        final localDoc = await _dbHelper.getDocumentById(remoteDocument.id);
+        if (localDoc == null) {
+          await _dbHelper.insertDocument(remoteDocument);
+          processedItems++;
+        } else if (remoteDocument.updatedAt.isAfter(localDoc.updatedAt)) {
+          await _dbHelper.updateDocument(remoteDocument);
           processedItems++;
         }
       }

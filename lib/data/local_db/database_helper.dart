@@ -4,6 +4,7 @@ import 'package:sqflite/sqflite.dart';
 import '../../core/constants/app_constants.dart';
 import '../../features/budget/domain/trip.dart';
 import '../../features/budget/domain/expense.dart';
+import '../../features/vault/domain/document.dart';
 
 /// SQLite Database Helper providing offline-first local persistence and soft-delete CRUD
 class DatabaseHelper {
@@ -64,15 +65,13 @@ class DatabaseHelper {
       )
     ''');
 
-    // 3. Document Vault Table (Schema ready for Phase 4)
+    // 3. Document Vault Table
     await db.execute('''
       CREATE TABLE ${AppConstants.tableDocuments} (
         id TEXT PRIMARY KEY NOT NULL,
-        trip_id TEXT,
         title TEXT NOT NULL,
-        file_path TEXT NOT NULL,
         category TEXT NOT NULL,
-        notes TEXT,
+        local_image_path TEXT NOT NULL,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
         is_deleted INTEGER NOT NULL DEFAULT 0
@@ -294,6 +293,92 @@ class DatabaseHelper {
       expense.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+  }
+
+  // ==========================================
+  // DOCUMENT VAULT CRUD OPERATIONS
+  // ==========================================
+
+  /// Inserts a new document into SQLite
+  Future<int> insertDocument(Document document) async {
+    final db = await database;
+    return await db.insert(
+      AppConstants.tableDocuments,
+      document.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  /// Retrieves documents. By default only active (non-deleted) documents are returned.
+  Future<List<Document>> getDocuments({bool includeDeleted = false}) async {
+    final db = await database;
+    final whereClause = includeDeleted ? null : 'is_deleted = 0';
+    final result = await db.query(
+      AppConstants.tableDocuments,
+      where: whereClause,
+      orderBy: 'created_at DESC',
+    );
+    return result.map((map) => Document.fromMap(map)).toList();
+  }
+
+  /// Retrieves a single document by ID
+  Future<Document?> getDocumentById(String id) async {
+    final db = await database;
+    final maps = await db.query(
+      AppConstants.tableDocuments,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (maps.isNotEmpty) {
+      return Document.fromMap(maps.first);
+    }
+    return null;
+  }
+
+  /// Updates an existing document
+  Future<int> updateDocument(Document document) async {
+    final db = await database;
+    final updatedDoc = document.copyWith(updatedAt: DateTime.now());
+    return await db.update(
+      AppConstants.tableDocuments,
+      updatedDoc.toMap(),
+      where: 'id = ?',
+      whereArgs: [document.id],
+    );
+  }
+
+  /// Soft Delete: Marks document as is_deleted = 1 and updates timestamp
+  Future<int> deleteDocument(String id) async {
+    final db = await database;
+    return await db.update(
+      AppConstants.tableDocuments,
+      {
+        'is_deleted': 1,
+        'updated_at': DateTime.now().millisecondsSinceEpoch,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  /// Hard Delete: Permanently removes document from SQLite (executed after cloud deletion)
+  Future<int> hardDeleteDocument(String id) async {
+    final db = await database;
+    return await db.delete(
+      AppConstants.tableDocuments,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  /// Retrieves all documents marked for deletion (is_deleted == 1) for cloud sync
+  Future<List<Document>> getDeletedDocuments() async {
+    final db = await database;
+    final result = await db.query(
+      AppConstants.tableDocuments,
+      where: 'is_deleted = 1',
+    );
+    return result.map((map) => Document.fromMap(map)).toList();
   }
 
   Future<void> close() async {

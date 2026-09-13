@@ -136,5 +136,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteExpense => 'Delete Expense';
 
   @override
-  String get architecturePhase => 'Phase 3: Budget, Trips & Expenses Ready';
+  String get addDocument => 'Add Document';
+
+  @override
+  String get documentName => 'Document Name';
+
+  @override
+  String get passport => 'Passport';
+
+  @override
+  String get ticket => 'Ticket';
+
+  @override
+  String get booking => 'Booking Voucher';
+
+  @override
+  String get camera => 'Take Photo';
+
+  @override
+  String get gallery => 'Choose from Gallery';
+
+  @override
+  String get viewDocument => 'View Document';
+
+  @override
+  String get noDocumentsYet => 'No documents saved yet';
+
+  @override
+  String get noDocumentsSubtitle =>
+      'Securely store your passports, tickets and reservations';
+
+  @override
+  String get deleteDocument => 'Delete Document';
+
+  @override
+  String get deleteDocumentConfirm =>
+      'Are you sure you want to delete this document?';
+
+  @override
+  String get architecturePhase => 'Phase 4: Vault & Document Storage Ready';
 }

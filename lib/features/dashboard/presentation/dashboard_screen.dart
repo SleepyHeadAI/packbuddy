@@ -7,6 +7,7 @@ import '../../../data/sync_engine/sync_engine.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/status_badge.dart';
 import '../../budget/presentation/screens/trips_screen.dart';
+import '../../vault/presentation/screens/vault_screen.dart';
 import '../../settings/presentation/settings_screen.dart';
 
 /// Minimalist, elegant Dashboard home screen for PackBuddy
@@ -194,6 +195,13 @@ class DashboardScreen extends ConsumerWidget {
                   iconBg: AppColors.secondaryContainerLight,
                   title: l10n.vault,
                   subtitle: l10n.vaultDescription,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const VaultScreen(),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 12),
 

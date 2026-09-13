@@ -138,6 +138,43 @@ class AppLocalizationsTr extends AppLocalizations {
   String get deleteExpense => 'Harcamayı Sil';
 
   @override
-  String get architecturePhase =>
-      'Faz 3: Bütçe, Seyahat ve Harcama Yönetimi Hazır';
+  String get addDocument => 'Belge Ekle';
+
+  @override
+  String get documentName => 'Belge Adı';
+
+  @override
+  String get passport => 'Pasaport';
+
+  @override
+  String get ticket => 'Bilet';
+
+  @override
+  String get booking => 'Rezervasyon';
+
+  @override
+  String get camera => 'Kameradan Çek';
+
+  @override
+  String get gallery => 'Galeriden Seç';
+
+  @override
+  String get viewDocument => 'Belgeyi Görüntüle';
+
+  @override
+  String get noDocumentsYet => 'Henüz kaydedilmiş belge yok';
+
+  @override
+  String get noDocumentsSubtitle =>
+      'Pasaport, bilet ve rezervasyonlarınızı güvenle saklayın';
+
+  @override
+  String get deleteDocument => 'Belgeyi Sil';
+
+  @override
+  String get deleteDocumentConfirm =>
+      'Bu belgeyi silmek istediğinizden emin misiniz?';
+
+  @override
+  String get architecturePhase => 'Faz 4: Belge Kasası ve Depolama Hazır';
 }

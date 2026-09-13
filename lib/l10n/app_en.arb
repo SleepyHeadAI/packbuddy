@@ -164,7 +164,55 @@
   "@deleteExpense": {
     "description": "Delete expense action"
   },
-  "architecturePhase": "Phase 3: Budget, Trips & Expenses Ready",
+  "addDocument": "Add Document",
+  "@addDocument": {
+    "description": "Add document button label"
+  },
+  "documentName": "Document Name",
+  "@documentName": {
+    "description": "Document name input label"
+  },
+  "passport": "Passport",
+  "@passport": {
+    "description": "Passport category label"
+  },
+  "ticket": "Ticket",
+  "@ticket": {
+    "description": "Ticket category label"
+  },
+  "booking": "Booking Voucher",
+  "@booking": {
+    "description": "Booking voucher category label"
+  },
+  "camera": "Take Photo",
+  "@camera": {
+    "description": "Camera picker button"
+  },
+  "gallery": "Choose from Gallery",
+  "@gallery": {
+    "description": "Gallery picker button"
+  },
+  "viewDocument": "View Document",
+  "@viewDocument": {
+    "description": "View document title"
+  },
+  "noDocumentsYet": "No documents saved yet",
+  "@noDocumentsYet": {
+    "description": "Message when vault is empty"
+  },
+  "noDocumentsSubtitle": "Securely store your passports, tickets and reservations",
+  "@noDocumentsSubtitle": {
+    "description": "Subtitle when vault is empty"
+  },
+  "deleteDocument": "Delete Document",
+  "@deleteDocument": {
+    "description": "Delete document action"
+  },
+  "deleteDocumentConfirm": "Are you sure you want to delete this document?",
+  "@deleteDocumentConfirm": {
+    "description": "Confirmation message when deleting document"
+  },
+  "architecturePhase": "Phase 4: Vault & Document Storage Ready",
   "@architecturePhase": {
     "description": "Phase status indicator"
   }

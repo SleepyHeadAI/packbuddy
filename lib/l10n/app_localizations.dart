@@ -344,10 +344,82 @@ abstract class AppLocalizations {
   /// **'Delete Expense'**
   String get deleteExpense;
 
+  /// Add document button label
+  ///
+  /// In en, this message translates to:
+  /// **'Add Document'**
+  String get addDocument;
+
+  /// Document name input label
+  ///
+  /// In en, this message translates to:
+  /// **'Document Name'**
+  String get documentName;
+
+  /// Passport category label
+  ///
+  /// In en, this message translates to:
+  /// **'Passport'**
+  String get passport;
+
+  /// Ticket category label
+  ///
+  /// In en, this message translates to:
+  /// **'Ticket'**
+  String get ticket;
+
+  /// Booking voucher category label
+  ///
+  /// In en, this message translates to:
+  /// **'Booking Voucher'**
+  String get booking;
+
+  /// Camera picker button
+  ///
+  /// In en, this message translates to:
+  /// **'Take Photo'**
+  String get camera;
+
+  /// Gallery picker button
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from Gallery'**
+  String get gallery;
+
+  /// View document title
+  ///
+  /// In en, this message translates to:
+  /// **'View Document'**
+  String get viewDocument;
+
+  /// Message when vault is empty
+  ///
+  /// In en, this message translates to:
+  /// **'No documents saved yet'**
+  String get noDocumentsYet;
+
+  /// Subtitle when vault is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Securely store your passports, tickets and reservations'**
+  String get noDocumentsSubtitle;
+
+  /// Delete document action
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Document'**
+  String get deleteDocument;
+
+  /// Confirmation message when deleting document
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this document?'**
+  String get deleteDocumentConfirm;
+
   /// Phase status indicator
   ///
   /// In en, this message translates to:
-  /// **'Phase 3: Budget, Trips & Expenses Ready'**
+  /// **'Phase 4: Vault & Document Storage Ready'**
   String get architecturePhase;
 }
 

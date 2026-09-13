@@ -41,5 +41,17 @@
   "deleteTrip": "Seyahati Sil",
   "deleteTripConfirm": "Bu seyahati silmek istediğinizden emin misiniz?",
   "deleteExpense": "Harcamayı Sil",
-  "architecturePhase": "Faz 3: Bütçe, Seyahat ve Harcama Yönetimi Hazır"
+  "addDocument": "Belge Ekle",
+  "documentName": "Belge Adı",
+  "passport": "Pasaport",
+  "ticket": "Bilet",
+  "booking": "Rezervasyon",
+  "camera": "Kameradan Çek",
+  "gallery": "Galeriden Seç",
+  "viewDocument": "Belgeyi Görüntüle",
+  "noDocumentsYet": "Henüz kaydedilmiş belge yok",
+  "noDocumentsSubtitle": "Pasaport, bilet ve rezervasyonlarınızı güvenle saklayın",
+  "deleteDocument": "Belgeyi Sil",
+  "deleteDocumentConfirm": "Bu belgeyi silmek istediğinizden emin misiniz?",
+  "architecturePhase": "Faz 4: Belge Kasası ve Depolama Hazır"
 }
