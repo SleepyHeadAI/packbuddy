@@ -2,8 +2,10 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import '../../core/constants/app_constants.dart';
+import '../../features/budget/domain/trip.dart';
+import '../../features/budget/domain/expense.dart';
 
-/// SQLite Database Helper providing offline-first local persistence
+/// SQLite Database Helper providing offline-first local persistence and soft-delete CRUD
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
@@ -38,9 +40,9 @@ class DatabaseHelper {
         end_date TEXT NOT NULL,
         default_currency TEXT NOT NULL,
         budget_limit REAL,
-        is_deleted INTEGER NOT NULL DEFAULT 0,
-        sync_status TEXT NOT NULL DEFAULT 'synced',
-        updated_at INTEGER NOT NULL
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        is_deleted INTEGER NOT NULL DEFAULT 0
       )
     ''');
 
@@ -55,14 +57,14 @@ class DatabaseHelper {
         category TEXT NOT NULL,
         date TEXT NOT NULL,
         receipt_path TEXT,
-        is_deleted INTEGER NOT NULL DEFAULT 0,
-        sync_status TEXT NOT NULL DEFAULT 'synced',
+        created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
+        is_deleted INTEGER NOT NULL DEFAULT 0,
         FOREIGN KEY (trip_id) REFERENCES ${AppConstants.tableTrips}(id) ON DELETE CASCADE
       )
     ''');
 
-    // 3. Document Vault Table
+    // 3. Document Vault Table (Schema ready for Phase 4)
     await db.execute('''
       CREATE TABLE ${AppConstants.tableDocuments} (
         id TEXT PRIMARY KEY NOT NULL,
@@ -71,9 +73,9 @@ class DatabaseHelper {
         file_path TEXT NOT NULL,
         category TEXT NOT NULL,
         notes TEXT,
-        is_deleted INTEGER NOT NULL DEFAULT 0,
-        sync_status TEXT NOT NULL DEFAULT 'synced',
-        updated_at INTEGER NOT NULL
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        is_deleted INTEGER NOT NULL DEFAULT 0
       )
     ''');
 
@@ -85,6 +87,213 @@ class DatabaseHelper {
         last_synced_at INTEGER NOT NULL
       )
     ''');
+  }
+
+  // ==========================================
+  // TRIP CRUD OPERATIONS
+  // ==========================================
+
+  /// Inserts a new trip into SQLite
+  Future<int> insertTrip(Trip trip) async {
+    final db = await database;
+    return await db.insert(
+      AppConstants.tableTrips,
+      trip.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  /// Retrieves trips. By default only active (non-deleted) trips are returned.
+  Future<List<Trip>> getTrips({bool includeDeleted = false}) async {
+    final db = await database;
+    final whereClause = includeDeleted ? null : 'is_deleted = 0';
+    final result = await db.query(
+      AppConstants.tableTrips,
+      where: whereClause,
+      orderBy: 'start_date DESC',
+    );
+    return result.map((map) => Trip.fromMap(map)).toList();
+  }
+
+  /// Retrieves a single trip by ID
+  Future<Trip?> getTripById(String id) async {
+    final db = await database;
+    final maps = await db.query(
+      AppConstants.tableTrips,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (maps.isNotEmpty) {
+      return Trip.fromMap(maps.first);
+    }
+    return null;
+  }
+
+  /// Updates an existing trip
+  Future<int> updateTrip(Trip trip) async {
+    final db = await database;
+    final updatedTrip = trip.copyWith(updatedAt: DateTime.now());
+    return await db.update(
+      AppConstants.tableTrips,
+      updatedTrip.toMap(),
+      where: 'id = ?',
+      whereArgs: [trip.id],
+    );
+  }
+
+  /// Soft Delete: Marks trip as is_deleted = 1 and updates timestamp
+  Future<int> deleteTrip(String id) async {
+    final db = await database;
+    return await db.update(
+      AppConstants.tableTrips,
+      {
+        'is_deleted': 1,
+        'updated_at': DateTime.now().millisecondsSinceEpoch,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  /// Hard Delete: Permanently removes trip from SQLite (executed after cloud deletion)
+  Future<int> hardDeleteTrip(String id) async {
+    final db = await database;
+    return await db.delete(
+      AppConstants.tableTrips,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  /// Retrieves all trips marked for deletion (is_deleted == 1) for cloud sync
+  Future<List<Trip>> getDeletedTrips() async {
+    final db = await database;
+    final result = await db.query(
+      AppConstants.tableTrips,
+      where: 'is_deleted = 1',
+    );
+    return result.map((map) => Trip.fromMap(map)).toList();
+  }
+
+  /// Upsert a trip (insert or update)
+  Future<void> upsertTrip(Trip trip) async {
+    final db = await database;
+    await db.insert(
+      AppConstants.tableTrips,
+      trip.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  // ==========================================
+  // EXPENSE CRUD OPERATIONS
+  // ==========================================
+
+  /// Inserts a new expense into SQLite
+  Future<int> insertExpense(Expense expense) async {
+    final db = await database;
+    return await db.insert(
+      AppConstants.tableExpenses,
+      expense.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  /// Retrieves expenses. Can be filtered by tripId. Non-deleted by default.
+  Future<List<Expense>> getExpenses({
+    String? tripId,
+    bool includeDeleted = false,
+  }) async {
+    final db = await database;
+    final conditions = <String>[];
+    final args = <dynamic>[];
+
+    if (!includeDeleted) {
+      conditions.add('is_deleted = 0');
+    }
+    if (tripId != null) {
+      conditions.add('trip_id = ?');
+      args.add(tripId);
+    }
+
+    final whereClause = conditions.isNotEmpty ? conditions.join(' AND ') : null;
+    final result = await db.query(
+      AppConstants.tableExpenses,
+      where: whereClause,
+      whereArgs: args.isNotEmpty ? args : null,
+      orderBy: 'date DESC',
+    );
+    return result.map((map) => Expense.fromMap(map)).toList();
+  }
+
+  /// Retrieves a single expense by ID
+  Future<Expense?> getExpenseById(String id) async {
+    final db = await database;
+    final maps = await db.query(
+      AppConstants.tableExpenses,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (maps.isNotEmpty) {
+      return Expense.fromMap(maps.first);
+    }
+    return null;
+  }
+
+  /// Updates an existing expense
+  Future<int> updateExpense(Expense expense) async {
+    final db = await database;
+    final updatedExpense = expense.copyWith(updatedAt: DateTime.now());
+    return await db.update(
+      AppConstants.tableExpenses,
+      updatedExpense.toMap(),
+      where: 'id = ?',
+      whereArgs: [expense.id],
+    );
+  }
+
+  /// Soft Delete: Marks expense as is_deleted = 1 and updates timestamp
+  Future<int> deleteExpense(String id) async {
+    final db = await database;
+    return await db.update(
+      AppConstants.tableExpenses,
+      {
+        'is_deleted': 1,
+        'updated_at': DateTime.now().millisecondsSinceEpoch,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  /// Hard Delete: Permanently removes expense from SQLite (executed after cloud deletion)
+  Future<int> hardDeleteExpense(String id) async {
+    final db = await database;
+    return await db.delete(
+      AppConstants.tableExpenses,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  /// Retrieves all expenses marked for deletion (is_deleted == 1) for cloud sync
+  Future<List<Expense>> getDeletedExpenses() async {
+    final db = await database;
+    final result = await db.query(
+      AppConstants.tableExpenses,
+      where: 'is_deleted = 1',
+    );
+    return result.map((map) => Expense.fromMap(map)).toList();
+  }
+
+  /// Upsert an expense (insert or update)
+  Future<void> upsertExpense(Expense expense) async {
+    final db = await database;
+    await db.insert(
+      AppConstants.tableExpenses,
+      expense.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<void> close() async {

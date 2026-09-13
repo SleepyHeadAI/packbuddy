@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../core/l10n/locale_provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../data/sync_engine/sync_engine.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/status_badge.dart';
 
@@ -14,7 +15,47 @@ class DashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final currentLocale = ref.watch(localeProvider);
+    final syncState = ref.watch(syncEngineProvider);
     final theme = Theme.of(context);
+
+    // Dynamic Sync Badge UI attributes based on Riverpod SyncState
+    String syncLabel;
+    IconData syncIcon;
+    Color syncBgColor;
+    Color syncTextColor;
+
+    switch (syncState.status) {
+      case SyncStatus.syncing:
+        syncLabel = l10n.syncInProgress;
+        syncIcon = Icons.sync_rounded;
+        syncBgColor = AppColors.infoPastel.withValues(alpha: 0.2);
+        syncTextColor = AppColors.infoPastel;
+        break;
+      case SyncStatus.upToDate:
+        syncLabel = l10n.syncUpToDate;
+        syncIcon = Icons.cloud_done_outlined;
+        syncBgColor = AppColors.primaryContainerLight;
+        syncTextColor = AppColors.primaryLight;
+        break;
+      case SyncStatus.failed:
+        syncLabel = l10n.syncFailed;
+        syncIcon = Icons.cloud_off_outlined;
+        syncBgColor = AppColors.errorPastel.withValues(alpha: 0.2);
+        syncTextColor = AppColors.errorPastel;
+        break;
+      case SyncStatus.noInternet:
+        syncLabel = l10n.offlineReady;
+        syncIcon = Icons.wifi_off_rounded;
+        syncBgColor = AppColors.secondaryContainerLight;
+        syncTextColor = AppColors.secondaryLight;
+        break;
+      case SyncStatus.idle:
+        syncLabel = l10n.syncReady;
+        syncIcon = Icons.cloud_sync_outlined;
+        syncBgColor = AppColors.secondaryContainerLight;
+        syncTextColor = AppColors.secondaryLight;
+        break;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -93,7 +134,7 @@ class DashboardScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
 
-                // Status Badges (Offline Ready, Two-Way Sync, Multi-Currency)
+                // Status Badges (Offline Ready, Dynamic Two-Way Sync, Multi-Currency)
                 Wrap(
                   alignment: WrapAlignment.center,
                   spacing: 8,
@@ -105,11 +146,18 @@ class DashboardScreen extends ConsumerWidget {
                       backgroundColor: AppColors.primaryContainerLight,
                       textColor: AppColors.primaryLight,
                     ),
-                    StatusBadge(
-                      label: l10n.syncReady,
-                      icon: Icons.cloud_sync_outlined,
-                      backgroundColor: AppColors.secondaryContainerLight,
-                      textColor: AppColors.secondaryLight,
+                    // Tap-to-sync dynamic badge bound to Riverpod SyncEngine
+                    InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        ref.read(syncEngineProvider.notifier).performSync();
+                      },
+                      child: StatusBadge(
+                        label: syncLabel,
+                        icon: syncIcon,
+                        backgroundColor: syncBgColor,
+                        textColor: syncTextColor,
+                      ),
                     ),
                     StatusBadge(
                       label: l10n.multiCurrency,
@@ -149,7 +197,7 @@ class DashboardScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 28),
 
-                // Phase 1 Footer Indicator
+                // Phase 2 Footer Indicator
                 Text(
                   l10n.architecturePhase,
                   style: theme.textTheme.labelSmall?.copyWith(

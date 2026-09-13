@@ -11,6 +11,9 @@
   "settingsDescription": "Tercihler, yedekleme ve senkronizasyon ayarları",
   "offlineReady": "Çevrimdışı Hazır",
   "syncReady": "Çift Yönlü Bulut Senkronizasyonu",
+  "syncInProgress": "Eşitleniyor...",
+  "syncUpToDate": "Güncel",
+  "syncFailed": "Eşitleme Hatası",
   "multiCurrency": "Çoklu Para Birimi",
-  "architecturePhase": "Faz 1: Mimari ve İzin Altyapısı Hazır"
+  "architecturePhase": "Faz 2: Yerel Veritabanı ve Çift Yönlü Senkronizasyon Hazır"
 }

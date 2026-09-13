@@ -164,6 +164,24 @@ abstract class AppLocalizations {
   /// **'Two-Way Cloud Sync'**
   String get syncReady;
 
+  /// Status text while synchronizing
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing...'**
+  String get syncInProgress;
+
+  /// Status text when synchronization is up to date
+  ///
+  /// In en, this message translates to:
+  /// **'Up to date'**
+  String get syncUpToDate;
+
+  /// Status text when synchronization failed
+  ///
+  /// In en, this message translates to:
+  /// **'Sync Failed'**
+  String get syncFailed;
+
   /// Badge showing multi-currency feature
   ///
   /// In en, this message translates to:
@@ -173,7 +191,7 @@ abstract class AppLocalizations {
   /// Phase status indicator
   ///
   /// In en, this message translates to:
-  /// **'Phase 1: Architecture & Permissions Ready'**
+  /// **'Phase 2: Local DB & Two-Way Sync Ready'**
   String get architecturePhase;
 }
 

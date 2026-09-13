@@ -45,8 +45,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String get syncReady => 'Çift Yönlü Bulut Senkronizasyonu';
 
   @override
+  String get syncInProgress => 'Eşitleniyor...';
+
+  @override
+  String get syncUpToDate => 'Güncel';
+
+  @override
+  String get syncFailed => 'Eşitleme Hatası';
+
+  @override
   String get multiCurrency => 'Çoklu Para Birimi';
 
   @override
-  String get architecturePhase => 'Faz 1: Mimari ve İzin Altyapısı Hazır';
+  String get architecturePhase =>
+      'Faz 2: Yerel Veritabanı ve Çift Yönlü Senkronizasyon Hazır';
 }

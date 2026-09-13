@@ -45,8 +45,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncReady => 'Two-Way Cloud Sync';
 
   @override
+  String get syncInProgress => 'Syncing...';
+
+  @override
+  String get syncUpToDate => 'Up to date';
+
+  @override
+  String get syncFailed => 'Sync Failed';
+
+  @override
   String get multiCurrency => 'Multi-Currency';
 
   @override
-  String get architecturePhase => 'Phase 1: Architecture & Permissions Ready';
+  String get architecturePhase => 'Phase 2: Local DB & Two-Way Sync Ready';
 }

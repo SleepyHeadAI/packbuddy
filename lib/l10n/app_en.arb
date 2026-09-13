@@ -44,11 +44,23 @@
   "@syncReady": {
     "description": "Badge showing two-way sync readiness"
   },
+  "syncInProgress": "Syncing...",
+  "@syncInProgress": {
+    "description": "Status text while synchronizing"
+  },
+  "syncUpToDate": "Up to date",
+  "@syncUpToDate": {
+    "description": "Status text when synchronization is up to date"
+  },
+  "syncFailed": "Sync Failed",
+  "@syncFailed": {
+    "description": "Status text when synchronization failed"
+  },
   "multiCurrency": "Multi-Currency",
   "@multiCurrency": {
     "description": "Badge showing multi-currency feature"
   },
-  "architecturePhase": "Phase 1: Architecture & Permissions Ready",
+  "architecturePhase": "Phase 2: Local DB & Two-Way Sync Ready",
   "@architecturePhase": {
     "description": "Phase status indicator"
   }
