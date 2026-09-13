@@ -16,6 +16,9 @@ class CurrencyFormatter {
   /// Formats an amount with the corresponding currency symbol and locale formatting
   static String format(double amount, {String currency = 'USD', String locale = 'en'}) {
     final symbol = currencySymbols[currency] ?? currency;
+    if (amount.isNaN || amount.isInfinite) {
+      return '$symbol 0';
+    }
     final formatter = NumberFormat.currency(
       locale: locale,
       symbol: symbol,

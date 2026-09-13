@@ -55,11 +55,13 @@ class VaultController extends StateNotifier<VaultState> {
     state = state.copyWith(isLoading: true);
     try {
       final docs = await _dbHelper.getDocuments(includeDeleted: false);
+      if (!mounted) return;
       state = state.copyWith(
         isLoading: false,
         documents: docs,
       );
     } catch (e) {
+      if (!mounted) return;
       state = state.copyWith(
         isLoading: false,
         errorMessage: e.toString(),

@@ -94,6 +94,9 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
     ];
 
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.9,
+      ),
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -153,7 +156,8 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) return l10n.amount;
-                  if (double.tryParse(value.trim()) == null) return l10n.amount;
+                  final parsed = double.tryParse(value.trim());
+                  if (parsed == null || parsed <= 0) return l10n.amount;
                   return null;
                 },
               ),

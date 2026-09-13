@@ -97,6 +97,9 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
     final dateFormat = DateFormat.yMMMd(Localizations.localeOf(context).languageCode);
 
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.9,
+      ),
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -176,6 +179,15 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                         labelText: l10n.budget,
                         prefixIcon: const Icon(Icons.attach_money_rounded, size: 20),
                       ),
+                      validator: (value) {
+                        if (value != null && value.trim().isNotEmpty) {
+                          final parsed = double.tryParse(value.trim());
+                          if (parsed == null || parsed <= 0) {
+                            return l10n.budget;
+                          }
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   const SizedBox(width: 10),

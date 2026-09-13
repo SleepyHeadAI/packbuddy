@@ -49,6 +49,26 @@ class VaultScreen extends ConsumerWidget {
     final vaultState = ref.watch(vaultControllerProvider);
     final dateFormat = DateFormat.yMMMd(Localizations.localeOf(context).languageCode);
 
+    // Listen for errors (permission denied, disk full, etc.) and show SnackBar
+    ref.listen<VaultState>(vaultControllerProvider, (previous, next) {
+      if (next.errorMessage != null && next.errorMessage != previous?.errorMessage) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.info_outline_rounded, color: Colors.white, size: 20),
+                const SizedBox(width: 12),
+                Expanded(child: Text(next.errorMessage!)),
+              ],
+            ),
+            backgroundColor: AppColors.errorPastel,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.vault),

@@ -52,6 +52,26 @@ class TripDetailScreen extends ConsumerWidget {
     final expenseState = ref.watch(expenseControllerProvider(trip.id));
     final dateFormat = DateFormat.yMMMd(Localizations.localeOf(context).languageCode);
 
+    // Listen for database errors and notify user cleanly
+    ref.listen<ExpenseState>(expenseControllerProvider(trip.id), (previous, next) {
+      if (next.errorMessage != null && next.errorMessage != previous?.errorMessage) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.info_outline_rounded, color: Colors.white, size: 20),
+                const SizedBox(width: 12),
+                Expanded(child: Text(next.errorMessage!)),
+              ],
+            ),
+            backgroundColor: AppColors.errorPastel,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text(trip.title),
@@ -84,14 +104,18 @@ class TripDetailScreen extends ConsumerWidget {
                     children: [
                       const Icon(Icons.place_outlined, size: 16, color: AppColors.primaryLight),
                       const SizedBox(width: 4),
-                      Text(
-                        trip.destination,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.onSurfaceVariant,
+                      Flexible(
+                        child: Text(
+                          trip.destination,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 8),
                       const Icon(Icons.calendar_today_rounded, size: 14, color: AppColors.secondaryLight),
                       const SizedBox(width: 4),
                       Text(
@@ -99,6 +123,7 @@ class TripDetailScreen extends ConsumerWidget {
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
+                        maxLines: 1,
                       ),
                     ],
                   ),
@@ -228,6 +253,8 @@ class TripDetailScreen extends ConsumerWidget {
                                     style: theme.textTheme.titleSmall?.copyWith(
                                       fontWeight: FontWeight.w600,
                                     ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 2),
                                   Text(

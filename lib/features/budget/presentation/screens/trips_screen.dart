@@ -46,6 +46,26 @@ class TripsScreen extends ConsumerWidget {
     final tripState = ref.watch(tripControllerProvider);
     final dateFormat = DateFormat.yMMMd(Localizations.localeOf(context).languageCode);
 
+    // Listen for database or network errors and notify user cleanly
+    ref.listen<TripState>(tripControllerProvider, (previous, next) {
+      if (next.errorMessage != null && next.errorMessage != previous?.errorMessage) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.info_outline_rounded, color: Colors.white, size: 20),
+                const SizedBox(width: 12),
+                Expanded(child: Text(next.errorMessage!)),
+              ],
+            ),
+            backgroundColor: AppColors.errorPastel,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.trips),
@@ -153,6 +173,8 @@ class TripsScreen extends ConsumerWidget {
                                           fontWeight: FontWeight.w700,
                                           letterSpacing: -0.3,
                                         ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                       const SizedBox(height: 2),
                                       Row(
@@ -160,11 +182,15 @@ class TripsScreen extends ConsumerWidget {
                                           const Icon(Icons.place_outlined,
                                               size: 14, color: AppColors.secondaryLight),
                                           const SizedBox(width: 4),
-                                          Text(
-                                            trip.destination,
-                                            style: theme.textTheme.bodySmall?.copyWith(
-                                              color: theme.colorScheme.onSurfaceVariant,
-                                              fontWeight: FontWeight.w500,
+                                          Expanded(
+                                            child: Text(
+                                              trip.destination,
+                                              style: theme.textTheme.bodySmall?.copyWith(
+                                                color: theme.colorScheme.onSurfaceVariant,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
                                         ],

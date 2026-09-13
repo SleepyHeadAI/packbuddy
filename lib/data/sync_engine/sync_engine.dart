@@ -70,19 +70,31 @@ class SyncEngine extends StateNotifier<SyncState> {
     }
   }
 
+  bool _isSyncing = false;
+
+  /// Returns true if a synchronization process is actively executing
+  bool get isSyncing => _isSyncing;
+
   /// Executes two-way bidirectional sync between local SQLite and Cloud Firestore
   Future<void> performSync() async {
-    // 1. Check network connectivity
-    final isOnline = await hasInternetConnection();
-    if (!isOnline) {
-      state = state.copyWith(status: SyncStatus.noInternet);
+    // Concurrency guard: Prevent race condition if triggered multiple times simultaneously
+    if (_isSyncing || state.status == SyncStatus.syncing) {
       return;
     }
 
-    // Set status to syncing
-    state = state.copyWith(status: SyncStatus.syncing);
+    _isSyncing = true;
 
     try {
+      // 1. Check network connectivity
+      final isOnline = await hasInternetConnection();
+      if (!isOnline) {
+        state = state.copyWith(status: SyncStatus.noInternet);
+        return;
+      }
+
+      // Set status to syncing
+      state = state.copyWith(status: SyncStatus.syncing);
+
       // Safely check if Firebase is initialized
       final bool isFirebaseReady = Firebase.apps.isNotEmpty;
       if (!isFirebaseReady && _firestoreInstance == null) {
@@ -233,6 +245,8 @@ class SyncEngine extends StateNotifier<SyncState> {
         status: SyncStatus.failed,
         errorMessage: e.toString(),
       );
+    } finally {
+      _isSyncing = false;
     }
   }
 }

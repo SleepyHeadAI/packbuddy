@@ -58,12 +58,14 @@ class ExpenseController extends StateNotifier<ExpenseState> {
         includeDeleted: false,
       );
       final total = expenses.fold<double>(0.0, (sum, item) => sum + item.amount);
+      if (!mounted) return;
       state = state.copyWith(
         isLoading: false,
         expenses: expenses,
         totalSpent: total,
       );
     } catch (e) {
+      if (!mounted) return;
       state = state.copyWith(
         isLoading: false,
         errorMessage: e.toString(),
@@ -140,9 +142,9 @@ class ExpenseController extends StateNotifier<ExpenseState> {
   }
 }
 
-/// Family provider keyed by tripId
+/// Family provider keyed by tripId with autoDispose to prevent memory leaks
 final expenseControllerProvider =
-    StateNotifierProvider.family<ExpenseController, ExpenseState, String>(
+    StateNotifierProvider.autoDispose.family<ExpenseController, ExpenseState, String>(
   (ref, tripId) {
     return ExpenseController(ref, tripId);
   },

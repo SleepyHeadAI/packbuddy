@@ -46,11 +46,13 @@ class TripController extends StateNotifier<TripState> {
     state = state.copyWith(isLoading: true);
     try {
       final trips = await _dbHelper.getTrips(includeDeleted: false);
+      if (!mounted) return;
       state = state.copyWith(
         isLoading: false,
         trips: trips,
       );
     } catch (e) {
+      if (!mounted) return;
       state = state.copyWith(
         isLoading: false,
         errorMessage: e.toString(),

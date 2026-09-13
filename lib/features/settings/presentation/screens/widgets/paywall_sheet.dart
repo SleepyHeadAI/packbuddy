@@ -24,6 +24,9 @@ class PaywallSheet extends ConsumerWidget {
     final proState = ref.watch(proSubscriptionProvider);
 
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.9,
+      ),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -34,9 +37,10 @@ class PaywallSheet extends ConsumerWidget {
         right: 24,
         bottom: MediaQuery.of(context).viewInsets.bottom + 28,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
           // Drag Handle
           Container(
             width: 40,
@@ -200,8 +204,9 @@ class PaywallSheet extends ConsumerWidget {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 class _ProFeatureRow extends StatelessWidget {
