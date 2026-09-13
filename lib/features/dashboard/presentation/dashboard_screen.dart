@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../l10n/app_localizations.dart';
+import '../../../core/l10n/l10n.dart';
 import '../../../core/l10n/locale_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/sync_engine/sync_engine.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/status_badge.dart';
+import '../../budget/presentation/controllers/trip_controller.dart';
 import '../../budget/presentation/screens/trips_screen.dart';
+import '../../settings/data/mock_revenuecat_service.dart';
+import '../../settings/presentation/screens/settings_screen.dart';
+import '../../vault/presentation/controllers/vault_controller.dart';
 import '../../vault/presentation/screens/vault_screen.dart';
-import '../../settings/presentation/settings_screen.dart';
 
-/// Minimalist, elegant Dashboard home screen for PackBuddy
+/// Minimalist, elegant Dashboard home screen for PackBuddy with live Riverpod bindings
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
@@ -19,6 +23,9 @@ class DashboardScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final currentLocale = ref.watch(localeProvider);
     final syncState = ref.watch(syncEngineProvider);
+    final tripState = ref.watch(tripControllerProvider);
+    final vaultState = ref.watch(vaultControllerProvider);
+    final proState = ref.watch(proSubscriptionProvider);
     final theme = Theme.of(context);
 
     // Dynamic Sync Badge UI attributes based on Riverpod SyncState
@@ -60,15 +67,52 @@ class DashboardScreen extends ConsumerWidget {
         break;
     }
 
+    // Dynamic Trip and Vault counts
+    final tripCount = tripState.trips.length;
+    final tripSubtitle = tripCount == 0
+        ? l10n.budgetDescription
+        : '$tripCount ${l10n.trips}';
+
+    final docCount = vaultState.documents.length;
+    final vaultSubtitle = docCount == 0
+        ? l10n.vaultDescription
+        : '$docCount ${l10n.vault}';
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.appName),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(l10n.appName),
+            if (proState.isPro) ...[
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.tertiaryLight,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Text(
+                  'PRO',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
         actions: [
-          // Language toggle button for seamless testing
+          // 20-Language Quick Switcher Chip
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: ActionChip(
-              avatar: const Icon(Icons.language_rounded, size: 16),
+              avatar: Text(
+                L10n.getLanguageFlag(currentLocale.languageCode),
+                style: const TextStyle(fontSize: 14),
+              ),
               label: Text(
                 currentLocale.languageCode.toUpperCase(),
                 style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
@@ -76,9 +120,7 @@ class DashboardScreen extends ConsumerWidget {
               backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
               side: BorderSide.none,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              onPressed: () {
-                ref.read(localeProvider.notifier).toggleLocale();
-              },
+              onPressed: () => _showLanguageSelector(context, ref, currentLocale),
             ),
           ),
         ],
@@ -178,7 +220,8 @@ class DashboardScreen extends ConsumerWidget {
                   iconColor: AppColors.primaryLight,
                   iconBg: AppColors.primaryContainerLight,
                   title: l10n.budget,
-                  subtitle: l10n.budgetDescription,
+                  subtitle: tripSubtitle,
+                  countBadge: tripCount > 0 ? '$tripCount' : null,
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
@@ -194,7 +237,8 @@ class DashboardScreen extends ConsumerWidget {
                   iconColor: AppColors.secondaryLight,
                   iconBg: AppColors.secondaryContainerLight,
                   title: l10n.vault,
-                  subtitle: l10n.vaultDescription,
+                  subtitle: vaultSubtitle,
+                  countBadge: docCount > 0 ? '$docCount' : null,
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
@@ -221,7 +265,7 @@ class DashboardScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 28),
 
-                // Phase 3 Footer Indicator
+                // Phase 5 Footer Indicator
                 Text(
                   l10n.architecturePhase,
                   style: theme.textTheme.labelSmall?.copyWith(
@@ -236,6 +280,96 @@ class DashboardScreen extends ConsumerWidget {
       ),
     );
   }
+
+  void _showLanguageSelector(BuildContext context, WidgetRef ref, Locale currentLocale) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        final theme = Theme.of(ctx);
+        final l10n = AppLocalizations.of(ctx)!;
+
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(ctx).size.height * 0.75,
+          ),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                child: Row(
+                  children: [
+                    const Icon(Icons.translate_rounded, size: 22),
+                    const SizedBox(width: 12),
+                    Text(
+                      l10n.language,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      '20 ${l10n.language}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(height: 1),
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  itemCount: L10n.all.length,
+                  separatorBuilder: (context, index) => const Divider(height: 1, indent: 64),
+                  itemBuilder: (context, index) {
+                    final locale = L10n.all[index];
+                    final isSelected = locale.languageCode == currentLocale.languageCode;
+
+                    return ListTile(
+                      leading: Text(
+                        L10n.getLanguageFlag(locale.languageCode),
+                        style: const TextStyle(fontSize: 24),
+                      ),
+                      title: Text(
+                        L10n.getLanguageName(locale.languageCode),
+                        style: TextStyle(
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected ? theme.colorScheme.primary : null,
+                        ),
+                      ),
+                      trailing: isSelected
+                          ? Icon(Icons.check_circle_rounded, color: theme.colorScheme.primary)
+                          : null,
+                      onTap: () {
+                        ref.read(localeProvider.notifier).setLocale(locale);
+                        Navigator.of(ctx).pop();
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
 
 class _FeatureRowItem extends StatelessWidget {
@@ -244,6 +378,7 @@ class _FeatureRowItem extends StatelessWidget {
   final Color iconBg;
   final String title;
   final String subtitle;
+  final String? countBadge;
   final VoidCallback? onTap;
 
   const _FeatureRowItem({
@@ -252,6 +387,7 @@ class _FeatureRowItem extends StatelessWidget {
     required this.iconBg,
     required this.title,
     required this.subtitle,
+    this.countBadge,
     this.onTap,
   });
 
@@ -277,11 +413,33 @@ class _FeatureRowItem extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      title,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (countBadge != null) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: iconBg,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          countBadge!,
+                          style: TextStyle(
+                            color: iconColor,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 const SizedBox(height: 2),
                 Text(

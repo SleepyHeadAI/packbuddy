@@ -174,5 +174,63 @@ class AppLocalizationsEn extends AppLocalizations {
       'Are you sure you want to delete this document?';
 
   @override
-  String get architecturePhase => 'Phase 4: Vault & Document Storage Ready';
+  String get theme => 'Theme';
+
+  @override
+  String get themeSystem => 'System Default';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get syncNow => 'Sync Now';
+
+  @override
+  String get lastSync => 'Last Sync';
+
+  @override
+  String get upgradeToPro => 'Upgrade to PackBuddy Pro';
+
+  @override
+  String get proBadge => 'PRO';
+
+  @override
+  String get proTitle => 'PackBuddy Pro';
+
+  @override
+  String get proSubtitle =>
+      'Unlock limitless travel and ultimate peace of mind';
+
+  @override
+  String get proFeature1 => 'Unlimited Trips & Expense Tracking';
+
+  @override
+  String get proFeature2 => 'Unlimited Document Vault Storage';
+
+  @override
+  String get proFeature3 => 'Automatic Two-Way Cloud Sync';
+
+  @override
+  String get monthly => 'Monthly';
+
+  @override
+  String get annual => 'Annual';
+
+  @override
+  String get annualSave => 'Save 33%';
+
+  @override
+  String get subscribeNow => 'Continue with Pro';
+
+  @override
+  String get purchaseSuccess => 'Welcome to PackBuddy Pro!';
+
+  @override
+  String get architecturePhase => 'Phase 5: Full Product & 20 Languages Ready';
 }

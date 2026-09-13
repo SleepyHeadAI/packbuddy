@@ -212,7 +212,83 @@
   "@deleteDocumentConfirm": {
     "description": "Confirmation message when deleting document"
   },
-  "architecturePhase": "Phase 4: Vault & Document Storage Ready",
+  "theme": "Theme",
+  "@theme": {
+    "description": "Theme settings label"
+  },
+  "themeSystem": "System Default",
+  "@themeSystem": {
+    "description": "System default theme option"
+  },
+  "themeLight": "Light",
+  "@themeLight": {
+    "description": "Light theme option"
+  },
+  "themeDark": "Dark",
+  "@themeDark": {
+    "description": "Dark theme option"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Language settings label"
+  },
+  "syncNow": "Sync Now",
+  "@syncNow": {
+    "description": "Manual sync button label"
+  },
+  "lastSync": "Last Sync",
+  "@lastSync": {
+    "description": "Last sync time label"
+  },
+  "upgradeToPro": "Upgrade to PackBuddy Pro",
+  "@upgradeToPro": {
+    "description": "Upgrade to Pro banner text"
+  },
+  "proBadge": "PRO",
+  "@proBadge": {
+    "description": "Pro badge label"
+  },
+  "proTitle": "PackBuddy Pro",
+  "@proTitle": {
+    "description": "Paywall title"
+  },
+  "proSubtitle": "Unlock limitless travel and ultimate peace of mind",
+  "@proSubtitle": {
+    "description": "Paywall subtitle"
+  },
+  "proFeature1": "Unlimited Trips & Expense Tracking",
+  "@proFeature1": {
+    "description": "Pro feature 1 description"
+  },
+  "proFeature2": "Unlimited Document Vault Storage",
+  "@proFeature2": {
+    "description": "Pro feature 2 description"
+  },
+  "proFeature3": "Automatic Two-Way Cloud Sync",
+  "@proFeature3": {
+    "description": "Pro feature 3 description"
+  },
+  "monthly": "Monthly",
+  "@monthly": {
+    "description": "Monthly subscription label"
+  },
+  "annual": "Annual",
+  "@annual": {
+    "description": "Annual subscription label"
+  },
+  "annualSave": "Save 33%",
+  "@annualSave": {
+    "description": "Annual discount badge"
+  },
+  "subscribeNow": "Continue with Pro",
+  "@subscribeNow": {
+    "description": "Subscription button label"
+  },
+  "purchaseSuccess": "Welcome to PackBuddy Pro!",
+  "@purchaseSuccess": {
+    "description": "Purchase success message"
+  },
+  "architecturePhase": "Phase 5: Full Product & 20 Languages Ready",
   "@architecturePhase": {
     "description": "Phase status indicator"
   }

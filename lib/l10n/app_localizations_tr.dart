@@ -176,5 +176,62 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu belgeyi silmek istediğinizden emin misiniz?';
 
   @override
-  String get architecturePhase => 'Faz 4: Belge Kasası ve Depolama Hazır';
+  String get theme => 'Tema';
+
+  @override
+  String get themeSystem => 'Sistem Varsayılanı';
+
+  @override
+  String get themeLight => 'Açık';
+
+  @override
+  String get themeDark => 'Koyu';
+
+  @override
+  String get language => 'Dil';
+
+  @override
+  String get syncNow => 'Şimdi Eşitle';
+
+  @override
+  String get lastSync => 'Son Eşitleme';
+
+  @override
+  String get upgradeToPro => 'PackBuddy Pro\'ya Geç';
+
+  @override
+  String get proBadge => 'PRO';
+
+  @override
+  String get proTitle => 'PackBuddy Pro';
+
+  @override
+  String get proSubtitle => 'Sınırsız seyahat ve tam güvence ile seyahat edin';
+
+  @override
+  String get proFeature1 => 'Sınırsız Seyahat ve Bütçe Takibi';
+
+  @override
+  String get proFeature2 => 'Sınırsız Belge Kasası Depolama';
+
+  @override
+  String get proFeature3 => 'Otomatik Çift Yönlü Bulut Senkronizasyonu';
+
+  @override
+  String get monthly => 'Aylık';
+
+  @override
+  String get annual => 'Yıllık';
+
+  @override
+  String get annualSave => '%33 Tasarruf';
+
+  @override
+  String get subscribeNow => 'Pro ile Devam Et';
+
+  @override
+  String get purchaseSuccess => 'PackBuddy Pro\'ya Hoş Geldiniz!';
+
+  @override
+  String get architecturePhase => 'Faz 5: Tam Ürün ve 20 Dil Desteği Hazır';
 }
