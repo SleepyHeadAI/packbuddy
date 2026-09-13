@@ -1,0 +1,16 @@
+{
+  "@@locale": "tr",
+  "appName": "PackBuddy",
+  "welcome": "PackBuddy'ye Hoş Geldiniz",
+  "welcomeSubtitle": "Minimalist, offline-first seyahat asistanı ve bütçe yöneticisi",
+  "budget": "Bütçe",
+  "budgetDescription": "Çoklu para birimli seyahat harcama takibi",
+  "vault": "Belge Kasası",
+  "vaultDescription": "Pasaport, bilet ve rezervasyon belgeleri",
+  "settings": "Ayarlar",
+  "settingsDescription": "Tercihler, yedekleme ve senkronizasyon ayarları",
+  "offlineReady": "Çevrimdışı Hazır",
+  "syncReady": "Çift Yönlü Bulut Senkronizasyonu",
+  "multiCurrency": "Çoklu Para Birimi",
+  "architecturePhase": "Faz 1: Mimari ve İzin Altyapısı Hazır"
+}

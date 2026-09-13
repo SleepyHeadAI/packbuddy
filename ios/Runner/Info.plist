@@ -66,5 +66,18 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+
+	<!-- PackBuddy Permissions -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>PackBuddy seyahat belgelerinizi, biletlerinizi ve makbuzlarınızı seçebilmeniz için fotoğraf galerinize erişim gerektirir.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>PackBuddy pasaport, bilet ve harcama fişlerinizi doğrudan tarayabilmeniz için kamera erişimi gerektirir.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>PackBuddy seyahat sırasında sesli harcama ve gezi notları kaydedebilmeniz için mikrofon erişimi gerektirir.</string>
+
+	<!-- Sign in with Apple Capability Requirement:
+	     Xcode -> Runner -> Signing & Capabilities -> + Capability -> Sign In with Apple.
+	     Associated Entitlements: com.apple.developer.applesignin (Default)
+	-->
 </dict>
 </plist>

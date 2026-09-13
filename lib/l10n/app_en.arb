@@ -1,0 +1,55 @@
+{
+  "@@locale": "en",
+  "appName": "PackBuddy",
+  "@appName": {
+    "description": "The title of the application"
+  },
+  "welcome": "Welcome to PackBuddy",
+  "@welcome": {
+    "description": "Welcome message shown on the dashboard"
+  },
+  "welcomeSubtitle": "Minimalist, offline-first travel assistant & budget manager",
+  "@welcomeSubtitle": {
+    "description": "Subtitle underneath the welcome message"
+  },
+  "budget": "Budget",
+  "@budget": {
+    "description": "Label for budget feature"
+  },
+  "budgetDescription": "Multi-currency travel expense tracking",
+  "@budgetDescription": {
+    "description": "Description of budget feature"
+  },
+  "vault": "Document Vault",
+  "@vault": {
+    "description": "Label for document vault feature"
+  },
+  "vaultDescription": "Passports, tickets and booking vouchers",
+  "@vaultDescription": {
+    "description": "Description of vault feature"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "Label for settings feature"
+  },
+  "settingsDescription": "Preferences, backup and sync configuration",
+  "@settingsDescription": {
+    "description": "Description of settings feature"
+  },
+  "offlineReady": "Offline Ready",
+  "@offlineReady": {
+    "description": "Badge showing offline-first readiness"
+  },
+  "syncReady": "Two-Way Cloud Sync",
+  "@syncReady": {
+    "description": "Badge showing two-way sync readiness"
+  },
+  "multiCurrency": "Multi-Currency",
+  "@multiCurrency": {
+    "description": "Badge showing multi-currency feature"
+  },
+  "architecturePhase": "Phase 1: Architecture & Permissions Ready",
+  "@architecturePhase": {
+    "description": "Phase status indicator"
+  }
+}
