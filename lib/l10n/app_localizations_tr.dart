@@ -57,6 +57,87 @@ class AppLocalizationsTr extends AppLocalizations {
   String get multiCurrency => 'Çoklu Para Birimi';
 
   @override
+  String get trips => 'Seyahatler';
+
+  @override
+  String get addTrip => 'Seyahat Ekle';
+
+  @override
+  String get tripName => 'Seyahat Adı';
+
+  @override
+  String get destination => 'Hedef';
+
+  @override
+  String get remaining => 'Kalan';
+
+  @override
+  String get spent => 'Harcanan';
+
+  @override
+  String get addExpense => 'Harcama Ekle';
+
+  @override
+  String get amount => 'Tutar';
+
+  @override
+  String get category => 'Kategori';
+
+  @override
+  String get food => 'Yemek';
+
+  @override
+  String get transport => 'Ulaşım';
+
+  @override
+  String get accommodation => 'Konaklama';
+
+  @override
+  String get entertainment => 'Eğlence';
+
+  @override
+  String get other => 'Diğer';
+
+  @override
+  String get save => 'Kaydet';
+
+  @override
+  String get cancel => 'İptal';
+
+  @override
+  String get date => 'Tarih';
+
+  @override
+  String get startDate => 'Başlangıç Tarihi';
+
+  @override
+  String get endDate => 'Bitiş Tarihi';
+
+  @override
+  String get noTripsYet => 'Henüz planlanmış seyahat yok';
+
+  @override
+  String get noTripsSubtitle =>
+      'İlk seyahatinizi eklemek için aşağıdaki butona dokunun';
+
+  @override
+  String get noExpensesYet => 'Henüz harcama kaydedilmedi';
+
+  @override
+  String get noExpensesSubtitle =>
+      'Harcama ekleyerek bütçenizi takip etmeye başlayın';
+
+  @override
+  String get deleteTrip => 'Seyahati Sil';
+
+  @override
+  String get deleteTripConfirm =>
+      'Bu seyahati silmek istediğinizden emin misiniz?';
+
+  @override
+  String get deleteExpense => 'Harcamayı Sil';
+
+  @override
   String get architecturePhase =>
-      'Faz 2: Yerel Veritabanı ve Çift Yönlü Senkronizasyon Hazır';
+      'Faz 3: Bütçe, Seyahat ve Harcama Yönetimi Hazır';
 }

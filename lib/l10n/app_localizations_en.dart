@@ -57,5 +57,84 @@ class AppLocalizationsEn extends AppLocalizations {
   String get multiCurrency => 'Multi-Currency';
 
   @override
-  String get architecturePhase => 'Phase 2: Local DB & Two-Way Sync Ready';
+  String get trips => 'Trips';
+
+  @override
+  String get addTrip => 'Add Trip';
+
+  @override
+  String get tripName => 'Trip Name';
+
+  @override
+  String get destination => 'Destination';
+
+  @override
+  String get remaining => 'Remaining';
+
+  @override
+  String get spent => 'Spent';
+
+  @override
+  String get addExpense => 'Add Expense';
+
+  @override
+  String get amount => 'Amount';
+
+  @override
+  String get category => 'Category';
+
+  @override
+  String get food => 'Food & Dining';
+
+  @override
+  String get transport => 'Transportation';
+
+  @override
+  String get accommodation => 'Accommodation';
+
+  @override
+  String get entertainment => 'Entertainment';
+
+  @override
+  String get other => 'Other';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get startDate => 'Start Date';
+
+  @override
+  String get endDate => 'End Date';
+
+  @override
+  String get noTripsYet => 'No trips planned yet';
+
+  @override
+  String get noTripsSubtitle =>
+      'Tap the button below to add your first journey';
+
+  @override
+  String get noExpensesYet => 'No expenses recorded yet';
+
+  @override
+  String get noExpensesSubtitle => 'Track your spendings by adding an expense';
+
+  @override
+  String get deleteTrip => 'Delete Trip';
+
+  @override
+  String get deleteTripConfirm => 'Are you sure you want to delete this trip?';
+
+  @override
+  String get deleteExpense => 'Delete Expense';
+
+  @override
+  String get architecturePhase => 'Phase 3: Budget, Trips & Expenses Ready';
 }

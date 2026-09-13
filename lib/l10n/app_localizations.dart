@@ -188,10 +188,166 @@ abstract class AppLocalizations {
   /// **'Multi-Currency'**
   String get multiCurrency;
 
+  /// Header for trips screen
+  ///
+  /// In en, this message translates to:
+  /// **'Trips'**
+  String get trips;
+
+  /// Button to add a new trip
+  ///
+  /// In en, this message translates to:
+  /// **'Add Trip'**
+  String get addTrip;
+
+  /// Input field label for trip title
+  ///
+  /// In en, this message translates to:
+  /// **'Trip Name'**
+  String get tripName;
+
+  /// Input field label for destination
+  ///
+  /// In en, this message translates to:
+  /// **'Destination'**
+  String get destination;
+
+  /// Remaining budget label
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining'**
+  String get remaining;
+
+  /// Total spent amount label
+  ///
+  /// In en, this message translates to:
+  /// **'Spent'**
+  String get spent;
+
+  /// Button to add an expense
+  ///
+  /// In en, this message translates to:
+  /// **'Add Expense'**
+  String get addExpense;
+
+  /// Expense amount field label
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get amount;
+
+  /// Expense category dropdown label
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get category;
+
+  /// Food category label
+  ///
+  /// In en, this message translates to:
+  /// **'Food & Dining'**
+  String get food;
+
+  /// Transportation category label
+  ///
+  /// In en, this message translates to:
+  /// **'Transportation'**
+  String get transport;
+
+  /// Accommodation category label
+  ///
+  /// In en, this message translates to:
+  /// **'Accommodation'**
+  String get accommodation;
+
+  /// Entertainment category label
+  ///
+  /// In en, this message translates to:
+  /// **'Entertainment'**
+  String get entertainment;
+
+  /// Other category label
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get other;
+
+  /// Save button label
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// Cancel button label
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// Date label
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get date;
+
+  /// Start date label
+  ///
+  /// In en, this message translates to:
+  /// **'Start Date'**
+  String get startDate;
+
+  /// End date label
+  ///
+  /// In en, this message translates to:
+  /// **'End Date'**
+  String get endDate;
+
+  /// Message when trips list is empty
+  ///
+  /// In en, this message translates to:
+  /// **'No trips planned yet'**
+  String get noTripsYet;
+
+  /// Subtitle when trips list is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the button below to add your first journey'**
+  String get noTripsSubtitle;
+
+  /// Message when expenses list is empty
+  ///
+  /// In en, this message translates to:
+  /// **'No expenses recorded yet'**
+  String get noExpensesYet;
+
+  /// Subtitle when expenses list is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Track your spendings by adding an expense'**
+  String get noExpensesSubtitle;
+
+  /// Delete trip action
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Trip'**
+  String get deleteTrip;
+
+  /// Confirmation message when deleting trip
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this trip?'**
+  String get deleteTripConfirm;
+
+  /// Delete expense action
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Expense'**
+  String get deleteExpense;
+
   /// Phase status indicator
   ///
   /// In en, this message translates to:
-  /// **'Phase 2: Local DB & Two-Way Sync Ready'**
+  /// **'Phase 3: Budget, Trips & Expenses Ready'**
   String get architecturePhase;
 }
 

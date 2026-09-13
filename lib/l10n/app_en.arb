@@ -60,7 +60,111 @@
   "@multiCurrency": {
     "description": "Badge showing multi-currency feature"
   },
-  "architecturePhase": "Phase 2: Local DB & Two-Way Sync Ready",
+  "trips": "Trips",
+  "@trips": {
+    "description": "Header for trips screen"
+  },
+  "addTrip": "Add Trip",
+  "@addTrip": {
+    "description": "Button to add a new trip"
+  },
+  "tripName": "Trip Name",
+  "@tripName": {
+    "description": "Input field label for trip title"
+  },
+  "destination": "Destination",
+  "@destination": {
+    "description": "Input field label for destination"
+  },
+  "remaining": "Remaining",
+  "@remaining": {
+    "description": "Remaining budget label"
+  },
+  "spent": "Spent",
+  "@spent": {
+    "description": "Total spent amount label"
+  },
+  "addExpense": "Add Expense",
+  "@addExpense": {
+    "description": "Button to add an expense"
+  },
+  "amount": "Amount",
+  "@amount": {
+    "description": "Expense amount field label"
+  },
+  "category": "Category",
+  "@category": {
+    "description": "Expense category dropdown label"
+  },
+  "food": "Food & Dining",
+  "@food": {
+    "description": "Food category label"
+  },
+  "transport": "Transportation",
+  "@transport": {
+    "description": "Transportation category label"
+  },
+  "accommodation": "Accommodation",
+  "@accommodation": {
+    "description": "Accommodation category label"
+  },
+  "entertainment": "Entertainment",
+  "@entertainment": {
+    "description": "Entertainment category label"
+  },
+  "other": "Other",
+  "@other": {
+    "description": "Other category label"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save button label"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button label"
+  },
+  "date": "Date",
+  "@date": {
+    "description": "Date label"
+  },
+  "startDate": "Start Date",
+  "@startDate": {
+    "description": "Start date label"
+  },
+  "endDate": "End Date",
+  "@endDate": {
+    "description": "End date label"
+  },
+  "noTripsYet": "No trips planned yet",
+  "@noTripsYet": {
+    "description": "Message when trips list is empty"
+  },
+  "noTripsSubtitle": "Tap the button below to add your first journey",
+  "@noTripsSubtitle": {
+    "description": "Subtitle when trips list is empty"
+  },
+  "noExpensesYet": "No expenses recorded yet",
+  "@noExpensesYet": {
+    "description": "Message when expenses list is empty"
+  },
+  "noExpensesSubtitle": "Track your spendings by adding an expense",
+  "@noExpensesSubtitle": {
+    "description": "Subtitle when expenses list is empty"
+  },
+  "deleteTrip": "Delete Trip",
+  "@deleteTrip": {
+    "description": "Delete trip action"
+  },
+  "deleteTripConfirm": "Are you sure you want to delete this trip?",
+  "@deleteTripConfirm": {
+    "description": "Confirmation message when deleting trip"
+  },
+  "deleteExpense": "Delete Expense",
+  "@deleteExpense": {
+    "description": "Delete expense action"
+  },
+  "architecturePhase": "Phase 3: Budget, Trips & Expenses Ready",
   "@architecturePhase": {
     "description": "Phase status indicator"
   }

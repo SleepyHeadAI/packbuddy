@@ -6,6 +6,8 @@ import '../../../core/theme/app_colors.dart';
 import '../../../data/sync_engine/sync_engine.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/status_badge.dart';
+import '../../budget/presentation/screens/trips_screen.dart';
+import '../../settings/presentation/settings_screen.dart';
 
 /// Minimalist, elegant Dashboard home screen for PackBuddy
 class DashboardScreen extends ConsumerWidget {
@@ -176,6 +178,13 @@ class DashboardScreen extends ConsumerWidget {
                   iconBg: AppColors.primaryContainerLight,
                   title: l10n.budget,
                   subtitle: l10n.budgetDescription,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const TripsScreen(),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 12),
 
@@ -194,10 +203,17 @@ class DashboardScreen extends ConsumerWidget {
                   iconBg: AppColors.tertiaryContainerLight,
                   title: l10n.settings,
                   subtitle: l10n.settingsDescription,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const SettingsScreen(),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 28),
 
-                // Phase 2 Footer Indicator
+                // Phase 3 Footer Indicator
                 Text(
                   l10n.architecturePhase,
                   style: theme.textTheme.labelSmall?.copyWith(
@@ -220,6 +236,7 @@ class _FeatureRowItem extends StatelessWidget {
   final Color iconBg;
   final String title;
   final String subtitle;
+  final VoidCallback? onTap;
 
   const _FeatureRowItem({
     required this.icon,
@@ -227,6 +244,7 @@ class _FeatureRowItem extends StatelessWidget {
     required this.iconBg,
     required this.title,
     required this.subtitle,
+    this.onTap,
   });
 
   @override
@@ -234,6 +252,7 @@ class _FeatureRowItem extends StatelessWidget {
     final theme = Theme.of(context);
 
     return AppCard(
+      onTap: onTap,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
         children: [
