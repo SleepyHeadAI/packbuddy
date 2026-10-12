@@ -142,7 +142,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get passport => '护照';
 
   @override
-  String get ticket => '车机票';
+  String get ticket => '车票 / 机票';
 
   @override
   String get booking => '预订凭证';
@@ -227,4 +227,661 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get architecturePhase => '阶段 5：完整产品与 20 种语言支持';
+
+  @override
+  String get goodMorning => '早上好，旅行者 ☀️';
+
+  @override
+  String get goodAfternoon => '下午好，旅行者 ✈️';
+
+  @override
+  String get goodEvening => '晚上好，旅行者 🌙';
+
+  @override
+  String get allCategories => '全部';
+
+  @override
+  String get categoryClothing => '衣物';
+
+  @override
+  String get categoryElectronics => '数码电器';
+
+  @override
+  String get categoryToiletries => '洗护用品';
+
+  @override
+  String get categoryDocuments => '证件文件';
+
+  @override
+  String get categoryAccessories => '随身配件';
+
+  @override
+  String get deleted => '已删除';
+
+  @override
+  String get undo => '撤销';
+
+  @override
+  String get luggageAndChecklist => '行李与清单';
+
+  @override
+  String get smartPackingTemplates => '智能打包模板';
+
+  @override
+  String get airlineBaggageGuide => '航司行李指南';
+
+  @override
+  String get vaultLocked => '保险库已锁定';
+
+  @override
+  String get unlockVault => '解锁保险库';
+
+  @override
+  String get security => '安全设置';
+
+  @override
+  String get upcomingRoute => '即将出发';
+
+  @override
+  String get ongoingTrip => '正在旅行';
+
+  @override
+  String get offlineVault => '离线安全库';
+
+  @override
+  String get noItemsYet => '暂无物品';
+
+  @override
+  String get itemsReady => '件物品已准备';
+
+  @override
+  String get listEmpty => '清单为空';
+
+  @override
+  String get quickActions => '快捷操作';
+
+  @override
+  String get addItem => '添加物品';
+
+  @override
+  String get recentlyAdded => '最新添加';
+
+  @override
+  String get travelAssistant => '旅行助手';
+
+  @override
+  String get viewAll => '查看全部';
+
+  @override
+  String get allNotificationsUpToDate => '所有旅行提醒均为最新！';
+
+  @override
+  String get createFirstTrip => '立即创建您的第一条行程与预算。';
+
+  @override
+  String get editTrip => '编辑行程';
+
+  @override
+  String get editExpense => '编辑支出';
+
+  @override
+  String get expenseTitle => '支出名称';
+
+  @override
+  String get expenseTitleHint => '例：晚餐、地铁票、咖啡...';
+
+  @override
+  String get pleaseEnterExpenseTitle => '请输入支出名称';
+
+  @override
+  String get customCategoryName => '自定义分类名称';
+
+  @override
+  String get customCategoryHint => '例：纪念品、小费、门票、签证...';
+
+  @override
+  String get pleaseEnterCustomCategory => '请输入分类名称';
+
+  @override
+  String get paymentMethod => '支付方式';
+
+  @override
+  String get cash => '现金';
+
+  @override
+  String get creditCard => '信用卡';
+
+  @override
+  String get debitCard => '借记卡';
+
+  @override
+  String get onlinePayment => '在线支付';
+
+  @override
+  String get customTransport => '自定义交通';
+
+  @override
+  String get addCustomTransport => '+ 自定义交通';
+
+  @override
+  String get itineraryStops => '行程途经点';
+
+  @override
+  String get destinationHint => '目的地城市或国家';
+
+  @override
+  String get baggageAndChecklist => '行李与清单';
+
+  @override
+  String get travelDocuments => '旅行证件';
+
+  @override
+  String get currencySynced => '汇率已自动同步';
+
+  @override
+  String get offlineRatesActive => '离线参考汇率生效中（联网时自动同步）';
+
+  @override
+  String get createPinToProtect => '设置4位PIN码以保护您的重要证件。';
+
+  @override
+  String get createPinAndProtect => '创建PIN码并保护';
+
+  @override
+  String get continueUnlocked => '暂不设密继续';
+
+  @override
+  String get changeOrRemovePin => '修改或移除PIN码';
+
+  @override
+  String get setVaultPin => '设置保险库PIN码';
+
+  @override
+  String get boardingPassAndPass => '登机牌与通票';
+
+  @override
+  String get offlineAndEncrypted => '离线加密存储';
+
+  @override
+  String get searchItems => '搜索';
+
+  @override
+  String get closeSearch => '关闭搜索';
+
+  @override
+  String get readyTemplates => '预置模板';
+
+  @override
+  String get searchItemsHint => '搜索物品名称...';
+
+  @override
+  String get noMatchingItems => '未找到匹配物品';
+
+  @override
+  String get checklistEmpty => '清单为空';
+
+  @override
+  String get addFirstItem => '添加您的第一件旅行物品';
+
+  @override
+  String get completed => '已完成';
+
+  @override
+  String get budgetLimit => '预算上限';
+
+  @override
+  String get change => '修改';
+
+  @override
+  String get set => '设置';
+
+  @override
+  String get notifications => '通知';
+
+  @override
+  String get plan => '规划';
+
+  @override
+  String get preparing => '准备中';
+
+  @override
+  String get tripsPlanned => '个已规划行程';
+
+  @override
+  String get documentsSaved => '个已保存证件与票券';
+
+  @override
+  String get standardBaggageLimitNote => '标准限额: 随身 8 kg • 托运 20-23 kg';
+
+  @override
+  String get airlineBaggageLimits => '航空公司行李额度';
+
+  @override
+  String get compartmentBreakdown => '隔层分布明细';
+
+  @override
+  String get packingTip => '提示：衣物卷起放置比折叠存放能节省30%空间。';
+
+  @override
+  String get tryDifferentKeyword => '尝试其他关键词或分类';
+
+  @override
+  String get luggagePreparationGuide => '行李打包指南';
+
+  @override
+  String get weighingResponsibilityNote => '⚖️ 称重合规责任归旅客所有。';
+
+  @override
+  String get digitalWallet => '电子卡包';
+
+  @override
+  String get flight => '航班 / 飞机';
+
+  @override
+  String get bulletTrain => '高铁 / 动车';
+
+  @override
+  String get train => '普通火车';
+
+  @override
+  String get car => '自驾 / 租车';
+
+  @override
+  String get bus => '大巴 / 公交';
+
+  @override
+  String get ferry => '轮渡 / 游轮';
+
+  @override
+  String get motorcycle => '摩托车';
+
+  @override
+  String get camper => '房车';
+
+  @override
+  String get bicycle => '自行车 / 骑行';
+
+  @override
+  String get subway => '地铁 / 有轨电车';
+
+  @override
+  String get hiking => '徒步 / 登山';
+
+  @override
+  String get transportMode => '出行交通方式';
+
+  @override
+  String get customTransportType => '自定义交通方式';
+
+  @override
+  String get customTransportVehicle => '交通工具 / 类型';
+
+  @override
+  String get customTransportHint => '例：直升机、游艇、缆车、Safari越野...';
+
+  @override
+  String get cityOrStopHint => '输入城市或途径站（例：巴黎、罗马、东京）...';
+
+  @override
+  String get travelRouteOrStops => '旅行路线 / 经停点';
+
+  @override
+  String get addCountry => '添加国家';
+
+  @override
+  String get tripNameHint => '例：意大利深度游、暑期度假...';
+
+  @override
+  String get tripNotesLabel => '旅行备忘（酒店、预订号、路线安排...）';
+
+  @override
+  String get tripNotesHint => '例：酒店入住14:00，切记携带护照...';
+
+  @override
+  String get changeCurrency => '切换币种';
+
+  @override
+  String get expenseNotesLabel => '支出备注（详情、票号...）';
+
+  @override
+  String get expenseNotesHint => '例：晚餐（含小费）...';
+
+  @override
+  String get wrongPinTryAgain => '密码错误！请重试。';
+
+  @override
+  String get fourDigitPin => '4位数字PIN码';
+
+  @override
+  String get saveAndOpen => '保存并解锁';
+
+  @override
+  String get enterPinToUnlockVault => '请输入PIN码以查看您的护照和旅行证件';
+
+  @override
+  String get vaultNotProtectedWithPin => '您的保险库尚未设置PIN码保护';
+
+  @override
+  String get lastTrip => '最近行程';
+
+  @override
+  String get ok => '确定';
+
+  @override
+  String get custom => '自定义';
+
+  @override
+  String get add => '添加';
+
+  @override
+  String get close => '关闭';
+
+  @override
+  String get delete => '删除';
+
+  @override
+  String get edit => '编辑';
+
+  @override
+  String get tickets => '票券';
+
+  @override
+  String get idAndPassport => '身份证件与护照';
+
+  @override
+  String get healthAndInsurance => '健康与旅行保险';
+
+  @override
+  String get otherDocuments => '其他文件';
+
+  @override
+  String get allDocuments => '全部文件';
+
+  @override
+  String get allTickets => '全部票券';
+
+  @override
+  String get flightTickets => '机票';
+
+  @override
+  String get busTickets => '大巴票';
+
+  @override
+  String get ferryBoat => '船票 / 轮渡';
+
+  @override
+  String get trainTickets => '火车票';
+
+  @override
+  String get allTrips => '所有行程';
+
+  @override
+  String get general => '通用';
+
+  @override
+  String get generalDocumentAllTrips => '🌐 通用文件（适用于所有行程）';
+
+  @override
+  String get documentScope => '文件归属 / 行程';
+
+  @override
+  String get documentNotesLabel => '文件备注（PNR订座号、座位、有效期...）';
+
+  @override
+  String get documentNotesHint => '例：PNR: TK7890，座位: 12A，2号航站楼';
+
+  @override
+  String get uploadDocumentPrompt => '上传文件（照片或PDF）';
+
+  @override
+  String get pdfOrFile => 'PDF / 文件';
+
+  @override
+  String get ticketTypeSubCategory => '票券类型 / 子分类';
+
+  @override
+  String get documentNameHint => '例：机票确认单、酒店入住凭证...';
+
+  @override
+  String get flightTicket => '机票';
+
+  @override
+  String get busTicket => '汽车票';
+
+  @override
+  String get ferryTicket => '轮渡票';
+
+  @override
+  String get trainTicket => '火车票';
+
+  @override
+  String get otherTransport => '其他交通票';
+
+  @override
+  String get myPassport => '我的护照';
+
+  @override
+  String get hotelBooking => '酒店预订单';
+
+  @override
+  String get mainCategory => '主分类';
+
+  @override
+  String get boardingPassAndTransit => '登机牌与通关乘车凭证';
+
+  @override
+  String get boardingPassSubtitle => '查看凭证或在外部应用中打开';
+
+  @override
+  String get viewDocumentAction => '查看文件';
+
+  @override
+  String get fileNotFoundLocally => '本地存储中暂未找到该文件。';
+
+  @override
+  String get openInExternalApp => '在系统外部应用中打开';
+
+  @override
+  String get secureBadge => '安全加密';
+
+  @override
+  String get savedDocument => '已保存文件';
+
+  @override
+  String get readyBadge => '就绪';
+
+  @override
+  String get pinnedBadge => '置顶';
+
+  @override
+  String get passportSlot => '护照卡槽';
+
+  @override
+  String get saveYourPassport => '+ 保存您的护照';
+
+  @override
+  String get tapToView => '轻按即可查看';
+
+  @override
+  String get quickUpload => '极速上传';
+
+  @override
+  String get noDocumentsForFilter => '暂无符合此筛选条件的文件';
+
+  @override
+  String get pdfFileBadge => 'PDF 文件';
+
+  @override
+  String get pdfBadge => 'PDF';
+
+  @override
+  String get imageBadge => '图片';
+
+  @override
+  String get addToWallet => '+ 卡包';
+
+  @override
+  String get boardingPassOptions => '登机牌选项';
+
+  @override
+  String get openPdf => '打开 PDF';
+
+  @override
+  String get vaultPinProtection => '保险库PIN码保护';
+
+  @override
+  String get pinProtectionActive => 'PIN码保护已启用';
+
+  @override
+  String get unprotectedSetPin => '未受保护（立即设置PIN码）';
+
+  @override
+  String get setup => '设置';
+
+  @override
+  String get changePinDescription => '输入新的4位PIN码，或清除现有保护码。';
+
+  @override
+  String get setPinDescription => '设置4位PIN码以加密保护保险库内的护照与文件。';
+
+  @override
+  String get removePin => '移除PIN码';
+
+  @override
+  String get proActive => 'PackBuddy Pro 会员有效';
+
+  @override
+  String get annualPlan => '年度订阅（¥258/年）';
+
+  @override
+  String get monthlyPlan => '月度订阅（¥33/月）';
+
+  @override
+  String get activePlanLabel => '订阅方案';
+
+  @override
+  String get editItem => '编辑物品';
+
+  @override
+  String get addNewItem => '添加新物品';
+
+  @override
+  String get itemName => '物品名称';
+
+  @override
+  String get itemNameHint => '例：冲锋衣、头戴耳机...';
+
+  @override
+  String get pleaseEnterItemName => '请输入物品名称';
+
+  @override
+  String get carryType => '携带类型';
+
+  @override
+  String get compartment => '收纳隔层 / 位置';
+
+  @override
+  String get pieces => '件';
+
+  @override
+  String get addToBaggage => '放入行李';
+
+  @override
+  String get itemUpdated => '已更新。';
+
+  @override
+  String get itemAddedToBaggage => '已添加至行李箱。';
+
+  @override
+  String get markedAsPacked => '已标记为已打包';
+
+  @override
+  String get notPacked => '未打包';
+
+  @override
+  String get packed => '已打包';
+
+  @override
+  String get smartTemplatesSubtitle => '精选智能旅行打包清单，一键极速导入行李箱';
+
+  @override
+  String get itemsCount => '件物品';
+
+  @override
+  String get readyTravelPackage => '精选出行装备包';
+
+  @override
+  String get contentList => '清单明细：';
+
+  @override
+  String get templateImportSuccess => '件物品已成功自模板导入！ 🎉';
+
+  @override
+  String get addTemplateToBaggage => '导入行李箱';
+
+  @override
+  String get currentLimit => '当前限额';
+
+  @override
+  String get searchAirlineOrCode => '搜索航空公司名称或代码（如 CA, CZ, TK）...';
+
+  @override
+  String get activeLimit => '当前生效限额';
+
+  @override
+  String get cabinBaggage => '随身登机行李';
+
+  @override
+  String get checkedBaggage => '托运行李';
+
+  @override
+  String get standardEconomy => '标准经济舱';
+
+  @override
+  String get limitSelected => '已选此限额';
+
+  @override
+  String get applyCabinLimit => '应用随身行李限额';
+
+  @override
+  String get baggageLimitSet => '行李限额已设置为：';
+
+  @override
+  String get lockVault => '锁定保险库';
+
+  @override
+  String get navHome => '首页';
+
+  @override
+  String get navTrips => '行程';
+
+  @override
+  String get navBaggage => '行李';
+
+  @override
+  String get navVault => '保管库';
+
+  @override
+  String get navSettings => '设置';
+
+  @override
+  String get selectAirlineToCustomize => '点击以根据您的航空公司自定义行李限额';
+
+  @override
+  String get changeAirlineLimit => '更换航空公司';
+
+  @override
+  String get selectCountryAndRoute => '选择国家与路线';
+
+  @override
+  String get countriesLabel => '个国家';
+
+  @override
+  String get searchCountryOrCity => '搜索国家或城市（例：意大利、东京、巴黎）...';
+
+  @override
+  String get noMatchingCountry => '未找到匹配的国家';
+
+  @override
+  String get activeStatus => '已激活';
 }

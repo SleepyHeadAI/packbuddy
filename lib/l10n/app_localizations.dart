@@ -571,6 +571,1320 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Phase 5: Full Product & 20 Languages Ready'**
   String get architecturePhase;
+
+  /// Morning greeting
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning, Traveler ☀️'**
+  String get goodMorning;
+
+  /// Afternoon greeting
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon, Traveler ✈️'**
+  String get goodAfternoon;
+
+  /// Evening greeting
+  ///
+  /// In en, this message translates to:
+  /// **'Good evening, Traveler 🌙'**
+  String get goodEvening;
+
+  /// All category filter
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get allCategories;
+
+  /// Clothing category
+  ///
+  /// In en, this message translates to:
+  /// **'Clothing'**
+  String get categoryClothing;
+
+  /// Electronics category
+  ///
+  /// In en, this message translates to:
+  /// **'Electronics'**
+  String get categoryElectronics;
+
+  /// Toiletries category
+  ///
+  /// In en, this message translates to:
+  /// **'Toiletries'**
+  String get categoryToiletries;
+
+  /// Documents category
+  ///
+  /// In en, this message translates to:
+  /// **'Documents'**
+  String get categoryDocuments;
+
+  /// Accessories category
+  ///
+  /// In en, this message translates to:
+  /// **'Accessories'**
+  String get categoryAccessories;
+
+  /// Item deleted snackbar label
+  ///
+  /// In en, this message translates to:
+  /// **'deleted'**
+  String get deleted;
+
+  /// Undo action label
+  ///
+  /// In en, this message translates to:
+  /// **'UNDO'**
+  String get undo;
+
+  /// Luggage checklist screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Luggage & Checklist'**
+  String get luggageAndChecklist;
+
+  /// Packing templates label
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Packing Templates'**
+  String get smartPackingTemplates;
+
+  /// Airline baggage guide title
+  ///
+  /// In en, this message translates to:
+  /// **'Airline Baggage Guide'**
+  String get airlineBaggageGuide;
+
+  /// Vault locked status
+  ///
+  /// In en, this message translates to:
+  /// **'Vault is Locked'**
+  String get vaultLocked;
+
+  /// Unlock vault action
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Vault'**
+  String get unlockVault;
+
+  /// Security settings section
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get security;
+
+  /// Upcoming trip badge
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming Route'**
+  String get upcomingRoute;
+
+  /// Ongoing trip badge
+  ///
+  /// In en, this message translates to:
+  /// **'Ongoing Trip'**
+  String get ongoingTrip;
+
+  /// Offline vault stat label
+  ///
+  /// In en, this message translates to:
+  /// **'Offline Vault'**
+  String get offlineVault;
+
+  /// Empty items state
+  ///
+  /// In en, this message translates to:
+  /// **'No items added yet'**
+  String get noItemsYet;
+
+  /// Items packed status
+  ///
+  /// In en, this message translates to:
+  /// **'items ready'**
+  String get itemsReady;
+
+  /// Empty list badge
+  ///
+  /// In en, this message translates to:
+  /// **'EMPTY LIST'**
+  String get listEmpty;
+
+  /// Quick actions section header
+  ///
+  /// In en, this message translates to:
+  /// **'QUICK ACTIONS'**
+  String get quickActions;
+
+  /// Add packing item button
+  ///
+  /// In en, this message translates to:
+  /// **'Add Item'**
+  String get addItem;
+
+  /// Recent items section header
+  ///
+  /// In en, this message translates to:
+  /// **'RECENTLY ADDED ITEMS'**
+  String get recentlyAdded;
+
+  /// Travel assistant section header
+  ///
+  /// In en, this message translates to:
+  /// **'TRAVEL ASSISTANT'**
+  String get travelAssistant;
+
+  /// View all items link
+  ///
+  /// In en, this message translates to:
+  /// **'View All'**
+  String get viewAll;
+
+  /// Notification snackbar
+  ///
+  /// In en, this message translates to:
+  /// **'All travel notifications are up to date!'**
+  String get allNotificationsUpToDate;
+
+  /// Empty trips banner subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first route and budget now.'**
+  String get createFirstTrip;
+
+  /// Edit trip sheet title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Trip'**
+  String get editTrip;
+
+  /// Edit expense sheet title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Expense'**
+  String get editExpense;
+
+  /// Expense title input label
+  ///
+  /// In en, this message translates to:
+  /// **'Expense / Transaction Title'**
+  String get expenseTitle;
+
+  /// Expense title input hint
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Dinner, Metro Ticket, Coffee...'**
+  String get expenseTitleHint;
+
+  /// Expense title validator error
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter an expense or transaction title'**
+  String get pleaseEnterExpenseTitle;
+
+  /// Custom category input label
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Category Name'**
+  String get customCategoryName;
+
+  /// Custom category input hint
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Souvenir, Tip, Museum, Visa, Gas...'**
+  String get customCategoryHint;
+
+  /// Custom category validator error
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter custom category name'**
+  String get pleaseEnterCustomCategory;
+
+  /// Payment method header
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Method'**
+  String get paymentMethod;
+
+  /// Cash payment option
+  ///
+  /// In en, this message translates to:
+  /// **'Cash'**
+  String get cash;
+
+  /// Credit card payment option
+  ///
+  /// In en, this message translates to:
+  /// **'Credit Card'**
+  String get creditCard;
+
+  /// Debit card payment option
+  ///
+  /// In en, this message translates to:
+  /// **'Debit Card'**
+  String get debitCard;
+
+  /// Online payment option
+  ///
+  /// In en, this message translates to:
+  /// **'Online Payment'**
+  String get onlinePayment;
+
+  /// Custom transport option
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Transport'**
+  String get customTransport;
+
+  /// Add custom transport button
+  ///
+  /// In en, this message translates to:
+  /// **'+ Custom Transport'**
+  String get addCustomTransport;
+
+  /// Itinerary stops label
+  ///
+  /// In en, this message translates to:
+  /// **'Itinerary Stops'**
+  String get itineraryStops;
+
+  /// Destination field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Destination city or country'**
+  String get destinationHint;
+
+  /// Luggage & checklist tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Luggage & Checklist'**
+  String get baggageAndChecklist;
+
+  /// Travel documents tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Travel Documents'**
+  String get travelDocuments;
+
+  /// Currency sync banner
+  ///
+  /// In en, this message translates to:
+  /// **'Exchange rates automatically synchronized'**
+  String get currencySynced;
+
+  /// Offline rates banner
+  ///
+  /// In en, this message translates to:
+  /// **'Offline reference rates active (Auto-syncs online)'**
+  String get offlineRatesActive;
+
+  /// Vault pin setup description
+  ///
+  /// In en, this message translates to:
+  /// **'Create a 4-digit PIN code to keep your documents secure.'**
+  String get createPinToProtect;
+
+  /// Vault pin setup button
+  ///
+  /// In en, this message translates to:
+  /// **'Create PIN & Protect'**
+  String get createPinAndProtect;
+
+  /// Skip pin button
+  ///
+  /// In en, this message translates to:
+  /// **'Continue Unlocked for Now'**
+  String get continueUnlocked;
+
+  /// Vault settings pin change title
+  ///
+  /// In en, this message translates to:
+  /// **'Change or Remove PIN Code'**
+  String get changeOrRemovePin;
+
+  /// Vault settings pin set title
+  ///
+  /// In en, this message translates to:
+  /// **'Set Vault PIN Code'**
+  String get setVaultPin;
+
+  /// Boarding pass category
+  ///
+  /// In en, this message translates to:
+  /// **'Boarding Pass & Travel Pass'**
+  String get boardingPassAndPass;
+
+  /// Vault encryption badge
+  ///
+  /// In en, this message translates to:
+  /// **'Offline & Encrypted'**
+  String get offlineAndEncrypted;
+
+  /// Search items button
+  ///
+  /// In en, this message translates to:
+  /// **'Search items'**
+  String get searchItems;
+
+  /// Close search button
+  ///
+  /// In en, this message translates to:
+  /// **'Close search'**
+  String get closeSearch;
+
+  /// Templates button
+  ///
+  /// In en, this message translates to:
+  /// **'Ready Templates'**
+  String get readyTemplates;
+
+  /// Search field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Search item name or tag (e.g. carry-on, headphones)...'**
+  String get searchItemsHint;
+
+  /// Empty search results message
+  ///
+  /// In en, this message translates to:
+  /// **'No matching items found'**
+  String get noMatchingItems;
+
+  /// Empty checklist message
+  ///
+  /// In en, this message translates to:
+  /// **'Checklist is empty'**
+  String get checklistEmpty;
+
+  /// Empty checklist subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Add your first item for your trip'**
+  String get addFirstItem;
+
+  /// Checklist completion status
+  ///
+  /// In en, this message translates to:
+  /// **'completed'**
+  String get completed;
+
+  /// Budget limit field label
+  ///
+  /// In en, this message translates to:
+  /// **'Budget Limit'**
+  String get budgetLimit;
+
+  /// Change action label
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get change;
+
+  /// Set action label
+  ///
+  /// In en, this message translates to:
+  /// **'Set'**
+  String get set;
+
+  /// Notifications button tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
+  /// Plan trip button
+  ///
+  /// In en, this message translates to:
+  /// **'Plan'**
+  String get plan;
+
+  /// Checklist preparing status
+  ///
+  /// In en, this message translates to:
+  /// **'PREPARING'**
+  String get preparing;
+
+  /// Trips planned counter label
+  ///
+  /// In en, this message translates to:
+  /// **'trips planned'**
+  String get tripsPlanned;
+
+  /// Documents saved counter label
+  ///
+  /// In en, this message translates to:
+  /// **'saved documents & tickets'**
+  String get documentsSaved;
+
+  /// Standard luggage limit note
+  ///
+  /// In en, this message translates to:
+  /// **'Standard Limit: Cabin 8 kg • Checked 20-23 kg'**
+  String get standardBaggageLimitNote;
+
+  /// Airline baggage limits button
+  ///
+  /// In en, this message translates to:
+  /// **'Airline Limits'**
+  String get airlineBaggageLimits;
+
+  /// Compartment breakdown title
+  ///
+  /// In en, this message translates to:
+  /// **'Compartment Breakdown'**
+  String get compartmentBreakdown;
+
+  /// Smart packing tip banner
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: Rolling clothes instead of folding them saves 30% space.'**
+  String get packingTip;
+
+  /// Empty search subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different keyword or category'**
+  String get tryDifferentKeyword;
+
+  /// Luggage guide title
+  ///
+  /// In en, this message translates to:
+  /// **'Luggage Preparation & Baggage Guide'**
+  String get luggagePreparationGuide;
+
+  /// Luggage weight disclaimer
+  ///
+  /// In en, this message translates to:
+  /// **'⚖️ Weighing responsibility belongs to traveler. Weight calculation is not active.'**
+  String get weighingResponsibilityNote;
+
+  /// Digital wallet payment method
+  ///
+  /// In en, this message translates to:
+  /// **'Digital Wallet'**
+  String get digitalWallet;
+
+  /// Flight transport mode
+  ///
+  /// In en, this message translates to:
+  /// **'Flight'**
+  String get flight;
+
+  /// High-speed train transport mode
+  ///
+  /// In en, this message translates to:
+  /// **'High-Speed Train'**
+  String get bulletTrain;
+
+  /// Train transport mode
+  ///
+  /// In en, this message translates to:
+  /// **'Train'**
+  String get train;
+
+  /// Car transport mode
+  ///
+  /// In en, this message translates to:
+  /// **'Car / Rental'**
+  String get car;
+
+  /// Bus transport mode
+  ///
+  /// In en, this message translates to:
+  /// **'Bus'**
+  String get bus;
+
+  /// Ferry transport mode
+  ///
+  /// In en, this message translates to:
+  /// **'Ferry / Ship'**
+  String get ferry;
+
+  /// Motorcycle transport mode
+  ///
+  /// In en, this message translates to:
+  /// **'Motorcycle'**
+  String get motorcycle;
+
+  /// Camper transport mode
+  ///
+  /// In en, this message translates to:
+  /// **'Camper / RV'**
+  String get camper;
+
+  /// Bicycle transport mode
+  ///
+  /// In en, this message translates to:
+  /// **'Bicycle'**
+  String get bicycle;
+
+  /// Subway transport mode
+  ///
+  /// In en, this message translates to:
+  /// **'Subway / Tram'**
+  String get subway;
+
+  /// Hiking transport mode
+  ///
+  /// In en, this message translates to:
+  /// **'Hiking / Trekking'**
+  String get hiking;
+
+  /// Transport mode label
+  ///
+  /// In en, this message translates to:
+  /// **'Transport Mode'**
+  String get transportMode;
+
+  /// Custom transport dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Transport Type'**
+  String get customTransportType;
+
+  /// Custom transport field label
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle / Transport Mode'**
+  String get customTransportVehicle;
+
+  /// Custom transport field hint
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Helicopter, Yacht, Cable Car, Safari...'**
+  String get customTransportHint;
+
+  /// Itinerary stop input hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter city or stop (e.g. Paris, Rome, Tokyo)...'**
+  String get cityOrStopHint;
+
+  /// Itinerary stops header
+  ///
+  /// In en, this message translates to:
+  /// **'Travel Route / Stops'**
+  String get travelRouteOrStops;
+
+  /// Add country button
+  ///
+  /// In en, this message translates to:
+  /// **'Add Country'**
+  String get addCountry;
+
+  /// Trip name input hint
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Italy Tour, Summer Vacation...'**
+  String get tripNameHint;
+
+  /// Trip notes field label
+  ///
+  /// In en, this message translates to:
+  /// **'Trip Notes (Hotel, Reservation, Route...)'**
+  String get tripNotesLabel;
+
+  /// Trip notes field hint
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Hotel check-in 14:00, don\'t forget passports...'**
+  String get tripNotesHint;
+
+  /// Change currency tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Change Currency'**
+  String get changeCurrency;
+
+  /// Expense note field label
+  ///
+  /// In en, this message translates to:
+  /// **'Expense Note (Details, Receipt No...)'**
+  String get expenseNotesLabel;
+
+  /// Expense note field hint
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Dinner including tip...'**
+  String get expenseNotesHint;
+
+  /// Wrong PIN snackbar error
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect PIN! Please try again.'**
+  String get wrongPinTryAgain;
+
+  /// 4-digit PIN input label
+  ///
+  /// In en, this message translates to:
+  /// **'4-Digit PIN'**
+  String get fourDigitPin;
+
+  /// Save PIN and open vault button
+  ///
+  /// In en, this message translates to:
+  /// **'Save & Unlock'**
+  String get saveAndOpen;
+
+  /// Vault lock subtitle when PIN is set
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your PIN code to access your passports and travel documents'**
+  String get enterPinToUnlockVault;
+
+  /// Vault lock subtitle when no PIN
+  ///
+  /// In en, this message translates to:
+  /// **'Your vault is not yet protected with a PIN code'**
+  String get vaultNotProtectedWithPin;
+
+  /// Last completed trip badge
+  ///
+  /// In en, this message translates to:
+  /// **'Last Trip'**
+  String get lastTrip;
+
+  /// OK dialog button
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
+
+  /// Custom prefix label
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get custom;
+
+  /// Generic add button
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
+  /// Generic close button
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// Generic delete button
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// Generic edit button
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// Tickets category label
+  ///
+  /// In en, this message translates to:
+  /// **'Tickets'**
+  String get tickets;
+
+  /// ID & Passport category label
+  ///
+  /// In en, this message translates to:
+  /// **'ID & Passport'**
+  String get idAndPassport;
+
+  /// Health & Insurance category label
+  ///
+  /// In en, this message translates to:
+  /// **'Health & Insurance'**
+  String get healthAndInsurance;
+
+  /// Other Documents category label
+  ///
+  /// In en, this message translates to:
+  /// **'Other Documents'**
+  String get otherDocuments;
+
+  /// All Documents filter label
+  ///
+  /// In en, this message translates to:
+  /// **'All Documents'**
+  String get allDocuments;
+
+  /// All Tickets filter label
+  ///
+  /// In en, this message translates to:
+  /// **'All Tickets'**
+  String get allTickets;
+
+  /// Flight Tickets filter label
+  ///
+  /// In en, this message translates to:
+  /// **'Flight Tickets'**
+  String get flightTickets;
+
+  /// Bus Tickets filter label
+  ///
+  /// In en, this message translates to:
+  /// **'Bus Tickets'**
+  String get busTickets;
+
+  /// Ferry / Boat filter label
+  ///
+  /// In en, this message translates to:
+  /// **'Ferry / Boat'**
+  String get ferryBoat;
+
+  /// Train Tickets filter label
+  ///
+  /// In en, this message translates to:
+  /// **'Train Tickets'**
+  String get trainTickets;
+
+  /// All Trips filter label
+  ///
+  /// In en, this message translates to:
+  /// **'All Trips'**
+  String get allTrips;
+
+  /// General scope filter label
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get general;
+
+  /// General Document dropdown option
+  ///
+  /// In en, this message translates to:
+  /// **'🌐 General Document (All Trips)'**
+  String get generalDocumentAllTrips;
+
+  /// Document Scope field label
+  ///
+  /// In en, this message translates to:
+  /// **'Document Scope / Trip'**
+  String get documentScope;
+
+  /// Document note field label
+  ///
+  /// In en, this message translates to:
+  /// **'Document Note (PNR, Seat, Expiry...)'**
+  String get documentNotesLabel;
+
+  /// Document note field hint
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. PNR: TK7890, Seat: 12A, Terminal 2'**
+  String get documentNotesHint;
+
+  /// Upload document section header
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Document (Photo or PDF)'**
+  String get uploadDocumentPrompt;
+
+  /// PDF or file picker button
+  ///
+  /// In en, this message translates to:
+  /// **'PDF / File'**
+  String get pdfOrFile;
+
+  /// Ticket sub-category header
+  ///
+  /// In en, this message translates to:
+  /// **'Ticket Type / Sub-Category'**
+  String get ticketTypeSubCategory;
+
+  /// Document name input hint
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Airline Ticket, Hotel Booking...'**
+  String get documentNameHint;
+
+  /// Flight ticket sub-category
+  ///
+  /// In en, this message translates to:
+  /// **'Flight Ticket'**
+  String get flightTicket;
+
+  /// Bus ticket sub-category
+  ///
+  /// In en, this message translates to:
+  /// **'Bus Ticket'**
+  String get busTicket;
+
+  /// Ferry ticket sub-category
+  ///
+  /// In en, this message translates to:
+  /// **'Ferry / Boat Ticket'**
+  String get ferryTicket;
+
+  /// Train ticket sub-category
+  ///
+  /// In en, this message translates to:
+  /// **'Train Ticket'**
+  String get trainTicket;
+
+  /// Other transport sub-category
+  ///
+  /// In en, this message translates to:
+  /// **'Other Transport'**
+  String get otherTransport;
+
+  /// Default passport document title
+  ///
+  /// In en, this message translates to:
+  /// **'My Passport'**
+  String get myPassport;
+
+  /// Default hotel reservation title
+  ///
+  /// In en, this message translates to:
+  /// **'Hotel Reservation'**
+  String get hotelBooking;
+
+  /// Main category label
+  ///
+  /// In en, this message translates to:
+  /// **'Main Category'**
+  String get mainCategory;
+
+  /// Boarding pass preview title
+  ///
+  /// In en, this message translates to:
+  /// **'Boarding Pass & Transit Pass'**
+  String get boardingPassAndTransit;
+
+  /// Boarding pass preview subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'View document or open in device app'**
+  String get boardingPassSubtitle;
+
+  /// View document action button
+  ///
+  /// In en, this message translates to:
+  /// **'View Document'**
+  String get viewDocumentAction;
+
+  /// File not found snackbar message
+  ///
+  /// In en, this message translates to:
+  /// **'File not found in local storage yet.'**
+  String get fileNotFoundLocally;
+
+  /// Open in device app action button
+  ///
+  /// In en, this message translates to:
+  /// **'Open in Device App'**
+  String get openInExternalApp;
+
+  /// Secure badge text
+  ///
+  /// In en, this message translates to:
+  /// **'SECURE'**
+  String get secureBadge;
+
+  /// Saved document counter label
+  ///
+  /// In en, this message translates to:
+  /// **'Saved Document'**
+  String get savedDocument;
+
+  /// Ready badge text
+  ///
+  /// In en, this message translates to:
+  /// **'READY'**
+  String get readyBadge;
+
+  /// Pinned badge text
+  ///
+  /// In en, this message translates to:
+  /// **'PINNED'**
+  String get pinnedBadge;
+
+  /// Passport slot title
+  ///
+  /// In en, this message translates to:
+  /// **'Passport Slot'**
+  String get passportSlot;
+
+  /// Save passport prompt
+  ///
+  /// In en, this message translates to:
+  /// **'+ Save Your Passport'**
+  String get saveYourPassport;
+
+  /// Tap to view hint
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to view'**
+  String get tapToView;
+
+  /// Quick upload hint
+  ///
+  /// In en, this message translates to:
+  /// **'Quick upload'**
+  String get quickUpload;
+
+  /// Empty state for vault filter
+  ///
+  /// In en, this message translates to:
+  /// **'No documents found matching this filter'**
+  String get noDocumentsForFilter;
+
+  /// PDF file indicator badge
+  ///
+  /// In en, this message translates to:
+  /// **'PDF FILE'**
+  String get pdfFileBadge;
+
+  /// PDF badge text
+  ///
+  /// In en, this message translates to:
+  /// **'PDF'**
+  String get pdfBadge;
+
+  /// Image badge text
+  ///
+  /// In en, this message translates to:
+  /// **'IMAGE'**
+  String get imageBadge;
+
+  /// Add to wallet button
+  ///
+  /// In en, this message translates to:
+  /// **'+ Wallet'**
+  String get addToWallet;
+
+  /// Boarding pass options tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Boarding Pass Options'**
+  String get boardingPassOptions;
+
+  /// Open PDF tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Open PDF'**
+  String get openPdf;
+
+  /// Vault PIN protection title
+  ///
+  /// In en, this message translates to:
+  /// **'Vault PIN Protection'**
+  String get vaultPinProtection;
+
+  /// PIN protection active subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'PIN protection active'**
+  String get pinProtectionActive;
+
+  /// Unprotected subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Unprotected (Set a PIN)'**
+  String get unprotectedSetPin;
+
+  /// Set up button text
+  ///
+  /// In en, this message translates to:
+  /// **'Set Up'**
+  String get setup;
+
+  /// Change PIN dialog description
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a new 4-digit PIN or remove the existing PIN code.'**
+  String get changePinDescription;
+
+  /// Set PIN dialog description
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a 4-digit PIN to protect your passports and documents in the vault.'**
+  String get setPinDescription;
+
+  /// Remove PIN button label
+  ///
+  /// In en, this message translates to:
+  /// **'Remove PIN'**
+  String get removePin;
+
+  /// PackBuddy Pro active status
+  ///
+  /// In en, this message translates to:
+  /// **'PackBuddy Pro Active'**
+  String get proActive;
+
+  /// Annual plan label
+  ///
+  /// In en, this message translates to:
+  /// **'Annual Plan (\$39.99/yr)'**
+  String get annualPlan;
+
+  /// Monthly plan label
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Plan (\$4.99/mo)'**
+  String get monthlyPlan;
+
+  /// Active subscription plan label
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription Plan'**
+  String get activePlanLabel;
+
+  /// Edit item sheet title
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Item'**
+  String get editItem;
+
+  /// Add new item sheet title
+  ///
+  /// In en, this message translates to:
+  /// **'Add New Item'**
+  String get addNewItem;
+
+  /// Item name field label
+  ///
+  /// In en, this message translates to:
+  /// **'Item Name'**
+  String get itemName;
+
+  /// Item name field hint
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Waterproof Jacket, Headphones...'**
+  String get itemNameHint;
+
+  /// Item name validation error
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter an item name'**
+  String get pleaseEnterItemName;
+
+  /// Carry type field label
+  ///
+  /// In en, this message translates to:
+  /// **'Carry Type'**
+  String get carryType;
+
+  /// Compartment field label
+  ///
+  /// In en, this message translates to:
+  /// **'Compartment / Location'**
+  String get compartment;
+
+  /// Pieces / units suffix
+  ///
+  /// In en, this message translates to:
+  /// **'pcs'**
+  String get pieces;
+
+  /// Add to baggage button
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Baggage'**
+  String get addToBaggage;
+
+  /// Item updated snackbar text
+  ///
+  /// In en, this message translates to:
+  /// **'updated.'**
+  String get itemUpdated;
+
+  /// Item added to baggage snackbar text
+  ///
+  /// In en, this message translates to:
+  /// **'added to baggage.'**
+  String get itemAddedToBaggage;
+
+  /// Marked as packed accessibility label
+  ///
+  /// In en, this message translates to:
+  /// **'Marked as packed'**
+  String get markedAsPacked;
+
+  /// Not packed accessibility label
+  ///
+  /// In en, this message translates to:
+  /// **'Not packed'**
+  String get notPacked;
+
+  /// Packed swipe label
+  ///
+  /// In en, this message translates to:
+  /// **'Packed'**
+  String get packed;
+
+  /// Smart templates subtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer curated travel packing lists to your baggage in one tap'**
+  String get smartTemplatesSubtitle;
+
+  /// Items count label
+  ///
+  /// In en, this message translates to:
+  /// **'Items'**
+  String get itemsCount;
+
+  /// Curated travel package tag
+  ///
+  /// In en, this message translates to:
+  /// **'Curated Travel Package'**
+  String get readyTravelPackage;
+
+  /// Contents list header
+  ///
+  /// In en, this message translates to:
+  /// **'Contents List:'**
+  String get contentList;
+
+  /// Template import success message
+  ///
+  /// In en, this message translates to:
+  /// **'items added from template! 🎉'**
+  String get templateImportSuccess;
+
+  /// Add template to baggage button
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Baggage'**
+  String get addTemplateToBaggage;
+
+  /// Current baggage limit label
+  ///
+  /// In en, this message translates to:
+  /// **'Current Limit'**
+  String get currentLimit;
+
+  /// Search airline input hint
+  ///
+  /// In en, this message translates to:
+  /// **'Search airline or code (e.g. THY, PC, LH)...'**
+  String get searchAirlineOrCode;
+
+  /// Active limit badge
+  ///
+  /// In en, this message translates to:
+  /// **'Active Limit'**
+  String get activeLimit;
+
+  /// Cabin baggage label
+  ///
+  /// In en, this message translates to:
+  /// **'Cabin Baggage'**
+  String get cabinBaggage;
+
+  /// Checked baggage label
+  ///
+  /// In en, this message translates to:
+  /// **'Checked Baggage'**
+  String get checkedBaggage;
+
+  /// Standard economy baggage note
+  ///
+  /// In en, this message translates to:
+  /// **'Standard Economy'**
+  String get standardEconomy;
+
+  /// Limit selected button text
+  ///
+  /// In en, this message translates to:
+  /// **'This Limit Selected'**
+  String get limitSelected;
+
+  /// Apply cabin limit button text
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Cabin Limit'**
+  String get applyCabinLimit;
+
+  /// Baggage limit set snackbar message
+  ///
+  /// In en, this message translates to:
+  /// **'Baggage limit set to'**
+  String get baggageLimitSet;
+
+  /// Lock vault button tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Lock Vault'**
+  String get lockVault;
+
+  /// Bottom nav home label
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
+  /// Bottom nav trips label
+  ///
+  /// In en, this message translates to:
+  /// **'Trips'**
+  String get navTrips;
+
+  /// Bottom nav baggage label
+  ///
+  /// In en, this message translates to:
+  /// **'Luggage'**
+  String get navBaggage;
+
+  /// Bottom nav vault label
+  ///
+  /// In en, this message translates to:
+  /// **'Vault'**
+  String get navVault;
+
+  /// Bottom nav settings label
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get navSettings;
+
+  /// Prompt to select an airline and customize limits
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to customize limits for your airline'**
+  String get selectAirlineToCustomize;
+
+  /// Button to change current airline limit
+  ///
+  /// In en, this message translates to:
+  /// **'Change Airline'**
+  String get changeAirlineLimit;
+
+  /// Header title for country and route selection sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Select Country & Route'**
+  String get selectCountryAndRoute;
+
+  /// Label for count of countries
+  ///
+  /// In en, this message translates to:
+  /// **'Countries'**
+  String get countriesLabel;
+
+  /// Hint text for country search field
+  ///
+  /// In en, this message translates to:
+  /// **'Search country or city (e.g. Italy, Tokyo, Paris)...'**
+  String get searchCountryOrCity;
+
+  /// Empty state text when no country matches search
+  ///
+  /// In en, this message translates to:
+  /// **'No matching country found'**
+  String get noMatchingCountry;
+
+  /// Active subscription status badge
+  ///
+  /// In en, this message translates to:
+  /// **'ACTIVE'**
+  String get activeStatus;
 }
 
 class _AppLocalizationsDelegate

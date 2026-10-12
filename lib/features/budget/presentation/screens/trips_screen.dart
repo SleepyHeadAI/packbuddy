@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
+import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
@@ -16,25 +16,65 @@ class TripsScreen extends ConsumerWidget {
   const TripsScreen({super.key});
 
   static IconData getTransportIcon(String? mode) {
-    switch (mode?.toLowerCase()) {
-      case 'flight':
-      case 'uçak':
-        return Icons.flight_rounded;
-      case 'train':
-      case 'tren':
-        return Icons.train_rounded;
-      case 'car':
-      case 'araba':
-        return Icons.directions_car_rounded;
-      case 'ship':
-      case 'gemi':
-        return Icons.directions_boat_rounded;
-      case 'bus':
-      case 'otobüs':
-        return Icons.directions_bus_rounded;
-      default:
-        return Icons.luggage_outlined;
+    if (mode == null || mode.isEmpty) return Icons.luggage_outlined;
+    final lower = mode.toLowerCase();
+    if (lower.contains('uçak') || lower.contains('flight') || lower.contains('plane')) {
+      return Icons.flight_rounded;
+    } else if (lower.contains('hızlı tren') || lower.contains('yht') || lower.contains('bullet')) {
+      return Icons.directions_railway_rounded;
+    } else if (lower.contains('tren') || lower.contains('train')) {
+      return Icons.train_rounded;
+    } else if (lower.contains('araba') || lower.contains('car') || lower.contains('kiralık')) {
+      return Icons.directions_car_rounded;
+    } else if (lower.contains('gemi') || lower.contains('ship') || lower.contains('feribot') || lower.contains('ferry') || lower.contains('boat')) {
+      return Icons.directions_boat_rounded;
+    } else if (lower.contains('otobüs') || lower.contains('bus')) {
+      return Icons.directions_bus_rounded;
+    } else if (lower.contains('moto') || lower.contains('motor')) {
+      return Icons.two_wheeler_rounded;
+    } else if (lower.contains('karavan') || lower.contains('camper') || lower.contains('rv')) {
+      return Icons.airport_shuttle_rounded;
+    } else if (lower.contains('bisiklet') || lower.contains('bike') || lower.contains('bicycle')) {
+      return Icons.pedal_bike_rounded;
+    } else if (lower.contains('metro') || lower.contains('tram') || lower.contains('subway')) {
+      return Icons.tram_rounded;
+    } else if (lower.contains('yürüyüş') || lower.contains('trekking') || lower.contains('hike') || lower.contains('walk')) {
+      return Icons.hiking_rounded;
+    } else if (lower.contains('heli') || lower.contains('helikopter')) {
+      return Icons.flight_takeoff_rounded;
+    } else if (lower == 'other' || lower == 'diğer') {
+      return Icons.luggage_outlined;
     }
+    return Icons.commute_rounded;
+  }
+
+  static String formatTransportMode(String? mode, AppLocalizations l10n) {
+    if (mode == null || mode.isEmpty) return '';
+    final lower = mode.toLowerCase();
+    if (lower.contains('uçak') || lower.contains('flight') || lower.contains('plane')) {
+      return l10n.flight;
+    } else if (lower.contains('hızlı tren') || lower.contains('yht') || lower.contains('bullet')) {
+      return l10n.bulletTrain;
+    } else if (lower.contains('tren') || lower.contains('train')) {
+      return l10n.train;
+    } else if (lower.contains('araba') || lower.contains('car') || lower.contains('kiralık')) {
+      return l10n.car;
+    } else if (lower.contains('gemi') || lower.contains('ship') || lower.contains('feribot') || lower.contains('ferry') || lower.contains('boat')) {
+      return l10n.ferry;
+    } else if (lower.contains('otobüs') || lower.contains('bus')) {
+      return l10n.bus;
+    } else if (lower.contains('moto') || lower.contains('motor')) {
+      return l10n.motorcycle;
+    } else if (lower.contains('karavan') || lower.contains('camper') || lower.contains('rv')) {
+      return l10n.camper;
+    } else if (lower.contains('bisiklet') || lower.contains('bike') || lower.contains('bicycle')) {
+      return l10n.bicycle;
+    } else if (lower.contains('metro') || lower.contains('tram') || lower.contains('subway')) {
+      return l10n.subway;
+    } else if (lower.contains('yürüyüş') || lower.contains('trekking') || lower.contains('hike') || lower.contains('walk')) {
+      return l10n.hiking;
+    }
+    return mode;
   }
 
   void _showDeleteDialog(BuildContext context, WidgetRef ref, Trip trip) {
@@ -67,7 +107,6 @@ class TripsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final tripState = ref.watch(tripControllerProvider);
-    final dateFormat = DateFormat.yMMMd(Localizations.localeOf(context).languageCode);
 
     // Listen for database or network errors and notify user cleanly
     ref.listen<TripState>(tripControllerProvider, (previous, next) {
@@ -89,18 +128,35 @@ class TripsScreen extends ConsumerWidget {
       }
     });
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.trips),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => AddTripSheet.show(context),
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: theme.colorScheme.onPrimary,
-        elevation: 3,
-        icon: const Icon(Icons.add_rounded),
-        label: Text(l10n.addTrip, style: const TextStyle(fontWeight: FontWeight.w600)),
-      ),
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.trips),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded),
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+            onPressed: () {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              }
+            },
+          ),
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          heroTag: null,
+          onPressed: () => AddTripSheet.show(context),
+          backgroundColor: theme.colorScheme.primary,
+          foregroundColor: theme.colorScheme.onPrimary,
+          elevation: 3,
+          icon: const Icon(Icons.add_rounded),
+          label: Text(l10n.addTrip, style: const TextStyle(fontWeight: FontWeight.w600)),
+        ),
       body: tripState.isLoading
           ? const Center(child: CircularProgressIndicator())
           : tripState.trips.isEmpty
@@ -137,12 +193,6 @@ class TripsScreen extends ConsumerWidget {
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
-                        ),
-                        const SizedBox(height: 28),
-                        FilledButton.icon(
-                          onPressed: () => AddTripSheet.show(context),
-                          icon: const Icon(Icons.add_rounded, size: 18),
-                          label: Text(l10n.addTrip),
                         ),
                       ],
                     ),
@@ -240,7 +290,7 @@ class TripsScreen extends ConsumerWidget {
                                                 borderRadius: BorderRadius.circular(6),
                                               ),
                                               child: Text(
-                                                trip.transportMode!,
+                                                formatTransportMode(trip.transportMode, l10n),
                                                 style: theme.textTheme.labelSmall?.copyWith(
                                                   fontSize: 10,
                                                   fontWeight: FontWeight.w600,
@@ -306,25 +356,35 @@ class TripsScreen extends ConsumerWidget {
 
                             // Footer row: Dates & Budget
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.calendar_month_outlined,
-                                      size: 14,
-                                      color: theme.colorScheme.secondary,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      '${dateFormat.format(trip.startDate)} - ${dateFormat.format(trip.endDate)}',
-                                      style: theme.textTheme.bodySmall?.copyWith(
-                                        color: theme.colorScheme.onSurfaceVariant,
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.calendar_month_outlined,
+                                        size: 14,
+                                        color: theme.colorScheme.secondary,
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(width: 6),
+                                      Expanded(
+                                        child: Text(
+                                          AppDateFormatter.formatDateRange(
+                                            trip.startDate,
+                                            trip.endDate,
+                                            locale: Localizations.localeOf(context).languageCode,
+                                          ),
+                                          style: theme.textTheme.bodySmall?.copyWith(
+                                            color: theme.colorScheme.onSurfaceVariant,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                if (trip.budgetLimit != null)
+                                if (trip.budgetLimit != null) ...[
+                                  const SizedBox(width: 8),
                                   Container(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 10, vertical: 4),
@@ -344,6 +404,7 @@ class TripsScreen extends ConsumerWidget {
                                       ),
                                     ),
                                   ),
+                                ],
                               ],
                             ),
                           ],
@@ -352,6 +413,7 @@ class TripsScreen extends ConsumerWidget {
                     );
                   },
                 ),
+      ),
     );
   }
 }

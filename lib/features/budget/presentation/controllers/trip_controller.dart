@@ -107,6 +107,32 @@ class TripController extends StateNotifier<TripState> {
     }
   }
 
+  /// Updates an existing trip, persists to SQLite and triggers background sync
+  Future<Trip?> updateTrip(Trip updated) async {
+    try {
+      final tripToSave = updated.copyWith(updatedAt: DateTime.now());
+      await _dbHelper.updateTrip(tripToSave);
+
+      final index = state.trips.indexWhere((t) => t.id == updated.id);
+      final updatedList = List<Trip>.from(state.trips);
+      if (index != -1) {
+        updatedList[index] = tripToSave;
+      } else {
+        updatedList.insert(0, tripToSave);
+      }
+
+      state = state.copyWith(trips: updatedList);
+
+      // Trigger background two-way sync
+      _ref.read(syncEngineProvider.notifier).performSync();
+
+      return tripToSave;
+    } catch (e) {
+      state = state.copyWith(errorMessage: e.toString());
+      return null;
+    }
+  }
+
   /// Soft deletes a trip, updates state and triggers background sync
   Future<bool> deleteTrip(String tripId) async {
     try {

@@ -228,4 +228,673 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get architecturePhase => 'चरण 5: पूर्ण उत्पाद और 20 भाषाएं';
+
+  @override
+  String get goodMorning => 'शुभ प्रभात, यात्री ☀️';
+
+  @override
+  String get goodAfternoon => 'शुभ दोपहर, यात्री ✈️';
+
+  @override
+  String get goodEvening => 'शुभ संध्या, यात्री 🌙';
+
+  @override
+  String get allCategories => 'सभी';
+
+  @override
+  String get categoryClothing => 'कपड़े';
+
+  @override
+  String get categoryElectronics => 'इलेक्ट्रॉनिक्स';
+
+  @override
+  String get categoryToiletries => 'शौच प्रसाधन';
+
+  @override
+  String get categoryDocuments => 'दस्तावेज';
+
+  @override
+  String get categoryAccessories => 'सामान/एक्सेसरीज';
+
+  @override
+  String get deleted => 'हटा दिया गया';
+
+  @override
+  String get undo => 'पूर्ववत करें';
+
+  @override
+  String get luggageAndChecklist => 'सामान और चेकलिस्ट';
+
+  @override
+  String get smartPackingTemplates => 'स्मार्ट पैकिंग टेम्प्लेट';
+
+  @override
+  String get airlineBaggageGuide => 'एयरलाइन बैगेज गाइड';
+
+  @override
+  String get vaultLocked => 'वॉल्ट लॉक है';
+
+  @override
+  String get unlockVault => 'वॉल्ट अनलॉक करें';
+
+  @override
+  String get security => 'सुरक्षा';
+
+  @override
+  String get upcomingRoute => 'आगामी यात्रा';
+
+  @override
+  String get ongoingTrip => 'वर्तमान यात्रा';
+
+  @override
+  String get offlineVault => 'ऑफ़लाइन वॉल्ट';
+
+  @override
+  String get noItemsYet => 'अभी तक कोई सामान नहीं जोड़ा गया';
+
+  @override
+  String get itemsReady => 'सामान तैयार';
+
+  @override
+  String get listEmpty => 'सूची खाली है';
+
+  @override
+  String get quickActions => 'त्वरित कार्रवाई';
+
+  @override
+  String get addItem => 'सामान जोड़ें';
+
+  @override
+  String get recentlyAdded => 'हाल ही में जोड़े गए सामान';
+
+  @override
+  String get travelAssistant => 'यात्रा सहायक';
+
+  @override
+  String get viewAll => 'सभी देखें';
+
+  @override
+  String get allNotificationsUpToDate => 'सभी यात्रा सूचनाएं अपडेट हैं!';
+
+  @override
+  String get createFirstTrip => 'अपना पहला रूट और बजट अभी बनाएं।';
+
+  @override
+  String get editTrip => 'यात्रा संपादित करें';
+
+  @override
+  String get editExpense => 'खर्च संपादित करें';
+
+  @override
+  String get expenseTitle => 'खर्च का शीर्षक';
+
+  @override
+  String get expenseTitleHint => 'उदा. रात का खाना, मेट्रो टिकट, कॉफी...';
+
+  @override
+  String get pleaseEnterExpenseTitle => 'कृपया खर्च का शीर्षक दर्ज करें';
+
+  @override
+  String get customCategoryName => 'कस्टम श्रेणी का नाम';
+
+  @override
+  String get customCategoryHint => 'उदा. स्मृति चिन्ह, टिप, संग्रहालय, वीजा...';
+
+  @override
+  String get pleaseEnterCustomCategory => 'कृपया श्रेणी का नाम दर्ज करें';
+
+  @override
+  String get paymentMethod => 'भुगतान का तरीका';
+
+  @override
+  String get cash => 'नकद';
+
+  @override
+  String get creditCard => 'क्रेडिट कार्ड';
+
+  @override
+  String get debitCard => 'डेबिट कार्ड';
+
+  @override
+  String get onlinePayment => 'ऑनलाइन भुगतान';
+
+  @override
+  String get customTransport => 'कस्टम परिवहन';
+
+  @override
+  String get addCustomTransport => '+ कस्टम परिवहन';
+
+  @override
+  String get itineraryStops => 'यात्रा कार्यक्रम स्टॉप';
+
+  @override
+  String get destinationHint => 'गंतव्य शहर या देश';
+
+  @override
+  String get baggageAndChecklist => 'सामान और चेकलिस्ट';
+
+  @override
+  String get travelDocuments => 'यात्रा दस्तावेज';
+
+  @override
+  String get currencySynced => 'विनिमय दरें स्वचालित रूप से सिंक हुईं';
+
+  @override
+  String get offlineRatesActive => 'ऑफ़लाइन संदर्भ दरें सक्रिय हैं';
+
+  @override
+  String get createPinToProtect =>
+      'दस्तावेजों की सुरक्षा के लिए 4 अंकों का पिन बनाएं।';
+
+  @override
+  String get createPinAndProtect => 'पिन बनाएं और सुरक्षित करें';
+
+  @override
+  String get continueUnlocked => 'अनलॉक रखकर जारी रखें';
+
+  @override
+  String get changeOrRemovePin => 'पिन बदलें या हटाएं';
+
+  @override
+  String get setVaultPin => 'वॉल्ट पिन सेट करें';
+
+  @override
+  String get boardingPassAndPass => 'बोर्डिंग पास और पास';
+
+  @override
+  String get offlineAndEncrypted => 'ऑफ़लाइन और एन्क्रिप्टेड';
+
+  @override
+  String get searchItems => 'खोजें';
+
+  @override
+  String get closeSearch => 'खोज बंद करें';
+
+  @override
+  String get readyTemplates => 'टेम्प्लेट';
+
+  @override
+  String get searchItemsHint => 'सामान खोजें...';
+
+  @override
+  String get noMatchingItems => 'कोई मेल खाता सामान नहीं मिला';
+
+  @override
+  String get checklistEmpty => 'चेकलिस्ट खाली है';
+
+  @override
+  String get addFirstItem => 'अपनी यात्रा के लिए पहला सामान जोड़ें';
+
+  @override
+  String get completed => 'पूर्ण';
+
+  @override
+  String get budgetLimit => 'बजट सीमा';
+
+  @override
+  String get change => 'बदलें';
+
+  @override
+  String get set => 'सेट करें';
+
+  @override
+  String get notifications => 'सूचनाएं';
+
+  @override
+  String get plan => 'योजना बनाएं';
+
+  @override
+  String get preparing => 'तैयारी जारी है';
+
+  @override
+  String get tripsPlanned => 'यात्राएं नियोजित';
+
+  @override
+  String get documentsSaved => 'सहेजे गए दस्तावेज़ और टिकट';
+
+  @override
+  String get standardBaggageLimitNote =>
+      'मानक सीमा: केबिन 8 किग्रा • चेक-इन 20-23 किग्रा';
+
+  @override
+  String get airlineBaggageLimits => 'एयरलाइन सामान सीमाएं';
+
+  @override
+  String get compartmentBreakdown => 'डिब्बों का विवरण';
+
+  @override
+  String get packingTip =>
+      'सुझाव: कपड़ों को मोड़ने के बजाय रोल करने से 30% जगह बचती है।';
+
+  @override
+  String get tryDifferentKeyword => 'कोई दूसरा कीवर्ड या श्रेणी आज़माएं';
+
+  @override
+  String get luggagePreparationGuide => 'सामान तैयारी गाइड';
+
+  @override
+  String get weighingResponsibilityNote =>
+      '⚖️ वज़न की ज़िम्मेदारी यात्री की होती है।';
+
+  @override
+  String get digitalWallet => 'डिजिटल वॉलेट';
+
+  @override
+  String get flight => 'उड़ान / विमान';
+
+  @override
+  String get bulletTrain => 'हाई-स्पीड ट्रेन';
+
+  @override
+  String get train => 'ट्रेन';
+
+  @override
+  String get car => 'कार / रेंटल';
+
+  @override
+  String get bus => 'बस';
+
+  @override
+  String get ferry => 'फेरी / नाव';
+
+  @override
+  String get motorcycle => 'मोटरसाइकिल';
+
+  @override
+  String get camper => 'कैम्पर वैन';
+
+  @override
+  String get bicycle => 'साइकिल';
+
+  @override
+  String get subway => 'मेट्रो / ट्राम';
+
+  @override
+  String get hiking => 'हाइकिंग / ट्रेकिंग';
+
+  @override
+  String get transportMode => 'परिवहन का साधन';
+
+  @override
+  String get customTransportType => 'कस्टम परिवहन प्रकार';
+
+  @override
+  String get customTransportVehicle => 'वाहन / साधन';
+
+  @override
+  String get customTransportHint => 'उदा: हेलीकॉप्टर, यॉट, केबल कार, सफारी...';
+
+  @override
+  String get cityOrStopHint =>
+      'शहर या स्टॉप दर्ज करें (उदा: पेरिस, रोम, टोक्यो)...';
+
+  @override
+  String get travelRouteOrStops => 'यात्रा मार्ग / ठहराव';
+
+  @override
+  String get addCountry => 'देश जोड़ें';
+
+  @override
+  String get tripNameHint => 'उदा: इटली यात्रा, गर्मियों की छुट्टियां...';
+
+  @override
+  String get tripNotesLabel => 'यात्रा नोट्स (होटल, बुकिंग, रूट...)';
+
+  @override
+  String get tripNotesHint => 'उदा: होटल चेक-इन 14:00, पासपोर्ट न भूलें...';
+
+  @override
+  String get changeCurrency => 'मुद्रा बदलें';
+
+  @override
+  String get expenseNotesLabel => 'खर्च का नोट (विवरण, रसीद संख्या...)';
+
+  @override
+  String get expenseNotesHint => 'उदा: टिप सहित डिनर...';
+
+  @override
+  String get wrongPinTryAgain => 'गलत पिन कोड! कृपया पुनः प्रयास करें।';
+
+  @override
+  String get fourDigitPin => '4-अंकीय पिन';
+
+  @override
+  String get saveAndOpen => 'सहेजें और अनलॉक करें';
+
+  @override
+  String get enterPinToUnlockVault =>
+      'अपने पासपोर्ट और दस्तावेज़ देखने के लिए पिन दर्ज करें';
+
+  @override
+  String get vaultNotProtectedWithPin =>
+      'आपकी तिजोरी अभी पिन से सुरक्षित नहीं है';
+
+  @override
+  String get lastTrip => 'पिछली यात्रा';
+
+  @override
+  String get ok => 'ठीक है';
+
+  @override
+  String get custom => 'कस्टम';
+
+  @override
+  String get add => 'जोड़ें';
+
+  @override
+  String get close => 'बंद करें';
+
+  @override
+  String get delete => 'हटाएं';
+
+  @override
+  String get edit => 'संपादित करें';
+
+  @override
+  String get tickets => 'टिकट';
+
+  @override
+  String get idAndPassport => 'पहचान पत्र और पासपोर्ट';
+
+  @override
+  String get healthAndInsurance => 'स्वास्थ्य और बीमा';
+
+  @override
+  String get otherDocuments => 'अन्य दस्तावेज़';
+
+  @override
+  String get allDocuments => 'सभी दस्तावेज़';
+
+  @override
+  String get allTickets => 'सभी टिकट';
+
+  @override
+  String get flightTickets => 'फ्लाइट टिकट';
+
+  @override
+  String get busTickets => 'बस टिकट';
+
+  @override
+  String get ferryBoat => 'फेरी / नाव';
+
+  @override
+  String get trainTickets => 'ट्रेन टिकट';
+
+  @override
+  String get allTrips => 'सभी यात्राएं';
+
+  @override
+  String get general => 'सामान्य';
+
+  @override
+  String get generalDocumentAllTrips => '🌐 सामान्य दस्तावेज़ (सभी यात्राएं)';
+
+  @override
+  String get documentScope => 'दस्तावेज़ का दायरा / यात्रा';
+
+  @override
+  String get documentNotesLabel => 'दस्तावेज़ नोट (PNR, सीट, समाप्ति...)';
+
+  @override
+  String get documentNotesHint => 'उदा: PNR: TK7890, सीट: 12A, टर्मिनल 2';
+
+  @override
+  String get uploadDocumentPrompt => 'दस्तावेज़ अपलोड करें (फोटो या PDF)';
+
+  @override
+  String get pdfOrFile => 'PDF / फ़ाइल';
+
+  @override
+  String get ticketTypeSubCategory => 'टिकट प्रकार / उप-श्रेणी';
+
+  @override
+  String get documentNameHint => 'उदा: हवाई टिकट, होटल बुकिंग...';
+
+  @override
+  String get flightTicket => 'हवाई टिकट';
+
+  @override
+  String get busTicket => 'बस टिकट';
+
+  @override
+  String get ferryTicket => 'फेरी टिकट';
+
+  @override
+  String get trainTicket => 'ट्रेन टिकट';
+
+  @override
+  String get otherTransport => 'अन्य परिवहन';
+
+  @override
+  String get myPassport => 'मेरा पासपोर्ट';
+
+  @override
+  String get hotelBooking => 'होटल आरक्षण';
+
+  @override
+  String get mainCategory => 'मुख्य श्रेणी';
+
+  @override
+  String get boardingPassAndTransit => 'बोर्डिंग पास और ट्रांजिट पास';
+
+  @override
+  String get boardingPassSubtitle => 'दस्तावेज़ देखें या डिवाइस ऐप में खोलें';
+
+  @override
+  String get viewDocumentAction => 'दस्तावेज़ देखें';
+
+  @override
+  String get fileNotFoundLocally => 'फ़ाइल अभी स्थानीय मेमोरी में नहीं मिली।';
+
+  @override
+  String get openInExternalApp => 'बाहरी ऐप में खोलें';
+
+  @override
+  String get secureBadge => 'सुरक्षित';
+
+  @override
+  String get savedDocument => 'सहेजा गया दस्तावेज़';
+
+  @override
+  String get readyBadge => 'तैयार';
+
+  @override
+  String get pinnedBadge => 'पिन किया गया';
+
+  @override
+  String get passportSlot => 'पासपोर्ट स्लॉट';
+
+  @override
+  String get saveYourPassport => '+ अपना पासपोर्ट सहेजें';
+
+  @override
+  String get tapToView => 'देखने के लिए टैप करें';
+
+  @override
+  String get quickUpload => 'त्वरित अपलोड';
+
+  @override
+  String get noDocumentsForFilter => 'इस फ़िल्टर से कोई दस्तावेज़ नहीं मिला';
+
+  @override
+  String get pdfFileBadge => 'PDF फ़ाइल';
+
+  @override
+  String get pdfBadge => 'PDF';
+
+  @override
+  String get imageBadge => 'छवि';
+
+  @override
+  String get addToWallet => '+ वॉलेट';
+
+  @override
+  String get boardingPassOptions => 'बोर्डिंग पास विकल्प';
+
+  @override
+  String get openPdf => 'PDF खोलें';
+
+  @override
+  String get vaultPinProtection => 'वॉल्ट पिन सुरक्षा';
+
+  @override
+  String get pinProtectionActive => 'पिन सुरक्षा सक्रिय है';
+
+  @override
+  String get unprotectedSetPin => 'असुरक्षित (पिन सेट करें)';
+
+  @override
+  String get setup => 'सेट करें';
+
+  @override
+  String get changePinDescription =>
+      'नया 4-अंकीय पिन दर्ज करें या मौजूदा पिन हटाएं।';
+
+  @override
+  String get setPinDescription =>
+      'वॉल्ट में दस्तावेज़ों की सुरक्षा के लिए 4-अंकीय पिन दर्ज करें।';
+
+  @override
+  String get removePin => 'पिन हटाएं';
+
+  @override
+  String get proActive => 'PackBuddy Pro सक्रिय है';
+
+  @override
+  String get annualPlan => 'वार्षिक योजना (₹3,299/वर्ष)';
+
+  @override
+  String get monthlyPlan => 'मासिक योजना (₹399/माह)';
+
+  @override
+  String get activePlanLabel => 'सदस्यता योजना';
+
+  @override
+  String get editItem => 'सामान संपादित करें';
+
+  @override
+  String get addNewItem => 'नया सामान जोड़ें';
+
+  @override
+  String get itemName => 'सामान का नाम';
+
+  @override
+  String get itemNameHint => 'उदा: वाटरप्रूफ जैकेट, हेडफोन...';
+
+  @override
+  String get pleaseEnterItemName => 'कृपया सामान का नाम दर्ज करें';
+
+  @override
+  String get carryType => 'ले जाने का प्रकार';
+
+  @override
+  String get compartment => 'डिब्बा / स्थान';
+
+  @override
+  String get pieces => 'नग';
+
+  @override
+  String get addToBaggage => 'सामान में जोड़ें';
+
+  @override
+  String get itemUpdated => 'अपडेट किया गया।';
+
+  @override
+  String get itemAddedToBaggage => 'सामान में जोड़ा गया।';
+
+  @override
+  String get markedAsPacked => 'पैक के रूप में चिह्नित';
+
+  @override
+  String get notPacked => 'पैक नहीं किया गया';
+
+  @override
+  String get packed => 'पैक किया गया';
+
+  @override
+  String get smartTemplatesSubtitle =>
+      'एक टैप में तैयार पैकिंग सूचियों को अपने बैग में स्थानांतरित करें';
+
+  @override
+  String get itemsCount => 'सामान';
+
+  @override
+  String get readyTravelPackage => 'तैयार यात्रा पैकेज';
+
+  @override
+  String get contentList => 'सामग्री सूची:';
+
+  @override
+  String get templateImportSuccess => 'सामान टेम्पलेट से जोड़ा गया! 🎉';
+
+  @override
+  String get addTemplateToBaggage => 'सामान में जोड़ें';
+
+  @override
+  String get currentLimit => 'वर्तमान सीमा';
+
+  @override
+  String get searchAirlineOrCode => 'एयरलाइन या कोड खोजें (AI, 6E, TK)...';
+
+  @override
+  String get activeLimit => 'सक्रिय सीमा';
+
+  @override
+  String get cabinBaggage => 'केबिन सामान';
+
+  @override
+  String get checkedBaggage => 'चेक-इन सामान';
+
+  @override
+  String get standardEconomy => 'मानक इकोनॉमी';
+
+  @override
+  String get limitSelected => 'यह सीमा चुनी गई';
+
+  @override
+  String get applyCabinLimit => 'केबिन सीमा लागू करें';
+
+  @override
+  String get baggageLimitSet => 'सामान सीमा सेट की गई:';
+
+  @override
+  String get lockVault => 'वॉल्ट लॉक करें';
+
+  @override
+  String get navHome => 'होम';
+
+  @override
+  String get navTrips => 'यात्राएं';
+
+  @override
+  String get navBaggage => 'सामान';
+
+  @override
+  String get navVault => 'तिजोरी';
+
+  @override
+  String get navSettings => 'सेटिंग्स';
+
+  @override
+  String get selectAirlineToCustomize =>
+      'अपनी एयरलाइन के लिए सीमा अनुकूलित करने के लिए टैप करें';
+
+  @override
+  String get changeAirlineLimit => 'एयरलाइन बदलें';
+
+  @override
+  String get selectCountryAndRoute => 'देश और मार्ग चुनें';
+
+  @override
+  String get countriesLabel => 'देश';
+
+  @override
+  String get searchCountryOrCity =>
+      'देश या शहर खोजें (उदा: इटली, टोक्यो, पेरिस)...';
+
+  @override
+  String get noMatchingCountry => 'कोई मेल खाता देश नहीं मिला';
+
+  @override
+  String get activeStatus => 'सक्रिय';
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
@@ -9,6 +10,8 @@ import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/screens/trips_screen.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  GoogleFonts.config.allowRuntimeFetching = false;
   group('1 & 2: Smooth Animations & App Themes', () {
     test('AppAnimations contains consistent durations and cubic curves', () {
       expect(AppAnimations.fast, const Duration(milliseconds: 200));

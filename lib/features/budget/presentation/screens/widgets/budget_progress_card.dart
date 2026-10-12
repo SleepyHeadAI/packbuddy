@@ -120,6 +120,8 @@ class BudgetProgressCard extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                         color: theme.colorScheme.onSurface,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -146,6 +148,8 @@ class BudgetProgressCard extends StatelessWidget {
                               ? AppColors.errorPastel
                               : theme.colorScheme.primary,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),

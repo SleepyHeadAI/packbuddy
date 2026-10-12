@@ -1,21 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../services/preferences_service.dart';
 
-/// Notifier to switch between languages dynamically across PackBuddy
+/// Notifier to switch between languages dynamically across PackBuddy with persistence
 class LocaleNotifier extends StateNotifier<Locale> {
-  LocaleNotifier() : super(const Locale('tr'));
+  final PreferencesService _prefs;
+
+  LocaleNotifier([PreferencesService? prefs])
+      : _prefs = prefs ?? PreferencesService.instance,
+        super(prefs?.getLocale() ?? PreferencesService.instance.getLocale() ?? const Locale('tr'));
 
   void setLocale(Locale locale) {
     if (state != locale) {
       state = locale;
+      _prefs.setLocale(locale);
     }
   }
 
   void toggleLocale() {
     if (state.languageCode == 'tr') {
-      state = const Locale('en');
+      setLocale(const Locale('en'));
     } else {
-      state = const Locale('tr');
+      setLocale(const Locale('tr'));
     }
   }
 }
@@ -24,3 +30,4 @@ class LocaleNotifier extends StateNotifier<Locale> {
 final localeProvider = StateNotifierProvider<LocaleNotifier, Locale>((ref) {
   return LocaleNotifier();
 });
+

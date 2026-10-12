@@ -13,7 +13,13 @@ class PaywallSheet extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => const PaywallSheet(),
+      sheetAnimationStyle: const AnimationStyle(
+        duration: Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
+        reverseDuration: Duration(milliseconds: 200),
+        reverseCurve: Curves.easeInCubic,
+      ),
+      builder: (_) => const RepaintBoundary(child: PaywallSheet()),
     );
   }
 
@@ -118,93 +124,137 @@ class PaywallSheet extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
-          // Subscription Plan Selector (Annual vs Monthly)
-          Row(
-            children: [
-              Expanded(
-                child: _PlanOptionCard(
-                  title: l10n.annual,
-                  price: '\$39.99 / yr',
-                  subPrice: '\$3.33 / mo',
-                  badge: l10n.annualSave,
-                  isSelected: proState.activePlan == SubscriptionPlan.annual,
-                  onTap: () {
-                    ref.read(proSubscriptionProvider.notifier).selectPlan(SubscriptionPlan.annual);
-                  },
-                ),
+          if (proState.isPro) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.successPastel.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.successPastel.withValues(alpha: 0.4)),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _PlanOptionCard(
-                  title: l10n.monthly,
-                  price: '\$4.99 / mo',
-                  subPrice: null,
-                  badge: null,
-                  isSelected: proState.activePlan == SubscriptionPlan.monthly,
-                  onTap: () {
-                    ref.read(proSubscriptionProvider.notifier).selectPlan(SubscriptionPlan.monthly);
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          // Subscribe / Purchase Action Button
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              onPressed: proState.isLoading
-                  ? null
-                  : () async {
-                      final success = await ref
-                          .read(proSubscriptionProvider.notifier)
-                          .purchaseActivePlan();
-                      if (context.mounted && success) {
-                        Navigator.of(context).pop();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Row(
-                              children: [
-                                const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
-                                const SizedBox(width: 12),
-                                Expanded(child: Text(l10n.purchaseSuccess)),
-                              ],
-                            ),
-                            backgroundColor: AppColors.successPastel,
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                        );
-                      }
-                    },
-              child: proState.isLoading
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        color: Colors.white,
-                      ),
-                    )
-                  : Text(
-                      l10n.subscribeNow,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+              child: Row(
+                children: [
+                  const Icon(Icons.verified_rounded, color: AppColors.successPastel, size: 28),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.proActive,
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        Text(
+                          '${l10n.activePlanLabel}: ${proState.activePlan == SubscriptionPlan.annual ? l10n.annualPlan : l10n.monthlyPlan}',
+                          style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+                        ),
+                      ],
                     ),
+                  ),
+                ],
+              ),
             ),
-          ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: FilledButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: FilledButton.styleFrom(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+                child: Text(l10n.ok, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              ),
+            ),
+          ] else ...[
+            // Subscription Plan Selector (Annual vs Monthly)
+            Row(
+              children: [
+                Expanded(
+                  child: _PlanOptionCard(
+                    title: l10n.annual,
+                    price: '\$39.99 / yr',
+                    subPrice: '\$3.33 / mo',
+                    badge: l10n.annualSave,
+                    isSelected: proState.activePlan == SubscriptionPlan.annual,
+                    onTap: () {
+                      ref.read(proSubscriptionProvider.notifier).selectPlan(SubscriptionPlan.annual);
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _PlanOptionCard(
+                    title: l10n.monthly,
+                    price: '\$4.99 / mo',
+                    subPrice: null,
+                    badge: null,
+                    isSelected: proState.activePlan == SubscriptionPlan.monthly,
+                    onTap: () {
+                      ref.read(proSubscriptionProvider.notifier).selectPlan(SubscriptionPlan.monthly);
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // Subscribe / Purchase Action Button
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.onPrimary,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                onPressed: proState.isLoading
+                    ? null
+                    : () async {
+                        final success = await ref
+                            .read(proSubscriptionProvider.notifier)
+                            .purchaseActivePlan();
+                        if (context.mounted && success) {
+                          Navigator.of(context).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                                  const SizedBox(width: 12),
+                                  Expanded(child: Text(l10n.purchaseSuccess)),
+                                ],
+                              ),
+                              backgroundColor: AppColors.successPastel,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                          );
+                        }
+                      },
+                child: proState.isLoading
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        l10n.subscribeNow,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+              ),
+            ),
+          ],
         ],
       ),
     ),

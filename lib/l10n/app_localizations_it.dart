@@ -233,4 +233,681 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get architecturePhase => 'Fase 5: Prodotto completo e 20 lingue';
+
+  @override
+  String get goodMorning => 'Buongiorno, Viaggiatore ☀️';
+
+  @override
+  String get goodAfternoon => 'Buon pomeriggio, Viaggiatore ✈️';
+
+  @override
+  String get goodEvening => 'Buonasera, Viaggiatore 🌙';
+
+  @override
+  String get allCategories => 'Tutto';
+
+  @override
+  String get categoryClothing => 'Abbigliamento';
+
+  @override
+  String get categoryElectronics => 'Elettronica';
+
+  @override
+  String get categoryToiletries => 'Toeletta';
+
+  @override
+  String get categoryDocuments => 'Documenti';
+
+  @override
+  String get categoryAccessories => 'Accessori';
+
+  @override
+  String get deleted => 'eliminato';
+
+  @override
+  String get undo => 'ANNULLA';
+
+  @override
+  String get luggageAndChecklist => 'Bagagli & Lista';
+
+  @override
+  String get smartPackingTemplates => 'Modelli di Valigia Intelligenti';
+
+  @override
+  String get airlineBaggageGuide => 'Guida Bagagli Compagnie Aeree';
+
+  @override
+  String get vaultLocked => 'Cassaforte Bloccata';
+
+  @override
+  String get unlockVault => 'Sblocca Cassaforte';
+
+  @override
+  String get security => 'Sicurezza';
+
+  @override
+  String get upcomingRoute => 'Itinerario in Arrivo';
+
+  @override
+  String get ongoingTrip => 'Viaggio in Corso';
+
+  @override
+  String get offlineVault => 'Cassaforte Offline';
+
+  @override
+  String get noItemsYet => 'Nessun oggetto aggiunto';
+
+  @override
+  String get itemsReady => 'oggetti pronti';
+
+  @override
+  String get listEmpty => 'LISTA VUOTA';
+
+  @override
+  String get quickActions => 'AZIONI RAPIDE';
+
+  @override
+  String get addItem => 'Aggiungi Oggetto';
+
+  @override
+  String get recentlyAdded => 'OGGETTI RECENTI';
+
+  @override
+  String get travelAssistant => 'ASSISTENTE DI VIAGGIO';
+
+  @override
+  String get viewAll => 'Mostra Tutto';
+
+  @override
+  String get allNotificationsUpToDate => 'Tutte le notifiche sono aggiornate!';
+
+  @override
+  String get createFirstTrip => 'Crea subito il tuo primo itinerario e budget.';
+
+  @override
+  String get editTrip => 'Modifica Viaggio';
+
+  @override
+  String get editExpense => 'Modifica Spesa';
+
+  @override
+  String get expenseTitle => 'Titolo Spesa';
+
+  @override
+  String get expenseTitleHint => 'es. Cena, Biglietto Metro, Caffè...';
+
+  @override
+  String get pleaseEnterExpenseTitle => 'Inserisci un titolo per la spesa';
+
+  @override
+  String get customCategoryName => 'Nome Categoria Personalizzata';
+
+  @override
+  String get customCategoryHint => 'es. Souvenir, Mancia, Museo, Visto...';
+
+  @override
+  String get pleaseEnterCustomCategory => 'Inserisci il nome della categoria';
+
+  @override
+  String get paymentMethod => 'Metodo di Pagamento';
+
+  @override
+  String get cash => 'Contanti';
+
+  @override
+  String get creditCard => 'Carta di Credito';
+
+  @override
+  String get debitCard => 'Carta di Debito';
+
+  @override
+  String get onlinePayment => 'Pagamento Online';
+
+  @override
+  String get customTransport => 'Trasporto Personalizzato';
+
+  @override
+  String get addCustomTransport => '+ Trasporto Personalizzato';
+
+  @override
+  String get itineraryStops => 'Fermate Itinerario';
+
+  @override
+  String get destinationHint => 'Città o paese di destinazione';
+
+  @override
+  String get baggageAndChecklist => 'Bagagli & Checklist';
+
+  @override
+  String get travelDocuments => 'Documenti di Viaggio';
+
+  @override
+  String get currencySynced => 'Tassi di cambio sincronizzati automaticamente';
+
+  @override
+  String get offlineRatesActive => 'Tassi di riferimento offline attivi';
+
+  @override
+  String get createPinToProtect =>
+      'Crea un PIN a 4 cifre per proteggere i tuoi documenti.';
+
+  @override
+  String get createPinAndProtect => 'Crea PIN e Proteggi';
+
+  @override
+  String get continueUnlocked => 'Continua Senza PIN';
+
+  @override
+  String get changeOrRemovePin => 'Modifica o Rimuovi PIN';
+
+  @override
+  String get setVaultPin => 'Imposta PIN Cassaforte';
+
+  @override
+  String get boardingPassAndPass => 'Carta d’Imbarco e Pass';
+
+  @override
+  String get offlineAndEncrypted => 'Offline e Crittografato';
+
+  @override
+  String get searchItems => 'Cerca';
+
+  @override
+  String get closeSearch => 'Chiudi Ricerca';
+
+  @override
+  String get readyTemplates => 'Modelli';
+
+  @override
+  String get searchItemsHint => 'Cerca oggetto...';
+
+  @override
+  String get noMatchingItems => 'Nessun oggetto trovato';
+
+  @override
+  String get checklistEmpty => 'La lista è vuota';
+
+  @override
+  String get addFirstItem => 'Aggiungi il tuo primo oggetto';
+
+  @override
+  String get completed => 'completato';
+
+  @override
+  String get budgetLimit => 'Limite di Budget';
+
+  @override
+  String get change => 'Modifica';
+
+  @override
+  String get set => 'Imposta';
+
+  @override
+  String get notifications => 'Notifiche';
+
+  @override
+  String get plan => 'Pianifica';
+
+  @override
+  String get preparing => 'IN PREPARAZIONE';
+
+  @override
+  String get tripsPlanned => 'viaggi pianificati';
+
+  @override
+  String get documentsSaved => 'documenti e biglietti salvati';
+
+  @override
+  String get standardBaggageLimitNote =>
+      'Limite standard: Cabina 8 kg • Da stiva 20-23 kg';
+
+  @override
+  String get airlineBaggageLimits => 'Limiti bagaglio compagnie';
+
+  @override
+  String get compartmentBreakdown => 'Suddivisione scomparti';
+
+  @override
+  String get packingTip =>
+      'Consiglio: Arrotolare i vestiti invece di piegarli fa risparmiare il 30% di spazio.';
+
+  @override
+  String get tryDifferentKeyword =>
+      'Prova con un\'altra parola chiave o categoria';
+
+  @override
+  String get luggagePreparationGuide => 'Guida preparazione bagagli';
+
+  @override
+  String get weighingResponsibilityNote =>
+      '⚖️ La responsabilità del peso è a carico del passeggero.';
+
+  @override
+  String get digitalWallet => 'Portafoglio digitale';
+
+  @override
+  String get flight => 'Volo';
+
+  @override
+  String get bulletTrain => 'Treno ad alta velocità';
+
+  @override
+  String get train => 'Treno';
+
+  @override
+  String get car => 'Auto / Noleggio';
+
+  @override
+  String get bus => 'Autobus';
+
+  @override
+  String get ferry => 'Traghetto / Nave';
+
+  @override
+  String get motorcycle => 'Moto';
+
+  @override
+  String get camper => 'Camper';
+
+  @override
+  String get bicycle => 'Bicicletta';
+
+  @override
+  String get subway => 'Metropolitana / Tram';
+
+  @override
+  String get hiking => 'Trekking / Escursionismo';
+
+  @override
+  String get transportMode => 'Mezzo di trasporto';
+
+  @override
+  String get customTransportType => 'Trasporto personalizzato';
+
+  @override
+  String get customTransportVehicle => 'Veicolo / Mezzo';
+
+  @override
+  String get customTransportHint => 'Es: Elicottero, Yacht, Funivia, Safari...';
+
+  @override
+  String get cityOrStopHint =>
+      'Inserisci città o tappa (es: Parigi, Roma, Tokyo)...';
+
+  @override
+  String get travelRouteOrStops => 'Itinerario / Tappe';
+
+  @override
+  String get addCountry => 'Aggiungi paese';
+
+  @override
+  String get tripNameHint => 'Es: Tour in Italia, Vacanza estiva...';
+
+  @override
+  String get tripNotesLabel =>
+      'Note di viaggio (Hotel, Prenotazione, Itinerario...)';
+
+  @override
+  String get tripNotesHint =>
+      'Es: Check-in hotel ore 14:00, non dimenticare passaporti...';
+
+  @override
+  String get changeCurrency => 'Cambia valuta';
+
+  @override
+  String get expenseNotesLabel => 'Nota spesa (Dettagli, N. ricevuta...)';
+
+  @override
+  String get expenseNotesHint => 'Es: Cena con mancia inclusa...';
+
+  @override
+  String get wrongPinTryAgain => 'PIN errato! Riprova.';
+
+  @override
+  String get fourDigitPin => 'PIN a 4 cifre';
+
+  @override
+  String get saveAndOpen => 'Salva e sblocca';
+
+  @override
+  String get enterPinToUnlockVault =>
+      'Inserisci il PIN per accedere ai passaporti e ai documenti';
+
+  @override
+  String get vaultNotProtectedWithPin =>
+      'La tua cassaforte non è ancora protetta da un PIN';
+
+  @override
+  String get lastTrip => 'Ultimo viaggio';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get custom => 'Personalizzato';
+
+  @override
+  String get add => 'Aggiungi';
+
+  @override
+  String get close => 'Chiudi';
+
+  @override
+  String get delete => 'Elimina';
+
+  @override
+  String get edit => 'Modifica';
+
+  @override
+  String get tickets => 'Biglietti';
+
+  @override
+  String get idAndPassport => 'Documenti e passaporto';
+
+  @override
+  String get healthAndInsurance => 'Salute e assicurazione';
+
+  @override
+  String get otherDocuments => 'Altri documenti';
+
+  @override
+  String get allDocuments => 'Tutti i documenti';
+
+  @override
+  String get allTickets => 'Tutti i biglietti';
+
+  @override
+  String get flightTickets => 'Biglietti aerei';
+
+  @override
+  String get busTickets => 'Biglietti autobus';
+
+  @override
+  String get ferryBoat => 'Traghetto / Barca';
+
+  @override
+  String get trainTickets => 'Biglietti del treno';
+
+  @override
+  String get allTrips => 'Tutti i viaggi';
+
+  @override
+  String get general => 'Generale';
+
+  @override
+  String get generalDocumentAllTrips =>
+      '🌐 Documento generale (Tutti i viaggi)';
+
+  @override
+  String get documentScope => 'Ambito documento / Viaggio';
+
+  @override
+  String get documentNotesLabel => 'Nota documento (PNR, Posto, Scadenza...)';
+
+  @override
+  String get documentNotesHint => 'Es: PNR: TK7890, Posto: 12A, Terminal 2';
+
+  @override
+  String get uploadDocumentPrompt => 'Carica documento (Foto o PDF)';
+
+  @override
+  String get pdfOrFile => 'PDF / File';
+
+  @override
+  String get ticketTypeSubCategory => 'Tipo di biglietto / Sottocategoria';
+
+  @override
+  String get documentNameHint => 'Es: Biglietto aereo, Prenotazione hotel...';
+
+  @override
+  String get flightTicket => 'Biglietto aereo';
+
+  @override
+  String get busTicket => 'Biglietto autobus';
+
+  @override
+  String get ferryTicket => 'Biglietto traghetto / nave';
+
+  @override
+  String get trainTicket => 'Biglietto treno';
+
+  @override
+  String get otherTransport => 'Altro trasporto';
+
+  @override
+  String get myPassport => 'Il mio passaporto';
+
+  @override
+  String get hotelBooking => 'Prenotazione hotel';
+
+  @override
+  String get mainCategory => 'Categoria principale';
+
+  @override
+  String get boardingPassAndTransit => 'Carta d\'imbarco e pass di transito';
+
+  @override
+  String get boardingPassSubtitle =>
+      'Visualizza documento o apri nell\'app del dispositivo';
+
+  @override
+  String get viewDocumentAction => 'Visualizza documento';
+
+  @override
+  String get fileNotFoundLocally =>
+      'File non ancora trovato nella memoria locale.';
+
+  @override
+  String get openInExternalApp => 'Apri nell\'app esterna';
+
+  @override
+  String get secureBadge => 'SICURO';
+
+  @override
+  String get savedDocument => 'Documento salvato';
+
+  @override
+  String get readyBadge => 'PRONTO';
+
+  @override
+  String get pinnedBadge => 'FISSATO';
+
+  @override
+  String get passportSlot => 'Slot passaporto';
+
+  @override
+  String get saveYourPassport => '+ Salva il tuo passaporto';
+
+  @override
+  String get tapToView => 'Tocca per visualizzare';
+
+  @override
+  String get quickUpload => 'Caricamento rapido';
+
+  @override
+  String get noDocumentsForFilter =>
+      'Nessun documento trovato per questo filtro';
+
+  @override
+  String get pdfFileBadge => 'FILE PDF';
+
+  @override
+  String get pdfBadge => 'PDF';
+
+  @override
+  String get imageBadge => 'IMMAGINE';
+
+  @override
+  String get addToWallet => '+ Wallet';
+
+  @override
+  String get boardingPassOptions => 'Opzioni carta d\'imbarco';
+
+  @override
+  String get openPdf => 'Apri PDF';
+
+  @override
+  String get vaultPinProtection => 'Protezione PIN cassaforte';
+
+  @override
+  String get pinProtectionActive => 'Protezione PIN attiva';
+
+  @override
+  String get unprotectedSetPin => 'Non protetta (Imposta un PIN)';
+
+  @override
+  String get setup => 'Configura';
+
+  @override
+  String get changePinDescription =>
+      'Inserisci un nuovo PIN a 4 cifre o rimuovi il PIN esistente.';
+
+  @override
+  String get setPinDescription =>
+      'Inserisci un PIN a 4 cifre per proteggere passaporti e documenti nella cassaforte.';
+
+  @override
+  String get removePin => 'Rimuovi PIN';
+
+  @override
+  String get proActive => 'PackBuddy Pro Attivo';
+
+  @override
+  String get annualPlan => 'Piano annuale (39,99 \$/anno)';
+
+  @override
+  String get monthlyPlan => 'Piano mensile (4,99 \$/mese)';
+
+  @override
+  String get activePlanLabel => 'Piano di abbonamento';
+
+  @override
+  String get editItem => 'Modifica oggetto';
+
+  @override
+  String get addNewItem => 'Aggiungi nuovo oggetto';
+
+  @override
+  String get itemName => 'Nome oggetto';
+
+  @override
+  String get itemNameHint => 'Es: Giacca impermeabile, Cuffie...';
+
+  @override
+  String get pleaseEnterItemName => 'Inserisci il nome dell\'oggetto';
+
+  @override
+  String get carryType => 'Tipo di trasporto';
+
+  @override
+  String get compartment => 'Scomparto / Posizione';
+
+  @override
+  String get pieces => 'pz';
+
+  @override
+  String get addToBaggage => 'Aggiungi al bagaglio';
+
+  @override
+  String get itemUpdated => 'aggiornato.';
+
+  @override
+  String get itemAddedToBaggage => 'aggiunto al bagaglio.';
+
+  @override
+  String get markedAsPacked => 'Contrassegnato come imballato';
+
+  @override
+  String get notPacked => 'Non imballato';
+
+  @override
+  String get packed => 'Imballato';
+
+  @override
+  String get smartTemplatesSubtitle =>
+      'Trasferisci liste bagagli curate direttamente nella valigia con un tocco';
+
+  @override
+  String get itemsCount => 'Oggetti';
+
+  @override
+  String get readyTravelPackage => 'Pacchetto viaggio pronto';
+
+  @override
+  String get contentList => 'Elenco contenuti:';
+
+  @override
+  String get templateImportSuccess => 'oggetti aggiunti dal modello! 🎉';
+
+  @override
+  String get addTemplateToBaggage => 'Aggiungi al bagaglio';
+
+  @override
+  String get currentLimit => 'Limite attuale';
+
+  @override
+  String get searchAirlineOrCode =>
+      'Cerca compagnia o codice (es: AZ, TK, LH)...';
+
+  @override
+  String get activeLimit => 'Limite attivo';
+
+  @override
+  String get cabinBaggage => 'Bagaglio a mano';
+
+  @override
+  String get checkedBaggage => 'Bagaglio da stiva';
+
+  @override
+  String get standardEconomy => 'Economy standard';
+
+  @override
+  String get limitSelected => 'Questo limite è selezionato';
+
+  @override
+  String get applyCabinLimit => 'Applica limite cabina';
+
+  @override
+  String get baggageLimitSet => 'Limite bagaglio impostato su';
+
+  @override
+  String get lockVault => 'Blocca cassaforte';
+
+  @override
+  String get navHome => 'Home';
+
+  @override
+  String get navTrips => 'Viaggi';
+
+  @override
+  String get navBaggage => 'Bagagli';
+
+  @override
+  String get navVault => 'Cassaforte';
+
+  @override
+  String get navSettings => 'Impostazioni';
+
+  @override
+  String get selectAirlineToCustomize =>
+      'Tocca per personalizzare i limiti per la tua compagnia aerea';
+
+  @override
+  String get changeAirlineLimit => 'Cambia compagnia';
+
+  @override
+  String get selectCountryAndRoute => 'Seleziona paese e itinerario';
+
+  @override
+  String get countriesLabel => 'Paesi';
+
+  @override
+  String get searchCountryOrCity =>
+      'Cerca paese o città (es: Italia, Tokyo, Parigi)...';
+
+  @override
+  String get noMatchingCountry => 'Nessun paese corrispondente trovato';
+
+  @override
+  String get activeStatus => 'ATTIVO';
 }

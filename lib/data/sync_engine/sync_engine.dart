@@ -7,6 +7,8 @@ import '../local_db/database_helper.dart';
 import '../../features/budget/domain/trip.dart';
 import '../../features/budget/domain/expense.dart';
 import '../../features/vault/domain/document.dart';
+import '../../features/checklist/domain/packing_item.dart';
+import '../../core/services/currency_service.dart';
 
 /// Sync Status enumeration for UI and State Management
 enum SyncStatus {
@@ -92,6 +94,9 @@ class SyncEngine extends StateNotifier<SyncState> {
         return;
       }
 
+      // Automatically sync latest exchange rates in background when online
+      CurrencyService.syncRates();
+
       // Set status to syncing
       state = state.copyWith(status: SyncStatus.syncing);
 
@@ -146,6 +151,16 @@ class SyncEngine extends StateNotifier<SyncState> {
         processedItems++;
       }
 
+      // 1.4 Soft-deleted Checklist Items
+      final deletedItems = await _dbHelper.getDeletedChecklistItems();
+      for (final item in deletedItems) {
+        try {
+          await firestore.collection('checklist_items').doc(item.id).delete();
+        } catch (_) {}
+        await _dbHelper.hardDeleteChecklistItem(item.id);
+        processedItems++;
+      }
+
       // ===================================================================
       // ALGORITHM STEP 2: Push Local Active Changes to Cloud Firestore
       // ===================================================================
@@ -175,6 +190,16 @@ class SyncEngine extends StateNotifier<SyncState> {
       for (final doc in localDocs) {
         await firestore.collection('documents').doc(doc.id).set(
           doc.toJson(),
+          SetOptions(merge: true),
+        );
+        processedItems++;
+      }
+
+      // 2.4 Push active local Checklist Items
+      final localItems = await _dbHelper.getChecklistItems(includeDeleted: false);
+      for (final item in localItems) {
+        await firestore.collection('checklist_items').doc(item.id).set(
+          item.toJson(),
           SetOptions(merge: true),
         );
         processedItems++;
@@ -230,6 +255,22 @@ class SyncEngine extends StateNotifier<SyncState> {
           processedItems++;
         } else if (remoteDocument.updatedAt.isAfter(localDoc.updatedAt)) {
           await _dbHelper.updateDocument(remoteDocument);
+          processedItems++;
+        }
+      }
+
+      // 3.4 Pull Checklist Items from Firestore
+      final remoteItemsSnapshot = await firestore.collection('checklist_items').get();
+      for (final d in remoteItemsSnapshot.docs) {
+        final remoteData = d.data();
+        final remoteItem = PackingItem.fromJson(remoteData);
+
+        final localItem = await _dbHelper.getChecklistItemById(remoteItem.id);
+        if (localItem == null) {
+          await _dbHelper.insertChecklistItem(remoteItem);
+          processedItems++;
+        } else if (remoteItem.updatedAt.isAfter(localItem.updatedAt)) {
+          await _dbHelper.updateChecklistItem(remoteItem);
           processedItems++;
         }
       }

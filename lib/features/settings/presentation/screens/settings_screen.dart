@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
+import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:packbuddy/core/l10n/l10n.dart';
 import 'package:packbuddy/core/l10n/locale_provider.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
@@ -8,6 +8,7 @@ import 'package:packbuddy/core/theme/theme_provider.dart';
 import 'package:packbuddy/data/sync_engine/sync_engine.dart';
 import 'package:packbuddy/features/settings/data/mock_revenuecat_service.dart';
 import 'package:packbuddy/features/settings/presentation/screens/widgets/paywall_sheet.dart';
+import 'package:packbuddy/features/vault/presentation/controllers/vault_controller.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
 
@@ -22,12 +23,29 @@ class SettingsScreen extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
     final syncState = ref.watch(syncEngineProvider);
     final proState = ref.watch(proSubscriptionProvider);
+    final vaultState = ref.watch(vaultControllerProvider);
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.settings),
-      ),
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(l10n.settings),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded),
+            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+            onPressed: () {
+              if (Navigator.of(context).canPop()) {
+                Navigator.of(context).pop();
+              }
+            },
+          ),
+        ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         children: [
@@ -43,31 +61,34 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           AppCard(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            child: ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
-                  borderRadius: BorderRadius.circular(10),
+            child: Material(
+              color: Colors.transparent,
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    L10n.getLanguageFlag(currentLocale.languageCode),
+                    style: const TextStyle(fontSize: 20),
+                  ),
                 ),
-                child: Text(
-                  L10n.getLanguageFlag(currentLocale.languageCode),
-                  style: const TextStyle(fontSize: 20),
+                title: Text(
+                  L10n.getLanguageName(currentLocale.languageCode),
+                  style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
-              ),
-              title: Text(
-                L10n.getLanguageName(currentLocale.languageCode),
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-              subtitle: Text(
-                '${currentLocale.languageCode.toUpperCase()} • 20 ${l10n.language}',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+                subtitle: Text(
+                  '${currentLocale.languageCode.toUpperCase()} • 20 ${l10n.language}',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => _showLanguageSelector(context, ref, currentLocale),
               ),
-              trailing: const Icon(Icons.chevron_right_rounded),
-              onTap: () => _showLanguageSelector(context, ref, currentLocale),
             ),
           ),
           const SizedBox(height: 24),
@@ -144,7 +165,7 @@ class SettingsScreen extends ConsumerWidget {
                           const SizedBox(height: 4),
                           Text(
                             syncState.lastSyncTime != null
-                                ? '${l10n.lastSync}: ${DateFormat('dd.MM.yyyy HH:mm').format(syncState.lastSyncTime!)}'
+                                ? '${l10n.lastSync}: ${AppDateFormatter.formatDateTime(syncState.lastSyncTime!)}'
                                 : '${l10n.lastSync}: --',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
@@ -186,9 +207,45 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
           ),
+          // 5. Security & Vault Protection
+          _SectionHeader(title: l10n.security),
+          const SizedBox(height: 8),
+          AppCard(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: vaultState.hasPin
+                      ? AppColors.successPastel.withValues(alpha: 0.15)
+                      : theme.colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  vaultState.hasPin ? Icons.lock_rounded : Icons.lock_open_rounded,
+                  color: vaultState.hasPin ? AppColors.successPastel : theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              title: Text(
+                l10n.vaultPinProtection,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              subtitle: Text(
+                vaultState.hasPin ? l10n.pinProtectionActive : l10n.unprotectedSetPin,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              trailing: TextButton(
+                onPressed: () => _showPinDialog(context, ref, vaultState.hasPin),
+                child: Text(vaultState.hasPin ? l10n.change : l10n.setup),
+              ),
+            ),
+          ),
           const SizedBox(height: 28),
 
-          // 5. App Footer
+          // 6. App Footer
           Center(
             child: Column(
               children: [
@@ -212,6 +269,65 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 16),
         ],
       ),
+    ),
+  );
+}
+
+  void _showPinDialog(BuildContext context, WidgetRef ref, bool hasPin) {
+    final l10n = AppLocalizations.of(context)!;
+    final pinController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(hasPin ? l10n.changeOrRemovePin : l10n.setVaultPin),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              hasPin ? l10n.changePinDescription : l10n.setPinDescription,
+              style: const TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: pinController,
+              keyboardType: TextInputType.number,
+              maxLength: 4,
+              obscureText: true,
+              autofocus: true,
+              decoration: InputDecoration(
+                labelText: l10n.fourDigitPin,
+                prefixIcon: const Icon(Icons.pin_rounded),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          if (hasPin)
+            TextButton(
+              style: TextButton.styleFrom(foregroundColor: AppColors.errorPastel),
+              onPressed: () {
+                ref.read(vaultControllerProvider.notifier).removePin();
+                Navigator.of(ctx).pop();
+              },
+              child: Text(l10n.removePin),
+            ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              final pin = pinController.text.trim();
+              if (pin.length == 4) {
+                ref.read(vaultControllerProvider.notifier).setPin(pin);
+                Navigator.of(ctx).pop();
+              }
+            },
+            child: Text(l10n.save),
+          ),
+        ],
+      ),
     );
   }
 
@@ -220,14 +336,21 @@ class SettingsScreen extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      sheetAnimationStyle: const AnimationStyle(
+        duration: Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
+        reverseDuration: Duration(milliseconds: 200),
+        reverseCurve: Curves.easeInCubic,
+      ),
       builder: (ctx) {
         final theme = Theme.of(ctx);
         final l10n = AppLocalizations.of(ctx)!;
 
-        return Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(ctx).size.height * 0.75,
-          ),
+        return RepaintBoundary(
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(ctx).size.height * 0.75,
+            ),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -300,9 +423,10 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ],
           ),
-        );
-      },
-    );
+        ),
+      );
+    },
+  );
   }
 
   IconData _getSyncIcon(SyncStatus status) {
@@ -462,7 +586,7 @@ class _ProBanner extends StatelessWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          isPro ? 'ACTIVE' : l10n.proBadge,
+                          isPro ? l10n.activeStatus : l10n.proBadge,
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 10,

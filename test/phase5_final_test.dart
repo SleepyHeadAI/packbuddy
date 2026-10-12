@@ -9,6 +9,13 @@ import 'package:packbuddy/features/settings/presentation/screens/settings_screen
 import 'package:packbuddy/features/settings/presentation/screens/widgets/paywall_sheet.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
+class FakeProNotifier extends StateNotifier<ProSubscriptionState> implements MockRevenueCatNotifier {
+  FakeProNotifier(super.state);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 void main() {
   group('Phase 5 - 20 Languages & Localization Verification', () {
     test('L10n supports all 20 languages', () {
@@ -121,6 +128,35 @@ void main() {
       expect(find.text('English'), findsOneWidget);
       expect(find.text('Theme'), findsOneWidget);
       expect(find.text('Sync Now'), findsOneWidget);
+    });
+
+    testWidgets('SettingsScreen displays localized active status badge when Pro is active', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            proSubscriptionProvider.overrideWith(
+              (ref) => FakeProNotifier(
+                const ProSubscriptionState(
+                  isPro: true,
+                  activePlan: SubscriptionPlan.annual,
+                ),
+              ),
+            ),
+          ],
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('tr'),
+            home: SettingsScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('PackBuddy Pro'), findsOneWidget);
+      expect(find.text('AKTİF'), findsOneWidget);
+      expect(find.text('ACTIVE'), findsNothing);
     });
 
     testWidgets('PaywallSheet displays Pro features and plan options', (tester) async {

@@ -291,5 +291,881 @@
   "architecturePhase": "Phase 5: Full Product & 20 Languages Ready",
   "@architecturePhase": {
     "description": "Phase status indicator"
+  },
+  "goodMorning": "Good morning, Traveler ☀️",
+  "@goodMorning": {
+    "description": "Morning greeting"
+  },
+  "goodAfternoon": "Good afternoon, Traveler ✈️",
+  "@goodAfternoon": {
+    "description": "Afternoon greeting"
+  },
+  "goodEvening": "Good evening, Traveler 🌙",
+  "@goodEvening": {
+    "description": "Evening greeting"
+  },
+  "allCategories": "All",
+  "@allCategories": {
+    "description": "All category filter"
+  },
+  "categoryClothing": "Clothing",
+  "@categoryClothing": {
+    "description": "Clothing category"
+  },
+  "categoryElectronics": "Electronics",
+  "@categoryElectronics": {
+    "description": "Electronics category"
+  },
+  "categoryToiletries": "Toiletries",
+  "@categoryToiletries": {
+    "description": "Toiletries category"
+  },
+  "categoryDocuments": "Documents",
+  "@categoryDocuments": {
+    "description": "Documents category"
+  },
+  "categoryAccessories": "Accessories",
+  "@categoryAccessories": {
+    "description": "Accessories category"
+  },
+  "deleted": "deleted",
+  "@deleted": {
+    "description": "Item deleted snackbar label"
+  },
+  "undo": "UNDO",
+  "@undo": {
+    "description": "Undo action label"
+  },
+  "luggageAndChecklist": "Luggage & Checklist",
+  "@luggageAndChecklist": {
+    "description": "Luggage checklist screen title"
+  },
+  "smartPackingTemplates": "Smart Packing Templates",
+  "@smartPackingTemplates": {
+    "description": "Packing templates label"
+  },
+  "airlineBaggageGuide": "Airline Baggage Guide",
+  "@airlineBaggageGuide": {
+    "description": "Airline baggage guide title"
+  },
+  "vaultLocked": "Vault is Locked",
+  "@vaultLocked": {
+    "description": "Vault locked status"
+  },
+  "unlockVault": "Unlock Vault",
+  "@unlockVault": {
+    "description": "Unlock vault action"
+  },
+  "security": "Security",
+  "@security": {
+    "description": "Security settings section"
+  },
+  "upcomingRoute": "Upcoming Route",
+  "@upcomingRoute": {
+    "description": "Upcoming trip badge"
+  },
+  "ongoingTrip": "Ongoing Trip",
+  "@ongoingTrip": {
+    "description": "Ongoing trip badge"
+  },
+  "offlineVault": "Offline Vault",
+  "@offlineVault": {
+    "description": "Offline vault stat label"
+  },
+  "noItemsYet": "No items added yet",
+  "@noItemsYet": {
+    "description": "Empty items state"
+  },
+  "itemsReady": "items ready",
+  "@itemsReady": {
+    "description": "Items packed status"
+  },
+  "listEmpty": "EMPTY LIST",
+  "@listEmpty": {
+    "description": "Empty list badge"
+  },
+  "quickActions": "QUICK ACTIONS",
+  "@quickActions": {
+    "description": "Quick actions section header"
+  },
+  "addItem": "Add Item",
+  "@addItem": {
+    "description": "Add packing item button"
+  },
+  "recentlyAdded": "RECENTLY ADDED ITEMS",
+  "@recentlyAdded": {
+    "description": "Recent items section header"
+  },
+  "travelAssistant": "TRAVEL ASSISTANT",
+  "@travelAssistant": {
+    "description": "Travel assistant section header"
+  },
+  "viewAll": "View All",
+  "@viewAll": {
+    "description": "View all items link"
+  },
+  "allNotificationsUpToDate": "All travel notifications are up to date!",
+  "@allNotificationsUpToDate": {
+    "description": "Notification snackbar"
+  },
+  "createFirstTrip": "Create your first route and budget now.",
+  "@createFirstTrip": {
+    "description": "Empty trips banner subtitle"
+  },
+  "editTrip": "Edit Trip",
+  "@editTrip": {
+    "description": "Edit trip sheet title"
+  },
+  "editExpense": "Edit Expense",
+  "@editExpense": {
+    "description": "Edit expense sheet title"
+  },
+  "expenseTitle": "Expense / Transaction Title",
+  "@expenseTitle": {
+    "description": "Expense title input label"
+  },
+  "expenseTitleHint": "e.g. Dinner, Metro Ticket, Coffee...",
+  "@expenseTitleHint": {
+    "description": "Expense title input hint"
+  },
+  "pleaseEnterExpenseTitle": "Please enter an expense or transaction title",
+  "@pleaseEnterExpenseTitle": {
+    "description": "Expense title validator error"
+  },
+  "customCategoryName": "Custom Category Name",
+  "@customCategoryName": {
+    "description": "Custom category input label"
+  },
+  "customCategoryHint": "e.g. Souvenir, Tip, Museum, Visa, Gas...",
+  "@customCategoryHint": {
+    "description": "Custom category input hint"
+  },
+  "pleaseEnterCustomCategory": "Please enter custom category name",
+  "@pleaseEnterCustomCategory": {
+    "description": "Custom category validator error"
+  },
+  "paymentMethod": "Payment Method",
+  "@paymentMethod": {
+    "description": "Payment method header"
+  },
+  "cash": "Cash",
+  "@cash": {
+    "description": "Cash payment option"
+  },
+  "creditCard": "Credit Card",
+  "@creditCard": {
+    "description": "Credit card payment option"
+  },
+  "debitCard": "Debit Card",
+  "@debitCard": {
+    "description": "Debit card payment option"
+  },
+  "onlinePayment": "Online Payment",
+  "@onlinePayment": {
+    "description": "Online payment option"
+  },
+  "customTransport": "Custom Transport",
+  "@customTransport": {
+    "description": "Custom transport option"
+  },
+  "addCustomTransport": "+ Custom Transport",
+  "@addCustomTransport": {
+    "description": "Add custom transport button"
+  },
+  "itineraryStops": "Itinerary Stops",
+  "@itineraryStops": {
+    "description": "Itinerary stops label"
+  },
+  "destinationHint": "Destination city or country",
+  "@destinationHint": {
+    "description": "Destination field hint"
+  },
+  "baggageAndChecklist": "Luggage & Checklist",
+  "@baggageAndChecklist": {
+    "description": "Luggage & checklist tooltip"
+  },
+  "travelDocuments": "Travel Documents",
+  "@travelDocuments": {
+    "description": "Travel documents tooltip"
+  },
+  "currencySynced": "Exchange rates automatically synchronized",
+  "@currencySynced": {
+    "description": "Currency sync banner"
+  },
+  "offlineRatesActive": "Offline reference rates active (Auto-syncs online)",
+  "@offlineRatesActive": {
+    "description": "Offline rates banner"
+  },
+  "createPinToProtect": "Create a 4-digit PIN code to keep your documents secure.",
+  "@createPinToProtect": {
+    "description": "Vault pin setup description"
+  },
+  "createPinAndProtect": "Create PIN & Protect",
+  "@createPinAndProtect": {
+    "description": "Vault pin setup button"
+  },
+  "continueUnlocked": "Continue Unlocked for Now",
+  "@continueUnlocked": {
+    "description": "Skip pin button"
+  },
+  "changeOrRemovePin": "Change or Remove PIN Code",
+  "@changeOrRemovePin": {
+    "description": "Vault settings pin change title"
+  },
+  "setVaultPin": "Set Vault PIN Code",
+  "@setVaultPin": {
+    "description": "Vault settings pin set title"
+  },
+  "boardingPassAndPass": "Boarding Pass & Travel Pass",
+  "@boardingPassAndPass": {
+    "description": "Boarding pass category"
+  },
+  "offlineAndEncrypted": "Offline & Encrypted",
+  "@offlineAndEncrypted": {
+    "description": "Vault encryption badge"
+  },
+  "searchItems": "Search items",
+  "@searchItems": {
+    "description": "Search items button"
+  },
+  "closeSearch": "Close search",
+  "@closeSearch": {
+    "description": "Close search button"
+  },
+  "readyTemplates": "Ready Templates",
+  "@readyTemplates": {
+    "description": "Templates button"
+  },
+  "searchItemsHint": "Search item name or tag (e.g. carry-on, headphones)...",
+  "@searchItemsHint": {
+    "description": "Search field hint"
+  },
+  "noMatchingItems": "No matching items found",
+  "@noMatchingItems": {
+    "description": "Empty search results message"
+  },
+  "checklistEmpty": "Checklist is empty",
+  "@checklistEmpty": {
+    "description": "Empty checklist message"
+  },
+  "addFirstItem": "Add your first item for your trip",
+  "@addFirstItem": {
+    "description": "Empty checklist subtitle"
+  },
+  "completed": "completed",
+  "@completed": {
+    "description": "Checklist completion status"
+  },
+  "budgetLimit": "Budget Limit",
+  "@budgetLimit": {
+    "description": "Budget limit field label"
+  },
+  "change": "Change",
+  "@change": {
+    "description": "Change action label"
+  },
+  "set": "Set",
+  "@set": {
+    "description": "Set action label"
+  },
+  "notifications": "Notifications",
+  "@notifications": {
+    "description": "Notifications button tooltip"
+  },
+  "plan": "Plan",
+  "@plan": {
+    "description": "Plan trip button"
+  },
+  "preparing": "PREPARING",
+  "@preparing": {
+    "description": "Checklist preparing status"
+  },
+  "tripsPlanned": "trips planned",
+  "@tripsPlanned": {
+    "description": "Trips planned counter label"
+  },
+  "documentsSaved": "saved documents & tickets",
+  "@documentsSaved": {
+    "description": "Documents saved counter label"
+  },
+  "standardBaggageLimitNote": "Standard Limit: Cabin 8 kg • Checked 20-23 kg",
+  "@standardBaggageLimitNote": {
+    "description": "Standard luggage limit note"
+  },
+  "airlineBaggageLimits": "Airline Limits",
+  "@airlineBaggageLimits": {
+    "description": "Airline baggage limits button"
+  },
+  "compartmentBreakdown": "Compartment Breakdown",
+  "@compartmentBreakdown": {
+    "description": "Compartment breakdown title"
+  },
+  "packingTip": "Tip: Rolling clothes instead of folding them saves 30% space.",
+  "@packingTip": {
+    "description": "Smart packing tip banner"
+  },
+  "tryDifferentKeyword": "Try a different keyword or category",
+  "@tryDifferentKeyword": {
+    "description": "Empty search subtitle"
+  },
+  "luggagePreparationGuide": "Luggage Preparation & Baggage Guide",
+  "@luggagePreparationGuide": {
+    "description": "Luggage guide title"
+  },
+  "weighingResponsibilityNote": "⚖️ Weighing responsibility belongs to traveler. Weight calculation is not active.",
+  "@weighingResponsibilityNote": {
+    "description": "Luggage weight disclaimer"
+  },
+  "digitalWallet": "Digital Wallet",
+  "@digitalWallet": {
+    "description": "Digital wallet payment method"
+  },
+  "flight": "Flight",
+  "@flight": {
+    "description": "Flight transport mode"
+  },
+  "bulletTrain": "High-Speed Train",
+  "@bulletTrain": {
+    "description": "High-speed train transport mode"
+  },
+  "train": "Train",
+  "@train": {
+    "description": "Train transport mode"
+  },
+  "car": "Car / Rental",
+  "@car": {
+    "description": "Car transport mode"
+  },
+  "bus": "Bus",
+  "@bus": {
+    "description": "Bus transport mode"
+  },
+  "ferry": "Ferry / Ship",
+  "@ferry": {
+    "description": "Ferry transport mode"
+  },
+  "motorcycle": "Motorcycle",
+  "@motorcycle": {
+    "description": "Motorcycle transport mode"
+  },
+  "camper": "Camper / RV",
+  "@camper": {
+    "description": "Camper transport mode"
+  },
+  "bicycle": "Bicycle",
+  "@bicycle": {
+    "description": "Bicycle transport mode"
+  },
+  "subway": "Subway / Tram",
+  "@subway": {
+    "description": "Subway transport mode"
+  },
+  "hiking": "Hiking / Trekking",
+  "@hiking": {
+    "description": "Hiking transport mode"
+  },
+  "transportMode": "Transport Mode",
+  "@transportMode": {
+    "description": "Transport mode label"
+  },
+  "customTransportType": "Custom Transport Type",
+  "@customTransportType": {
+    "description": "Custom transport dialog title"
+  },
+  "customTransportVehicle": "Vehicle / Transport Mode",
+  "@customTransportVehicle": {
+    "description": "Custom transport field label"
+  },
+  "customTransportHint": "e.g. Helicopter, Yacht, Cable Car, Safari...",
+  "@customTransportHint": {
+    "description": "Custom transport field hint"
+  },
+  "cityOrStopHint": "Enter city or stop (e.g. Paris, Rome, Tokyo)...",
+  "@cityOrStopHint": {
+    "description": "Itinerary stop input hint"
+  },
+  "travelRouteOrStops": "Travel Route / Stops",
+  "@travelRouteOrStops": {
+    "description": "Itinerary stops header"
+  },
+  "addCountry": "Add Country",
+  "@addCountry": {
+    "description": "Add country button"
+  },
+  "tripNameHint": "e.g. Italy Tour, Summer Vacation...",
+  "@tripNameHint": {
+    "description": "Trip name input hint"
+  },
+  "tripNotesLabel": "Trip Notes (Hotel, Reservation, Route...)",
+  "@tripNotesLabel": {
+    "description": "Trip notes field label"
+  },
+  "tripNotesHint": "e.g. Hotel check-in 14:00, don't forget passports...",
+  "@tripNotesHint": {
+    "description": "Trip notes field hint"
+  },
+  "changeCurrency": "Change Currency",
+  "@changeCurrency": {
+    "description": "Change currency tooltip"
+  },
+  "expenseNotesLabel": "Expense Note (Details, Receipt No...)",
+  "@expenseNotesLabel": {
+    "description": "Expense note field label"
+  },
+  "expenseNotesHint": "e.g. Dinner including tip...",
+  "@expenseNotesHint": {
+    "description": "Expense note field hint"
+  },
+  "wrongPinTryAgain": "Incorrect PIN! Please try again.",
+  "@wrongPinTryAgain": {
+    "description": "Wrong PIN snackbar error"
+  },
+  "fourDigitPin": "4-Digit PIN",
+  "@fourDigitPin": {
+    "description": "4-digit PIN input label"
+  },
+  "saveAndOpen": "Save & Unlock",
+  "@saveAndOpen": {
+    "description": "Save PIN and open vault button"
+  },
+  "enterPinToUnlockVault": "Enter your PIN code to access your passports and travel documents",
+  "@enterPinToUnlockVault": {
+    "description": "Vault lock subtitle when PIN is set"
+  },
+  "vaultNotProtectedWithPin": "Your vault is not yet protected with a PIN code",
+  "@vaultNotProtectedWithPin": {
+    "description": "Vault lock subtitle when no PIN"
+  },
+  "lastTrip": "Last Trip",
+  "@lastTrip": {
+    "description": "Last completed trip badge"
+  },
+  "ok": "OK",
+  "@ok": {
+    "description": "OK dialog button"
+  },
+  "custom": "Custom",
+  "@custom": {
+    "description": "Custom prefix label"
+  },
+  "add": "Add",
+  "@add": {
+    "description": "Generic add button"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Generic close button"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Generic delete button"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Generic edit button"
+  },
+  "tickets": "Tickets",
+  "@tickets": {
+    "description": "Tickets category label"
+  },
+  "idAndPassport": "ID & Passport",
+  "@idAndPassport": {
+    "description": "ID & Passport category label"
+  },
+  "healthAndInsurance": "Health & Insurance",
+  "@healthAndInsurance": {
+    "description": "Health & Insurance category label"
+  },
+  "otherDocuments": "Other Documents",
+  "@otherDocuments": {
+    "description": "Other Documents category label"
+  },
+  "allDocuments": "All Documents",
+  "@allDocuments": {
+    "description": "All Documents filter label"
+  },
+  "allTickets": "All Tickets",
+  "@allTickets": {
+    "description": "All Tickets filter label"
+  },
+  "flightTickets": "Flight Tickets",
+  "@flightTickets": {
+    "description": "Flight Tickets filter label"
+  },
+  "busTickets": "Bus Tickets",
+  "@busTickets": {
+    "description": "Bus Tickets filter label"
+  },
+  "ferryBoat": "Ferry / Boat",
+  "@ferryBoat": {
+    "description": "Ferry / Boat filter label"
+  },
+  "trainTickets": "Train Tickets",
+  "@trainTickets": {
+    "description": "Train Tickets filter label"
+  },
+  "allTrips": "All Trips",
+  "@allTrips": {
+    "description": "All Trips filter label"
+  },
+  "general": "General",
+  "@general": {
+    "description": "General scope filter label"
+  },
+  "generalDocumentAllTrips": "🌐 General Document (All Trips)",
+  "@generalDocumentAllTrips": {
+    "description": "General Document dropdown option"
+  },
+  "documentScope": "Document Scope / Trip",
+  "@documentScope": {
+    "description": "Document Scope field label"
+  },
+  "documentNotesLabel": "Document Note (PNR, Seat, Expiry...)",
+  "@documentNotesLabel": {
+    "description": "Document note field label"
+  },
+  "documentNotesHint": "e.g. PNR: TK7890, Seat: 12A, Terminal 2",
+  "@documentNotesHint": {
+    "description": "Document note field hint"
+  },
+  "uploadDocumentPrompt": "Upload Document (Photo or PDF)",
+  "@uploadDocumentPrompt": {
+    "description": "Upload document section header"
+  },
+  "pdfOrFile": "PDF / File",
+  "@pdfOrFile": {
+    "description": "PDF or file picker button"
+  },
+  "ticketTypeSubCategory": "Ticket Type / Sub-Category",
+  "@ticketTypeSubCategory": {
+    "description": "Ticket sub-category header"
+  },
+  "documentNameHint": "e.g. Airline Ticket, Hotel Booking...",
+  "@documentNameHint": {
+    "description": "Document name input hint"
+  },
+  "flightTicket": "Flight Ticket",
+  "@flightTicket": {
+    "description": "Flight ticket sub-category"
+  },
+  "busTicket": "Bus Ticket",
+  "@busTicket": {
+    "description": "Bus ticket sub-category"
+  },
+  "ferryTicket": "Ferry / Boat Ticket",
+  "@ferryTicket": {
+    "description": "Ferry ticket sub-category"
+  },
+  "trainTicket": "Train Ticket",
+  "@trainTicket": {
+    "description": "Train ticket sub-category"
+  },
+  "otherTransport": "Other Transport",
+  "@otherTransport": {
+    "description": "Other transport sub-category"
+  },
+  "myPassport": "My Passport",
+  "@myPassport": {
+    "description": "Default passport document title"
+  },
+  "hotelBooking": "Hotel Reservation",
+  "@hotelBooking": {
+    "description": "Default hotel reservation title"
+  },
+  "mainCategory": "Main Category",
+  "@mainCategory": {
+    "description": "Main category label"
+  },
+  "boardingPassAndTransit": "Boarding Pass & Transit Pass",
+  "@boardingPassAndTransit": {
+    "description": "Boarding pass preview title"
+  },
+  "boardingPassSubtitle": "View document or open in device app",
+  "@boardingPassSubtitle": {
+    "description": "Boarding pass preview subtitle"
+  },
+  "viewDocumentAction": "View Document",
+  "@viewDocumentAction": {
+    "description": "View document action button"
+  },
+  "fileNotFoundLocally": "File not found in local storage yet.",
+  "@fileNotFoundLocally": {
+    "description": "File not found snackbar message"
+  },
+  "openInExternalApp": "Open in Device App",
+  "@openInExternalApp": {
+    "description": "Open in device app action button"
+  },
+  "secureBadge": "SECURE",
+  "@secureBadge": {
+    "description": "Secure badge text"
+  },
+  "savedDocument": "Saved Document",
+  "@savedDocument": {
+    "description": "Saved document counter label"
+  },
+  "readyBadge": "READY",
+  "@readyBadge": {
+    "description": "Ready badge text"
+  },
+  "pinnedBadge": "PINNED",
+  "@pinnedBadge": {
+    "description": "Pinned badge text"
+  },
+  "passportSlot": "Passport Slot",
+  "@passportSlot": {
+    "description": "Passport slot title"
+  },
+  "saveYourPassport": "+ Save Your Passport",
+  "@saveYourPassport": {
+    "description": "Save passport prompt"
+  },
+  "tapToView": "Tap to view",
+  "@tapToView": {
+    "description": "Tap to view hint"
+  },
+  "quickUpload": "Quick upload",
+  "@quickUpload": {
+    "description": "Quick upload hint"
+  },
+  "noDocumentsForFilter": "No documents found matching this filter",
+  "@noDocumentsForFilter": {
+    "description": "Empty state for vault filter"
+  },
+  "pdfFileBadge": "PDF FILE",
+  "@pdfFileBadge": {
+    "description": "PDF file indicator badge"
+  },
+  "pdfBadge": "PDF",
+  "@pdfBadge": {
+    "description": "PDF badge text"
+  },
+  "imageBadge": "IMAGE",
+  "@imageBadge": {
+    "description": "Image badge text"
+  },
+  "addToWallet": "+ Wallet",
+  "@addToWallet": {
+    "description": "Add to wallet button"
+  },
+  "boardingPassOptions": "Boarding Pass Options",
+  "@boardingPassOptions": {
+    "description": "Boarding pass options tooltip"
+  },
+  "openPdf": "Open PDF",
+  "@openPdf": {
+    "description": "Open PDF tooltip"
+  },
+  "vaultPinProtection": "Vault PIN Protection",
+  "@vaultPinProtection": {
+    "description": "Vault PIN protection title"
+  },
+  "pinProtectionActive": "PIN protection active",
+  "@pinProtectionActive": {
+    "description": "PIN protection active subtitle"
+  },
+  "unprotectedSetPin": "Unprotected (Set a PIN)",
+  "@unprotectedSetPin": {
+    "description": "Unprotected subtitle"
+  },
+  "setup": "Set Up",
+  "@setup": {
+    "description": "Set up button text"
+  },
+  "changePinDescription": "Enter a new 4-digit PIN or remove the existing PIN code.",
+  "@changePinDescription": {
+    "description": "Change PIN dialog description"
+  },
+  "setPinDescription": "Enter a 4-digit PIN to protect your passports and documents in the vault.",
+  "@setPinDescription": {
+    "description": "Set PIN dialog description"
+  },
+  "removePin": "Remove PIN",
+  "@removePin": {
+    "description": "Remove PIN button label"
+  },
+  "proActive": "PackBuddy Pro Active",
+  "@proActive": {
+    "description": "PackBuddy Pro active status"
+  },
+  "annualPlan": "Annual Plan ($39.99/yr)",
+  "@annualPlan": {
+    "description": "Annual plan label"
+  },
+  "monthlyPlan": "Monthly Plan ($4.99/mo)",
+  "@monthlyPlan": {
+    "description": "Monthly plan label"
+  },
+  "activePlanLabel": "Subscription Plan",
+  "@activePlanLabel": {
+    "description": "Active subscription plan label"
+  },
+  "editItem": "Edit Item",
+  "@editItem": {
+    "description": "Edit item sheet title"
+  },
+  "addNewItem": "Add New Item",
+  "@addNewItem": {
+    "description": "Add new item sheet title"
+  },
+  "itemName": "Item Name",
+  "@itemName": {
+    "description": "Item name field label"
+  },
+  "itemNameHint": "e.g. Waterproof Jacket, Headphones...",
+  "@itemNameHint": {
+    "description": "Item name field hint"
+  },
+  "pleaseEnterItemName": "Please enter an item name",
+  "@pleaseEnterItemName": {
+    "description": "Item name validation error"
+  },
+  "carryType": "Carry Type",
+  "@carryType": {
+    "description": "Carry type field label"
+  },
+  "compartment": "Compartment / Location",
+  "@compartment": {
+    "description": "Compartment field label"
+  },
+  "pieces": "pcs",
+  "@pieces": {
+    "description": "Pieces / units suffix"
+  },
+  "addToBaggage": "Add to Baggage",
+  "@addToBaggage": {
+    "description": "Add to baggage button"
+  },
+  "itemUpdated": "updated.",
+  "@itemUpdated": {
+    "description": "Item updated snackbar text"
+  },
+  "itemAddedToBaggage": "added to baggage.",
+  "@itemAddedToBaggage": {
+    "description": "Item added to baggage snackbar text"
+  },
+  "markedAsPacked": "Marked as packed",
+  "@markedAsPacked": {
+    "description": "Marked as packed accessibility label"
+  },
+  "notPacked": "Not packed",
+  "@notPacked": {
+    "description": "Not packed accessibility label"
+  },
+  "packed": "Packed",
+  "@packed": {
+    "description": "Packed swipe label"
+  },
+  "smartTemplatesSubtitle": "Transfer curated travel packing lists to your baggage in one tap",
+  "@smartTemplatesSubtitle": {
+    "description": "Smart templates subtitle"
+  },
+  "itemsCount": "Items",
+  "@itemsCount": {
+    "description": "Items count label"
+  },
+  "readyTravelPackage": "Curated Travel Package",
+  "@readyTravelPackage": {
+    "description": "Curated travel package tag"
+  },
+  "contentList": "Contents List:",
+  "@contentList": {
+    "description": "Contents list header"
+  },
+  "templateImportSuccess": "items added from template! 🎉",
+  "@templateImportSuccess": {
+    "description": "Template import success message"
+  },
+  "addTemplateToBaggage": "Add to Baggage",
+  "@addTemplateToBaggage": {
+    "description": "Add template to baggage button"
+  },
+  "currentLimit": "Current Limit",
+  "@currentLimit": {
+    "description": "Current baggage limit label"
+  },
+  "searchAirlineOrCode": "Search airline or code (e.g. THY, PC, LH)...",
+  "@searchAirlineOrCode": {
+    "description": "Search airline input hint"
+  },
+  "activeLimit": "Active Limit",
+  "@activeLimit": {
+    "description": "Active limit badge"
+  },
+  "cabinBaggage": "Cabin Baggage",
+  "@cabinBaggage": {
+    "description": "Cabin baggage label"
+  },
+  "checkedBaggage": "Checked Baggage",
+  "@checkedBaggage": {
+    "description": "Checked baggage label"
+  },
+  "standardEconomy": "Standard Economy",
+  "@standardEconomy": {
+    "description": "Standard economy baggage note"
+  },
+  "limitSelected": "This Limit Selected",
+  "@limitSelected": {
+    "description": "Limit selected button text"
+  },
+  "applyCabinLimit": "Apply Cabin Limit",
+  "@applyCabinLimit": {
+    "description": "Apply cabin limit button text"
+  },
+  "baggageLimitSet": "Baggage limit set to",
+  "@baggageLimitSet": {
+    "description": "Baggage limit set snackbar message"
+  },
+  "lockVault": "Lock Vault",
+  "@lockVault": {
+    "description": "Lock vault button tooltip"
+  },
+  "navHome": "Home",
+  "@navHome": {
+    "description": "Bottom nav home label"
+  },
+  "navTrips": "Trips",
+  "@navTrips": {
+    "description": "Bottom nav trips label"
+  },
+  "navBaggage": "Luggage",
+  "@navBaggage": {
+    "description": "Bottom nav baggage label"
+  },
+  "navVault": "Vault",
+  "@navVault": {
+    "description": "Bottom nav vault label"
+  },
+  "navSettings": "Settings",
+  "@navSettings": {
+    "description": "Bottom nav settings label"
+  },
+  "selectAirlineToCustomize": "Tap to customize limits for your airline",
+  "@selectAirlineToCustomize": {
+    "description": "Prompt to select an airline and customize limits"
+  },
+  "changeAirlineLimit": "Change Airline",
+  "@changeAirlineLimit": {
+    "description": "Button to change current airline limit"
+  },
+  "selectCountryAndRoute": "Select Country & Route",
+  "@selectCountryAndRoute": {
+    "description": "Header title for country and route selection sheet"
+  },
+  "countriesLabel": "Countries",
+  "@countriesLabel": {
+    "description": "Label for count of countries"
+  },
+  "searchCountryOrCity": "Search country or city (e.g. Italy, Tokyo, Paris)...",
+  "@searchCountryOrCity": {
+    "description": "Hint text for country search field"
+  },
+  "noMatchingCountry": "No matching country found",
+  "@noMatchingCountry": {
+    "description": "Empty state text when no country matches search"
+  },
+  "activeStatus": "ACTIVE",
+  "@activeStatus": {
+    "description": "Active subscription status badge"
   }
 }

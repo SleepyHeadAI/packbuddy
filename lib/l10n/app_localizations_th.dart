@@ -143,7 +143,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get passport => 'หนังสือเดินทาง';
 
   @override
-  String get ticket => 'ตั๋ว';
+  String get ticket => 'ตั๋วเดินทาง';
 
   @override
   String get booking => 'การจอง';
@@ -230,4 +230,679 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get architecturePhase =>
       'ระยะที่ 5: ผลิตภัณฑ์สมบูรณ์พร้อมรองรับ 20 ภาษา';
+
+  @override
+  String get goodMorning => 'สวัสดีตอนเช้า นักเดินทาง ☀️';
+
+  @override
+  String get goodAfternoon => 'สวัสดีตอนบ่าย นักเดินทาง ✈️';
+
+  @override
+  String get goodEvening => 'สวัสดีตอนเย็น นักเดินทาง 🌙';
+
+  @override
+  String get allCategories => 'ทั้งหมด';
+
+  @override
+  String get categoryClothing => 'เสื้อผ้า';
+
+  @override
+  String get categoryElectronics => 'อุปกรณ์อิเล็กทรอนิกส์';
+
+  @override
+  String get categoryToiletries => 'ของใช้ส่วนตัว';
+
+  @override
+  String get categoryDocuments => 'เอกสารการเดินทาง';
+
+  @override
+  String get categoryAccessories => 'เครื่องประดับ/ของใช้';
+
+  @override
+  String get deleted => 'ลบแล้ว';
+
+  @override
+  String get undo => 'เลิกทำ';
+
+  @override
+  String get luggageAndChecklist => 'สัมภาระและรายการตรวจสอบ';
+
+  @override
+  String get smartPackingTemplates => 'เทมเพลตจัดกระเป๋าอัจฉริยะ';
+
+  @override
+  String get airlineBaggageGuide => 'คู่มือน้ำหนักกระเป๋าสายการบิน';
+
+  @override
+  String get vaultLocked => 'คลังถูกล็อค';
+
+  @override
+  String get unlockVault => 'ปลดล็อคคลัง';
+
+  @override
+  String get security => 'ความปลอดภัย';
+
+  @override
+  String get upcomingRoute => 'เส้นทางที่กำลังมาถึง';
+
+  @override
+  String get ongoingTrip => 'การเดินทางปัจจุบัน';
+
+  @override
+  String get offlineVault => 'คลังออฟไลน์';
+
+  @override
+  String get noItemsYet => 'ยังไม่มีรายการสิ่งของ';
+
+  @override
+  String get itemsReady => 'รายการพร้อมแล้ว';
+
+  @override
+  String get listEmpty => 'รายการว่างเปล่า';
+
+  @override
+  String get quickActions => 'การดำเนินการด่วน';
+
+  @override
+  String get addItem => 'เพิ่มสิ่งของ';
+
+  @override
+  String get recentlyAdded => 'สิ่งของที่เพิ่มล่าสุด';
+
+  @override
+  String get travelAssistant => 'ผู้ช่วยการเดินทาง';
+
+  @override
+  String get viewAll => 'ดูทั้งหมด';
+
+  @override
+  String get allNotificationsUpToDate => 'การแจ้งเตือนทั้งหมดเป็นปัจจุบันแล้ว!';
+
+  @override
+  String get createFirstTrip => 'สร้างเส้นทางและงบประมาณแรกของคุณตอนนี้';
+
+  @override
+  String get editTrip => 'แก้ไขการเดินทาง';
+
+  @override
+  String get editExpense => 'แก้ไขค่าใช้จ่าย';
+
+  @override
+  String get expenseTitle => 'ชื่อค่าใช้จ่าย';
+
+  @override
+  String get expenseTitleHint => 'เช่น อาหารเย็น, ตั๋วรถไฟ, กาแฟ...';
+
+  @override
+  String get pleaseEnterExpenseTitle => 'กรุณากรอกชื่อค่าใช้จ่าย';
+
+  @override
+  String get customCategoryName => 'ชื่อหมวดหมู่ที่กำหนดเอง';
+
+  @override
+  String get customCategoryHint =>
+      'เช่น ของที่ระลึก, ทิป, พิพิธภัณฑ์, วีซ่า...';
+
+  @override
+  String get pleaseEnterCustomCategory => 'กรุณาระบุชื่อหมวดหมู่';
+
+  @override
+  String get paymentMethod => 'วิธีชำระเงิน';
+
+  @override
+  String get cash => 'เงินสด';
+
+  @override
+  String get creditCard => 'บัตรเครดิต';
+
+  @override
+  String get debitCard => 'บัตรเดบิต';
+
+  @override
+  String get onlinePayment => 'ชำระเงินออนไลน์';
+
+  @override
+  String get customTransport => 'การเดินทางที่กำหนดเอง';
+
+  @override
+  String get addCustomTransport => '+ การเดินทางที่กำหนดเอง';
+
+  @override
+  String get itineraryStops => 'จุดแวะตามแผนการเดินทาง';
+
+  @override
+  String get destinationHint => 'เมืองหรือประเทศปลายทาง';
+
+  @override
+  String get baggageAndChecklist => 'สัมภาระและรายการตรวจ';
+
+  @override
+  String get travelDocuments => 'เอกสารการเดินทาง';
+
+  @override
+  String get currencySynced => 'ซิงค์อัตราแลกเปลี่ยนอัตโนมัติแล้ว';
+
+  @override
+  String get offlineRatesActive => 'ใช้อัตราแลกเปลี่ยนออฟไลน์';
+
+  @override
+  String get createPinToProtect =>
+      'สร้างรหัส PIN 4 หลักเพื่อความปลอดภัยของเอกสาร';
+
+  @override
+  String get createPinAndProtect => 'สร้าง PIN และป้องกัน';
+
+  @override
+  String get continueUnlocked => 'ดำเนินการต่อโดยไม่ล็อค';
+
+  @override
+  String get changeOrRemovePin => 'เปลี่ยนหรือลบรหัส PIN';
+
+  @override
+  String get setVaultPin => 'ตั้งค่ารหัส PIN ของคลัง';
+
+  @override
+  String get boardingPassAndPass => 'บอร์ดดิ้งพาสและบัตรผ่าน';
+
+  @override
+  String get offlineAndEncrypted => 'ออฟไลน์และเข้ารหัสปลอดภัย';
+
+  @override
+  String get searchItems => 'ค้นหา';
+
+  @override
+  String get closeSearch => 'ปิดการค้นหา';
+
+  @override
+  String get readyTemplates => 'เทมเพลตพร้อมใช้';
+
+  @override
+  String get searchItemsHint => 'ค้นหาสิ่งของ...';
+
+  @override
+  String get noMatchingItems => 'ไม่พบสิ่งของที่ตรงกัน';
+
+  @override
+  String get checklistEmpty => 'รายการตรวจสอบว่างเปล่า';
+
+  @override
+  String get addFirstItem => 'เพิ่มสิ่งของชิ้นแรกสำหรับการเดินทาง';
+
+  @override
+  String get completed => 'เสร็จสมบูรณ์';
+
+  @override
+  String get budgetLimit => 'ขีดจำกัดงบประมาณ';
+
+  @override
+  String get change => 'เปลี่ยน';
+
+  @override
+  String get set => 'ตั้งค่า';
+
+  @override
+  String get notifications => 'การแจ้งเตือน';
+
+  @override
+  String get plan => 'วางแผน';
+
+  @override
+  String get preparing => 'กำลังเตรียมตัว';
+
+  @override
+  String get tripsPlanned => 'ทริปที่วางแผนไว้';
+
+  @override
+  String get documentsSaved => 'เอกสารและตั๋วที่บันทึกไว้';
+
+  @override
+  String get standardBaggageLimitNote =>
+      'ขีดจำกัดมาตรฐาน: ถือขึ้นเครื่อง 8 กก. • โหลดใต้เครื่อง 20-23 กก.';
+
+  @override
+  String get airlineBaggageLimits => 'น้ำหนักสัมภาระสายการบิน';
+
+  @override
+  String get compartmentBreakdown => 'สัดส่วนตามช่องกระเป๋า';
+
+  @override
+  String get packingTip =>
+      'เคล็ดลับ: การม้วนเสื้อผ้าแทนการพับช่วยประหยัดพื้นที่ได้ถึง 30%';
+
+  @override
+  String get tryDifferentKeyword => 'ลองใช้คำค้นหาหรือหมวดหมู่อื่น';
+
+  @override
+  String get luggagePreparationGuide => 'คู่มือการจัดกระเป๋าและสัมภาระ';
+
+  @override
+  String get weighingResponsibilityNote =>
+      '⚖️ การชั่งน้ำหนักสัมภาระเป็นความรับผิดชอบของผู้โดยสาร';
+
+  @override
+  String get digitalWallet => 'กระเป๋าเงินดิจิทัล';
+
+  @override
+  String get flight => 'เที่ยวบิน / เครื่องบิน';
+
+  @override
+  String get bulletTrain => 'รถไฟความเร็วสูง';
+
+  @override
+  String get train => 'รถไฟ';
+
+  @override
+  String get car => 'รถยนต์ / รถเช่า';
+
+  @override
+  String get bus => 'รถบัส / รถประจำทาง';
+
+  @override
+  String get ferry => 'เรือเฟอร์รี่ / เรือ';
+
+  @override
+  String get motorcycle => 'รถจักรยานยนต์';
+
+  @override
+  String get camper => 'รถบ้าน / แคมเปอร์';
+
+  @override
+  String get bicycle => 'จักรยาน';
+
+  @override
+  String get subway => 'รถไฟใต้ดิน / รถราง';
+
+  @override
+  String get hiking => 'เดินป่า / เทรคกิ้ง';
+
+  @override
+  String get transportMode => 'รูปแบบการเดินทาง';
+
+  @override
+  String get customTransportType => 'การเดินทางแบบกำหนดเอง';
+
+  @override
+  String get customTransportVehicle => 'ยานพาหนะ / รูปแบบ';
+
+  @override
+  String get customTransportHint =>
+      'เช่น เฮลิคอปเตอร์, เรือยอชท์, กระเช้าลอยฟ้า, ซาฟารี...';
+
+  @override
+  String get cityOrStopHint =>
+      'ระบุเมืองหรือจุดแวะ (เช่น ปารีส, โรม, โตเกียว)...';
+
+  @override
+  String get travelRouteOrStops => 'เส้นทางท่องเที่ยว / จุดแวะพัก';
+
+  @override
+  String get addCountry => 'เพิ่มประเทศ';
+
+  @override
+  String get tripNameHint => 'เช่น ทริปอิตาลี, วันหยุดฤดูร้อน...';
+
+  @override
+  String get tripNotesLabel =>
+      'บันทึกการเดินทาง (โรงแรม, หมายเลขจอง, แผนการเดินทาง...)';
+
+  @override
+  String get tripNotesHint => 'เช่น เช็คอินโรงแรม 14:00 น., อย่าลืมพาสปอร์ต...';
+
+  @override
+  String get changeCurrency => 'เปลี่ยนสกุลเงิน';
+
+  @override
+  String get expenseNotesLabel =>
+      'บันทึกค่าใช้จ่าย (รายละเอียด, เลขใบเสร็จ...)';
+
+  @override
+  String get expenseNotesHint => 'เช่น ดินเนอร์รวมทิป...';
+
+  @override
+  String get wrongPinTryAgain => 'รหัส PIN ไม่ถูกต้อง! กรุณาลองใหม่อีกครั้ง';
+
+  @override
+  String get fourDigitPin => 'รหัส PIN 4 หลัก';
+
+  @override
+  String get saveAndOpen => 'บันทึก & ปลดล็อก';
+
+  @override
+  String get enterPinToUnlockVault =>
+      'ป้อนรหัส PIN เพื่อเข้าถึงพาสปอร์ตและเอกสารการเดินทาง';
+
+  @override
+  String get vaultNotProtectedWithPin =>
+      'ตู้นิรภัยของคุณยังไม่ได้ตั้งรหัส PIN ป้องกัน';
+
+  @override
+  String get lastTrip => 'ทริปล่าสุด';
+
+  @override
+  String get ok => 'ตกลง';
+
+  @override
+  String get custom => 'กำหนดเอง';
+
+  @override
+  String get add => 'เพิ่ม';
+
+  @override
+  String get close => 'ปิด';
+
+  @override
+  String get delete => 'ลบ';
+
+  @override
+  String get edit => 'แก้ไข';
+
+  @override
+  String get tickets => 'ตั๋ว';
+
+  @override
+  String get idAndPassport => 'บัตรประชาชนและพาสปอร์ต';
+
+  @override
+  String get healthAndInsurance => 'สุขภาพและประกันภัย';
+
+  @override
+  String get otherDocuments => 'เอกสารอื่นๆ';
+
+  @override
+  String get allDocuments => 'เอกสารทั้งหมด';
+
+  @override
+  String get allTickets => 'ตั๋วทั้งหมด';
+
+  @override
+  String get flightTickets => 'ตั๋วเครื่องบิน';
+
+  @override
+  String get busTickets => 'ตั๋วรถบัส';
+
+  @override
+  String get ferryBoat => 'ตั๋วเรือเฟอร์รี่ / เรือ';
+
+  @override
+  String get trainTickets => 'ตั๋วรถไฟ';
+
+  @override
+  String get allTrips => 'ทริปทั้งหมด';
+
+  @override
+  String get general => 'ทั่วไป';
+
+  @override
+  String get generalDocumentAllTrips => '🌐 เอกสารทั่วไป (ใช้ได้ทุกทริป)';
+
+  @override
+  String get documentScope => 'ขอบเขตเอกสาร / ทริป';
+
+  @override
+  String get documentNotesLabel => 'บันทึกเอกสาร (PNR, ที่นั่ง, วันหมดอายุ...)';
+
+  @override
+  String get documentNotesHint => 'เช่น PNR: TK7890, ที่นั่ง: 12A, อาคาร 2';
+
+  @override
+  String get uploadDocumentPrompt => 'อัปโหลดเอกสาร (รูปภาพหรือ PDF)';
+
+  @override
+  String get pdfOrFile => 'PDF / ไฟล์';
+
+  @override
+  String get ticketTypeSubCategory => 'ประเภทตั๋ว / หมวดย่อย';
+
+  @override
+  String get documentNameHint => 'เช่น ตั๋วเครื่องบิน, ใบยืนยันโรงแรม...';
+
+  @override
+  String get flightTicket => 'ตั๋วเครื่องบิน';
+
+  @override
+  String get busTicket => 'ตั๋วรถบัส';
+
+  @override
+  String get ferryTicket => 'ตั๋วเรือ';
+
+  @override
+  String get trainTicket => 'ตั๋วรถไฟ';
+
+  @override
+  String get otherTransport => 'การเดินทางอื่นๆ';
+
+  @override
+  String get myPassport => 'หนังสือเดินทางของฉัน';
+
+  @override
+  String get hotelBooking => 'ใบจองโรงแรม';
+
+  @override
+  String get mainCategory => 'หมวดหมู่หลัก';
+
+  @override
+  String get boardingPassAndTransit => 'บอร์ดดิ้งพาส & บัตรผ่านเดินทาง';
+
+  @override
+  String get boardingPassSubtitle => 'ดูเอกสารหรือเปิดในแอปของอุปกรณ์';
+
+  @override
+  String get viewDocumentAction => 'ดูเอกสาร';
+
+  @override
+  String get fileNotFoundLocally => 'ยังไม่พบไฟล์ในที่จัดเก็บข้อมูลในเครื่อง';
+
+  @override
+  String get openInExternalApp => 'เปิดในแอปภายนอก';
+
+  @override
+  String get secureBadge => 'ปลอดภัย';
+
+  @override
+  String get savedDocument => 'เอกสารที่บันทึกไว้';
+
+  @override
+  String get readyBadge => 'พร้อม';
+
+  @override
+  String get pinnedBadge => 'ปักหมุด';
+
+  @override
+  String get passportSlot => 'ช่องเก็บพาสปอร์ต';
+
+  @override
+  String get saveYourPassport => '+ บันทึกพาสปอร์ตของคุณ';
+
+  @override
+  String get tapToView => 'แตะเพื่อดู';
+
+  @override
+  String get quickUpload => 'อัปโหลดด่วน';
+
+  @override
+  String get noDocumentsForFilter => 'ไม่พบเอกสารที่ตรงกับตัวกรองนี้';
+
+  @override
+  String get pdfFileBadge => 'ไฟล์ PDF';
+
+  @override
+  String get pdfBadge => 'PDF';
+
+  @override
+  String get imageBadge => 'รูปภาพ';
+
+  @override
+  String get addToWallet => '+ วอลเล็ต';
+
+  @override
+  String get boardingPassOptions => 'ตัวเลือกบอร์ดดิ้งพาส';
+
+  @override
+  String get openPdf => 'เปิด PDF';
+
+  @override
+  String get vaultPinProtection => 'การป้องกันตู้นิรภัยด้วย PIN';
+
+  @override
+  String get pinProtectionActive => 'เปิดใช้งานการป้องกันด้วย PIN แล้ว';
+
+  @override
+  String get unprotectedSetPin => 'ยังไม่ได้รับการป้องกัน (ตั้งค่า PIN)';
+
+  @override
+  String get setup => 'ตั้งค่า';
+
+  @override
+  String get changePinDescription =>
+      'ป้อนรหัส PIN 4 หลักใหม่ หรือยกเลิกรหัส PIN ปัจจุบัน';
+
+  @override
+  String get setPinDescription =>
+      'ป้อนรหัส PIN 4 หลักเพื่อปกป้องพาสปอร์ตและเอกสารในตู้นิรภัย';
+
+  @override
+  String get removePin => 'ลบรหัส PIN';
+
+  @override
+  String get proActive => 'PackBuddy Pro เปิดใช้งานแล้ว';
+
+  @override
+  String get annualPlan => 'แผนรายปี (฿1,390/ปี)';
+
+  @override
+  String get monthlyPlan => 'แผนรายเดือน (฿179/เดือน)';
+
+  @override
+  String get activePlanLabel => 'แผนสมาชิก';
+
+  @override
+  String get editItem => 'แก้ไขสัมภาระ';
+
+  @override
+  String get addNewItem => 'เพิ่มสัมภาระใหม่';
+
+  @override
+  String get itemName => 'ชื่อสัมภาระ';
+
+  @override
+  String get itemNameHint => 'เช่น เสื้อกันฝน, หูฟัง...';
+
+  @override
+  String get pleaseEnterItemName => 'กรุณาระบุชื่อสัมภาระ';
+
+  @override
+  String get carryType => 'ประเภทการพกพา';
+
+  @override
+  String get compartment => 'ช่องเก็บ / ตำแหน่ง';
+
+  @override
+  String get pieces => 'ชิ้น';
+
+  @override
+  String get addToBaggage => 'เพิ่มลงในกระเป๋า';
+
+  @override
+  String get itemUpdated => 'อัปเดตเรียบร้อย';
+
+  @override
+  String get itemAddedToBaggage => 'เพิ่มลงในกระเป๋าแล้ว';
+
+  @override
+  String get markedAsPacked => 'ระบุว่าจัดลงกระเป๋าแล้ว';
+
+  @override
+  String get notPacked => 'ยังไม่ได้จัด';
+
+  @override
+  String get packed => 'จัดแล้ว';
+
+  @override
+  String get smartTemplatesSubtitle =>
+      'โอนย้ายรายการจัดกระเป๋าสำเร็จรูปไปยังกระเป๋าของคุณในแตะเดียว';
+
+  @override
+  String get itemsCount => 'ชิ้น';
+
+  @override
+  String get readyTravelPackage => 'แพ็กเกจการเดินทางสำเร็จรูป';
+
+  @override
+  String get contentList => 'รายการสิ่งของ:';
+
+  @override
+  String get templateImportSuccess =>
+      'รายการถูกเพิ่มจากเทมเพลตเรียบร้อยแล้ว! 🎉';
+
+  @override
+  String get addTemplateToBaggage => 'เพิ่มลงกระเป๋า';
+
+  @override
+  String get currentLimit => 'ขีดจำกัดปัจจุบัน';
+
+  @override
+  String get searchAirlineOrCode =>
+      'ค้นหาสายการบินหรือรหัส (เช่น TG, PG, TK)...';
+
+  @override
+  String get activeLimit => 'ขีดจำกัดที่ใช้งานอยู่';
+
+  @override
+  String get cabinBaggage => 'สัมภาระถือขึ้นเครื่อง';
+
+  @override
+  String get checkedBaggage => 'สัมภาระโหลดใต้เครื่อง';
+
+  @override
+  String get standardEconomy => 'ชั้นประหยัดมาตรฐาน';
+
+  @override
+  String get limitSelected => 'เลือกขีดจำกัดนี้แล้ว';
+
+  @override
+  String get applyCabinLimit => 'ใช้ขีดจำกัดสัมภาระถือขึ้นเครื่อง';
+
+  @override
+  String get baggageLimitSet => 'ตั้งค่าน้ำหนักสัมภาระเป็น';
+
+  @override
+  String get lockVault => 'ล็อคตู้นิรภัย';
+
+  @override
+  String get navHome => 'หน้าแรก';
+
+  @override
+  String get navTrips => 'การเดินทาง';
+
+  @override
+  String get navBaggage => 'สัมภาระ';
+
+  @override
+  String get navVault => 'ตู้นิรภัย';
+
+  @override
+  String get navSettings => 'การตั้งค่า';
+
+  @override
+  String get selectAirlineToCustomize =>
+      'แตะเพื่อปรับแต่งขีดจำกัดสำหรับสายการบินของคุณ';
+
+  @override
+  String get changeAirlineLimit => 'เปลี่ยนสายการบิน';
+
+  @override
+  String get selectCountryAndRoute => 'เลือกประเทศและเส้นทาง';
+
+  @override
+  String get countriesLabel => 'ประเทศ';
+
+  @override
+  String get searchCountryOrCity =>
+      'ค้นหาประเทศหรือเมือง (เช่น อิตาลี, โตเกียว, ปารีส)...';
+
+  @override
+  String get noMatchingCountry => 'ไม่พบประเทศที่ตรงกัน';
+
+  @override
+  String get activeStatus => 'เปิดใช้งาน';
 }

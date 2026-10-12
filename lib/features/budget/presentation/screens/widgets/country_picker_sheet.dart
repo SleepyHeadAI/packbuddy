@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
+import 'package:packbuddy/l10n/app_localizations.dart';
 
 /// Searchable modal bottom sheet to select travel destinations & countries
 class CountryPickerSheet extends StatefulWidget {
@@ -10,7 +11,13 @@ class CountryPickerSheet extends StatefulWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => const CountryPickerSheet(),
+      sheetAnimationStyle: const AnimationStyle(
+        duration: Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
+        reverseDuration: Duration(milliseconds: 200),
+        reverseCurve: Curves.easeInCubic,
+      ),
+      builder: (_) => const RepaintBoundary(child: CountryPickerSheet()),
     );
   }
 
@@ -54,6 +61,7 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final popularQuickCountries = Country.allCountries.take(8).toList();
 
     return Container(
@@ -92,7 +100,7 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
               const Icon(Icons.travel_explore_rounded, size: 24),
               const SizedBox(width: 10),
               Text(
-                'Ülke & Rota Seç',
+                l10n.selectCountryAndRoute,
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                   letterSpacing: -0.4,
@@ -100,7 +108,7 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
               ),
               const Spacer(),
               Text(
-                '${_filtered.length} Ülke',
+                '${_filtered.length} ${l10n.countriesLabel}',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -114,7 +122,7 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
             controller: _searchController,
             autofocus: false,
             decoration: InputDecoration(
-              hintText: 'Ülke veya şehir ara (örn: İtalya, Tokyo, Paris)...',
+              hintText: l10n.searchCountryOrCity,
               prefixIcon: const Icon(Icons.search_rounded, size: 20),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
@@ -165,7 +173,7 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'Eşleşen ülke bulunamadı',
+                          l10n.noMatchingCountry,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
@@ -195,20 +203,25 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
                             style: const TextStyle(fontSize: 24),
                           ),
                         ),
-                        title: Row(
-                          children: [
-                            Text(
-                              country.localName,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        title: Text.rich(
+                          TextSpan(
+                            text: country.localName,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              '(${country.name})',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
+                            children: [
+                              TextSpan(
+                                text: ' (${country.name})',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.normal,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         subtitle: country.popularDestinations.isNotEmpty
                             ? Text(
