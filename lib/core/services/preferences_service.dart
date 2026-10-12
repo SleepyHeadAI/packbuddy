@@ -10,6 +10,7 @@ class PreferencesService {
   static const String keyVaultPin = 'packbuddy_vault_pin';
   static const String keyVaultLocked = 'packbuddy_vault_locked';
   static const String keyVaultBiometricEnabled = 'packbuddy_vault_biometric_enabled';
+  static const String keyPackingRemindersEnabled = 'packbuddy_packing_reminders_enabled';
 
   static PreferencesService? _instance;
   final SharedPreferences? _prefs;
@@ -118,5 +119,14 @@ class PreferencesService {
 
   Future<void> setVaultLocked(bool locked) async {
     await _prefs?.setBool(keyVaultLocked, locked);
+  }
+
+  // --- Smart Notifications & Packing Reminders ---
+  bool isPackingRemindersEnabled() {
+    return _prefs?.getBool(keyPackingRemindersEnabled) ?? true;
+  }
+
+  Future<void> setPackingRemindersEnabled(bool enabled) async {
+    await _prefs?.setBool(keyPackingRemindersEnabled, enabled);
   }
 }

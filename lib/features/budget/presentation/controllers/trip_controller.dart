@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
+import '../../../../core/services/notification_service.dart';
 import '../../../../data/local_db/database_helper.dart';
 import '../../../../data/sync_engine/sync_engine.dart';
 import '../../domain/trip.dart';
@@ -29,17 +30,25 @@ class TripState {
   }
 }
 
-/// Controller managing trips persistence and background cloud sync
+/// Controller managing trips persistence, background cloud sync, and smart notifications
 class TripController extends StateNotifier<TripState> {
   final Ref _ref;
   final DatabaseHelper _dbHelper;
+  final INotificationService? _notificationService;
   final _uuid = const Uuid();
 
-  TripController(this._ref, {DatabaseHelper? dbHelper})
-      : _dbHelper = dbHelper ?? DatabaseHelper.instance,
+  TripController(
+    this._ref, {
+    DatabaseHelper? dbHelper,
+    INotificationService? notificationService,
+  })  : _dbHelper = dbHelper ?? DatabaseHelper.instance,
+        _notificationService = notificationService,
         super(const TripState()) {
     loadTrips();
   }
+
+  INotificationService get _notifications =>
+      _notificationService ?? _ref.read(notificationServiceProvider);
 
   /// Loads non-deleted trips from SQLite
   Future<void> loadTrips() async {
@@ -51,6 +60,11 @@ class TripController extends StateNotifier<TripState> {
         isLoading: false,
         trips: trips,
       );
+
+      // Sync active reminders for upcoming trips
+      try {
+        _notifications.syncAllTripReminders(trips);
+      } catch (_) {}
     } catch (e) {
       if (!mounted) return;
       state = state.copyWith(
@@ -97,8 +111,15 @@ class TripController extends StateNotifier<TripState> {
         trips: [newTrip, ...state.trips],
       );
 
-      // Trigger background two-way sync
-      _ref.read(syncEngineProvider.notifier).performSync();
+      // Schedule smart packing notifications (48h & 24h prior to departure)
+      try {
+        await _notifications.scheduleTripReminder(newTrip);
+      } catch (_) {}
+
+      // Trigger background two-way sync safely
+      try {
+        _ref.read(syncEngineProvider.notifier).performSync();
+      } catch (_) {}
 
       return newTrip;
     } catch (e) {
@@ -123,8 +144,16 @@ class TripController extends StateNotifier<TripState> {
 
       state = state.copyWith(trips: updatedList);
 
-      // Trigger background two-way sync
-      _ref.read(syncEngineProvider.notifier).performSync();
+      // Reschedule packing reminders with updated departure dates
+      try {
+        await _notifications.cancelReminder(tripToSave.id);
+        await _notifications.scheduleTripReminder(tripToSave);
+      } catch (_) {}
+
+      // Trigger background two-way sync safely
+      try {
+        _ref.read(syncEngineProvider.notifier).performSync();
+      } catch (_) {}
 
       return tripToSave;
     } catch (e) {
@@ -143,8 +172,15 @@ class TripController extends StateNotifier<TripState> {
         trips: state.trips.where((t) => t.id != tripId).toList(),
       );
 
-      // Trigger background two-way sync (soft-deleted trip will cascade to cloud)
-      _ref.read(syncEngineProvider.notifier).performSync();
+      // Cancel associated packing reminders
+      try {
+        await _notifications.cancelReminder(tripId);
+      } catch (_) {}
+
+      // Trigger background two-way sync safely (soft-deleted trip will cascade to cloud)
+      try {
+        _ref.read(syncEngineProvider.notifier).performSync();
+      } catch (_) {}
 
       return true;
     } catch (e) {

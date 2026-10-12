@@ -6,6 +6,7 @@ import 'package:packbuddy/core/l10n/locale_provider.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/theme/theme_provider.dart';
 import 'package:packbuddy/data/sync_engine/sync_engine.dart';
+import 'package:packbuddy/core/services/notification_service.dart';
 import 'package:packbuddy/features/settings/data/mock_revenuecat_service.dart';
 import 'package:packbuddy/features/settings/presentation/screens/widgets/paywall_sheet.dart';
 import 'package:packbuddy/features/vault/presentation/controllers/vault_controller.dart';
@@ -24,6 +25,7 @@ class SettingsScreen extends ConsumerWidget {
     final syncState = ref.watch(syncEngineProvider);
     final proState = ref.watch(proSubscriptionProvider);
     final vaultState = ref.watch(vaultControllerProvider);
+    final packingRemindersEnabled = ref.watch(packingRemindersProvider);
     final theme = Theme.of(context);
 
     return PopScope(
@@ -207,12 +209,69 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
           ),
-          // 5. Security & Vault Protection
+          const SizedBox(height: 24),
+
+          // 5. Notifications & Smart Packing Reminders
+          _SectionHeader(
+            title: currentLocale.languageCode == 'tr'
+                ? 'Bildirimler & Hatırlatıcılar'
+                : 'Notifications & Reminders',
+          ),
+          const SizedBox(height: 8),
+          AppCard(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Material(
+              color: Colors.transparent,
+              child: SwitchListTile.adaptive(
+                contentPadding: EdgeInsets.zero,
+                secondary: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: packingRemindersEnabled
+                        ? theme.colorScheme.primaryContainer.withValues(alpha: 0.6)
+                        : theme.colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    packingRemindersEnabled
+                        ? Icons.notifications_active_rounded
+                        : Icons.notifications_off_outlined,
+                    color: packingRemindersEnabled
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                title: Text(
+                  currentLocale.languageCode == 'tr'
+                      ? 'Paketleme Hatırlatıcıları'
+                      : 'Packing Reminders',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  currentLocale.languageCode == 'tr'
+                      ? 'Uçuştan 48 ve 24 saat önce akıllı bildirimler alın'
+                      : 'Get smart reminders 48h and 24h before departure',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                value: packingRemindersEnabled,
+                onChanged: (value) {
+                  ref.read(packingRemindersProvider.notifier).toggle(value);
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // 6. Security & Vault Protection
           _SectionHeader(title: l10n.security),
           const SizedBox(height: 8),
           AppCard(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: ListTile(
+            child: Material(
+              color: Colors.transparent,
+              child: ListTile(
               contentPadding: EdgeInsets.zero,
               leading: Container(
                 padding: const EdgeInsets.all(8),
@@ -242,6 +301,7 @@ class SettingsScreen extends ConsumerWidget {
                 child: Text(vaultState.hasPin ? l10n.change : l10n.setup),
               ),
             ),
+          ),
           ),
           const SizedBox(height: 28),
 
@@ -571,11 +631,14 @@ class _ProBanner extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        l10n.proTitle,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: -0.3,
+                      Flexible(
+                        child: Text(
+                          l10n.proTitle,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -0.3,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       const SizedBox(width: 8),

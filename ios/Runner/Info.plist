@@ -75,6 +75,13 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>PackBuddy seyahat sırasında sesli harcama ve gezi notları kaydedebilmeniz için mikrofon erişimi gerektirir.</string>
 
+	<!-- Background Modes & Push Notifications Capabilities Placeholder -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+
 	<!-- Sign in with Apple Capability Requirement:
 	     Xcode -> Runner -> Signing & Capabilities -> + Capability -> Sign In with Apple.
 	     Associated Entitlements: com.apple.developer.applesignin (Default)
