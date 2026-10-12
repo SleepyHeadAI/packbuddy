@@ -188,7 +188,7 @@ void main() {
   });
 
   group('5. Bottom Navigation & Airline Selection Tests', () {
-    test('ChecklistController updates selectedAirline and luggageLimitKg properly', () {
+    test('ChecklistController updates selectedAirline properly', () {
       final notifier = ChecklistNotifier();
       expect(notifier.state.selectedAirline, isNull);
 
@@ -202,9 +202,9 @@ void main() {
         notes: '1 adet 8 kg kabin bagajı',
       );
 
-      notifier.setLuggageLimit(testAirline.cabinLimitKg, airline: testAirline);
+      notifier.selectAirline(testAirline);
       expect(notifier.state.selectedAirline, equals(testAirline));
-      expect(notifier.state.luggageLimitKg, equals(8.0));
+      expect(notifier.state.selectedAirline?.cabinLimitKg, equals(8.0));
       expect(notifier.state.selectedAirline?.airlineName, 'Türk Hava Yolları');
       expect(notifier.state.selectedAirline?.checkedLimitKg, 23.0);
 

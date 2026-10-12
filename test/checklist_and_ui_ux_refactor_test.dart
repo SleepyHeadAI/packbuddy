@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:packbuddy/features/checklist/domain/luggage_weight_guard.dart';
 import 'package:packbuddy/features/checklist/domain/packing_item.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
 import 'package:packbuddy/features/checklist/presentation/screens/checklist_screen.dart';
@@ -21,58 +20,13 @@ class FakeVaultController extends StateNotifier<VaultState> implements VaultCont
 }
 
 void main() {
-  group('LuggageWeightGuard Domain Tests', () {
-    test('Calculates Normal status when weight is below 90% of limit', () {
-      final status = LuggageWeightGuard.computeStatus(
-        currentWeightKg: 12.0,
-        limitWeightKg: 20.0,
-      );
-      expect(status, equals(LuggageWeightStatus.normal));
-      expect(LuggageWeightGuard.getStatusBadgeText(status), equals('GÜVENLİ LİMİT'));
-    });
-
-    test('Calculates Warning status when weight is between 90% and 100% of limit', () {
-      final status = LuggageWeightGuard.computeStatus(
-        currentWeightKg: 18.5,
-        limitWeightKg: 20.0,
-      );
-      expect(status, equals(LuggageWeightStatus.warning));
-      expect(LuggageWeightGuard.getStatusBadgeText(status), equals('DİKKAT: %90+ DOLU'));
-    });
-
-    test('Calculates Exceeded status when weight exceeds 100% of limit', () {
-      final status = LuggageWeightGuard.computeStatus(
-        currentWeightKg: 21.2,
-        limitWeightKg: 20.0,
-      );
-      expect(status, equals(LuggageWeightStatus.exceeded));
-      expect(LuggageWeightGuard.getStatusBadgeText(status), equals('LİMİT AŞILDI!'));
-    });
-
-    test('Computes progress ratio clamped safely between 0.0 and 1.0', () {
-      expect(
-        LuggageWeightGuard.getProgressRatio(currentWeightKg: 10.0, limitWeightKg: 20.0),
-        equals(0.5),
-      );
-      expect(
-        LuggageWeightGuard.getProgressRatio(currentWeightKg: 25.0, limitWeightKg: 20.0),
-        equals(1.0),
-      );
-      expect(
-        LuggageWeightGuard.getProgressRatio(currentWeightKg: -2.0, limitWeightKg: 20.0),
-        equals(0.0),
-      );
-    });
-  });
-
-  group('PackingItem Domain Tests', () {
-    test('Serializes toMap and deserializes fromMap accurately', () {
+  group('PackingItem Domain Tests (Weight-Free Architecture)', () {
+    test('Serializes toMap and deserializes fromMap accurately without weight fields', () {
       final item = PackingItem(
         id: 'test-item-1',
         name: 'Noise-Cancelling Headphones',
         category: 'Elektronik',
         quantity: 2,
-        weightKg: 0.45,
         isPacked: true,
         tag: 'CABIN ONLY',
         compartment: 'Sırt Çantası',
@@ -85,10 +39,12 @@ void main() {
       expect(map['quantity'], 2);
       expect(map['is_packed'], 1);
       expect(map['tag'], 'CABIN ONLY');
+      expect(map.containsKey('weight_kg'), isFalse);
 
       final reconstructed = PackingItem.fromMap(map);
       expect(reconstructed, equals(item));
-      expect(reconstructed.totalWeightKg, closeTo(0.90, 0.001));
+      expect(reconstructed.quantity, 2);
+      expect(reconstructed.isPacked, isTrue);
     });
 
     test('copyWith properly preserves or updates fields', () {
@@ -97,7 +53,6 @@ void main() {
         name: 'Rain Jacket',
         category: 'Kıyafet',
         quantity: 1,
-        weightKg: 0.6,
         isPacked: false,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -108,18 +63,16 @@ void main() {
       expect(updated.name, original.name);
       expect(updated.quantity, 3);
       expect(updated.isPacked, true);
-      expect(updated.totalWeightKg, closeTo(1.8, 0.001));
     });
   });
 
-  group('ChecklistState & Reactive Calculations Tests', () {
-    test('Calculates dynamic luggage weight, status, and completion ratio', () {
+  group('ChecklistState & Reactive Item Completion Calculations', () {
+    test('Calculates item completion counts and ratio without weight dependencies', () {
       final item1 = PackingItem(
         id: '1',
         name: 'Universal Adapter',
         category: 'Elektronik',
         quantity: 2,
-        weightKg: 0.5, // 1.0 kg
         isPacked: true,
         compartment: 'Sırt Çantası',
         createdAt: DateTime.now(),
@@ -130,7 +83,6 @@ void main() {
         name: 'Heavy Boots',
         category: 'Kıyafet',
         quantity: 1,
-        weightKg: 2.0, // 2.0 kg
         isPacked: false,
         compartment: 'Ana Bölme',
         createdAt: DateTime.now(),
@@ -139,44 +91,35 @@ void main() {
 
       final state = ChecklistState(
         items: [item1, item2],
-        luggageLimitKg: 10.0,
       );
 
-      expect(state.totalWeightKg, closeTo(3.0, 0.001));
-      expect(state.packedWeightKg, closeTo(1.0, 0.001));
       expect(state.packedCount, 1);
       expect(state.totalCount, 2);
       expect(state.completionRatio, 0.5);
-      expect(state.weightStatus, LuggageWeightStatus.normal);
-
-      expect(state.compartmentBreakdown['Sırt Çantası'], closeTo(1.0, 0.001));
-      expect(state.compartmentBreakdown['Ana Bölme'], closeTo(2.0, 0.001));
     });
 
-    test('Transitions weightStatus dynamically from normal to warning and exceeded', () {
-      final baseItem = PackingItem(
-        id: 'w1',
-        name: 'Test Load',
-        category: 'Gear',
-        quantity: 1,
-        weightKg: 8.0,
+    test('Calculates 100% completion ratio when all items are packed', () {
+      final item1 = PackingItem(
+        id: '1',
+        name: 'Passport',
+        category: 'Belgeler',
+        isPacked: true,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      final item2 = PackingItem(
+        id: '2',
+        name: 'Wallet',
+        category: 'Belgeler',
+        isPacked: true,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
 
-      // 8 kg / 10 kg = 80% (< 90%) -> Normal
-      final stateNormal = ChecklistState(items: [baseItem], luggageLimitKg: 10.0);
-      expect(stateNormal.weightStatus, LuggageWeightStatus.normal);
-
-      // 9.5 kg / 10 kg = 95% (>= 90% and <= 100%) -> Warning
-      final warningItem = baseItem.copyWith(weightKg: 9.5);
-      final stateWarning = ChecklistState(items: [warningItem], luggageLimitKg: 10.0);
-      expect(stateWarning.weightStatus, LuggageWeightStatus.warning);
-
-      // 11.2 kg / 10 kg = 112% (> 100%) -> Exceeded
-      final exceededItem = baseItem.copyWith(weightKg: 11.2);
-      final stateExceeded = ChecklistState(items: [exceededItem], luggageLimitKg: 10.0);
-      expect(stateExceeded.weightStatus, LuggageWeightStatus.exceeded);
+      final state = ChecklistState(items: [item1, item2]);
+      expect(state.packedCount, 2);
+      expect(state.totalCount, 2);
+      expect(state.completionRatio, 1.0);
     });
 
     test('Search query matches item name, tag, or category correctly', () {
@@ -212,7 +155,6 @@ void main() {
         name: 'Güneş Gözlüğü',
         category: 'Aksesuar',
         quantity: 1,
-        weightKg: 0.1,
         isPacked: true,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -222,7 +164,6 @@ void main() {
         name: 'Mayo',
         category: 'Kıyafet',
         quantity: 1,
-        weightKg: 0.3,
         isPacked: false,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -268,7 +209,6 @@ void main() {
         name: 'Noise-Cancelling Headphones with Long Product Title That Wraps Nicely',
         category: 'Elektronik',
         quantity: 1,
-        weightKg: 0.5,
         isPacked: false,
         tag: 'CABIN ONLY',
         compartment: 'Sırt Çantası',
@@ -321,13 +261,12 @@ void main() {
       expect(find.text('Sırt Çantası'), findsNothing);
     });
 
-    testWidgets('ChecklistScreen renders Dynamic Luggage Guard and search bar without overflow', (tester) async {
+    testWidgets('ChecklistScreen renders Packing Progress and search bar without overflow', (tester) async {
       final sampleItem = PackingItem(
         id: 'c1',
         name: 'Noise-Cancelling Headphones',
         category: 'Elektronik',
         quantity: 1,
-        weightKg: 0.45,
         isPacked: false,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -342,7 +281,6 @@ void main() {
                 ChecklistState(
                   isLoading: false,
                   items: [sampleItem],
-                  luggageLimitKg: 20.0,
                 ),
               ),
             ),
@@ -377,7 +315,6 @@ void main() {
         name: 'Passports & Flight Tickets',
         category: 'Belgeler',
         quantity: 1,
-        weightKg: 0.2,
         isPacked: true,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -392,7 +329,6 @@ void main() {
                 ChecklistState(
                   isLoading: false,
                   items: [sampleItem],
-                  luggageLimitKg: 20.0,
                 ),
               ),
             ),

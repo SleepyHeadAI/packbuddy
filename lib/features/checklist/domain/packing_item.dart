@@ -5,7 +5,6 @@ class PackingItem {
   final String name;
   final String category;
   final int quantity;
-  final double weightKg; // Unit weight in kilograms
   final bool isPacked;
   final String tag; // e.g. "CARRY-ON", "CABIN ONLY", "CHECK-IN", "ESSENTIAL"
   final String compartment; // e.g. "Main Cabin", "Carry-on", "Front Pocket", "Toiletry Kit"
@@ -19,7 +18,6 @@ class PackingItem {
     required this.name,
     required this.category,
     this.quantity = 1,
-    this.weightKg = 0.5,
     this.isPacked = false,
     this.tag = 'CARRY-ON',
     this.compartment = 'Main Cabin',
@@ -28,16 +26,12 @@ class PackingItem {
     this.isDeleted = false,
   });
 
-  /// Total combined weight for this item (unit weight * quantity)
-  double get totalWeightKg => weightKg * quantity;
-
   PackingItem copyWith({
     String? id,
     String? tripId,
     String? name,
     String? category,
     int? quantity,
-    double? weightKg,
     bool? isPacked,
     String? tag,
     String? compartment,
@@ -51,7 +45,6 @@ class PackingItem {
       name: name ?? this.name,
       category: category ?? this.category,
       quantity: quantity ?? this.quantity,
-      weightKg: weightKg ?? this.weightKg,
       isPacked: isPacked ?? this.isPacked,
       tag: tag ?? this.tag,
       compartment: compartment ?? this.compartment,
@@ -69,7 +62,6 @@ class PackingItem {
       'name': name,
       'category': category,
       'quantity': quantity,
-      'weight_kg': weightKg,
       'is_packed': isPacked ? 1 : 0,
       'tag': tag,
       'compartment': compartment,
@@ -103,7 +95,6 @@ class PackingItem {
       name: (map['name'] ?? '') as String,
       category: (map['category'] ?? 'Diğer') as String,
       quantity: ((map['quantity'] as num?) ?? 1).toInt(),
-      weightKg: ((map['weight_kg'] ?? map['weightKg']) as num?)?.toDouble() ?? 0.5,
       isPacked: parseBool(map['is_packed'] ?? map['isPacked']),
       tag: (map['tag'] as String?) ?? 'CARRY-ON',
       compartment: (map['compartment'] as String?) ?? 'Main Cabin',
@@ -122,8 +113,6 @@ class PackingItem {
       'name': name,
       'category': category,
       'quantity': quantity,
-      'weightKg': weightKg,
-      'weight_kg': weightKg,
       'isPacked': isPacked,
       'is_packed': isPacked ? 1 : 0,
       'tag': tag,
@@ -147,7 +136,6 @@ class PackingItem {
           id == other.id &&
           name == other.name &&
           quantity == other.quantity &&
-          weightKg == other.weightKg &&
           isPacked == other.isPacked &&
           tag == other.tag &&
           compartment == other.compartment &&
@@ -158,7 +146,6 @@ class PackingItem {
       id.hashCode ^
       name.hashCode ^
       quantity.hashCode ^
-      weightKg.hashCode ^
       isPacked.hashCode ^
       tag.hashCode ^
       compartment.hashCode ^

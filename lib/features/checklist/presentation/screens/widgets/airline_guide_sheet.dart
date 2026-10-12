@@ -62,7 +62,6 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
     final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
     final checklistState = ref.watch(checklistControllerProvider);
-    final currentLimit = checklistState.luggageLimitKg;
     final selectedAirline = checklistState.selectedAirline;
 
     final filteredAirlines = _filteredAirlines;
@@ -120,12 +119,14 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${l10n.currentLimit}: ${currentLimit.toStringAsFixed(1)} kg',
+                        l10n.standardBaggageLimitNote,
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w500,
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -185,9 +186,8 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
               separatorBuilder: (_, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final airline = filteredAirlines[index];
-                final isCurrent = selectedAirline != null
-                    ? selectedAirline.iataCode == airline.iataCode
-                    : (airline.cabinLimitKg - currentLimit).abs() < 0.05;
+                final isCurrent = selectedAirline != null &&
+                    selectedAirline.iataCode == airline.iataCode;
 
                 return Container(
                   padding: const EdgeInsets.all(16),
@@ -369,50 +369,6 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
                           fontSize: 11,
                           color: theme.colorScheme.onSurfaceVariant,
                           height: 1.25,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-
-                      // Set limit button
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            ref
-                                .read(checklistControllerProvider.notifier)
-                                .setLuggageLimit(airline.cabinLimitKg, airline: airline);
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  '${l10n.baggageLimitSet} ${airline.airlineName} (${airline.cabinLimitKg.toStringAsFixed(0)} kg) ✈️',
-                                ),
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              ),
-                            );
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(
-                              color: isCurrent
-                                  ? theme.colorScheme.primary
-                                  : theme.colorScheme.outlineVariant,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                          ),
-                          icon: Icon(
-                            isCurrent ? Icons.check_circle_outline_rounded : Icons.sync_rounded,
-                            size: 16,
-                          ),
-                          label: Text(
-                            isCurrent
-                                ? '${l10n.limitSelected} (${airline.cabinLimitKg.toStringAsFixed(0)} kg)'
-                                : '${l10n.applyCabinLimit} (${airline.cabinLimitKg.toStringAsFixed(0)} kg)',
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                          ),
                         ),
                       ),
                     ],

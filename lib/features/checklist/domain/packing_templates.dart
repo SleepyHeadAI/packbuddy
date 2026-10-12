@@ -23,7 +23,6 @@ class PackingItemTemplate {
   final String name;
   final String category;
   final int quantity;
-  final double weightKg;
   final String tag;
   final String compartment;
 
@@ -31,7 +30,6 @@ class PackingItemTemplate {
     required this.name,
     required this.category,
     this.quantity = 1,
-    this.weightKg = 0.5,
     this.tag = 'CARRY-ON',
     this.compartment = 'Main Cabin',
   });
@@ -44,7 +42,6 @@ class PackingItemTemplate {
       name: name,
       category: category,
       quantity: quantity,
-      weightKg: weightKg,
       isPacked: false,
       tag: tag,
       compartment: compartment,

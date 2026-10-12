@@ -116,15 +116,25 @@ class SyncEngine extends StateNotifier<SyncState> {
       int processedItems = 0;
 
       // ===================================================================
-      // ALGORITHM STEP 1: Process Soft-Deleted Records
-      // Find locally soft-deleted records (is_deleted == 1), hard delete from
-      // Firestore (to save cloud storage), then hard delete from local SQLite.
+      // ALGORITHM STEP 1: Process Soft-Deleted Records with LWW Conflict Check
+      // If a remote edit is newer than the local deletion, remote edit wins.
+      // Otherwise, hard delete from Firestore and local SQLite.
       // ===================================================================
       
       // 1.1 Soft-deleted Trips
       final deletedTrips = await _dbHelper.getDeletedTrips();
       for (final trip in deletedTrips) {
         try {
+          final doc = await firestore.collection('trips').doc(trip.id).get();
+          if (doc.exists && doc.data() != null) {
+            final remoteTrip = Trip.fromJson(doc.data()!);
+            if (remoteTrip.updatedAt.isAfter(trip.updatedAt)) {
+              // Remote edit occurred after local deletion: Remote wins
+              await _dbHelper.updateTrip(remoteTrip);
+              processedItems++;
+              continue;
+            }
+          }
           await firestore.collection('trips').doc(trip.id).delete();
         } catch (_) {}
         await _dbHelper.hardDeleteTrip(trip.id);
@@ -135,6 +145,16 @@ class SyncEngine extends StateNotifier<SyncState> {
       final deletedExpenses = await _dbHelper.getDeletedExpenses();
       for (final expense in deletedExpenses) {
         try {
+          final doc = await firestore.collection('expenses').doc(expense.id).get();
+          if (doc.exists && doc.data() != null) {
+            final remoteExpense = Expense.fromJson(doc.data()!);
+            if (remoteExpense.updatedAt.isAfter(expense.updatedAt)) {
+              // Remote edit occurred after local deletion: Remote wins
+              await _dbHelper.updateExpense(remoteExpense);
+              processedItems++;
+              continue;
+            }
+          }
           await firestore.collection('expenses').doc(expense.id).delete();
         } catch (_) {}
         await _dbHelper.hardDeleteExpense(expense.id);
@@ -145,6 +165,16 @@ class SyncEngine extends StateNotifier<SyncState> {
       final deletedDocs = await _dbHelper.getDeletedDocuments();
       for (final doc in deletedDocs) {
         try {
+          final docSnap = await firestore.collection('documents').doc(doc.id).get();
+          if (docSnap.exists && docSnap.data() != null) {
+            final remoteDoc = Document.fromJson(docSnap.data()!);
+            if (remoteDoc.updatedAt.isAfter(doc.updatedAt)) {
+              // Remote edit occurred after local deletion: Remote wins
+              await _dbHelper.updateDocument(remoteDoc);
+              processedItems++;
+              continue;
+            }
+          }
           await firestore.collection('documents').doc(doc.id).delete();
         } catch (_) {}
         await _dbHelper.hardDeleteDocument(doc.id);
@@ -155,6 +185,16 @@ class SyncEngine extends StateNotifier<SyncState> {
       final deletedItems = await _dbHelper.getDeletedChecklistItems();
       for (final item in deletedItems) {
         try {
+          final doc = await firestore.collection('checklist_items').doc(item.id).get();
+          if (doc.exists && doc.data() != null) {
+            final remoteItem = PackingItem.fromJson(doc.data()!);
+            if (remoteItem.updatedAt.isAfter(item.updatedAt)) {
+              // Remote edit occurred after local deletion: Remote wins
+              await _dbHelper.updateChecklistItem(remoteItem);
+              processedItems++;
+              continue;
+            }
+          }
           await firestore.collection('checklist_items').doc(item.id).delete();
         } catch (_) {}
         await _dbHelper.hardDeleteChecklistItem(item.id);
@@ -162,115 +202,176 @@ class SyncEngine extends StateNotifier<SyncState> {
       }
 
       // ===================================================================
-      // ALGORITHM STEP 2: Push Local Active Changes to Cloud Firestore
+      // ALGORITHM STEP 2: Bidirectional Reconciliation with Last-Write-Wins (LWW)
+      // Conflict Resolution Strategy using `updatedAt` timestamps:
+      // - If record exists only locally: Push to Cloud Firestore.
+      // - If record exists only remotely: Pull & insert into SQLite.
+      // - If record exists on both devices:
+      //     * local.updatedAt > remote.updatedAt: Local wins -> Overwrite Firestore
+      //     * remote.updatedAt > local.updatedAt: Remote wins -> Overwrite SQLite
+      //     * timestamps equal: Already synchronized -> No write needed.
       // ===================================================================
 
-      // 2.1 Push active local Trips
-      final localTrips = await _dbHelper.getTrips(includeDeleted: false);
-      for (final trip in localTrips) {
-        await firestore.collection('trips').doc(trip.id).set(
-          trip.toJson(),
-          SetOptions(merge: true),
-        );
-        processedItems++;
-      }
-
-      // 2.2 Push active local Expenses
-      final localExpenses = await _dbHelper.getExpenses(includeDeleted: false);
-      for (final expense in localExpenses) {
-        await firestore.collection('expenses').doc(expense.id).set(
-          expense.toJson(),
-          SetOptions(merge: true),
-        );
-        processedItems++;
-      }
-
-      // 2.3 Push active local Documents
-      final localDocs = await _dbHelper.getDocuments(includeDeleted: false);
-      for (final doc in localDocs) {
-        await firestore.collection('documents').doc(doc.id).set(
-          doc.toJson(),
-          SetOptions(merge: true),
-        );
-        processedItems++;
-      }
-
-      // 2.4 Push active local Checklist Items
-      final localItems = await _dbHelper.getChecklistItems(includeDeleted: false);
-      for (final item in localItems) {
-        await firestore.collection('checklist_items').doc(item.id).set(
-          item.toJson(),
-          SetOptions(merge: true),
-        );
-        processedItems++;
-      }
-
-      // ===================================================================
-      // ALGORITHM STEP 3: Pull Remote Records from Cloud Firestore to SQLite
-      // If record does not exist locally -> insert.
-      // If record exists locally and remote updatedAt is newer -> update local.
-      // ===================================================================
-
-      // 3.1 Pull Trips from Firestore
+      // 2.1 Reconcile Trips with LWW
       final remoteTripsSnapshot = await firestore.collection('trips').get();
+      final remoteTripsMap = <String, Trip>{};
       for (final doc in remoteTripsSnapshot.docs) {
-        final remoteData = doc.data();
-        final remoteTrip = Trip.fromJson(remoteData);
+        try {
+          remoteTripsMap[doc.id] = Trip.fromJson(doc.data());
+        } catch (_) {}
+      }
 
-        final localTrip = await _dbHelper.getTripById(remoteTrip.id);
-        if (localTrip == null) {
-          await _dbHelper.insertTrip(remoteTrip);
+      final localTrips = await _dbHelper.getTrips(includeDeleted: false);
+      final localTripsMap = <String, Trip>{for (final t in localTrips) t.id: t};
+
+      for (final localTrip in localTrips) {
+        final remoteTrip = remoteTripsMap[localTrip.id];
+        if (remoteTrip == null) {
+          await firestore.collection('trips').doc(localTrip.id).set(
+            localTrip.toJson(),
+            SetOptions(merge: true),
+          );
+          processedItems++;
+        } else if (localTrip.updatedAt.isAfter(remoteTrip.updatedAt)) {
+          // LWW: Local modification is newer -> Overwrite Firestore
+          await firestore.collection('trips').doc(localTrip.id).set(
+            localTrip.toJson(),
+            SetOptions(merge: true),
+          );
           processedItems++;
         } else if (remoteTrip.updatedAt.isAfter(localTrip.updatedAt)) {
+          // LWW: Remote modification is newer -> Overwrite local SQLite
           await _dbHelper.updateTrip(remoteTrip);
           processedItems++;
         }
       }
 
-      // 3.2 Pull Expenses from Firestore
-      final remoteExpensesSnapshot = await firestore.collection('expenses').get();
-      for (final doc in remoteExpensesSnapshot.docs) {
-        final remoteData = doc.data();
-        final remoteExpense = Expense.fromJson(remoteData);
+      for (final entry in remoteTripsMap.entries) {
+        if (!localTripsMap.containsKey(entry.key)) {
+          await _dbHelper.insertTrip(entry.value);
+          processedItems++;
+        }
+      }
 
-        final localExpense = await _dbHelper.getExpenseById(remoteExpense.id);
-        if (localExpense == null) {
-          await _dbHelper.insertExpense(remoteExpense);
+      // 2.2 Reconcile Expenses with LWW
+      final remoteExpensesSnapshot = await firestore.collection('expenses').get();
+      final remoteExpensesMap = <String, Expense>{};
+      for (final doc in remoteExpensesSnapshot.docs) {
+        try {
+          remoteExpensesMap[doc.id] = Expense.fromJson(doc.data());
+        } catch (_) {}
+      }
+
+      final localExpenses = await _dbHelper.getExpenses(includeDeleted: false);
+      final localExpensesMap = <String, Expense>{for (final e in localExpenses) e.id: e};
+
+      for (final localExpense in localExpenses) {
+        final remoteExpense = remoteExpensesMap[localExpense.id];
+        if (remoteExpense == null) {
+          await firestore.collection('expenses').doc(localExpense.id).set(
+            localExpense.toJson(),
+            SetOptions(merge: true),
+          );
+          processedItems++;
+        } else if (localExpense.updatedAt.isAfter(remoteExpense.updatedAt)) {
+          // LWW: Local modification is newer -> Overwrite Firestore
+          await firestore.collection('expenses').doc(localExpense.id).set(
+            localExpense.toJson(),
+            SetOptions(merge: true),
+          );
           processedItems++;
         } else if (remoteExpense.updatedAt.isAfter(localExpense.updatedAt)) {
+          // LWW: Remote modification is newer -> Overwrite local SQLite
           await _dbHelper.updateExpense(remoteExpense);
           processedItems++;
         }
       }
 
-      // 3.3 Pull Documents from Firestore
-      final remoteDocsSnapshot = await firestore.collection('documents').get();
-      for (final d in remoteDocsSnapshot.docs) {
-        final remoteData = d.data();
-        final remoteDocument = Document.fromJson(remoteData);
-
-        final localDoc = await _dbHelper.getDocumentById(remoteDocument.id);
-        if (localDoc == null) {
-          await _dbHelper.insertDocument(remoteDocument);
-          processedItems++;
-        } else if (remoteDocument.updatedAt.isAfter(localDoc.updatedAt)) {
-          await _dbHelper.updateDocument(remoteDocument);
+      for (final entry in remoteExpensesMap.entries) {
+        if (!localExpensesMap.containsKey(entry.key)) {
+          await _dbHelper.insertExpense(entry.value);
           processedItems++;
         }
       }
 
-      // 3.4 Pull Checklist Items from Firestore
-      final remoteItemsSnapshot = await firestore.collection('checklist_items').get();
-      for (final d in remoteItemsSnapshot.docs) {
-        final remoteData = d.data();
-        final remoteItem = PackingItem.fromJson(remoteData);
+      // 2.3 Reconcile Documents with LWW
+      final remoteDocsSnapshot = await firestore.collection('documents').get();
+      final remoteDocsMap = <String, Document>{};
+      for (final doc in remoteDocsSnapshot.docs) {
+        try {
+          remoteDocsMap[doc.id] = Document.fromJson(doc.data());
+        } catch (_) {}
+      }
 
-        final localItem = await _dbHelper.getChecklistItemById(remoteItem.id);
-        if (localItem == null) {
-          await _dbHelper.insertChecklistItem(remoteItem);
+      final localDocs = await _dbHelper.getDocuments(includeDeleted: false);
+      final localDocsMap = <String, Document>{for (final d in localDocs) d.id: d};
+
+      for (final localDoc in localDocs) {
+        final remoteDoc = remoteDocsMap[localDoc.id];
+        if (remoteDoc == null) {
+          await firestore.collection('documents').doc(localDoc.id).set(
+            localDoc.toJson(),
+            SetOptions(merge: true),
+          );
+          processedItems++;
+        } else if (localDoc.updatedAt.isAfter(remoteDoc.updatedAt)) {
+          // LWW: Local modification is newer -> Overwrite Firestore
+          await firestore.collection('documents').doc(localDoc.id).set(
+            localDoc.toJson(),
+            SetOptions(merge: true),
+          );
+          processedItems++;
+        } else if (remoteDoc.updatedAt.isAfter(localDoc.updatedAt)) {
+          // LWW: Remote modification is newer -> Overwrite local SQLite
+          await _dbHelper.updateDocument(remoteDoc);
+          processedItems++;
+        }
+      }
+
+      for (final entry in remoteDocsMap.entries) {
+        if (!localDocsMap.containsKey(entry.key)) {
+          await _dbHelper.insertDocument(entry.value);
+          processedItems++;
+        }
+      }
+
+      // 2.4 Reconcile Checklist Items with LWW
+      final remoteItemsSnapshot = await firestore.collection('checklist_items').get();
+      final remoteItemsMap = <String, PackingItem>{};
+      for (final doc in remoteItemsSnapshot.docs) {
+        try {
+          remoteItemsMap[doc.id] = PackingItem.fromJson(doc.data());
+        } catch (_) {}
+      }
+
+      final localItems = await _dbHelper.getChecklistItems(includeDeleted: false);
+      final localItemsMap = <String, PackingItem>{for (final i in localItems) i.id: i};
+
+      for (final localItem in localItems) {
+        final remoteItem = remoteItemsMap[localItem.id];
+        if (remoteItem == null) {
+          await firestore.collection('checklist_items').doc(localItem.id).set(
+            localItem.toJson(),
+            SetOptions(merge: true),
+          );
+          processedItems++;
+        } else if (localItem.updatedAt.isAfter(remoteItem.updatedAt)) {
+          // LWW: Local modification is newer -> Overwrite Firestore
+          await firestore.collection('checklist_items').doc(localItem.id).set(
+            localItem.toJson(),
+            SetOptions(merge: true),
+          );
           processedItems++;
         } else if (remoteItem.updatedAt.isAfter(localItem.updatedAt)) {
+          // LWW: Remote modification is newer -> Overwrite local SQLite
           await _dbHelper.updateChecklistItem(remoteItem);
+          processedItems++;
+        }
+      }
+
+      for (final entry in remoteItemsMap.entries) {
+        if (!localItemsMap.containsKey(entry.key)) {
+          await _dbHelper.insertChecklistItem(entry.value);
           processedItems++;
         }
       }

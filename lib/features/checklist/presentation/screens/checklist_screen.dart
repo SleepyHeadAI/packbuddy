@@ -9,7 +9,7 @@ import 'package:packbuddy/features/checklist/presentation/screens/widgets/packin
 import 'package:packbuddy/features/checklist/presentation/screens/widgets/smart_templates_sheet.dart';
 import 'package:packbuddy/features/checklist/presentation/screens/widgets/airline_guide_sheet.dart';
 
-/// Principal Flutter UI/UX Checklist & Dynamic Luggage Weight Guard Screen
+/// Principal Flutter UI/UX Checklist & Item Completion Tracking Screen
 class ChecklistScreen extends ConsumerStatefulWidget {
   final String? tripId;
   final String? tripTitle;
@@ -108,7 +108,6 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
     final progressRatio = completionRatio;
 
     final filteredItems = checklistState.filteredItems;
-    final selectedAirline = checklistState.selectedAirline;
 
     return PopScope(
       canPop: true,
@@ -232,7 +231,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                 ),
               ),
 
-              // 2. Dynamic Luggage Weight Guard Card
+              // 2. Item Completion Progress & Overview Card
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 6, 20, 10),
@@ -368,82 +367,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10),
-
-                        // Airline Limits Reference Banner (Live selected airline sync)
-                        InkWell(
-                          onTap: () => AirlineGuideSheet.show(context),
-                          borderRadius: BorderRadius.circular(12),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.45)
-                                  : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: selectedAirline != null
-                                    ? theme.colorScheme.primary.withValues(alpha: 0.45)
-                                    : theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(Icons.flight_takeoff_rounded, size: 15, color: theme.colorScheme.primary),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        selectedAirline != null
-                                            ? '${selectedAirline.countryFlag} ${selectedAirline.airlineName} (${selectedAirline.iataCode})'
-                                            : l10n.standardBaggageLimitNote,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700,
-                                          color: theme.colorScheme.primary,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: Text(
-                                        selectedAirline != null ? l10n.changeAirlineLimit : l10n.airlineBaggageLimits,
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w700,
-                                          color: theme.colorScheme.primary,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 5),
-                                Text(
-                                  selectedAirline != null
-                                      ? '${l10n.cabinBaggage}: ${selectedAirline.cabinLimitKg.toStringAsFixed(0)} kg (${selectedAirline.cabinDimensions}) • ${l10n.checkedBaggage}: ${selectedAirline.checkedLimitKg.toStringAsFixed(0)} kg'
-                                      : l10n.selectAirlineToCustomize,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 14),
 
                         // Quick Actions: Airline Guide & Smart Templates
                         Row(

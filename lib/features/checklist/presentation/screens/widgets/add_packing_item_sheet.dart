@@ -157,7 +157,6 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
       name: _nameController.text.trim(),
       category: _category,
       quantity: _quantity,
-      weightKg: 0.0,
       isPacked: false,
       tag: _tag,
       compartment: _compartment,

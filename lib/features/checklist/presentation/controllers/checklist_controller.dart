@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../data/local_db/database_helper.dart';
 import '../../domain/packing_item.dart';
-import '../../domain/luggage_weight_guard.dart';
 import '../../domain/packing_templates.dart';
 import '../../domain/airline_baggage_guide.dart';
 
@@ -13,7 +12,6 @@ class ChecklistState {
   final String searchQuery;
   final String? selectedCategory;
   final bool isSearchExpanded;
-  final double luggageLimitKg;
   final String? errorMessage;
   final String? activeTripId;
   final AirlineBaggageRule? selectedAirline;
@@ -24,7 +22,6 @@ class ChecklistState {
     this.searchQuery = '',
     this.selectedCategory,
     this.isSearchExpanded = false,
-    this.luggageLimitKg = 20.0,
     this.errorMessage,
     this.activeTripId,
     this.selectedAirline,
@@ -72,16 +69,6 @@ class ChecklistState {
     }).toList();
   }
 
-  /// Total weight of all active items (unit weight * quantity)
-  double get totalWeightKg {
-    return items.fold(0.0, (sum, item) => sum + item.totalWeightKg);
-  }
-
-  /// Total weight of items already packed
-  double get packedWeightKg {
-    return items.where((i) => i.isPacked).fold(0.0, (sum, item) => sum + item.totalWeightKg);
-  }
-
   /// Count of packed items
   int get packedCount => items.where((i) => i.isPacked).length;
 
@@ -91,28 +78,12 @@ class ChecklistState {
   /// Packed percentage ratio (0.0 to 1.0)
   double get completionRatio => totalCount > 0 ? packedCount / totalCount : 0.0;
 
-  /// Dynamic weight guard status: normal (green), warning (amber), exceeded (crimson)
-  LuggageWeightStatus get weightStatus => LuggageWeightGuard.computeStatus(
-        currentWeightKg: totalWeightKg,
-        limitWeightKg: luggageLimitKg,
-      );
-
-  /// Breakdown of weight grouped by luggage compartment
-  Map<String, double> get compartmentBreakdown {
-    final map = <String, double>{};
-    for (final item in items) {
-      map[item.compartment] = (map[item.compartment] ?? 0.0) + item.totalWeightKg;
-    }
-    return map;
-  }
-
   ChecklistState copyWith({
     List<PackingItem>? items,
     bool? isLoading,
     String? searchQuery,
     String? selectedCategory,
     bool? isSearchExpanded,
-    double? luggageLimitKg,
     String? errorMessage,
     String? activeTripId,
     bool clearSelectedCategory = false,
@@ -125,7 +96,6 @@ class ChecklistState {
       searchQuery: searchQuery ?? this.searchQuery,
       selectedCategory: clearSelectedCategory ? null : (selectedCategory ?? this.selectedCategory),
       isSearchExpanded: isSearchExpanded ?? this.isSearchExpanded,
-      luggageLimitKg: luggageLimitKg ?? this.luggageLimitKg,
       errorMessage: errorMessage,
       activeTripId: activeTripId ?? this.activeTripId,
       selectedAirline: clearSelectedAirline ? null : (selectedAirline ?? this.selectedAirline),
@@ -133,7 +103,7 @@ class ChecklistState {
   }
 }
 
-/// StateNotifier orchestrating packing checklist, luggage weight, and filtering
+/// StateNotifier orchestrating packing checklist, item progress, and filtering
 class ChecklistNotifier extends StateNotifier<ChecklistState> {
   final DatabaseHelper _db;
   static const _uuid = Uuid();
@@ -153,7 +123,6 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
           name: 'Noise-Cancelling Headphones & Case',
           category: 'Elektronik',
           quantity: 1,
-          weightKg: 0.45,
           isPacked: true,
           tag: 'CABIN ONLY',
           compartment: 'Sırt Çantası',
@@ -165,7 +134,6 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
           name: 'Pasaport, Vize & Uçuş Biletleri',
           category: 'Belgeler',
           quantity: 1,
-          weightKg: 0.15,
           isPacked: true,
           tag: 'ESSENTIAL',
           compartment: 'Ön Cep',
@@ -177,7 +145,6 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
           name: 'Hafif Su Geçirmez Yağmurluk',
           category: 'Kıyafet',
           quantity: 1,
-          weightKg: 0.65,
           isPacked: false,
           tag: 'CARRY-ON',
           compartment: 'Ana Bölme',
@@ -189,7 +156,6 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
           name: 'Evrensel Seyahat Prizi & Hızlı Şarj Cihazı',
           category: 'Elektronik',
           quantity: 2,
-          weightKg: 0.35,
           isPacked: true,
           tag: 'CABIN ONLY',
           compartment: 'Sırt Çantası',
@@ -201,7 +167,6 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
           name: 'Kişisel Bakım & Kozmetik Çantası (100ml TSA)',
           category: 'Kişisel Bakım',
           quantity: 1,
-          weightKg: 0.90,
           isPacked: false,
           tag: 'CARRY-ON',
           compartment: 'Kozmetik Bölmesi',
@@ -213,7 +178,6 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
           name: 'Konforlu Yürüyüş Ayakkabısı',
           category: 'Kıyafet',
           quantity: 1,
-          weightKg: 1.10,
           isPacked: false,
           tag: 'CHECK-IN',
           compartment: 'Ana Bölme',
@@ -225,7 +189,6 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
           name: 'Merino Yün Termal İçlik & Çoraplar',
           category: 'Kıyafet',
           quantity: 3,
-          weightKg: 0.30,
           isPacked: true,
           tag: 'CARRY-ON',
           compartment: 'Ana Bölme',
@@ -237,7 +200,6 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
           name: 'Powerbank 20.000 mAh (Uçuş Onaylı)',
           category: 'Elektronik',
           quantity: 1,
-          weightKg: 0.42,
           isPacked: false,
           tag: 'CABIN ONLY',
           compartment: 'Ön Cep',
@@ -292,7 +254,7 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
     }
   }
 
-  /// Updates quantity via - 1 + stepper (minimum 1), dynamically recalculating weight
+  /// Updates quantity via - 1 + stepper (minimum 1)
   Future<void> updateQuantity(String id, int delta) async {
     final index = state.items.indexWhere((i) => i.id == id);
     if (index == -1) return;
@@ -319,7 +281,7 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
     }
   }
 
-  /// Updates full item attributes (name, weight, category, tag, compartment)
+  /// Updates full item attributes (name, category, tag, compartment)
   Future<void> updateItem(PackingItem updated) async {
     final index = state.items.indexWhere((i) => i.id == updated.id);
     if (index == -1) return;
@@ -457,25 +419,19 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
     );
   }
 
-  /// Configures luggage limit and optionally the active airline rule
-  void setLuggageLimit(double limit, {AirlineBaggageRule? airline}) {
-    if (limit > 0) {
-      state = state.copyWith(
-        luggageLimitKg: limit,
-        selectedAirline: airline,
-      );
+  /// Sets or clears selected airline rule for informational guidance
+  void selectAirline(AirlineBaggageRule? airline) {
+    if (airline != null) {
+      state = state.copyWith(selectedAirline: airline);
+    } else {
+      state = state.copyWith(clearSelectedAirline: true);
     }
   }
 
-  /// Sets or clears selected airline rule
-  void selectAirline(AirlineBaggageRule? airline) {
+  /// Convenience method for setting airline reference without weight limits
+  void setLuggageLimit(double limit, {AirlineBaggageRule? airline}) {
     if (airline != null) {
-      state = state.copyWith(
-        luggageLimitKg: airline.cabinLimitKg,
-        selectedAirline: airline,
-      );
-    } else {
-      state = state.copyWith(clearSelectedAirline: true);
+      selectAirline(airline);
     }
   }
 }

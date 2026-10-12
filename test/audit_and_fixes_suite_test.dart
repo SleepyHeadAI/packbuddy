@@ -99,7 +99,6 @@ void main() {
         name: 'Gözlük',
         category: 'Aksesuar',
         quantity: 1,
-        weightKg: 0.2,
         isPacked: true,
         tag: 'CARRY-ON',
         compartment: 'Ön Cep',
@@ -110,8 +109,6 @@ void main() {
       final json = item.toJson();
       expect(json['is_packed'], 1);
       expect(json['isPacked'], true);
-      expect(json['weight_kg'], 0.2);
-      expect(json['weightKg'], 0.2);
     });
   });
 
@@ -201,7 +198,6 @@ void main() {
         name: 'Tişört',
         category: 'Kıyafet',
         quantity: 2,
-        weightKg: 0.4,
         isPacked: false,
         tag: 'CARRY-ON',
         compartment: 'Ana Bölme',
@@ -211,11 +207,10 @@ void main() {
 
       controller.state = ChecklistState(items: [item]);
 
-      final updated = item.copyWith(quantity: 5, weightKg: 1.0);
+      final updated = item.copyWith(quantity: 5);
       await controller.updateItem(updated);
 
       expect(controller.state.items.first.quantity, 5);
-      expect(controller.state.items.first.weightKg, 1.0);
     });
   });
 
@@ -255,7 +250,6 @@ void main() {
         name: 'Güneş Gözlüğü',
         category: 'Aksesuar',
         quantity: 1,
-        weightKg: 0.1,
         isPacked: false,
         tag: 'CARRY-ON',
         compartment: 'Ön Cep',
