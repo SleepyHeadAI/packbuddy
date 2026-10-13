@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/features/checklist/domain/airline_baggage_guide.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
@@ -66,14 +67,23 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
 
     final filteredAirlines = _filteredAirlines;
 
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.88,
-      ),
-      decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-      ),
+    return SafeArea(
+      top: false,
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.88,
+        ),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
+              blurRadius: 24,
+              offset: const Offset(0, -6),
+            ),
+          ],
+        ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -192,19 +202,17 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
                 return Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
-                        : Colors.white,
+                    color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(
                       color: isCurrent
                           ? theme.colorScheme.primary
-                          : theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+                          : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
                       width: isCurrent ? 1.8 : 1,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.08 : 0.03),
+                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -219,39 +227,39 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
                           Text(airline.countryFlag, style: const TextStyle(fontSize: 22)),
                           const SizedBox(width: 10),
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Row(
                               children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      airline.airlineName,
-                                      style: theme.textTheme.titleSmall?.copyWith(
-                                        fontWeight: FontWeight.w700,
-                                      ),
+                                Flexible(
+                                  child: Text(
+                                    airline.airlineName,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: theme.textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.w700,
                                     ),
-                                    const SizedBox(width: 8),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: Text(
-                                        airline.iataCode,
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w700,
-                                          color: theme.colorScheme.primary,
-                                        ),
-                                      ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    airline.iataCode,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      color: theme.colorScheme.primary,
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                          if (isCurrent)
+                          if (isCurrent) ...[
+                            const SizedBox(width: 8),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
@@ -267,98 +275,128 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
                                 ),
                               ),
                             ),
+                          ],
                         ],
                       ),
                       const SizedBox(height: 12),
 
-                      // Allowances Row
-                      Row(
-                        children: [
-                          // Cabin Limit Box
-                          Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(Icons.backpack_rounded, size: 14, color: theme.colorScheme.primary),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        l10n.cabinBaggage,
-                                        style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600),
+                      // Allowances Row with equal height
+                      IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Cabin Limit Box
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? AppColors.surfaceVariantDark
+                                      : AppColors.surfaceVariantLight,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(Icons.backpack_rounded, size: 14, color: theme.colorScheme.primary),
+                                        const SizedBox(width: 6),
+                                        Flexible(
+                                          child: Text(
+                                            l10n.cabinBaggage,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        '${airline.cabinLimitKg.toStringAsFixed(0)} kg',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w800,
+                                          color: theme.colorScheme.primary,
+                                        ),
                                       ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '${airline.cabinLimitKg.toStringAsFixed(0)} kg',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w800,
-                                      color: theme.colorScheme.primary,
                                     ),
-                                  ),
-                                  Text(
-                                    airline.cabinDimensions,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: theme.colorScheme.onSurfaceVariant,
+                                    Text(
+                                      airline.cabinDimensions,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: theme.colorScheme.onSurfaceVariant,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 10),
+                            const SizedBox(width: 10),
 
-                          // Checked Limit Box
-                          Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(Icons.luggage_rounded, size: 14, color: theme.colorScheme.secondary),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        l10n.checkedBaggage,
-                                        style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600),
+                            // Checked Limit Box
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: isDark
+                                      ? AppColors.surfaceVariantDark
+                                      : AppColors.surfaceVariantLight,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(Icons.luggage_rounded, size: 14, color: theme.colorScheme.secondary),
+                                        const SizedBox(width: 6),
+                                        Flexible(
+                                          child: Text(
+                                            l10n.checkedBaggage,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        '${airline.checkedLimitKg.toStringAsFixed(0)} kg',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w800,
+                                          color: theme.colorScheme.secondary,
+                                        ),
                                       ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '${airline.checkedLimitKg.toStringAsFixed(0)} kg',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w800,
-                                      color: theme.colorScheme.secondary,
                                     ),
-                                  ),
-                                  Text(
-                                    l10n.standardEconomy,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: theme.colorScheme.onSurfaceVariant,
+                                    Text(
+                                      l10n.standardEconomy,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: theme.colorScheme.onSurfaceVariant,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 10),
 
@@ -379,6 +417,7 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

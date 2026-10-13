@@ -20,7 +20,7 @@ class AppCard extends StatefulWidget {
     this.backgroundColor,
     this.gradient,
     this.border,
-    this.borderRadius = 22,
+    this.borderRadius = 20,
     this.customShadow,
   });
 
@@ -67,8 +67,8 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
         ? Border.fromBorderSide(widget.border!)
         : Border.all(
             color: isDark
-                ? Colors.white.withValues(alpha: 0.08)
-                : theme.colorScheme.outline.withValues(alpha: 0.5),
+                ? const Color(0xFF1E293B)
+                : const Color(0xFFDDE3ED),
             width: 1,
           );
 
@@ -76,23 +76,23 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
         [
           BoxShadow(
             color: isDark
-                ? Colors.black.withValues(alpha: 0.35)
-                : const Color(0xFF0F172A).withValues(alpha: 0.04),
-            blurRadius: 20,
+                ? Colors.black.withValues(alpha: 0.30)
+                : const Color(0xFF0F172A).withValues(alpha: 0.03),
+            blurRadius: 16,
             spreadRadius: 0,
-            offset: const Offset(0, 6),
+            offset: const Offset(0, 4),
           ),
           if (!isDark)
             BoxShadow(
               color: const Color(0xFF0F172A).withValues(alpha: 0.015),
-              blurRadius: 6,
+              blurRadius: 4,
               spreadRadius: 0,
               offset: const Offset(0, 1),
             ),
         ];
 
     Widget body = Container(
-      padding: widget.padding ?? const EdgeInsets.all(20),
+      padding: widget.padding ?? const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: widget.gradient == null
             ? (widget.backgroundColor ?? theme.cardTheme.color ?? theme.colorScheme.surface)

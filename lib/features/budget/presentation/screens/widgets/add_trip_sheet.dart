@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
@@ -295,29 +296,31 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    final isCustomSelected = _customTransport != null && _selectedTransport == _customTransport;
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.92,
       ),
       decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
+        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 20,
+        left: 20,
+        right: 20,
+        top: 16,
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
       ),
-      child: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+      child: SafeArea(
+        top: false,
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
               // Drag handle
               Center(
                 child: Container(
@@ -359,13 +362,18 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    l10n.travelRouteOrStops,
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurfaceVariant,
+                  Expanded(
+                    child: Text(
+                      l10n.travelRouteOrStops,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  const SizedBox(width: 8),
                   TextButton.icon(
                     onPressed: _openCountryPicker,
                     icon: const Icon(Icons.travel_explore_rounded, size: 16),
@@ -497,22 +505,33 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    l10n.transportMode,
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurfaceVariant,
+                  Flexible(
+                    child: Text(
+                      l10n.transportMode,
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  if (_customTransport != null)
-                    Text(
-                      '${l10n.custom}: $_customTransport',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.w600,
+                  if (_customTransport != null) ...[
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        '${l10n.custom}: $_customTransport',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.end,
                       ),
                     ),
+                  ],
                 ],
               ),
               const SizedBox(height: 8),
@@ -549,30 +568,34 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                       );
                     }),
                     // Custom Transport Chip
-                    if (_customTransport != null)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: ChoiceChip(
-                          avatar: Icon(
-                            Icons.commute_rounded,
-                            size: 16,
-                            color: isCustomSelected ? theme.colorScheme.onPrimary : theme.colorScheme.primary,
+                    if (_customTransport != null) ...[
+                      () {
+                        final isCustomSelected = _selectedTransport == _customTransport;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: ChoiceChip(
+                            avatar: Icon(
+                              Icons.commute_rounded,
+                              size: 16,
+                              color: isCustomSelected ? theme.colorScheme.onPrimary : theme.colorScheme.primary,
+                            ),
+                            label: Text(_customTransport!),
+                            selected: isCustomSelected,
+                            selectedColor: theme.colorScheme.primary,
+                            labelStyle: TextStyle(
+                              color: isCustomSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
+                            onSelected: (val) {
+                              if (val) {
+                                setState(() => _selectedTransport = _customTransport!);
+                              }
+                            },
                           ),
-                          label: Text(_customTransport!),
-                          selected: isCustomSelected,
-                          selectedColor: theme.colorScheme.primary,
-                          labelStyle: TextStyle(
-                            color: isCustomSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                          ),
-                          onSelected: (val) {
-                            if (val) {
-                              setState(() => _selectedTransport = _customTransport!);
-                            }
-                          },
-                        ),
-                      ),
+                        );
+                      }(),
+                    ],
                     // Add Custom Action Chip
                     ActionChip(
                       avatar: const Icon(Icons.add_rounded, size: 16),
@@ -703,9 +726,13 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                   children: [
                     const Icon(Icons.check_circle_outline_rounded, size: 20),
                     const SizedBox(width: 8),
-                    Text(
-                      l10n.save,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                    Flexible(
+                      child: Text(
+                        l10n.save,
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
@@ -714,6 +741,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

@@ -554,12 +554,13 @@ class TripDetailScreen extends ConsumerWidget {
                                 Row(
                                   children: [
                                     Container(
-                                      padding: const EdgeInsets.all(10),
+                                      width: 44,
+                                      height: 44,
                                       decoration: BoxDecoration(
                                         color: color.withValues(alpha: 0.15),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
-                                      child: Icon(icon, color: color, size: 20),
+                                      child: Center(child: Icon(icon, color: color, size: 20)),
                                     ),
                                     const SizedBox(width: 14),
                                     Expanded(
@@ -626,31 +627,42 @@ class TripDetailScreen extends ConsumerWidget {
                                         ],
                                       ),
                                     ),
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                          CurrencyFormatter.format(
-                                            expense.amount,
-                                            currency: expense.currency,
-                                          ),
-                                          style: theme.textTheme.titleMedium?.copyWith(
-                                            fontWeight: FontWeight.w700,
-                                            color: theme.colorScheme.onSurface,
-                                          ),
-                                        ),
-                                        if (expense.currency.toUpperCase() != currentTrip.defaultCurrency.toUpperCase()) ...[
-                                          const SizedBox(height: 1),
-                                          Text(
-                                            '≈ ${CurrencyFormatter.format(CurrencyService.convert(amount: expense.amount, fromCurrency: expense.currency, toCurrency: currentTrip.defaultCurrency), currency: currentTrip.defaultCurrency)}',
-                                            style: theme.textTheme.bodySmall?.copyWith(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w500,
-                                              color: theme.colorScheme.onSurfaceVariant,
+                                    const SizedBox(width: 10),
+                                    Flexible(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            alignment: Alignment.centerRight,
+                                            child: Text(
+                                              CurrencyFormatter.format(
+                                                expense.amount,
+                                                currency: expense.currency,
+                                              ),
+                                              style: theme.textTheme.titleMedium?.copyWith(
+                                                fontWeight: FontWeight.w700,
+                                                color: theme.colorScheme.onSurface,
+                                              ),
                                             ),
                                           ),
+                                          if (expense.currency.toUpperCase() != currentTrip.defaultCurrency.toUpperCase()) ...[
+                                            const SizedBox(height: 1),
+                                            FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              alignment: Alignment.centerRight,
+                                              child: Text(
+                                                '≈ ${CurrencyFormatter.format(CurrencyService.convert(amount: expense.amount, fromCurrency: expense.currency, toCurrency: currentTrip.defaultCurrency), currency: currentTrip.defaultCurrency)}',
+                                                style: theme.textTheme.bodySmall?.copyWith(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: theme.colorScheme.onSurfaceVariant,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ],
-                                      ],
+                                      ),
                                     ),
                                   ],
                                 ),

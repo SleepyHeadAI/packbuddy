@@ -1171,7 +1171,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adminAccessRestricted => 'الوصول مقيد';
 
   @override
-  String get adminAccessRestrictedDesc => 'هذه المنطقة مخصصة حصرياً للمسؤولين المعتمدين.';
+  String get adminAccessRestrictedDesc =>
+      'هذه المنطقة مخصصة حصرياً للمسؤولين المعتمدين.';
 
   @override
   String get adminMetrics => 'مقاييس المنصة';
@@ -1201,7 +1202,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adminUserManagement => 'إدارة المستخدمين';
 
   @override
-  String get adminSearchUsers => 'البحث بالبريد الإلكتروني أو الاسم أو المعرف...';
+  String get adminSearchUsers =>
+      'البحث بالبريد الإلكتروني أو الاسم أو المعرف...';
 
   @override
   String get adminGrantPro => 'منح Pro';
@@ -1214,4 +1216,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get adminNoUsersFound => 'لم يتم العثور على مستخدمين';
+
+  @override
+  String get adminTotalStorage => 'مساحة الخزنة';
 }

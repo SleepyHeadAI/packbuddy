@@ -1185,13 +1185,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get adminDashboard => 'Painel do Administrador';
 
   @override
-  String get adminDashboardDesc => 'Métricas globais da plataforma e gestão de utilizadores';
+  String get adminDashboardDesc =>
+      'Métricas globais da plataforma e gestão de utilizadores';
 
   @override
   String get adminAccessRestricted => 'Acesso restrito';
 
   @override
-  String get adminAccessRestrictedDesc => 'Esta área é estritamente reservada a administradores autorizados.';
+  String get adminAccessRestrictedDesc =>
+      'Esta área é estritamente reservada a administradores autorizados.';
 
   @override
   String get adminMetrics => 'Métricas da plataforma';
@@ -1221,7 +1223,8 @@ class AppLocalizationsPt extends AppLocalizations {
   String get adminUserManagement => 'Gestão de utilizadores';
 
   @override
-  String get adminSearchUsers => 'Procurar utilizadores por e-mail, nome ou UID...';
+  String get adminSearchUsers =>
+      'Procurar utilizadores por e-mail, nome ou UID...';
 
   @override
   String get adminGrantPro => 'Conceder Pro';
@@ -1234,4 +1237,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get adminNoUsersFound => 'Nenhum utilizador encontrado';
+
+  @override
+  String get adminTotalStorage => 'Armazém Cofre';
 }

@@ -136,17 +136,17 @@ class PackingItemTile extends StatelessWidget {
                     ? theme.colorScheme.surfaceContainerLowest.withValues(alpha: 0.6)
                     : theme.colorScheme.surface)
                 : (item.isPacked
-                    ? const Color(0xFFF8FAFC)
-                    : theme.colorScheme.surface),
+                    ? AppColors.surfaceVariantLight.withValues(alpha: 0.5)
+                    : AppColors.surfaceLight),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: item.isPacked
                   ? (isDark
-                      ? theme.colorScheme.outlineVariant.withValues(alpha: 0.3)
-                      : const Color(0xFFE2E8F0))
+                      ? AppColors.outlineDark.withValues(alpha: 0.5)
+                      : AppColors.outlineLight.withValues(alpha: 0.6))
                   : (isDark
-                      ? theme.colorScheme.outline.withValues(alpha: 0.4)
-                      : theme.colorScheme.outlineVariant),
+                      ? AppColors.outlineDark
+                      : AppColors.outlineLight),
               width: 1,
             ),
             boxShadow: item.isPacked

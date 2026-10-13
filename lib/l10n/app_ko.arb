@@ -386,5 +386,6 @@
   "adminGrantPro": "Pro 부여",
   "adminRevokePro": "Pro 해제",
   "adminProStatusUpdated": "Pro 상태가 성공적으로 업데이트되었습니다",
-  "adminNoUsersFound": "사용자를 찾을 수 없습니다"
+  "adminNoUsersFound": "사용자를 찾을 수 없습니다",
+  "adminTotalStorage": "보관함 저장공간"
 }

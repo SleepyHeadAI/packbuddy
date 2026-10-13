@@ -629,6 +629,20 @@ class SyncEngine extends StateNotifier<SyncState> {
         );
       });
 
+      // 4. Meter and sync aggregate vault storage to users/{uid} profile in Firestore
+      try {
+        final totalStorage = await _dbHelper.getTotalVaultStorageBytes(userId: uid);
+        await firestore.collection('users').doc(uid).set(
+          {
+            'totalVaultStorageBytes': totalStorage,
+            'storage_updated_at': syncStartTime,
+          },
+          SetOptions(merge: true),
+        );
+      } catch (e) {
+        debugPrint('[SyncEngine] Storage metering update notice: $e');
+      }
+
       // Mark sync as completed and up to date
       state = state.copyWith(
         status: SyncStatus.upToDate,

@@ -1183,7 +1183,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get adminAccessRestricted => 'Truy cập bị hạn chế';
 
   @override
-  String get adminAccessRestrictedDesc => 'Khu vực này chỉ dành riêng cho quản trị viên được ủy quyền.';
+  String get adminAccessRestrictedDesc =>
+      'Khu vực này chỉ dành riêng cho quản trị viên được ủy quyền.';
 
   @override
   String get adminMetrics => 'Chỉ số nền tảng';
@@ -1222,8 +1223,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get adminRevokePro => 'Hủy Pro';
 
   @override
-  String get adminProStatusUpdated => 'Trạng thái Pro đã được cập nhật thành công';
+  String get adminProStatusUpdated =>
+      'Trạng thái Pro đã được cập nhật thành công';
 
   @override
   String get adminNoUsersFound => 'Không tìm thấy người dùng';
+
+  @override
+  String get adminTotalStorage => 'Dung lượng kho';
 }

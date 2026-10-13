@@ -109,6 +109,8 @@ class DocumentViewerScreen extends ConsumerWidget {
             ),
             Text(
               '${_getCategoryLabel(document.category, l10n)} • ${dateFormat.format(document.createdAt)}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.white.withValues(alpha: 0.7),
@@ -168,7 +170,7 @@ class DocumentViewerScreen extends ConsumerWidget {
                 ),
               )
             : isPdf
-                ? Padding(
+                ? SingleChildScrollView(
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,

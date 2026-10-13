@@ -386,5 +386,6 @@
   "adminGrantPro": "Pro Tanımla",
   "adminRevokePro": "Pro İptal Et",
   "adminProStatusUpdated": "Pro durumu başarıyla güncellendi",
-  "adminNoUsersFound": "Kullanıcı bulunamadı"
+  "adminNoUsersFound": "Kullanıcı bulunamadı",
+  "adminTotalStorage": "Kasa Depolama"
 }

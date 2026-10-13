@@ -386,5 +386,6 @@
   "adminGrantPro": "Concedi Pro",
   "adminRevokePro": "Revoca Pro",
   "adminProStatusUpdated": "Stato Pro aggiornato con successo",
-  "adminNoUsersFound": "Nessun utente trovato"
+  "adminNoUsersFound": "Nessun utente trovato",
+  "adminTotalStorage": "Archivio Vault"
 }

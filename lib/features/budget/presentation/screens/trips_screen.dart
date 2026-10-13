@@ -224,15 +224,18 @@ class TripsScreen extends ConsumerWidget {
                               children: [
                                 // Transport Mode Icon container
                                 Container(
-                                  padding: const EdgeInsets.all(12),
+                                  width: 44,
+                                  height: 44,
                                   decoration: BoxDecoration(
                                     color: theme.colorScheme.primaryContainer,
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                  child: Icon(
-                                    transportIcon,
-                                    color: theme.colorScheme.primary,
-                                    size: 24,
+                                  child: Center(
+                                    child: Icon(
+                                      transportIcon,
+                                      color: theme.colorScheme.primary,
+                                      size: 20,
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(width: 14),
@@ -281,20 +284,25 @@ class TripsScreen extends ConsumerWidget {
                                           ),
                                           if (trip.transportMode != null &&
                                               trip.transportMode!.isNotEmpty) ...[
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                  horizontal: 6, vertical: 2),
-                                              decoration: BoxDecoration(
-                                                color: theme.colorScheme.surfaceContainerHighest
-                                                    .withValues(alpha: 0.6),
-                                                borderRadius: BorderRadius.circular(6),
-                                              ),
-                                              child: Text(
-                                                formatTransportMode(trip.transportMode, l10n),
-                                                style: theme.textTheme.labelSmall?.copyWith(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: theme.colorScheme.onSurfaceVariant,
+                                            const SizedBox(width: 6),
+                                            Flexible(
+                                              child: Container(
+                                                padding: const EdgeInsets.symmetric(
+                                                    horizontal: 6, vertical: 2),
+                                                decoration: BoxDecoration(
+                                                  color: theme.colorScheme.surfaceContainerHighest
+                                                      .withValues(alpha: 0.6),
+                                                  borderRadius: BorderRadius.circular(6),
+                                                ),
+                                                child: Text(
+                                                  formatTransportMode(trip.transportMode, l10n),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: theme.textTheme.labelSmall?.copyWith(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: theme.colorScheme.onSurfaceVariant,
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -386,21 +394,26 @@ class TripsScreen extends ConsumerWidget {
                                 if (trip.budgetLimit != null) ...[
                                   const SizedBox(width: 8),
                                   Container(
+                                    constraints: const BoxConstraints(maxWidth: 120),
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 10, vertical: 4),
                                     decoration: BoxDecoration(
                                       color: theme.colorScheme.primaryContainer,
                                       borderRadius: BorderRadius.circular(10),
                                     ),
-                                    child: Text(
-                                      CurrencyFormatter.format(
-                                        trip.budgetLimit!,
-                                        currency: trip.defaultCurrency,
-                                      ),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        color: theme.colorScheme.primary,
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      alignment: Alignment.centerRight,
+                                      child: Text(
+                                        CurrencyFormatter.format(
+                                          trip.budgetLimit!,
+                                          currency: trip.defaultCurrency,
+                                        ),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: theme.colorScheme.primary,
+                                        ),
                                       ),
                                     ),
                                   ),

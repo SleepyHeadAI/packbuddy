@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../data/local_db/database_helper.dart';
 import '../../../../data/sync_engine/sync_engine.dart';
+import '../../../../core/services/telemetry_service.dart';
 import '../../domain/packing_item.dart';
 import '../../domain/packing_templates.dart';
 import '../../domain/airline_baggage_guide.dart';
@@ -256,6 +257,11 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
     try {
       await _db.updateChecklistItem(updated);
       _triggerSync();
+      TelemetryService.instance.logChecklistAction(
+        action: updated.isPacked ? 'pack' : 'unpack',
+        category: updated.category,
+        itemCount: 1,
+      );
     } catch (e) {
       // Revert on error
       newItems[index] = current;
@@ -355,6 +361,11 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
     try {
       await _db.insertChecklistItem(item);
       _triggerSync();
+      TelemetryService.instance.logChecklistAction(
+        action: 'add',
+        category: item.category,
+        itemCount: 1,
+      );
     } catch (e) {
       newItems.removeWhere((i) => i.id == item.id);
       state = state.copyWith(items: newItems, errorMessage: 'Eşya eklenemedi: $e');
@@ -375,6 +386,10 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
       }
     }
     _triggerSync();
+    TelemetryService.instance.logChecklistAction(
+      action: 'bulk_add',
+      itemCount: items.length,
+    );
   }
 
   /// Imports a pre-curated template into the active checklist.
@@ -410,6 +425,10 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
       } catch (_) {}
     }
     _triggerSync();
+    TelemetryService.instance.logChecklistAction(
+      action: 'import_template',
+      itemCount: newPackingItems.length,
+    );
   }
 
   /// Category filter selection

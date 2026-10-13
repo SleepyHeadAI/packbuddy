@@ -386,5 +386,6 @@
   "adminGrantPro": "授予Pro",
   "adminRevokePro": "撤销Pro",
   "adminProStatusUpdated": "Pro状态更新成功",
-  "adminNoUsersFound": "未找到用户"
+  "adminNoUsersFound": "未找到用户",
+  "adminTotalStorage": "保管库存储"
 }

@@ -1183,13 +1183,15 @@ class AppLocalizationsTr extends AppLocalizations {
   String get adminDashboard => 'Yönetici Paneli';
 
   @override
-  String get adminDashboardDesc => 'Genel platform metrikleri ve kullanıcı yönetimi';
+  String get adminDashboardDesc =>
+      'Genel platform metrikleri ve kullanıcı yönetimi';
 
   @override
   String get adminAccessRestricted => 'Erişim Kısıtlandı';
 
   @override
-  String get adminAccessRestrictedDesc => 'Bu alan yalnızca yetkili yöneticiler için ayrılmıştır.';
+  String get adminAccessRestrictedDesc =>
+      'Bu alan yalnızca yetkili yöneticiler için ayrılmıştır.';
 
   @override
   String get adminMetrics => 'Platform Metrikleri';
@@ -1232,4 +1234,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get adminNoUsersFound => 'Kullanıcı bulunamadı';
+
+  @override
+  String get adminTotalStorage => 'Kasa Depolama';
 }

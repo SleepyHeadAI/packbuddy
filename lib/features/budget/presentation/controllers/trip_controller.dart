@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../core/services/notification_service.dart';
+import '../../../../core/services/telemetry_service.dart';
 import '../../../../data/local_db/database_helper.dart';
 import '../../../../data/sync_engine/sync_engine.dart';
 import '../../domain/trip.dart';
@@ -110,6 +111,14 @@ class TripController extends StateNotifier<TripState> {
       // Update state locally first (Offline-First immediate feedback)
       state = state.copyWith(
         trips: [newTrip, ...state.trips],
+      );
+
+      // Log telemetry event
+      TelemetryService.instance.logTripCreated(
+        destination: destination,
+        transportMode: transportMode ?? 'unspecified',
+        budget: budgetLimit ?? 0.0,
+        currency: defaultCurrency,
       );
 
       // Schedule smart packing notifications (48h & 24h prior to departure)

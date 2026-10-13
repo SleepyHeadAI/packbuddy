@@ -8,6 +8,7 @@ import 'package:uuid/uuid.dart';
 import 'package:packbuddy/data/local_db/database_helper.dart';
 import 'package:packbuddy/data/sync_engine/sync_engine.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
+import 'package:packbuddy/core/services/telemetry_service.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
 
 /// State representation for Document Vault
@@ -163,6 +164,14 @@ class VaultController extends StateNotifier<VaultState> {
       final originalFile = File(pickedFile.path);
       await originalFile.copy(targetPath);
 
+      var fileBytes = 0;
+      try {
+        final targetFile = File(targetPath);
+        if (await targetFile.exists()) {
+          fileBytes = await targetFile.length();
+        }
+      } catch (_) {}
+
       // 3. Create Document entity
       final now = DateTime.now();
       final newDoc = Document(
@@ -174,6 +183,7 @@ class VaultController extends StateNotifier<VaultState> {
         tripId: tripId,
         fileType: 'image',
         notes: notes,
+        fileSizeBytes: fileBytes,
         createdAt: now,
         updatedAt: now,
         isDeleted: false,
@@ -187,7 +197,14 @@ class VaultController extends StateNotifier<VaultState> {
         documents: [newDoc, ...state.documents],
       );
 
-      // 6. Trigger background two-way sync
+      // 6. Log telemetry event
+      TelemetryService.instance.logDocumentUploaded(
+        category: category,
+        fileSizeBytes: fileBytes,
+        fileExtension: ext,
+      );
+
+      // 7. Trigger background two-way sync
       try {
         _ref.read(syncEngineProvider.notifier).performSync();
       } catch (_) {}
@@ -232,6 +249,14 @@ class VaultController extends StateNotifier<VaultState> {
       final originalFile = File(pickedPath);
       await originalFile.copy(targetPath);
 
+      var fileBytes = 0;
+      try {
+        final targetFile = File(targetPath);
+        if (await targetFile.exists()) {
+          fileBytes = await targetFile.length();
+        }
+      } catch (_) {}
+
       final now = DateTime.now();
       final newDoc = Document(
         id: _uuid.v4(),
@@ -242,6 +267,7 @@ class VaultController extends StateNotifier<VaultState> {
         tripId: tripId,
         fileType: isPdf ? 'pdf' : 'image',
         notes: notes,
+        fileSizeBytes: fileBytes,
         createdAt: now,
         updatedAt: now,
         isDeleted: false,
@@ -251,6 +277,13 @@ class VaultController extends StateNotifier<VaultState> {
       state = state.copyWith(
         documents: [newDoc, ...state.documents],
       );
+
+      TelemetryService.instance.logDocumentUploaded(
+        category: category,
+        fileSizeBytes: fileBytes,
+        fileExtension: ext,
+      );
+
       try {
         _ref.read(syncEngineProvider.notifier).performSync();
       } catch (_) {}
@@ -264,14 +297,29 @@ class VaultController extends StateNotifier<VaultState> {
   /// Adds an existing document directly (for manual entry or unit tests)
   Future<Document?> addDocument(Document doc) async {
     try {
-      await _dbHelper.insertDocument(doc);
+      var fileBytes = doc.fileSizeBytes;
+      if (fileBytes == 0 && doc.localImagePath.isNotEmpty) {
+        try {
+          final f = File(doc.localImagePath);
+          if (f.existsSync()) {
+            fileBytes = f.lengthSync();
+          }
+        } catch (_) {}
+      }
+      final docToSave = doc.copyWith(fileSizeBytes: fileBytes);
+      await _dbHelper.insertDocument(docToSave);
       state = state.copyWith(
-        documents: [doc, ...state.documents],
+        documents: [docToSave, ...state.documents],
+      );
+      TelemetryService.instance.logDocumentUploaded(
+        category: docToSave.category,
+        fileSizeBytes: fileBytes,
+        fileExtension: p.extension(docToSave.localImagePath),
       );
       try {
         _ref.read(syncEngineProvider.notifier).performSync();
       } catch (_) {}
-      return doc;
+      return docToSave;
     } catch (e) {
       state = state.copyWith(errorMessage: e.toString());
       return null;

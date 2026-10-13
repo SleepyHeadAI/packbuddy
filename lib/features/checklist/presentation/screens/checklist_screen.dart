@@ -276,7 +276,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                 theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
                               ]
                             : [
-                                Colors.white,
+                                AppColors.surfaceLight,
                                 theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                               ],
                         begin: Alignment.topLeft,
@@ -320,6 +320,8 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                       fontWeight: FontWeight.w800,
                                       letterSpacing: -0.2,
                                     ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                   Text(
                                     checklistState.totalCount == 0
@@ -330,29 +332,36 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                       color: theme.colorScheme.onSurfaceVariant,
                                       fontWeight: FontWeight.w500,
                                     ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
                             ),
+                            const SizedBox(width: 8),
                             // Status badge
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: statusColor.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: statusColor.withValues(alpha: 0.4), width: 1),
-                              ),
-                              child: Text(
-                                checklistState.totalCount == 0
-                                    ? l10n.listEmpty.toUpperCase()
-                                    : (completionRatio >= 1.0
-                                        ? l10n.completed.toUpperCase()
-                                        : l10n.preparing.toUpperCase()),
-                                style: TextStyle(
-                                  color: statusColor,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0.2,
+                            Flexible(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: statusColor.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: statusColor.withValues(alpha: 0.4), width: 1),
+                                ),
+                                child: Text(
+                                  checklistState.totalCount == 0
+                                      ? l10n.listEmpty.toUpperCase()
+                                      : (completionRatio >= 1.0
+                                          ? l10n.completed.toUpperCase()
+                                          : l10n.preparing.toUpperCase()),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: statusColor,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.2,
+                                  ),
                                 ),
                               ),
                             ),
@@ -400,69 +409,73 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                         ),
                         const SizedBox(height: 14),
 
-                        // Quick Actions: Airline Guide & Smart Templates
-                        Row(
-                          children: [
-                            InkWell(
-                              onTap: () => AirlineGuideSheet.show(context),
-                              borderRadius: BorderRadius.circular(10),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                        // Quick Actions: Airline Guide & Smart Templates (Horizontally scrollable for safety)
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          physics: const BouncingScrollPhysics(),
+                          child: Row(
+                            children: [
+                              InkWell(
+                                onTap: () => AirlineGuideSheet.show(context),
+                                borderRadius: BorderRadius.circular(10),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.flight_takeoff_rounded, size: 13, color: theme.colorScheme.primary),
+                                      const SizedBox(width: 5),
+                                      Text(
+                                        l10n.airlineBaggageLimits,
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w700,
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.flight_takeoff_rounded, size: 13, color: theme.colorScheme.primary),
-                                    const SizedBox(width: 5),
-                                    Text(
-                                      l10n.airlineBaggageLimits,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w700,
-                                        color: theme.colorScheme.primary,
-                                      ),
-                                    ),
-                                  ],
-                                ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            InkWell(
-                              onTap: () => SmartTemplatesSheet.show(context, tripId: widget.tripId),
-                              borderRadius: BorderRadius.circular(10),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: theme.colorScheme.secondary.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: theme.colorScheme.secondary.withValues(alpha: 0.25),
+                              const SizedBox(width: 8),
+                              InkWell(
+                                onTap: () => SmartTemplatesSheet.show(context, tripId: widget.tripId),
+                                borderRadius: BorderRadius.circular(10),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.secondary.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: theme.colorScheme.secondary.withValues(alpha: 0.25),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.auto_awesome_rounded, size: 13, color: theme.colorScheme.secondary),
+                                      const SizedBox(width: 5),
+                                      Text(
+                                        l10n.readyTemplates,
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w700,
+                                          color: theme.colorScheme.secondary,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.auto_awesome_rounded, size: 13, color: theme.colorScheme.secondary),
-                                    const SizedBox(width: 5),
-                                    Text(
-                                      l10n.readyTemplates,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w700,
-                                        color: theme.colorScheme.secondary,
-                                      ),
-                                    ),
-                                  ],
-                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),

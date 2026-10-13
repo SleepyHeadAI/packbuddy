@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "719651073535-k2i2qltulrebq0ck1rksvskv8nepmplj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sleepyhead.packbuddy",
+            "certificate_hash": "00e929476a4ef8b14dfe6cac2baa7cb339567a87"
+          }
+        },
+        {
           "client_id": "719651073535-34t98obhv0kcpifa6f29tme61s04o2jm.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,6 +37,13 @@
             {
               "client_id": "719651073535-34t98obhv0kcpifa6f29tme61s04o2jm.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "719651073535-6de0r287ore7palh4vbv9bfon9p9nekv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.sleepyhead.packbuddy"
+              }
             }
           ]
         }

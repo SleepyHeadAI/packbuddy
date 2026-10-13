@@ -922,12 +922,16 @@ class _AdminDashboardBanner extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(
-                      l10n.adminDashboard,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 15,
-                        letterSpacing: -0.2,
+                    Flexible(
+                      child: Text(
+                        l10n.adminDashboard,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 15,
+                          letterSpacing: -0.2,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     const SizedBox(width: 8),

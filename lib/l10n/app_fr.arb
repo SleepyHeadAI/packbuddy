@@ -386,5 +386,6 @@
   "adminGrantPro": "Accorder Pro",
   "adminRevokePro": "Révoquer Pro",
   "adminProStatusUpdated": "Statut Pro mis à jour avec succès",
-  "adminNoUsersFound": "Aucun utilisateur trouvé"
+  "adminNoUsersFound": "Aucun utilisateur trouvé",
+  "adminTotalStorage": "Stockage Coffre"
 }

@@ -12,6 +12,8 @@ import 'core/services/currency_service.dart';
 import 'core/services/preferences_service.dart';
 import 'features/auth/auth_controller.dart';
 import 'features/auth/auth_screen.dart';
+import 'package:posthog_flutter/posthog_flutter.dart';
+import 'core/services/telemetry_service.dart';
 import 'features/auth/presentation/screens/email_verification_screen.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'data/sync_engine/sync_engine.dart';
@@ -27,6 +29,11 @@ void main() async {
   } catch (e) {
     debugPrint('[Firebase] Initialization notice: $e');
   }
+
+  // Initialize PostHog EU Cloud with Session Replay & PII text masking
+  try {
+    await TelemetryService.instance.init();
+  } catch (_) {}
 
   try {
     await initializeDateFormatting();
@@ -94,6 +101,9 @@ class _PackBuddyAppState extends ConsumerState<PackBuddyApp>
       locale: activeLocale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+      navigatorObservers: [
+        PosthogObserver(),
+      ],
       home: const AuthWallGate(),
     );
   }

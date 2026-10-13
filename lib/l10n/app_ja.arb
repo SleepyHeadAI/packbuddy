@@ -386,5 +386,6 @@
   "adminGrantPro": "Proを付与",
   "adminRevokePro": "Proを取り消し",
   "adminProStatusUpdated": "Proステータスを正常に更新しました",
-  "adminNoUsersFound": "ユーザーが見つかりません"
+  "adminNoUsersFound": "ユーザーが見つかりません",
+  "adminTotalStorage": "保管庫ストレージ"
 }

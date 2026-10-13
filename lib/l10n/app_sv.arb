@@ -386,5 +386,6 @@
   "adminGrantPro": "Bevilja Pro",
   "adminRevokePro": "Återkalla Pro",
   "adminProStatusUpdated": "Pro-status har uppdaterats",
-  "adminNoUsersFound": "Inga användare hittades"
+  "adminNoUsersFound": "Inga användare hittades",
+  "adminTotalStorage": "Valvlagring"
 }

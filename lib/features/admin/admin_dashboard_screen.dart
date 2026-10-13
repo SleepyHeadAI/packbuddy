@@ -118,9 +118,13 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               ),
             ),
             const SizedBox(width: 12),
-            Text(
-              l10n.adminDashboard,
-              style: const TextStyle(fontWeight: FontWeight.w800),
+            Expanded(
+              child: Text(
+                l10n.adminDashboard,
+                style: const TextStyle(fontWeight: FontWeight.w800),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),
@@ -251,66 +255,83 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
 
     return Column(
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: _MetricCard(
-                title: l10n.adminTotalUsers,
-                value: metrics.totalUsers.toString(),
-                subtitle: '${metrics.verifiedUsers} ${l10n.adminVerifiedUsers.toLowerCase()}',
-                icon: Icons.people_alt_rounded,
-                iconColor: const Color(0xFF3B82F6),
-                backgroundColor: isDark
-                    ? const Color(0xFF1E293B)
-                    : const Color(0xFFEFF6FF),
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: _MetricCard(
+                  title: l10n.adminTotalUsers,
+                  value: metrics.totalUsers.toString(),
+                  subtitle: '${metrics.verifiedUsers} ${l10n.adminVerifiedUsers.toLowerCase()}',
+                  icon: Icons.people_alt_rounded,
+                  iconColor: const Color(0xFF3B82F6),
+                  backgroundColor: isDark
+                      ? const Color(0xFF1E293B)
+                      : const Color(0xFFEFF6FF),
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _MetricCard(
-                title: l10n.adminProUsers,
-                value: metrics.proUsers.toString(),
-                subtitle: metrics.totalUsers > 0
-                    ? '%${((metrics.proUsers / metrics.totalUsers) * 100).toStringAsFixed(1)} rate'
-                    : '0%',
-                icon: Icons.workspace_premium_rounded,
-                iconColor: const Color(0xFFD97706),
-                backgroundColor: isDark
-                    ? const Color(0xFF292218)
-                    : const Color(0xFFFEF3C7),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _MetricCard(
+                  title: l10n.adminProUsers,
+                  value: metrics.proUsers.toString(),
+                  subtitle: metrics.totalUsers > 0
+                      ? '%${((metrics.proUsers / metrics.totalUsers) * 100).toStringAsFixed(1)} rate'
+                      : '0%',
+                  icon: Icons.workspace_premium_rounded,
+                  iconColor: const Color(0xFFD97706),
+                  backgroundColor: isDark
+                      ? const Color(0xFF292218)
+                      : const Color(0xFFFEF3C7),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _MetricCard(
-                title: l10n.adminTotalTrips,
-                value: metrics.totalTrips.toString(),
-                subtitle: '${metrics.totalExpenses} ${l10n.adminTotalExpenses.toLowerCase()}',
-                icon: Icons.flight_takeoff_rounded,
-                iconColor: const Color(0xFF10B981),
-                backgroundColor: isDark
-                    ? const Color(0xFF132E27)
-                    : const Color(0xFFECFDF5),
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: _MetricCard(
+                  title: l10n.adminTotalTrips,
+                  value: metrics.totalTrips.toString(),
+                  subtitle: '${metrics.totalExpenses} ${l10n.adminTotalExpenses.toLowerCase()}',
+                  icon: Icons.flight_takeoff_rounded,
+                  iconColor: const Color(0xFF10B981),
+                  backgroundColor: isDark
+                      ? const Color(0xFF132E27)
+                      : const Color(0xFFECFDF5),
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _MetricCard(
-                title: l10n.adminTotalDocs,
-                value: metrics.totalDocuments.toString(),
-                subtitle: '${metrics.totalChecklistItems} ${l10n.adminTotalItems.toLowerCase()}',
-                icon: Icons.inventory_2_rounded,
-                iconColor: const Color(0xFF8B5CF6),
-                backgroundColor: isDark
-                    ? const Color(0xFF261D38)
-                    : const Color(0xFFF5F3FF),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _MetricCard(
+                  title: l10n.adminTotalDocs,
+                  value: metrics.totalDocuments.toString(),
+                  subtitle: '${metrics.totalChecklistItems} ${l10n.adminTotalItems.toLowerCase()}',
+                  icon: Icons.inventory_2_rounded,
+                  iconColor: const Color(0xFF8B5CF6),
+                  backgroundColor: isDark
+                      ? const Color(0xFF261D38)
+                      : const Color(0xFFF5F3FF),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        _MetricCard(
+          title: l10n.adminTotalStorage,
+          value: formatStorageBytes(metrics.totalStorageBytes),
+          subtitle: '${metrics.totalDocuments} ${l10n.adminTotalDocs.toLowerCase()}',
+          icon: Icons.cloud_done_rounded,
+          iconColor: const Color(0xFF0EA5E9),
+          backgroundColor: isDark
+              ? const Color(0xFF0C2B3E)
+              : const Color(0xFFE0F2FE),
         ),
       ],
     );
@@ -479,7 +500,10 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             const SizedBox(height: 10),
 
             // Bottom Badges & Meta
-            Row(
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 // Verification Badge
                 if (user.emailVerified)
@@ -488,6 +512,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                     icon: Icons.verified_rounded,
                     backgroundColor: AppColors.successPastel.withValues(alpha: 0.15),
                     textColor: AppColors.successPastel,
+                    maxWidth: 130,
                   )
                 else
                   StatusBadge(
@@ -495,20 +520,26 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                     icon: Icons.hourglass_top_rounded,
                     backgroundColor: AppColors.warningPastel.withValues(alpha: 0.15),
                     textColor: AppColors.warningPastel,
+                    maxWidth: 130,
                   ),
-                const SizedBox(width: 8),
-
-                // Pro Badge
                 if (user.isPremium)
-                  StatusBadge(
+                  const StatusBadge(
                     label: 'PRO',
                     icon: Icons.star_rounded,
-                    backgroundColor: const Color(0xFFD97706).withValues(alpha: 0.18),
-                    textColor: const Color(0xFFD97706),
+                    backgroundColor: Color(0x2ED97706),
+                    textColor: Color(0xFFD97706),
+                    maxWidth: 70,
                   ),
-
-                const Spacer(),
-
+                // Storage Badge
+                StatusBadge(
+                  label: formatStorageBytes(user.totalVaultStorageBytes),
+                  icon: Icons.cloud_outlined,
+                  backgroundColor: isDark
+                      ? const Color(0xFF1E293B)
+                      : const Color(0xFFEFF6FF),
+                  textColor: const Color(0xFF3B82F6),
+                  maxWidth: 110,
+                ),
                 // Last Login Date
                 Row(
                   mainAxisSize: MainAxisSize.min,
@@ -563,23 +594,31 @@ class _MetricCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                width: 38,
+                height: 38,
                 decoration: BoxDecoration(
                   color: backgroundColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, size: 20, color: iconColor),
               ),
-              const Spacer(),
-              Text(
-                value,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.5,
+              const SizedBox(width: 8),
+              Expanded(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    value,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
                 ),
               ),
             ],

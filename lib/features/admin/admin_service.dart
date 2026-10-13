@@ -18,6 +18,7 @@ class AdminPlatformMetrics {
   final int totalExpenses;
   final int totalDocuments;
   final int totalChecklistItems;
+  final int totalStorageBytes;
 
   const AdminPlatformMetrics({
     this.totalUsers = 0,
@@ -27,6 +28,7 @@ class AdminPlatformMetrics {
     this.totalExpenses = 0,
     this.totalDocuments = 0,
     this.totalChecklistItems = 0,
+    this.totalStorageBytes = 0,
   });
 
   AdminPlatformMetrics copyWith({
@@ -37,6 +39,7 @@ class AdminPlatformMetrics {
     int? totalExpenses,
     int? totalDocuments,
     int? totalChecklistItems,
+    int? totalStorageBytes,
   }) {
     return AdminPlatformMetrics(
       totalUsers: totalUsers ?? this.totalUsers,
@@ -46,6 +49,7 @@ class AdminPlatformMetrics {
       totalExpenses: totalExpenses ?? this.totalExpenses,
       totalDocuments: totalDocuments ?? this.totalDocuments,
       totalChecklistItems: totalChecklistItems ?? this.totalChecklistItems,
+      totalStorageBytes: totalStorageBytes ?? this.totalStorageBytes,
     );
   }
 }
@@ -61,6 +65,7 @@ class AdminUserModel {
   final DateTime? createdAt;
   final DateTime? lastLoginAt;
   final bool isPremium;
+  final int totalVaultStorageBytes;
 
   const AdminUserModel({
     required this.uid,
@@ -72,6 +77,7 @@ class AdminUserModel {
     this.createdAt,
     this.lastLoginAt,
     this.isPremium = false,
+    this.totalVaultStorageBytes = 0,
   });
 
   factory AdminUserModel.fromMap(String id, Map<String, dynamic> data) {
@@ -92,6 +98,7 @@ class AdminUserModel {
       createdAt: parseDate(data['createdAt']),
       lastLoginAt: parseDate(data['lastLoginAt']),
       isPremium: data['isPremium'] as bool? ?? false,
+      totalVaultStorageBytes: (data['totalVaultStorageBytes'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -105,6 +112,7 @@ class AdminUserModel {
     DateTime? createdAt,
     DateTime? lastLoginAt,
     bool? isPremium,
+    int? totalVaultStorageBytes,
   }) {
     return AdminUserModel(
       uid: uid ?? this.uid,
@@ -116,8 +124,26 @@ class AdminUserModel {
       createdAt: createdAt ?? this.createdAt,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
       isPremium: isPremium ?? this.isPremium,
+      totalVaultStorageBytes: totalVaultStorageBytes ?? this.totalVaultStorageBytes,
     );
   }
+}
+
+/// Helper function to format storage byte measurements cleanly (e.g. 0 B, 450 KB, 3.2 MB)
+String formatStorageBytes(int bytes) {
+  if (bytes <= 0) return '0 B';
+  const suffixes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  var i = 0;
+  var d = bytes.toDouble();
+  while (d >= 1024 && i < suffixes.length - 1) {
+    d /= 1024;
+    i++;
+  }
+  if (i == 0) return '$bytes B';
+  final formatted = d.toStringAsFixed(1);
+  return formatted.endsWith('.0')
+      ? '${formatted.substring(0, formatted.length - 2)} ${suffixes[i]}'
+      : '$formatted ${suffixes[i]}';
 }
 
 /// Contract for Admin Data Service
@@ -192,6 +218,7 @@ class FirebaseAdminService implements AdminService {
       final totalUsers = usersSnapshot.docs.length;
       int verifiedUsers = 0;
       int proUsers = 0;
+      int totalStorageBytes = 0;
 
       for (final doc in usersSnapshot.docs) {
         final data = doc.data();
@@ -201,6 +228,8 @@ class FirebaseAdminService implements AdminService {
         if (data['isPremium'] == true) {
           proUsers++;
         }
+        final storage = (data['totalVaultStorageBytes'] as num?)?.toInt() ?? 0;
+        totalStorageBytes += storage;
       }
 
       final totalTrips = await _getCollectionCount('trips');
@@ -216,6 +245,7 @@ class FirebaseAdminService implements AdminService {
         totalExpenses: totalExpenses,
         totalDocuments: totalDocs,
         totalChecklistItems: totalItems,
+        totalStorageBytes: totalStorageBytes,
       );
     } catch (e) {
       debugPrint('[AdminService] fetchMetrics error: $e');

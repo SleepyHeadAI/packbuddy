@@ -9,6 +9,7 @@ class Document {
   final String? tripId;
   final String? fileType;
   final String? notes;
+  final int fileSizeBytes;
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isDeleted;
@@ -23,6 +24,7 @@ class Document {
     this.tripId,
     this.fileType,
     this.notes,
+    this.fileSizeBytes = 0,
     required this.createdAt,
     required this.updatedAt,
     this.isDeleted = false,
@@ -46,6 +48,7 @@ class Document {
     bool clearTripId = false,
     String? fileType,
     String? notes,
+    int? fileSizeBytes,
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isDeleted,
@@ -60,6 +63,7 @@ class Document {
       tripId: clearTripId ? null : (tripId ?? this.tripId),
       fileType: fileType ?? this.fileType,
       notes: notes ?? this.notes,
+      fileSizeBytes: fileSizeBytes ?? this.fileSizeBytes,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isDeleted: isDeleted ?? this.isDeleted,
@@ -79,6 +83,8 @@ class Document {
       'tripId': tripId,
       'fileType': fileType ?? (isPdf ? 'pdf' : 'image'),
       'notes': notes,
+      'fileSizeBytes': fileSizeBytes,
+      'file_size_bytes': fileSizeBytes,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
       'updated_at': updatedAt.millisecondsSinceEpoch,
@@ -112,6 +118,7 @@ class Document {
       tripId: json['tripId'] as String?,
       fileType: fType,
       notes: json['notes'] as String?,
+      fileSizeBytes: (json['file_size_bytes'] ?? json['fileSizeBytes'] as num?)?.toInt() ?? 0,
       createdAt: json['createdAt'] != null || json['created_at'] != null
           ? parseDate(json['createdAt'] ?? json['created_at'])
           : DateTime.now(),
@@ -134,6 +141,7 @@ class Document {
       'trip_id': tripId,
       'file_type': fileType ?? (isPdf ? 'pdf' : 'image'),
       'notes': notes,
+      'file_size_bytes': fileSizeBytes,
       'created_at': createdAt.millisecondsSinceEpoch,
       'updated_at': updatedAt.millisecondsSinceEpoch,
       'is_deleted': isDeleted ? 1 : 0,
@@ -165,9 +173,13 @@ class Document {
       tripId: (map['trip_id'] ?? map['tripId']) as String?,
       fileType: fType,
       notes: map['notes'] as String?,
+      fileSizeBytes: (map['file_size_bytes'] ?? map['fileSizeBytes'] as num?)?.toInt() ?? 0,
       createdAt: parseDate(map['created_at'] ?? map['createdAt']),
       updatedAt: parseDate(map['updated_at'] ?? map['updatedAt']),
       isDeleted: (map['is_deleted'] as int? ?? 0) == 1,
     );
   }
 }
+
+/// Type alias for Document to support VaultDocument naming interchangeably
+typedef VaultDocument = Document;

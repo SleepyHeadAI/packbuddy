@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/services/preferences_service.dart';
+import '../../../../core/services/telemetry_service.dart';
 
 /// Package subscription types for PackBuddy Pro
 enum SubscriptionPlan {
@@ -113,6 +114,7 @@ class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
       isPro: true,
       isLoading: false,
     );
+    TelemetryService.instance.logProStatusChanged(isPro: true, source: 'purchase');
     return true;
   }
 
@@ -142,6 +144,7 @@ class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
       isPro: true,
       isLoading: false,
     );
+    TelemetryService.instance.logProStatusChanged(isPro: true, source: 'restore');
     return true;
   }
 
@@ -151,6 +154,7 @@ class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
     // TODO: Replace with official purchases_flutter SDK (Purchases.logOut())
     await _prefs.setProUser(false);
     state = state.copyWith(isPro: false);
+    TelemetryService.instance.logProStatusChanged(isPro: false, source: 'reset');
   }
 
   /// Sets or synchronizes Pro status directly (e.g. from Firestore admin or remote entitlements)
@@ -159,6 +163,7 @@ class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
     await _prefs.setProUser(isPro);
     if (state.isPro != isPro) {
       state = state.copyWith(isPro: isPro);
+      TelemetryService.instance.logProStatusChanged(isPro: isPro, source: 'sync');
     }
   }
 }

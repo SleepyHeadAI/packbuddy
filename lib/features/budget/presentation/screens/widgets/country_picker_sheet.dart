@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
@@ -62,6 +63,7 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final isDark = theme.brightness == Brightness.dark;
     final popularQuickCountries = Country.allCountries.take(8).toList();
 
     return Container(
@@ -69,7 +71,7 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
         maxHeight: MediaQuery.of(context).size.height * 0.85,
       ),
       decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
+        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: EdgeInsets.only(
@@ -78,43 +80,49 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
         right: 20,
         bottom: MediaQuery.of(context).viewInsets.bottom + 20,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Drag handle
-          Center(
-            child: Container(
-              width: 44,
-              height: 4.5,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(3),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Drag handle
+            Center(
+              child: Container(
+                width: 44,
+                height: 4.5,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(3),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-          // Title
-          Row(
-            children: [
-              const Icon(Icons.travel_explore_rounded, size: 24),
-              const SizedBox(width: 10),
-              Text(
-                l10n.selectCountryAndRoute,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: -0.4,
+            // Title
+            Row(
+              children: [
+                const Icon(Icons.travel_explore_rounded, size: 24),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    l10n.selectCountryAndRoute,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.4,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-              const Spacer(),
-              Text(
-                '${_filtered.length} ${l10n.countriesLabel}',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+                const SizedBox(width: 8),
+                Text(
+                  '${_filtered.length} ${l10n.countriesLabel}',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
           const SizedBox(height: 16),
 
           // Search Field
@@ -255,6 +263,7 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

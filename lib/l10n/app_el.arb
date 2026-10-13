@@ -386,5 +386,6 @@
   "adminGrantPro": "Χορήγηση Pro",
   "adminRevokePro": "Ανάκληση Pro",
   "adminProStatusUpdated": "Η κατάσταση Pro ενημερώθηκε με επιτυχία",
-  "adminNoUsersFound": "Δεν βρέθηκαν χρήστες"
+  "adminNoUsersFound": "Δεν βρέθηκαν χρήστες",
+  "adminTotalStorage": "Χώρος Θησαυρού"
 }

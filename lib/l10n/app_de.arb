@@ -386,5 +386,6 @@
   "adminGrantPro": "Pro erteilen",
   "adminRevokePro": "Pro widerrufen",
   "adminProStatusUpdated": "Pro-Status erfolgreich aktualisiert",
-  "adminNoUsersFound": "Keine Benutzer gefunden"
+  "adminNoUsersFound": "Keine Benutzer gefunden",
+  "adminTotalStorage": "Vault-Speicher"
 }

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/local_db/database_helper.dart';
+import '../../core/services/telemetry_service.dart';
 import 'auth_service.dart';
 import '../settings/data/mock_revenuecat_service.dart';
 
@@ -93,6 +94,19 @@ class AuthController extends StateNotifier<AuthState> {
     try {
       final isPro = await _authService.syncUserProfile(user);
       _ref?.read(proSubscriptionProvider.notifier).updateProStatus(isPro);
+
+      int? totalStorage;
+      try {
+        totalStorage = await DatabaseHelper.instance.getTotalVaultStorageBytes(userId: user.uid);
+      } catch (_) {}
+
+      unawaited(TelemetryService.instance.identifyUser(
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        isPro: isPro,
+        totalStorageBytes: totalStorage,
+      ));
     } catch (_) {}
   }
 
@@ -251,6 +265,7 @@ class AuthController extends StateNotifier<AuthState> {
   Future<void> signOut() async {
     state = state.copyWith(isLoading: true);
     try {
+      unawaited(TelemetryService.instance.resetUser());
       // Ensure previous user's local SQLite data is completely wiped from device before signing out
       try {
         await DatabaseHelper.instance.clearAllData();

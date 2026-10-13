@@ -1181,13 +1181,15 @@ class AppLocalizationsId extends AppLocalizations {
   String get adminDashboard => 'Dasbor Admin';
 
   @override
-  String get adminDashboardDesc => 'Metrik platform global dan manajemen pengguna';
+  String get adminDashboardDesc =>
+      'Metrik platform global dan manajemen pengguna';
 
   @override
   String get adminAccessRestricted => 'Akses Dibatasi';
 
   @override
-  String get adminAccessRestrictedDesc => 'Area ini hanya ditujukan untuk administrator resmi.';
+  String get adminAccessRestrictedDesc =>
+      'Area ini hanya ditujukan untuk administrator resmi.';
 
   @override
   String get adminMetrics => 'Metrik Platform';
@@ -1217,7 +1219,8 @@ class AppLocalizationsId extends AppLocalizations {
   String get adminUserManagement => 'Manajemen Pengguna';
 
   @override
-  String get adminSearchUsers => 'Cari pengguna berdasarkan email, nama, atau UID...';
+  String get adminSearchUsers =>
+      'Cari pengguna berdasarkan email, nama, atau UID...';
 
   @override
   String get adminGrantPro => 'Berikan Pro';
@@ -1230,4 +1233,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get adminNoUsersFound => 'Pengguna tidak ditemukan';
+
+  @override
+  String get adminTotalStorage => 'Penyimpanan Brankas';
 }

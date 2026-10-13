@@ -386,5 +386,6 @@
   "adminGrantPro": "Cấp Pro",
   "adminRevokePro": "Hủy Pro",
   "adminProStatusUpdated": "Trạng thái Pro đã được cập nhật thành công",
-  "adminNoUsersFound": "Không tìm thấy người dùng"
+  "adminNoUsersFound": "Không tìm thấy người dùng",
+  "adminTotalStorage": "Dung lượng kho"
 }

@@ -1181,4 +1181,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get adminNoUsersFound => 'ユーザーが見つかりません';
+
+  @override
+  String get adminTotalStorage => '保管庫ストレージ';
 }

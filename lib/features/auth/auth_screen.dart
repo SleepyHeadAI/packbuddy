@@ -351,7 +351,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       height: 52,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceVariantDark : const Color(0xFFEDF2F7),
+        color: isDark ? AppColors.surfaceVariantDark : AppColors.surfaceVariantLight,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
@@ -370,7 +370,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: _mode == AuthMode.signIn
-                      ? (isDark ? AppColors.surfaceDark : Colors.white)
+                      ? (isDark ? AppColors.surfaceDark : AppColors.surfaceLight)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(18),
                   boxShadow: _mode == AuthMode.signIn
@@ -410,7 +410,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: _mode == AuthMode.signUp
-                      ? (isDark ? AppColors.surfaceDark : Colors.white)
+                      ? (isDark ? AppColors.surfaceDark : AppColors.surfaceLight)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(18),
                   boxShadow: _mode == AuthMode.signUp
@@ -501,7 +501,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : Colors.white,
+        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
@@ -560,28 +560,39 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                l10n.authPassword,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? AppColors.onSurfaceDark : AppColors.primaryLight,
+              Flexible(
+                child: Text(
+                  l10n.authPassword,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? AppColors.onSurfaceDark : AppColors.primaryLight,
+                  ),
                 ),
               ),
-              if (_mode == AuthMode.signIn)
-                GestureDetector(
-                  onTap: () => _handleForgotPassword(context),
-                  child: Text(
-                    l10n.authForgotPassword,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: isDark
-                          ? AppColors.primaryDark
-                          : AppColors.tertiaryLight,
+              if (_mode == AuthMode.signIn) ...[
+                const SizedBox(width: 8),
+                Flexible(
+                  child: GestureDetector(
+                    onTap: () => _handleForgotPassword(context),
+                    child: Text(
+                      l10n.authForgotPassword,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.end,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? AppColors.primaryDark
+                            : AppColors.tertiaryLight,
+                      ),
                     ),
                   ),
                 ),
+              ],
             ],
           ),
           const SizedBox(height: 8),
@@ -746,8 +757,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
             color: isDark
-                ? AppColors.surfaceVariantDark.withValues(alpha: 0.4)
-                : const Color(0xFFF8FAFC),
+                ? AppColors.surfaceVariantDark.withValues(alpha: 0.5)
+                : AppColors.surfaceVariantLight,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isDark
@@ -867,7 +878,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       filled: true,
       fillColor: isDark
           ? AppColors.surfaceVariantDark.withValues(alpha: 0.6)
-          : const Color(0xFFF8FAFC),
+          : AppColors.surfaceVariantLight,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(18),
@@ -946,16 +957,24 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    _mode == AuthMode.signIn
-                        ? l10n.authSignIn
-                        : l10n.authCreateAccount,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.2,
-                      color: isDark ? AppColors.onPrimaryDark : Colors.white,
+                  Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        _mode == AuthMode.signIn
+                            ? l10n.authSignIn
+                            : l10n.authCreateAccount,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.2,
+                          color: isDark ? AppColors.onPrimaryDark : Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -1020,8 +1039,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           borderRadius: BorderRadius.circular(22),
           child: Container(
             height: 52,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              color: isDark ? AppColors.surfaceDark : Colors.white,
+              color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
               borderRadius: BorderRadius.circular(22),
               border: Border.all(
                 color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
@@ -1040,13 +1060,18 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               children: [
                 _buildGoogleIconBadge(),
                 const SizedBox(width: 12),
-                Text(
-                  l10n.authContinueWithGoogle,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.2,
-                    color: isDark ? AppColors.onSurfaceDark : Colors.black87,
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      l10n.authContinueWithGoogle,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2,
+                        color: isDark ? AppColors.onSurfaceDark : Colors.black87,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -1061,8 +1086,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           borderRadius: BorderRadius.circular(22),
           child: Container(
             height: 52,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              color: isDark ? AppColors.surfaceDark : Colors.white,
+              color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
               borderRadius: BorderRadius.circular(22),
               border: Border.all(
                 color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
@@ -1085,13 +1111,18 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   color: isDark ? AppColors.onSurfaceDark : Colors.black,
                 ),
                 const SizedBox(width: 12),
-                Text(
-                  l10n.authContinueWithApple,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.2,
-                    color: isDark ? AppColors.onSurfaceDark : Colors.black87,
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      l10n.authContinueWithApple,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2,
+                        color: isDark ? AppColors.onSurfaceDark : Colors.black87,
+                      ),
+                    ),
                   ),
                 ),
               ],

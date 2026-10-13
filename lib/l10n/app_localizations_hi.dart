@@ -1167,13 +1167,15 @@ class AppLocalizationsHi extends AppLocalizations {
   String get adminDashboard => 'व्यवस्थापक डैशबोर्ड';
 
   @override
-  String get adminDashboardDesc => 'वैश्विक प्लेटफ़ॉर्म मेट्रिक्स और उपयोगकर्ता प्रबंधन';
+  String get adminDashboardDesc =>
+      'वैश्विक प्लेटफ़ॉर्म मेट्रिक्स और उपयोगकर्ता प्रबंधन';
 
   @override
   String get adminAccessRestricted => 'पहुँच प्रतिबंधित';
 
   @override
-  String get adminAccessRestrictedDesc => 'यह क्षेत्र केवल अधिकृत व्यवस्थापकों के लिए आरक्षित है।';
+  String get adminAccessRestrictedDesc =>
+      'यह क्षेत्र केवल अधिकृत व्यवस्थापकों के लिए आरक्षित है।';
 
   @override
   String get adminMetrics => 'प्लेटफ़ॉर्म मेट्रिक्स';
@@ -1216,4 +1218,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get adminNoUsersFound => 'कोई उपयोगकर्ता नहीं मिला';
+
+  @override
+  String get adminTotalStorage => 'वॉल्ट स्टोरेज';
 }

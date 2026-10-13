@@ -386,5 +386,6 @@
   "adminGrantPro": "Otorgar Pro",
   "adminRevokePro": "Revocar Pro",
   "adminProStatusUpdated": "Estado Pro actualizado con éxito",
-  "adminNoUsersFound": "No se encontraron usuarios"
+  "adminNoUsersFound": "No se encontraron usuarios",
+  "adminTotalStorage": "Almacén Bóveda"
 }

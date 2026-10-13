@@ -386,5 +386,6 @@
   "adminGrantPro": "ให้สิทธิ์ Pro",
   "adminRevokePro": "ยกเลิกสิทธิ์ Pro",
   "adminProStatusUpdated": "อัปเดตสถานะ Pro สำเร็จแล้ว",
-  "adminNoUsersFound": "ไม่พบผู้ใช้"
+  "adminNoUsersFound": "ไม่พบผู้ใช้",
+  "adminTotalStorage": "พื้นที่ห้องนิรภัย"
 }

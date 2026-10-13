@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/services/telemetry_service.dart';
 import 'admin_service.dart';
 
 /// State representation for the Executive Admin Dashboard
@@ -98,6 +99,11 @@ class AdminController extends StateNotifier<AdminState> {
     state = state.copyWith(isActionLoading: true, clearError: true);
     try {
       await _adminService.toggleUserProStatus(uid, isPremium);
+
+      TelemetryService.instance.logAdminAction(
+        action: isPremium ? 'grant_pro' : 'revoke_pro',
+        targetUid: uid,
+      );
 
       // Optimistic update of local user model and metric count
       final updatedUsers = state.allUsers.map((u) {

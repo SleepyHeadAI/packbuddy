@@ -1175,13 +1175,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminDashboard => 'Admin Dashboard';
 
   @override
-  String get adminDashboardDesc => 'Global platform metrics and user management';
+  String get adminDashboardDesc =>
+      'Global platform metrics and user management';
 
   @override
   String get adminAccessRestricted => 'Access Restricted';
 
   @override
-  String get adminAccessRestrictedDesc => 'This area is strictly reserved for authorized administrators.';
+  String get adminAccessRestrictedDesc =>
+      'This area is strictly reserved for authorized administrators.';
 
   @override
   String get adminMetrics => 'Platform Metrics';
@@ -1224,4 +1226,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminNoUsersFound => 'No users found';
+
+  @override
+  String get adminTotalStorage => 'Vault Storage';
 }

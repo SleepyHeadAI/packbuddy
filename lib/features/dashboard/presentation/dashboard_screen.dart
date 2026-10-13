@@ -402,43 +402,46 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             const SizedBox(height: 20),
 
             // 3. Bento Summary Grid (Trips Counter & Vault Counter)
-            Row(
-              children: [
-                // Trips Bento Item
-                Expanded(
-                  child: _BentoStatCard(
-                    title: l10n.trips,
-                    count: '$tripCount',
-                    description: l10n.multiCurrency,
-                    icon: Icons.flight_takeoff_rounded,
-                    accentColor: theme.colorScheme.primary,
-                    gradientStart: theme.colorScheme.primary.withValues(alpha: 0.12),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        _createSmoothRoute(const TripsScreen()),
-                      );
-                    },
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Trips Bento Item
+                  Expanded(
+                    child: _BentoStatCard(
+                      title: l10n.trips,
+                      count: '$tripCount',
+                      description: l10n.multiCurrency,
+                      icon: Icons.flight_takeoff_rounded,
+                      accentColor: theme.colorScheme.primary,
+                      gradientStart: theme.colorScheme.primary.withValues(alpha: 0.12),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          _createSmoothRoute(const TripsScreen()),
+                        );
+                      },
+                    ),
                   ),
-                ),
-                const SizedBox(width: 14),
+                  const SizedBox(width: 14),
 
-                // Vault Bento Item
-                Expanded(
-                  child: _BentoStatCard(
-                    title: l10n.vault,
-                    count: '$docCount',
-                    description: '🔒 ${l10n.offlineVault}',
-                    icon: Icons.shield_outlined,
-                    accentColor: theme.colorScheme.tertiary,
-                    gradientStart: theme.colorScheme.tertiary.withValues(alpha: 0.12),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        _createSmoothRoute(const VaultScreen()),
-                      );
-                    },
+                  // Vault Bento Item
+                  Expanded(
+                    child: _BentoStatCard(
+                      title: l10n.vault,
+                      count: '$docCount',
+                      description: '🔒 ${l10n.offlineVault}',
+                      icon: Icons.shield_outlined,
+                      accentColor: theme.colorScheme.tertiary,
+                      gradientStart: theme.colorScheme.tertiary.withValues(alpha: 0.12),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          _createSmoothRoute(const VaultScreen()),
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(height: 12),
 
@@ -680,18 +683,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF0F172A) : Colors.white,
+          color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
           border: Border(
             top: BorderSide(
               color: isDark
                   ? theme.colorScheme.outlineVariant.withValues(alpha: 0.15)
-                  : theme.colorScheme.outlineVariant.withValues(alpha: 0.25),
+                  : AppColors.outlineLight,
               width: 1,
             ),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.06),
+              color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.04),
               blurRadius: 16,
               offset: const Offset(0, -4),
             ),
@@ -911,8 +914,8 @@ class _HeroGreetingCard extends StatelessWidget {
                 const Color(0xFF0F172A),
               ]
             : [
-                const Color(0xFFFFFFFF),
-                const Color(0xFFF1F5F9),
+                AppColors.surfaceLight,
+                AppColors.surfaceVariantLight,
               ],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -1001,8 +1004,8 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                 const Color(0xFF0F172A),
               ]
             : [
-                theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
-                Colors.white,
+                theme.colorScheme.primaryContainer.withValues(alpha: 0.4),
+                AppColors.surfaceLight,
               ],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -1015,12 +1018,15 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
               Hero(
                 tag: 'trip-transport-icon-${trip.id}',
                 child: Container(
-                  padding: const EdgeInsets.all(10),
+                  width: 44,
+                  height: 44,
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(transportIcon, color: Colors.white, size: 20),
+                  child: Center(
+                    child: Icon(transportIcon, color: Colors.white, size: 20),
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -1030,12 +1036,16 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          badgeText,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: theme.colorScheme.primary,
-                            letterSpacing: 0.8,
+                        Flexible(
+                          child: Text(
+                            badgeText,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: theme.colorScheme.primary,
+                              letterSpacing: 0.8,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         if (country != null) ...[
@@ -1071,7 +1081,7 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: isDark
                   ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
-                  : Colors.white,
+                  : theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: theme.colorScheme.outline.withValues(alpha: 0.5),
@@ -1102,27 +1112,33 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.calendar_today_rounded,
-                      size: 13,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      AppDateFormatter.formatDateRange(
-                        trip.startDate,
-                        trip.endDate,
-                        locale: Localizations.localeOf(context).languageCode,
-                      ),
-                      style: theme.textTheme.bodySmall?.copyWith(
+                Flexible(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.calendar_today_rounded,
+                        size: 13,
                         color: theme.colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w500,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          AppDateFormatter.formatDateRange(
+                            trip.startDate,
+                            trip.endDate,
+                            locale: Localizations.localeOf(context).languageCode,
+                          ),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -1228,21 +1244,28 @@ class _BentoStatCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
                   color: gradientStart,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, color: accentColor, size: 20),
+                child: Center(
+                  child: Icon(icon, color: accentColor, size: 20),
+                ),
               ),
+              const SizedBox(width: 8),
               Flexible(
-                child: Text(
-                  count,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: accentColor,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    count,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: accentColor,
+                    ),
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -1253,6 +1276,8 @@ class _BentoStatCard extends StatelessWidget {
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w700,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 2),
           Text(
@@ -1302,12 +1327,15 @@ class _HubFeatureCard extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
               color: iconContainerColor,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: iconColor, size: 22),
+            child: Center(
+              child: Icon(icon, color: iconColor, size: 20),
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(

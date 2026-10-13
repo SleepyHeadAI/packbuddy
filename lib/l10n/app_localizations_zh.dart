@@ -1181,4 +1181,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get adminNoUsersFound => '未找到用户';
+
+  @override
+  String get adminTotalStorage => '保管库存储';
 }

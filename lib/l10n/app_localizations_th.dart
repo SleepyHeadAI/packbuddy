@@ -1176,7 +1176,8 @@ class AppLocalizationsTh extends AppLocalizations {
   String get adminAccessRestricted => 'จำกัดการเข้าถึง';
 
   @override
-  String get adminAccessRestrictedDesc => 'พื้นที่นี้สงวนไว้สำหรับผู้ดูแลระบบที่ได้รับอนุญาตเท่านั้น';
+  String get adminAccessRestrictedDesc =>
+      'พื้นที่นี้สงวนไว้สำหรับผู้ดูแลระบบที่ได้รับอนุญาตเท่านั้น';
 
   @override
   String get adminMetrics => 'สถิติแพลตฟอร์ม';
@@ -1219,4 +1220,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get adminNoUsersFound => 'ไม่พบผู้ใช้';
+
+  @override
+  String get adminTotalStorage => 'พื้นที่ห้องนิรภัย';
 }

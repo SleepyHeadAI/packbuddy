@@ -2348,59 +2348,119 @@ abstract class AppLocalizations {
   /// **'Final packing check! Double-check your passport, tickets, and travel essentials for {destination}.'**
   String notification24hBody(String destination);
 
-  /// Admin dashboard localized string
+  /// Admin dashboard string: adminDashboard
+  ///
+  /// In en, this message translates to:
+  /// **'Admin Dashboard'**
   String get adminDashboard;
 
-  /// Admin dashboard localized string
+  /// Admin dashboard string: adminDashboardDesc
+  ///
+  /// In en, this message translates to:
+  /// **'Global platform metrics and user management'**
   String get adminDashboardDesc;
 
-  /// Admin dashboard localized string
+  /// Admin dashboard string: adminAccessRestricted
+  ///
+  /// In en, this message translates to:
+  /// **'Access Restricted'**
   String get adminAccessRestricted;
 
-  /// Admin dashboard localized string
+  /// Admin dashboard string: adminAccessRestrictedDesc
+  ///
+  /// In en, this message translates to:
+  /// **'This area is strictly reserved for authorized administrators.'**
   String get adminAccessRestrictedDesc;
 
-  /// Admin dashboard localized string
+  /// Admin dashboard string: adminMetrics
+  ///
+  /// In en, this message translates to:
+  /// **'Platform Metrics'**
   String get adminMetrics;
 
-  /// Admin dashboard localized string
+  /// Admin dashboard string: adminTotalUsers
+  ///
+  /// In en, this message translates to:
+  /// **'Total Users'**
   String get adminTotalUsers;
 
-  /// Admin dashboard localized string
+  /// Admin dashboard string: adminVerifiedUsers
+  ///
+  /// In en, this message translates to:
+  /// **'Verified Users'**
   String get adminVerifiedUsers;
 
-  /// Admin dashboard localized string
+  /// Admin dashboard string: adminProUsers
+  ///
+  /// In en, this message translates to:
+  /// **'Pro Members'**
   String get adminProUsers;
 
-  /// Admin dashboard localized string
+  /// Admin dashboard string: adminTotalTrips
+  ///
+  /// In en, this message translates to:
+  /// **'Total Trips'**
   String get adminTotalTrips;
 
-  /// Admin dashboard localized string
+  /// Admin dashboard string: adminTotalExpenses
+  ///
+  /// In en, this message translates to:
+  /// **'Total Expenses'**
   String get adminTotalExpenses;
 
-  /// Admin dashboard localized string
+  /// Admin dashboard string: adminTotalDocs
+  ///
+  /// In en, this message translates to:
+  /// **'Vault Documents'**
   String get adminTotalDocs;
 
-  /// Admin dashboard localized string
+  /// Admin dashboard string: adminTotalItems
+  ///
+  /// In en, this message translates to:
+  /// **'Checklist Items'**
   String get adminTotalItems;
 
-  /// Admin dashboard localized string
+  /// Admin dashboard string: adminUserManagement
+  ///
+  /// In en, this message translates to:
+  /// **'User Management'**
   String get adminUserManagement;
 
-  /// Admin dashboard localized string
+  /// Admin dashboard string: adminSearchUsers
+  ///
+  /// In en, this message translates to:
+  /// **'Search users by email, name or UID...'**
   String get adminSearchUsers;
 
-  /// Admin dashboard localized string
+  /// Admin dashboard string: adminGrantPro
+  ///
+  /// In en, this message translates to:
+  /// **'Grant Pro'**
   String get adminGrantPro;
 
-  /// Admin dashboard localized string
+  /// Admin dashboard string: adminRevokePro
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke Pro'**
   String get adminRevokePro;
 
-  /// Admin dashboard localized string
+  /// Admin dashboard string: adminProStatusUpdated
+  ///
+  /// In en, this message translates to:
+  /// **'Pro status successfully updated'**
   String get adminProStatusUpdated;
 
-  /// Admin dashboard localized string
+  /// Admin dashboard string: adminNoUsersFound
+  ///
+  /// In en, this message translates to:
+  /// **'No users found'**
   String get adminNoUsersFound;
+
+  /// Admin dashboard string: adminTotalStorage
+  ///
+  /// In en, this message translates to:
+  /// **'Vault Storage'**
+  String get adminTotalStorage;
 }
 
 class _AppLocalizationsDelegate

@@ -1195,7 +1195,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get adminAccessRestricted => 'Acceso restringido';
 
   @override
-  String get adminAccessRestrictedDesc => 'Esta área está estrictamente reservada para administradores autorizados.';
+  String get adminAccessRestrictedDesc =>
+      'Esta área está estrictamente reservada para administradores autorizados.';
 
   @override
   String get adminMetrics => 'Métricas de la plataforma';
@@ -1238,4 +1239,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get adminNoUsersFound => 'No se encontraron usuarios';
+
+  @override
+  String get adminTotalStorage => 'Almacén Bóveda';
 }

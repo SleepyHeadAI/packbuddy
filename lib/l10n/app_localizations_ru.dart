@@ -1180,13 +1180,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get adminDashboard => 'Панель администратора';
 
   @override
-  String get adminDashboardDesc => 'Глобальные метрики платформы и управление пользователями';
+  String get adminDashboardDesc =>
+      'Глобальные метрики платформы и управление пользователями';
 
   @override
   String get adminAccessRestricted => 'Доступ ограничен';
 
   @override
-  String get adminAccessRestrictedDesc => 'Эта зона строго предназначена только для авторизованных администраторов.';
+  String get adminAccessRestrictedDesc =>
+      'Эта зона строго предназначена только для авторизованных администраторов.';
 
   @override
   String get adminMetrics => 'Метрики платформы';
@@ -1229,4 +1231,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get adminNoUsersFound => 'Пользователи не найдены';
+
+  @override
+  String get adminTotalStorage => 'Хранилище сейфа';
 }

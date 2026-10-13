@@ -1184,13 +1184,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get adminDashboard => 'Admin-Dashboard';
 
   @override
-  String get adminDashboardDesc => 'Globale Plattformmetriken und Benutzerverwaltung';
+  String get adminDashboardDesc =>
+      'Globale Plattformmetriken und Benutzerverwaltung';
 
   @override
   String get adminAccessRestricted => 'Zugriff eingeschränkt';
 
   @override
-  String get adminAccessRestrictedDesc => 'Dieser Bereich ist ausschließlich autorisierten Administratoren vorbehalten.';
+  String get adminAccessRestrictedDesc =>
+      'Dieser Bereich ist ausschließlich autorisierten Administratoren vorbehalten.';
 
   @override
   String get adminMetrics => 'Plattformmetriken';
@@ -1220,7 +1222,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get adminUserManagement => 'Benutzerverwaltung';
 
   @override
-  String get adminSearchUsers => 'Benutzer nach E-Mail, Name oder UID suchen...';
+  String get adminSearchUsers =>
+      'Benutzer nach E-Mail, Name oder UID suchen...';
 
   @override
   String get adminGrantPro => 'Pro erteilen';
@@ -1233,4 +1236,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get adminNoUsersFound => 'Keine Benutzer gefunden';
+
+  @override
+  String get adminTotalStorage => 'Vault-Speicher';
 }

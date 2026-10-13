@@ -109,21 +109,21 @@ class BudgetAnalyticsCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDark
             ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
-            : Colors.white,
-        borderRadius: BorderRadius.circular(22),
+            : theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isDark
-              ? Colors.white.withValues(alpha: 0.08)
-              : theme.colorScheme.outline.withValues(alpha: 0.5),
+              ? AppColors.outlineDark
+              : AppColors.outlineLight,
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withValues(alpha: 0.35)
-                : const Color(0xFF0F172A).withValues(alpha: 0.04),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
+                ? Colors.black.withValues(alpha: 0.30)
+                : const Color(0xFF0F172A).withValues(alpha: 0.03),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -134,15 +134,18 @@ class BudgetAnalyticsCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
                   color: theme.colorScheme.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  Icons.pie_chart_rounded,
-                  size: 20,
-                  color: theme.colorScheme.primary,
+                child: Center(
+                  child: Icon(
+                    Icons.pie_chart_rounded,
+                    size: 20,
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -156,6 +159,8 @@ class BudgetAnalyticsCard extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                         letterSpacing: -0.2,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     if (topCategory != null && totalSpent > 0) ...[
                       Text(
@@ -165,11 +170,14 @@ class BudgetAnalyticsCard extends StatelessWidget {
                           color: theme.colorScheme.onSurfaceVariant,
                           fontWeight: FontWeight.w500,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ],
                 ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
@@ -228,22 +236,27 @@ class BudgetAnalyticsCard extends StatelessWidget {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(6),
+                        width: 32,
+                        height: 32,
                         decoration: BoxDecoration(
                           color: color.withValues(alpha: 0.15),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(icon, size: 14, color: color),
+                        child: Center(child: Icon(icon, size: 16, color: color)),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Row(
                           children: [
-                            Text(
-                              catName,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 13,
+                            Flexible(
+                              child: Text(
+                                catName,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             const SizedBox(width: 6),
@@ -257,12 +270,19 @@ class BudgetAnalyticsCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                      Text(
-                        CurrencyFormatter.format(catAmount, currency: tripCurrency),
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: theme.colorScheme.onSurface,
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            CurrencyFormatter.format(catAmount, currency: tripCurrency),
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),

@@ -44,10 +44,11 @@ class AppTheme {
   }
 
   /// Builds a complete Plus Jakarta Sans TextTheme with refined typographic hierarchy
-  /// Featuring bold, breathable headlines and highly readable, slightly muted body copy.
+  /// Featuring bold, breathable headlines and highly readable, eye-friendly body copy.
   static TextTheme _buildTextTheme(bool isDark) {
     final onSurface = isDark ? AppColors.onSurfaceDark : AppColors.onSurfaceLight;
     final onSurfaceVariant = isDark ? AppColors.onSurfaceVariantDark : AppColors.onSurfaceVariantLight;
+    final textMuted = isDark ? AppColors.textMutedDark : AppColors.textMutedLight;
     final baseTextTheme = isDark ? ThemeData.dark().textTheme : ThemeData.light().textTheme;
     final textTheme = _isTesting
         ? baseTextTheme
@@ -136,7 +137,7 @@ class AppTheme {
         fontWeight: FontWeight.w400,
         letterSpacing: 0,
         height: 1.5,
-        color: onSurfaceVariant,
+        color: textMuted,
       ),
       labelLarge: _font(
         fontSize: 14,
@@ -157,7 +158,7 @@ class AppTheme {
         fontWeight: FontWeight.w600,
         letterSpacing: 0.2,
         height: 1.4,
-        color: onSurfaceVariant,
+        color: textMuted,
       ),
     );
   }
@@ -220,19 +221,19 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: AppColors.surfaceLight,
         elevation: 0,
-        shadowColor: Colors.black.withValues(alpha: 0.04),
+        shadowColor: const Color(0xFF0F172A).withValues(alpha: 0.03),
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
-          side: BorderSide(
-            color: AppColors.outlineLight.withValues(alpha: 0.6),
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(
+            color: AppColors.outlineLight,
             width: 1,
           ),
         ),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: Colors.transparent,
-        modalBackgroundColor: Colors.transparent,
+        backgroundColor: AppColors.surfaceLight,
+        modalBackgroundColor: AppColors.surfaceLight,
         surfaceTintColor: Colors.transparent,
         clipBehavior: Clip.antiAliasWithSaveLayer,
         shape: RoundedRectangleBorder(
@@ -241,12 +242,13 @@ class AppTheme {
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: AppColors.surfaceLight,
+        surfaceTintColor: Colors.transparent,
         elevation: 4,
-        shadowColor: Colors.black.withValues(alpha: 0.08),
+        shadowColor: const Color(0xFF0F172A).withValues(alpha: 0.08),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-          side: BorderSide(
-            color: AppColors.outlineLight.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(24),
+          side: const BorderSide(
+            color: AppColors.outlineLight,
             width: 1,
           ),
         ),
@@ -440,16 +442,16 @@ class AppTheme {
         shadowColor: Colors.black.withValues(alpha: 0.25),
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
-          side: BorderSide(
-            color: AppColors.outlineDark.withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(
+            color: AppColors.outlineDark,
             width: 1,
           ),
         ),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: Colors.transparent,
-        modalBackgroundColor: Colors.transparent,
+        backgroundColor: AppColors.surfaceDark,
+        modalBackgroundColor: AppColors.surfaceDark,
         surfaceTintColor: Colors.transparent,
         clipBehavior: Clip.antiAliasWithSaveLayer,
         shape: RoundedRectangleBorder(
@@ -458,12 +460,13 @@ class AppTheme {
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: AppColors.surfaceDark,
+        surfaceTintColor: Colors.transparent,
         elevation: 6,
         shadowColor: Colors.black.withValues(alpha: 0.35),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-          side: BorderSide(
-            color: AppColors.outlineDark.withValues(alpha: 0.8),
+          borderRadius: BorderRadius.circular(24),
+          side: const BorderSide(
+            color: AppColors.outlineDark,
             width: 1,
           ),
         ),

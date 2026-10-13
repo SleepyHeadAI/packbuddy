@@ -277,27 +277,31 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
       {'key': 'Other', 'label': l10n.other, 'icon': Icons.more_horiz_rounded, 'color': theme.colorScheme.outline},
     ];
 
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.9,
       ),
       decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
+        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 20,
+        left: 20,
+        right: 20,
+        top: 16,
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
       ),
-      child: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+      child: SafeArea(
+        top: false,
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
               // Handle
               Center(
                 child: Container(
@@ -413,11 +417,15 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
                     children: [
                       Icon(Icons.currency_exchange_rounded, size: 14, color: theme.colorScheme.primary),
                       const SizedBox(width: 6),
-                      Text(
-                        '≈ ${CurrencyFormatter.format(CurrencyService.convert(amount: double.tryParse(_amountController.text.trim()) ?? 0.0, fromCurrency: _selectedCurrency, toCurrency: widget.defaultCurrency), currency: widget.defaultCurrency)} (${widget.defaultCurrency})',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.w600,
+                      Flexible(
+                        child: Text(
+                          '≈ ${CurrencyFormatter.format(CurrencyService.convert(amount: double.tryParse(_amountController.text.trim()) ?? 0.0, fromCurrency: _selectedCurrency, toCurrency: widget.defaultCurrency), currency: widget.defaultCurrency)} (${widget.defaultCurrency})',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -611,6 +619,7 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

@@ -82,6 +82,14 @@
 		<string>remote-notification</string>
 	</array>
 
+	<!-- PostHog EU Cloud Configuration -->
+	<key>com.posthog.posthog.API_KEY</key>
+	<string>phc_zJWTksx4JFN95rKAsfPxR9fUeQLFyM9ArCb9ZUkVjLeK</string>
+	<key>com.posthog.posthog.POSTHOG_HOST</key>
+	<string>https://eu.i.posthog.com</string>
+	<key>com.posthog.posthog.CAPTURE_APPLICATION_LIFECYCLE_EVENTS</key>
+	<true/>
+
 	<!-- Sign in with Apple Capability Requirement:
 	     Xcode -> Runner -> Signing & Capabilities -> + Capability -> Sign In with Apple.
 	     Associated Entitlements: com.apple.developer.applesignin (Default)

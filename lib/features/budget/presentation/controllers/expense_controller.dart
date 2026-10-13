@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../data/local_db/database_helper.dart';
 import '../../../../data/sync_engine/sync_engine.dart';
+import '../../../../core/services/telemetry_service.dart';
 import '../../domain/expense.dart';
 import '../../../../core/services/currency_service.dart';
 
@@ -129,6 +130,13 @@ class ExpenseController extends StateNotifier<ExpenseState> {
       state = state.copyWith(
         expenses: updatedList,
         totalSpent: newTotal,
+      );
+
+      // Log telemetry event
+      TelemetryService.instance.logExpenseLogged(
+        category: category,
+        amount: amount,
+        currency: currency,
       );
 
       // Trigger background two-way sync

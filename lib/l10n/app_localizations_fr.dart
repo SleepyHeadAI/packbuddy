@@ -1192,13 +1192,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get adminDashboard => 'Tableau de bord administrateur';
 
   @override
-  String get adminDashboardDesc => 'Métriques globales et gestion des utilisateurs';
+  String get adminDashboardDesc =>
+      'Métriques globales et gestion des utilisateurs';
 
   @override
   String get adminAccessRestricted => 'Accès restreint';
 
   @override
-  String get adminAccessRestrictedDesc => 'Cette zone est strictement réservée aux administrateurs autorisés.';
+  String get adminAccessRestrictedDesc =>
+      'Cette zone est strictement réservée aux administrateurs autorisés.';
 
   @override
   String get adminMetrics => 'Métriques de la plateforme';
@@ -1241,4 +1243,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get adminNoUsersFound => 'Aucun utilisateur trouvé';
+
+  @override
+  String get adminTotalStorage => 'Stockage Coffre';
 }

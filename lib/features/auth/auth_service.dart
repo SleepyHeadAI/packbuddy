@@ -50,12 +50,18 @@ class FirebaseAuthService implements AuthService {
   final GoogleSignIn _googleSignIn;
   final FirebaseFirestore? _firestore;
 
+  static const String _defaultServerClientId =
+      '719651073535-34t98obhv0kcpifa6f29tme61s04o2jm.apps.googleusercontent.com';
+
   FirebaseAuthService({
     FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
     FirebaseFirestore? firestore,
   })  : _auth = firebaseAuth,
-        _googleSignIn = googleSignIn ?? GoogleSignIn(),
+        _googleSignIn = googleSignIn ??
+            GoogleSignIn(
+              serverClientId: _defaultServerClientId,
+            ),
         // ignore: prefer_initializing_formals
         _firestore = firestore;
 
@@ -172,9 +178,11 @@ class FirebaseAuthService implements AuthService {
         unawaited(syncUserProfile(userCredential.user!));
       }
       return userCredential;
-    } on FirebaseAuthException {
+    } on FirebaseAuthException catch (e) {
+      debugPrint('[FirebaseAuthService] Firebase Auth error during Google Sign-In: [${e.code}] ${e.message}');
       rethrow;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrint('[FirebaseAuthService] Google Sign-In exception: $e\n$stackTrace');
       throw FirebaseAuthException(
         code: 'google-sign-in-failed',
         message: e.toString(),

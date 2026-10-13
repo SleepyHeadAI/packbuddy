@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/preferences_service.dart';
+import '../services/telemetry_service.dart';
 
 /// Notifier to switch between languages dynamically across PackBuddy with persistence
 class LocaleNotifier extends StateNotifier<Locale> {
@@ -14,6 +15,10 @@ class LocaleNotifier extends StateNotifier<Locale> {
     if (state != locale) {
       state = locale;
       _prefs.setLocale(locale);
+      TelemetryService.instance.logPreferenceChanged(
+        setting: 'locale',
+        value: locale.languageCode,
+      );
     }
   }
 

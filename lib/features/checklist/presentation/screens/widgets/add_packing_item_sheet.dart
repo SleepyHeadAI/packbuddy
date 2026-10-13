@@ -188,21 +188,28 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
 
-    return Container(
-      padding: EdgeInsets.fromLTRB(22, 12, 22, 20 + bottomInset),
-      decoration: BoxDecoration(
-        color: isDark ? theme.colorScheme.surface : Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
-            blurRadius: 24,
-            offset: const Offset(0, -6),
-          ),
-        ],
-      ),
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 12,
+          bottom: bottomInset + 24,
+        ),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
+              blurRadius: 24,
+              offset: const Offset(0, -6),
+            ),
+          ],
+        ),
       child: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -346,7 +353,10 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                           ),
                           onPressed: () => Navigator.of(context).pop(),
-                          child: Text(l10n.cancel),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(l10n.cancel),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -358,9 +368,12 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                           ),
                           onPressed: () => _submit(ref),
-                          child: Text(
-                            widget.itemToEdit != null ? l10n.save : l10n.addToBaggage,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              widget.itemToEdit != null ? l10n.save : l10n.addToBaggage,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ),
                       ),
@@ -372,6 +385,7 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

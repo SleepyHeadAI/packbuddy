@@ -1180,13 +1180,15 @@ class AppLocalizationsPl extends AppLocalizations {
   String get adminDashboard => 'Panel administratora';
 
   @override
-  String get adminDashboardDesc => 'Globalne statystyki platformy i zarządzanie użytkownikami';
+  String get adminDashboardDesc =>
+      'Globalne statystyki platformy i zarządzanie użytkownikami';
 
   @override
   String get adminAccessRestricted => 'Dostęp ograniczony';
 
   @override
-  String get adminAccessRestrictedDesc => 'Ten obszar jest ściśle zarezerwowany dla upoważnionych administratorów.';
+  String get adminAccessRestrictedDesc =>
+      'Ten obszar jest ściśle zarezerwowany dla upoważnionych administratorów.';
 
   @override
   String get adminMetrics => 'Statystyki platformy';
@@ -1216,7 +1218,8 @@ class AppLocalizationsPl extends AppLocalizations {
   String get adminUserManagement => 'Zarządzanie użytkownikami';
 
   @override
-  String get adminSearchUsers => 'Szukaj użytkowników po emailu, nazwie lub UID...';
+  String get adminSearchUsers =>
+      'Szukaj użytkowników po emailu, nazwie lub UID...';
 
   @override
   String get adminGrantPro => 'Przyznaj Pro';
@@ -1229,4 +1232,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get adminNoUsersFound => 'Nie znaleziono użytkowników';
+
+  @override
+  String get adminTotalStorage => 'Pamięć skarbca';
 }

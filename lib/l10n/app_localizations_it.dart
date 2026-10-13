@@ -1181,13 +1181,15 @@ class AppLocalizationsIt extends AppLocalizations {
   String get adminDashboard => 'Pannello di controllo amministratore';
 
   @override
-  String get adminDashboardDesc => 'Metriche globali della piattaforma e gestione utenti';
+  String get adminDashboardDesc =>
+      'Metriche globali della piattaforma e gestione utenti';
 
   @override
   String get adminAccessRestricted => 'Accesso limitato';
 
   @override
-  String get adminAccessRestrictedDesc => 'Quest\'area è strettamente riservata agli amministratori autorizzati.';
+  String get adminAccessRestrictedDesc =>
+      'Quest\'area è strettamente riservata agli amministratori autorizzati.';
 
   @override
   String get adminMetrics => 'Metriche della piattaforma';
@@ -1230,4 +1232,7 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get adminNoUsersFound => 'Nessun utente trovato';
+
+  @override
+  String get adminTotalStorage => 'Archivio Vault';
 }

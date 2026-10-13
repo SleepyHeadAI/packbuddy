@@ -1181,4 +1181,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get adminNoUsersFound => '사용자를 찾을 수 없습니다';
+
+  @override
+  String get adminTotalStorage => '보관함 저장공간';
 }

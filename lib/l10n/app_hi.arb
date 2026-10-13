@@ -386,5 +386,6 @@
   "adminGrantPro": "Pro प्रदान करें",
   "adminRevokePro": "Pro रद्द करें",
   "adminProStatusUpdated": "Pro स्थिति सफलतापूर्वक अपडेट की गई",
-  "adminNoUsersFound": "कोई उपयोगकर्ता नहीं मिला"
+  "adminNoUsersFound": "कोई उपयोगकर्ता नहीं मिला",
+  "adminTotalStorage": "वॉल्ट स्टोरेज"
 }

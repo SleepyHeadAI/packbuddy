@@ -1175,13 +1175,15 @@ class AppLocalizationsSv extends AppLocalizations {
   String get adminDashboard => 'Administratörspanel';
 
   @override
-  String get adminDashboardDesc => 'Globala plattformsmått och användarhantering';
+  String get adminDashboardDesc =>
+      'Globala plattformsmått och användarhantering';
 
   @override
   String get adminAccessRestricted => 'Åtkomst begränsad';
 
   @override
-  String get adminAccessRestrictedDesc => 'Detta område är strikt reserverat för auktoriserade administratörer.';
+  String get adminAccessRestrictedDesc =>
+      'Detta område är strikt reserverat för auktoriserade administratörer.';
 
   @override
   String get adminMetrics => 'Plattformsmått';
@@ -1224,4 +1226,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get adminNoUsersFound => 'Inga användare hittades';
+
+  @override
+  String get adminTotalStorage => 'Valvlagring';
 }

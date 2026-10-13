@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/features/checklist/domain/packing_templates.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
@@ -39,14 +40,23 @@ class _SmartTemplatesSheetState extends ConsumerState<SmartTemplatesSheet> {
     final l10n = AppLocalizations.of(context)!;
     final templates = PackingTemplatesRepository.all;
 
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.85,
-      ),
-      decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-      ),
+    return SafeArea(
+      top: false,
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
+        ),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
+              blurRadius: 24,
+              offset: const Offset(0, -6),
+            ),
+          ],
+        ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -124,19 +134,17 @@ class _SmartTemplatesSheetState extends ConsumerState<SmartTemplatesSheet> {
 
                 return Container(
                   decoration: BoxDecoration(
-                    color: isDark
-                        ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
-                        : Colors.white,
+                    color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: isExpanded
                           ? theme.colorScheme.primary.withValues(alpha: 0.5)
-                          : theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+                          : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
                       width: isExpanded ? 1.5 : 1,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.1 : 0.04),
+                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
                         blurRadius: 10,
                         offset: const Offset(0, 3),
                       ),
@@ -162,7 +170,7 @@ class _SmartTemplatesSheetState extends ConsumerState<SmartTemplatesSheet> {
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
                                   color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(14),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
                                   template.emoji,
@@ -207,12 +215,16 @@ class _SmartTemplatesSheetState extends ConsumerState<SmartTemplatesSheet> {
                                           ),
                                         ),
                                         const SizedBox(width: 8),
-                                        Text(
-                                          l10n.readyTravelPackage,
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w500,
-                                            color: theme.colorScheme.onSurfaceVariant,
+                                        Expanded(
+                                          child: Text(
+                                            l10n.readyTravelPackage,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w500,
+                                              color: theme.colorScheme.onSurfaceVariant,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -238,8 +250,8 @@ class _SmartTemplatesSheetState extends ConsumerState<SmartTemplatesSheet> {
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: isDark
-                                ? theme.colorScheme.surface.withValues(alpha: 0.4)
-                                : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.25),
+                                ? AppColors.surfaceVariantDark
+                                : AppColors.surfaceVariantLight,
                             borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
                           ),
                           child: Column(
@@ -261,10 +273,10 @@ class _SmartTemplatesSheetState extends ConsumerState<SmartTemplatesSheet> {
                                   return Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                                      color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
                                       borderRadius: BorderRadius.circular(10),
                                       border: Border.all(
-                                        color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+                                        color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
                                       ),
                                     ),
                                     child: Text(
@@ -316,9 +328,13 @@ class _SmartTemplatesSheetState extends ConsumerState<SmartTemplatesSheet> {
                                     ),
                                   ),
                                   icon: const Icon(Icons.add_task_rounded, size: 18),
-                                  label: Text(
-                                    '"${template.title}" ${l10n.addTemplateToBaggage}',
-                                    style: const TextStyle(fontWeight: FontWeight.w700),
+                                  label: Flexible(
+                                    child: Text(
+                                      '"${template.title}" ${l10n.addTemplateToBaggage}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(fontWeight: FontWeight.w700),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -334,6 +350,7 @@ class _SmartTemplatesSheetState extends ConsumerState<SmartTemplatesSheet> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

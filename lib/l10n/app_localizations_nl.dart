@@ -1178,13 +1178,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get adminDashboard => 'Beheerdersdashboard';
 
   @override
-  String get adminDashboardDesc => 'Wereldwijde platformstatistieken en gebruikersbeheer';
+  String get adminDashboardDesc =>
+      'Wereldwijde platformstatistieken en gebruikersbeheer';
 
   @override
   String get adminAccessRestricted => 'Toegang beperkt';
 
   @override
-  String get adminAccessRestrictedDesc => 'Dit gebied is strikt voorbehouden aan bevoegde beheerders.';
+  String get adminAccessRestrictedDesc =>
+      'Dit gebied is strikt voorbehouden aan bevoegde beheerders.';
 
   @override
   String get adminMetrics => 'Platformstatistieken';
@@ -1227,4 +1229,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get adminNoUsersFound => 'Geen gebruikers gevonden';
+
+  @override
+  String get adminTotalStorage => 'Kluisopslag';
 }

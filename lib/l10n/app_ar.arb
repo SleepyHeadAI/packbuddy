@@ -386,5 +386,6 @@
   "adminGrantPro": "منح Pro",
   "adminRevokePro": "إلغاء Pro",
   "adminProStatusUpdated": "تم تحديث حالة Pro بنجاح",
-  "adminNoUsersFound": "لم يتم العثور على مستخدمين"
+  "adminNoUsersFound": "لم يتم العثور على مستخدمين",
+  "adminTotalStorage": "مساحة الخزنة"
 }

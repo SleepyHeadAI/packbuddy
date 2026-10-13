@@ -386,5 +386,6 @@
   "adminGrantPro": "Выдать Pro",
   "adminRevokePro": "Отозвать Pro",
   "adminProStatusUpdated": "Статус Pro успешно обновлен",
-  "adminNoUsersFound": "Пользователи не найдены"
+  "adminNoUsersFound": "Пользователи не найдены",
+  "adminTotalStorage": "Хранилище сейфа"
 }

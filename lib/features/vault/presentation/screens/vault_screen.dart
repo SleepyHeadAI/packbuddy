@@ -189,16 +189,26 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
       ),
       builder: (ctx) {
         return RepaintBoundary(
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-            ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+          child: SafeArea(
+            top: false,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
+                    blurRadius: 24,
+                    offset: const Offset(0, -6),
+                  ),
+                ],
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
               Center(
                 child: Container(
                   width: 40,
@@ -451,9 +461,11 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
             ],
           ),
         ),
-      );
-    },
+      ),
+    ),
   );
+      },
+    );
   }
 
   @override
@@ -565,118 +577,130 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20, right: 20, top: 12, bottom: 12),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Left: Vault Status Window
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            height: 155,
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
-                                  theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: theme.colorScheme.primary.withValues(alpha: 0.2),
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        Icons.shield_outlined,
-                                        size: 20,
-                                        color: theme.colorScheme.primary,
-                                      ),
-                                    ),
-                                    const Spacer(),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.successPastel.withValues(alpha: 0.2),
-                                        borderRadius: BorderRadius.circular(6),
-                                      ),
-                                      child: Text(
-                                        l10n.secureBadge,
-                                        style: TextStyle(
-                                          fontSize: 9,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.successPastel,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${vaultState.documents.length}',
-                                      style: theme.textTheme.headlineSmall?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: theme.colorScheme.primary,
-                                      ),
-                                    ),
-                                    Text(
-                                      l10n.savedDocument,
-                                      style: theme.textTheme.bodySmall?.copyWith(
-                                        color: theme.colorScheme.onSurfaceVariant,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Text(
-                                  l10n.offlineAndEncrypted,
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-
-                        // Right: Pinned Passport Window (Always on the Top Right)
-                        Expanded(
-                          flex: 1,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(20),
-                            onTap: () {
-                              if (passportDoc != null) {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => DocumentViewerScreen(document: passportDoc),
-                                  ),
-                                );
-                              } else {
-                                AddDocumentSheet.show(context, initialCategory: 'Passport');
-                              }
-                            },
+                    child: IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // Left: Vault Status Window
+                          Expanded(
+                            flex: 1,
                             child: Container(
-                              height: 155,
+                              constraints: const BoxConstraints(minHeight: 155),
                               padding: const EdgeInsets.all(14),
                               decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
+                                    theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.shield_outlined,
+                                          size: 20,
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Expanded(
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.successPastel.withValues(alpha: 0.2),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: Text(
+                                              l10n.secureBadge,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.successPastel,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          '${vaultState.documents.length}',
+                                          style: theme.textTheme.headlineSmall?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: theme.colorScheme.primary,
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                        l10n.savedDocument,
+                                        style: theme.textTheme.bodySmall?.copyWith(
+                                          color: theme.colorScheme.onSurfaceVariant,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    l10n.offlineAndEncrypted,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+
+                          // Right: Pinned Passport Window (Always on the Top Right)
+                          Expanded(
+                            flex: 1,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(20),
+                              onTap: () {
+                                if (passportDoc != null) {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => DocumentViewerScreen(document: passportDoc),
+                                    ),
+                                  );
+                                } else {
+                                  AddDocumentSheet.show(context, initialCategory: 'Passport');
+                                }
+                              },
+                              child: Container(
+                                constraints: const BoxConstraints(minHeight: 155),
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: passportDoc != null
                                       ? [
@@ -729,23 +753,30 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                               : theme.colorScheme.secondary,
                                         ),
                                       ),
-                                      const Spacer(),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: passportDoc != null
-                                              ? const Color(0xFFF59E0B).withValues(alpha: 0.25)
-                                              : theme.colorScheme.primaryContainer,
-                                          borderRadius: BorderRadius.circular(6),
-                                        ),
-                                        child: Text(
-                                          passportDoc != null ? l10n.readyBadge : l10n.pinnedBadge,
-                                          style: TextStyle(
-                                            fontSize: 9,
-                                            fontWeight: FontWeight.bold,
-                                            color: passportDoc != null
-                                                ? const Color(0xFFF59E0B)
-                                                : theme.colorScheme.primary,
+                                      const SizedBox(width: 4),
+                                      Expanded(
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: passportDoc != null
+                                                  ? const Color(0xFFF59E0B).withValues(alpha: 0.25)
+                                                  : theme.colorScheme.primaryContainer,
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: Text(
+                                              passportDoc != null ? l10n.readyBadge : l10n.pinnedBadge,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.bold,
+                                                color: passportDoc != null
+                                                    ? const Color(0xFFF59E0B)
+                                                    : theme.colorScheme.primary,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -789,13 +820,17 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                             : theme.colorScheme.primary,
                                       ),
                                       const SizedBox(width: 4),
-                                      Text(
-                                        passportDoc != null ? l10n.tapToView : l10n.quickUpload,
-                                        style: TextStyle(
-                                          fontSize: 9,
-                                          color: passportDoc != null
-                                              ? Colors.white.withValues(alpha: 0.7)
-                                              : theme.colorScheme.onSurfaceVariant,
+                                      Expanded(
+                                        child: Text(
+                                          passportDoc != null ? l10n.tapToView : l10n.quickUpload,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 9,
+                                            color: passportDoc != null
+                                                ? Colors.white.withValues(alpha: 0.7)
+                                                : theme.colorScheme.onSurfaceVariant,
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -808,6 +843,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                       ],
                     ),
                   ),
+                ),
                 ),
 
                 // Category and Subcategory Filters Bar
@@ -1207,7 +1243,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                         crossAxisCount: 2,
                         crossAxisSpacing: 14,
                         mainAxisSpacing: 14,
-                        childAspectRatio: 0.74,
+                        mainAxisExtent: 228,
                       ),
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {

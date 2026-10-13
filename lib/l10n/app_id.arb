@@ -386,5 +386,6 @@
   "adminGrantPro": "Berikan Pro",
   "adminRevokePro": "Cabut Pro",
   "adminProStatusUpdated": "Status Pro berhasil diperbarui",
-  "adminNoUsersFound": "Pengguna tidak ditemukan"
+  "adminNoUsersFound": "Pengguna tidak ditemukan",
+  "adminTotalStorage": "Penyimpanan Brankas"
 }

@@ -100,6 +100,7 @@ class DatabaseHelper {
         trip_id TEXT,
         file_type TEXT,
         notes TEXT,
+        file_size_bytes INTEGER NOT NULL DEFAULT 0,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
         is_deleted INTEGER NOT NULL DEFAULT 0
@@ -200,6 +201,13 @@ class DatabaseHelper {
       } catch (_) {}
       try {
         await db.execute('ALTER TABLE ${AppConstants.tableChecklistItems} ADD COLUMN user_id TEXT NOT NULL DEFAULT ""');
+      } catch (_) {}
+    }
+
+    // Version 7: Add file_size_bytes column to documents table for storage metering
+    if (oldVersion < 7) {
+      try {
+        await db.execute('ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN file_size_bytes INTEGER NOT NULL DEFAULT 0');
       } catch (_) {}
     }
   }
@@ -628,6 +636,16 @@ class DatabaseHelper {
       orderBy: 'created_at DESC',
     );
     return result.map((map) => Document.fromMap(map)).toList();
+  }
+
+  /// Computes the total storage size in bytes of active documents for a given user
+  Future<int> getTotalVaultStorageBytes({String? userId}) async {
+    final docs = await getDocuments(userId: userId, includeDeleted: false);
+    var total = 0;
+    for (final doc in docs) {
+      total += doc.fileSizeBytes;
+    }
+    return total;
   }
 
   /// Retrieves a single document by ID strictly filtered by userId

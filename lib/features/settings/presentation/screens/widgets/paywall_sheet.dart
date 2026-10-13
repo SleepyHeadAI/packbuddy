@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:packbuddy/core/services/telemetry_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/features/settings/data/mock_revenuecat_service.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
@@ -8,7 +9,8 @@ import 'package:packbuddy/l10n/app_localizations.dart';
 class PaywallSheet extends ConsumerWidget {
   const PaywallSheet({super.key});
 
-  static Future<void> show(BuildContext context) {
+  static Future<void> show(BuildContext context, {String triggerSource = 'settings'}) {
+    TelemetryService.instance.logPaywallViewed(triggerSource: triggerSource);
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -27,26 +29,36 @@ class PaywallSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final proState = ref.watch(proSubscriptionProvider);
 
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.9,
-      ),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      padding: EdgeInsets.only(
-        top: 12,
-        left: 24,
-        right: 24,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 28,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+    return SafeArea(
+      top: false,
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.9,
+        ),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
+              blurRadius: 24,
+              offset: const Offset(0, -6),
+            ),
+          ],
+        ),
+        padding: EdgeInsets.only(
+          top: 12,
+          left: 20,
+          right: 20,
+          bottom: MediaQuery.viewInsetsOf(context).bottom + 24,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
           // Drag Handle
           Container(
             width: 44,
@@ -168,34 +180,37 @@ class PaywallSheet extends ConsumerWidget {
             ),
           ] else ...[
             // Subscription Plan Selector (Annual vs Monthly)
-            Row(
-              children: [
-                Expanded(
-                  child: _PlanOptionCard(
-                    title: l10n.annual,
-                    price: '\$39.99 / yr',
-                    subPrice: '\$3.33 / mo',
-                    badge: l10n.annualSave,
-                    isSelected: proState.activePlan == SubscriptionPlan.annual,
-                    onTap: () {
-                      ref.read(proSubscriptionProvider.notifier).selectPlan(SubscriptionPlan.annual);
-                    },
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: _PlanOptionCard(
+                      title: l10n.annual,
+                      price: '\$39.99 / yr',
+                      subPrice: '\$3.33 / mo',
+                      badge: l10n.annualSave,
+                      isSelected: proState.activePlan == SubscriptionPlan.annual,
+                      onTap: () {
+                        ref.read(proSubscriptionProvider.notifier).selectPlan(SubscriptionPlan.annual);
+                      },
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _PlanOptionCard(
-                    title: l10n.monthly,
-                    price: '\$4.99 / mo',
-                    subPrice: null,
-                    badge: null,
-                    isSelected: proState.activePlan == SubscriptionPlan.monthly,
-                    onTap: () {
-                      ref.read(proSubscriptionProvider.notifier).selectPlan(SubscriptionPlan.monthly);
-                    },
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _PlanOptionCard(
+                      title: l10n.monthly,
+                      price: '\$4.99 / mo',
+                      subPrice: null,
+                      badge: null,
+                      isSelected: proState.activePlan == SubscriptionPlan.monthly,
+                      onTap: () {
+                        ref.read(proSubscriptionProvider.notifier).selectPlan(SubscriptionPlan.monthly);
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(height: 24),
 
@@ -258,7 +273,8 @@ class PaywallSheet extends ConsumerWidget {
         ],
       ),
     ),
-  );
+  ),
+);
 }
 }
 
@@ -324,6 +340,7 @@ class _PlanOptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return InkWell(
       onTap: onTap,
@@ -334,28 +351,34 @@ class _PlanOptionCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? theme.colorScheme.primaryContainer.withValues(alpha: 0.3)
-              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+              : (isDark ? AppColors.surfaceVariantDark : AppColors.surfaceVariantLight),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected
                 ? theme.colorScheme.primary
-                : theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+                : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
             width: isSelected ? 2 : 1,
           ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  title,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                if (badge != null)
+                if (badge != null) ...[
+                  const SizedBox(width: 4),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
@@ -371,22 +394,31 @@ class _PlanOptionCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                ],
               ],
             ),
             const SizedBox(height: 8),
-            Text(
-              price,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                price,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface,
+                ),
               ),
             ),
             if (subPrice != null) ...[
               const SizedBox(height: 2),
-              Text(
-                subPrice!,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  subPrice!,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
             ],

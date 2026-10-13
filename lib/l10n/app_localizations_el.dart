@@ -1193,13 +1193,15 @@ class AppLocalizationsEl extends AppLocalizations {
   String get adminDashboard => 'Πίνακας διαχειριστή';
 
   @override
-  String get adminDashboardDesc => 'Συνολικά στατιστικά πλατφόρμας και διαχείριση χρηστών';
+  String get adminDashboardDesc =>
+      'Συνολικά στατιστικά πλατφόρμας και διαχείριση χρηστών';
 
   @override
   String get adminAccessRestricted => 'Περιορισμένη πρόσβαση';
 
   @override
-  String get adminAccessRestrictedDesc => 'Αυτή η περιοχή προορίζεται αυστηρά για εξουσιοδοτημένους διαχειριστές.';
+  String get adminAccessRestrictedDesc =>
+      'Αυτή η περιοχή προορίζεται αυστηρά για εξουσιοδοτημένους διαχειριστές.';
 
   @override
   String get adminMetrics => 'Στατιστικά πλατφόρμας';
@@ -1242,4 +1244,7 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get adminNoUsersFound => 'Δεν βρέθηκαν χρήστες';
+
+  @override
+  String get adminTotalStorage => 'Χώρος Θησαυρού';
 }

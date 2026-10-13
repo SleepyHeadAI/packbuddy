@@ -386,5 +386,6 @@
   "adminGrantPro": "Przyznaj Pro",
   "adminRevokePro": "Odbierz Pro",
   "adminProStatusUpdated": "Status Pro zaktualizowany pomyślnie",
-  "adminNoUsersFound": "Nie znaleziono użytkowników"
+  "adminNoUsersFound": "Nie znaleziono użytkowników",
+  "adminTotalStorage": "Pamięć skarbca"
 }

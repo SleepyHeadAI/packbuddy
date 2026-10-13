@@ -448,12 +448,11 @@ class _EmailVerificationScreenState
     );
   }
 
-  /// Informational Card Explaining Next Steps
   Widget _buildInstructionCard(bool isDark, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : Colors.white,
+        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
@@ -593,14 +592,18 @@ class _EmailVerificationScreenState
           ),
         ),
         const SizedBox(width: 10),
-        Text(
-          l10n.emailVerifyWaiting,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: isDark
-                ? AppColors.onSurfaceVariantDark
-                : AppColors.onSurfaceVariantLight,
+        Flexible(
+          child: Text(
+            l10n.emailVerifyWaiting,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: isDark
+                  ? AppColors.onSurfaceVariantDark
+                  : AppColors.onSurfaceVariantLight,
+            ),
           ),
         ),
       ],
