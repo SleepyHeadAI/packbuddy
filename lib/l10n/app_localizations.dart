@@ -2347,6 +2347,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Final packing check! Double-check your passport, tickets, and travel essentials for {destination}.'**
   String notification24hBody(String destination);
+
+  /// Admin dashboard localized string
+  String get adminDashboard;
+
+  /// Admin dashboard localized string
+  String get adminDashboardDesc;
+
+  /// Admin dashboard localized string
+  String get adminAccessRestricted;
+
+  /// Admin dashboard localized string
+  String get adminAccessRestrictedDesc;
+
+  /// Admin dashboard localized string
+  String get adminMetrics;
+
+  /// Admin dashboard localized string
+  String get adminTotalUsers;
+
+  /// Admin dashboard localized string
+  String get adminVerifiedUsers;
+
+  /// Admin dashboard localized string
+  String get adminProUsers;
+
+  /// Admin dashboard localized string
+  String get adminTotalTrips;
+
+  /// Admin dashboard localized string
+  String get adminTotalExpenses;
+
+  /// Admin dashboard localized string
+  String get adminTotalDocs;
+
+  /// Admin dashboard localized string
+  String get adminTotalItems;
+
+  /// Admin dashboard localized string
+  String get adminUserManagement;
+
+  /// Admin dashboard localized string
+  String get adminSearchUsers;
+
+  /// Admin dashboard localized string
+  String get adminGrantPro;
+
+  /// Admin dashboard localized string
+  String get adminRevokePro;
+
+  /// Admin dashboard localized string
+  String get adminProStatusUpdated;
+
+  /// Admin dashboard localized string
+  String get adminNoUsersFound;
 }
 
 class _AppLocalizationsDelegate

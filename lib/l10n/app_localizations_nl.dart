@@ -1173,4 +1173,58 @@ class AppLocalizationsNl extends AppLocalizations {
   String notification24hBody(String destination) {
     return 'Laatste inpakcontrole! Controleer je paspoort, tickets en reisbenodigdheden voor $destination.';
   }
+
+  @override
+  String get adminDashboard => 'Beheerdersdashboard';
+
+  @override
+  String get adminDashboardDesc => 'Wereldwijde platformstatistieken en gebruikersbeheer';
+
+  @override
+  String get adminAccessRestricted => 'Toegang beperkt';
+
+  @override
+  String get adminAccessRestrictedDesc => 'Dit gebied is strikt voorbehouden aan bevoegde beheerders.';
+
+  @override
+  String get adminMetrics => 'Platformstatistieken';
+
+  @override
+  String get adminTotalUsers => 'Totaal aantal gebruikers';
+
+  @override
+  String get adminVerifiedUsers => 'Geverifieerde gebruikers';
+
+  @override
+  String get adminProUsers => 'Pro-leden';
+
+  @override
+  String get adminTotalTrips => 'Totaal aantal reizen';
+
+  @override
+  String get adminTotalExpenses => 'Totale uitgaven';
+
+  @override
+  String get adminTotalDocs => 'Kluisdocumenten';
+
+  @override
+  String get adminTotalItems => 'Checklist-items';
+
+  @override
+  String get adminUserManagement => 'Gebruikersbeheer';
+
+  @override
+  String get adminSearchUsers => 'Zoek gebruikers op e-mail, naam of UID...';
+
+  @override
+  String get adminGrantPro => 'Pro toekennen';
+
+  @override
+  String get adminRevokePro => 'Pro intrekken';
+
+  @override
+  String get adminProStatusUpdated => 'Pro-status succesvol bijgewerkt';
+
+  @override
+  String get adminNoUsersFound => 'Geen gebruikers gevonden';
 }

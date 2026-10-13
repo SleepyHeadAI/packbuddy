@@ -1127,4 +1127,58 @@ class AppLocalizationsZh extends AppLocalizations {
   String notification24hBody(String destination) {
     return '最后的行李检查！请再次确认前往 $destination 的护照、机票和旅行必需品。';
   }
+
+  @override
+  String get adminDashboard => '管理员仪表板';
+
+  @override
+  String get adminDashboardDesc => '全局平台指标与用户管理';
+
+  @override
+  String get adminAccessRestricted => '访问受限';
+
+  @override
+  String get adminAccessRestrictedDesc => '此区域仅限授权管理员访问。';
+
+  @override
+  String get adminMetrics => '平台指标';
+
+  @override
+  String get adminTotalUsers => '用户总数';
+
+  @override
+  String get adminVerifiedUsers => '已验证用户';
+
+  @override
+  String get adminProUsers => 'Pro会员';
+
+  @override
+  String get adminTotalTrips => '旅行总数';
+
+  @override
+  String get adminTotalExpenses => '支出总数';
+
+  @override
+  String get adminTotalDocs => '保险箱文档';
+
+  @override
+  String get adminTotalItems => '清单物品';
+
+  @override
+  String get adminUserManagement => '用户管理';
+
+  @override
+  String get adminSearchUsers => '按邮箱、姓名或UID搜索用户...';
+
+  @override
+  String get adminGrantPro => '授予Pro';
+
+  @override
+  String get adminRevokePro => '撤销Pro';
+
+  @override
+  String get adminProStatusUpdated => 'Pro状态更新成功';
+
+  @override
+  String get adminNoUsersFound => '未找到用户';
 }

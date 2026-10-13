@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../data/local_db/database_helper.dart';
+import '../../../../data/sync_engine/sync_engine.dart';
 import '../../domain/packing_item.dart';
 import '../../domain/packing_templates.dart';
 import '../../domain/airline_baggage_guide.dart';
@@ -106,14 +107,21 @@ class ChecklistState {
 /// StateNotifier orchestrating packing checklist, item progress, and filtering
 class ChecklistNotifier extends StateNotifier<ChecklistState> {
   final DatabaseHelper _db;
+  final Ref? _ref;
   static const _uuid = Uuid();
 
-  ChecklistNotifier([DatabaseHelper? db, ChecklistState? initialState])
+  ChecklistNotifier([DatabaseHelper? db, ChecklistState? initialState, this._ref])
       : _db = db ?? DatabaseHelper.instance,
         super(initialState ?? const ChecklistState()) {
     if (initialState == null) {
       loadItems();
     }
+  }
+
+  void _triggerSync() {
+    try {
+      _ref?.read(syncEngineProvider.notifier).performSync();
+    } catch (_) {}
   }
 
   /// Seed initial representative travel items if database is empty
@@ -247,6 +255,7 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
 
     try {
       await _db.updateChecklistItem(updated);
+      _triggerSync();
     } catch (e) {
       // Revert on error
       newItems[index] = current;
@@ -275,6 +284,7 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
 
     try {
       await _db.updateChecklistItem(updated);
+      _triggerSync();
     } catch (e) {
       newItems[index] = current;
       state = state.copyWith(items: newItems, errorMessage: 'Adet güncellenemedi: $e');
@@ -295,6 +305,7 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
 
     try {
       await _db.updateChecklistItem(itemToSave);
+      _triggerSync();
     } catch (e) {
       newItems[index] = current;
       state = state.copyWith(items: newItems, errorMessage: 'Eşya güncellenemedi: $e');
@@ -313,6 +324,7 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
 
     try {
       await _db.deleteChecklistItem(id);
+      _triggerSync();
       return deleted;
     } catch (e) {
       // Revert
@@ -329,6 +341,7 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
 
     try {
       await _db.restoreChecklistItem(item.id);
+      _triggerSync();
     } catch (e) {
       state = state.copyWith(errorMessage: 'Geri alma başarısız: $e');
     }
@@ -341,6 +354,7 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
 
     try {
       await _db.insertChecklistItem(item);
+      _triggerSync();
     } catch (e) {
       newItems.removeWhere((i) => i.id == item.id);
       state = state.copyWith(items: newItems, errorMessage: 'Eşya eklenemedi: $e');
@@ -360,6 +374,7 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
         // Continue adding
       }
     }
+    _triggerSync();
   }
 
   /// Imports a pre-curated template into the active checklist.
@@ -394,6 +409,7 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
         await _db.insertChecklistItem(item);
       } catch (_) {}
     }
+    _triggerSync();
   }
 
   /// Category filter selection
@@ -439,5 +455,5 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
 /// Global provider for Checklist StateNotifier
 final checklistControllerProvider =
     StateNotifierProvider<ChecklistNotifier, ChecklistState>((ref) {
-  return ChecklistNotifier();
+  return ChecklistNotifier(null, null, ref);
 });

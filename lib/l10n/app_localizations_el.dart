@@ -1188,4 +1188,58 @@ class AppLocalizationsEl extends AppLocalizations {
   String notification24hBody(String destination) {
     return 'Τελικός έλεγχος αποσκευών! Ελέγξτε ξανά το διαβατήριο, τα εισιτήρια και τα απαραίτητα για $destination.';
   }
+
+  @override
+  String get adminDashboard => 'Πίνακας διαχειριστή';
+
+  @override
+  String get adminDashboardDesc => 'Συνολικά στατιστικά πλατφόρμας και διαχείριση χρηστών';
+
+  @override
+  String get adminAccessRestricted => 'Περιορισμένη πρόσβαση';
+
+  @override
+  String get adminAccessRestrictedDesc => 'Αυτή η περιοχή προορίζεται αυστηρά για εξουσιοδοτημένους διαχειριστές.';
+
+  @override
+  String get adminMetrics => 'Στατιστικά πλατφόρμας';
+
+  @override
+  String get adminTotalUsers => 'Σύνολο χρηστών';
+
+  @override
+  String get adminVerifiedUsers => 'Επαληθευμένοι χρήστες';
+
+  @override
+  String get adminProUsers => 'Μέλη Pro';
+
+  @override
+  String get adminTotalTrips => 'Σύνολο ταξιδιών';
+
+  @override
+  String get adminTotalExpenses => 'Συνολικά έξοδα';
+
+  @override
+  String get adminTotalDocs => 'Έγγραφα θησαυροφυλακίου';
+
+  @override
+  String get adminTotalItems => 'Αντικείμενα λίστας';
+
+  @override
+  String get adminUserManagement => 'Διαχείριση χρηστών';
+
+  @override
+  String get adminSearchUsers => 'Αναζήτηση χρηστών με email, όνομα ή UID...';
+
+  @override
+  String get adminGrantPro => 'Χορήγηση Pro';
+
+  @override
+  String get adminRevokePro => 'Ανάκληση Pro';
+
+  @override
+  String get adminProStatusUpdated => 'Η κατάσταση Pro ενημερώθηκε με επιτυχία';
+
+  @override
+  String get adminNoUsersFound => 'Δεν βρέθηκαν χρήστες';
 }

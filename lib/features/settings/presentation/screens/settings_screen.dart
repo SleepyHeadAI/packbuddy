@@ -13,6 +13,8 @@ import 'package:packbuddy/features/vault/presentation/controllers/vault_controll
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
+import 'package:packbuddy/features/admin/admin_service.dart';
+import 'package:packbuddy/features/admin/admin_dashboard_screen.dart';
 
 /// Complete Settings screen handling Language, Theme, Sync, and PackBuddy Pro
 class SettingsScreen extends ConsumerWidget {
@@ -27,6 +29,7 @@ class SettingsScreen extends ConsumerWidget {
     final proState = ref.watch(proSubscriptionProvider);
     final vaultState = ref.watch(vaultControllerProvider);
     final packingRemindersEnabled = ref.watch(packingRemindersProvider);
+    final isAdmin = ref.watch(isAdminProvider);
     final theme = Theme.of(context);
 
     return PopScope(
@@ -52,6 +55,20 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         children: [
+          // 0. Executive Admin Dashboard Entry (Strictly visible for authorized admin)
+          if (isAdmin) ...[
+            _AdminDashboardBanner(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const AdminDashboardScreen(),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 20),
+          ],
+
           // 1. PackBuddy Pro Banner
           _ProBanner(
             isPro: proState.isPro,
@@ -847,4 +864,111 @@ class _AccountSessionCard extends ConsumerWidget {
     );
   }
 }
+
+class _AdminDashboardBanner extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _AdminDashboardBanner({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return AppCard(
+      borderRadius: 22,
+      onTap: onTap,
+      backgroundColor: isDark
+          ? const Color(0xFF1E2638)
+          : const Color(0xFFF1F5FD),
+      border: BorderSide(
+        color: theme.colorScheme.primary.withValues(alpha: 0.35),
+        width: 1.5,
+      ),
+      padding: const EdgeInsets.all(18),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  theme.colorScheme.primary,
+                  theme.colorScheme.primary.withValues(alpha: 0.8),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.admin_panel_settings_rounded,
+              color: Colors.white,
+              size: 26,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      l10n.adminDashboard,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        'EXECUTIVE',
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w900,
+                          color: theme.colorScheme.primary,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  l10n.adminDashboardDesc,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Icon(
+            Icons.chevron_right_rounded,
+            color: theme.colorScheme.primary,
+            size: 24,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 

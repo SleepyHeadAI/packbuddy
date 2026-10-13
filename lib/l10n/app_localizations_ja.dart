@@ -1127,4 +1127,58 @@ class AppLocalizationsJa extends AppLocalizations {
   String notification24hBody(String destination) {
     return '最終パッキングチェック！$destinationのパスポート、チケット、必需品を再確認してください。';
   }
+
+  @override
+  String get adminDashboard => '管理者ダッシュボード';
+
+  @override
+  String get adminDashboardDesc => 'プラットフォーム全体の指標とユーザー管理';
+
+  @override
+  String get adminAccessRestricted => 'アクセス制限';
+
+  @override
+  String get adminAccessRestrictedDesc => 'このエリアは承認された管理者のみアクセス可能です。';
+
+  @override
+  String get adminMetrics => 'プラットフォーム指標';
+
+  @override
+  String get adminTotalUsers => '総ユーザー数';
+
+  @override
+  String get adminVerifiedUsers => '認証済みユーザー';
+
+  @override
+  String get adminProUsers => 'Proメンバー';
+
+  @override
+  String get adminTotalTrips => '総旅行数';
+
+  @override
+  String get adminTotalExpenses => '総支出数';
+
+  @override
+  String get adminTotalDocs => '保管書類数';
+
+  @override
+  String get adminTotalItems => '持ち物アイテム数';
+
+  @override
+  String get adminUserManagement => 'ユーザー管理';
+
+  @override
+  String get adminSearchUsers => 'メールアドレス、名前、UIDで検索...';
+
+  @override
+  String get adminGrantPro => 'Proを付与';
+
+  @override
+  String get adminRevokePro => 'Proを取り消し';
+
+  @override
+  String get adminProStatusUpdated => 'Proステータスを正常に更新しました';
+
+  @override
+  String get adminNoUsersFound => 'ユーザーが見つかりません';
 }

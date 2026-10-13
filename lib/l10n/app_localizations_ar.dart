@@ -1160,4 +1160,58 @@ class AppLocalizationsAr extends AppLocalizations {
   String notification24hBody(String destination) {
     return 'الفحص النهائي للحقيبة! تأكد من جواز سفرك وتذاكرك وأساسيات سفرك إلى $destination.';
   }
+
+  @override
+  String get adminDashboard => 'لوحة تحكم المسؤول';
+
+  @override
+  String get adminDashboardDesc => 'مقاييس المنصة العالمية وإدارة المستخدمين';
+
+  @override
+  String get adminAccessRestricted => 'الوصول مقيد';
+
+  @override
+  String get adminAccessRestrictedDesc => 'هذه المنطقة مخصصة حصرياً للمسؤولين المعتمدين.';
+
+  @override
+  String get adminMetrics => 'مقاييس المنصة';
+
+  @override
+  String get adminTotalUsers => 'إجمالي المستخدمين';
+
+  @override
+  String get adminVerifiedUsers => 'المستخدمون المؤكدون';
+
+  @override
+  String get adminProUsers => 'مشتركو Pro';
+
+  @override
+  String get adminTotalTrips => 'إجمالي الرحلات';
+
+  @override
+  String get adminTotalExpenses => 'إجمالي المصروفات';
+
+  @override
+  String get adminTotalDocs => 'مستندات الخزينة';
+
+  @override
+  String get adminTotalItems => 'عناصر القائمة';
+
+  @override
+  String get adminUserManagement => 'إدارة المستخدمين';
+
+  @override
+  String get adminSearchUsers => 'البحث بالبريد الإلكتروني أو الاسم أو المعرف...';
+
+  @override
+  String get adminGrantPro => 'منح Pro';
+
+  @override
+  String get adminRevokePro => 'إلغاء Pro';
+
+  @override
+  String get adminProStatusUpdated => 'تم تحديث حالة Pro بنجاح';
+
+  @override
+  String get adminNoUsersFound => 'لم يتم العثور على مستخدمين';
 }

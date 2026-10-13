@@ -1170,4 +1170,58 @@ class AppLocalizationsEn extends AppLocalizations {
   String notification24hBody(String destination) {
     return 'Final packing check! Double-check your passport, tickets, and travel essentials for $destination.';
   }
+
+  @override
+  String get adminDashboard => 'Admin Dashboard';
+
+  @override
+  String get adminDashboardDesc => 'Global platform metrics and user management';
+
+  @override
+  String get adminAccessRestricted => 'Access Restricted';
+
+  @override
+  String get adminAccessRestrictedDesc => 'This area is strictly reserved for authorized administrators.';
+
+  @override
+  String get adminMetrics => 'Platform Metrics';
+
+  @override
+  String get adminTotalUsers => 'Total Users';
+
+  @override
+  String get adminVerifiedUsers => 'Verified Users';
+
+  @override
+  String get adminProUsers => 'Pro Members';
+
+  @override
+  String get adminTotalTrips => 'Total Trips';
+
+  @override
+  String get adminTotalExpenses => 'Total Expenses';
+
+  @override
+  String get adminTotalDocs => 'Vault Documents';
+
+  @override
+  String get adminTotalItems => 'Checklist Items';
+
+  @override
+  String get adminUserManagement => 'User Management';
+
+  @override
+  String get adminSearchUsers => 'Search users by email, name or UID...';
+
+  @override
+  String get adminGrantPro => 'Grant Pro';
+
+  @override
+  String get adminRevokePro => 'Revoke Pro';
+
+  @override
+  String get adminProStatusUpdated => 'Pro status successfully updated';
+
+  @override
+  String get adminNoUsersFound => 'No users found';
 }

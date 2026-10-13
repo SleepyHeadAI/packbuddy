@@ -1172,4 +1172,58 @@ class AppLocalizationsVi extends AppLocalizations {
   String notification24hBody(String destination) {
     return 'Kiểm tra hành lý lần cuối! Hãy kiểm tra lại hộ chiếu, vé và đồ dùng cần thiết cho $destination.';
   }
+
+  @override
+  String get adminDashboard => 'Bảng điều khiển quản trị';
+
+  @override
+  String get adminDashboardDesc => 'Chỉ số nền tảng và quản lý người dùng';
+
+  @override
+  String get adminAccessRestricted => 'Truy cập bị hạn chế';
+
+  @override
+  String get adminAccessRestrictedDesc => 'Khu vực này chỉ dành riêng cho quản trị viên được ủy quyền.';
+
+  @override
+  String get adminMetrics => 'Chỉ số nền tảng';
+
+  @override
+  String get adminTotalUsers => 'Tổng số người dùng';
+
+  @override
+  String get adminVerifiedUsers => 'Người dùng đã xác minh';
+
+  @override
+  String get adminProUsers => 'Thành viên Pro';
+
+  @override
+  String get adminTotalTrips => 'Tổng chuyến đi';
+
+  @override
+  String get adminTotalExpenses => 'Tổng chi tiêu';
+
+  @override
+  String get adminTotalDocs => 'Tài liệu két an toàn';
+
+  @override
+  String get adminTotalItems => 'Vật dụng danh sách';
+
+  @override
+  String get adminUserManagement => 'Quản lý người dùng';
+
+  @override
+  String get adminSearchUsers => 'Tìm người dùng theo email, tên hoặc UID...';
+
+  @override
+  String get adminGrantPro => 'Cấp Pro';
+
+  @override
+  String get adminRevokePro => 'Hủy Pro';
+
+  @override
+  String get adminProStatusUpdated => 'Trạng thái Pro đã được cập nhật thành công';
+
+  @override
+  String get adminNoUsersFound => 'Không tìm thấy người dùng';
 }

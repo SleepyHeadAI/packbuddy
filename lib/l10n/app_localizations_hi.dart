@@ -1162,4 +1162,58 @@ class AppLocalizationsHi extends AppLocalizations {
   String notification24hBody(String destination) {
     return 'अंतिम पैकिंग जांच! $destination के लिए अपने पासपोर्ट, टिकट और यात्रा आवश्यक वस्तुओं की दोबारा जांच करें।';
   }
+
+  @override
+  String get adminDashboard => 'व्यवस्थापक डैशबोर्ड';
+
+  @override
+  String get adminDashboardDesc => 'वैश्विक प्लेटफ़ॉर्म मेट्रिक्स और उपयोगकर्ता प्रबंधन';
+
+  @override
+  String get adminAccessRestricted => 'पहुँच प्रतिबंधित';
+
+  @override
+  String get adminAccessRestrictedDesc => 'यह क्षेत्र केवल अधिकृत व्यवस्थापकों के लिए आरक्षित है।';
+
+  @override
+  String get adminMetrics => 'प्लेटफ़ॉर्म मेट्रिक्स';
+
+  @override
+  String get adminTotalUsers => 'कुल उपयोगकर्ता';
+
+  @override
+  String get adminVerifiedUsers => 'सत्यापित उपयोगकर्ता';
+
+  @override
+  String get adminProUsers => 'Pro सदस्य';
+
+  @override
+  String get adminTotalTrips => 'कुल यात्राएं';
+
+  @override
+  String get adminTotalExpenses => 'कुल खर्च';
+
+  @override
+  String get adminTotalDocs => 'वॉल्ट दस्तावेज़';
+
+  @override
+  String get adminTotalItems => 'चेकलिस्ट आइटम';
+
+  @override
+  String get adminUserManagement => 'उपयोगकर्ता प्रबंधन';
+
+  @override
+  String get adminSearchUsers => 'ईमेल, नाम या UID से खोजें...';
+
+  @override
+  String get adminGrantPro => 'Pro प्रदान करें';
+
+  @override
+  String get adminRevokePro => 'Pro रद्द करें';
+
+  @override
+  String get adminProStatusUpdated => 'Pro स्थिति सफलतापूर्वक अपडेट की गई';
+
+  @override
+  String get adminNoUsersFound => 'कोई उपयोगकर्ता नहीं मिला';
 }

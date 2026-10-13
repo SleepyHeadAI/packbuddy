@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import '../../core/services/preferences_service.dart';
 
 /// Contract defining authentication operations for PackBuddy
 abstract class AuthService {
@@ -35,18 +38,33 @@ abstract class AuthService {
 
   /// Reload current user profile from Firebase to refresh claims and emailVerified status
   Future<User?> reloadUser();
+
+  /// Upsert user profile document in Firestore at `users/{uid}` for admin dashboard & reporting
+  Future<void> syncUserProfile(User user);
 }
 
 /// Firebase implementation of [AuthService]
 class FirebaseAuthService implements AuthService {
   FirebaseAuth? _auth;
   final GoogleSignIn _googleSignIn;
+  final FirebaseFirestore? _firestore;
 
   FirebaseAuthService({
     FirebaseAuth? firebaseAuth,
     GoogleSignIn? googleSignIn,
+    FirebaseFirestore? firestore,
   })  : _auth = firebaseAuth,
-        _googleSignIn = googleSignIn ?? GoogleSignIn();
+        _googleSignIn = googleSignIn ?? GoogleSignIn(),
+        // ignore: prefer_initializing_formals
+        _firestore = firestore;
+
+  bool get _isFirebaseReady {
+    try {
+      return Firebase.apps.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
 
   FirebaseAuth get _firebaseAuth {
     try {
@@ -82,10 +100,14 @@ class FirebaseAuthService implements AuthService {
     required String password,
   }) async {
     try {
-      return await _firebaseAuth.signInWithEmailAndPassword(
+      final credential = await _firebaseAuth.signInWithEmailAndPassword(
         email: email.trim(),
         password: password,
       );
+      if (credential.user != null) {
+        unawaited(syncUserProfile(credential.user!));
+      }
+      return credential;
     } on FirebaseAuthException {
       rethrow;
     } catch (e) {
@@ -114,6 +136,10 @@ class FirebaseAuthService implements AuthService {
         debugPrint('[FirebaseAuthService] sendEmailVerification warning: $verificationError');
       }
 
+      if (credential.user != null) {
+        unawaited(syncUserProfile(credential.user!));
+      }
+
       return credential;
     } on FirebaseAuthException {
       rethrow;
@@ -140,7 +166,11 @@ class FirebaseAuthService implements AuthService {
         idToken: googleAuth.idToken,
       );
 
-      return await _firebaseAuth.signInWithCredential(credential);
+      final userCredential = await _firebaseAuth.signInWithCredential(credential);
+      if (userCredential.user != null) {
+        unawaited(syncUserProfile(userCredential.user!));
+      }
+      return userCredential;
     } on FirebaseAuthException {
       rethrow;
     } catch (e) {
@@ -189,11 +219,76 @@ class FirebaseAuthService implements AuthService {
       final user = _firebaseAuth.currentUser;
       if (user != null) {
         await user.reload();
+        final refreshed = _firebaseAuth.currentUser;
+        if (refreshed != null) {
+          unawaited(syncUserProfile(refreshed));
+        }
+        return refreshed;
       }
       return _firebaseAuth.currentUser;
     } catch (e) {
       debugPrint('[FirebaseAuthService] reloadUser notice: $e');
       return _firebaseAuth.currentUser;
+    }
+  }
+
+  @override
+  Future<void> syncUserProfile(User user) async {
+    try {
+      if (!_isFirebaseReady && _firestore == null) {
+        return;
+      }
+      final firestore = _firestore ?? FirebaseFirestore.instance;
+
+      String provider = 'password';
+      try {
+        if (user.providerData.isNotEmpty) {
+          provider = user.providerData.first.providerId;
+        }
+      } catch (_) {}
+
+      final isPremium = PreferencesService.instance.isProUser();
+      final now = DateTime.now().toIso8601String();
+      String createdAt = now;
+      try {
+        if (user.metadata.creationTime != null) {
+          createdAt = user.metadata.creationTime!.toIso8601String();
+        }
+      } catch (_) {}
+
+      String? email;
+      try {
+        email = user.email;
+      } catch (_) {}
+
+      String? displayName;
+      try {
+        displayName = user.displayName;
+      } catch (_) {}
+
+      String? photoUrl;
+      try {
+        photoUrl = user.photoURL;
+      } catch (_) {}
+
+      bool emailVerified = false;
+      try {
+        emailVerified = user.emailVerified;
+      } catch (_) {}
+
+      await firestore.collection('users').doc(user.uid).set({
+        'uid': user.uid,
+        'email': email,
+        'displayName': displayName,
+        'photoUrl': photoUrl,
+        'provider': provider,
+        'emailVerified': emailVerified,
+        'createdAt': createdAt,
+        'lastLoginAt': now,
+        'isPremium': isPremium,
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('[FirebaseAuthService] syncUserProfile notice: $e');
     }
   }
 }

@@ -147,6 +147,15 @@ class MockAuthService implements AuthService {
     return _current;
   }
 
+  bool syncUserProfileCalled = false;
+  User? syncedUser;
+
+  @override
+  Future<void> syncUserProfile(User user) async {
+    syncUserProfileCalled = true;
+    syncedUser = user;
+  }
+
   void dispose() {
     _controller.close();
   }
@@ -218,6 +227,49 @@ void main() {
       expect(service.reloadUserCalled, isTrue);
       expect(controller.state.isEmailVerified, isTrue);
       expect(controller.state.requiresEmailVerification, isFalse);
+    });
+
+    test('signUpWithEmail triggers syncUserProfile', () async {
+      final controller = AuthController(mockAuthService);
+      mockAuthService.syncUserProfileCalled = false;
+
+      final success = await controller.signUpWithEmail(
+        email: 'user@packbuddy.com',
+        password: 'Password123',
+      );
+
+      expect(success, isTrue);
+      expect(mockAuthService.syncUserProfileCalled, isTrue);
+      expect(mockAuthService.syncedUser?.email, 'user@packbuddy.com');
+    });
+
+    test('signInWithEmail triggers syncUserProfile', () async {
+      final controller = AuthController(mockAuthService);
+      mockAuthService.syncUserProfileCalled = false;
+
+      final success = await controller.signInWithEmail(
+        email: 'login@packbuddy.com',
+        password: 'Password123',
+      );
+
+      expect(success, isTrue);
+      expect(mockAuthService.syncUserProfileCalled, isTrue);
+      expect(mockAuthService.syncedUser?.email, 'login@packbuddy.com');
+    });
+
+    test('reloadUser triggers syncUserProfile when user reloads', () async {
+      final verifiedUser = FakeUser(
+        uid: 'uid-verified-1',
+        email: 'verified@packbuddy.com',
+        emailVerified: true,
+      );
+      final service = MockAuthService(initialUser: verifiedUser);
+      final controller = AuthController(service);
+      service.syncUserProfileCalled = false;
+
+      await controller.reloadUser();
+      expect(service.syncUserProfileCalled, isTrue);
+      expect(service.syncedUser?.uid, 'uid-verified-1');
     });
   });
 

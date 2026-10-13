@@ -1170,4 +1170,58 @@ class AppLocalizationsSv extends AppLocalizations {
   String notification24hBody(String destination) {
     return 'Sista packningskontrollen! Dubbelkolla pass, biljetter och det viktigaste för $destination.';
   }
+
+  @override
+  String get adminDashboard => 'Administratörspanel';
+
+  @override
+  String get adminDashboardDesc => 'Globala plattformsmått och användarhantering';
+
+  @override
+  String get adminAccessRestricted => 'Åtkomst begränsad';
+
+  @override
+  String get adminAccessRestrictedDesc => 'Detta område är strikt reserverat för auktoriserade administratörer.';
+
+  @override
+  String get adminMetrics => 'Plattformsmått';
+
+  @override
+  String get adminTotalUsers => 'Totalt antal användare';
+
+  @override
+  String get adminVerifiedUsers => 'Verifierade användare';
+
+  @override
+  String get adminProUsers => 'Pro-medlemmar';
+
+  @override
+  String get adminTotalTrips => 'Totalt antal resor';
+
+  @override
+  String get adminTotalExpenses => 'Totala utgifter';
+
+  @override
+  String get adminTotalDocs => 'Valvdokument';
+
+  @override
+  String get adminTotalItems => 'Checklisteartiklar';
+
+  @override
+  String get adminUserManagement => 'Användarhantering';
+
+  @override
+  String get adminSearchUsers => 'Sök användare via e-post, namn eller UID...';
+
+  @override
+  String get adminGrantPro => 'Bevilja Pro';
+
+  @override
+  String get adminRevokePro => 'Återkalla Pro';
+
+  @override
+  String get adminProStatusUpdated => 'Pro-status har uppdaterats';
+
+  @override
+  String get adminNoUsersFound => 'Inga användare hittades';
 }

@@ -1127,4 +1127,58 @@ class AppLocalizationsKo extends AppLocalizations {
   String notification24hBody(String destination) {
     return '최종 짐 확인! $destination 여행을 위한 여권, 티켓, 필수품을 다시 한번 확인하세요.';
   }
+
+  @override
+  String get adminDashboard => '관리자 대시보드';
+
+  @override
+  String get adminDashboardDesc => '플랫폼 지표 및 사용자 관리';
+
+  @override
+  String get adminAccessRestricted => '접근 제한됨';
+
+  @override
+  String get adminAccessRestrictedDesc => '이 영역은 승인된 관리자 전용입니다.';
+
+  @override
+  String get adminMetrics => '플랫폼 지표';
+
+  @override
+  String get adminTotalUsers => '총 사용자';
+
+  @override
+  String get adminVerifiedUsers => '인증된 사용자';
+
+  @override
+  String get adminProUsers => 'Pro 회원';
+
+  @override
+  String get adminTotalTrips => '총 여행';
+
+  @override
+  String get adminTotalExpenses => '총 지출';
+
+  @override
+  String get adminTotalDocs => '금고 문서';
+
+  @override
+  String get adminTotalItems => '체크리스트 항목';
+
+  @override
+  String get adminUserManagement => '사용자 관리';
+
+  @override
+  String get adminSearchUsers => '이메일, 이름 또는 UID로 검색...';
+
+  @override
+  String get adminGrantPro => 'Pro 부여';
+
+  @override
+  String get adminRevokePro => 'Pro 해제';
+
+  @override
+  String get adminProStatusUpdated => 'Pro 상태가 성공적으로 업데이트되었습니다';
+
+  @override
+  String get adminNoUsersFound => '사용자를 찾을 수 없습니다';
 }

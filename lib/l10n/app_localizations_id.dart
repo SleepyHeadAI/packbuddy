@@ -1176,4 +1176,58 @@ class AppLocalizationsId extends AppLocalizations {
   String notification24hBody(String destination) {
     return 'Pemeriksaan persiapan terakhir! Periksa kembali paspor, tiket, dan barang penting untuk $destination.';
   }
+
+  @override
+  String get adminDashboard => 'Dasbor Admin';
+
+  @override
+  String get adminDashboardDesc => 'Metrik platform global dan manajemen pengguna';
+
+  @override
+  String get adminAccessRestricted => 'Akses Dibatasi';
+
+  @override
+  String get adminAccessRestrictedDesc => 'Area ini hanya ditujukan untuk administrator resmi.';
+
+  @override
+  String get adminMetrics => 'Metrik Platform';
+
+  @override
+  String get adminTotalUsers => 'Total Pengguna';
+
+  @override
+  String get adminVerifiedUsers => 'Pengguna Terverifikasi';
+
+  @override
+  String get adminProUsers => 'Anggota Pro';
+
+  @override
+  String get adminTotalTrips => 'Total Perjalanan';
+
+  @override
+  String get adminTotalExpenses => 'Total Pengeluaran';
+
+  @override
+  String get adminTotalDocs => 'Dokumen Brankas';
+
+  @override
+  String get adminTotalItems => 'Item Daftar Periksa';
+
+  @override
+  String get adminUserManagement => 'Manajemen Pengguna';
+
+  @override
+  String get adminSearchUsers => 'Cari pengguna berdasarkan email, nama, atau UID...';
+
+  @override
+  String get adminGrantPro => 'Berikan Pro';
+
+  @override
+  String get adminRevokePro => 'Cabut Pro';
+
+  @override
+  String get adminProStatusUpdated => 'Status Pro berhasil diperbarui';
+
+  @override
+  String get adminNoUsersFound => 'Pengguna tidak ditemukan';
 }

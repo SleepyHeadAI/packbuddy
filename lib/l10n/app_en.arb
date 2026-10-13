@@ -1515,5 +1515,77 @@
         "example": "Tokyo"
       }
     }
+  },
+  "adminDashboard": "Admin Dashboard",
+  "@adminDashboard": {
+    "description": "Admin dashboard string: adminDashboard"
+  },
+  "adminDashboardDesc": "Global platform metrics and user management",
+  "@adminDashboardDesc": {
+    "description": "Admin dashboard string: adminDashboardDesc"
+  },
+  "adminAccessRestricted": "Access Restricted",
+  "@adminAccessRestricted": {
+    "description": "Admin dashboard string: adminAccessRestricted"
+  },
+  "adminAccessRestrictedDesc": "This area is strictly reserved for authorized administrators.",
+  "@adminAccessRestrictedDesc": {
+    "description": "Admin dashboard string: adminAccessRestrictedDesc"
+  },
+  "adminMetrics": "Platform Metrics",
+  "@adminMetrics": {
+    "description": "Admin dashboard string: adminMetrics"
+  },
+  "adminTotalUsers": "Total Users",
+  "@adminTotalUsers": {
+    "description": "Admin dashboard string: adminTotalUsers"
+  },
+  "adminVerifiedUsers": "Verified Users",
+  "@adminVerifiedUsers": {
+    "description": "Admin dashboard string: adminVerifiedUsers"
+  },
+  "adminProUsers": "Pro Members",
+  "@adminProUsers": {
+    "description": "Admin dashboard string: adminProUsers"
+  },
+  "adminTotalTrips": "Total Trips",
+  "@adminTotalTrips": {
+    "description": "Admin dashboard string: adminTotalTrips"
+  },
+  "adminTotalExpenses": "Total Expenses",
+  "@adminTotalExpenses": {
+    "description": "Admin dashboard string: adminTotalExpenses"
+  },
+  "adminTotalDocs": "Vault Documents",
+  "@adminTotalDocs": {
+    "description": "Admin dashboard string: adminTotalDocs"
+  },
+  "adminTotalItems": "Checklist Items",
+  "@adminTotalItems": {
+    "description": "Admin dashboard string: adminTotalItems"
+  },
+  "adminUserManagement": "User Management",
+  "@adminUserManagement": {
+    "description": "Admin dashboard string: adminUserManagement"
+  },
+  "adminSearchUsers": "Search users by email, name or UID...",
+  "@adminSearchUsers": {
+    "description": "Admin dashboard string: adminSearchUsers"
+  },
+  "adminGrantPro": "Grant Pro",
+  "@adminGrantPro": {
+    "description": "Admin dashboard string: adminGrantPro"
+  },
+  "adminRevokePro": "Revoke Pro",
+  "@adminRevokePro": {
+    "description": "Admin dashboard string: adminRevokePro"
+  },
+  "adminProStatusUpdated": "Pro status successfully updated",
+  "@adminProStatusUpdated": {
+    "description": "Admin dashboard string: adminProStatusUpdated"
+  },
+  "adminNoUsersFound": "No users found",
+  "@adminNoUsersFound": {
+    "description": "Admin dashboard string: adminNoUsersFound"
   }
 }

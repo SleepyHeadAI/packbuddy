@@ -14,6 +14,7 @@ import 'features/auth/auth_controller.dart';
 import 'features/auth/auth_screen.dart';
 import 'features/auth/presentation/screens/email_verification_screen.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
+import 'data/sync_engine/sync_engine.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,11 +47,41 @@ void main() async {
   );
 }
 
-class PackBuddyApp extends ConsumerWidget {
+class PackBuddyApp extends ConsumerStatefulWidget {
   const PackBuddyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PackBuddyApp> createState() => _PackBuddyAppState();
+}
+
+class _PackBuddyAppState extends ConsumerState<PackBuddyApp>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      final user = ref.read(authUserProvider);
+      final isVerified = ref.read(isEmailVerifiedProvider);
+      final isPassword = ref.read(authControllerProvider).isPasswordProvider;
+      if (user != null && (isVerified || !isPassword)) {
+        ref.read(syncEngineProvider.notifier).performSync().catchError((_) {});
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final activeLocale = ref.watch(localeProvider);
     final activeThemeMode = ref.watch(themeModeProvider);
 

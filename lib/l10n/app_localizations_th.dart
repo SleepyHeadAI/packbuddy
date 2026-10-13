@@ -1165,4 +1165,58 @@ class AppLocalizationsTh extends AppLocalizations {
   String notification24hBody(String destination) {
     return 'ตรวจสอบการจัดกระเป๋าครั้งสุดท้าย! ตรวจสอบหนังสือเดินทาง ตั๋ว และของใช้จำเป็นสำหรับ $destination อีกครั้ง';
   }
+
+  @override
+  String get adminDashboard => 'แดชบอร์ดผู้ดูแลระบบ';
+
+  @override
+  String get adminDashboardDesc => 'ข้อมูลสถิติแพลตฟอร์มและการจัดการผู้ใช้';
+
+  @override
+  String get adminAccessRestricted => 'จำกัดการเข้าถึง';
+
+  @override
+  String get adminAccessRestrictedDesc => 'พื้นที่นี้สงวนไว้สำหรับผู้ดูแลระบบที่ได้รับอนุญาตเท่านั้น';
+
+  @override
+  String get adminMetrics => 'สถิติแพลตฟอร์ม';
+
+  @override
+  String get adminTotalUsers => 'ผู้ใช้ทั้งหมด';
+
+  @override
+  String get adminVerifiedUsers => 'ผู้ใช้ที่ยืนยันแล้ว';
+
+  @override
+  String get adminProUsers => 'สมาชิก Pro';
+
+  @override
+  String get adminTotalTrips => 'การเดินทางทั้งหมด';
+
+  @override
+  String get adminTotalExpenses => 'ค่าใช้จ่ายทั้งหมด';
+
+  @override
+  String get adminTotalDocs => 'เอกสารนิรภัย';
+
+  @override
+  String get adminTotalItems => 'รายการสัมภาระ';
+
+  @override
+  String get adminUserManagement => 'การจัดการผู้ใช้';
+
+  @override
+  String get adminSearchUsers => 'ค้นหาผู้ใช้ตามอีเมล ชื่อ หรือ UID...';
+
+  @override
+  String get adminGrantPro => 'ให้สิทธิ์ Pro';
+
+  @override
+  String get adminRevokePro => 'ยกเลิกสิทธิ์ Pro';
+
+  @override
+  String get adminProStatusUpdated => 'อัปเดตสถานะ Pro สำเร็จแล้ว';
+
+  @override
+  String get adminNoUsersFound => 'ไม่พบผู้ใช้';
 }

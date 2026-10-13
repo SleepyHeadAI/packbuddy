@@ -30,19 +30,40 @@ class DashboardScreen extends ConsumerStatefulWidget {
   ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+class _DashboardScreenState extends ConsumerState<DashboardScreen>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    // Automatic Cloud Sync & Local DB Refresh on Dashboard launch
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await ref.read(syncEngineProvider.notifier).performSync();
+    WidgetsBinding.instance.addObserver(this);
+    // Automatic Cloud Sync & Local DB Refresh on Dashboard launch (non-blocking)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _triggerSyncAndRefresh();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _triggerSyncAndRefresh();
+    }
+  }
+
+  void _triggerSyncAndRefresh() {
+    // Non-blocking automatic cloud sync
+    ref.read(syncEngineProvider.notifier).performSync().then((_) {
       if (mounted) {
         ref.read(tripControllerProvider.notifier).loadTrips();
         ref.read(vaultControllerProvider.notifier).loadDocuments();
         ref.read(checklistControllerProvider.notifier).loadItems();
       }
-    });
+    }).catchError((_) {});
   }
 
   String _getTimeBasedGreeting(AppLocalizations l10n) {

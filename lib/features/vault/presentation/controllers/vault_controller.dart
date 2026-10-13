@@ -188,7 +188,9 @@ class VaultController extends StateNotifier<VaultState> {
       );
 
       // 6. Trigger background two-way sync
-      _ref.read(syncEngineProvider.notifier).performSync();
+      try {
+        _ref.read(syncEngineProvider.notifier).performSync();
+      } catch (_) {}
 
       return newDoc;
     } catch (e) {
@@ -249,7 +251,9 @@ class VaultController extends StateNotifier<VaultState> {
       state = state.copyWith(
         documents: [newDoc, ...state.documents],
       );
-      _ref.read(syncEngineProvider.notifier).performSync();
+      try {
+        _ref.read(syncEngineProvider.notifier).performSync();
+      } catch (_) {}
       return newDoc;
     } catch (e) {
       state = state.copyWith(errorMessage: e.toString());
@@ -264,8 +268,37 @@ class VaultController extends StateNotifier<VaultState> {
       state = state.copyWith(
         documents: [doc, ...state.documents],
       );
-      _ref.read(syncEngineProvider.notifier).performSync();
+      try {
+        _ref.read(syncEngineProvider.notifier).performSync();
+      } catch (_) {}
       return doc;
+    } catch (e) {
+      state = state.copyWith(errorMessage: e.toString());
+      return null;
+    }
+  }
+
+  /// Updates an existing document in SQLite and triggers background sync
+  Future<Document?> updateDocument(Document updated) async {
+    try {
+      final docToSave = updated.copyWith(updatedAt: DateTime.now());
+      await _dbHelper.updateDocument(docToSave);
+
+      final index = state.documents.indexWhere((d) => d.id == updated.id);
+      final updatedList = List<Document>.from(state.documents);
+      if (index != -1) {
+        updatedList[index] = docToSave;
+      } else {
+        updatedList.insert(0, docToSave);
+      }
+
+      state = state.copyWith(documents: updatedList);
+
+      try {
+        _ref.read(syncEngineProvider.notifier).performSync();
+      } catch (_) {}
+
+      return docToSave;
     } catch (e) {
       state = state.copyWith(errorMessage: e.toString());
       return null;
@@ -281,7 +314,9 @@ class VaultController extends StateNotifier<VaultState> {
         documents: state.documents.where((d) => d.id != docId).toList(),
       );
 
-      _ref.read(syncEngineProvider.notifier).performSync();
+      try {
+        _ref.read(syncEngineProvider.notifier).performSync();
+      } catch (_) {}
       return true;
     } catch (e) {
       state = state.copyWith(errorMessage: e.toString());
@@ -296,7 +331,9 @@ class VaultController extends StateNotifier<VaultState> {
       state = state.copyWith(
         documents: [doc, ...state.documents],
       );
-      _ref.read(syncEngineProvider.notifier).performSync();
+      try {
+        _ref.read(syncEngineProvider.notifier).performSync();
+      } catch (_) {}
       return true;
     } catch (e) {
       state = state.copyWith(errorMessage: e.toString());

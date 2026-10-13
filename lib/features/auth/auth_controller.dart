@@ -90,6 +90,9 @@ class AuthController extends StateNotifier<AuthState> {
   void _init() {
     _authSubscription = _authService.authStateChanges.listen(
       (user) {
+        if (user != null) {
+          _authService.syncUserProfile(user).catchError((_) {});
+        }
         state = state.copyWith(
           user: user,
           clearUser: user == null,
@@ -125,6 +128,9 @@ class AuthController extends StateNotifier<AuthState> {
         email: email,
         password: password,
       );
+      if (credential.user != null) {
+        _authService.syncUserProfile(credential.user!).catchError((_) {});
+      }
       state = state.copyWith(
         user: credential.user,
         isLoading: false,
@@ -151,6 +157,9 @@ class AuthController extends StateNotifier<AuthState> {
         email: email,
         password: password,
       );
+      if (credential.user != null) {
+        _authService.syncUserProfile(credential.user!).catchError((_) {});
+      }
       state = state.copyWith(
         user: credential.user,
         isLoading: false,
@@ -176,6 +185,9 @@ class AuthController extends StateNotifier<AuthState> {
         state = state.copyWith(isLoading: false);
         return false;
       }
+      if (credential.user != null) {
+        _authService.syncUserProfile(credential.user!).catchError((_) {});
+      }
       state = state.copyWith(
         user: credential.user,
         isLoading: false,
@@ -195,6 +207,9 @@ class AuthController extends StateNotifier<AuthState> {
   Future<bool> reloadUser() async {
     try {
       final updatedUser = await _authService.reloadUser();
+      if (updatedUser != null) {
+        _authService.syncUserProfile(updatedUser).catchError((_) {});
+      }
       state = state.copyWith(
         user: updatedUser,
         clearUser: updatedUser == null,

@@ -132,7 +132,9 @@ class ExpenseController extends StateNotifier<ExpenseState> {
       );
 
       // Trigger background two-way sync
-      _ref.read(syncEngineProvider.notifier).performSync();
+      try {
+        _ref.read(syncEngineProvider.notifier).performSync();
+      } catch (_) {}
 
       return newExpense;
     } catch (e) {
@@ -173,7 +175,9 @@ class ExpenseController extends StateNotifier<ExpenseState> {
       );
 
       // Trigger background two-way sync
-      _ref.read(syncEngineProvider.notifier).performSync();
+      try {
+        _ref.read(syncEngineProvider.notifier).performSync();
+      } catch (_) {}
 
       return expenseToSave;
     } catch (e) {
@@ -205,7 +209,9 @@ class ExpenseController extends StateNotifier<ExpenseState> {
       );
 
       // Trigger background two-way sync
-      _ref.read(syncEngineProvider.notifier).performSync();
+      try {
+        _ref.read(syncEngineProvider.notifier).performSync();
+      } catch (_) {}
 
       return true;
     } catch (e) {
@@ -237,7 +243,9 @@ class ExpenseController extends StateNotifier<ExpenseState> {
       );
 
       // Trigger background two-way sync
-      _ref.read(syncEngineProvider.notifier).performSync();
+      try {
+        _ref.read(syncEngineProvider.notifier).performSync();
+      } catch (_) {}
 
       return true;
     } catch (e) {

@@ -36,6 +36,9 @@ class FakeVaultController extends StateNotifier<VaultState> implements VaultCont
   Future<Document?> addDocument(Document doc) async => doc;
 
   @override
+  Future<Document?> updateDocument(Document updated) async => updated;
+
+  @override
   Future<bool> deleteDocument(String docId) async => true;
 
   @override

@@ -1175,4 +1175,58 @@ class AppLocalizationsPl extends AppLocalizations {
   String notification24hBody(String destination) {
     return 'Ostateczne sprawdzenie bagażu! Upewnij się, że masz paszport, bilety i niezbędne rzeczy do $destination.';
   }
+
+  @override
+  String get adminDashboard => 'Panel administratora';
+
+  @override
+  String get adminDashboardDesc => 'Globalne statystyki platformy i zarządzanie użytkownikami';
+
+  @override
+  String get adminAccessRestricted => 'Dostęp ograniczony';
+
+  @override
+  String get adminAccessRestrictedDesc => 'Ten obszar jest ściśle zarezerwowany dla upoważnionych administratorów.';
+
+  @override
+  String get adminMetrics => 'Statystyki platformy';
+
+  @override
+  String get adminTotalUsers => 'Wszyscy użytkownicy';
+
+  @override
+  String get adminVerifiedUsers => 'Zweryfikowani użytkownicy';
+
+  @override
+  String get adminProUsers => 'Subskrybenci Pro';
+
+  @override
+  String get adminTotalTrips => 'Wszystkie podróże';
+
+  @override
+  String get adminTotalExpenses => 'Wszystkie wydatki';
+
+  @override
+  String get adminTotalDocs => 'Dokumenty w sejfie';
+
+  @override
+  String get adminTotalItems => 'Rzeczy na liście';
+
+  @override
+  String get adminUserManagement => 'Zarządzanie użytkownikami';
+
+  @override
+  String get adminSearchUsers => 'Szukaj użytkowników po emailu, nazwie lub UID...';
+
+  @override
+  String get adminGrantPro => 'Przyznaj Pro';
+
+  @override
+  String get adminRevokePro => 'Odbierz Pro';
+
+  @override
+  String get adminProStatusUpdated => 'Status Pro zaktualizowany pomyślnie';
+
+  @override
+  String get adminNoUsersFound => 'Nie znaleziono użytkowników';
 }

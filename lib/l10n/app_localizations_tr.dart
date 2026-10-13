@@ -1178,4 +1178,58 @@ class AppLocalizationsTr extends AppLocalizations {
   String notification24hBody(String destination) {
     return 'Son kontroller! $destination seyahatiniz yarın başlıyor. Pasaport, bilet ve seyahat eşyalarınızı aldınız mı?';
   }
+
+  @override
+  String get adminDashboard => 'Yönetici Paneli';
+
+  @override
+  String get adminDashboardDesc => 'Genel platform metrikleri ve kullanıcı yönetimi';
+
+  @override
+  String get adminAccessRestricted => 'Erişim Kısıtlandı';
+
+  @override
+  String get adminAccessRestrictedDesc => 'Bu alan yalnızca yetkili yöneticiler için ayrılmıştır.';
+
+  @override
+  String get adminMetrics => 'Platform Metrikleri';
+
+  @override
+  String get adminTotalUsers => 'Toplam Kullanıcı';
+
+  @override
+  String get adminVerifiedUsers => 'Doğrulanmış Kullanıcı';
+
+  @override
+  String get adminProUsers => 'Pro Üyeler';
+
+  @override
+  String get adminTotalTrips => 'Toplam Seyahat';
+
+  @override
+  String get adminTotalExpenses => 'Toplam Harcama';
+
+  @override
+  String get adminTotalDocs => 'Kasa Belgeleri';
+
+  @override
+  String get adminTotalItems => 'Liste Eşyaları';
+
+  @override
+  String get adminUserManagement => 'Kullanıcı Yönetimi';
+
+  @override
+  String get adminSearchUsers => 'E-posta, isim veya UID ile ara...';
+
+  @override
+  String get adminGrantPro => 'Pro Tanımla';
+
+  @override
+  String get adminRevokePro => 'Pro İptal Et';
+
+  @override
+  String get adminProStatusUpdated => 'Pro durumu başarıyla güncellendi';
+
+  @override
+  String get adminNoUsersFound => 'Kullanıcı bulunamadı';
 }

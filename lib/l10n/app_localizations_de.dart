@@ -1179,4 +1179,58 @@ class AppLocalizationsDe extends AppLocalizations {
   String notification24hBody(String destination) {
     return 'Letzter Pack-Check! Überprüfe deinen Reisepass, Tickets und Reiseutensilien für $destination.';
   }
+
+  @override
+  String get adminDashboard => 'Admin-Dashboard';
+
+  @override
+  String get adminDashboardDesc => 'Globale Plattformmetriken und Benutzerverwaltung';
+
+  @override
+  String get adminAccessRestricted => 'Zugriff eingeschränkt';
+
+  @override
+  String get adminAccessRestrictedDesc => 'Dieser Bereich ist ausschließlich autorisierten Administratoren vorbehalten.';
+
+  @override
+  String get adminMetrics => 'Plattformmetriken';
+
+  @override
+  String get adminTotalUsers => 'Gesamte Benutzer';
+
+  @override
+  String get adminVerifiedUsers => 'Verifizierte Benutzer';
+
+  @override
+  String get adminProUsers => 'Pro-Mitglieder';
+
+  @override
+  String get adminTotalTrips => 'Gesamte Reisen';
+
+  @override
+  String get adminTotalExpenses => 'Gesamte Ausgaben';
+
+  @override
+  String get adminTotalDocs => 'Tresor-Dokumente';
+
+  @override
+  String get adminTotalItems => 'Packlisten-Artikel';
+
+  @override
+  String get adminUserManagement => 'Benutzerverwaltung';
+
+  @override
+  String get adminSearchUsers => 'Benutzer nach E-Mail, Name oder UID suchen...';
+
+  @override
+  String get adminGrantPro => 'Pro erteilen';
+
+  @override
+  String get adminRevokePro => 'Pro widerrufen';
+
+  @override
+  String get adminProStatusUpdated => 'Pro-Status erfolgreich aktualisiert';
+
+  @override
+  String get adminNoUsersFound => 'Keine Benutzer gefunden';
 }

@@ -1175,4 +1175,58 @@ class AppLocalizationsRu extends AppLocalizations {
   String notification24hBody(String destination) {
     return 'Финальная проверка багажа! Проверьте паспорт, билеты и всё необходимое для поездки в $destination.';
   }
+
+  @override
+  String get adminDashboard => 'Панель администратора';
+
+  @override
+  String get adminDashboardDesc => 'Глобальные метрики платформы и управление пользователями';
+
+  @override
+  String get adminAccessRestricted => 'Доступ ограничен';
+
+  @override
+  String get adminAccessRestrictedDesc => 'Эта зона строго предназначена только для авторизованных администраторов.';
+
+  @override
+  String get adminMetrics => 'Метрики платформы';
+
+  @override
+  String get adminTotalUsers => 'Всего пользователей';
+
+  @override
+  String get adminVerifiedUsers => 'Подтвержденные пользователи';
+
+  @override
+  String get adminProUsers => 'Pro-пользователи';
+
+  @override
+  String get adminTotalTrips => 'Всего поездок';
+
+  @override
+  String get adminTotalExpenses => 'Всего расходов';
+
+  @override
+  String get adminTotalDocs => 'Документы сейфа';
+
+  @override
+  String get adminTotalItems => 'Вещи в списках';
+
+  @override
+  String get adminUserManagement => 'Управление пользователями';
+
+  @override
+  String get adminSearchUsers => 'Поиск по email, имени или UID...';
+
+  @override
+  String get adminGrantPro => 'Выдать Pro';
+
+  @override
+  String get adminRevokePro => 'Отозвать Pro';
+
+  @override
+  String get adminProStatusUpdated => 'Статус Pro успешно обновлен';
+
+  @override
+  String get adminNoUsersFound => 'Пользователи не найдены';
 }
