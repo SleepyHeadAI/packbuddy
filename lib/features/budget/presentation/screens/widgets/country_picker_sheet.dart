@@ -84,11 +84,11 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
           // Drag handle
           Center(
             child: Container(
-              width: 40,
-              height: 4,
+              width: 44,
+              height: 4.5,
               decoration: BoxDecoration(
-                color: theme.colorScheme.outlineVariant,
-                borderRadius: BorderRadius.circular(2),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(3),
               ),
             ),
           ),

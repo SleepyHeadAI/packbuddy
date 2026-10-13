@@ -122,11 +122,42 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
           title: FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
-            child: Text(
-              widget.tripTitle != null
-                  ? '${widget.tripTitle} - ${l10n.luggageAndChecklist}'
-                  : l10n.baggageAndChecklist,
-              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 17),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (widget.tripTitle == null) ...[
+                  Hero(
+                    tag: 'checklist-hero-badge',
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      margin: const EdgeInsets.only(right: 8),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.luggage_rounded,
+                        color: theme.colorScheme.primary,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+                ],
+                Hero(
+                  tag: widget.tripTitle != null
+                      ? 'trip-checklist-title-${widget.tripId}'
+                      : 'checklist-hero-title',
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: Text(
+                      widget.tripTitle != null
+                          ? '${widget.tripTitle} - ${l10n.luggageAndChecklist}'
+                          : l10n.baggageAndChecklist,
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 17),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           leading: IconButton(

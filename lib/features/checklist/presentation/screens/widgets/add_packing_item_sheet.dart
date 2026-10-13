@@ -193,13 +193,13 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
     return Container(
       padding: EdgeInsets.fromLTRB(22, 12, 22, 20 + bottomInset),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        color: isDark ? theme.colorScheme.surface : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 20,
-            offset: const Offset(0, -4),
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
+            blurRadius: 24,
+            offset: const Offset(0, -6),
           ),
         ],
       ),
@@ -213,11 +213,11 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
               // Handle pill
               Center(
                 child: Container(
-                  width: 36,
-                  height: 4,
+                  width: 44,
+                  height: 4.5,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.outline.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(2),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(3),
                   ),
                 ),
               ),

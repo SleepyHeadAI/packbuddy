@@ -141,7 +141,7 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
         reverseCurve: Curves.easeInCubic,
       ),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (ctx) {
         return RepaintBoundary(
@@ -149,8 +149,19 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                const SizedBox(height: 12),
+                Center(
+                  child: Container(
+                    width: 44,
+                    height: 4.5,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                ),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                   child: Text(
                     l10n.changeCurrency,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -290,11 +301,11 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
               // Handle
               Center(
                 child: Container(
-                  width: 40,
-                  height: 4,
+                  width: 44,
+                  height: 4.5,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.outlineVariant,
-                    borderRadius: BorderRadius.circular(2),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(3),
                   ),
                 ),
               ),

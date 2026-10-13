@@ -49,11 +49,11 @@ class PaywallSheet extends ConsumerWidget {
           children: [
           // Drag Handle
           Container(
-            width: 40,
-            height: 4,
+            width: 44,
+            height: 4.5,
             decoration: BoxDecoration(
-              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(2),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(3),
             ),
           ),
           const SizedBox(height: 20),

@@ -178,7 +178,21 @@ class TripDetailScreen extends ConsumerWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(currentTrip.title),
+          title: Hero(
+            tag: 'trip-title-${currentTrip.id}',
+            child: Material(
+              type: MaterialType.transparency,
+              child: Text(
+                currentTrip.title,
+                style: theme.appBarTheme.titleTextStyle ??
+                    theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_rounded),
             tooltip: MaterialLocalizations.of(context).backButtonTooltip,
@@ -278,26 +292,29 @@ class TripDetailScreen extends ConsumerWidget {
                       runSpacing: 6,
                       children: [
                         if (currentTrip.transportMode != null && currentTrip.transportMode!.isNotEmpty) ...[
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(transportIcon, size: 13, color: theme.colorScheme.primary),
-                                const SizedBox(width: 5),
-                                Text(
-                                  _formatTransportMode(currentTrip.transportMode, l10n),
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                    color: theme.colorScheme.primary,
+                          Hero(
+                            tag: 'trip-transport-icon-${currentTrip.id}',
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(transportIcon, size: 13, color: theme.colorScheme.primary),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    _formatTransportMode(currentTrip.transportMode, l10n),
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: theme.colorScheme.primary,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ],

@@ -415,16 +415,19 @@ class DashboardScreen extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: checklistStatusColor.withValues(alpha: 0.15),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.luggage_rounded,
-                          color: checklistStatusColor,
-                          size: 20,
+                      Hero(
+                        tag: 'checklist-hero-badge',
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: checklistStatusColor.withValues(alpha: 0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.luggage_rounded,
+                            color: checklistStatusColor,
+                            size: 20,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -435,11 +438,17 @@ class DashboardScreen extends ConsumerWidget {
                             FittedBox(
                               fit: BoxFit.scaleDown,
                               alignment: Alignment.centerLeft,
-                              child: Text(
-                                l10n.baggageAndChecklist,
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: -0.2,
+                              child: Hero(
+                                tag: 'checklist-hero-title',
+                                child: Material(
+                                  type: MaterialType.transparency,
+                                  child: Text(
+                                    l10n.baggageAndChecklist,
+                                    style: theme.textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: -0.2,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -739,11 +748,11 @@ class DashboardScreen extends ConsumerWidget {
             children: [
               const SizedBox(height: 12),
               Container(
-                width: 40,
-                height: 4,
+                width: 44,
+                height: 4.5,
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.outline.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(2),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(3),
                 ),
               ),
               Padding(
@@ -963,13 +972,16 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
-                  borderRadius: BorderRadius.circular(14),
+              Hero(
+                tag: 'trip-transport-icon-${trip.id}',
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(transportIcon, color: Colors.white, size: 20),
                 ),
-                child: Icon(transportIcon, color: Colors.white, size: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -993,13 +1005,19 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      trip.title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
+                    Hero(
+                      tag: 'trip-title-${trip.id}',
+                      child: Material(
+                        type: MaterialType.transparency,
+                        child: Text(
+                          trip.title,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),

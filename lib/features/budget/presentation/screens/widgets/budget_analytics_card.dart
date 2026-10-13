@@ -108,16 +108,20 @@ class BudgetAnalyticsCard extends StatelessWidget {
         color: isDark
             ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
             : Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
-          width: 1.2,
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.08)
+              : theme.colorScheme.outline.withValues(alpha: 0.5),
+          width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.1 : 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            color: isDark
+                ? Colors.black.withValues(alpha: 0.35)
+                : const Color(0xFF0F172A).withValues(alpha: 0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
           ),
         ],
       ),

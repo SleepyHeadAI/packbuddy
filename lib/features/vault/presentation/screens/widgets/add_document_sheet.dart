@@ -185,8 +185,8 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
         maxHeight: MediaQuery.of(context).size.height * 0.90,
       ),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+        color: isDark ? theme.colorScheme.surface : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: EdgeInsets.only(
         left: 22,
@@ -204,11 +204,11 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
               // Handle
               Center(
                 child: Container(
-                  width: 40,
-                  height: 4,
+                  width: 44,
+                  height: 4.5,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.outline.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(2),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(3),
                   ),
                 ),
               ),

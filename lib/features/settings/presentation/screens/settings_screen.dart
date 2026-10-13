@@ -12,6 +12,7 @@ import 'package:packbuddy/features/settings/presentation/screens/widgets/paywall
 import 'package:packbuddy/features/vault/presentation/controllers/vault_controller.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
+import 'package:packbuddy/features/auth/auth_controller.dart';
 
 /// Complete Settings screen handling Language, Theme, Sync, and PackBuddy Pro
 class SettingsScreen extends ConsumerWidget {
@@ -303,9 +304,22 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           ),
+          const SizedBox(height: 24),
+
+          // 6. Account & Authentication Session
+          _SectionHeader(
+            title: currentLocale.languageCode == 'tr'
+                ? 'Hesap & Oturum'
+                : 'Account & Session',
+          ),
+          const SizedBox(height: 8),
+          _AccountSessionCard(
+            isDark: theme.brightness == Brightness.dark,
+            isTr: currentLocale.languageCode == 'tr',
+          ),
           const SizedBox(height: 28),
 
-          // 6. App Footer
+          // 7. App Footer
           Center(
             child: Column(
               children: [
@@ -679,3 +693,170 @@ class _ProBanner extends StatelessWidget {
     );
   }
 }
+
+/// Luxury Account and Authentication Session Card with Sign Out integration
+class _AccountSessionCard extends ConsumerWidget {
+  final bool isDark;
+  final bool isTr;
+
+  const _AccountSessionCard({
+    required this.isDark,
+    required this.isTr,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authUserProvider);
+    final theme = Theme.of(context);
+    final email = user?.email ?? '';
+    final initialLetter = email.isNotEmpty ? email[0].toUpperCase() : 'P';
+
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: isDark
+                        ? const [AppColors.primaryDark, Color(0xFF1E3A5F)]
+                        : const [AppColors.primaryLight, AppColors.passportNavy],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: (isDark ? AppColors.primaryDark : AppColors.primaryLight)
+                          .withValues(alpha: 0.25),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    initialLetter,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      email.isNotEmpty
+                          ? email
+                          : (isTr ? 'Giriş Yapılmış Kullanıcı' : 'Signed In Traveler'),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: AppColors.successPastel,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          isTr ? 'Bulut Oturumu Aktif' : 'Cloud Session Active',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.successPastel,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Divider(
+            height: 1,
+            color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            height: 42,
+            child: OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.errorPastel,
+                side: BorderSide(
+                  color: AppColors.errorPastel.withValues(alpha: 0.4),
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              onPressed: () => _confirmSignOut(context, ref),
+              icon: const Icon(Icons.logout_rounded, size: 18),
+              label: Text(
+                isTr ? 'Oturumu Kapat' : 'Sign Out',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmSignOut(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+        title: Text(isTr ? 'Oturumu Kapat' : 'Sign Out'),
+        content: Text(
+          isTr
+              ? 'Hesabınızdan çıkış yapmak istediğinize emin misiniz? Seyahat verileriniz cihazınızda güvende kalacaktır.'
+              : 'Are you sure you want to sign out? Your travel data remains safely stored on your device.',
+          style: const TextStyle(fontSize: 13),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(isTr ? 'Vazgeç' : 'Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.errorPastel,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              await ref.read(authControllerProvider.notifier).signOut();
+              if (context.mounted && Navigator.of(context).canPop()) {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              }
+            },
+            child: Text(isTr ? 'Çıkış Yap' : 'Sign Out'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+

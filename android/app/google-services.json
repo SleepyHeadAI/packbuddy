@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "719651073535",
+    "project_id": "packbuddy-1",
+    "storage_bucket": "packbuddy-1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:719651073535:android:6f2612dca5e2abb0cacbca",
+        "android_client_info": {
+          "package_name": "com.sleepyhead.packbuddy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "719651073535-34t98obhv0kcpifa6f29tme61s04o2jm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxlfc6y-3HqsSg37DGmwcdLDD_bX-zYWI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "719651073535-34t98obhv0kcpifa6f29tme61s04o2jm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

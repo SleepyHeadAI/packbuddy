@@ -42,6 +42,7 @@ class TripController extends StateNotifier<TripState> {
     DatabaseHelper? dbHelper,
     INotificationService? notificationService,
   })  : _dbHelper = dbHelper ?? DatabaseHelper.instance,
+        // ignore: prefer_initializing_formals
         _notificationService = notificationService,
         super(const TripState()) {
     loadTrips();

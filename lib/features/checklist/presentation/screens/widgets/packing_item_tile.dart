@@ -67,7 +67,7 @@ class PackingItemTile extends StatelessWidget {
             gradient: const LinearGradient(
               colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
             ),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
           ),
           child: Row(
             children: [
@@ -92,7 +92,7 @@ class PackingItemTile extends StatelessWidget {
             gradient: const LinearGradient(
               colors: [Color(0xFF10B981), Color(0xFF059669)],
             ),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -138,7 +138,7 @@ class PackingItemTile extends StatelessWidget {
                 : (item.isPacked
                     ? const Color(0xFFF8FAFC)
                     : theme.colorScheme.surface),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: item.isPacked
                   ? (isDark
@@ -153,16 +153,16 @@ class PackingItemTile extends StatelessWidget {
                 ? []
                 : [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+                      color: const Color(0xFF0F172A).withValues(alpha: isDark ? 0.25 : 0.035),
+                      blurRadius: 14,
+                      offset: const Offset(0, 3),
                     ),
                   ],
           ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
               onTap: onTap ?? onTogglePacked,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),

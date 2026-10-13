@@ -324,7 +324,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                   width: 44,
                   height: 4.5,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.outline.withValues(alpha: 0.6),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),

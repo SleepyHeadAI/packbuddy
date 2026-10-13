@@ -53,11 +53,11 @@ class _SmartTemplatesSheetState extends ConsumerState<SmartTemplatesSheet> {
           // Drag handle
           Container(
             margin: const EdgeInsets.only(top: 12, bottom: 8),
-            width: 40,
-            height: 4,
+            width: 44,
+            height: 4.5,
             decoration: BoxDecoration(
-              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(2),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(3),
             ),
           ),
 
