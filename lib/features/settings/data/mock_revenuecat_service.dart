@@ -43,6 +43,7 @@ abstract class SubscriptionService {
   Future<bool> purchaseActivePlan();
   Future<bool> restorePurchases();
   Future<void> resetProStatus();
+  Future<void> updateProStatus(bool isPro);
 }
 
 // =============================================================================
@@ -150,6 +151,15 @@ class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
     // TODO: Replace with official purchases_flutter SDK (Purchases.logOut())
     await _prefs.setProUser(false);
     state = state.copyWith(isPro: false);
+  }
+
+  /// Sets or synchronizes Pro status directly (e.g. from Firestore admin or remote entitlements)
+  @override
+  Future<void> updateProStatus(bool isPro) async {
+    await _prefs.setProUser(isPro);
+    if (state.isPro != isPro) {
+      state = state.copyWith(isPro: isPro);
+    }
   }
 }
 

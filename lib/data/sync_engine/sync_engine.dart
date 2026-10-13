@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite/sqflite.dart';
 import '../local_db/database_helper.dart';
@@ -12,6 +13,9 @@ import '../../features/budget/domain/expense.dart';
 import '../../features/vault/domain/document.dart';
 import '../../features/checklist/domain/packing_item.dart';
 import '../../core/services/currency_service.dart';
+import '../../core/services/preferences_service.dart';
+import '../../features/auth/auth_controller.dart';
+import '../../features/settings/data/mock_revenuecat_service.dart';
 
 /// Sync Status enumeration for UI and State Management
 enum SyncStatus {
@@ -56,15 +60,67 @@ class SyncEngine extends StateNotifier<SyncState> {
   final DatabaseHelper _dbHelper;
   final FirebaseFirestore? _firestoreInstance;
   final FirebaseAuth? _authInstance;
+  final Ref? ref;
+  final void Function(bool isPro)? onProStatusSynced;
+  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _userDocSubscription;
 
   SyncEngine({
     DatabaseHelper? dbHelper,
     FirebaseFirestore? firestore,
     FirebaseAuth? auth,
+    this.ref,
+    this.onProStatusSynced,
   })  : _dbHelper = dbHelper ?? DatabaseHelper.instance,
         _firestoreInstance = firestore,
         _authInstance = auth,
         super(const SyncState());
+
+  /// Listens to real-time changes to the user's profile in Firestore (e.g., remote Admin Pro grants/revokes)
+  void listenToUserDoc(String uid) {
+    _userDocSubscription?.cancel();
+    bool isFirebaseReady = false;
+    try {
+      isFirebaseReady = Firebase.apps.isNotEmpty;
+    } catch (_) {}
+    if (!isFirebaseReady && _firestoreInstance == null) return;
+    final firestore = _firestoreInstance ?? FirebaseFirestore.instance;
+
+    _userDocSubscription = firestore
+        .collection('users')
+        .doc(uid)
+        .snapshots()
+        .listen(
+      (snapshot) {
+        if (snapshot.exists && snapshot.data() != null) {
+          final data = snapshot.data()!;
+          if (data.containsKey('isPremium')) {
+            final isPro = data['isPremium'] == true;
+            PreferencesService.instance.setProUser(isPro);
+            onProStatusSynced?.call(isPro);
+            final r = ref;
+            if (r != null) {
+              r.read(proSubscriptionProvider.notifier).updateProStatus(isPro);
+            }
+          }
+        }
+      },
+      onError: (err) {
+        debugPrint('[SyncEngine] userDoc subscription error: $err');
+      },
+    );
+  }
+
+  /// Cancels any active Firestore user profile listener
+  void cancelUserDocSubscription() {
+    _userDocSubscription?.cancel();
+    _userDocSubscription = null;
+  }
+
+  @override
+  void dispose() {
+    _userDocSubscription?.cancel();
+    super.dispose();
+  }
 
   /// Simple and fast check for internet connection
   Future<bool> hasInternetConnection() async {
@@ -133,6 +189,26 @@ class SyncEngine extends StateNotifier<SyncState> {
       }
 
       final firestore = _firestoreInstance ?? FirebaseFirestore.instance;
+
+      // Remote Pro Status Sync: Fetch users/{uid} and synchronize isPremium
+      try {
+        final userDoc = await firestore.collection('users').doc(uid).get();
+        if (userDoc.exists && userDoc.data() != null) {
+          final userData = userDoc.data()!;
+          if (userData.containsKey('isPremium')) {
+            final remoteIsPro = userData['isPremium'] == true;
+            await PreferencesService.instance.setProUser(remoteIsPro);
+            onProStatusSynced?.call(remoteIsPro);
+            final r = ref;
+            if (r != null) {
+              r.read(proSubscriptionProvider.notifier).updateProStatus(remoteIsPro);
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint('[SyncEngine] Pro status sync notice: $e');
+      }
+
       int processedItems = 0;
       final syncStartTime = DateTime.now().millisecondsSinceEpoch;
 
@@ -572,5 +648,17 @@ class SyncEngine extends StateNotifier<SyncState> {
 
 /// Riverpod Provider exposing the two-way sync engine
 final syncEngineProvider = StateNotifierProvider<SyncEngine, SyncState>((ref) {
-  return SyncEngine();
+  final engine = SyncEngine(ref: ref);
+  ref.listen<User?>(authUserProvider, (prev, next) {
+    if (next != null) {
+      engine.listenToUserDoc(next.uid);
+    } else {
+      engine.cancelUserDocSubscription();
+    }
+  });
+  final initialUser = ref.read(authUserProvider);
+  if (initialUser != null) {
+    engine.listenToUserDoc(initialUser.uid);
+  }
+  return engine;
 });

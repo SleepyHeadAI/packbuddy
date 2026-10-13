@@ -360,6 +360,11 @@ class _FakeProNotifier extends StateNotifier<ProSubscriptionState> implements Mo
 
   @override
   Future<void> resetProStatus() async {}
+
+  @override
+  Future<void> updateProStatus(bool isPro) async {
+    state = state.copyWith(isPro: isPro);
+  }
 }
 
 class _FakeDatabaseHelper implements DatabaseHelper {

@@ -40,7 +40,8 @@ abstract class AuthService {
   Future<User?> reloadUser();
 
   /// Upsert user profile document in Firestore at `users/{uid}` for admin dashboard & reporting
-  Future<void> syncUserProfile(User user);
+  /// Returns the effective `isPremium` status.
+  Future<bool> syncUserProfile(User user);
 }
 
 /// Firebase implementation of [AuthService]
@@ -233,10 +234,10 @@ class FirebaseAuthService implements AuthService {
   }
 
   @override
-  Future<void> syncUserProfile(User user) async {
+  Future<bool> syncUserProfile(User user) async {
     try {
       if (!_isFirebaseReady && _firestore == null) {
-        return;
+        return PreferencesService.instance.isProUser();
       }
       final firestore = _firestore ?? FirebaseFirestore.instance;
 
@@ -247,7 +248,6 @@ class FirebaseAuthService implements AuthService {
         }
       } catch (_) {}
 
-      final isPremium = PreferencesService.instance.isProUser();
       final now = DateTime.now().toIso8601String();
       String createdAt = now;
       try {
@@ -276,19 +276,55 @@ class FirebaseAuthService implements AuthService {
         emailVerified = user.emailVerified;
       } catch (_) {}
 
-      await firestore.collection('users').doc(user.uid).set({
+      // 1. Fetch remote user document to prevent overwriting admin-granted Pro status
+      final userDocRef = firestore.collection('users').doc(user.uid);
+      DocumentSnapshot<Map<String, dynamic>>? existingDoc;
+      try {
+        existingDoc = await userDocRef.get();
+      } catch (e) {
+        debugPrint('[FirebaseAuthService] fetch existing user doc notice: $e');
+      }
+
+      final bool remoteExists = existingDoc?.exists ?? false;
+      final remoteData = existingDoc?.data();
+      final localIsPro = PreferencesService.instance.isProUser();
+
+      bool effectiveIsPremium = false;
+      if (remoteExists && remoteData != null && remoteData['isPremium'] == true) {
+        // Remote is true (e.g. granted by Admin): preserve true and unlock locally
+        effectiveIsPremium = true;
+        await PreferencesService.instance.setProUser(true);
+      } else if (localIsPro) {
+        // Local has Pro (e.g. user bought subscription locally): write true to remote
+        effectiveIsPremium = true;
+      } else {
+        // Neither remote nor local is Pro (first time creation or non-pro user)
+        effectiveIsPremium = false;
+      }
+
+      final remoteCreatedAt =
+          remoteExists && remoteData != null ? remoteData['createdAt'] : null;
+      final effectiveCreatedAt =
+          (remoteCreatedAt is String && remoteCreatedAt.isNotEmpty)
+              ? remoteCreatedAt
+              : createdAt;
+
+      await userDocRef.set({
         'uid': user.uid,
         'email': email,
         'displayName': displayName,
         'photoUrl': photoUrl,
         'provider': provider,
         'emailVerified': emailVerified,
-        'createdAt': createdAt,
+        'createdAt': effectiveCreatedAt,
         'lastLoginAt': now,
-        'isPremium': isPremium,
+        'isPremium': effectiveIsPremium,
       }, SetOptions(merge: true));
+
+      return effectiveIsPremium;
     } catch (e) {
       debugPrint('[FirebaseAuthService] syncUserProfile notice: $e');
+      return PreferencesService.instance.isProUser();
     }
   }
 }

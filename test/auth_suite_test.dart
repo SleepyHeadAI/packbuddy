@@ -151,9 +151,10 @@ class MockAuthService implements AuthService {
   User? syncedUser;
 
   @override
-  Future<void> syncUserProfile(User user) async {
+  Future<bool> syncUserProfile(User user) async {
     syncUserProfileCalled = true;
     syncedUser = user;
+    return false;
   }
 
   void dispose() {

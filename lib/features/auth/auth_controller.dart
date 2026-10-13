@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/local_db/database_helper.dart';
 import 'auth_service.dart';
+import '../settings/data/mock_revenuecat_service.dart';
 
 /// State representation for Authentication operations
 class AuthState {
@@ -77,9 +78,10 @@ class AuthState {
 /// Riverpod StateNotifier controlling authentication lifecycle
 class AuthController extends StateNotifier<AuthState> {
   final AuthService _authService;
+  final Ref? _ref;
   StreamSubscription<User?>? _authSubscription;
 
-  AuthController(this._authService)
+  AuthController(this._authService, [this._ref])
       : super(AuthState(
           user: _authService.currentUser,
           isInitialized: true,
@@ -87,11 +89,18 @@ class AuthController extends StateNotifier<AuthState> {
     _init();
   }
 
+  Future<void> _syncProfileAndNotify(User user) async {
+    try {
+      final isPro = await _authService.syncUserProfile(user);
+      _ref?.read(proSubscriptionProvider.notifier).updateProStatus(isPro);
+    } catch (_) {}
+  }
+
   void _init() {
     _authSubscription = _authService.authStateChanges.listen(
       (user) {
         if (user != null) {
-          _authService.syncUserProfile(user).catchError((_) {});
+          _syncProfileAndNotify(user);
         }
         state = state.copyWith(
           user: user,
@@ -129,7 +138,7 @@ class AuthController extends StateNotifier<AuthState> {
         password: password,
       );
       if (credential.user != null) {
-        _authService.syncUserProfile(credential.user!).catchError((_) {});
+        _syncProfileAndNotify(credential.user!);
       }
       state = state.copyWith(
         user: credential.user,
@@ -158,7 +167,7 @@ class AuthController extends StateNotifier<AuthState> {
         password: password,
       );
       if (credential.user != null) {
-        _authService.syncUserProfile(credential.user!).catchError((_) {});
+        _syncProfileAndNotify(credential.user!);
       }
       state = state.copyWith(
         user: credential.user,
@@ -186,7 +195,7 @@ class AuthController extends StateNotifier<AuthState> {
         return false;
       }
       if (credential.user != null) {
-        _authService.syncUserProfile(credential.user!).catchError((_) {});
+        _syncProfileAndNotify(credential.user!);
       }
       state = state.copyWith(
         user: credential.user,
@@ -208,7 +217,7 @@ class AuthController extends StateNotifier<AuthState> {
     try {
       final updatedUser = await _authService.reloadUser();
       if (updatedUser != null) {
-        _authService.syncUserProfile(updatedUser).catchError((_) {});
+        _syncProfileAndNotify(updatedUser);
       }
       state = state.copyWith(
         user: updatedUser,
@@ -286,7 +295,7 @@ class AuthController extends StateNotifier<AuthState> {
 final authControllerProvider =
     StateNotifierProvider<AuthController, AuthState>((ref) {
   final service = ref.watch(authServiceProvider);
-  return AuthController(service);
+  return AuthController(service, ref);
 });
 
 /// Direct reactive user provider
