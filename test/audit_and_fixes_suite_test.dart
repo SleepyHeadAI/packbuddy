@@ -368,55 +368,55 @@ class _FakeDatabaseHelper implements DatabaseHelper {
   final Map<String, PackingItem> items = {};
 
   @override
-  Future<int> insertTrip(Trip trip) async {
+  Future<int> insertTrip(Trip trip, {String? userId}) async {
     trips[trip.id] = trip;
     return 1;
   }
 
   @override
-  Future<int> updateTrip(Trip trip) async {
+  Future<int> updateTrip(Trip trip, {String? userId}) async {
     trips[trip.id] = trip;
     return 1;
   }
 
   @override
-  Future<Trip?> getTripById(String id) async => trips[id];
+  Future<Trip?> getTripById(String id, {String? userId}) async => trips[id];
 
   @override
-  Future<int> insertExpense(Expense expense) async {
+  Future<int> insertExpense(Expense expense, {String? userId}) async {
     expenses[expense.id] = expense;
     return 1;
   }
 
   @override
-  Future<int> updateExpense(Expense expense) async {
+  Future<int> updateExpense(Expense expense, {String? userId}) async {
     expenses[expense.id] = expense;
     return 1;
   }
 
   @override
-  Future<int> deleteExpense(String id) async {
+  Future<int> deleteExpense(String id, {String? userId}) async {
     expenses.remove(id);
     return 1;
   }
 
   @override
-  Future<int> restoreExpense(String id) async => 1;
+  Future<int> restoreExpense(String id, {String? userId}) async => 1;
 
   @override
-  Future<int> insertChecklistItem(PackingItem item) async {
+  Future<int> insertChecklistItem(PackingItem item, {String? userId}) async {
     items[item.id] = item;
     return 1;
   }
 
   @override
-  Future<int> updateChecklistItem(PackingItem item) async {
+  Future<int> updateChecklistItem(PackingItem item, {String? userId}) async {
     items[item.id] = item;
     return 1;
   }
 
   @override
-  Future<List<PackingItem>> getChecklistItems({String? tripId, bool includeDeleted = false}) async => [];
+  Future<List<PackingItem>> getChecklistItems({String? tripId, String? userId, bool includeDeleted = false}) async => [];
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

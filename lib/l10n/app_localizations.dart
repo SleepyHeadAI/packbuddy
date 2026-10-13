@@ -1885,6 +1885,468 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'ACTIVE'**
   String get activeStatus;
+
+  /// Subtitle on Auth screen during sign in
+  ///
+  /// In en, this message translates to:
+  /// **'Your Luxury Travel Companion • Sign In'**
+  String get authSubtitleSignIn;
+
+  /// Subtitle on Auth screen during sign up
+  ///
+  /// In en, this message translates to:
+  /// **'Begin a New Journey • Create Account'**
+  String get authSubtitleSignUp;
+
+  /// Tab/button label for sign in
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get authSignIn;
+
+  /// Tab/button label for sign up
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up'**
+  String get authSignUp;
+
+  /// Label for email field
+  ///
+  /// In en, this message translates to:
+  /// **'Email Address'**
+  String get authEmail;
+
+  /// Hint for email field
+  ///
+  /// In en, this message translates to:
+  /// **'traveler@packbuddy.com'**
+  String get authEmailHint;
+
+  /// Validation message when email is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your email address.'**
+  String get authEmailRequired;
+
+  /// Validation message when email is invalid
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email address.'**
+  String get authEmailInvalid;
+
+  /// Label for password field
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get authPassword;
+
+  /// Button to trigger forgot password dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot Password?'**
+  String get authForgotPassword;
+
+  /// Validation message when password is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your password.'**
+  String get authPasswordRequired;
+
+  /// Validation message when password fails rules
+  ///
+  /// In en, this message translates to:
+  /// **'Password does not meet requirements.'**
+  String get authPasswordRulesInvalid;
+
+  /// Validation message for sign in password length
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters.'**
+  String get authPasswordMinChars;
+
+  /// Header for password requirements checklist
+  ///
+  /// In en, this message translates to:
+  /// **'Password Requirements:'**
+  String get authPasswordRulesTitle;
+
+  /// Rule requirement: min 8 characters
+  ///
+  /// In en, this message translates to:
+  /// **'At least 8 characters'**
+  String get authRuleMinChars;
+
+  /// Rule requirement: at least 1 uppercase letter
+  ///
+  /// In en, this message translates to:
+  /// **'At least 1 uppercase letter'**
+  String get authRuleUppercase;
+
+  /// Rule requirement: at least 1 lowercase letter
+  ///
+  /// In en, this message translates to:
+  /// **'At least 1 lowercase letter'**
+  String get authRuleLowercase;
+
+  /// Rule requirement: at least 1 digit
+  ///
+  /// In en, this message translates to:
+  /// **'At least 1 number'**
+  String get authRuleDigit;
+
+  /// Label for password confirmation field
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get authConfirmPassword;
+
+  /// Validation message when confirm password is empty
+  ///
+  /// In en, this message translates to:
+  /// **'Please confirm your password.'**
+  String get authConfirmPasswordRequired;
+
+  /// Validation message when passwords do not match
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match.'**
+  String get authPasswordsDoNotMatch;
+
+  /// Primary action button to create account
+  ///
+  /// In en, this message translates to:
+  /// **'Create Account'**
+  String get authCreateAccount;
+
+  /// Divider text between email and social login
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get authOr;
+
+  /// Button to sign in with Google
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get authContinueWithGoogle;
+
+  /// Terms of service and privacy policy disclaimer
+  ///
+  /// In en, this message translates to:
+  /// **'By signing up, you agree to our Terms of Service & Privacy Policy.'**
+  String get authTermsNotice;
+
+  /// Dialog title for password reset
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Password'**
+  String get authResetPasswordTitle;
+
+  /// Dialog description for password reset
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your registered email address to receive a password reset link.'**
+  String get authResetPasswordDescription;
+
+  /// Button to send password reset link
+  ///
+  /// In en, this message translates to:
+  /// **'Send Link'**
+  String get authSendLink;
+
+  /// Snackbar notification after sending password reset link
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset link has been sent to your email.'**
+  String get authResetLinkSent;
+
+  /// Placeholder notification for Apple sign in
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Apple will be available in the upcoming update!'**
+  String get authAppleComingSoon;
+
+  /// Title on email verification screen
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Your Email'**
+  String get emailVerifyTitle;
+
+  /// Subtitle on email verification screen
+  ///
+  /// In en, this message translates to:
+  /// **'To protect your travel vault and sync your trips, please verify your email address.'**
+  String get emailVerifySubtitle;
+
+  /// Header for email verification steps
+  ///
+  /// In en, this message translates to:
+  /// **'What should you do?'**
+  String get emailVerifyInstructionsTitle;
+
+  /// Step 1 of email verification
+  ///
+  /// In en, this message translates to:
+  /// **'Check your inbox and spam folder.'**
+  String get emailVerifyStep1;
+
+  /// Step 2 of email verification
+  ///
+  /// In en, this message translates to:
+  /// **'Click the verification link in the email.'**
+  String get emailVerifyStep2;
+
+  /// Step 3 of email verification
+  ///
+  /// In en, this message translates to:
+  /// **'Wait a few seconds; this screen will proceed automatically.'**
+  String get emailVerifyStep3;
+
+  /// Indicator text while waiting for email verification
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for verification...'**
+  String get emailVerifyWaiting;
+
+  /// Manual check button on email verification screen
+  ///
+  /// In en, this message translates to:
+  /// **'I Verified, Continue'**
+  String get emailVerifyCheckNow;
+
+  /// Button to resend email verification link
+  ///
+  /// In en, this message translates to:
+  /// **'Resend Verification Email'**
+  String get emailVerifyResendLink;
+
+  /// Cooldown timer text for resending verification email
+  ///
+  /// In en, this message translates to:
+  /// **'Resend in {seconds}s'**
+  String emailVerifyResendCooldown(int seconds);
+
+  /// Button to sign out and return to sign in
+  ///
+  /// In en, this message translates to:
+  /// **'Back to Sign In'**
+  String get emailVerifyBackToSignIn;
+
+  /// Snackbar message when email is still unverified
+  ///
+  /// In en, this message translates to:
+  /// **'Email is not verified yet. Please check your inbox and click the link.'**
+  String get emailVerifyNotVerifiedYet;
+
+  /// Snackbar message when verification email is resent
+  ///
+  /// In en, this message translates to:
+  /// **'Verification email sent! Please check your inbox.'**
+  String get emailVerifyLinkSentSuccess;
+
+  /// Fallback name for signed in traveler
+  ///
+  /// In en, this message translates to:
+  /// **'Signed In Traveler'**
+  String get signedInTraveler;
+
+  /// Status badge indicating active cloud session
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud Session Active'**
+  String get cloudSessionActive;
+
+  /// Dialog title for sign out confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Out'**
+  String get signOutConfirmTitle;
+
+  /// Dialog content for sign out confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to sign out? Your travel data remains safely stored on your device.'**
+  String get signOutConfirmMessage;
+
+  /// Header for notifications section in settings
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications & Reminders'**
+  String get notificationsAndReminders;
+
+  /// Title for packing reminders setting
+  ///
+  /// In en, this message translates to:
+  /// **'Packing Reminders'**
+  String get packingReminders;
+
+  /// Subtitle for packing reminders setting
+  ///
+  /// In en, this message translates to:
+  /// **'Get smart reminders 48h and 24h before departure'**
+  String get packingRemindersSubtitle;
+
+  /// Expense category shopping
+  ///
+  /// In en, this message translates to:
+  /// **'Shopping'**
+  String get shopping;
+
+  /// Error message when account does not exist
+  ///
+  /// In en, this message translates to:
+  /// **'No account found with this email address.'**
+  String get authErrorUserNotFound;
+
+  /// Error message when password is wrong
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect password entered. Please try again.'**
+  String get authErrorWrongPassword;
+
+  /// Error message when credentials are invalid
+  ///
+  /// In en, this message translates to:
+  /// **'Email or password incorrect. Please check your credentials.'**
+  String get authErrorInvalidCredential;
+
+  /// Error message when email is already registered
+  ///
+  /// In en, this message translates to:
+  /// **'An account already exists with this email address.'**
+  String get authErrorEmailInUse;
+
+  /// Error message when email format is invalid
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email address.'**
+  String get authErrorInvalidEmail;
+
+  /// Error message when password is too weak
+  ///
+  /// In en, this message translates to:
+  /// **'Password does not meet requirements.'**
+  String get authErrorWeakPassword;
+
+  /// Error message when account is disabled
+  ///
+  /// In en, this message translates to:
+  /// **'This account has been disabled.'**
+  String get authErrorUserDisabled;
+
+  /// Error message when rate limited
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Please try again later.'**
+  String get authErrorTooManyRequests;
+
+  /// Error message on network failure
+  ///
+  /// In en, this message translates to:
+  /// **'Network connection error. Please check your internet.'**
+  String get authErrorNetworkFailed;
+
+  /// Error message on Google sign in failure
+  ///
+  /// In en, this message translates to:
+  /// **'Could not sign in with Google. Please try again.'**
+  String get authErrorGoogleFailed;
+
+  /// Error message on email verification send failure
+  ///
+  /// In en, this message translates to:
+  /// **'Could not send verification email. Please try again later.'**
+  String get authErrorVerificationFailed;
+
+  /// Generic authentication error message
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication failed. Please try again.'**
+  String get authErrorGeneric;
+
+  /// Button to continue with Apple ID
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Apple'**
+  String get authContinueWithApple;
+
+  /// Prompt asking if traveler needs to register
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account? '**
+  String get authNoAccount;
+
+  /// Prompt asking if traveler already has an account
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? '**
+  String get authAlreadyHaveAccount;
+
+  /// Header for account and session section in settings
+  ///
+  /// In en, this message translates to:
+  /// **'Account & Session'**
+  String get accountAndSession;
+
+  /// Title for category expense breakdown analytics card
+  ///
+  /// In en, this message translates to:
+  /// **'Category Spending Breakdown'**
+  String get categorySpendingAnalysis;
+
+  /// Highlight showing highest spending category and percentage
+  ///
+  /// In en, this message translates to:
+  /// **'Top: {category} ({percentage}%)'**
+  String topSpendingCategory(String category, String percentage);
+
+  /// Badge showing total count of expenses
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Expenses'**
+  String expenseCount(int count);
+
+  /// Passenger label on boarding pass simulation
+  ///
+  /// In en, this message translates to:
+  /// **'PASSENGER'**
+  String get boardingPassPassenger;
+
+  /// Gate label on boarding pass simulation
+  ///
+  /// In en, this message translates to:
+  /// **'GATE'**
+  String get boardingPassGate;
+
+  /// Sample traveler name on boarding pass simulation
+  ///
+  /// In en, this message translates to:
+  /// **'PACKBUDDY TRAVELER'**
+  String get boardingPassSampleTraveler;
+
+  /// Notification title sent 48 hours before trip departure
+  ///
+  /// In en, this message translates to:
+  /// **'PackBuddy: Trip to {destination} in 2 days! 🧳'**
+  String notification48hTitle(String destination);
+
+  /// Notification body sent 48 hours before trip departure
+  ///
+  /// In en, this message translates to:
+  /// **'Only 48 hours left until your trip to {destination}! Have you started packing your travel essentials?'**
+  String notification48hBody(String destination);
+
+  /// Notification title sent 24 hours before trip departure
+  ///
+  /// In en, this message translates to:
+  /// **'PackBuddy: You\'re Leaving Tomorrow! ✈️'**
+  String get notification24hTitle;
+
+  /// Notification body sent 24 hours before trip departure
+  ///
+  /// In en, this message translates to:
+  /// **'Final packing check! Double-check your passport, tickets, and travel essentials for {destination}.'**
+  String notification24hBody(String destination);
 }
 
 class _AppLocalizationsDelegate

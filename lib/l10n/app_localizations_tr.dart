@@ -913,4 +913,269 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get activeStatus => 'AKTİF';
+
+  @override
+  String get authSubtitleSignIn => 'Lüks Seyahat Asistanınız • Giriş Yapın';
+
+  @override
+  String get authSubtitleSignUp => 'Yeni Bir Maceraya Başlayın • Kayıt Olun';
+
+  @override
+  String get authSignIn => 'Giriş Yap';
+
+  @override
+  String get authSignUp => 'Kayıt Ol';
+
+  @override
+  String get authEmail => 'E-posta Adresi';
+
+  @override
+  String get authEmailHint => 'ornek@packbuddy.com';
+
+  @override
+  String get authEmailRequired => 'Lütfen e-posta adresinizi girin.';
+
+  @override
+  String get authEmailInvalid => 'Lütfen geçerli bir e-posta adresi girin.';
+
+  @override
+  String get authPassword => 'Şifre';
+
+  @override
+  String get authForgotPassword => 'Şifremi Unuttum?';
+
+  @override
+  String get authPasswordRequired => 'Lütfen şifrenizi girin.';
+
+  @override
+  String get authPasswordRulesInvalid => 'Şifre kurallara uygun değil.';
+
+  @override
+  String get authPasswordMinChars => 'Şifre en az 6 karakter olmalıdır.';
+
+  @override
+  String get authPasswordRulesTitle => 'Şifre Kuralları:';
+
+  @override
+  String get authRuleMinChars => 'En az 8 karakter';
+
+  @override
+  String get authRuleUppercase => 'En az 1 büyük harf';
+
+  @override
+  String get authRuleLowercase => 'En az 1 küçük harf';
+
+  @override
+  String get authRuleDigit => 'En az 1 rakam';
+
+  @override
+  String get authConfirmPassword => 'Şifre Tekrarı';
+
+  @override
+  String get authConfirmPasswordRequired => 'Lütfen şifrenizi tekrar girin.';
+
+  @override
+  String get authPasswordsDoNotMatch => 'Şifreler birbiriyle eşleşmiyor.';
+
+  @override
+  String get authCreateAccount => 'Hesap Oluştur';
+
+  @override
+  String get authOr => 'veya';
+
+  @override
+  String get authContinueWithGoogle => 'Google ile Devam Et';
+
+  @override
+  String get authTermsNotice =>
+      'Kayıt olarak Kullanım Koşulları ve Gizlilik Politikası\'nı kabul etmiş olursunuz.';
+
+  @override
+  String get authResetPasswordTitle => 'Şifre Sıfırlama';
+
+  @override
+  String get authResetPasswordDescription =>
+      'Kayıtlı e-posta adresinizi girin, sıfırlama bağlantısı gönderilecektir.';
+
+  @override
+  String get authSendLink => 'Gönder';
+
+  @override
+  String get authResetLinkSent =>
+      'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.';
+
+  @override
+  String get authAppleComingSoon =>
+      'Apple ile Giriş çok yakında sonraki güncellemede aktif edilecektir!';
+
+  @override
+  String get emailVerifyTitle => 'E-postanızı Doğrulayın';
+
+  @override
+  String get emailVerifySubtitle =>
+      'Seyahat kasanızı korumak ve verilerinizi buluta eşitlemek için lütfen e-posta adresinizi doğrulayın.';
+
+  @override
+  String get emailVerifyInstructionsTitle => 'Ne yapmalısınız?';
+
+  @override
+  String get emailVerifyStep1 =>
+      'Gelen kutunuzu ve spam klasörünüzü kontrol edin.';
+
+  @override
+  String get emailVerifyStep2 =>
+      'Gelen e-postadaki doğrulama bağlantısına tıklayın.';
+
+  @override
+  String get emailVerifyStep3 =>
+      'Bağlantıya tıkladıktan sonra birkaç saniye bekleyin, ekran otomatik olarak açılacaktır.';
+
+  @override
+  String get emailVerifyWaiting => 'Doğrulama bekleniyor...';
+
+  @override
+  String get emailVerifyCheckNow => 'Doğruladım, Devam Et';
+
+  @override
+  String get emailVerifyResendLink => 'Doğrulama E-postasını Tekrar Gönder';
+
+  @override
+  String emailVerifyResendCooldown(int seconds) {
+    return '$seconds sn sonra tekrar gönder';
+  }
+
+  @override
+  String get emailVerifyBackToSignIn => 'Giriş Ekranına Dön';
+
+  @override
+  String get emailVerifyNotVerifiedYet =>
+      'E-postanız henüz doğrulanmadı. Lütfen gelen kutunuzdaki bağlantıya tıklayın.';
+
+  @override
+  String get emailVerifyLinkSentSuccess =>
+      'Doğrulama e-postası tekrar gönderildi. Lütfen gelen kutunuzu kontrol edin.';
+
+  @override
+  String get signedInTraveler => 'Giriş Yapılmış Kullanıcı';
+
+  @override
+  String get cloudSessionActive => 'Bulut Oturumu Aktif';
+
+  @override
+  String get signOutConfirmTitle => 'Oturumu Kapat';
+
+  @override
+  String get signOutConfirmMessage =>
+      'Hesabınızdan çıkış yapmak istediğinize emin misiniz? Seyahat verileriniz cihazınızda güvende kalacaktır.';
+
+  @override
+  String get notificationsAndReminders => 'Bildirimler & Hatırlatıcılar';
+
+  @override
+  String get packingReminders => 'Paketleme Hatırlatıcıları';
+
+  @override
+  String get packingRemindersSubtitle =>
+      'Uçuştan 48 ve 24 saat önce akıllı bildirimler alın';
+
+  @override
+  String get shopping => 'Alışveriş';
+
+  @override
+  String get authErrorUserNotFound =>
+      'Bu e-posta adresine ait bir hesap bulunamadı.';
+
+  @override
+  String get authErrorWrongPassword =>
+      'Hatalı şifre girdiniz. Lütfen tekrar deneyin.';
+
+  @override
+  String get authErrorInvalidCredential =>
+      'E-posta veya şifre hatalı. Lütfen bilgilerinizi kontrol edin.';
+
+  @override
+  String get authErrorEmailInUse =>
+      'Bu e-posta adresi ile zaten kayıtlı bir hesap var.';
+
+  @override
+  String get authErrorInvalidEmail =>
+      'Lütfen geçerli bir e-posta adresi girin.';
+
+  @override
+  String get authErrorWeakPassword => 'Şifre kurallara uygun değil.';
+
+  @override
+  String get authErrorUserDisabled =>
+      'Bu hesap geçici olarak askıya alınmıştır.';
+
+  @override
+  String get authErrorTooManyRequests =>
+      'Çok fazla deneme yapıldı. Lütfen biraz bekleyip tekrar deneyin.';
+
+  @override
+  String get authErrorNetworkFailed =>
+      'İnternet bağlantısı hatası. Lütfen ağınızı kontrol edin.';
+
+  @override
+  String get authErrorGoogleFailed =>
+      'Google ile giriş yapılamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get authErrorVerificationFailed =>
+      'Doğrulama e-postası gönderilemedi. Lütfen daha sonra tekrar deneyin.';
+
+  @override
+  String get authErrorGeneric => 'Kimlik doğrulama işlemi gerçekleştirilemedi.';
+
+  @override
+  String get authContinueWithApple => 'Apple ile Devam Et';
+
+  @override
+  String get authNoAccount => 'Hesabınız yok mu? ';
+
+  @override
+  String get authAlreadyHaveAccount => 'Zaten bir hesabınız var mı? ';
+
+  @override
+  String get accountAndSession => 'Hesap & Oturum';
+
+  @override
+  String get categorySpendingAnalysis => 'Kategori Harcama Analizi';
+
+  @override
+  String topSpendingCategory(String category, String percentage) {
+    return 'En çok: $category (%$percentage)';
+  }
+
+  @override
+  String expenseCount(int count) {
+    return '$count Harcama';
+  }
+
+  @override
+  String get boardingPassPassenger => 'YOLCU';
+
+  @override
+  String get boardingPassGate => 'KAPI';
+
+  @override
+  String get boardingPassSampleTraveler => 'PACKBUDDY GEZGİNİ';
+
+  @override
+  String notification48hTitle(String destination) {
+    return 'PackBuddy: $destination Seyahati Yaklaşıyor! 🧳';
+  }
+
+  @override
+  String notification48hBody(String destination) {
+    return '$destination seyahatinize 48 saat kaldı! Eksiklerinizi kontrol edip bavulunuzu hazırlamaya başladınız mı?';
+  }
+
+  @override
+  String get notification24hTitle => 'PackBuddy: Yarın Yola Çıkıyorsunuz! ✈️';
+
+  @override
+  String notification24hBody(String destination) {
+    return 'Son kontroller! $destination seyahatiniz yarın başlıyor. Pasaport, bilet ve seyahat eşyalarınızı aldınız mı?';
+  }
 }

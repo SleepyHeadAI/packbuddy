@@ -906,4 +906,268 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get activeStatus => 'AKTIV';
+
+  @override
+  String get authSubtitleSignIn => 'Din exklusiva reseassistent • Logga in';
+
+  @override
+  String get authSubtitleSignUp => 'Börja ett nytt äventyr • Skapa konto';
+
+  @override
+  String get authSignIn => 'Logga in';
+
+  @override
+  String get authSignUp => 'Skapa konto';
+
+  @override
+  String get authEmail => 'E-postadress';
+
+  @override
+  String get authEmailHint => 'resenar@packbuddy.com';
+
+  @override
+  String get authEmailRequired => 'Ange din e-postadress.';
+
+  @override
+  String get authEmailInvalid => 'Ange en giltig e-postadress.';
+
+  @override
+  String get authPassword => 'Lösenord';
+
+  @override
+  String get authForgotPassword => 'Glömt lösenord?';
+
+  @override
+  String get authPasswordRequired => 'Ange ditt lösenord.';
+
+  @override
+  String get authPasswordRulesInvalid => 'Lösenordet uppfyller inte kraven.';
+
+  @override
+  String get authPasswordMinChars =>
+      'Lösenordet måste bestå av minst 6 tecken.';
+
+  @override
+  String get authPasswordRulesTitle => 'Lösenordskrav:';
+
+  @override
+  String get authRuleMinChars => 'Minst 8 tecken';
+
+  @override
+  String get authRuleUppercase => 'Minst 1 stor bokstav';
+
+  @override
+  String get authRuleLowercase => 'Minst 1 liten bokstav';
+
+  @override
+  String get authRuleDigit => 'Minst 1 siffra';
+
+  @override
+  String get authConfirmPassword => 'Bekräfta lösenord';
+
+  @override
+  String get authConfirmPasswordRequired => 'Bekräfta ditt lösenord.';
+
+  @override
+  String get authPasswordsDoNotMatch => 'Lösenorden matchar inte.';
+
+  @override
+  String get authCreateAccount => 'Skapa konto';
+
+  @override
+  String get authOr => 'eller';
+
+  @override
+  String get authContinueWithGoogle => 'Fortsätt med Google';
+
+  @override
+  String get authTermsNotice =>
+      'Genom att registrera dig godkänner du våra användarvillkor och integritetspolicy.';
+
+  @override
+  String get authResetPasswordTitle => 'Återställ lösenord';
+
+  @override
+  String get authResetPasswordDescription =>
+      'Ange din registrerade e-postadress för att få en återställningslänk.';
+
+  @override
+  String get authSendLink => 'Skicka länk';
+
+  @override
+  String get authResetLinkSent =>
+      'En återställningslänk har skickats till din e-post.';
+
+  @override
+  String get authAppleComingSoon =>
+      'Inloggning med Apple kommer i nästa uppdatering!';
+
+  @override
+  String get emailVerifyTitle => 'Verifiera din e-postadress';
+
+  @override
+  String get emailVerifySubtitle =>
+      'För att skydda ditt dokumentvalv och synkronisera resor, verifiera din e-post.';
+
+  @override
+  String get emailVerifyInstructionsTitle => 'Vad ska du göra?';
+
+  @override
+  String get emailVerifyStep1 => 'Kontrollera din inkorg och skräppostmapp.';
+
+  @override
+  String get emailVerifyStep2 =>
+      'Klicka på verifieringslänken i e-postmeddelandet.';
+
+  @override
+  String get emailVerifyStep3 =>
+      'Vänta några sekunder; den här skärmen fortsätter automatiskt.';
+
+  @override
+  String get emailVerifyWaiting => 'Väntar på verifiering...';
+
+  @override
+  String get emailVerifyCheckNow => 'Jag har verifierat, fortsätt';
+
+  @override
+  String get emailVerifyResendLink => 'Skicka verifieringsmail igen';
+
+  @override
+  String emailVerifyResendCooldown(int seconds) {
+    return 'Skicka igen om $seconds s';
+  }
+
+  @override
+  String get emailVerifyBackToSignIn => 'Tillbaka till inloggning';
+
+  @override
+  String get emailVerifyNotVerifiedYet =>
+      'E-post är inte verifierad än. Klicka på länken du fick.';
+
+  @override
+  String get emailVerifyLinkSentSuccess =>
+      'Verifieringsmail skickat igen! Kontrollera inkorgen.';
+
+  @override
+  String get signedInTraveler => 'Inloggad resenär';
+
+  @override
+  String get cloudSessionActive => 'Molnsession aktiv';
+
+  @override
+  String get signOutConfirmTitle => 'Logga ut';
+
+  @override
+  String get signOutConfirmMessage =>
+      'Är du säker på att du vill logga ut? Din resedata finns säkert kvar på din enhet.';
+
+  @override
+  String get notificationsAndReminders => 'Aviseringar och påminnelser';
+
+  @override
+  String get packingReminders => 'Packpåminnelser';
+
+  @override
+  String get packingRemindersSubtitle =>
+      'Få smarta påminnelser 48 timmar och 24 timmar före avgång';
+
+  @override
+  String get shopping => 'Shopping';
+
+  @override
+  String get authErrorUserNotFound =>
+      'Inget konto hittades med denna e-postadress.';
+
+  @override
+  String get authErrorWrongPassword => 'Fel lösenord angavs. Försök igen.';
+
+  @override
+  String get authErrorInvalidCredential =>
+      'Fel e-post eller lösenord. Kontrollera dina uppgifter.';
+
+  @override
+  String get authErrorEmailInUse =>
+      'Ett konto finns redan med denna e-postadress.';
+
+  @override
+  String get authErrorInvalidEmail => 'Ange en giltig e-postadress.';
+
+  @override
+  String get authErrorWeakPassword =>
+      'Lösenordet uppfyller inte säkerhetskraven.';
+
+  @override
+  String get authErrorUserDisabled =>
+      'Detta konto har inaktiverats tillfälligt.';
+
+  @override
+  String get authErrorTooManyRequests =>
+      'För många försök. Vänta en stund och försök igen.';
+
+  @override
+  String get authErrorNetworkFailed =>
+      'Nätverksfel. Kontrollera din internetanslutning.';
+
+  @override
+  String get authErrorGoogleFailed =>
+      'Kunde inte logga in med Google. Försök igen.';
+
+  @override
+  String get authErrorVerificationFailed =>
+      'Kunde inte skicka verifieringsmeddelande.';
+
+  @override
+  String get authErrorGeneric => 'Autentisering misslyckades. Försök igen.';
+
+  @override
+  String get authContinueWithApple => 'Fortsätt med Apple';
+
+  @override
+  String get authNoAccount => 'Har du inget konto? ';
+
+  @override
+  String get authAlreadyHaveAccount => 'Har du redan ett konto? ';
+
+  @override
+  String get accountAndSession => 'Konto & Session';
+
+  @override
+  String get categorySpendingAnalysis => 'Kategoriutgiftsanalys';
+
+  @override
+  String topSpendingCategory(String category, String percentage) {
+    return 'Mest: $category ($percentage%)';
+  }
+
+  @override
+  String expenseCount(int count) {
+    return '$count Utgifter';
+  }
+
+  @override
+  String get boardingPassPassenger => 'PASSAGERARE';
+
+  @override
+  String get boardingPassGate => 'GATE';
+
+  @override
+  String get boardingPassSampleTraveler => 'PACKBUDDY RESENÄR';
+
+  @override
+  String notification48hTitle(String destination) {
+    return 'PackBuddy: Resa till $destination om 2 dagar! 🧳';
+  }
+
+  @override
+  String notification48hBody(String destination) {
+    return 'Bara 48 timmar kvar till din resa till $destination! Har du börjat packa dina resesaker?';
+  }
+
+  @override
+  String get notification24hTitle => 'PackBuddy: Du åker imorgon! ✈️';
+
+  @override
+  String notification24hBody(String destination) {
+    return 'Sista packningskontrollen! Dubbelkolla pass, biljetter och det viktigaste för $destination.';
+  }
 }

@@ -8,6 +8,7 @@ import 'package:packbuddy/features/checklist/domain/airline_baggage_guide.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/budget_analytics_card.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
+import 'package:packbuddy/l10n/app_localizations.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -165,6 +166,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('tr'),
           home: Scaffold(
             body: SingleChildScrollView(
               child: BudgetAnalyticsCard(
@@ -180,9 +184,9 @@ void main() {
 
       expect(find.text('Kategori Harcama Analizi'), findsOneWidget);
       expect(find.text('3 Harcama'), findsOneWidget);
-      expect(find.text('Yeme & İçme'), findsOneWidget);
+      expect(find.text('Yemek'), findsOneWidget);
       expect(find.text('Ulaşım'), findsOneWidget);
-      expect(find.text('Aktivite & Eğlence'), findsOneWidget);
+      expect(find.text('Eğlence'), findsOneWidget);
       expect(find.text('%50'), findsOneWidget); // 50 / 100 EUR
     });
   });

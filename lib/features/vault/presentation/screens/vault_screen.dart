@@ -311,18 +311,18 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Column(
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('YOLCU / PASSENGER', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 9, fontWeight: FontWeight.bold)),
-                            SizedBox(height: 2),
-                            Text('PACKBUDDY TRAVELER', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
+                            Text(l10n.boardingPassPassenger, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 9, fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 2),
+                            Text(l10n.boardingPassSampleTraveler, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
                           ],
                         ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            const Text('KAPI / GATE', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 9, fontWeight: FontWeight.bold)),
+                            Text(l10n.boardingPassGate, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 9, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 2),
                             Text('A14 • 12B', style: TextStyle(color: theme.colorScheme.primary, fontSize: 13, fontWeight: FontWeight.w800)),
                           ],

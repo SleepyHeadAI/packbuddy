@@ -57,8 +57,6 @@ void main() {
 
   print('\n--- Identical to English (potentially untranslated) count per language ---');
   identicalToEnglish.forEach((lang, keys) {
-    print('$lang has ${keys.length} keys identical to English.');
+    print('$lang has ${keys.length} keys identical to English: $keys');
   });
-
-  print('tr identical keys: ${identicalToEnglish['tr']}');
 }

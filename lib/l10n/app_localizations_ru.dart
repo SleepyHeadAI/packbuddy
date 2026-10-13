@@ -906,4 +906,273 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get activeStatus => 'АКТИВНО';
+
+  @override
+  String get authSubtitleSignIn =>
+      'Ваш премиальный помощник в путешествиях • Войти';
+
+  @override
+  String get authSubtitleSignUp =>
+      'Начните новое приключение • Создать аккаунт';
+
+  @override
+  String get authSignIn => 'Войти';
+
+  @override
+  String get authSignUp => 'Регистрация';
+
+  @override
+  String get authEmail => 'Адрес эл. почты';
+
+  @override
+  String get authEmailHint => 'traveler@packbuddy.com';
+
+  @override
+  String get authEmailRequired => 'Пожалуйста, введите адрес эл. почты.';
+
+  @override
+  String get authEmailInvalid =>
+      'Пожалуйста, введите корректный адрес эл. почты.';
+
+  @override
+  String get authPassword => 'Пароль';
+
+  @override
+  String get authForgotPassword => 'Забыли пароль?';
+
+  @override
+  String get authPasswordRequired => 'Пожалуйста, введите пароль.';
+
+  @override
+  String get authPasswordRulesInvalid => 'Пароль не соответствует требованиям.';
+
+  @override
+  String get authPasswordMinChars =>
+      'Пароль должен содержать не менее 6 символов.';
+
+  @override
+  String get authPasswordRulesTitle => 'Требования к паролю:';
+
+  @override
+  String get authRuleMinChars => 'Не менее 8 символов';
+
+  @override
+  String get authRuleUppercase => 'Не менее 1 заглавной буквы';
+
+  @override
+  String get authRuleLowercase => 'Не менее 1 строчной буквы';
+
+  @override
+  String get authRuleDigit => 'Не менее 1 цифры';
+
+  @override
+  String get authConfirmPassword => 'Подтвердите пароль';
+
+  @override
+  String get authConfirmPasswordRequired => 'Пожалуйста, подтвердите пароль.';
+
+  @override
+  String get authPasswordsDoNotMatch => 'Пароли не совпадают.';
+
+  @override
+  String get authCreateAccount => 'Создать аккаунт';
+
+  @override
+  String get authOr => 'или';
+
+  @override
+  String get authContinueWithGoogle => 'Продолжить с Google';
+
+  @override
+  String get authTermsNotice =>
+      'Регистрируясь, вы принимаете Условия использования и Политику конфиденциальности.';
+
+  @override
+  String get authResetPasswordTitle => 'Сброс пароля';
+
+  @override
+  String get authResetPasswordDescription =>
+      'Введите зарегистрированный адрес эл. почты для получения ссылки.';
+
+  @override
+  String get authSendLink => 'Отправить ссылку';
+
+  @override
+  String get authResetLinkSent =>
+      'Ссылка для сброса пароля отправлена на вашу почту.';
+
+  @override
+  String get authAppleComingSoon =>
+      'Вход через Apple появится в следующем обновлении!';
+
+  @override
+  String get emailVerifyTitle => 'Подтвердите адрес эл. почты';
+
+  @override
+  String get emailVerifySubtitle =>
+      'Для защиты документов и облачной синхронизации подтвердите эл. почту.';
+
+  @override
+  String get emailVerifyInstructionsTitle => 'Что нужно сделать?';
+
+  @override
+  String get emailVerifyStep1 =>
+      'Проверьте входящие сообщения и папку со спамом.';
+
+  @override
+  String get emailVerifyStep2 =>
+      'Нажмите на ссылку для подтверждения в письме.';
+
+  @override
+  String get emailVerifyStep3 =>
+      'Подождите несколько секунд; экран разблокируется автоматически.';
+
+  @override
+  String get emailVerifyWaiting => 'Ожидание подтверждения...';
+
+  @override
+  String get emailVerifyCheckNow => 'Я подтвердил, продолжить';
+
+  @override
+  String get emailVerifyResendLink => 'Отправить письмо повторно';
+
+  @override
+  String emailVerifyResendCooldown(int seconds) {
+    return 'Отправить снова через $seconds с';
+  }
+
+  @override
+  String get emailVerifyBackToSignIn => 'Вернуться ко входу';
+
+  @override
+  String get emailVerifyNotVerifiedYet =>
+      'Эл. почта еще не подтверждена. Перейдите по ссылке из письма.';
+
+  @override
+  String get emailVerifyLinkSentSuccess =>
+      'Письмо с подтверждением отправлено повторно!';
+
+  @override
+  String get signedInTraveler => 'Авторизованный путешественник';
+
+  @override
+  String get cloudSessionActive => 'Облачная сессия активна';
+
+  @override
+  String get signOutConfirmTitle => 'Выйти из аккаунта';
+
+  @override
+  String get signOutConfirmMessage =>
+      'Вы уверены, что хотите выйти? Данные поездок останутся на вашем устройстве.';
+
+  @override
+  String get notificationsAndReminders => 'Уведомления и напоминания';
+
+  @override
+  String get packingReminders => 'Напоминания о сборах';
+
+  @override
+  String get packingRemindersSubtitle =>
+      'Умные напоминания за 48 и 24 часа до вылета';
+
+  @override
+  String get shopping => 'Шопинг';
+
+  @override
+  String get authErrorUserNotFound =>
+      'Аккаунт с таким адресом эл. почты не найден.';
+
+  @override
+  String get authErrorWrongPassword =>
+      'Введен неверный пароль. Попробуйте снова.';
+
+  @override
+  String get authErrorInvalidCredential =>
+      'Неверный адрес или пароль. Проверьте данные.';
+
+  @override
+  String get authErrorEmailInUse =>
+      'Аккаунт с таким адресом эл. почты уже существует.';
+
+  @override
+  String get authErrorInvalidEmail =>
+      'Пожалуйста, введите корректный адрес эл. почты.';
+
+  @override
+  String get authErrorWeakPassword =>
+      'Пароль не соответствует требованиям безопасности.';
+
+  @override
+  String get authErrorUserDisabled => 'Этот аккаунт временно заблокирован.';
+
+  @override
+  String get authErrorTooManyRequests =>
+      'Слишком много попыток. Пожалуйста, подождите.';
+
+  @override
+  String get authErrorNetworkFailed =>
+      'Ошибка соединения. Проверьте подключение к интернету.';
+
+  @override
+  String get authErrorGoogleFailed =>
+      'Не удалось войти через Google. Попробуйте снова.';
+
+  @override
+  String get authErrorVerificationFailed =>
+      'Не удалось отправить письмо с подтверждением.';
+
+  @override
+  String get authErrorGeneric => 'Ошибка аутентификации. Попробуйте снова.';
+
+  @override
+  String get authContinueWithApple => 'Продолжить с Apple';
+
+  @override
+  String get authNoAccount => 'Нет аккаунта? ';
+
+  @override
+  String get authAlreadyHaveAccount => 'Уже есть аккаунт? ';
+
+  @override
+  String get accountAndSession => 'Аккаунт и сессия';
+
+  @override
+  String get categorySpendingAnalysis => 'Анализ расходов по категориям';
+
+  @override
+  String topSpendingCategory(String category, String percentage) {
+    return 'Больше всего: $category ($percentage%)';
+  }
+
+  @override
+  String expenseCount(int count) {
+    return '$count Расходов';
+  }
+
+  @override
+  String get boardingPassPassenger => 'ПАССАЖИР';
+
+  @override
+  String get boardingPassGate => 'ВЫХОД';
+
+  @override
+  String get boardingPassSampleTraveler => 'ПУТЕШЕСТВЕННИК PACKBUDDY';
+
+  @override
+  String notification48hTitle(String destination) {
+    return 'PackBuddy: Поездка в $destination через 2 дня! 🧳';
+  }
+
+  @override
+  String notification48hBody(String destination) {
+    return 'Осталось всего 48 часов до поездки в $destination! Вы уже начали собирать чемодан?';
+  }
+
+  @override
+  String get notification24hTitle => 'PackBuddy: Вы отправляетесь завтра! ✈️';
+
+  @override
+  String notification24hBody(String destination) {
+    return 'Финальная проверка багажа! Проверьте паспорт, билеты и всё необходимое для поездки в $destination.';
+  }
 }

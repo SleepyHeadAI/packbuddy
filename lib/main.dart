@@ -17,6 +17,16 @@ import 'features/dashboard/presentation/dashboard_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase with current platform options (must execute before preferences/currency services)
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    debugPrint('[Firebase] Initialization notice: $e');
+  }
+
   try {
     await initializeDateFormatting();
   } catch (_) {}
@@ -28,15 +38,6 @@ void main() async {
     // Non-blocking background sync when online
     CurrencyService.syncRates();
   } catch (_) {}
-
-  // Initialize Firebase with current platform options
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  } catch (e) {
-    debugPrint('[Firebase] Initialization notice: $e');
-  }
 
   runApp(
     const ProviderScope(

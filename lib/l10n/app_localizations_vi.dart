@@ -908,4 +908,268 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get activeStatus => 'ĐANG HOẠT ĐỘNG';
+
+  @override
+  String get authSubtitleSignIn => 'Trợ lý du lịch cao cấp của bạn • Đăng nhập';
+
+  @override
+  String get authSubtitleSignUp => 'Bắt đầu hành trình mới • Tạo tài khoản';
+
+  @override
+  String get authSignIn => 'Đăng nhập';
+
+  @override
+  String get authSignUp => 'Đăng ký';
+
+  @override
+  String get authEmail => 'Địa chỉ email';
+
+  @override
+  String get authEmailHint => 'traveler@packbuddy.com';
+
+  @override
+  String get authEmailRequired => 'Vui lòng nhập địa chỉ email của bạn.';
+
+  @override
+  String get authEmailInvalid => 'Vui lòng nhập địa chỉ email hợp lệ.';
+
+  @override
+  String get authPassword => 'Mật khẩu';
+
+  @override
+  String get authForgotPassword => 'Quên mật khẩu?';
+
+  @override
+  String get authPasswordRequired => 'Vui lòng nhập mật khẩu của bạn.';
+
+  @override
+  String get authPasswordRulesInvalid => 'Mật khẩu không đáp ứng yêu cầu.';
+
+  @override
+  String get authPasswordMinChars => 'Mật khẩu phải có ít nhất 6 ký tự.';
+
+  @override
+  String get authPasswordRulesTitle => 'Yêu cầu mật khẩu:';
+
+  @override
+  String get authRuleMinChars => 'Ít nhất 8 ký tự';
+
+  @override
+  String get authRuleUppercase => 'Ít nhất 1 chữ in hoa';
+
+  @override
+  String get authRuleLowercase => 'Ít nhất 1 chữ thường';
+
+  @override
+  String get authRuleDigit => 'Ít nhất 1 chữ số';
+
+  @override
+  String get authConfirmPassword => 'Xác nhận mật khẩu';
+
+  @override
+  String get authConfirmPasswordRequired =>
+      'Vui lòng xác nhận mật khẩu của bạn.';
+
+  @override
+  String get authPasswordsDoNotMatch => 'Mật khẩu không khớp.';
+
+  @override
+  String get authCreateAccount => 'Tạo tài khoản';
+
+  @override
+  String get authOr => 'hoặc';
+
+  @override
+  String get authContinueWithGoogle => 'Tiếp tục với Google';
+
+  @override
+  String get authTermsNotice =>
+      'Bằng cách đăng ký, bạn đồng ý với Điều khoản dịch vụ và Chính sách bảo mật của chúng tôi.';
+
+  @override
+  String get authResetPasswordTitle => 'Đặt lại mật khẩu';
+
+  @override
+  String get authResetPasswordDescription =>
+      'Nhập email đã đăng ký để nhận liên kết đặt lại mật khẩu.';
+
+  @override
+  String get authSendLink => 'Gửi liên kết';
+
+  @override
+  String get authResetLinkSent =>
+      'Liên kết đặt lại mật khẩu đã được gửi đến email của bạn.';
+
+  @override
+  String get authAppleComingSoon =>
+      'Đăng nhập bằng Apple sẽ có trong bản cập nhật sắp tới!';
+
+  @override
+  String get emailVerifyTitle => 'Xác minh email của bạn';
+
+  @override
+  String get emailVerifySubtitle =>
+      'Để bảo vệ két tài liệu và đồng bộ hóa chuyến đi, vui lòng xác minh email.';
+
+  @override
+  String get emailVerifyInstructionsTitle => 'Bạn cần làm gì?';
+
+  @override
+  String get emailVerifyStep1 =>
+      'Kiểm tra hộp thư đến và thư mục thư rác (spam).';
+
+  @override
+  String get emailVerifyStep2 => 'Nhấp vào liên kết xác minh trong email.';
+
+  @override
+  String get emailVerifyStep3 =>
+      'Đợi vài giây; màn hình này sẽ tự động chuyển tiếp.';
+
+  @override
+  String get emailVerifyWaiting => 'Đang chờ xác minh...';
+
+  @override
+  String get emailVerifyCheckNow => 'Tôi đã xác minh, tiếp tục';
+
+  @override
+  String get emailVerifyResendLink => 'Gửi lại email xác minh';
+
+  @override
+  String emailVerifyResendCooldown(int seconds) {
+    return 'Gửi lại sau $seconds giây';
+  }
+
+  @override
+  String get emailVerifyBackToSignIn => 'Quay lại đăng nhập';
+
+  @override
+  String get emailVerifyNotVerifiedYet =>
+      'Email chưa được xác minh. Vui lòng nhấp vào liên kết bạn nhận được.';
+
+  @override
+  String get emailVerifyLinkSentSuccess =>
+      'Đã gửi lại email xác minh! Vui lòng kiểm tra hộp thư.';
+
+  @override
+  String get signedInTraveler => 'Du khách đã đăng nhập';
+
+  @override
+  String get cloudSessionActive => 'Phiên đám mây đang hoạt động';
+
+  @override
+  String get signOutConfirmTitle => 'Đăng xuất';
+
+  @override
+  String get signOutConfirmMessage =>
+      'Bạn có chắc chắn muốn đăng xuất? Dữ liệu chuyến đi sẽ vẫn được lưu an toàn trên thiết bị của bạn.';
+
+  @override
+  String get notificationsAndReminders => 'Thông báo & Nhắc nhở';
+
+  @override
+  String get packingReminders => 'Nhắc nhở đóng gói hành lý';
+
+  @override
+  String get packingRemindersSubtitle =>
+      'Nhận thông báo thông minh 48 giờ và 24 giờ trước chuyến bay';
+
+  @override
+  String get shopping => 'Mua sắm';
+
+  @override
+  String get authErrorUserNotFound =>
+      'Không tìm thấy tài khoản nào với email này.';
+
+  @override
+  String get authErrorWrongPassword => 'Mật khẩu không đúng. Vui lòng thử lại.';
+
+  @override
+  String get authErrorInvalidCredential =>
+      'Email hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại.';
+
+  @override
+  String get authErrorEmailInUse =>
+      'Email này đã được sử dụng cho một tài khoản khác.';
+
+  @override
+  String get authErrorInvalidEmail => 'Vui lòng nhập địa chỉ email hợp lệ.';
+
+  @override
+  String get authErrorWeakPassword =>
+      'Mật khẩu không đáp ứng tiêu chuẩn bảo mật.';
+
+  @override
+  String get authErrorUserDisabled => 'Tài khoản này đã bị tạm khóa.';
+
+  @override
+  String get authErrorTooManyRequests =>
+      'Quá nhiều lần thử. Vui lòng đợi trong giây lát.';
+
+  @override
+  String get authErrorNetworkFailed =>
+      'Lỗi kết nối mạng. Vui lòng kiểm tra internet.';
+
+  @override
+  String get authErrorGoogleFailed =>
+      'Đăng nhập bằng Google thất bại. Vui lòng thử lại.';
+
+  @override
+  String get authErrorVerificationFailed =>
+      'Không thể gửi email xác minh. Thử lại sau.';
+
+  @override
+  String get authErrorGeneric => 'Xác thực thất bại. Vui lòng thử lại.';
+
+  @override
+  String get authContinueWithApple => 'Tiếp tục với Apple';
+
+  @override
+  String get authNoAccount => 'Chưa có tài khoản? ';
+
+  @override
+  String get authAlreadyHaveAccount => 'Đã có tài khoản? ';
+
+  @override
+  String get accountAndSession => 'Tài khoản & Phiên';
+
+  @override
+  String get categorySpendingAnalysis => 'Phân tích chi tiêu theo danh mục';
+
+  @override
+  String topSpendingCategory(String category, String percentage) {
+    return 'Nhiều nhất: $category ($percentage%)';
+  }
+
+  @override
+  String expenseCount(int count) {
+    return '$count Khoản chi';
+  }
+
+  @override
+  String get boardingPassPassenger => 'HÀNH KHÁCH';
+
+  @override
+  String get boardingPassGate => 'CỔNG';
+
+  @override
+  String get boardingPassSampleTraveler => 'DU KHÁCH PACKBUDDY';
+
+  @override
+  String notification48hTitle(String destination) {
+    return 'PackBuddy: Chuyến đi đến $destination sau 2 ngày nữa! 🧳';
+  }
+
+  @override
+  String notification48hBody(String destination) {
+    return 'Chỉ còn 48 giờ nữa là đến chuyến đi $destination! Bạn đã bắt đầu xếp hành lý chưa?';
+  }
+
+  @override
+  String get notification24hTitle =>
+      'PackBuddy: Bạn sẽ khởi hành vào ngày mai! ✈️';
+
+  @override
+  String notification24hBody(String destination) {
+    return 'Kiểm tra hành lý lần cuối! Hãy kiểm tra lại hộ chiếu, vé và đồ dùng cần thiết cho $destination.';
+  }
 }

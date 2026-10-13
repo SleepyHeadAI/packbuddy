@@ -63,7 +63,7 @@ class FirebaseAuthService implements AuthService {
       return _firebaseAuth.authStateChanges();
     } catch (e) {
       debugPrint('[FirebaseAuthService] authStateChanges stream error: $e');
-      return Stream.value(null);
+      return const Stream.empty();
     }
   }
 

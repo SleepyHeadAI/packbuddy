@@ -214,9 +214,7 @@ class SettingsScreen extends ConsumerWidget {
 
           // 5. Notifications & Smart Packing Reminders
           _SectionHeader(
-            title: currentLocale.languageCode == 'tr'
-                ? 'Bildirimler & Hatırlatıcılar'
-                : 'Notifications & Reminders',
+            title: l10n.notificationsAndReminders,
           ),
           const SizedBox(height: 8),
           AppCard(
@@ -243,15 +241,11 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                 ),
                 title: Text(
-                  currentLocale.languageCode == 'tr'
-                      ? 'Paketleme Hatırlatıcıları'
-                      : 'Packing Reminders',
+                  l10n.packingReminders,
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
                 subtitle: Text(
-                  currentLocale.languageCode == 'tr'
-                      ? 'Uçuştan 48 ve 24 saat önce akıllı bildirimler alın'
-                      : 'Get smart reminders 48h and 24h before departure',
+                  l10n.packingRemindersSubtitle,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -308,14 +302,11 @@ class SettingsScreen extends ConsumerWidget {
 
           // 6. Account & Authentication Session
           _SectionHeader(
-            title: currentLocale.languageCode == 'tr'
-                ? 'Hesap & Oturum'
-                : 'Account & Session',
+            title: l10n.accountAndSession,
           ),
           const SizedBox(height: 8),
           _AccountSessionCard(
             isDark: theme.brightness == Brightness.dark,
-            isTr: currentLocale.languageCode == 'tr',
           ),
           const SizedBox(height: 28),
 
@@ -697,17 +688,16 @@ class _ProBanner extends StatelessWidget {
 /// Luxury Account and Authentication Session Card with Sign Out integration
 class _AccountSessionCard extends ConsumerWidget {
   final bool isDark;
-  final bool isTr;
 
   const _AccountSessionCard({
     required this.isDark,
-    required this.isTr,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authUserProvider);
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final email = user?.email ?? '';
     final initialLetter = email.isNotEmpty ? email[0].toUpperCase() : 'P';
 
@@ -757,7 +747,7 @@ class _AccountSessionCard extends ConsumerWidget {
                     Text(
                       email.isNotEmpty
                           ? email
-                          : (isTr ? 'Giriş Yapılmış Kullanıcı' : 'Signed In Traveler'),
+                          : l10n.signedInTraveler,
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
@@ -777,7 +767,7 @@ class _AccountSessionCard extends ConsumerWidget {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          isTr ? 'Bulut Oturumu Aktif' : 'Cloud Session Active',
+                          l10n.cloudSessionActive,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: AppColors.successPastel,
                             fontWeight: FontWeight.w600,
@@ -810,10 +800,10 @@ class _AccountSessionCard extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              onPressed: () => _confirmSignOut(context, ref),
+              onPressed: () => _confirmSignOut(context, ref, l10n),
               icon: const Icon(Icons.logout_rounded, size: 18),
               label: Text(
-                isTr ? 'Oturumu Kapat' : 'Sign Out',
+                l10n.signOutConfirmTitle,
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
             ),
@@ -823,22 +813,20 @@ class _AccountSessionCard extends ConsumerWidget {
     );
   }
 
-  void _confirmSignOut(BuildContext context, WidgetRef ref) {
+  void _confirmSignOut(BuildContext context, WidgetRef ref, AppLocalizations l10n) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-        title: Text(isTr ? 'Oturumu Kapat' : 'Sign Out'),
+        title: Text(l10n.signOutConfirmTitle),
         content: Text(
-          isTr
-              ? 'Hesabınızdan çıkış yapmak istediğinize emin misiniz? Seyahat verileriniz cihazınızda güvende kalacaktır.'
-              : 'Are you sure you want to sign out? Your travel data remains safely stored on your device.',
+          l10n.signOutConfirmMessage,
           style: const TextStyle(fontSize: 13),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(isTr ? 'Vazgeç' : 'Cancel'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -852,7 +840,7 @@ class _AccountSessionCard extends ConsumerWidget {
                 Navigator.of(context).popUntil((route) => route.isFirst);
               }
             },
-            child: Text(isTr ? 'Çıkış Yap' : 'Sign Out'),
+            child: Text(l10n.signOutConfirmTitle),
           ),
         ],
       ),

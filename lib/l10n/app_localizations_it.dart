@@ -910,4 +910,270 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get activeStatus => 'ATTIVO';
+
+  @override
+  String get authSubtitleSignIn =>
+      'Il tuo compagno di viaggio esclusivo • Accedi';
+
+  @override
+  String get authSubtitleSignUp => 'Inizia una nuova avventura • Crea account';
+
+  @override
+  String get authSignIn => 'Accedi';
+
+  @override
+  String get authSignUp => 'Registrati';
+
+  @override
+  String get authEmail => 'Indirizzo e-mail';
+
+  @override
+  String get authEmailHint => 'viaggiatore@packbuddy.com';
+
+  @override
+  String get authEmailRequired => 'Inserisci il tuo indirizzo e-mail.';
+
+  @override
+  String get authEmailInvalid => 'Inserisci un indirizzo e-mail valido.';
+
+  @override
+  String get authPassword => 'Password';
+
+  @override
+  String get authForgotPassword => 'Password dimenticata?';
+
+  @override
+  String get authPasswordRequired => 'Inserisci la tua password.';
+
+  @override
+  String get authPasswordRulesInvalid =>
+      'La password non rispetta i criteri richiesti.';
+
+  @override
+  String get authPasswordMinChars =>
+      'La password deve contenere almeno 6 caratteri.';
+
+  @override
+  String get authPasswordRulesTitle => 'Requisiti della password:';
+
+  @override
+  String get authRuleMinChars => 'Almeno 8 caratteri';
+
+  @override
+  String get authRuleUppercase => 'Almeno 1 lettera maiuscola';
+
+  @override
+  String get authRuleLowercase => 'Almeno 1 lettera minuscola';
+
+  @override
+  String get authRuleDigit => 'Almeno 1 numero';
+
+  @override
+  String get authConfirmPassword => 'Conferma password';
+
+  @override
+  String get authConfirmPasswordRequired => 'Conferma la tua password.';
+
+  @override
+  String get authPasswordsDoNotMatch => 'Le password non coincidono.';
+
+  @override
+  String get authCreateAccount => 'Crea account';
+
+  @override
+  String get authOr => 'oppure';
+
+  @override
+  String get authContinueWithGoogle => 'Continua con Google';
+
+  @override
+  String get authTermsNotice =>
+      'Registrandoti, accetti i nostri Termini di servizio e l’Informativa sulla privacy.';
+
+  @override
+  String get authResetPasswordTitle => 'Reimposta password';
+
+  @override
+  String get authResetPasswordDescription =>
+      'Inserisci la tua e-mail registrata per ricevere il link di reimpostazione.';
+
+  @override
+  String get authSendLink => 'Invia link';
+
+  @override
+  String get authResetLinkSent =>
+      'Il link di reimpostazione è stato inviato alla tua e-mail.';
+
+  @override
+  String get authAppleComingSoon =>
+      'L\'accesso con Apple sarà disponibile nel prossimo aggiornamento!';
+
+  @override
+  String get emailVerifyTitle => 'Verifica la tua e-mail';
+
+  @override
+  String get emailVerifySubtitle =>
+      'Per proteggere i tuoi documenti e sincronizzare i viaggi, verifica la tua e-mail.';
+
+  @override
+  String get emailVerifyInstructionsTitle => 'Cosa devi fare?';
+
+  @override
+  String get emailVerifyStep1 =>
+      'Controlla la posta in arrivo e la cartella spam.';
+
+  @override
+  String get emailVerifyStep2 =>
+      'Fai clic sul link di verifica presente nell’e-mail.';
+
+  @override
+  String get emailVerifyStep3 =>
+      'Attendi qualche secondo; la schermata proseguirà automaticamente.';
+
+  @override
+  String get emailVerifyWaiting => 'In attesa di verifica...';
+
+  @override
+  String get emailVerifyCheckNow => 'Ho verificato, continua';
+
+  @override
+  String get emailVerifyResendLink => 'Invia di nuovo e-mail di verifica';
+
+  @override
+  String emailVerifyResendCooldown(int seconds) {
+    return 'Invia di nuovo tra $seconds s';
+  }
+
+  @override
+  String get emailVerifyBackToSignIn => 'Torna ad Accedi';
+
+  @override
+  String get emailVerifyNotVerifiedYet =>
+      'E-mail non ancora verificata. Fai clic sul link ricevuto.';
+
+  @override
+  String get emailVerifyLinkSentSuccess =>
+      'E-mail di verifica inviata di nuovo! Controlla la posta in arrivo.';
+
+  @override
+  String get signedInTraveler => 'Viaggiatore connesso';
+
+  @override
+  String get cloudSessionActive => 'Sessione cloud attiva';
+
+  @override
+  String get signOutConfirmTitle => 'Disconnetti';
+
+  @override
+  String get signOutConfirmMessage =>
+      'Sei sicuro di voler uscire? I tuoi dati di viaggio rimarranno al sicuro sul tuo dispositivo.';
+
+  @override
+  String get notificationsAndReminders => 'Notifiche e promemoria';
+
+  @override
+  String get packingReminders => 'Promemoria bagagli';
+
+  @override
+  String get packingRemindersSubtitle =>
+      'Ricevi promemoria intelligenti 48h e 24h prima del volo';
+
+  @override
+  String get shopping => 'Acquisti';
+
+  @override
+  String get authErrorUserNotFound =>
+      'Nessun account trovato con questo indirizzo e-mail.';
+
+  @override
+  String get authErrorWrongPassword => 'Password errata. Riprova.';
+
+  @override
+  String get authErrorInvalidCredential =>
+      'E-mail o password non corretti. Controlla le tue credenziali.';
+
+  @override
+  String get authErrorEmailInUse =>
+      'Esiste già un account con questo indirizzo e-mail.';
+
+  @override
+  String get authErrorInvalidEmail => 'Inserisci un indirizzo e-mail valido.';
+
+  @override
+  String get authErrorWeakPassword =>
+      'La password non soddisfa i requisiti di sicurezza.';
+
+  @override
+  String get authErrorUserDisabled =>
+      'Questo account è stato temporaneamente disabilitato.';
+
+  @override
+  String get authErrorTooManyRequests => 'Troppi tentativi. Riprova più tardi.';
+
+  @override
+  String get authErrorNetworkFailed =>
+      'Errore di connessione. Controlla la tua rete.';
+
+  @override
+  String get authErrorGoogleFailed =>
+      'Accesso con Google non riuscito. Riprova.';
+
+  @override
+  String get authErrorVerificationFailed =>
+      'Impossibile inviare l’e-mail di verifica.';
+
+  @override
+  String get authErrorGeneric => 'Autenticazione non riuscita. Riprova.';
+
+  @override
+  String get authContinueWithApple => 'Continua con Apple';
+
+  @override
+  String get authNoAccount => 'Non hai un account? ';
+
+  @override
+  String get authAlreadyHaveAccount => 'Hai già un account? ';
+
+  @override
+  String get accountAndSession => 'Account e sessione';
+
+  @override
+  String get categorySpendingAnalysis => 'Analisi delle spese per categoria';
+
+  @override
+  String topSpendingCategory(String category, String percentage) {
+    return 'Principale: $category ($percentage%)';
+  }
+
+  @override
+  String expenseCount(int count) {
+    return '$count Spese';
+  }
+
+  @override
+  String get boardingPassPassenger => 'PASSEGGERO';
+
+  @override
+  String get boardingPassGate => 'GATE';
+
+  @override
+  String get boardingPassSampleTraveler => 'VIAGGIATORE PACKBUDDY';
+
+  @override
+  String notification48hTitle(String destination) {
+    return 'PackBuddy: Viaggio a $destination tra 2 giorni! 🧳';
+  }
+
+  @override
+  String notification48hBody(String destination) {
+    return 'Mancano solo 48 ore al tuo viaggio a $destination! Hai iniziato a preparare la valigia?';
+  }
+
+  @override
+  String get notification24hTitle => 'PackBuddy: Si parte domani! ✈️';
+
+  @override
+  String notification24hBody(String destination) {
+    return 'Controllo finale dei bagagli! Ricontrolla passaporto, biglietti ed elementi essenziali per $destination.';
+  }
 }

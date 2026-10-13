@@ -1,6 +1,7 @@
 /// Domain entity representing a travel Expense with soft-delete and two-way sync support
 class Expense {
   final String id;
+  final String userId;
   final String tripId;
   final String title;
   final double amount;
@@ -16,6 +17,7 @@ class Expense {
 
   const Expense({
     required this.id,
+    this.userId = '',
     required this.tripId,
     required this.title,
     required this.amount,
@@ -33,6 +35,7 @@ class Expense {
   /// Creates a copy with optionally modified fields
   Expense copyWith({
     String? id,
+    String? userId,
     String? tripId,
     String? title,
     double? amount,
@@ -48,6 +51,7 @@ class Expense {
   }) {
     return Expense(
       id: id ?? this.id,
+      userId: userId ?? this.userId,
       tripId: tripId ?? this.tripId,
       title: title ?? this.title,
       amount: amount ?? this.amount,
@@ -67,7 +71,10 @@ class Expense {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'userId': userId,
+      'user_id': userId,
       'tripId': tripId,
+      'trip_id': tripId,
       'title': title,
       'amount': amount,
       'currency': currency,
@@ -78,30 +85,42 @@ class Expense {
       'notes': notes,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'updated_at': updatedAt.millisecondsSinceEpoch,
       'isDeleted': isDeleted,
+      'is_deleted': isDeleted,
     };
   }
 
   /// Deserialization from Cloud Firestore / JSON APIs
   factory Expense.fromJson(Map<String, dynamic> json) {
+    DateTime parseDate(dynamic val) {
+      if (val is int) return DateTime.fromMillisecondsSinceEpoch(val);
+      if (val is String) {
+        final parsed = DateTime.tryParse(val);
+        if (parsed != null) return parsed;
+      }
+      return DateTime.now();
+    }
+
     return Expense(
       id: json['id'] as String,
-      tripId: json['tripId'] as String,
+      userId: (json['user_id'] ?? json['userId'] ?? '') as String,
+      tripId: (json['tripId'] ?? json['trip_id'] ?? '') as String,
       title: json['title'] as String,
       amount: (json['amount'] as num).toDouble(),
       currency: json['currency'] as String? ?? 'USD',
       category: json['category'] as String? ?? 'General',
-      date: DateTime.parse(json['date'] as String),
+      date: parseDate(json['date']),
       receiptPath: json['receiptPath'] as String?,
       paymentMethod: json['paymentMethod'] as String?,
       notes: json['notes'] as String?,
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'] as String)
+      createdAt: json['createdAt'] != null || json['created_at'] != null
+          ? parseDate(json['createdAt'] ?? json['created_at'])
           : DateTime.now(),
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'] as String)
+      updatedAt: json['updatedAt'] != null || json['updated_at'] != null
+          ? parseDate(json['updatedAt'] ?? json['updated_at'])
           : DateTime.now(),
-      isDeleted: json['isDeleted'] as bool? ?? false,
+      isDeleted: json['isDeleted'] as bool? ?? json['is_deleted'] == true || json['is_deleted'] == 1,
     );
   }
 
@@ -109,6 +128,7 @@ class Expense {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'user_id': userId,
       'trip_id': tripId,
       'title': title,
       'amount': amount,
@@ -134,6 +154,7 @@ class Expense {
 
     return Expense(
       id: (map['id'] ?? '') as String,
+      userId: (map['user_id'] ?? map['userId'] ?? '') as String,
       tripId: (map['trip_id'] ?? map['tripId'] ?? '') as String,
       title: (map['title'] ?? '') as String,
       amount: ((map['amount'] as num?) ?? 0).toDouble(),

@@ -917,4 +917,275 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get activeStatus => 'ΕΝΕΡΓΟ';
+
+  @override
+  String get authSubtitleSignIn =>
+      'Ο πολυτελής ταξιδιωτικός σας βοηθός • Σύνδεση';
+
+  @override
+  String get authSubtitleSignUp =>
+      'Ξεκινήστε μια νέα περιπέτεια • Δημιουργία λογαριασμού';
+
+  @override
+  String get authSignIn => 'Σύνδεση';
+
+  @override
+  String get authSignUp => 'Εγγραφή';
+
+  @override
+  String get authEmail => 'Διεύθυνση email';
+
+  @override
+  String get authEmailHint => 'taxidiotis@packbuddy.com';
+
+  @override
+  String get authEmailRequired => 'Παρακαλούμε εισαγάγετε το email σας.';
+
+  @override
+  String get authEmailInvalid => 'Παρακαλούμε εισαγάγετε ένα έγκυρο email.';
+
+  @override
+  String get authPassword => 'Κωδικός πρόσβασης';
+
+  @override
+  String get authForgotPassword => 'Ξεχάσατε τον κωδικό;';
+
+  @override
+  String get authPasswordRequired =>
+      'Παρακαλούμε εισαγάγετε τον κωδικό πρόσβασης.';
+
+  @override
+  String get authPasswordRulesInvalid =>
+      'Ο κωδικός πρόσβασης δεν πληροί τις προϋποθέσεις.';
+
+  @override
+  String get authPasswordMinChars =>
+      'Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες.';
+
+  @override
+  String get authPasswordRulesTitle => 'Απαιτήσεις κωδικού πρόσβασης:';
+
+  @override
+  String get authRuleMinChars => 'Τουλάχιστον 8 χαρακτήρες';
+
+  @override
+  String get authRuleUppercase => 'Τουλάχιστον 1 κεφαλαίο γράμμα';
+
+  @override
+  String get authRuleLowercase => 'Τουλάχιστον 1 πεζό γράμμα';
+
+  @override
+  String get authRuleDigit => 'Τουλάχιστον 1 αριθμός';
+
+  @override
+  String get authConfirmPassword => 'Επιβεβαίωση κωδικού πρόσβασης';
+
+  @override
+  String get authConfirmPasswordRequired =>
+      'Παρακαλούμε επιβεβαιώστε τον κωδικό πρόσβασης.';
+
+  @override
+  String get authPasswordsDoNotMatch => 'Οι κωδικοί πρόσβασης δεν ταιριάζουν.';
+
+  @override
+  String get authCreateAccount => 'Δημιουργία λογαριασμού';
+
+  @override
+  String get authOr => 'ή';
+
+  @override
+  String get authContinueWithGoogle => 'Συνέχεια με Google';
+
+  @override
+  String get authTermsNotice =>
+      'Με την εγγραφή σας, αποδέχεστε τους Όρους Χρήσης και την Πολιτική Απορρήτου.';
+
+  @override
+  String get authResetPasswordTitle => 'Επαναφορά κωδικού πρόσβασης';
+
+  @override
+  String get authResetPasswordDescription =>
+      'Εισαγάγετε το εγγεγραμμένο email σας για να λάβετε σύνδεσμο επαναφοράς.';
+
+  @override
+  String get authSendLink => 'Αποστολή συνδέσμου';
+
+  @override
+  String get authResetLinkSent =>
+      'Ο σύνδεσμος επαναφοράς στάλθηκε στο email σας.';
+
+  @override
+  String get authAppleComingSoon =>
+      'Η σύνδεση με Apple θα είναι διαθέσιμη στην επόμενη ενημέρωση!';
+
+  @override
+  String get emailVerifyTitle => 'Επαληθεύστε το email σας';
+
+  @override
+  String get emailVerifySubtitle =>
+      'Για να προστατεύσετε τα έγγραφά σας και να συγχρονίσετε τα ταξίδια σας, επαληθεύστε το email.';
+
+  @override
+  String get emailVerifyInstructionsTitle => 'Τι πρέπει να κάνετε;';
+
+  @override
+  String get emailVerifyStep1 =>
+      'Ελέγξτε τα εισερχόμενά σας και τον φάκελο ανεπιθύμητων (spam).';
+
+  @override
+  String get emailVerifyStep2 =>
+      'Κάντε κλικ στον σύνδεσμο επαλήθευσης στο email.';
+
+  @override
+  String get emailVerifyStep3 =>
+      'Περιμένετε λίγα δευτερόλεπτα, η οθόνη θα προχωρήσει αυτόματα.';
+
+  @override
+  String get emailVerifyWaiting => 'Αναμονή για επαλήθευση...';
+
+  @override
+  String get emailVerifyCheckNow => 'Επαλήθευσα, συνέχεια';
+
+  @override
+  String get emailVerifyResendLink => 'Επαναποστολή email επαλήθευσης';
+
+  @override
+  String emailVerifyResendCooldown(int seconds) {
+    return 'Επαναποστολή σε $seconds δευτ.';
+  }
+
+  @override
+  String get emailVerifyBackToSignIn => 'Επιστροφή στη σύνδεση';
+
+  @override
+  String get emailVerifyNotVerifiedYet =>
+      'Το email δεν έχει επαληθευτεί ακόμα. Κάντε κλικ στον σύνδεσμο που λάβατε.';
+
+  @override
+  String get emailVerifyLinkSentSuccess =>
+      'Το email επαλήθευσης στάλθηκε ξανά! Ελέγξτε τα εισερχόμενά σας.';
+
+  @override
+  String get signedInTraveler => 'Συνδεδεμένος ταξιδιώτης';
+
+  @override
+  String get cloudSessionActive => 'Ενεργή συνεδρία Cloud';
+
+  @override
+  String get signOutConfirmTitle => 'Αποσύνδεση';
+
+  @override
+  String get signOutConfirmMessage =>
+      'Είστε σίγουροι ότι θέλετε να αποσυνδεθείτε; Τα ταξιδιωτικά σας δεδομένα παραμένουν ασφαλή στη συσκευή.';
+
+  @override
+  String get notificationsAndReminders => 'Ειδοποιήσεις & Υπενθυμίσεις';
+
+  @override
+  String get packingReminders => 'Υπενθυμίσεις πακεταρίσματος';
+
+  @override
+  String get packingRemindersSubtitle =>
+      'Λάβετε έξυπνες υπενθυμίσεις 48 ώρες και 24 ώρες πριν από την πτήση';
+
+  @override
+  String get shopping => 'Αγορές';
+
+  @override
+  String get authErrorUserNotFound =>
+      'Δεν βρέθηκε λογαριασμός με αυτό το email.';
+
+  @override
+  String get authErrorWrongPassword =>
+      'Εισαγάγατε λάθος κωδικό πρόσβασης. Δοκιμάστε ξανά.';
+
+  @override
+  String get authErrorInvalidCredential =>
+      'Λανθασμένο email ή κωδικός. Ελέγξτε τα στοιχεία σας.';
+
+  @override
+  String get authErrorEmailInUse => 'Υπάρχει ήδη λογαριασμός με αυτό το email.';
+
+  @override
+  String get authErrorInvalidEmail =>
+      'Παρακαλούμε εισαγάγετε ένα έγκυρο email.';
+
+  @override
+  String get authErrorWeakPassword =>
+      'Ο κωδικός δεν πληροί τις απαιτήσεις ασφαλείας.';
+
+  @override
+  String get authErrorUserDisabled =>
+      'Αυτός ο λογαριασμός έχει απενεργοποιηθεί προσωρινά.';
+
+  @override
+  String get authErrorTooManyRequests =>
+      'Πάρα πολλές προσπάθειες. Παρακαλούμε περιμένετε.';
+
+  @override
+  String get authErrorNetworkFailed =>
+      'Σφάλμα σύνδεσης. Ελέγξτε το διαδίκτυό σας.';
+
+  @override
+  String get authErrorGoogleFailed =>
+      'Η σύνδεση με Google απέτυχε. Δοκιμάστε ξανά.';
+
+  @override
+  String get authErrorVerificationFailed =>
+      'Αδυναμία αποστολής email επαλήθευσης.';
+
+  @override
+  String get authErrorGeneric => 'Η ταυτοποίηση απέτυχε. Δοκιμάστε ξανά.';
+
+  @override
+  String get authContinueWithApple => 'Συνέχεια με την Apple';
+
+  @override
+  String get authNoAccount => 'Δεν έχετε λογαριασμό; ';
+
+  @override
+  String get authAlreadyHaveAccount => 'Έχετε ήδη λογαριασμό; ';
+
+  @override
+  String get accountAndSession => 'Λογαριασμός & Συνεδρία';
+
+  @override
+  String get categorySpendingAnalysis => 'Ανάλυση δαπανών ανά κατηγορία';
+
+  @override
+  String topSpendingCategory(String category, String percentage) {
+    return 'Κορυφαία: $category ($percentage%)';
+  }
+
+  @override
+  String expenseCount(int count) {
+    return '$count Έξοδα';
+  }
+
+  @override
+  String get boardingPassPassenger => 'ΕΠΙΒΑΤΗΣ';
+
+  @override
+  String get boardingPassGate => 'ΠΥΛΗ';
+
+  @override
+  String get boardingPassSampleTraveler => 'ΤΑΞΙΔΙΩΤΗΣ PACKBUDDY';
+
+  @override
+  String notification48hTitle(String destination) {
+    return 'PackBuddy: Ταξίδι προς $destination σε 2 ημέρες! 🧳';
+  }
+
+  @override
+  String notification48hBody(String destination) {
+    return 'Μόλις 48 ώρες απομένουν για το ταξίδι σας προς $destination! Ξεκινήσατε να φτιάχνετε τη βαλίτσα σας;';
+  }
+
+  @override
+  String get notification24hTitle => 'PackBuddy: Φεύγετε αύριο! ✈️';
+
+  @override
+  String notification24hBody(String destination) {
+    return 'Τελικός έλεγχος αποσκευών! Ελέγξτε ξανά το διαβατήριο, τα εισιτήρια και τα απαραίτητα για $destination.';
+  }
 }

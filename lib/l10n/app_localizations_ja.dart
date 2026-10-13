@@ -884,4 +884,247 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get activeStatus => '有効';
+
+  @override
+  String get authSubtitleSignIn => 'ラグジュアリーな旅のパートナー • ログイン';
+
+  @override
+  String get authSubtitleSignUp => '新しい冒険を始めましょう • アカウント登録';
+
+  @override
+  String get authSignIn => 'ログイン';
+
+  @override
+  String get authSignUp => '新規登録';
+
+  @override
+  String get authEmail => 'メールアドレス';
+
+  @override
+  String get authEmailHint => 'traveler@packbuddy.com';
+
+  @override
+  String get authEmailRequired => 'メールアドレスを入力してください。';
+
+  @override
+  String get authEmailInvalid => '有効なメールアドレスを入力してください。';
+
+  @override
+  String get authPassword => 'パスワード';
+
+  @override
+  String get authForgotPassword => 'パスワードをお忘れですか？';
+
+  @override
+  String get authPasswordRequired => 'パスワードを入力してください。';
+
+  @override
+  String get authPasswordRulesInvalid => 'パスワードが要件を満たしていません。';
+
+  @override
+  String get authPasswordMinChars => 'パスワードは6文字以上である必要があります。';
+
+  @override
+  String get authPasswordRulesTitle => 'パスワードの要件：';
+
+  @override
+  String get authRuleMinChars => '8文字以上';
+
+  @override
+  String get authRuleUppercase => '大文字1文字以上';
+
+  @override
+  String get authRuleLowercase => '小文字1文字以上';
+
+  @override
+  String get authRuleDigit => '数字1文字以上';
+
+  @override
+  String get authConfirmPassword => 'パスワード（確認）';
+
+  @override
+  String get authConfirmPasswordRequired => '確認用パスワードを入力してください。';
+
+  @override
+  String get authPasswordsDoNotMatch => 'パスワードが一致しません。';
+
+  @override
+  String get authCreateAccount => 'アカウントを作成';
+
+  @override
+  String get authOr => 'または';
+
+  @override
+  String get authContinueWithGoogle => 'Googleで続ける';
+
+  @override
+  String get authTermsNotice => '登録することにより、利用規約およびプライバシーポリシーに同意したものとみなされます。';
+
+  @override
+  String get authResetPasswordTitle => 'パスワードのリセット';
+
+  @override
+  String get authResetPasswordDescription => '登録済みのメールアドレスを入力してリセット用リンクを受信します。';
+
+  @override
+  String get authSendLink => 'リンクを送信';
+
+  @override
+  String get authResetLinkSent => 'パスワード再設定リンクがメール宛てに送信されました。';
+
+  @override
+  String get authAppleComingSoon => 'Appleでサインインは次期アップデートで対応予定です！';
+
+  @override
+  String get emailVerifyTitle => 'メールアドレスの確認';
+
+  @override
+  String get emailVerifySubtitle => '金庫を保護し旅行データを同期するため、メールアドレスをご確認ください。';
+
+  @override
+  String get emailVerifyInstructionsTitle => '確認手順';
+
+  @override
+  String get emailVerifyStep1 => '受信トレイおよび迷惑メールフォルダをご確認ください。';
+
+  @override
+  String get emailVerifyStep2 => '届いたメール内の確認リンクをクリックしてください。';
+
+  @override
+  String get emailVerifyStep3 => 'クリック後数秒お待ちいただくと、自動的に画面が切り替わります。';
+
+  @override
+  String get emailVerifyWaiting => '確認待ちです...';
+
+  @override
+  String get emailVerifyCheckNow => '確認しました、続ける';
+
+  @override
+  String get emailVerifyResendLink => '確認メールを再送信';
+
+  @override
+  String emailVerifyResendCooldown(int seconds) {
+    return '$seconds秒後に再送信可能';
+  }
+
+  @override
+  String get emailVerifyBackToSignIn => 'ログイン画面に戻る';
+
+  @override
+  String get emailVerifyNotVerifiedYet => 'まだ確認が完了していません。受信したリンクをクリックしてください。';
+
+  @override
+  String get emailVerifyLinkSentSuccess => '確認メールを再送しました！受信トレイをご確認ください。';
+
+  @override
+  String get signedInTraveler => 'ログイン中の旅行者';
+
+  @override
+  String get cloudSessionActive => 'クラウドセッション有効';
+
+  @override
+  String get signOutConfirmTitle => 'ログアウト';
+
+  @override
+  String get signOutConfirmMessage => '本当にログアウトしますか？旅行データは端末内に安全に保持されます。';
+
+  @override
+  String get notificationsAndReminders => '通知とリマインダー';
+
+  @override
+  String get packingReminders => 'パッキングリマインダー';
+
+  @override
+  String get packingRemindersSubtitle => '出発の48時間前および24時間前にスマート通知を受け取る';
+
+  @override
+  String get shopping => 'ショッピング';
+
+  @override
+  String get authErrorUserNotFound => 'このメールアドレスのアカウントが見つかりません。';
+
+  @override
+  String get authErrorWrongPassword => 'パスワードが間違っています。もう一度お試しください。';
+
+  @override
+  String get authErrorInvalidCredential => 'メールアドレスまたはパスワードが正しくありません。';
+
+  @override
+  String get authErrorEmailInUse => 'このメールアドレスは既に登録されています。';
+
+  @override
+  String get authErrorInvalidEmail => '有効なメールアドレスを入力してください。';
+
+  @override
+  String get authErrorWeakPassword => 'パスワードがセキュリティ基準を満たしていません。';
+
+  @override
+  String get authErrorUserDisabled => 'このアカウントは一時的に無効化されています。';
+
+  @override
+  String get authErrorTooManyRequests => '試行回数が多すぎます。しばらく時間をおいてください。';
+
+  @override
+  String get authErrorNetworkFailed => 'ネットワーク接続エラーです。接続をご確認ください。';
+
+  @override
+  String get authErrorGoogleFailed => 'Googleログインに失敗しました。もう一度お試しください。';
+
+  @override
+  String get authErrorVerificationFailed => '確認メールを送信できませんでした。';
+
+  @override
+  String get authErrorGeneric => '認証に失敗しました。もう一度お試しください。';
+
+  @override
+  String get authContinueWithApple => 'Appleで続ける';
+
+  @override
+  String get authNoAccount => 'アカウントをお持ちでないですか？ ';
+
+  @override
+  String get authAlreadyHaveAccount => 'すでにアカウントをお持ちですか？ ';
+
+  @override
+  String get accountAndSession => 'アカウントとセッション';
+
+  @override
+  String get categorySpendingAnalysis => 'カテゴリー別支出の内訳';
+
+  @override
+  String topSpendingCategory(String category, String percentage) {
+    return '最多: $category ($percentage%)';
+  }
+
+  @override
+  String expenseCount(int count) {
+    return '$count件の支出';
+  }
+
+  @override
+  String get boardingPassPassenger => '乗客';
+
+  @override
+  String get boardingPassGate => '搭乗口';
+
+  @override
+  String get boardingPassSampleTraveler => 'PACKBUDDY トラベラー';
+
+  @override
+  String notification48hTitle(String destination) {
+    return 'PackBuddy: $destinationへの旅行まであと2日！ 🧳';
+  }
+
+  @override
+  String notification48hBody(String destination) {
+    return '$destinationへの旅行まであと48時間です！持ち物のパッキングは始めましたか？';
+  }
+
+  @override
+  String get notification24hTitle => 'PackBuddy: いよいよ明日出発です！ ✈️';
+
+  @override
+  String notification24hBody(String destination) {
+    return '最終パッキングチェック！$destinationのパスポート、チケット、必需品を再確認してください。';
+  }
 }

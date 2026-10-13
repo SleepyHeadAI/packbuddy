@@ -884,4 +884,247 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get activeStatus => '已激活';
+
+  @override
+  String get authSubtitleSignIn => '您的尊贵旅行助手 • 登录';
+
+  @override
+  String get authSubtitleSignUp => '开启全新的旅行旅程 • 注册账号';
+
+  @override
+  String get authSignIn => '登录';
+
+  @override
+  String get authSignUp => '注册';
+
+  @override
+  String get authEmail => '电子邮箱';
+
+  @override
+  String get authEmailHint => 'traveler@packbuddy.com';
+
+  @override
+  String get authEmailRequired => '请输入您的电子邮箱。';
+
+  @override
+  String get authEmailInvalid => '请输入有效的电子邮箱地址。';
+
+  @override
+  String get authPassword => '密码';
+
+  @override
+  String get authForgotPassword => '忘记密码？';
+
+  @override
+  String get authPasswordRequired => '请输入您的密码。';
+
+  @override
+  String get authPasswordRulesInvalid => '密码不符合要求。';
+
+  @override
+  String get authPasswordMinChars => '密码必须至少包含6个字符。';
+
+  @override
+  String get authPasswordRulesTitle => '密码要求：';
+
+  @override
+  String get authRuleMinChars => '至少8个字符';
+
+  @override
+  String get authRuleUppercase => '至少1个大写字母';
+
+  @override
+  String get authRuleLowercase => '至少1个小写字母';
+
+  @override
+  String get authRuleDigit => '至少1个数字';
+
+  @override
+  String get authConfirmPassword => '确认密码';
+
+  @override
+  String get authConfirmPasswordRequired => '请确认您的密码。';
+
+  @override
+  String get authPasswordsDoNotMatch => '两次输入的密码不一致。';
+
+  @override
+  String get authCreateAccount => '创建账号';
+
+  @override
+  String get authOr => '或';
+
+  @override
+  String get authContinueWithGoogle => '通过 Google 继续';
+
+  @override
+  String get authTermsNotice => '注册即表示您同意我们的服务条款与隐私政策。';
+
+  @override
+  String get authResetPasswordTitle => '重置密码';
+
+  @override
+  String get authResetPasswordDescription => '输入您注册的邮箱地址以接收重置链接。';
+
+  @override
+  String get authSendLink => '发送链接';
+
+  @override
+  String get authResetLinkSent => '密码重置链接已发送到您的邮箱。';
+
+  @override
+  String get authAppleComingSoon => '通过 Apple 登录将在近期更新中推出！';
+
+  @override
+  String get emailVerifyTitle => '验证您的邮箱';
+
+  @override
+  String get emailVerifySubtitle => '为了保护您的旅行保险箱并同步数据，请验证您的邮箱。';
+
+  @override
+  String get emailVerifyInstructionsTitle => '操作指南';
+
+  @override
+  String get emailVerifyStep1 => '检查您的收件箱及垃圾邮件文件夹。';
+
+  @override
+  String get emailVerifyStep2 => '点击邮件中的验证链接。';
+
+  @override
+  String get emailVerifyStep3 => '点击后稍等数秒，本界面将自动继续。';
+
+  @override
+  String get emailVerifyWaiting => '等待验证中...';
+
+  @override
+  String get emailVerifyCheckNow => '我已验证，继续';
+
+  @override
+  String get emailVerifyResendLink => '重新发送验证邮件';
+
+  @override
+  String emailVerifyResendCooldown(int seconds) {
+    return '$seconds秒后可重发';
+  }
+
+  @override
+  String get emailVerifyBackToSignIn => '返回登录';
+
+  @override
+  String get emailVerifyNotVerifiedYet => '邮箱尚未验证。请点击收到的验证链接。';
+
+  @override
+  String get emailVerifyLinkSentSuccess => '验证邮件已重新发送！请检查收件箱。';
+
+  @override
+  String get signedInTraveler => '已登录旅客';
+
+  @override
+  String get cloudSessionActive => '云端会话已激活';
+
+  @override
+  String get signOutConfirmTitle => '退出登录';
+
+  @override
+  String get signOutConfirmMessage => '您确定要退出登录吗？您的旅行数据将安全保存在此设备中。';
+
+  @override
+  String get notificationsAndReminders => '通知与提醒';
+
+  @override
+  String get packingReminders => '打包提醒';
+
+  @override
+  String get packingRemindersSubtitle => '在起飞前48小时和24小时接收智能提醒';
+
+  @override
+  String get shopping => '购物';
+
+  @override
+  String get authErrorUserNotFound => '未找到使用此邮箱的账号。';
+
+  @override
+  String get authErrorWrongPassword => '密码错误，请重试。';
+
+  @override
+  String get authErrorInvalidCredential => '邮箱或密码不正确，请核对信息。';
+
+  @override
+  String get authErrorEmailInUse => '该邮箱已被注册使用。';
+
+  @override
+  String get authErrorInvalidEmail => '请输入有效的电子邮箱地址。';
+
+  @override
+  String get authErrorWeakPassword => '密码不满足安全强度要求。';
+
+  @override
+  String get authErrorUserDisabled => '此账号已被暂时停用。';
+
+  @override
+  String get authErrorTooManyRequests => '尝试次数过多，请稍后再试。';
+
+  @override
+  String get authErrorNetworkFailed => '网络连接错误，请检查网络设置。';
+
+  @override
+  String get authErrorGoogleFailed => 'Google 登录失败，请重试。';
+
+  @override
+  String get authErrorVerificationFailed => '未能发送验证邮件，请稍后再试。';
+
+  @override
+  String get authErrorGeneric => '身份验证失败，请重试。';
+
+  @override
+  String get authContinueWithApple => '通过 Apple 继续';
+
+  @override
+  String get authNoAccount => '还没有账户？ ';
+
+  @override
+  String get authAlreadyHaveAccount => '已有账户？ ';
+
+  @override
+  String get accountAndSession => '账户与会话';
+
+  @override
+  String get categorySpendingAnalysis => '类别支出明细';
+
+  @override
+  String topSpendingCategory(String category, String percentage) {
+    return '最多：$category（$percentage%）';
+  }
+
+  @override
+  String expenseCount(int count) {
+    return '$count 笔支出';
+  }
+
+  @override
+  String get boardingPassPassenger => '乘客';
+
+  @override
+  String get boardingPassGate => '登机口';
+
+  @override
+  String get boardingPassSampleTraveler => 'PACKBUDDY 旅行者';
+
+  @override
+  String notification48hTitle(String destination) {
+    return 'PackBuddy：距离前往 $destination 的行程还有2天！🧳';
+  }
+
+  @override
+  String notification48hBody(String destination) {
+    return '距离前往 $destination 的旅行仅剩 48 小时！您开始收拾行李了吗？';
+  }
+
+  @override
+  String get notification24hTitle => 'PackBuddy：明天就要出发了！✈️';
+
+  @override
+  String notification24hBody(String destination) {
+    return '最后的行李检查！请再次确认前往 $destination 的护照、机票和旅行必需品。';
+  }
 }

@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -256,36 +257,29 @@ class LocalNotificationService implements INotificationService {
 
   // --- Context-Aware Messaging ---
 
-  String _get48hTitle(Trip trip) {
-    final lang = _prefs.getLocale()?.languageCode ?? 'tr';
-    if (lang == 'tr') {
-      return 'PackBuddy: ${trip.destination} Seyahati Yaklaşıyor! 🧳';
+  AppLocalizations _getL10n() {
+    final locale = _prefs.getLocale() ?? const Locale('en');
+    try {
+      return lookupAppLocalizations(locale);
+    } catch (_) {
+      return lookupAppLocalizations(const Locale('en'));
     }
-    return 'PackBuddy: Trip to ${trip.destination} in 2 days! 🧳';
+  }
+
+  String _get48hTitle(Trip trip) {
+    return _getL10n().notification48hTitle(trip.destination);
   }
 
   String _get48hBody(Trip trip) {
-    final lang = _prefs.getLocale()?.languageCode ?? 'tr';
-    if (lang == 'tr') {
-      return '${trip.destination} seyahatinize 48 saat kaldı! Eksiklerinizi kontrol edip bavulunuzu hazırlamaya başladınız mı?';
-    }
-    return 'Your trip to ${trip.destination} is coming up! Have you started packing your travel essentials?';
+    return _getL10n().notification48hBody(trip.destination);
   }
 
   String _get24hTitle(Trip trip) {
-    final lang = _prefs.getLocale()?.languageCode ?? 'tr';
-    if (lang == 'tr') {
-      return 'PackBuddy: Yarın Yola Çıkıyorsunuz! ✈️';
-    }
-    return 'PackBuddy: You\'re Leaving Tomorrow! ✈️';
+    return _getL10n().notification24hTitle;
   }
 
   String _get24hBody(Trip trip) {
-    final lang = _prefs.getLocale()?.languageCode ?? 'tr';
-    if (lang == 'tr') {
-      return 'Son kontroller! ${trip.destination} seyahatiniz yarın başlıyor. Pasaport, bilet ve şarj cihazlarınızı aldınız mı?';
-    }
-    return 'Final packing check! Double-check your passport, tickets, and travel essentials for ${trip.destination}.';
+    return _getL10n().notification24hBody(trip.destination);
   }
 }
 

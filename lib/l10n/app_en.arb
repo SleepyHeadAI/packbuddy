@@ -1167,5 +1167,353 @@
   "activeStatus": "ACTIVE",
   "@activeStatus": {
     "description": "Active subscription status badge"
+  },
+  "authSubtitleSignIn": "Your Luxury Travel Companion • Sign In",
+  "@authSubtitleSignIn": {
+    "description": "Subtitle on Auth screen during sign in"
+  },
+  "authSubtitleSignUp": "Begin a New Journey • Create Account",
+  "@authSubtitleSignUp": {
+    "description": "Subtitle on Auth screen during sign up"
+  },
+  "authSignIn": "Sign In",
+  "@authSignIn": {
+    "description": "Tab/button label for sign in"
+  },
+  "authSignUp": "Sign Up",
+  "@authSignUp": {
+    "description": "Tab/button label for sign up"
+  },
+  "authEmail": "Email Address",
+  "@authEmail": {
+    "description": "Label for email field"
+  },
+  "authEmailHint": "traveler@packbuddy.com",
+  "@authEmailHint": {
+    "description": "Hint for email field"
+  },
+  "authEmailRequired": "Please enter your email address.",
+  "@authEmailRequired": {
+    "description": "Validation message when email is empty"
+  },
+  "authEmailInvalid": "Please enter a valid email address.",
+  "@authEmailInvalid": {
+    "description": "Validation message when email is invalid"
+  },
+  "authPassword": "Password",
+  "@authPassword": {
+    "description": "Label for password field"
+  },
+  "authForgotPassword": "Forgot Password?",
+  "@authForgotPassword": {
+    "description": "Button to trigger forgot password dialog"
+  },
+  "authPasswordRequired": "Please enter your password.",
+  "@authPasswordRequired": {
+    "description": "Validation message when password is empty"
+  },
+  "authPasswordRulesInvalid": "Password does not meet requirements.",
+  "@authPasswordRulesInvalid": {
+    "description": "Validation message when password fails rules"
+  },
+  "authPasswordMinChars": "Password must be at least 6 characters.",
+  "@authPasswordMinChars": {
+    "description": "Validation message for sign in password length"
+  },
+  "authPasswordRulesTitle": "Password Requirements:",
+  "@authPasswordRulesTitle": {
+    "description": "Header for password requirements checklist"
+  },
+  "authRuleMinChars": "At least 8 characters",
+  "@authRuleMinChars": {
+    "description": "Rule requirement: min 8 characters"
+  },
+  "authRuleUppercase": "At least 1 uppercase letter",
+  "@authRuleUppercase": {
+    "description": "Rule requirement: at least 1 uppercase letter"
+  },
+  "authRuleLowercase": "At least 1 lowercase letter",
+  "@authRuleLowercase": {
+    "description": "Rule requirement: at least 1 lowercase letter"
+  },
+  "authRuleDigit": "At least 1 number",
+  "@authRuleDigit": {
+    "description": "Rule requirement: at least 1 digit"
+  },
+  "authConfirmPassword": "Confirm Password",
+  "@authConfirmPassword": {
+    "description": "Label for password confirmation field"
+  },
+  "authConfirmPasswordRequired": "Please confirm your password.",
+  "@authConfirmPasswordRequired": {
+    "description": "Validation message when confirm password is empty"
+  },
+  "authPasswordsDoNotMatch": "Passwords do not match.",
+  "@authPasswordsDoNotMatch": {
+    "description": "Validation message when passwords do not match"
+  },
+  "authCreateAccount": "Create Account",
+  "@authCreateAccount": {
+    "description": "Primary action button to create account"
+  },
+  "authOr": "or",
+  "@authOr": {
+    "description": "Divider text between email and social login"
+  },
+  "authContinueWithGoogle": "Continue with Google",
+  "@authContinueWithGoogle": {
+    "description": "Button to sign in with Google"
+  },
+  "authTermsNotice": "By signing up, you agree to our Terms of Service & Privacy Policy.",
+  "@authTermsNotice": {
+    "description": "Terms of service and privacy policy disclaimer"
+  },
+  "authResetPasswordTitle": "Reset Password",
+  "@authResetPasswordTitle": {
+    "description": "Dialog title for password reset"
+  },
+  "authResetPasswordDescription": "Enter your registered email address to receive a password reset link.",
+  "@authResetPasswordDescription": {
+    "description": "Dialog description for password reset"
+  },
+  "authSendLink": "Send Link",
+  "@authSendLink": {
+    "description": "Button to send password reset link"
+  },
+  "authResetLinkSent": "Password reset link has been sent to your email.",
+  "@authResetLinkSent": {
+    "description": "Snackbar notification after sending password reset link"
+  },
+  "authAppleComingSoon": "Sign in with Apple will be available in the upcoming update!",
+  "@authAppleComingSoon": {
+    "description": "Placeholder notification for Apple sign in"
+  },
+  "emailVerifyTitle": "Verify Your Email",
+  "@emailVerifyTitle": {
+    "description": "Title on email verification screen"
+  },
+  "emailVerifySubtitle": "To protect your travel vault and sync your trips, please verify your email address.",
+  "@emailVerifySubtitle": {
+    "description": "Subtitle on email verification screen"
+  },
+  "emailVerifyInstructionsTitle": "What should you do?",
+  "@emailVerifyInstructionsTitle": {
+    "description": "Header for email verification steps"
+  },
+  "emailVerifyStep1": "Check your inbox and spam folder.",
+  "@emailVerifyStep1": {
+    "description": "Step 1 of email verification"
+  },
+  "emailVerifyStep2": "Click the verification link in the email.",
+  "@emailVerifyStep2": {
+    "description": "Step 2 of email verification"
+  },
+  "emailVerifyStep3": "Wait a few seconds; this screen will proceed automatically.",
+  "@emailVerifyStep3": {
+    "description": "Step 3 of email verification"
+  },
+  "emailVerifyWaiting": "Waiting for verification...",
+  "@emailVerifyWaiting": {
+    "description": "Indicator text while waiting for email verification"
+  },
+  "emailVerifyCheckNow": "I Verified, Continue",
+  "@emailVerifyCheckNow": {
+    "description": "Manual check button on email verification screen"
+  },
+  "emailVerifyResendLink": "Resend Verification Email",
+  "@emailVerifyResendLink": {
+    "description": "Button to resend email verification link"
+  },
+  "emailVerifyResendCooldown": "Resend in {seconds}s",
+  "@emailVerifyResendCooldown": {
+    "description": "Cooldown timer text for resending verification email",
+    "placeholders": {
+      "seconds": {
+        "type": "int",
+        "example": "30"
+      }
+    }
+  },
+  "emailVerifyBackToSignIn": "Back to Sign In",
+  "@emailVerifyBackToSignIn": {
+    "description": "Button to sign out and return to sign in"
+  },
+  "emailVerifyNotVerifiedYet": "Email is not verified yet. Please check your inbox and click the link.",
+  "@emailVerifyNotVerifiedYet": {
+    "description": "Snackbar message when email is still unverified"
+  },
+  "emailVerifyLinkSentSuccess": "Verification email sent! Please check your inbox.",
+  "@emailVerifyLinkSentSuccess": {
+    "description": "Snackbar message when verification email is resent"
+  },
+  "signedInTraveler": "Signed In Traveler",
+  "@signedInTraveler": {
+    "description": "Fallback name for signed in traveler"
+  },
+  "cloudSessionActive": "Cloud Session Active",
+  "@cloudSessionActive": {
+    "description": "Status badge indicating active cloud session"
+  },
+  "signOutConfirmTitle": "Sign Out",
+  "@signOutConfirmTitle": {
+    "description": "Dialog title for sign out confirmation"
+  },
+  "signOutConfirmMessage": "Are you sure you want to sign out? Your travel data remains safely stored on your device.",
+  "@signOutConfirmMessage": {
+    "description": "Dialog content for sign out confirmation"
+  },
+  "notificationsAndReminders": "Notifications & Reminders",
+  "@notificationsAndReminders": {
+    "description": "Header for notifications section in settings"
+  },
+  "packingReminders": "Packing Reminders",
+  "@packingReminders": {
+    "description": "Title for packing reminders setting"
+  },
+  "packingRemindersSubtitle": "Get smart reminders 48h and 24h before departure",
+  "@packingRemindersSubtitle": {
+    "description": "Subtitle for packing reminders setting"
+  },
+  "shopping": "Shopping",
+  "@shopping": {
+    "description": "Expense category shopping"
+  },
+  "authErrorUserNotFound": "No account found with this email address.",
+  "@authErrorUserNotFound": {
+    "description": "Error message when account does not exist"
+  },
+  "authErrorWrongPassword": "Incorrect password entered. Please try again.",
+  "@authErrorWrongPassword": {
+    "description": "Error message when password is wrong"
+  },
+  "authErrorInvalidCredential": "Email or password incorrect. Please check your credentials.",
+  "@authErrorInvalidCredential": {
+    "description": "Error message when credentials are invalid"
+  },
+  "authErrorEmailInUse": "An account already exists with this email address.",
+  "@authErrorEmailInUse": {
+    "description": "Error message when email is already registered"
+  },
+  "authErrorInvalidEmail": "Please enter a valid email address.",
+  "@authErrorInvalidEmail": {
+    "description": "Error message when email format is invalid"
+  },
+  "authErrorWeakPassword": "Password does not meet requirements.",
+  "@authErrorWeakPassword": {
+    "description": "Error message when password is too weak"
+  },
+  "authErrorUserDisabled": "This account has been disabled.",
+  "@authErrorUserDisabled": {
+    "description": "Error message when account is disabled"
+  },
+  "authErrorTooManyRequests": "Too many attempts. Please try again later.",
+  "@authErrorTooManyRequests": {
+    "description": "Error message when rate limited"
+  },
+  "authErrorNetworkFailed": "Network connection error. Please check your internet.",
+  "@authErrorNetworkFailed": {
+    "description": "Error message on network failure"
+  },
+  "authErrorGoogleFailed": "Could not sign in with Google. Please try again.",
+  "@authErrorGoogleFailed": {
+    "description": "Error message on Google sign in failure"
+  },
+  "authErrorVerificationFailed": "Could not send verification email. Please try again later.",
+  "@authErrorVerificationFailed": {
+    "description": "Error message on email verification send failure"
+  },
+  "authErrorGeneric": "Authentication failed. Please try again.",
+  "@authErrorGeneric": {
+    "description": "Generic authentication error message"
+  },
+  "authContinueWithApple": "Continue with Apple",
+  "@authContinueWithApple": {
+    "description": "Button to continue with Apple ID"
+  },
+  "authNoAccount": "Don't have an account? ",
+  "@authNoAccount": {
+    "description": "Prompt asking if traveler needs to register"
+  },
+  "authAlreadyHaveAccount": "Already have an account? ",
+  "@authAlreadyHaveAccount": {
+    "description": "Prompt asking if traveler already has an account"
+  },
+  "accountAndSession": "Account & Session",
+  "@accountAndSession": {
+    "description": "Header for account and session section in settings"
+  },
+  "categorySpendingAnalysis": "Category Spending Breakdown",
+  "@categorySpendingAnalysis": {
+    "description": "Title for category expense breakdown analytics card"
+  },
+  "topSpendingCategory": "Top: {category} ({percentage}%)",
+  "@topSpendingCategory": {
+    "description": "Highlight showing highest spending category and percentage",
+    "placeholders": {
+      "category": {
+        "type": "String",
+        "example": "Food & Dining"
+      },
+      "percentage": {
+        "type": "String",
+        "example": "42"
+      }
+    }
+  },
+  "expenseCount": "{count} Expenses",
+  "@expenseCount": {
+    "description": "Badge showing total count of expenses",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "boardingPassPassenger": "PASSENGER",
+  "@boardingPassPassenger": {
+    "description": "Passenger label on boarding pass simulation"
+  },
+  "boardingPassGate": "GATE",
+  "@boardingPassGate": {
+    "description": "Gate label on boarding pass simulation"
+  },
+  "boardingPassSampleTraveler": "PACKBUDDY TRAVELER",
+  "@boardingPassSampleTraveler": {
+    "description": "Sample traveler name on boarding pass simulation"
+  },
+  "notification48hTitle": "PackBuddy: Trip to {destination} in 2 days! 🧳",
+  "@notification48hTitle": {
+    "description": "Notification title sent 48 hours before trip departure",
+    "placeholders": {
+      "destination": {
+        "type": "String",
+        "example": "Tokyo"
+      }
+    }
+  },
+  "notification48hBody": "Only 48 hours left until your trip to {destination}! Have you started packing your travel essentials?",
+  "@notification48hBody": {
+    "description": "Notification body sent 48 hours before trip departure",
+    "placeholders": {
+      "destination": {
+        "type": "String",
+        "example": "Tokyo"
+      }
+    }
+  },
+  "notification24hTitle": "PackBuddy: You're Leaving Tomorrow! ✈️",
+  "@notification24hTitle": {
+    "description": "Notification title sent 24 hours before trip departure"
+  },
+  "notification24hBody": "Final packing check! Double-check your passport, tickets, and travel essentials for {destination}.",
+  "@notification24hBody": {
+    "description": "Notification body sent 24 hours before trip departure",
+    "placeholders": {
+      "destination": {
+        "type": "String",
+        "example": "Tokyo"
+      }
+    }
   }
 }

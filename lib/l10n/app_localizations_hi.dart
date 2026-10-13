@@ -897,4 +897,269 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get activeStatus => 'सक्रिय';
+
+  @override
+  String get authSubtitleSignIn => 'आपका लक्जरी यात्रा साथी • साइन इन करें';
+
+  @override
+  String get authSubtitleSignUp => 'एक नया रोमांच शुरू करें • खाता बनाएं';
+
+  @override
+  String get authSignIn => 'साइन इन करें';
+
+  @override
+  String get authSignUp => 'साइन अप करें';
+
+  @override
+  String get authEmail => 'ईमेल पता';
+
+  @override
+  String get authEmailHint => 'traveler@packbuddy.com';
+
+  @override
+  String get authEmailRequired => 'कृपया अपना ईमेल पता दर्ज करें।';
+
+  @override
+  String get authEmailInvalid => 'कृपया एक वैध ईमेल पता दर्ज करें।';
+
+  @override
+  String get authPassword => 'पासवर्ड';
+
+  @override
+  String get authForgotPassword => 'पासवर्ड भूल गए?';
+
+  @override
+  String get authPasswordRequired => 'कृपया अपना पासवर्ड दर्ज करें।';
+
+  @override
+  String get authPasswordRulesInvalid =>
+      'पासवर्ड आवश्यकताओं को पूरा नहीं करता है।';
+
+  @override
+  String get authPasswordMinChars =>
+      'पासवर्ड कम से कम 6 अक्षरों का होना चाहिए।';
+
+  @override
+  String get authPasswordRulesTitle => 'पासवर्ड आवश्यकताएं:';
+
+  @override
+  String get authRuleMinChars => 'कम से कम 8 अक्षर';
+
+  @override
+  String get authRuleUppercase => 'कम से कम 1 बड़ा अक्षर';
+
+  @override
+  String get authRuleLowercase => 'कम से कम 1 छोटा अक्षर';
+
+  @override
+  String get authRuleDigit => 'कम से कम 1 अंक';
+
+  @override
+  String get authConfirmPassword => 'पासवर्ड की पुष्टि करें';
+
+  @override
+  String get authConfirmPasswordRequired =>
+      'कृपया अपने पासवर्ड की पुष्टि करें।';
+
+  @override
+  String get authPasswordsDoNotMatch => 'पासवर्ड मेल नहीं खाते हैं।';
+
+  @override
+  String get authCreateAccount => 'खाता बनाएं';
+
+  @override
+  String get authOr => 'या';
+
+  @override
+  String get authContinueWithGoogle => 'Google के साथ जारी रखें';
+
+  @override
+  String get authTermsNotice =>
+      'साइन अप करके, आप हमारी सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं।';
+
+  @override
+  String get authResetPasswordTitle => 'पासवर्ड रीसेट करें';
+
+  @override
+  String get authResetPasswordDescription =>
+      'रीसेट लिंक प्राप्त करने के लिए अपना पंजीकृत ईमेल दर्ज करें।';
+
+  @override
+  String get authSendLink => 'लिंक भेजें';
+
+  @override
+  String get authResetLinkSent =>
+      'पासवर्ड रीसेट लिंक आपके ईमेल पर भेज दिया गया है।';
+
+  @override
+  String get authAppleComingSoon =>
+      'Apple से साइन इन आगामी अपडेट में उपलब्ध होगा!';
+
+  @override
+  String get emailVerifyTitle => 'अपना ईमेल सत्यापित करें';
+
+  @override
+  String get emailVerifySubtitle =>
+      'अपने यात्रा दस्तावेज़ों को सुरक्षित रखने और डेटा सिंक करने के लिए कृपया ईमेल सत्यापित करें।';
+
+  @override
+  String get emailVerifyInstructionsTitle => 'आपको क्या करना चाहिए?';
+
+  @override
+  String get emailVerifyStep1 => 'अपना इनबॉक्स और स्पैम फ़ोल्डर जांचें।';
+
+  @override
+  String get emailVerifyStep2 => 'ईमेल में आए सत्यापन लिंक पर क्लिक करें।';
+
+  @override
+  String get emailVerifyStep3 =>
+      'कुछ सेकंड प्रतीक्षा करें; यह स्क्रीन स्वचालित रूप से आगे बढ़ेगी।';
+
+  @override
+  String get emailVerifyWaiting => 'सत्यापन की प्रतीक्षा की जा रही है...';
+
+  @override
+  String get emailVerifyCheckNow => 'मैंने सत्यापित कर लिया, जारी रखें';
+
+  @override
+  String get emailVerifyResendLink => 'सत्यापन ईमेल पुनः भेजें';
+
+  @override
+  String emailVerifyResendCooldown(int seconds) {
+    return '$seconds सेकंड में पुनः भेजें';
+  }
+
+  @override
+  String get emailVerifyBackToSignIn => 'साइन इन पर वापस जाएं';
+
+  @override
+  String get emailVerifyNotVerifiedYet =>
+      'ईमेल अभी सत्यापित नहीं हुआ है। कृपया प्राप्त लिंक पर क्लिक करें।';
+
+  @override
+  String get emailVerifyLinkSentSuccess =>
+      'सत्यापन ईमेल पुनः भेज दिया गया है! कृपया इनबॉक्स जांचें।';
+
+  @override
+  String get signedInTraveler => 'साइन-इन किया हुआ यात्री';
+
+  @override
+  String get cloudSessionActive => 'क्लाउड सत्र सक्रिय';
+
+  @override
+  String get signOutConfirmTitle => 'साइन आउट करें';
+
+  @override
+  String get signOutConfirmMessage =>
+      'क्या आप वाकई साइन आउट करना चाहते हैं? आपका यात्रा डेटा आपके डिवाइस पर सुरक्षित रहेगा।';
+
+  @override
+  String get notificationsAndReminders => 'सूचनाएं और रिमाइंडर';
+
+  @override
+  String get packingReminders => 'पैकिंग रिमाइंडर';
+
+  @override
+  String get packingRemindersSubtitle =>
+      'उड़ान से 48 घंटे और 24 घंटे पहले स्मार्ट रिमाइंडर प्राप्त करें';
+
+  @override
+  String get shopping => 'खरीदारी';
+
+  @override
+  String get authErrorUserNotFound => 'इस ईमेल पते के साथ कोई खाता नहीं मिला।';
+
+  @override
+  String get authErrorWrongPassword =>
+      'गलत पासवर्ड दर्ज किया गया। कृपया पुनः प्रयास करें।';
+
+  @override
+  String get authErrorInvalidCredential =>
+      'ईमेल या पासवर्ड गलत है। कृपया विवरण जांचें।';
+
+  @override
+  String get authErrorEmailInUse =>
+      'इस ईमेल के साथ पहले से ही एक खाता पंजीकृत है।';
+
+  @override
+  String get authErrorInvalidEmail => 'कृपया एक वैध ईमेल पता दर्ज करें।';
+
+  @override
+  String get authErrorWeakPassword =>
+      'पासवर्ड सुरक्षा मानकों को पूरा नहीं करता है।';
+
+  @override
+  String get authErrorUserDisabled =>
+      'यह खाता अस्थायी रूप से अक्षम कर दिया गया है।';
+
+  @override
+  String get authErrorTooManyRequests =>
+      'बहुत अधिक प्रयास। कृपया थोड़ी देर बाद पुनः प्रयास करें।';
+
+  @override
+  String get authErrorNetworkFailed =>
+      'नेटवर्क त्रुटि। कृपया अपना इंटरनेट जांचें।';
+
+  @override
+  String get authErrorGoogleFailed =>
+      'Google से साइन इन विफल रहा। पुनः प्रयास करें।';
+
+  @override
+  String get authErrorVerificationFailed =>
+      'सत्यापन ईमेल भेजने में असमर्थ। बाद में प्रयास करें।';
+
+  @override
+  String get authErrorGeneric => 'प्रमाणीकरण विफल रहा। कृपया पुनः प्रयास करें।';
+
+  @override
+  String get authContinueWithApple => 'Apple के साथ जारी रखें';
+
+  @override
+  String get authNoAccount => 'खाता नहीं है? ';
+
+  @override
+  String get authAlreadyHaveAccount => 'पहले से ही एक खाता है? ';
+
+  @override
+  String get accountAndSession => 'खाता और सत्र';
+
+  @override
+  String get categorySpendingAnalysis => 'श्रेणी व्यय विश्लेषण';
+
+  @override
+  String topSpendingCategory(String category, String percentage) {
+    return 'शीर्ष: $category ($percentage%)';
+  }
+
+  @override
+  String expenseCount(int count) {
+    return '$count खर्च';
+  }
+
+  @override
+  String get boardingPassPassenger => 'यात्री';
+
+  @override
+  String get boardingPassGate => 'गेट';
+
+  @override
+  String get boardingPassSampleTraveler => 'PACKBUDDY यात्री';
+
+  @override
+  String notification48hTitle(String destination) {
+    return 'PackBuddy: 2 दिनों में $destination की यात्रा! 🧳';
+  }
+
+  @override
+  String notification48hBody(String destination) {
+    return '$destination की आपकी यात्रा में केवल 48 घंटे बचे हैं! क्या आपने सामान पैक करना शुरू कर दिया है?';
+  }
+
+  @override
+  String get notification24hTitle => 'PackBuddy: आप कल रवाना हो रहे हैं! ✈️';
+
+  @override
+  String notification24hBody(String destination) {
+    return 'अंतिम पैकिंग जांच! $destination के लिए अपने पासपोर्ट, टिकट और यात्रा आवश्यक वस्तुओं की दोबारा जांच करें।';
+  }
 }

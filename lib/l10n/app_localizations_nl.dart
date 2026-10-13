@@ -906,4 +906,271 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get activeStatus => 'ACTIEF';
+
+  @override
+  String get authSubtitleSignIn => 'Jouw exclusieve reisgezel • Inloggen';
+
+  @override
+  String get authSubtitleSignUp =>
+      'Begin een nieuw avontuur • Account aanmaken';
+
+  @override
+  String get authSignIn => 'Inloggen';
+
+  @override
+  String get authSignUp => 'Aanmelden';
+
+  @override
+  String get authEmail => 'E-mailadres';
+
+  @override
+  String get authEmailHint => 'reiziger@packbuddy.com';
+
+  @override
+  String get authEmailRequired => 'Voer je e-mailadres in.';
+
+  @override
+  String get authEmailInvalid => 'Voer een geldig e-mailadres in.';
+
+  @override
+  String get authPassword => 'Wachtwoord';
+
+  @override
+  String get authForgotPassword => 'Wachtwoord vergeten?';
+
+  @override
+  String get authPasswordRequired => 'Voer je wachtwoord in.';
+
+  @override
+  String get authPasswordRulesInvalid =>
+      'Wachtwoord voldoet niet aan de vereisten.';
+
+  @override
+  String get authPasswordMinChars =>
+      'Wachtwoord moet minimaal 6 tekens bevatten.';
+
+  @override
+  String get authPasswordRulesTitle => 'Wachtwoordvereisten:';
+
+  @override
+  String get authRuleMinChars => 'Minimaal 8 tekens';
+
+  @override
+  String get authRuleUppercase => 'Minimaal 1 hoofdletter';
+
+  @override
+  String get authRuleLowercase => 'Minimaal 1 kleine letter';
+
+  @override
+  String get authRuleDigit => 'Minimaal 1 cijfer';
+
+  @override
+  String get authConfirmPassword => 'Wachtwoord bevestigen';
+
+  @override
+  String get authConfirmPasswordRequired => 'Bevestig je wachtwoord.';
+
+  @override
+  String get authPasswordsDoNotMatch => 'Wachtwoorden komen niet overeen.';
+
+  @override
+  String get authCreateAccount => 'Account aanmaken';
+
+  @override
+  String get authOr => 'of';
+
+  @override
+  String get authContinueWithGoogle => 'Doorgaan met Google';
+
+  @override
+  String get authTermsNotice =>
+      'Door je aan te melden ga je akkoord met onze Gebruiksvoorwaarden en Privacybeleid.';
+
+  @override
+  String get authResetPasswordTitle => 'Wachtwoord opnieuw instellen';
+
+  @override
+  String get authResetPasswordDescription =>
+      'Voer je geregistreerde e-mailadres in om een herstellink te ontvangen.';
+
+  @override
+  String get authSendLink => 'Link verzenden';
+
+  @override
+  String get authResetLinkSent =>
+      'Herstellink is verzonden naar je e-mailadres.';
+
+  @override
+  String get authAppleComingSoon =>
+      'Inloggen met Apple is beschikbaar in de volgende update!';
+
+  @override
+  String get emailVerifyTitle => 'Verifieer je e-mailadres';
+
+  @override
+  String get emailVerifySubtitle =>
+      'Om je documentkluis te beschermen en reizen te synchroniseren, verifieer je e-mailadres.';
+
+  @override
+  String get emailVerifyInstructionsTitle => 'Wat moet je doen?';
+
+  @override
+  String get emailVerifyStep1 =>
+      'Controleer je inbox en map met ongewenste e-mail (spam).';
+
+  @override
+  String get emailVerifyStep2 =>
+      'Klik op de verificatielink in de ontvangen e-mail.';
+
+  @override
+  String get emailVerifyStep3 =>
+      'Wacht een paar seconden; dit scherm gaat automatisch verder.';
+
+  @override
+  String get emailVerifyWaiting => 'Wachten op verificatie...';
+
+  @override
+  String get emailVerifyCheckNow => 'Ik heb geverifieerd, doorgaan';
+
+  @override
+  String get emailVerifyResendLink => 'Verificatie-e-mail opnieuw verzenden';
+
+  @override
+  String emailVerifyResendCooldown(int seconds) {
+    return 'Opnieuw verzenden over $seconds s';
+  }
+
+  @override
+  String get emailVerifyBackToSignIn => 'Terug naar Inloggen';
+
+  @override
+  String get emailVerifyNotVerifiedYet =>
+      'E-mailadres is nog niet geverifieerd. Klik op de ontvangen link.';
+
+  @override
+  String get emailVerifyLinkSentSuccess =>
+      'Verificatie-e-mail opnieuw verzonden! Controleer je inbox.';
+
+  @override
+  String get signedInTraveler => 'Aangemelde reiziger';
+
+  @override
+  String get cloudSessionActive => 'Cloudsessie actief';
+
+  @override
+  String get signOutConfirmTitle => 'Uitloggen';
+
+  @override
+  String get signOutConfirmMessage =>
+      'Weet je zeker dat je wilt uitloggen? Je reisgegevens blijven veilig bewaard op je apparaat.';
+
+  @override
+  String get notificationsAndReminders => 'Meldingen en herinneringen';
+
+  @override
+  String get packingReminders => 'Inpakherinneringen';
+
+  @override
+  String get packingRemindersSubtitle =>
+      'Ontvang slimme herinneringen 48u en 24u voor vertrek';
+
+  @override
+  String get shopping => 'Winkelen';
+
+  @override
+  String get authErrorUserNotFound =>
+      'Geen account gevonden met dit e-mailadres.';
+
+  @override
+  String get authErrorWrongPassword =>
+      'Onjuist wachtwoord ingevoerd. Probeer het opnieuw.';
+
+  @override
+  String get authErrorInvalidCredential =>
+      'E-mail of wachtwoord onjuist. Controleer je gegevens.';
+
+  @override
+  String get authErrorEmailInUse =>
+      'Er bestaat al een account met dit e-mailadres.';
+
+  @override
+  String get authErrorInvalidEmail => 'Voer een geldig e-mailadres in.';
+
+  @override
+  String get authErrorWeakPassword =>
+      'Wachtwoord voldoet niet aan de veiligheidseisen.';
+
+  @override
+  String get authErrorUserDisabled => 'Dit account is tijdelijk uitgeschakeld.';
+
+  @override
+  String get authErrorTooManyRequests =>
+      'Te veel pogingen. Probeer het later opnieuw.';
+
+  @override
+  String get authErrorNetworkFailed =>
+      'Netwerkfout. Controleer je internetverbinding.';
+
+  @override
+  String get authErrorGoogleFailed =>
+      'Inloggen met Google mislukt. Probeer het opnieuw.';
+
+  @override
+  String get authErrorVerificationFailed =>
+      'Kon verificatie-e-mail niet verzenden.';
+
+  @override
+  String get authErrorGeneric => 'Authenticatie mislukt. Probeer het opnieuw.';
+
+  @override
+  String get authContinueWithApple => 'Doorgaan met Apple';
+
+  @override
+  String get authNoAccount => 'Nog geen account? ';
+
+  @override
+  String get authAlreadyHaveAccount => 'Al een account? ';
+
+  @override
+  String get accountAndSession => 'Account & Sessie';
+
+  @override
+  String get categorySpendingAnalysis => 'Uitgaven per categorie';
+
+  @override
+  String topSpendingCategory(String category, String percentage) {
+    return 'Hoogste: $category ($percentage%)';
+  }
+
+  @override
+  String expenseCount(int count) {
+    return '$count Uitgaven';
+  }
+
+  @override
+  String get boardingPassPassenger => 'PASSAGIER';
+
+  @override
+  String get boardingPassGate => 'GATE';
+
+  @override
+  String get boardingPassSampleTraveler => 'PACKBUDDY REIZIGER';
+
+  @override
+  String notification48hTitle(String destination) {
+    return 'PackBuddy: Reis naar $destination over 2 dagen! 🧳';
+  }
+
+  @override
+  String notification48hBody(String destination) {
+    return 'Nog maar 48 uur tot je reis naar $destination! Ben je al begonnen met inpakken?';
+  }
+
+  @override
+  String get notification24hTitle => 'PackBuddy: Je vertrekt morgen! ✈️';
+
+  @override
+  String notification24hBody(String destination) {
+    return 'Laatste inpakcontrole! Controleer je paspoort, tickets en reisbenodigdheden voor $destination.';
+  }
 }

@@ -3,6 +3,7 @@ import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
+import 'package:packbuddy/l10n/app_localizations.dart';
 
 /// Interactive Category Breakdown & Budget Analytics Card
 class BudgetAnalyticsCard extends StatelessWidget {
@@ -51,20 +52,20 @@ class BudgetAnalyticsCard extends StatelessWidget {
     }
   }
 
-  static String getCategoryDisplayName(String category) {
+  static String getCategoryDisplayName(String category, [AppLocalizations? l10n]) {
     final cat = category.toLowerCase();
     if (cat.contains('food') || cat.contains('yemek')) {
-      return 'Yeme & İçme';
+      return l10n?.food ?? 'Food & Dining';
     } else if (cat.contains('transport') || cat.contains('ulaşım')) {
-      return 'Ulaşım';
+      return l10n?.transport ?? 'Transportation';
     } else if (cat.contains('accommodation') || cat.contains('konaklama') || cat.contains('otel')) {
-      return 'Konaklama';
+      return l10n?.accommodation ?? 'Accommodation';
     } else if (cat.contains('entertainment') || cat.contains('eğlence') || cat.contains('aktivite')) {
-      return 'Aktivite & Eğlence';
+      return l10n?.entertainment ?? 'Entertainment';
     } else if (cat.contains('shopping') || cat.contains('alışveriş')) {
-      return 'Alışveriş';
+      return l10n?.shopping ?? 'Shopping';
     } else {
-      return 'Diğer';
+      return l10n?.other ?? 'Other';
     }
   }
 
@@ -72,6 +73,7 @@ class BudgetAnalyticsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     if (expenses.isEmpty) {
       return const SizedBox.shrink();
@@ -82,7 +84,7 @@ class BudgetAnalyticsCard extends StatelessWidget {
     final categoryCounts = <String, int>{};
 
     for (final exp in expenses) {
-      final key = getCategoryDisplayName(exp.category);
+      final key = getCategoryDisplayName(exp.category, l10n);
       final converted = CurrencyService.convert(
         amount: exp.amount,
         fromCurrency: exp.currency,
@@ -149,7 +151,7 @@ class BudgetAnalyticsCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Kategori Harcama Analizi',
+                      l10n.categorySpendingAnalysis,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w800,
                         letterSpacing: -0.2,
@@ -157,7 +159,7 @@ class BudgetAnalyticsCard extends StatelessWidget {
                     ),
                     if (topCategory != null && totalSpent > 0) ...[
                       Text(
-                        'En çok: ${topCategory.key} (%$topPercentage)',
+                        l10n.topSpendingCategory(topCategory.key, topPercentage),
                         style: TextStyle(
                           fontSize: 11,
                           color: theme.colorScheme.onSurfaceVariant,
@@ -175,7 +177,7 @@ class BudgetAnalyticsCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '${expenses.length} Harcama',
+                  l10n.expenseCount(expenses.length),
                   style: TextStyle(
                     fontSize: 10.5,
                     fontWeight: FontWeight.w700,

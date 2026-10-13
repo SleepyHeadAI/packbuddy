@@ -905,4 +905,264 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get activeStatus => 'เปิดใช้งาน';
+
+  @override
+  String get authSubtitleSignIn =>
+      'ผู้ช่วยการเดินทางระดับพรีเมียมของคุณ • เข้าสู่ระบบ';
+
+  @override
+  String get authSubtitleSignUp => 'เริ่มต้นการผจญภัยครั้งใหม่ • สร้างบัญชี';
+
+  @override
+  String get authSignIn => 'เข้าสู่ระบบ';
+
+  @override
+  String get authSignUp => 'ลงทะเบียน';
+
+  @override
+  String get authEmail => 'ที่อยู่อีเมล';
+
+  @override
+  String get authEmailHint => 'traveler@packbuddy.com';
+
+  @override
+  String get authEmailRequired => 'โปรดป้อนที่อยู่อีเมลของคุณ';
+
+  @override
+  String get authEmailInvalid => 'โปรดป้อนที่อยู่อีเมลที่ถูกต้อง';
+
+  @override
+  String get authPassword => 'รหัสผ่าน';
+
+  @override
+  String get authForgotPassword => 'ลืมรหัสผ่าน?';
+
+  @override
+  String get authPasswordRequired => 'โปรดป้อนรหัสผ่านของคุณ';
+
+  @override
+  String get authPasswordRulesInvalid => 'รหัสผ่านไม่ตรงตามข้อกำหนด';
+
+  @override
+  String get authPasswordMinChars =>
+      'รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร';
+
+  @override
+  String get authPasswordRulesTitle => 'ข้อกำหนดของรหัสผ่าน:';
+
+  @override
+  String get authRuleMinChars => 'อย่างน้อย 8 ตัวอักษร';
+
+  @override
+  String get authRuleUppercase => 'ตัวพิมพ์ใหญ่อย่างน้อย 1 ตัว';
+
+  @override
+  String get authRuleLowercase => 'ตัวพิมพ์เล็กอย่างน้อย 1 ตัว';
+
+  @override
+  String get authRuleDigit => 'ตัวเลขอย่างน้อย 1 ตัว';
+
+  @override
+  String get authConfirmPassword => 'ยืนยันรหัสผ่าน';
+
+  @override
+  String get authConfirmPasswordRequired => 'โปรดยืนยันรหัสผ่านของคุณ';
+
+  @override
+  String get authPasswordsDoNotMatch => 'รหัสผ่านไม่ตรงกัน';
+
+  @override
+  String get authCreateAccount => 'สร้างบัญชี';
+
+  @override
+  String get authOr => 'หรือ';
+
+  @override
+  String get authContinueWithGoogle => 'ดำเนินการต่อด้วย Google';
+
+  @override
+  String get authTermsNotice =>
+      'การลงทะเบียนแสดงว่าคุณยอมรับข้อกำหนดในการให้บริการและนโยบายความเป็นส่วนตัวของเรา';
+
+  @override
+  String get authResetPasswordTitle => 'รีเซ็ตรหัสผ่าน';
+
+  @override
+  String get authResetPasswordDescription =>
+      'ป้อนอีเมลที่ลงทะเบียนไว้เพื่อรับลิงก์รีเซ็ตรหัสผ่าน';
+
+  @override
+  String get authSendLink => 'ส่งลิงก์';
+
+  @override
+  String get authResetLinkSent => 'ส่งลิงก์รีเซ็ตรหัสผ่านไปยังอีเมลของคุณแล้ว';
+
+  @override
+  String get authAppleComingSoon =>
+      'การลงชื่อเข้าใช้ด้วย Apple จะพร้อมใช้งานในการอัปเดตถัดไป!';
+
+  @override
+  String get emailVerifyTitle => 'ยืนยันอีเมลของคุณ';
+
+  @override
+  String get emailVerifySubtitle =>
+      'เพื่อปกป้องตู้นิรภัยและซิงค์ข้อมูลการเดินทาง โปรดยืนยันอีเมลของคุณ';
+
+  @override
+  String get emailVerifyInstructionsTitle => 'คุณต้องทำอะไรบ้าง?';
+
+  @override
+  String get emailVerifyStep1 => 'ตรวจสอบกล่องจดหมายเข้าและโฟลเดอร์สแปมของคุณ';
+
+  @override
+  String get emailVerifyStep2 => 'คลิกลิงก์ยืนยันในอีเมลที่ได้รับ';
+
+  @override
+  String get emailVerifyStep3 =>
+      'รอสักครู่ หน้าจอนี้จะดำเนินการต่อโดยอัตโนมัติ';
+
+  @override
+  String get emailVerifyWaiting => 'กำลังรอยืนยัน...';
+
+  @override
+  String get emailVerifyCheckNow => 'ฉันยืนยันแล้ว ดำเนินการต่อ';
+
+  @override
+  String get emailVerifyResendLink => 'ส่งอีเมลยืนยันอีกครั้ง';
+
+  @override
+  String emailVerifyResendCooldown(int seconds) {
+    return 'ส่งอีกครั้งใน $seconds วินาที';
+  }
+
+  @override
+  String get emailVerifyBackToSignIn => 'กลับไปที่หน้าเข้าสู่ระบบ';
+
+  @override
+  String get emailVerifyNotVerifiedYet =>
+      'อีเมลยังไม่ได้รับการยืนยัน โปรดคลิกลิงก์ที่คุณได้รับ';
+
+  @override
+  String get emailVerifyLinkSentSuccess =>
+      'ส่งอีเมลยืนยันอีกครั้งแล้ว! โปรดตรวจสอบกล่องข้อความ';
+
+  @override
+  String get signedInTraveler => 'นักเดินทางที่เข้าสู่ระบบแล้ว';
+
+  @override
+  String get cloudSessionActive => 'เซสชันคลาวด์เปิดใช้งานอยู่';
+
+  @override
+  String get signOutConfirmTitle => 'ออกจากระบบ';
+
+  @override
+  String get signOutConfirmMessage =>
+      'คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ? ข้อมูลการเดินทางจะยังคงปลอดภัยในอุปกรณ์ของคุณ';
+
+  @override
+  String get notificationsAndReminders => 'การแจ้งเตือนและการเตือนความจำ';
+
+  @override
+  String get packingReminders => 'เตือนความจำการจัดกระเป๋า';
+
+  @override
+  String get packingRemindersSubtitle =>
+      'รับการแจ้งเตือนอัจฉริยะ 48 ชม. และ 24 ชม. ก่อนออกเดินทาง';
+
+  @override
+  String get shopping => 'ช้อปปิ้ง';
+
+  @override
+  String get authErrorUserNotFound => 'ไม่พบบัญชีที่ใช้อีเมลนี้';
+
+  @override
+  String get authErrorWrongPassword => 'รหัสผ่านไม่ถูกต้อง โปรดลองอีกครั้ง';
+
+  @override
+  String get authErrorInvalidCredential =>
+      'อีเมลหรือรหัสผ่านไม่ถูกต้อง โปรดตรวจสอบข้อมูล';
+
+  @override
+  String get authErrorEmailInUse => 'มีบัญชีที่ลงทะเบียนด้วยอีเมลนี้อยู่แล้ว';
+
+  @override
+  String get authErrorInvalidEmail => 'โปรดป้อนที่อยู่อีเมลที่ถูกต้อง';
+
+  @override
+  String get authErrorWeakPassword => 'รหัสผ่านไม่ตรงตามมาตรฐานความปลอดภัย';
+
+  @override
+  String get authErrorUserDisabled => 'บัญชีนี้ถูกระงับชั่วคราว';
+
+  @override
+  String get authErrorTooManyRequests =>
+      'พยายามบ่อยเกินไป โปรดรอสักครู่แล้วลองใหม่';
+
+  @override
+  String get authErrorNetworkFailed =>
+      'ข้อผิดพลาดการเชื่อมต่อเครือข่าย โปรดตรวจสอบอินเทอร์เน็ต';
+
+  @override
+  String get authErrorGoogleFailed =>
+      'ลงชื่อเข้าใช้ด้วย Google ล้มเหลว โปรดลองอีกครั้ง';
+
+  @override
+  String get authErrorVerificationFailed =>
+      'ไม่สามารถส่งอีเมลยืนยันได้ โปรดลองอีกครั้งในภายหลัง';
+
+  @override
+  String get authErrorGeneric => 'การตรวจสอบสิทธิ์ล้มเหลว โปรดลองอีกครั้ง';
+
+  @override
+  String get authContinueWithApple => 'ดำเนินการต่อด้วย Apple';
+
+  @override
+  String get authNoAccount => 'ยังไม่มีบัญชีใช่ไหม? ';
+
+  @override
+  String get authAlreadyHaveAccount => 'มีบัญชีอยู่แล้วใช่ไหม? ';
+
+  @override
+  String get accountAndSession => 'บัญชีและเซสชัน';
+
+  @override
+  String get categorySpendingAnalysis => 'การวิเคราะห์การใช้จ่ายตามหมวดหมู่';
+
+  @override
+  String topSpendingCategory(String category, String percentage) {
+    return 'สูงสุด: $category ($percentage%)';
+  }
+
+  @override
+  String expenseCount(int count) {
+    return '$count รายการใช้จ่าย';
+  }
+
+  @override
+  String get boardingPassPassenger => 'ผู้โดยสาร';
+
+  @override
+  String get boardingPassGate => 'ประตูขึ้นเครื่อง';
+
+  @override
+  String get boardingPassSampleTraveler => 'นักเดินทาง PACKBUDDY';
+
+  @override
+  String notification48hTitle(String destination) {
+    return 'PackBuddy: การเดินทางไป $destination ในอีก 2 วัน! 🧳';
+  }
+
+  @override
+  String notification48hBody(String destination) {
+    return 'เหลือเวลาอีกเพียง 48 ชั่วโมงก่อนการเดินทางไป $destination! เริ่มจัดกระเป๋าแล้วหรือยัง?';
+  }
+
+  @override
+  String get notification24hTitle =>
+      'PackBuddy: คุณจะออกเดินทางในวันพรุ่งนี้! ✈️';
+
+  @override
+  String notification24hBody(String destination) {
+    return 'ตรวจสอบการจัดกระเป๋าครั้งสุดท้าย! ตรวจสอบหนังสือเดินทาง ตั๋ว และของใช้จำเป็นสำหรับ $destination อีกครั้ง';
+  }
 }

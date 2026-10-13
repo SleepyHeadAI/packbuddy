@@ -273,7 +273,7 @@ void main() {
 
       // Verify inline error message
       expect(
-        find.text('Şifre en az 8 karakter olmalı, büyük/küçük harf ve rakam içermelidir.'),
+        find.text('Şifre kurallara uygun değil.'),
         findsOneWidget,
       );
     });
@@ -325,7 +325,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.text('Şifre en az 8 karakter olmalı, büyük/küçük harf ve rakam içermelidir.'),
+        find.text('Şifre kurallara uygun değil.'),
         findsOneWidget,
       );
     });
@@ -377,7 +377,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.text('Şifre en az 8 karakter olmalı, büyük/küçük harf ve rakam içermelidir.'),
+        find.text('Şifre kurallara uygun değil.'),
         findsOneWidget,
       );
     });
@@ -430,7 +430,7 @@ void main() {
 
       // No validation errors should be present
       expect(
-        find.text('Şifre en az 8 karakter olmalı, büyük/küçük harf ve rakam içermelidir.'),
+        find.text('Şifre kurallara uygun değil.'),
         findsNothing,
       );
     });
@@ -468,8 +468,8 @@ void main() {
       expect(find.text('security@packbuddy.com'), findsOneWidget);
 
       // Buttons
-      expect(find.text('Doğrulamayı Kontrol Et'), findsOneWidget);
-      expect(find.text('Doğrulama Linkini Tekrar Gönder'), findsOneWidget);
+      expect(find.text('Doğruladım, Devam Et'), findsOneWidget);
+      expect(find.text('Doğrulama E-postasını Tekrar Gönder'), findsOneWidget);
       expect(find.text('Giriş Ekranına Dön'), findsOneWidget);
     });
 
@@ -591,6 +591,7 @@ void main() {
       );
 
       await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 4));
 
       expect(find.byType(DashboardScreen), findsOneWidget);
       expect(find.byType(EmailVerificationScreen), findsNothing);
@@ -621,6 +622,7 @@ void main() {
       );
 
       await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 4));
 
       expect(find.byType(DashboardScreen), findsOneWidget);
       expect(find.byType(EmailVerificationScreen), findsNothing);

@@ -597,7 +597,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get delete => 'Hapus';
 
   @override
-  String get edit => 'Edit';
+  String get edit => 'Ubah';
 
   @override
   String get tickets => 'Tiket';
@@ -912,4 +912,268 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get activeStatus => 'AKTIF';
+
+  @override
+  String get authSubtitleSignIn => 'Pendamping perjalanan mewah Anda • Masuk';
+
+  @override
+  String get authSubtitleSignUp => 'Mulai petualangan baru • Buat akun';
+
+  @override
+  String get authSignIn => 'Masuk';
+
+  @override
+  String get authSignUp => 'Daftar';
+
+  @override
+  String get authEmail => 'Alamat Email';
+
+  @override
+  String get authEmailHint => 'traveler@packbuddy.com';
+
+  @override
+  String get authEmailRequired => 'Silakan masukkan alamat email Anda.';
+
+  @override
+  String get authEmailInvalid => 'Silakan masukkan alamat email yang valid.';
+
+  @override
+  String get authPassword => 'Kata Sandi';
+
+  @override
+  String get authForgotPassword => 'Lupa Kata Sandi?';
+
+  @override
+  String get authPasswordRequired => 'Silakan masukkan kata sandi Anda.';
+
+  @override
+  String get authPasswordRulesInvalid =>
+      'Kata sandi tidak memenuhi persyaratan.';
+
+  @override
+  String get authPasswordMinChars => 'Kata sandi minimal harus 6 karakter.';
+
+  @override
+  String get authPasswordRulesTitle => 'Persyaratan Kata Sandi:';
+
+  @override
+  String get authRuleMinChars => 'Minimal 8 karakter';
+
+  @override
+  String get authRuleUppercase => 'Minimal 1 huruf kapital';
+
+  @override
+  String get authRuleLowercase => 'Minimal 1 huruf kecil';
+
+  @override
+  String get authRuleDigit => 'Minimal 1 angka';
+
+  @override
+  String get authConfirmPassword => 'Konfirmasi Kata Sandi';
+
+  @override
+  String get authConfirmPasswordRequired =>
+      'Silakan konfirmasi kata sandi Anda.';
+
+  @override
+  String get authPasswordsDoNotMatch => 'Kata sandi tidak cocok.';
+
+  @override
+  String get authCreateAccount => 'Buat Akun';
+
+  @override
+  String get authOr => 'atau';
+
+  @override
+  String get authContinueWithGoogle => 'Lanjutkan dengan Google';
+
+  @override
+  String get authTermsNotice =>
+      'Dengan mendaftar, Anda menyetujui Ketentuan Layanan & Kebijakan Privasi kami.';
+
+  @override
+  String get authResetPasswordTitle => 'Atur Ulang Kata Sandi';
+
+  @override
+  String get authResetPasswordDescription =>
+      'Masukkan email terdaftar untuk menerima tautan atur ulang.';
+
+  @override
+  String get authSendLink => 'Kirim Tautan';
+
+  @override
+  String get authResetLinkSent =>
+      'Tautan atur ulang kata sandi telah dikirim ke email Anda.';
+
+  @override
+  String get authAppleComingSoon =>
+      'Masuk dengan Apple akan tersedia pada pembaruan mendatang!';
+
+  @override
+  String get emailVerifyTitle => 'Verifikasi Email Anda';
+
+  @override
+  String get emailVerifySubtitle =>
+      'Untuk melindungi brankas dan menyinkronkan perjalanan, silakan verifikasi email Anda.';
+
+  @override
+  String get emailVerifyInstructionsTitle => 'Apa yang harus Anda lakukan?';
+
+  @override
+  String get emailVerifyStep1 => 'Periksa kotak masuk dan folder spam Anda.';
+
+  @override
+  String get emailVerifyStep2 =>
+      'Klik tautan verifikasi di email yang diterima.';
+
+  @override
+  String get emailVerifyStep3 =>
+      'Tunggu beberapa detik; layar ini akan melanjutkan secara otomatis.';
+
+  @override
+  String get emailVerifyWaiting => 'Menunggu verifikasi...';
+
+  @override
+  String get emailVerifyCheckNow => 'Saya Sudah Verifikasi, Lanjutkan';
+
+  @override
+  String get emailVerifyResendLink => 'Kirim Ulang Email Verifikasi';
+
+  @override
+  String emailVerifyResendCooldown(int seconds) {
+    return 'Kirim ulang dalam $seconds dtk';
+  }
+
+  @override
+  String get emailVerifyBackToSignIn => 'Kembali ke Masuk';
+
+  @override
+  String get emailVerifyNotVerifiedYet =>
+      'Email belum diverifikasi. Silakan klik tautan yang Anda terima.';
+
+  @override
+  String get emailVerifyLinkSentSuccess =>
+      'Email verifikasi telah dikirim ulang! Periksa kotak masuk Anda.';
+
+  @override
+  String get signedInTraveler => 'Pelancong Masuk';
+
+  @override
+  String get cloudSessionActive => 'Sesi Cloud Aktif';
+
+  @override
+  String get signOutConfirmTitle => 'Keluar';
+
+  @override
+  String get signOutConfirmMessage =>
+      'Apakah Anda yakin ingin keluar? Data perjalanan Anda akan tetap aman di perangkat Anda.';
+
+  @override
+  String get notificationsAndReminders => 'Notifikasi & Pengingat';
+
+  @override
+  String get packingReminders => 'Pengingat Berkemas';
+
+  @override
+  String get packingRemindersSubtitle =>
+      'Dapatkan pengingat cerdas 48 jam dan 24 jam sebelum keberangkatan';
+
+  @override
+  String get shopping => 'Belanja';
+
+  @override
+  String get authErrorUserNotFound =>
+      'Tidak ada akun yang ditemukan dengan email ini.';
+
+  @override
+  String get authErrorWrongPassword => 'Kata sandi salah. Silakan coba lagi.';
+
+  @override
+  String get authErrorInvalidCredential =>
+      'Email atau kata sandi salah. Silakan periksa kredensial Anda.';
+
+  @override
+  String get authErrorEmailInUse => 'Akun dengan email ini sudah terdaftar.';
+
+  @override
+  String get authErrorInvalidEmail =>
+      'Silakan masukkan alamat email yang valid.';
+
+  @override
+  String get authErrorWeakPassword =>
+      'Kata sandi tidak memenuhi standar keamanan.';
+
+  @override
+  String get authErrorUserDisabled => 'Akun ini telah dinonaktifkan sementara.';
+
+  @override
+  String get authErrorTooManyRequests =>
+      'Terlalu banyak percobaan. Silakan coba lagi nanti.';
+
+  @override
+  String get authErrorNetworkFailed =>
+      'Kesalahan koneksi jaringan. Periksa internet Anda.';
+
+  @override
+  String get authErrorGoogleFailed =>
+      'Gagal masuk dengan Google. Silakan coba lagi.';
+
+  @override
+  String get authErrorVerificationFailed =>
+      'Gagal mengirim email verifikasi. Coba lagi nanti.';
+
+  @override
+  String get authErrorGeneric => 'Autentikasi gagal. Silakan coba lagi.';
+
+  @override
+  String get authContinueWithApple => 'Lanjutkan dengan Apple';
+
+  @override
+  String get authNoAccount => 'Belum punya akun? ';
+
+  @override
+  String get authAlreadyHaveAccount => 'Sudah memiliki akun? ';
+
+  @override
+  String get accountAndSession => 'Akun & Sesi';
+
+  @override
+  String get categorySpendingAnalysis => 'Analisis Pengeluaran Kategori';
+
+  @override
+  String topSpendingCategory(String category, String percentage) {
+    return 'Terbanyak: $category ($percentage%)';
+  }
+
+  @override
+  String expenseCount(int count) {
+    return '$count Pengeluaran';
+  }
+
+  @override
+  String get boardingPassPassenger => 'PENUMPANG';
+
+  @override
+  String get boardingPassGate => 'PINTU';
+
+  @override
+  String get boardingPassSampleTraveler => 'PENJELAJAH PACKBUDDY';
+
+  @override
+  String notification48hTitle(String destination) {
+    return 'PackBuddy: Perjalanan ke $destination dalam 2 hari! 🧳';
+  }
+
+  @override
+  String notification48hBody(String destination) {
+    return 'Hanya tersisa 48 jam sebelum perjalanan Anda ke $destination! Sudah mulai mengemas barang bawaan?';
+  }
+
+  @override
+  String get notification24hTitle => 'PackBuddy: Anda Berangkat Besok! ✈️';
+
+  @override
+  String notification24hBody(String destination) {
+    return 'Pemeriksaan persiapan terakhir! Periksa kembali paspor, tiket, dan barang penting untuk $destination.';
+  }
 }

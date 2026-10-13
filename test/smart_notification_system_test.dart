@@ -29,19 +29,19 @@ class FakeTestDbHelper implements DatabaseHelper {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 
   @override
-  Future<List<Trip>> getTrips({bool includeDeleted = false}) async {
+  Future<List<Trip>> getTrips({String? userId, bool includeDeleted = false}) async {
     return trips.where((t) => includeDeleted || !t.isDeleted).toList();
   }
 
   @override
-  Future<int> insertTrip(Trip trip) async {
+  Future<int> insertTrip(Trip trip, {String? userId}) async {
     trips.removeWhere((t) => t.id == trip.id);
     trips.add(trip);
     return 1;
   }
 
   @override
-  Future<int> updateTrip(Trip trip) async {
+  Future<int> updateTrip(Trip trip, {String? userId}) async {
     final index = trips.indexWhere((t) => t.id == trip.id);
     if (index != -1) {
       trips[index] = trip;
@@ -52,7 +52,7 @@ class FakeTestDbHelper implements DatabaseHelper {
   }
 
   @override
-  Future<int> deleteTrip(String id) async {
+  Future<int> deleteTrip(String id, {String? userId}) async {
     trips.removeWhere((t) => t.id == id);
     return 1;
   }

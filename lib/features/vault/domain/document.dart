@@ -1,6 +1,7 @@
 /// Domain entity representing a travel document stored in the Document Vault
 class Document {
   final String id;
+  final String userId;
   final String title;
   final String category;
   final String? subCategory;
@@ -14,6 +15,7 @@ class Document {
 
   const Document({
     required this.id,
+    this.userId = '',
     required this.title,
     required this.category,
     this.subCategory,
@@ -34,6 +36,7 @@ class Document {
   /// Creates a copy with optionally modified fields
   Document copyWith({
     String? id,
+    String? userId,
     String? title,
     String? category,
     String? subCategory,
@@ -49,6 +52,7 @@ class Document {
   }) {
     return Document(
       id: id ?? this.id,
+      userId: userId ?? this.userId,
       title: title ?? this.title,
       category: category ?? this.category,
       subCategory: clearSubCategory ? null : (subCategory ?? this.subCategory),
@@ -66,6 +70,8 @@ class Document {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'userId': userId,
+      'user_id': userId,
       'title': title,
       'category': category,
       'subCategory': subCategory,
@@ -75,18 +81,30 @@ class Document {
       'notes': notes,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'updated_at': updatedAt.millisecondsSinceEpoch,
       'isDeleted': isDeleted,
+      'is_deleted': isDeleted,
     };
   }
 
   /// Deserialization from Cloud Firestore / JSON APIs
   factory Document.fromJson(Map<String, dynamic> json) {
+    DateTime parseDate(dynamic val) {
+      if (val is int) return DateTime.fromMillisecondsSinceEpoch(val);
+      if (val is String) {
+        final parsed = DateTime.tryParse(val);
+        if (parsed != null) return parsed;
+      }
+      return DateTime.now();
+    }
+
     final localPath = (json['localImagePath'] ?? '') as String;
     final fType = (json['fileType'] as String?) ??
         (localPath.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image');
 
     return Document(
       id: json['id'] as String,
+      userId: (json['user_id'] ?? json['userId'] ?? '') as String,
       title: json['title'] as String,
       category: json['category'] as String? ?? 'Other',
       subCategory: (json['subCategory'] ?? json['sub_category']) as String?,
@@ -94,13 +112,13 @@ class Document {
       tripId: json['tripId'] as String?,
       fileType: fType,
       notes: json['notes'] as String?,
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'] as String)
+      createdAt: json['createdAt'] != null || json['created_at'] != null
+          ? parseDate(json['createdAt'] ?? json['created_at'])
           : DateTime.now(),
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'] as String)
+      updatedAt: json['updatedAt'] != null || json['updated_at'] != null
+          ? parseDate(json['updatedAt'] ?? json['updated_at'])
           : DateTime.now(),
-      isDeleted: json['isDeleted'] as bool? ?? false,
+      isDeleted: json['isDeleted'] as bool? ?? json['is_deleted'] == true || json['is_deleted'] == 1,
     );
   }
 
@@ -108,6 +126,7 @@ class Document {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'user_id': userId,
       'title': title,
       'category': category,
       'sub_category': subCategory,
@@ -123,12 +142,22 @@ class Document {
 
   /// Deserialization from local SQLite database
   factory Document.fromMap(Map<String, dynamic> map) {
+    DateTime parseDate(dynamic val) {
+      if (val is int) return DateTime.fromMillisecondsSinceEpoch(val);
+      if (val is String) {
+        final parsed = DateTime.tryParse(val);
+        if (parsed != null) return parsed;
+      }
+      return DateTime.now();
+    }
+
     final localPath = (map['local_image_path'] ?? map['file_path'] ?? '') as String;
     final fType = (map['file_type'] ?? map['fileType'] as String?) ??
         (localPath.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image');
 
     return Document(
       id: map['id'] as String,
+      userId: (map['user_id'] ?? map['userId'] ?? '') as String,
       title: map['title'] as String,
       category: map['category'] as String? ?? 'Other',
       subCategory: (map['sub_category'] ?? map['subCategory']) as String?,
@@ -136,8 +165,8 @@ class Document {
       tripId: (map['trip_id'] ?? map['tripId']) as String?,
       fileType: fType,
       notes: map['notes'] as String?,
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['created_at'] as int),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updated_at'] as int),
+      createdAt: parseDate(map['created_at'] ?? map['createdAt']),
+      updatedAt: parseDate(map['updated_at'] ?? map['updatedAt']),
       isDeleted: (map['is_deleted'] as int? ?? 0) == 1,
     );
   }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/local_db/database_helper.dart';
 import 'auth_service.dart';
 
 /// State representation for Authentication operations
@@ -226,6 +227,12 @@ class AuthController extends StateNotifier<AuthState> {
   Future<void> signOut() async {
     state = state.copyWith(isLoading: true);
     try {
+      // Ensure previous user's local SQLite data is completely wiped from device before signing out
+      try {
+        await DatabaseHelper.instance.clearAllData();
+      } catch (dbErr) {
+        debugPrint('[AuthController] clearAllData notice: $dbErr');
+      }
       await _authService.signOut();
       state = state.copyWith(
         clearUser: true,
@@ -247,37 +254,16 @@ class AuthController extends StateNotifier<AuthState> {
     }
   }
 
-  /// Convert technical Firebase errors to friendly human-readable messages
+  /// Formats technical authentication errors to standardized error code keys
+  /// for decoupled UI-level localization via AppLocalizations.
   static String _formatAuthError(dynamic error) {
     if (error is FirebaseAuthException) {
-      switch (error.code) {
-        case 'user-not-found':
-          return 'Bu e-posta adresine ait bir hesap bulunamadı.';
-        case 'wrong-password':
-          return 'Hatalı şifre girdiniz. Lütfen tekrar deneyin.';
-        case 'invalid-credential':
-          return 'E-posta veya şifre hatalı. Lütfen bilgilerinizi kontrol edin.';
-        case 'email-already-in-use':
-          return 'Bu e-posta adresi ile zaten kayıtlı bir hesap var.';
-        case 'invalid-email':
-          return 'Lütfen geçerli bir e-posta adresi girin.';
-        case 'weak-password':
-          return 'Şifreniz en az 8 karakter olmalı, büyük/küçük harf ve rakam içermelidir.';
-        case 'user-disabled':
-          return 'Bu hesap geçici olarak askıya alınmıştır.';
-        case 'too-many-requests':
-          return 'Çok fazla deneme yapıldı. Lütfen biraz bekleyip tekrar deneyin.';
-        case 'network-request-failed':
-          return 'İnternet bağlantısı hatası. Lütfen ağınızı kontrol edin.';
-        case 'google-sign-in-failed':
-          return 'Google ile giriş yapılamadı. Lütfen tekrar deneyin.';
-        case 'email-verification-failed':
-          return 'Doğrulama e-postası gönderilemedi. Lütfen daha sonra tekrar deneyin.';
-        default:
-          return error.message ?? 'Kimlik doğrulama işlemi gerçekleştirilemedi.';
-      }
+      return error.code;
     }
-    return error?.toString() ?? 'Beklenmedik bir hata oluştu.';
+    if (error is String) {
+      return error;
+    }
+    return 'generic';
   }
 }
 
@@ -290,12 +276,12 @@ final authControllerProvider =
 
 /// Direct reactive user provider
 final authUserProvider = Provider<User?>((ref) {
-  return ref.watch(authControllerProvider).user;
+  return ref.watch(authControllerProvider.select((state) => state.user));
 });
 
 /// Direct reactive email verification status provider
 final isEmailVerifiedProvider = Provider<bool>((ref) {
-  return ref.watch(authControllerProvider).isEmailVerified;
+  return ref.watch(authControllerProvider.select((state) => state.isEmailVerified));
 });
 
 /// Convenience provider for authentication status
@@ -305,5 +291,5 @@ final isAuthenticatedProvider = Provider<bool>((ref) {
 
 /// Convenience provider for email verification requirement gate
 final requiresEmailVerificationProvider = Provider<bool>((ref) {
-  return ref.watch(authControllerProvider).requiresEmailVerification;
+  return ref.watch(authControllerProvider.select((state) => state.requiresEmailVerification));
 });

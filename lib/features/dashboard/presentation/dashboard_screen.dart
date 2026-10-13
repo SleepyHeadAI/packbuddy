@@ -23,8 +23,27 @@ import '../../checklist/presentation/controllers/checklist_controller.dart';
 import '../../checklist/presentation/screens/checklist_screen.dart';
 
 /// Sophisticated, cinematic Dashboard for PackBuddy with live Riverpod state integration
-class DashboardScreen extends ConsumerWidget {
+class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Automatic Cloud Sync & Local DB Refresh on Dashboard launch
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ref.read(syncEngineProvider.notifier).performSync();
+      if (mounted) {
+        ref.read(tripControllerProvider.notifier).loadTrips();
+        ref.read(vaultControllerProvider.notifier).loadDocuments();
+        ref.read(checklistControllerProvider.notifier).loadItems();
+      }
+    });
+  }
 
   String _getTimeBasedGreeting(AppLocalizations l10n) {
     final hour = DateTime.now().hour;
@@ -63,7 +82,7 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final currentLocale = ref.watch(localeProvider);
     final syncState = ref.watch(syncEngineProvider);
@@ -939,7 +958,7 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
 
   const _UpcomingTripHighlightCard({
     required this.trip,
-    this.badgeText = 'YAKLAŞAN ROTA',
+    required this.badgeText,
     required this.dateFormat,
     required this.onTap,
   });

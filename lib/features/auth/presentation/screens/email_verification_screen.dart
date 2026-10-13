@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/l10n/locale_provider.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/widgets/bouncy_pressable.dart';
 import '../../auth_controller.dart';
 
@@ -49,7 +49,7 @@ class _EmailVerificationScreenState
     });
   }
 
-  Future<void> _handleManualCheck(bool isTr) async {
+  Future<void> _handleManualCheck() async {
     if (_isChecking) return;
     setState(() => _isChecking = true);
 
@@ -60,6 +60,7 @@ class _EmailVerificationScreenState
     setState(() => _isChecking = false);
 
     if (!isVerified) {
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           behavior: SnackBarBehavior.floating,
@@ -72,9 +73,7 @@ class _EmailVerificationScreenState
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  isTr
-                      ? 'E-postanız henüz doğrulanmadı. Lütfen gelen kutunuzdaki bağlantıya tıklayın.'
-                      : 'Email is not verified yet. Please check your inbox and click the link.',
+                  l10n.emailVerifyNotVerifiedYet,
                   style: const TextStyle(color: Colors.white, fontSize: 13),
                 ),
               ),
@@ -86,7 +85,7 @@ class _EmailVerificationScreenState
     }
   }
 
-  Future<void> _handleResendLink(bool isTr) async {
+  Future<void> _handleResendLink() async {
     if (_resendCooldownSeconds > 0) return;
 
     final success =
@@ -95,6 +94,7 @@ class _EmailVerificationScreenState
     if (!mounted) return;
 
     if (success) {
+      final l10n = AppLocalizations.of(context)!;
       setState(() => _resendCooldownSeconds = 30);
       _cooldownTimer?.cancel();
       _cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -122,9 +122,7 @@ class _EmailVerificationScreenState
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  isTr
-                      ? 'Doğrulama bağlantısı e-posta adresinize tekrar gönderildi!'
-                      : 'Verification email has been resent to your address!',
+                  l10n.emailVerifyLinkSentSuccess,
                   style: const TextStyle(color: Colors.white, fontSize: 13),
                 ),
               ),
@@ -146,8 +144,7 @@ class _EmailVerificationScreenState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final currentLocale = ref.watch(localeProvider);
-    final isTr = currentLocale.languageCode == 'tr';
+    final l10n = AppLocalizations.of(context)!;
     final user = ref.watch(authUserProvider);
     final email = user?.email ?? 'traveler@packbuddy.com';
 
@@ -173,7 +170,7 @@ class _EmailVerificationScreenState
 
                   // 2. Title & User Email Pill
                   Text(
-                    isTr ? 'E-postanızı Doğrulayın' : 'Verify Your Email',
+                    l10n.emailVerifyTitle,
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w800,
@@ -234,16 +231,16 @@ class _EmailVerificationScreenState
                   const SizedBox(height: 20),
 
                   // 3. Informational Instruction Card
-                  _buildInstructionCard(isDark, isTr),
+                  _buildInstructionCard(isDark, l10n),
                   const SizedBox(height: 24),
 
                   // 4. Polling Status Badge
-                  _buildPollerIndicator(isDark, isTr),
+                  _buildPollerIndicator(isDark, l10n),
                   const SizedBox(height: 28),
 
                   // 5. "Doğrulamayı Kontrol Et" Primary Action
                   BouncyPressable(
-                    onTap: () => _handleManualCheck(isTr),
+                    onTap: _handleManualCheck,
                     borderRadius: BorderRadius.circular(22),
                     child: Container(
                       height: 54,
@@ -291,9 +288,7 @@ class _EmailVerificationScreenState
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  isTr
-                                      ? 'Doğrulamayı Kontrol Et'
-                                      : 'Check Verification Now',
+                                  l10n.emailVerifyCheckNow,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
@@ -313,7 +308,7 @@ class _EmailVerificationScreenState
                   BouncyPressable(
                     onTap: _resendCooldownSeconds > 0
                         ? null
-                        : () => _handleResendLink(isTr),
+                        : _handleResendLink,
                     borderRadius: BorderRadius.circular(22),
                     child: Container(
                       height: 52,
@@ -350,25 +345,25 @@ class _EmailVerificationScreenState
                                     : AppColors.primaryLight),
                           ),
                           const SizedBox(width: 10),
-                          Text(
-                            _resendCooldownSeconds > 0
-                                ? (isTr
-                                    ? 'Tekrar Gönder ($_resendCooldownSeconds sn)'
-                                    : 'Resend Link ($_resendCooldownSeconds s)')
-                                : (isTr
-                                    ? 'Doğrulama Linkini Tekrar Gönder'
-                                    : 'Resend Verification Link'),
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.2,
-                              color: _resendCooldownSeconds > 0
-                                  ? (isDark
-                                      ? AppColors.onSurfaceVariantDark
-                                      : AppColors.onSurfaceVariantLight)
-                                  : (isDark
-                                      ? AppColors.onSurfaceDark
-                                      : AppColors.primaryLight),
+                          Flexible(
+                            child: Text(
+                              _resendCooldownSeconds > 0
+                                  ? l10n.emailVerifyResendCooldown(_resendCooldownSeconds)
+                                  : l10n.emailVerifyResendLink,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.2,
+                                color: _resendCooldownSeconds > 0
+                                    ? (isDark
+                                        ? AppColors.onSurfaceVariantDark
+                                        : AppColors.onSurfaceVariantLight)
+                                    : (isDark
+                                        ? AppColors.onSurfaceDark
+                                        : AppColors.primaryLight),
+                              ),
                             ),
                           ),
                         ],
@@ -383,7 +378,7 @@ class _EmailVerificationScreenState
                       onPressed: _handleSignOut,
                       icon: const Icon(Icons.arrow_back_rounded, size: 16),
                       label: Text(
-                        isTr ? 'Giriş Ekranına Dön' : 'Back to Sign In',
+                        l10n.emailVerifyBackToSignIn,
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
@@ -454,7 +449,7 @@ class _EmailVerificationScreenState
   }
 
   /// Informational Card Explaining Next Steps
-  Widget _buildInstructionCard(bool isDark, bool isTr) {
+  Widget _buildInstructionCard(bool isDark, AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -500,9 +495,7 @@ class _EmailVerificationScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isTr
-                          ? 'Gelen Kutunuzu Kontrol Edin'
-                          : 'Check Your Inbox',
+                      l10n.emailVerifyInstructionsTitle,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -513,9 +506,7 @@ class _EmailVerificationScreenState
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      isTr
-                          ? 'E-posta adresinize bir doğrulama bağlantısı ilettik. Spam veya Gereksiz klasörünü de kontrol etmeyi unutmayın.'
-                          : 'We dispatched a verification link to your inbox. Be sure to check your spam or junk folder as well.',
+                      l10n.emailVerifyStep1,
                       style: TextStyle(
                         fontSize: 12.5,
                         height: 1.45,
@@ -556,9 +547,7 @@ class _EmailVerificationScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isTr
-                          ? 'Otomatik Erişim Açılışı'
-                          : 'Instant Unlocking',
+                      l10n.emailVerifyStep2,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -569,9 +558,7 @@ class _EmailVerificationScreenState
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      isTr
-                          ? 'Bağlantıya tıkladığınız anda seyahat panonuz otomatik olarak açılacaktır.'
-                          : 'Once you click the link, your travel dashboard unlocks automatically.',
+                      l10n.emailVerifyStep3,
                       style: TextStyle(
                         fontSize: 12.5,
                         height: 1.45,
@@ -591,7 +578,7 @@ class _EmailVerificationScreenState
   }
 
   /// Live Background Polling Indicator
-  Widget _buildPollerIndicator(bool isDark, bool isTr) {
+  Widget _buildPollerIndicator(bool isDark, AppLocalizations l10n) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -607,9 +594,7 @@ class _EmailVerificationScreenState
         ),
         const SizedBox(width: 10),
         Text(
-          isTr
-              ? 'Doğrulama bağlantısı bekleniyor...'
-              : 'Waiting for verification link click...',
+          l10n.emailVerifyWaiting,
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w500,

@@ -1,6 +1,7 @@
 /// Packing Item domain entity representing luggage/checklist items
 class PackingItem {
   final String id;
+  final String userId;
   final String? tripId;
   final String name;
   final String category;
@@ -14,6 +15,7 @@ class PackingItem {
 
   const PackingItem({
     required this.id,
+    this.userId = '',
     this.tripId,
     required this.name,
     required this.category,
@@ -28,6 +30,7 @@ class PackingItem {
 
   PackingItem copyWith({
     String? id,
+    String? userId,
     String? tripId,
     String? name,
     String? category,
@@ -41,6 +44,7 @@ class PackingItem {
   }) {
     return PackingItem(
       id: id ?? this.id,
+      userId: userId ?? this.userId,
       tripId: tripId ?? this.tripId,
       name: name ?? this.name,
       category: category ?? this.category,
@@ -58,6 +62,7 @@ class PackingItem {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'user_id': userId,
       'trip_id': tripId,
       'name': name,
       'category': category,
@@ -91,6 +96,7 @@ class PackingItem {
 
     return PackingItem(
       id: (map['id'] ?? '') as String,
+      userId: (map['user_id'] ?? map['userId'] ?? '') as String,
       tripId: (map['trip_id'] ?? map['tripId']) as String?,
       name: (map['name'] ?? '') as String,
       category: (map['category'] ?? 'Diğer') as String,
@@ -108,6 +114,8 @@ class PackingItem {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'userId': userId,
+      'user_id': userId,
       'tripId': tripId,
       'trip_id': tripId,
       'name': name,
@@ -134,6 +142,7 @@ class PackingItem {
       other is PackingItem &&
           runtimeType == other.runtimeType &&
           id == other.id &&
+          userId == other.userId &&
           name == other.name &&
           quantity == other.quantity &&
           isPacked == other.isPacked &&
@@ -144,6 +153,7 @@ class PackingItem {
   @override
   int get hashCode =>
       id.hashCode ^
+      userId.hashCode ^
       name.hashCode ^
       quantity.hashCode ^
       isPacked.hashCode ^

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/l10n/locale_provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/bouncy_pressable.dart';
 import 'auth_controller.dart';
@@ -32,7 +31,20 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   bool _obscureConfirmPassword = true;
 
   @override
+  void initState() {
+    super.initState();
+    _passwordController.addListener(_onPasswordChanged);
+  }
+
+  void _onPasswordChanged() {
+    if (_mode == AuthMode.signUp && mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
   void dispose() {
+    _passwordController.removeListener(_onPasswordChanged);
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -71,7 +83,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     await ref.read(authControllerProvider.notifier).signInWithGoogle();
   }
 
-  void _handleApplePlaceholder(BuildContext context, bool isTr) {
+  void _handleApplePlaceholder(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
@@ -83,9 +96,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                isTr
-                    ? 'Apple ile Giriş çok yakında sonraki güncellemede aktif edilecektir!'
-                    : 'Sign in with Apple will be available in the upcoming update!',
+                l10n.authAppleComingSoon,
                 style: const TextStyle(color: Colors.white, fontSize: 13),
               ),
             ),
@@ -96,21 +107,20 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     );
   }
 
-  void _handleForgotPassword(BuildContext context, bool isTr) {
+  void _handleForgotPassword(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final emailCtrl = TextEditingController(text: _emailController.text);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-        title: Text(isTr ? 'Şifre Sıfırlama' : 'Reset Password'),
+        title: Text(l10n.authResetPasswordTitle),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              isTr
-                  ? 'Kayıtlı e-posta adresinizi girin, sıfırlama bağlantısı gönderilecektir.'
-                  : 'Enter your registered email address to receive a password reset link.',
+              l10n.authResetPasswordDescription,
               style: const TextStyle(fontSize: 13),
             ),
             const SizedBox(height: 16),
@@ -118,7 +128,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               controller: emailCtrl,
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
-                labelText: isTr ? 'E-posta Adresi' : 'Email Address',
+                labelText: l10n.authEmail,
                 prefixIcon: const Icon(Icons.alternate_email_rounded),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
               ),
@@ -128,7 +138,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(isTr ? 'İptal' : 'Cancel'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -142,19 +152,44 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   backgroundColor: AppColors.successPastel,
-                  content: Text(
-                    isTr
-                        ? 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.'
-                        : 'Password reset link has been dispatched to your email.',
-                  ),
+                  content: Text(l10n.authResetLinkSent),
                 ),
               );
             },
-            child: Text(isTr ? 'Gönder' : 'Send Link'),
+            child: Text(l10n.authSendLink),
           ),
         ],
       ),
     );
+  }
+
+  String _getLocalizedAuthError(String code, AppLocalizations l10n) {
+    switch (code) {
+      case 'user-not-found':
+        return l10n.authErrorUserNotFound;
+      case 'wrong-password':
+        return l10n.authErrorWrongPassword;
+      case 'invalid-credential':
+        return l10n.authErrorInvalidCredential;
+      case 'email-already-in-use':
+        return l10n.authErrorEmailInUse;
+      case 'invalid-email':
+        return l10n.authErrorInvalidEmail;
+      case 'weak-password':
+        return l10n.authErrorWeakPassword;
+      case 'user-disabled':
+        return l10n.authErrorUserDisabled;
+      case 'too-many-requests':
+        return l10n.authErrorTooManyRequests;
+      case 'network-request-failed':
+        return l10n.authErrorNetworkFailed;
+      case 'google-sign-in-failed':
+        return l10n.authErrorGoogleFailed;
+      case 'email-verification-failed':
+        return l10n.authErrorVerificationFailed;
+      default:
+        return l10n.authErrorGeneric;
+    }
   }
 
   @override
@@ -162,18 +197,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final authState = ref.watch(authControllerProvider);
-    final currentLocale = ref.watch(localeProvider);
-    final isTr = currentLocale.languageCode == 'tr';
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
-    final titleText = isTr ? 'PackBuddy' : 'PackBuddy';
+    const titleText = 'PackBuddy';
     final subtitleText = _mode == AuthMode.signIn
-        ? (isTr
-            ? 'Lüks Seyahat Asistanınız • Giriş Yapın'
-            : 'Your Luxury Travel Companion • Sign In')
-        : (isTr
-            ? 'Yeni Bir Maceraya Başlayın • Kayıt Olun'
-            : 'Begin a New Journey • Create Account');
+        ? l10n.authSubtitleSignIn
+        : l10n.authSubtitleSignUp;
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
@@ -196,33 +225,33 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     const SizedBox(height: 28),
 
                     // 2. Mode Selector Pill (Sign In / Sign Up)
-                    _buildModeSelector(isDark, isTr),
+                    _buildModeSelector(isDark, l10n),
                     const SizedBox(height: 24),
 
                     // 3. Error Banner (if error exists)
                     if (authState.errorMessage != null) ...[
-                      _buildErrorBanner(authState.errorMessage!, isDark),
+                      _buildErrorBanner(authState.errorMessage!, isDark, l10n),
                       const SizedBox(height: 16),
                     ],
 
                     // 4. Input Fields Card Container
-                    _buildFormCard(context, isDark, isTr, l10n),
+                    _buildFormCard(context, isDark, l10n),
                     const SizedBox(height: 20),
 
                     // 5. Primary Submit Button
-                    _buildSubmitButton(authState.isLoading, isDark, isTr),
+                    _buildSubmitButton(authState.isLoading, isDark, l10n),
                     const SizedBox(height: 24),
 
                     // 6. Modern Divider
-                    _buildDivider(isDark, isTr),
+                    _buildDivider(isDark, l10n),
                     const SizedBox(height: 20),
 
                     // 7. Social Login Buttons (Google & Apple)
-                    _buildSocialButtons(context, authState.isLoading, isDark, isTr),
+                    _buildSocialButtons(context, authState.isLoading, isDark, l10n),
                     const SizedBox(height: 28),
 
                     // 8. Terms & Privacy Notice
-                    _buildFooterTerms(isDark, isTr),
+                    _buildFooterTerms(isDark, l10n),
                     const SizedBox(height: 12),
                   ],
                 ),
@@ -317,7 +346,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 
   /// Animated Sliding Segmented Mode Selector
-  Widget _buildModeSelector(bool isDark, bool isTr) {
+  Widget _buildModeSelector(bool isDark, AppLocalizations l10n) {
     return Container(
       height: 52,
       padding: const EdgeInsets.all(4),
@@ -355,7 +384,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       : null,
                 ),
                 child: Text(
-                  isTr ? 'Giriş Yap' : 'Sign In',
+                  l10n.authSignIn,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: _mode == AuthMode.signIn
@@ -395,7 +424,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       : null,
                 ),
                 child: Text(
-                  isTr ? 'Kayıt Ol' : 'Sign Up',
+                  l10n.authSignUp,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: _mode == AuthMode.signUp
@@ -417,7 +446,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 
   /// Refined Error Alert Banner
-  Widget _buildErrorBanner(String message, bool isDark) {
+  Widget _buildErrorBanner(String message, bool isDark, AppLocalizations l10n) {
+    final localizedMessage = _getLocalizedAuthError(message, l10n);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -439,7 +469,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              message,
+              localizedMessage,
               style: const TextStyle(
                 color: AppColors.errorPastel,
                 fontSize: 13,
@@ -466,8 +496,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   Widget _buildFormCard(
     BuildContext context,
     bool isDark,
-    bool isTr,
-    AppLocalizations? l10n,
+    AppLocalizations l10n,
   ) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -482,7 +511,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           BoxShadow(
             color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.04),
             blurRadius: 20,
-            offset: const Offset(0, 8),
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -491,7 +520,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         children: [
           // Email Label & Field
           Text(
-            isTr ? 'E-posta Adresi' : 'Email Address',
+            l10n.authEmail,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -511,20 +540,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             ),
             decoration: _inputDecoration(
               isDark: isDark,
-              hintText: isTr ? 'ornek@packbuddy.com' : 'traveler@packbuddy.com',
+              hintText: l10n.authEmailHint,
               prefixIcon: Icons.alternate_email_rounded,
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return isTr
-                    ? 'Lütfen e-posta adresinizi girin.'
-                    : 'Please enter your email.';
+                return l10n.authEmailRequired;
               }
               final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
               if (!emailRegex.hasMatch(value.trim())) {
-                return isTr
-                    ? 'Geçerli bir e-posta adresi yazın.'
-                    : 'Enter a valid email address.';
+                return l10n.authEmailInvalid;
               }
               return null;
             },
@@ -536,7 +561,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                isTr ? 'Şifre' : 'Password',
+                l10n.authPassword,
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -545,9 +570,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               ),
               if (_mode == AuthMode.signIn)
                 GestureDetector(
-                  onTap: () => _handleForgotPassword(context, isTr),
+                  onTap: () => _handleForgotPassword(context),
                   child: Text(
-                    isTr ? 'Şifremi Unuttum?' : 'Forgot Password?',
+                    l10n.authForgotPassword,
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -566,6 +591,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             textInputAction: _mode == AuthMode.signUp
                 ? TextInputAction.next
                 : TextInputAction.done,
+            onChanged: (_) {
+              if (_mode == AuthMode.signUp) {
+                setState(() {});
+              }
+            },
             onFieldSubmitted: (_) {
               if (_mode == AuthMode.signIn) _handleSubmit();
             },
@@ -597,57 +627,25 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return isTr
-                    ? 'Lütfen şifrenizi girin.'
-                    : 'Please enter your password.';
+                return l10n.authPasswordRequired;
               }
               if (_mode == AuthMode.signUp) {
                 final strictRegex = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$');
                 if (!strictRegex.hasMatch(value)) {
-                  return isTr
-                      ? 'Şifre en az 8 karakter olmalı, büyük/küçük harf ve rakam içermelidir.'
-                      : 'Password must be at least 8 characters, containing uppercase, lowercase, and a number.';
+                  return l10n.authPasswordRulesInvalid;
                 }
               } else {
                 if (value.length < 6) {
-                  return isTr
-                      ? 'Şifre en az 6 karakter olmalıdır.'
-                      : 'Password must be at least 6 characters.';
+                  return l10n.authPasswordMinChars;
                 }
               }
               return null;
             },
           ),
 
-          // Password Requirements Hint (Visible in Sign Up mode)
+          // Password Requirements Checklist (Visible in Sign Up mode)
           if (_mode == AuthMode.signUp) ...[
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(
-                  Icons.shield_outlined,
-                  size: 14,
-                  color: isDark
-                      ? AppColors.primaryDark
-                      : AppColors.onSurfaceVariantLight,
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    isTr
-                        ? 'En az 8 karakter, büyük harf, küçük harf ve rakam gereklidir.'
-                        : 'Min 8 chars, uppercase, lowercase & number required.',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      color: isDark
-                          ? AppColors.onSurfaceVariantDark
-                          : AppColors.onSurfaceVariantLight,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            _buildPasswordRules(isDark, l10n),
           ],
 
           // Confirm Password Field (Animated in Sign Up mode)
@@ -660,7 +658,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     children: [
                       const SizedBox(height: 18),
                       Text(
-                        isTr ? 'Şifre Tekrarı' : 'Confirm Password',
+                        l10n.authConfirmPassword,
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -707,14 +705,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         validator: (value) {
                           if (_mode == AuthMode.signUp) {
                             if (value == null || value.isEmpty) {
-                              return isTr
-                                  ? 'Lütfen şifrenizi tekrar girin.'
-                                  : 'Please confirm your password.';
+                              return l10n.authConfirmPasswordRequired;
                             }
                             if (value != _passwordController.text) {
-                              return isTr
-                                  ? 'Şifreler birbiriyle eşleşmiyor.'
-                                  : 'Passwords do not match.';
+                              return l10n.authPasswordsDoNotMatch;
                             }
                           }
                           return null;
@@ -729,6 +723,123 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     );
   }
 
+  /// Modern 4-point Password Requirements Checklist
+  Widget _buildPasswordRules(bool isDark, AppLocalizations l10n) {
+    return ValueListenableBuilder<TextEditingValue>(
+      valueListenable: _passwordController,
+      builder: (context, value, _) {
+        final pwd = value.text;
+        final hasMinLength = pwd.length >= 8;
+        final hasUppercase = RegExp(r'[A-Z]').hasMatch(pwd);
+        final hasLowercase = RegExp(r'[a-z]').hasMatch(pwd);
+        final hasDigit = RegExp(r'[0-9]').hasMatch(pwd);
+
+        final rules = [
+          (l10n.authRuleMinChars, hasMinLength),
+          (l10n.authRuleUppercase, hasUppercase),
+          (l10n.authRuleLowercase, hasLowercase),
+          (l10n.authRuleDigit, hasDigit),
+        ];
+
+        return Container(
+          margin: const EdgeInsets.only(top: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: isDark
+                ? AppColors.surfaceVariantDark.withValues(alpha: 0.4)
+                : const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark
+                  ? AppColors.outlineDark.withValues(alpha: 0.5)
+                  : AppColors.outlineLight.withValues(alpha: 0.8),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.shield_outlined,
+                    size: 14,
+                    color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    l10n.authPasswordRulesTitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: isDark
+                          ? AppColors.onSurfaceDark
+                          : AppColors.primaryLight,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              ...rules.map((rule) {
+                final isMet = rule.$2;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 3),
+                  child: Row(
+                    children: [
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
+                        width: 18,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          color: isMet
+                              ? const Color(0xFF10B981)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(
+                            color: isMet
+                                ? const Color(0xFF10B981)
+                                : (isDark
+                                    ? Colors.white.withValues(alpha: 0.25)
+                                    : Colors.black.withValues(alpha: 0.22)),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Center(
+                          child: isMet
+                              ? const Icon(
+                                  Icons.check_rounded,
+                                  size: 13,
+                                  color: Colors.white,
+                                )
+                              : null,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          rule.$1,
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: isMet ? FontWeight.w600 : FontWeight.w400,
+                            color: isMet
+                                ? (isDark ? const Color(0xFF34D399) : const Color(0xFF059669))
+                                : (isDark
+                                    ? AppColors.onSurfaceVariantDark
+                                    : AppColors.onSurfaceVariantLight),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   /// Unified Modern Input Decoration
   InputDecoration _inputDecoration({
     required bool isDark,
@@ -737,6 +848,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     Widget? suffixIcon,
   }) {
     return InputDecoration(
+      errorMaxLines: 2,
       hintText: hintText,
       hintStyle: TextStyle(
         fontSize: 13,
@@ -796,7 +908,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 
   /// Primary Submit Button with Tactile Bouncy Feedback
-  Widget _buildSubmitButton(bool isLoading, bool isDark, bool isTr) {
+  Widget _buildSubmitButton(bool isLoading, bool isDark, AppLocalizations l10n) {
     return BouncyPressable(
       onTap: isLoading ? null : _handleSubmit,
       borderRadius: BorderRadius.circular(22),
@@ -837,8 +949,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 children: [
                   Text(
                     _mode == AuthMode.signIn
-                        ? (isTr ? 'Giriş Yap' : 'Sign In')
-                        : (isTr ? 'Hesap Oluştur' : 'Create Account'),
+                        ? l10n.authSignIn
+                        : l10n.authCreateAccount,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -861,7 +973,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 
   /// Refined Modern Divider
-  Widget _buildDivider(bool isDark, bool isTr) {
+  Widget _buildDivider(bool isDark, AppLocalizations l10n) {
     return Row(
       children: [
         Expanded(
@@ -873,7 +985,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14),
           child: Text(
-            isTr ? 'veya' : 'or continue with',
+            l10n.authOr,
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
@@ -898,7 +1010,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     BuildContext context,
     bool isLoading,
     bool isDark,
-    bool isTr,
+    AppLocalizations l10n,
   ) {
     return Column(
       children: [
@@ -929,7 +1041,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 _buildGoogleIconBadge(),
                 const SizedBox(width: 12),
                 Text(
-                  isTr ? 'Google ile Devam Et' : 'Continue with Google',
+                  l10n.authContinueWithGoogle,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -945,7 +1057,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
         // Continue with Apple (Placeholder)
         BouncyPressable(
-          onTap: isLoading ? null : () => _handleApplePlaceholder(context, isTr),
+          onTap: isLoading ? null : () => _handleApplePlaceholder(context),
           borderRadius: BorderRadius.circular(22),
           child: Container(
             height: 52,
@@ -974,7 +1086,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  isTr ? 'Apple ile Devam Et' : 'Continue with Apple',
+                  l10n.authContinueWithApple,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -1023,13 +1135,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 
   /// Terms and Privacy Policy Footer
-  Widget _buildFooterTerms(bool isDark, bool isTr) {
+  Widget _buildFooterTerms(bool isDark, AppLocalizations l10n) {
     return Column(
       children: [
         Text(
-          isTr
-              ? 'Devam ederek Hizmet Şartları ve Gizlilik Politikası\'nı kabul etmiş olursunuz.'
-              : 'By continuing, you agree to our Terms of Service & Privacy Policy.',
+          l10n.authTermsNotice,
           style: TextStyle(
             fontSize: 11,
             color: isDark
@@ -1056,13 +1166,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               children: [
                 TextSpan(
                   text: _mode == AuthMode.signIn
-                      ? (isTr ? 'Hesabınız yok mu? ' : "Don't have an account? ")
-                      : (isTr ? 'Zaten hesabınız var mı? ' : 'Already have an account? '),
+                      ? l10n.authNoAccount
+                      : l10n.authAlreadyHaveAccount,
                 ),
                 TextSpan(
                   text: _mode == AuthMode.signIn
-                      ? (isTr ? 'Kayıt Olun' : 'Sign Up')
-                      : (isTr ? 'Giriş Yapın' : 'Sign In'),
+                      ? l10n.authSignUp
+                      : l10n.authSignIn,
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
                     color: isDark

@@ -84,6 +84,7 @@ void main() {
     );
 
     await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 4));
 
     // Verify that DashboardScreen renders
     expect(find.byType(DashboardScreen), findsOneWidget);
