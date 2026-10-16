@@ -1,5 +1,7 @@
-import 'package:uuid/uuid.dart';
+import '../../../l10n/app_localizations.dart';
 import 'packing_item.dart';
+
+import 'canonical_packing_catalog.dart';
 
 /// Represents a pre-curated packing list template tailored for specific trip types
 class PackingTemplate {
@@ -16,9 +18,47 @@ class PackingTemplate {
     required this.emoji,
     required this.items,
   });
+
+  String getLocalizedTitle(AppLocalizations l10n) {
+    switch (id) {
+      case 'summer_beach':
+        return l10n.templateSummerTitle;
+      case 'winter_ski':
+        return l10n.templateWinterTitle;
+      case 'business_trip':
+      case 'business_work':
+        return l10n.templateBusinessTitle;
+      case 'camping_outdoor':
+      case 'camping_nature':
+        return l10n.templateCampingTitle;
+      case 'city_weekend':
+        return l10n.templateCityTitle;
+      default:
+        return title;
+    }
+  }
+
+  String getLocalizedDescription(AppLocalizations l10n) {
+    switch (id) {
+      case 'summer_beach':
+        return l10n.templateSummerDesc;
+      case 'winter_ski':
+        return l10n.templateWinterDesc;
+      case 'business_trip':
+      case 'business_work':
+        return l10n.templateBusinessDesc;
+      case 'camping_outdoor':
+      case 'camping_nature':
+        return l10n.templateCampingDesc;
+      case 'city_weekend':
+        return l10n.templateCityDesc;
+      default:
+        return description;
+    }
+  }
 }
 
-/// Simplified template item before instantiation with UUID
+/// Simplified template item before instantiation with deterministic ID
 class PackingItemTemplate {
   final String name;
   final String category;
@@ -34,10 +74,19 @@ class PackingItemTemplate {
     this.compartment = 'Main Cabin',
   });
 
-  PackingItem toPackingItem({String? tripId}) {
+  PackingItem toPackingItem({String? tripId, String? userId, String? templateId}) {
     final now = DateTime.now();
+    final canonicalKey = CanonicalPackingCatalog.resolveCanonicalKey(name) ??
+        CanonicalPackingCatalog.normalize(name);
+    final deterministicId = CanonicalPackingCatalog.generateDeterministicId(
+      prefix: templateId != null ? 'tpl_$templateId' : 'tpl',
+      userId: userId,
+      canonicalKey: canonicalKey,
+      tripId: tripId,
+    );
     return PackingItem(
-      id: const Uuid().v4(),
+      id: deterministicId,
+      userId: userId ?? '',
       tripId: tripId,
       name: name,
       category: category,

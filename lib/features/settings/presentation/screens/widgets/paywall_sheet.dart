@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:packbuddy/core/services/currency_service.dart';
 import 'package:packbuddy/core/services/telemetry_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/features/admin/admin_service.dart';
+import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/settings/data/mock_revenuecat_service.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
@@ -31,6 +34,51 @@ class PaywallSheet extends ConsumerWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final proState = ref.watch(proSubscriptionProvider);
+    final currentCurrency = ref.watch(currencyProvider);
+
+    // Affordable, localized micro-subscription tiers adapting cleanly to user currency
+    final String monthlyPriceText;
+    final String annualPriceText;
+    final String annualSubPriceText;
+
+    switch (currentCurrency.toUpperCase()) {
+      case 'TRY':
+        monthlyPriceText = '₺29,99 ${l10n.perMonth}';
+        annualPriceText = '₺149,99 ${l10n.perYear}';
+        annualSubPriceText = '~₺12,50 ${l10n.perMonth}';
+        break;
+      case 'EUR':
+        monthlyPriceText = '€0,99 ${l10n.perMonth}';
+        annualPriceText = '€4,99 ${l10n.perYear}';
+        annualSubPriceText = '~€0,41 ${l10n.perMonth}';
+        break;
+      case 'GBP':
+        monthlyPriceText = '£0.89 ${l10n.perMonth}';
+        annualPriceText = '£4.49 ${l10n.perYear}';
+        annualSubPriceText = '~£0.37 ${l10n.perMonth}';
+        break;
+      case 'JPY':
+        monthlyPriceText = '¥150 ${l10n.perMonth}';
+        annualPriceText = '¥750 ${l10n.perYear}';
+        annualSubPriceText = '~¥62 ${l10n.perMonth}';
+        break;
+      case 'AUD':
+        monthlyPriceText = 'A\$1.49 ${l10n.perMonth}';
+        annualPriceText = 'A\$7.49 ${l10n.perYear}';
+        annualSubPriceText = '~A\$0.62 ${l10n.perMonth}';
+        break;
+      case 'CAD':
+        monthlyPriceText = 'CA\$1.39 ${l10n.perMonth}';
+        annualPriceText = 'CA\$6.99 ${l10n.perYear}';
+        annualSubPriceText = '~CA\$0.58 ${l10n.perMonth}';
+        break;
+      case 'USD':
+      default:
+        monthlyPriceText = '\$0.99 ${l10n.perMonth}';
+        annualPriceText = '\$4.99 ${l10n.perYear}';
+        annualSubPriceText = '~\$0.41 ${l10n.perMonth}';
+        break;
+    }
 
     return SafeArea(
       top: false,
@@ -187,8 +235,8 @@ class PaywallSheet extends ConsumerWidget {
                   Expanded(
                     child: _PlanOptionCard(
                       title: l10n.annual,
-                      price: '\$39.99 / yr',
-                      subPrice: '\$3.33 / mo',
+                      price: annualPriceText,
+                      subPrice: annualSubPriceText,
                       badge: l10n.annualSave,
                       isSelected: proState.activePlan == SubscriptionPlan.annual,
                       onTap: () {
@@ -200,7 +248,7 @@ class PaywallSheet extends ConsumerWidget {
                   Expanded(
                     child: _PlanOptionCard(
                       title: l10n.monthly,
-                      price: '\$4.99 / mo',
+                      price: monthlyPriceText,
                       subPrice: null,
                       badge: null,
                       isSelected: proState.activePlan == SubscriptionPlan.monthly,
@@ -230,23 +278,82 @@ class PaywallSheet extends ConsumerWidget {
                 onPressed: proState.isLoading
                     ? null
                     : () async {
-                        final success = await ref
-                            .read(proSubscriptionProvider.notifier)
-                            .purchaseActivePlan();
-                        if (context.mounted && success) {
-                          Navigator.of(context).pop();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Row(
-                                children: [
-                                  const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
-                                  const SizedBox(width: 12),
-                                  Expanded(child: Text(l10n.purchaseSuccess)),
-                                ],
+                        final authState = ref.read(authControllerProvider);
+                        final userEmail = authState.user?.email?.trim().toLowerCase();
+                        final isSuperAdmin = userEmail == kAdminEmail.toLowerCase();
+
+                        if (isSuperAdmin) {
+                          // Dedicated Admin / Sandbox Test Purchase Confirmation Dialog
+                          final confirmed = await showDialog<bool>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              icon: const Icon(
+                                Icons.admin_panel_settings_rounded,
+                                color: AppColors.primaryLight,
+                                size: 36,
                               ),
-                              backgroundColor: AppColors.successPastel,
-                              behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              title: Text(l10n.adminTestPurchaseTitle),
+                              content: Text(
+                                userEmail != null
+                                    ? '${l10n.adminTestPurchaseMessage}\n\n($userEmail)'
+                                    : l10n.adminTestPurchaseMessage,
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(ctx).pop(false),
+                                  child: Text(l10n.cancel),
+                                ),
+                                FilledButton(
+                                  onPressed: () => Navigator.of(ctx).pop(true),
+                                  child: Text(l10n.activateTestPro),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          if (confirmed != true) return;
+
+                          final success = await ref
+                              .read(proSubscriptionProvider.notifier)
+                              .purchaseActivePlan(isTestOrAdminConfirmation: true);
+                          if (context.mounted && success) {
+                            Navigator.of(context).pop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Row(
+                                  children: [
+                                    const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                                    const SizedBox(width: 12),
+                                    Expanded(child: Text(l10n.purchaseSuccess)),
+                                  ],
+                                ),
+                                backgroundColor: AppColors.successPastel,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                            );
+                          }
+                        } else {
+                          // Normal user: Production store billing required, zero free bypass!
+                          if (!context.mounted) return;
+                          await showDialog<void>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              icon: const Icon(
+                                Icons.storefront_rounded,
+                                color: AppColors.primaryLight,
+                                size: 36,
+                              ),
+                              title: Text(l10n.storeBillingRequiredTitle),
+                              content: Text(l10n.storeBillingRequiredMessage),
+                              actions: [
+                                FilledButton(
+                                  onPressed: () => Navigator.of(ctx).pop(),
+                                  child: Text(l10n.ok),
+                                ),
+                              ],
                             ),
                           );
                         }
@@ -379,18 +486,22 @@ class _PlanOptionCard extends StatelessWidget {
                 ),
                 if (badge != null) ...[
                   const SizedBox(width: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: AppColors.tertiaryLight,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      badge!,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColors.tertiaryLight,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        badge!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),

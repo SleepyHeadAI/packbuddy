@@ -26,9 +26,18 @@ class TelemetryService {
   TelemetryService._();
   static final TelemetryService instance = TelemetryService._();
 
-  static const String posthogApiKey = 'phc_zJWTksx4JFN95rKAsfPxR9fUeQLFyM9ArCb9ZUkVjLeK';
-  static const int posthogProjectId = 305038;
-  static const String posthogHost = 'https://eu.i.posthog.com';
+  static const String posthogApiKey = String.fromEnvironment(
+    'POSTHOG_API_KEY',
+    defaultValue: 'phc_zJWTksx4JFN95rKAsfPxR9fUeQLFyM9ArCb9ZUkVjLeK',
+  );
+  static const int posthogProjectId = int.fromEnvironment(
+    'POSTHOG_PROJECT_ID',
+    defaultValue: 305038,
+  );
+  static const String posthogHost = String.fromEnvironment(
+    'POSTHOG_HOST',
+    defaultValue: 'https://eu.i.posthog.com',
+  );
 
   /// In-memory history of events for verification in unit/widget test environments
   final List<TelemetryEventRecord> testHistory = [];
@@ -279,14 +288,16 @@ class TelemetryService {
     }
   }
 
-  /// Captures executive administrative actions (pro grants/revocations)
+  /// Captures executive administrative actions (pro grants/revocations, document moderations, deletions)
   Future<void> logAdminAction({
     required String action,
     required String targetUid,
+    Map<String, Object>? details,
   }) async {
     final props = <String, Object>{
       'action': action,
       'target_uid': targetUid,
+      ...?details,
     };
     _record('admin_action', props);
 

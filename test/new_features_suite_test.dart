@@ -182,7 +182,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Kategori Harcama Analizi'), findsOneWidget);
+      expect(find.byType(BudgetAnalyticsCard), findsOneWidget);
+      expect(find.text('Bütçe Analitiği'), findsOneWidget);
       expect(find.text('3 Harcama'), findsOneWidget);
       expect(find.text('Yemek'), findsOneWidget);
       expect(find.text('Ulaşım'), findsOneWidget);

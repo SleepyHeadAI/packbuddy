@@ -93,10 +93,29 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
     }
   }
 
+  String _normalizeSubCategoryKey(String key) {
+    final k = key.toLowerCase();
+    if (k.contains('uçak') || k.contains('flight') || k.contains('flughafen') || k.contains('avion')) {
+      return 'flightTicket';
+    }
+    if (k.contains('otobüs') || k.contains('bus')) {
+      return 'busTicket';
+    }
+    if (k.contains('gemi') || k.contains('feribot') || k.contains('ferry') || k.contains('boat') || k.contains('bateau')) {
+      return 'ferryTicket';
+    }
+    if (k.contains('tren') || k.contains('train') || k.contains('bahn')) {
+      return 'trainTicket';
+    }
+    return key;
+  }
+
   bool _matchesSubCategory(Document doc, String? subCatFilter) {
     if (subCatFilter == null) return true;
     if (doc.subCategory == null) return false;
-    return doc.subCategory!.toLowerCase() == subCatFilter.toLowerCase();
+    final docNorm = _normalizeSubCategoryKey(doc.subCategory!);
+    final filterNorm = _normalizeSubCategoryKey(subCatFilter);
+    return docNorm.toLowerCase() == filterNorm.toLowerCase();
   }
 
   bool _isTransitOrTicket(String category) {
@@ -321,18 +340,21 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(l10n.boardingPassPassenger, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 9, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 2),
-                            Text(l10n.boardingPassSampleTraveler, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
-                          ],
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(l10n.boardingPassPassenger, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 9, fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 2),
+                              Text(l10n.boardingPassSampleTraveler, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
+                            ],
+                          ),
                         ),
+                        const SizedBox(width: 8),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(l10n.boardingPassGate, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 9, fontWeight: FontWeight.bold)),
+                            Text(l10n.boardingPassGate, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 9, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 2),
                             Text('A14 • 12B', style: TextStyle(color: theme.colorScheme.primary, fontSize: 13, fontWeight: FontWeight.w800)),
                           ],
@@ -391,13 +413,17 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                     children: [
                       Icon(Icons.visibility_rounded, color: theme.colorScheme.onPrimary, size: 20),
                       const SizedBox(width: 8),
-                      Text(
-                        l10n.viewDocumentAction,
-                        style: TextStyle(
-                          color: theme.colorScheme.onPrimary,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 15,
-                          letterSpacing: -0.2,
+                      Flexible(
+                        child: Text(
+                          l10n.viewDocumentAction,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: theme.colorScheme.onPrimary,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                            letterSpacing: -0.2,
+                          ),
                         ),
                       ),
                     ],
@@ -445,13 +471,17 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                     children: [
                       Icon(Icons.open_in_new_rounded, color: theme.colorScheme.onSurface, size: 18),
                       const SizedBox(width: 10),
-                      Text(
-                        l10n.openInExternalApp,
-                        style: TextStyle(
-                          color: theme.colorScheme.onSurface,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 15,
-                          letterSpacing: -0.2,
+                      Flexible(
+                        child: Text(
+                          l10n.openInExternalApp,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurface,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                            letterSpacing: -0.2,
+                          ),
                         ),
                       ),
                     ],
@@ -1017,68 +1047,68 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                   ChoiceChip(
                                     avatar: const Icon(Icons.flight_takeoff_rounded, size: 13),
                                     label: Text(l10n.flightTickets),
-                                    selected: _selectedSubCategoryFilter == 'Uçak Bileti',
+                                    selected: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'flightTicket',
                                     selectedColor: const Color(0xFF0284C7),
                                     labelStyle: TextStyle(
-                                      color: _selectedSubCategoryFilter == 'Uçak Bileti'
+                                      color: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'flightTicket'
                                           ? Colors.white
                                           : theme.colorScheme.onSurface,
                                       fontWeight: FontWeight.w600,
                                       fontSize: 11,
                                     ),
                                     onSelected: (val) {
-                                      setState(() => _selectedSubCategoryFilter = val ? 'Uçak Bileti' : null);
+                                      setState(() => _selectedSubCategoryFilter = val ? 'flightTicket' : null);
                                     },
                                   ),
                                   const SizedBox(width: 6),
                                   ChoiceChip(
                                     avatar: const Icon(Icons.directions_bus_rounded, size: 13),
                                     label: Text(l10n.busTickets),
-                                    selected: _selectedSubCategoryFilter == 'Otobüs Bileti',
+                                    selected: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'busTicket',
                                     selectedColor: const Color(0xFF0284C7),
                                     labelStyle: TextStyle(
-                                      color: _selectedSubCategoryFilter == 'Otobüs Bileti'
+                                      color: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'busTicket'
                                           ? Colors.white
                                           : theme.colorScheme.onSurface,
                                       fontWeight: FontWeight.w600,
                                       fontSize: 11,
                                     ),
                                     onSelected: (val) {
-                                      setState(() => _selectedSubCategoryFilter = val ? 'Otobüs Bileti' : null);
+                                      setState(() => _selectedSubCategoryFilter = val ? 'busTicket' : null);
                                     },
                                   ),
                                   const SizedBox(width: 6),
                                   ChoiceChip(
                                     avatar: const Icon(Icons.directions_boat_rounded, size: 13),
                                     label: Text(l10n.ferryBoat),
-                                    selected: _selectedSubCategoryFilter == 'Gemi / Feribot Bileti',
+                                    selected: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'ferryTicket',
                                     selectedColor: const Color(0xFF0284C7),
                                     labelStyle: TextStyle(
-                                      color: _selectedSubCategoryFilter == 'Gemi / Feribot Bileti'
+                                      color: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'ferryTicket'
                                           ? Colors.white
                                           : theme.colorScheme.onSurface,
                                       fontWeight: FontWeight.w600,
                                       fontSize: 11,
                                     ),
                                     onSelected: (val) {
-                                      setState(() => _selectedSubCategoryFilter = val ? 'Gemi / Feribot Bileti' : null);
+                                      setState(() => _selectedSubCategoryFilter = val ? 'ferryTicket' : null);
                                     },
                                   ),
                                   const SizedBox(width: 6),
                                   ChoiceChip(
                                     avatar: const Icon(Icons.train_rounded, size: 13),
                                     label: Text(l10n.trainTickets),
-                                    selected: _selectedSubCategoryFilter == 'Tren Bileti',
+                                    selected: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'trainTicket',
                                     selectedColor: const Color(0xFF0284C7),
                                     labelStyle: TextStyle(
-                                      color: _selectedSubCategoryFilter == 'Tren Bileti'
+                                      color: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'trainTicket'
                                           ? Colors.white
                                           : theme.colorScheme.onSurface,
                                       fontWeight: FontWeight.w600,
                                       fontSize: 11,
                                     ),
                                     onSelected: (val) {
-                                      setState(() => _selectedSubCategoryFilter = val ? 'Tren Bileti' : null);
+                                      setState(() => _selectedSubCategoryFilter = val ? 'trainTicket' : null);
                                     },
                                   ),
                                 ],

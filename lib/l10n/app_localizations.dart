@@ -551,7 +551,7 @@ abstract class AppLocalizations {
   /// Annual discount badge
   ///
   /// In en, this message translates to:
-  /// **'Save 33%'**
+  /// **'Save 58%'**
   String get annualSave;
 
   /// Subscription button label
@@ -2461,6 +2461,906 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Vault Storage'**
   String get adminTotalStorage;
+
+  /// Admin moderation string: adminDefaultBanReason
+  ///
+  /// In en, this message translates to:
+  /// **'Violation of platform terms of service.'**
+  String get adminDefaultBanReason;
+
+  /// Admin moderation string: adminPermanentBanTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Account Permanently Suspended'**
+  String get adminPermanentBanTitle;
+
+  /// Admin moderation string: adminTemporaryBanTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Account Temporarily Suspended'**
+  String get adminTemporaryBanTitle;
+
+  /// Admin moderation string: adminAccountSuspendedNotice
+  ///
+  /// In en, this message translates to:
+  /// **'Access to PackBuddy services has been restricted by an administrator.'**
+  String get adminAccountSuspendedNotice;
+
+  /// Admin moderation string: adminPermanentBan
+  ///
+  /// In en, this message translates to:
+  /// **'Permanent Ban'**
+  String get adminPermanentBan;
+
+  /// Admin moderation string: adminTemporaryBan
+  ///
+  /// In en, this message translates to:
+  /// **'Temporary Ban'**
+  String get adminTemporaryBan;
+
+  /// Admin moderation string: adminBanReasonLabel
+  ///
+  /// In en, this message translates to:
+  /// **'Suspension Reason'**
+  String get adminBanReasonLabel;
+
+  /// Admin moderation string: adminBanExpiresAtLabel
+  ///
+  /// In en, this message translates to:
+  /// **'Suspension Expires At'**
+  String get adminBanExpiresAtLabel;
+
+  /// Admin moderation string: adminFeatureRestrictedNotice
+  ///
+  /// In en, this message translates to:
+  /// **'This action is restricted by an administrator.'**
+  String get adminFeatureRestrictedNotice;
+
+  /// Admin moderation string: adminGeoAnalytics
+  ///
+  /// In en, this message translates to:
+  /// **'Geographic & Activity Analytics'**
+  String get adminGeoAnalytics;
+
+  /// Admin moderation string: adminPeriodLive
+  ///
+  /// In en, this message translates to:
+  /// **'Live (15m)'**
+  String get adminPeriodLive;
+
+  /// Admin moderation string: adminPeriodDaily
+  ///
+  /// In en, this message translates to:
+  /// **'Daily (24h)'**
+  String get adminPeriodDaily;
+
+  /// Admin moderation string: adminPeriodWeekly
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly (7d)'**
+  String get adminPeriodWeekly;
+
+  /// Admin moderation string: adminPeriodMonthly
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly (30d)'**
+  String get adminPeriodMonthly;
+
+  /// Admin moderation string: adminPeriodYearly
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly (365d)'**
+  String get adminPeriodYearly;
+
+  /// Admin moderation string: adminNoActiveUsers
+  ///
+  /// In en, this message translates to:
+  /// **'No active users in this period'**
+  String get adminNoActiveUsers;
+
+  /// Admin moderation string: adminFilterAll
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get adminFilterAll;
+
+  /// Admin moderation string: adminFilterPro
+  ///
+  /// In en, this message translates to:
+  /// **'Pro'**
+  String get adminFilterPro;
+
+  /// Admin moderation string: adminFilterBanned
+  ///
+  /// In en, this message translates to:
+  /// **'Banned'**
+  String get adminFilterBanned;
+
+  /// Admin moderation string: adminFilterRestricted
+  ///
+  /// In en, this message translates to:
+  /// **'Restricted'**
+  String get adminFilterRestricted;
+
+  /// Admin moderation string: adminModerateUser
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate User'**
+  String get adminModerateUser;
+
+  /// Admin moderation string: adminBanStatusLabel
+  ///
+  /// In en, this message translates to:
+  /// **'Account Suspension / Ban'**
+  String get adminBanStatusLabel;
+
+  /// Admin moderation string: adminUnbanned
+  ///
+  /// In en, this message translates to:
+  /// **'Unbanned'**
+  String get adminUnbanned;
+
+  /// Admin moderation string: adminBan24h
+  ///
+  /// In en, this message translates to:
+  /// **'24 Hours'**
+  String get adminBan24h;
+
+  /// Admin moderation string: adminBan7d
+  ///
+  /// In en, this message translates to:
+  /// **'7 Days'**
+  String get adminBan7d;
+
+  /// Admin moderation string: adminBan30d
+  ///
+  /// In en, this message translates to:
+  /// **'30 Days'**
+  String get adminBan30d;
+
+  /// Admin moderation string: adminBanReasonHint
+  ///
+  /// In en, this message translates to:
+  /// **'Reason for suspension (optional)...'**
+  String get adminBanReasonHint;
+
+  /// Admin moderation string: adminFeatureRestrictionsLabel
+  ///
+  /// In en, this message translates to:
+  /// **'Granular Feature Restrictions'**
+  String get adminFeatureRestrictionsLabel;
+
+  /// Admin moderation string: adminRestrictTripCreate
+  ///
+  /// In en, this message translates to:
+  /// **'Restrict Trip Creation'**
+  String get adminRestrictTripCreate;
+
+  /// Admin moderation string: adminRestrictExpenseAdd
+  ///
+  /// In en, this message translates to:
+  /// **'Restrict Expense Logging'**
+  String get adminRestrictExpenseAdd;
+
+  /// Admin moderation string: adminRestrictVaultUpload
+  ///
+  /// In en, this message translates to:
+  /// **'Restrict Vault Uploads'**
+  String get adminRestrictVaultUpload;
+
+  /// Admin moderation string: adminRestrictCloudSync
+  ///
+  /// In en, this message translates to:
+  /// **'Restrict Cloud Sync'**
+  String get adminRestrictCloudSync;
+
+  /// Admin moderation string: adminSaveChanges
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get adminSaveChanges;
+
+  /// Admin moderation string: adminChangesSaved
+  ///
+  /// In en, this message translates to:
+  /// **'Moderation changes saved successfully'**
+  String get adminChangesSaved;
+
+  /// Admin moderation string: adminSignOut
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Out'**
+  String get adminSignOut;
+
+  /// Localization key for perMonth
+  ///
+  /// In en, this message translates to:
+  /// **'/ mo'**
+  String get perMonth;
+
+  /// Localization key for perYear
+  ///
+  /// In en, this message translates to:
+  /// **'/ yr'**
+  String get perYear;
+
+  /// Localization key for storeBillingRequiredTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Store Billing Required'**
+  String get storeBillingRequiredTitle;
+
+  /// Localization key for storeBillingRequiredMessage
+  ///
+  /// In en, this message translates to:
+  /// **'Official Google Play & App Store billing is currently being activated for this production build. Subscription transactions cannot be bypassed for free.'**
+  String get storeBillingRequiredMessage;
+
+  /// Localization key for adminTestPurchaseTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Admin / Sandbox Test Purchase'**
+  String get adminTestPurchaseTitle;
+
+  /// Localization key for adminTestPurchaseMessage
+  ///
+  /// In en, this message translates to:
+  /// **'You are signed in as Super Admin. Would you like to confirm and activate PackBuddy Pro test subscription?'**
+  String get adminTestPurchaseMessage;
+
+  /// Localization key for activateTestPro
+  ///
+  /// In en, this message translates to:
+  /// **'Activate Pro (Test)'**
+  String get activateTestPro;
+
+  /// Localization key for templateSummerTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Beach & Summer Vacation'**
+  String get templateSummerTitle;
+
+  /// Localization key for templateSummerDesc
+  ///
+  /// In en, this message translates to:
+  /// **'Essential packing list for sea, sand, sun, and warm weather getaways'**
+  String get templateSummerDesc;
+
+  /// Localization key for templateWinterTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Winter & Ski Trip'**
+  String get templateWinterTitle;
+
+  /// Localization key for templateWinterDesc
+  ///
+  /// In en, this message translates to:
+  /// **'Protective gear and warm layers for cold climates and ski resorts'**
+  String get templateWinterDesc;
+
+  /// Localization key for templateBusinessTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Business & Conference'**
+  String get templateBusinessTitle;
+
+  /// Localization key for templateBusinessDesc
+  ///
+  /// In en, this message translates to:
+  /// **'Tailored packing list for meetings, conferences, and corporate trips'**
+  String get templateBusinessDesc;
+
+  /// Localization key for templateCampingTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Nature & Camping Expedition'**
+  String get templateCampingTitle;
+
+  /// Localization key for templateCampingDesc
+  ///
+  /// In en, this message translates to:
+  /// **'Durable outdoor gear for tent camping, trekking, and hiking'**
+  String get templateCampingDesc;
+
+  /// Localization key for templateCityTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Weekend City Break'**
+  String get templateCityTitle;
+
+  /// Localization key for templateCityDesc
+  ///
+  /// In en, this message translates to:
+  /// **'Lightweight and compact essentials for a 2-3 day city getaway'**
+  String get templateCityDesc;
+
+  /// Compliance notice for vault cloud backup
+  ///
+  /// In en, this message translates to:
+  /// **'Documents are encrypted & backed up to cloud storage for cross-device sync, 15-day account recovery, and safety compliance.'**
+  String get vaultCloudBackupNotice;
+
+  /// Delete account button title
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get deleteAccountTitle;
+
+  /// Title for 15-day deletion dialog
+  ///
+  /// In en, this message translates to:
+  /// **'15-Day Account Deletion Request'**
+  String get deleteAccountConfirmationTitle;
+
+  /// Message explaining 15-day grace period for deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Your account, trips, expenses, and vault documents will be scheduled for permanent deletion in 15 days.\n\n• Do not log in for 15 days to allow deletion to complete.\n• If you log in within 15 days, your account and all data will be automatically restored.\n\nDo you want to proceed?'**
+  String get deleteAccountConfirmationMessage;
+
+  /// Button confirming deletion request
+  ///
+  /// In en, this message translates to:
+  /// **'Request 15-Day Deletion'**
+  String get deleteAccountButton;
+
+  /// Notice after requesting deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been scheduled for deletion in 15 days. Do not log in if you wish to permanently delete your account.'**
+  String get deleteAccountScheduledNotice;
+
+  /// Notice when account is auto-recovered upon login
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back! Your account deletion was cancelled and all your data has been restored.'**
+  String get accountRestoredNotice;
+
+  /// Admin badge for pending deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled for deletion ({days}d remaining)'**
+  String adminPendingDeletionBadge(int days);
+
+  /// Admin button to cancel account deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Deletion'**
+  String get adminCancelDeletion;
+
+  /// Admin button to purge user data immediately
+  ///
+  /// In en, this message translates to:
+  /// **'Purge Data Now'**
+  String get adminPurgeNow;
+
+  /// Purge confirmation dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently Purge User Data?'**
+  String get adminPurgeConfirmTitle;
+
+  /// Purge confirmation dialog message
+  ///
+  /// In en, this message translates to:
+  /// **'This will immediately and irrevocably delete all cloud trips, expenses, checklists, and vault documents for this user.'**
+  String get adminPurgeConfirmMessage;
+
+  /// Admin deletion cancelled notification
+  ///
+  /// In en, this message translates to:
+  /// **'Account deletion successfully cancelled'**
+  String get adminDeletionCancelled;
+
+  /// Admin data purged notification
+  ///
+  /// In en, this message translates to:
+  /// **'All user data was permanently purged'**
+  String get adminDataPurged;
+
+  /// Title for uploaded vault documents section in admin
+  ///
+  /// In en, this message translates to:
+  /// **'Uploaded Vault Documents (Inspect / Moderate)'**
+  String get adminVaultDocumentsTitle;
+
+  /// Empty state for user documents in admin
+  ///
+  /// In en, this message translates to:
+  /// **'No vault documents uploaded yet'**
+  String get adminNoDocumentsUploaded;
+
+  /// Inspect document button
+  ///
+  /// In en, this message translates to:
+  /// **'Inspect'**
+  String get adminInspectDocument;
+
+  /// Admin delete document button
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Document'**
+  String get adminDeleteDocument;
+
+  /// Confirmation message for admin deleting document
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to permanently delete this document from the cloud vault?'**
+  String get adminDeleteDocumentConfirm;
+
+  /// Notification when admin deletes document
+  ///
+  /// In en, this message translates to:
+  /// **'Document successfully deleted by admin'**
+  String get adminDocumentDeleted;
+
+  /// Title for admin document preview dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Document Inspector'**
+  String get adminDocumentPreviewTitle;
+
+  /// Document type image label
+  ///
+  /// In en, this message translates to:
+  /// **'IMAGE'**
+  String get adminDocumentTypeImage;
+
+  /// Document type PDF label
+  ///
+  /// In en, this message translates to:
+  /// **'PDF'**
+  String get adminDocumentTypePdf;
+
+  /// Title for spam folder guidance
+  ///
+  /// In en, this message translates to:
+  /// **'Check Spam / Promotions Folder'**
+  String get emailVerifySpamFolderTip;
+
+  /// Description for spam folder guidance
+  ///
+  /// In en, this message translates to:
+  /// **'If you haven\'t received the link, check your spam or promotions folder for an email from PackBuddy. Verifying your email keeps your cloud vault secure.'**
+  String get emailVerifySpamFolderDesc;
+
+  /// Polling indicator text
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for verification link... (auto-checking)'**
+  String get emailVerifyAutoChecking;
+
+  /// No description provided for @currencyConverter.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency Converter'**
+  String get currencyConverter;
+
+  /// No description provided for @fromCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get fromCurrency;
+
+  /// No description provided for @toCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get toCurrency;
+
+  /// No description provided for @exchangeRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Exchange Rate'**
+  String get exchangeRate;
+
+  /// No description provided for @liveRates.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Rates'**
+  String get liveRates;
+
+  /// No description provided for @offlineRates.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline Rates'**
+  String get offlineRates;
+
+  /// No description provided for @quickConvert.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Currency Converter'**
+  String get quickConvert;
+
+  /// No description provided for @refreshRates.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh Rates'**
+  String get refreshRates;
+
+  /// No description provided for @budgetAnalytics.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget Analytics'**
+  String get budgetAnalytics;
+
+  /// No description provided for @categoryDistribution.
+  ///
+  /// In en, this message translates to:
+  /// **'Category Distribution'**
+  String get categoryDistribution;
+
+  /// No description provided for @spendingTrends.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending Trends'**
+  String get spendingTrends;
+
+  /// No description provided for @dailyBurnRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Spend Rate'**
+  String get dailyBurnRate;
+
+  /// No description provided for @projectedTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Projected Total'**
+  String get projectedTotal;
+
+  /// No description provided for @budgetStatusOnTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'On Track'**
+  String get budgetStatusOnTrack;
+
+  /// No description provided for @budgetStatusOver.
+  ///
+  /// In en, this message translates to:
+  /// **'Over Budget'**
+  String get budgetStatusOver;
+
+  /// No description provided for @budgetStatusWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Pacing High'**
+  String get budgetStatusWarning;
+
+  /// No description provided for @compareTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'Compare Trips'**
+  String get compareTrips;
+
+  /// No description provided for @selectTripsToCompare.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Trips to Compare'**
+  String get selectTripsToCompare;
+
+  /// No description provided for @selectAtLeastTwoTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least 2 trips to compare'**
+  String get selectAtLeastTwoTrips;
+
+  /// No description provided for @comparisonSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Comparison Summary'**
+  String get comparisonSummary;
+
+  /// No description provided for @budgetEfficiency.
+  ///
+  /// In en, this message translates to:
+  /// **'Pacing Status'**
+  String get budgetEfficiency;
+
+  /// No description provided for @packingReadiness.
+  ///
+  /// In en, this message translates to:
+  /// **'Packing Readiness'**
+  String get packingReadiness;
+
+  /// No description provided for @lowestDailyCost.
+  ///
+  /// In en, this message translates to:
+  /// **'Most Economical'**
+  String get lowestDailyCost;
+
+  /// No description provided for @highestSpending.
+  ///
+  /// In en, this message translates to:
+  /// **'Highest Spend'**
+  String get highestSpending;
+
+  /// No description provided for @sharedTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared Trip'**
+  String get sharedTrip;
+
+  /// No description provided for @shareTripInvite.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Collaborators'**
+  String get shareTripInvite;
+
+  /// No description provided for @joinSharedTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Join Shared Trip'**
+  String get joinSharedTrip;
+
+  /// No description provided for @inviteCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Code'**
+  String get inviteCode;
+
+  /// No description provided for @enterInviteCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter 6-character code'**
+  String get enterInviteCode;
+
+  /// No description provided for @collaborators.
+  ///
+  /// In en, this message translates to:
+  /// **'Collaborators'**
+  String get collaborators;
+
+  /// No description provided for @copyCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Code'**
+  String get copyCode;
+
+  /// No description provided for @codeCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite code copied to clipboard'**
+  String get codeCopied;
+
+  /// No description provided for @invalidInviteCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid or expired invite code'**
+  String get invalidInviteCode;
+
+  /// No description provided for @joinSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Successfully joined trip!'**
+  String get joinSuccess;
+
+  /// No description provided for @shareTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Trip'**
+  String get shareTrip;
+
+  /// No description provided for @shareChecklist.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Checklist'**
+  String get shareChecklist;
+
+  /// No description provided for @shareBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Budget'**
+  String get shareBudget;
+
+  /// No description provided for @shareTripSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Check out my travel plan on PackBuddy!'**
+  String get shareTripSummary;
+
+  /// No description provided for @shareCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip details copied to clipboard'**
+  String get shareCopied;
+
+  /// No description provided for @tripMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel Map & Route'**
+  String get tripMap;
+
+  /// No description provided for @openInMaps.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in Maps'**
+  String get openInMaps;
+
+  /// No description provided for @openInGoogleMaps.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in Google Maps'**
+  String get openInGoogleMaps;
+
+  /// No description provided for @openInAppleMaps.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in Apple Maps'**
+  String get openInAppleMaps;
+
+  /// No description provided for @waypoints.
+  ///
+  /// In en, this message translates to:
+  /// **'Route Waypoints'**
+  String get waypoints;
+
+  /// No description provided for @addWaypoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Waypoint'**
+  String get addWaypoint;
+
+  /// No description provided for @waypointName.
+  ///
+  /// In en, this message translates to:
+  /// **'Place / Hotel / Landmark'**
+  String get waypointName;
+
+  /// No description provided for @noWaypoints.
+  ///
+  /// In en, this message translates to:
+  /// **'No waypoints added yet'**
+  String get noWaypoints;
+
+  /// No description provided for @widgetSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Home Screen Widget'**
+  String get widgetSettings;
+
+  /// No description provided for @widgetPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Widget Preview'**
+  String get widgetPreview;
+
+  /// No description provided for @showCountdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Countdown'**
+  String get showCountdown;
+
+  /// No description provided for @showPackingProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Packing Progress'**
+  String get showPackingProgress;
+
+  /// No description provided for @showBudgetData.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Budget Summary'**
+  String get showBudgetData;
+
+  /// No description provided for @widgetSizeSmall.
+  ///
+  /// In en, this message translates to:
+  /// **'Small'**
+  String get widgetSizeSmall;
+
+  /// No description provided for @widgetSizeMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get widgetSizeMedium;
+
+  /// No description provided for @widgetSizeLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Large'**
+  String get widgetSizeLarge;
+
+  /// No description provided for @onboardingTitle1.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan Trips Effortlessly'**
+  String get onboardingTitle1;
+
+  /// No description provided for @onboardingDesc1.
+  ///
+  /// In en, this message translates to:
+  /// **'Organize multi-currency budgets and track daily expenses anywhere in the world.'**
+  String get onboardingDesc1;
+
+  /// No description provided for @onboardingTitle2.
+  ///
+  /// In en, this message translates to:
+  /// **'Smart Packing Checklists'**
+  String get onboardingTitle2;
+
+  /// No description provided for @onboardingDesc2.
+  ///
+  /// In en, this message translates to:
+  /// **'Airline baggage guidelines and smart category templates ensure you never forget essentials.'**
+  String get onboardingDesc2;
+
+  /// No description provided for @onboardingTitle3.
+  ///
+  /// In en, this message translates to:
+  /// **'Collaborate in Real-Time'**
+  String get onboardingTitle3;
+
+  /// No description provided for @onboardingDesc3.
+  ///
+  /// In en, this message translates to:
+  /// **'Share your trip plans and checklists with friends and family with simple invite codes.'**
+  String get onboardingDesc3;
+
+  /// No description provided for @onboardingTitle4.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline Travel Vault'**
+  String get onboardingTitle4;
+
+  /// No description provided for @onboardingDesc4.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep passports, boarding passes, and vouchers encrypted and accessible without internet.'**
+  String get onboardingDesc4;
+
+  /// No description provided for @getStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get getStarted;
+
+  /// No description provided for @skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
+
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// No description provided for @replayTour.
+  ///
+  /// In en, this message translates to:
+  /// **'Replay App Tour'**
+  String get replayTour;
+
+  /// No description provided for @signInWithApple.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Apple'**
+  String get signInWithApple;
+
+  /// No description provided for @appleSignInFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Apple Sign-In failed'**
+  String get appleSignInFailed;
+
+  /// No description provided for @total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get total;
+
+  /// No description provided for @totalSpent.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Spent'**
+  String get totalSpent;
+
+  /// No description provided for @confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm;
 }
 
 class _AppLocalizationsDelegate

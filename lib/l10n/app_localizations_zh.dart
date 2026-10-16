@@ -217,7 +217,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get annual => '按年订阅';
 
   @override
-  String get annualSave => '立省 33%';
+  String get annualSave => '省58%';
 
   @override
   String get subscribeNow => '开通 Pro 会员';
@@ -1184,4 +1184,461 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get adminTotalStorage => '保管库存储';
+
+  @override
+  String get adminDefaultBanReason => '违反平台服务条款。';
+
+  @override
+  String get adminPermanentBanTitle => '账号已被永久封禁';
+
+  @override
+  String get adminTemporaryBanTitle => '账号已被临时封禁';
+
+  @override
+  String get adminAccountSuspendedNotice => '管理员已限制您访问 PackBuddy 服务。';
+
+  @override
+  String get adminPermanentBan => '永久封禁';
+
+  @override
+  String get adminTemporaryBan => '临时封禁';
+
+  @override
+  String get adminBanReasonLabel => '封禁原因';
+
+  @override
+  String get adminBanExpiresAtLabel => '封禁到期时间';
+
+  @override
+  String get adminFeatureRestrictedNotice => '此操作已被管理员限制。';
+
+  @override
+  String get adminGeoAnalytics => '地理分布与活跃分析';
+
+  @override
+  String get adminPeriodLive => '实时 (15分)';
+
+  @override
+  String get adminPeriodDaily => '每日 (24小时)';
+
+  @override
+  String get adminPeriodWeekly => '每周 (7天)';
+
+  @override
+  String get adminPeriodMonthly => '每月 (30天)';
+
+  @override
+  String get adminPeriodYearly => '每年 (365天)';
+
+  @override
+  String get adminNoActiveUsers => '此期间无活跃用户';
+
+  @override
+  String get adminFilterAll => '全部';
+
+  @override
+  String get adminFilterPro => 'Pro';
+
+  @override
+  String get adminFilterBanned => '已封禁';
+
+  @override
+  String get adminFilterRestricted => '受限';
+
+  @override
+  String get adminModerateUser => '管理用户';
+
+  @override
+  String get adminBanStatusLabel => '账号封禁 / 暂停';
+
+  @override
+  String get adminUnbanned => '正常';
+
+  @override
+  String get adminBan24h => '24小时';
+
+  @override
+  String get adminBan7d => '7天';
+
+  @override
+  String get adminBan30d => '30天';
+
+  @override
+  String get adminBanReasonHint => '封禁原因 (选填)...';
+
+  @override
+  String get adminFeatureRestrictionsLabel => '精细化功能限制';
+
+  @override
+  String get adminRestrictTripCreate => '限制创建旅行';
+
+  @override
+  String get adminRestrictExpenseAdd => '限制记账';
+
+  @override
+  String get adminRestrictVaultUpload => '限制保险箱上传';
+
+  @override
+  String get adminRestrictCloudSync => '限制云同步';
+
+  @override
+  String get adminSaveChanges => '保存更改';
+
+  @override
+  String get adminChangesSaved => '管理配置已成功保存';
+
+  @override
+  String get adminSignOut => '退出登录';
+
+  @override
+  String get perMonth => '/月';
+
+  @override
+  String get perYear => '/年';
+
+  @override
+  String get storeBillingRequiredTitle => '需要商店结算';
+
+  @override
+  String get storeBillingRequiredMessage =>
+      '官方 Google Play 与 App Store 商店支付正在为该正式版激活中。不可免费跳过购买订阅。';
+
+  @override
+  String get adminTestPurchaseTitle => '管理员 / 沙盒测试购买';
+
+  @override
+  String get adminTestPurchaseMessage =>
+      '您已作为超级管理员登录。是否确认并激活 PackBuddy Pro 测试订阅？';
+
+  @override
+  String get activateTestPro => '激活 Pro (测试)';
+
+  @override
+  String get templateSummerTitle => '海滩与夏日度假';
+
+  @override
+  String get templateSummerDesc => '专为阳光、沙滩和温暖假期打造的行李打包清单';
+
+  @override
+  String get templateWinterTitle => '冬季与滑雪之旅';
+
+  @override
+  String get templateWinterDesc => '应对寒冷气候和滑雪胜地的防护保暖装备清单';
+
+  @override
+  String get templateBusinessTitle => '商务与差旅会议';
+
+  @override
+  String get templateBusinessDesc => '适合商务谈判、行业会议和出差的专业行李配置';
+
+  @override
+  String get templateCampingTitle => '户外露营与徒步';
+
+  @override
+  String get templateCampingDesc => '帐篷露营、野外穿越与徒步探险的耐用专业装备';
+
+  @override
+  String get templateCityTitle => '周末城市漫游';
+
+  @override
+  String get templateCityDesc => '轻松紧凑的双肩包出行，适合2-3天城市短途游';
+
+  @override
+  String get vaultCloudBackupNotice => '文件已安全加密并备份至云端，以实现多设备同步、15天账户恢复和安全合规。';
+
+  @override
+  String get deleteAccountTitle => '删除账户';
+
+  @override
+  String get deleteAccountConfirmationTitle => '15天账户删除申请';
+
+  @override
+  String get deleteAccountConfirmationMessage =>
+      '您的账户、旅行、开支及保险箱文件将安排在15天后永久删除。\n\n• 15天内请勿登录以完成删除。\n• 若在15天内重新登录，您的账户及所有数据将自动恢复。\n\n是否继续？';
+
+  @override
+  String get deleteAccountButton => '申请15天删除';
+
+  @override
+  String get deleteAccountScheduledNotice => '您的账户已安排在15天后删除。如欲彻底注销，请勿在期间登录。';
+
+  @override
+  String get accountRestoredNotice => '欢迎回来！您的账户删除已取消，所有数据已完全恢复。';
+
+  @override
+  String adminPendingDeletionBadge(int days) {
+    return '已安排删除（剩余$days天）';
+  }
+
+  @override
+  String get adminCancelDeletion => '取消删除';
+
+  @override
+  String get adminPurgeNow => '立即清除数据';
+
+  @override
+  String get adminPurgeConfirmTitle => '永久清除用户数据？';
+
+  @override
+  String get adminPurgeConfirmMessage =>
+      '此操作将立即且不可撤销地删除该用户的所有云端行程、费用、清单和保险箱文件。';
+
+  @override
+  String get adminDeletionCancelled => '账户删除已成功取消';
+
+  @override
+  String get adminDataPurged => '所有用户数据已永久清除';
+
+  @override
+  String get adminVaultDocumentsTitle => '已上传的保险箱文件（审查／管理）';
+
+  @override
+  String get adminNoDocumentsUploaded => '暂无上传的保险箱文件';
+
+  @override
+  String get adminInspectDocument => '审查';
+
+  @override
+  String get adminDeleteDocument => '删除文件';
+
+  @override
+  String get adminDeleteDocumentConfirm => '您确定要从云端保险箱永久删除此文件吗？';
+
+  @override
+  String get adminDocumentDeleted => '管理员已成功删除文件';
+
+  @override
+  String get adminDocumentPreviewTitle => '文件审查器';
+
+  @override
+  String get adminDocumentTypeImage => '图片';
+
+  @override
+  String get adminDocumentTypePdf => 'PDF';
+
+  @override
+  String get emailVerifySpamFolderTip => '检查垃圾邮件／广告邮件箱';
+
+  @override
+  String get emailVerifySpamFolderDesc =>
+      '若未收到验证链接，请检查垃圾箱中来自 PackBuddy 的邮件。验证邮箱可保障云端保险箱的安全。';
+
+  @override
+  String get emailVerifyAutoChecking => '正在等待验证链接...（自动检测中）';
+
+  @override
+  String get currencyConverter => '货币换算器';
+
+  @override
+  String get fromCurrency => '从';
+
+  @override
+  String get toCurrency => '至';
+
+  @override
+  String get exchangeRate => '汇率';
+
+  @override
+  String get liveRates => '实时汇率';
+
+  @override
+  String get offlineRates => '离线汇率';
+
+  @override
+  String get quickConvert => '快速货币换算';
+
+  @override
+  String get refreshRates => '刷新汇率';
+
+  @override
+  String get budgetAnalytics => '预算分析';
+
+  @override
+  String get categoryDistribution => '类别支出分布';
+
+  @override
+  String get spendingTrends => '支出趋势';
+
+  @override
+  String get dailyBurnRate => '日均支出率';
+
+  @override
+  String get projectedTotal => '预计总支出';
+
+  @override
+  String get budgetStatusOnTrack => '符合预算';
+
+  @override
+  String get budgetStatusOver => '超出预算';
+
+  @override
+  String get budgetStatusWarning => '支出过快';
+
+  @override
+  String get compareTrips => '行程对比';
+
+  @override
+  String get selectTripsToCompare => '选择要对比的行程';
+
+  @override
+  String get selectAtLeastTwoTrips => '请选择至少2个行程进行对比';
+
+  @override
+  String get comparisonSummary => '对比汇总';
+
+  @override
+  String get budgetEfficiency => '预算状态';
+
+  @override
+  String get packingReadiness => '打包就绪度';
+
+  @override
+  String get lowestDailyCost => '最省钱行程';
+
+  @override
+  String get highestSpending => '最高支出行程';
+
+  @override
+  String get sharedTrip => '共享行程';
+
+  @override
+  String get shareTripInvite => '邀请旅伴';
+
+  @override
+  String get joinSharedTrip => '加入共享行程';
+
+  @override
+  String get inviteCode => '邀请码';
+
+  @override
+  String get enterInviteCode => '输入6位邀请码';
+
+  @override
+  String get collaborators => '旅伴';
+
+  @override
+  String get copyCode => '复制代码';
+
+  @override
+  String get codeCopied => '邀请码已复制到剪贴板';
+
+  @override
+  String get invalidInviteCode => '无效或过期的邀请码';
+
+  @override
+  String get joinSuccess => '成功加入行程！';
+
+  @override
+  String get shareTrip => '分享行程';
+
+  @override
+  String get shareChecklist => '分享清单';
+
+  @override
+  String get shareBudget => '分享预算';
+
+  @override
+  String get shareTripSummary => '在PackBuddy上查看我的旅行计划！';
+
+  @override
+  String get shareCopied => '行程详情已复制';
+
+  @override
+  String get tripMap => '旅行地图与路线';
+
+  @override
+  String get openInMaps => '在地图中打开';
+
+  @override
+  String get openInGoogleMaps => '在谷歌地图中打开';
+
+  @override
+  String get openInAppleMaps => '在苹果地图中打开';
+
+  @override
+  String get waypoints => '路线途经点';
+
+  @override
+  String get addWaypoint => '添加途经点';
+
+  @override
+  String get waypointName => '地点 / 酒店 / 景点';
+
+  @override
+  String get noWaypoints => '暂无途经点';
+
+  @override
+  String get widgetSettings => '主屏幕小组件';
+
+  @override
+  String get widgetPreview => '小组件预览';
+
+  @override
+  String get showCountdown => '显示倒计时';
+
+  @override
+  String get showPackingProgress => '显示打包进度';
+
+  @override
+  String get showBudgetData => '显示预算摘要';
+
+  @override
+  String get widgetSizeSmall => '小';
+
+  @override
+  String get widgetSizeMedium => '中';
+
+  @override
+  String get widgetSizeLarge => '大';
+
+  @override
+  String get onboardingTitle1 => '轻松规划旅行';
+
+  @override
+  String get onboardingDesc1 => '管理多货币预算，随时随地跟踪每日开销。';
+
+  @override
+  String get onboardingTitle2 => '智能打包清单';
+
+  @override
+  String get onboardingDesc2 => '航空公司行李规则与智能模板，确保行装齐全。';
+
+  @override
+  String get onboardingTitle3 => '实时协同旅行';
+
+  @override
+  String get onboardingDesc3 => '通过简单的6位邀请码与家人朋友共享行程。';
+
+  @override
+  String get onboardingTitle4 => '安全离线凭证保险箱';
+
+  @override
+  String get onboardingDesc4 => '无网络状态下安全加密存储护照与登机牌。';
+
+  @override
+  String get getStarted => '立即开始';
+
+  @override
+  String get skip => '跳过';
+
+  @override
+  String get next => '下一步';
+
+  @override
+  String get replayTour => '重新查看引导';
+
+  @override
+  String get signInWithApple => '通过 Apple 登录';
+
+  @override
+  String get appleSignInFailed => 'Apple 登录失败';
+
+  @override
+  String get total => '总计';
+
+  @override
+  String get totalSpent => '总支出';
+
+  @override
+  String get confirm => '确认';
 }

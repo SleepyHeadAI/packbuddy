@@ -224,7 +224,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get annual => 'Anual';
 
   @override
-  String get annualSave => 'Economize 33%';
+  String get annualSave => 'Economize 58%';
 
   @override
   String get subscribeNow => 'Continuar com Pro';
@@ -1240,4 +1240,489 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get adminTotalStorage => 'Armazém Cofre';
+
+  @override
+  String get adminDefaultBanReason =>
+      'Violação dos termos de serviço da plataforma.';
+
+  @override
+  String get adminPermanentBanTitle => 'Conta suspensa permanentemente';
+
+  @override
+  String get adminTemporaryBanTitle => 'Conta suspensa temporariamente';
+
+  @override
+  String get adminAccountSuspendedNotice =>
+      'O acesso aos serviços PackBuddy foi restrito por um administrador.';
+
+  @override
+  String get adminPermanentBan => 'Bloqueio permanente';
+
+  @override
+  String get adminTemporaryBan => 'Bloqueio temporário';
+
+  @override
+  String get adminBanReasonLabel => 'Motivo da suspensão';
+
+  @override
+  String get adminBanExpiresAtLabel => 'A suspensão expira em';
+
+  @override
+  String get adminFeatureRestrictedNotice =>
+      'Esta ação está restrita por um administrador.';
+
+  @override
+  String get adminGeoAnalytics => 'Análise geográfica e de atividade';
+
+  @override
+  String get adminPeriodLive => 'Ao vivo (15m)';
+
+  @override
+  String get adminPeriodDaily => 'Diário (24h)';
+
+  @override
+  String get adminPeriodWeekly => 'Semanal (7d)';
+
+  @override
+  String get adminPeriodMonthly => 'Mensal (30d)';
+
+  @override
+  String get adminPeriodYearly => 'Anual (365d)';
+
+  @override
+  String get adminNoActiveUsers => 'Nenhum utilizador ativo neste período';
+
+  @override
+  String get adminFilterAll => 'Todos';
+
+  @override
+  String get adminFilterPro => 'Pro';
+
+  @override
+  String get adminFilterBanned => 'Bloqueados';
+
+  @override
+  String get adminFilterRestricted => 'Restritos';
+
+  @override
+  String get adminModerateUser => 'Moderar utilizador';
+
+  @override
+  String get adminBanStatusLabel => 'Suspensão de conta / Bloqueio';
+
+  @override
+  String get adminUnbanned => 'Desbloqueado';
+
+  @override
+  String get adminBan24h => '24 horas';
+
+  @override
+  String get adminBan7d => '7 dias';
+
+  @override
+  String get adminBan30d => '30 dias';
+
+  @override
+  String get adminBanReasonHint => 'Motivo da suspensão (opcional)...';
+
+  @override
+  String get adminFeatureRestrictionsLabel =>
+      'Restrições granulares de funcionalidades';
+
+  @override
+  String get adminRestrictTripCreate => 'Restringir criação de viagens';
+
+  @override
+  String get adminRestrictExpenseAdd => 'Restringir registo de despesas';
+
+  @override
+  String get adminRestrictVaultUpload => 'Restringir envios para o cofre';
+
+  @override
+  String get adminRestrictCloudSync => 'Restringir sincronização na nuvem';
+
+  @override
+  String get adminSaveChanges => 'Guardar alterações';
+
+  @override
+  String get adminChangesSaved =>
+      'Alterações de moderação guardadas com sucesso';
+
+  @override
+  String get adminSignOut => 'Terminar sessão';
+
+  @override
+  String get perMonth => '/ mês';
+
+  @override
+  String get perYear => '/ ano';
+
+  @override
+  String get storeBillingRequiredTitle => 'Faturamento da loja necessário';
+
+  @override
+  String get storeBillingRequiredMessage =>
+      'O faturamento oficial do Google Play e da App Store está sendo ativado para esta versão. As assinaturas não podem ser ignoradas gratuitamente.';
+
+  @override
+  String get adminTestPurchaseTitle =>
+      'Compra de teste do administrador / Sandbox';
+
+  @override
+  String get adminTestPurchaseMessage =>
+      'Você está conectado como Super Admin. Deseja confirmar e ativar a assinatura de teste do PackBuddy Pro?';
+
+  @override
+  String get activateTestPro => 'Ativar Pro (Teste)';
+
+  @override
+  String get templateSummerTitle => 'Praia e Férias de Verão';
+
+  @override
+  String get templateSummerDesc =>
+      'Lista essencial para mar, areia, sol e destinos de clima quente';
+
+  @override
+  String get templateWinterTitle => 'Viagem de Inverno e Esqui';
+
+  @override
+  String get templateWinterDesc =>
+      'Roupas térmicas e equipamentos de proteção para destinos frios e estações de esqui';
+
+  @override
+  String get templateBusinessTitle => 'Trabalho e Conferências';
+
+  @override
+  String get templateBusinessDesc =>
+      'Mala sob medida para reuniões, congressos e viagens de negócios';
+
+  @override
+  String get templateCampingTitle => 'Natureza e Acampamento';
+
+  @override
+  String get templateCampingDesc =>
+      'Equipamentos duráveis para acampar em barraca, trilhas e trekking';
+
+  @override
+  String get templateCityTitle => 'Fim de Semana na Cidade';
+
+  @override
+  String get templateCityDesc =>
+      'Mochila leve e compacta para um passeio de 2 a 3 dias na cidade';
+
+  @override
+  String get vaultCloudBackupNotice =>
+      'Os documentos são criptografados e salvos na nuvem para sincronização entre dispositivos, recuperação em 15 dias e segurança.';
+
+  @override
+  String get deleteAccountTitle => 'Excluir conta';
+
+  @override
+  String get deleteAccountConfirmationTitle =>
+      'Solicitação de exclusão de conta em 15 dias';
+
+  @override
+  String get deleteAccountConfirmationMessage =>
+      'Sua conta, viagens, despesas e documentos do cofre serão agendados para exclusão permanente em 15 dias.\n\n• Não faça login por 15 dias para concluir a exclusão.\n• Se fizer login em até 15 dias, sua conta e dados serão restaurados.\n\nDeseja prosseguir?';
+
+  @override
+  String get deleteAccountButton => 'Solicitar exclusão em 15 dias';
+
+  @override
+  String get deleteAccountScheduledNotice =>
+      'Sua conta foi agendada para exclusão em 15 dias. Não faça login se desejar excluí-la definitivamente.';
+
+  @override
+  String get accountRestoredNotice =>
+      'Bem-vindo de volta! A exclusão da sua conta foi cancelada e seus dados foram restaurados.';
+
+  @override
+  String adminPendingDeletionBadge(int days) {
+    return 'Agendado para exclusão (${days}d restantes)';
+  }
+
+  @override
+  String get adminCancelDeletion => 'Cancelar exclusão';
+
+  @override
+  String get adminPurgeNow => 'Limpar dados agora';
+
+  @override
+  String get adminPurgeConfirmTitle =>
+      'Limpar permanentemente os dados do usuário?';
+
+  @override
+  String get adminPurgeConfirmMessage =>
+      'Isso excluirá de forma imediata e irrevogável todas as viagens, despesas, listas e documentos deste usuário.';
+
+  @override
+  String get adminDeletionCancelled =>
+      'Exclusão de conta cancelada com sucesso';
+
+  @override
+  String get adminDataPurged =>
+      'Todos os dados do usuário foram limpos permanentemente';
+
+  @override
+  String get adminVaultDocumentsTitle =>
+      'Documentos do cofre enviados (Inspecionar / Moderar)';
+
+  @override
+  String get adminNoDocumentsUploaded =>
+      'Nenhum documento do cofre enviado até o momento';
+
+  @override
+  String get adminInspectDocument => 'Inspecionar';
+
+  @override
+  String get adminDeleteDocument => 'Excluir documento';
+
+  @override
+  String get adminDeleteDocumentConfirm =>
+      'Tem certeza de que deseja excluir permanentemente este documento do cofre na nuvem?';
+
+  @override
+  String get adminDocumentDeleted =>
+      'Documento excluído com sucesso pelo administrador';
+
+  @override
+  String get adminDocumentPreviewTitle => 'Inspetor de documentos';
+
+  @override
+  String get adminDocumentTypeImage => 'IMAGEM';
+
+  @override
+  String get adminDocumentTypePdf => 'PDF';
+
+  @override
+  String get emailVerifySpamFolderTip =>
+      'Verifique a pasta de Spam / Lixo eletrônico';
+
+  @override
+  String get emailVerifySpamFolderDesc =>
+      'Se não recebeu o link, verifique sua pasta de spam procurando por PackBuddy. A confirmação mantém seu cofre seguro.';
+
+  @override
+  String get emailVerifyAutoChecking =>
+      'Aguardando link de verificação... (verificação automática)';
+
+  @override
+  String get currencyConverter => 'Conversor de Moedas';
+
+  @override
+  String get fromCurrency => 'De';
+
+  @override
+  String get toCurrency => 'Para';
+
+  @override
+  String get exchangeRate => 'Taxa de Câmbio';
+
+  @override
+  String get liveRates => 'Taxas em Tempo Real';
+
+  @override
+  String get offlineRates => 'Taxas Offline';
+
+  @override
+  String get quickConvert => 'Conversor Rápido';
+
+  @override
+  String get refreshRates => 'Atualizar Taxas';
+
+  @override
+  String get budgetAnalytics => 'Análise de Orçamento';
+
+  @override
+  String get categoryDistribution => 'Distribuição por Categoria';
+
+  @override
+  String get spendingTrends => 'Tendências de Gastos';
+
+  @override
+  String get dailyBurnRate => 'Taxa de Gasto Diário';
+
+  @override
+  String get projectedTotal => 'Total Projetado';
+
+  @override
+  String get budgetStatusOnTrack => 'Dentro do Orçamento';
+
+  @override
+  String get budgetStatusOver => 'Orçamento Excedido';
+
+  @override
+  String get budgetStatusWarning => 'Gasto Acelerado';
+
+  @override
+  String get compareTrips => 'Comparar Viagens';
+
+  @override
+  String get selectTripsToCompare => 'Selecionar Viagens';
+
+  @override
+  String get selectAtLeastTwoTrips => 'Selecione pelo menos 2 viagens';
+
+  @override
+  String get comparisonSummary => 'Resumo da Comparação';
+
+  @override
+  String get budgetEfficiency => 'Estado do Orçamento';
+
+  @override
+  String get packingReadiness => 'Prontidão de Bagagem';
+
+  @override
+  String get lowestDailyCost => 'Mais Econômico';
+
+  @override
+  String get highestSpending => 'Maior Gasto';
+
+  @override
+  String get sharedTrip => 'Viagem Compartilhada';
+
+  @override
+  String get shareTripInvite => 'Convidar Colaboradores';
+
+  @override
+  String get joinSharedTrip => 'Entrar em Viagem';
+
+  @override
+  String get inviteCode => 'Código de Convite';
+
+  @override
+  String get enterInviteCode => 'Digite o código de 6 caracteres';
+
+  @override
+  String get collaborators => 'Colaboradores';
+
+  @override
+  String get copyCode => 'Copiar Código';
+
+  @override
+  String get codeCopied => 'Código de convite copiado';
+
+  @override
+  String get invalidInviteCode => 'Código inválido ou expirado';
+
+  @override
+  String get joinSuccess => 'Entrou na viagem com sucesso!';
+
+  @override
+  String get shareTrip => 'Compartilhar Viagem';
+
+  @override
+  String get shareChecklist => 'Compartilhar Lista';
+
+  @override
+  String get shareBudget => 'Compartilhar Orçamento';
+
+  @override
+  String get shareTripSummary => 'Confira meu plano de viagem no PackBuddy!';
+
+  @override
+  String get shareCopied => 'Detalhes copiados para a área de transferência';
+
+  @override
+  String get tripMap => 'Mapa e Rota de Viagem';
+
+  @override
+  String get openInMaps => 'Abrir no Mapas';
+
+  @override
+  String get openInGoogleMaps => 'Abrir no Google Maps';
+
+  @override
+  String get openInAppleMaps => 'Abrir no Apple Maps';
+
+  @override
+  String get waypoints => 'Paradas da Rota';
+
+  @override
+  String get addWaypoint => 'Adicionar Parada';
+
+  @override
+  String get waypointName => 'Local / Hotel / Ponto Turístico';
+
+  @override
+  String get noWaypoints => 'Nenhuma parada adicionada';
+
+  @override
+  String get widgetSettings => 'Widget da Tela Inicial';
+
+  @override
+  String get widgetPreview => 'Pré-visualização do Widget';
+
+  @override
+  String get showCountdown => 'Mostrar Contagem Regressiva';
+
+  @override
+  String get showPackingProgress => 'Mostrar Progresso de Bagagem';
+
+  @override
+  String get showBudgetData => 'Mostrar Resumo do Orçamento';
+
+  @override
+  String get widgetSizeSmall => 'Pequeno';
+
+  @override
+  String get widgetSizeMedium => 'Médio';
+
+  @override
+  String get widgetSizeLarge => 'Grande';
+
+  @override
+  String get onboardingTitle1 => 'Planeje Sem Esforço';
+
+  @override
+  String get onboardingDesc1 =>
+      'Gerencie orçamentos multimoeda e despesas diárias em qualquer lugar do mundo.';
+
+  @override
+  String get onboardingTitle2 => 'Listas de Bagagem Inteligentes';
+
+  @override
+  String get onboardingDesc2 =>
+      'Diretrizes de bagagem de companhias aéreas e modelos inteligentes.';
+
+  @override
+  String get onboardingTitle3 => 'Colabore em Tempo Real';
+
+  @override
+  String get onboardingDesc3 =>
+      'Compartilhe planos de viagem e listas com amigos e família.';
+
+  @override
+  String get onboardingTitle4 => 'Cofre Offline Seguro';
+
+  @override
+  String get onboardingDesc4 =>
+      'Mantenha passaportes e cartões de embarque criptografados sem internet.';
+
+  @override
+  String get getStarted => 'Começar';
+
+  @override
+  String get skip => 'Pular';
+
+  @override
+  String get next => 'Avançar';
+
+  @override
+  String get replayTour => 'Repetir Tour';
+
+  @override
+  String get signInWithApple => 'Iniciar sessão com a Apple';
+
+  @override
+  String get appleSignInFailed => 'Falha ao iniciar sessão com a Apple';
+
+  @override
+  String get total => 'Total';
+
+  @override
+  String get totalSpent => 'Total Gasto';
+
+  @override
+  String get confirm => 'Confirmar';
 }

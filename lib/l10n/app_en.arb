@@ -276,7 +276,7 @@
   "@annual": {
     "description": "Annual subscription label"
   },
-  "annualSave": "Save 33%",
+  "annualSave": "Save 58%",
   "@annualSave": {
     "description": "Annual discount badge"
   },
@@ -1591,5 +1591,394 @@
   "adminTotalStorage": "Vault Storage",
   "@adminTotalStorage": {
     "description": "Admin dashboard string: adminTotalStorage"
-  }
+  },
+  "adminDefaultBanReason": "Violation of platform terms of service.",
+  "@adminDefaultBanReason": {
+    "description": "Admin moderation string: adminDefaultBanReason"
+  },
+  "adminPermanentBanTitle": "Account Permanently Suspended",
+  "@adminPermanentBanTitle": {
+    "description": "Admin moderation string: adminPermanentBanTitle"
+  },
+  "adminTemporaryBanTitle": "Account Temporarily Suspended",
+  "@adminTemporaryBanTitle": {
+    "description": "Admin moderation string: adminTemporaryBanTitle"
+  },
+  "adminAccountSuspendedNotice": "Access to PackBuddy services has been restricted by an administrator.",
+  "@adminAccountSuspendedNotice": {
+    "description": "Admin moderation string: adminAccountSuspendedNotice"
+  },
+  "adminPermanentBan": "Permanent Ban",
+  "@adminPermanentBan": {
+    "description": "Admin moderation string: adminPermanentBan"
+  },
+  "adminTemporaryBan": "Temporary Ban",
+  "@adminTemporaryBan": {
+    "description": "Admin moderation string: adminTemporaryBan"
+  },
+  "adminBanReasonLabel": "Suspension Reason",
+  "@adminBanReasonLabel": {
+    "description": "Admin moderation string: adminBanReasonLabel"
+  },
+  "adminBanExpiresAtLabel": "Suspension Expires At",
+  "@adminBanExpiresAtLabel": {
+    "description": "Admin moderation string: adminBanExpiresAtLabel"
+  },
+  "adminFeatureRestrictedNotice": "This action is restricted by an administrator.",
+  "@adminFeatureRestrictedNotice": {
+    "description": "Admin moderation string: adminFeatureRestrictedNotice"
+  },
+  "adminGeoAnalytics": "Geographic & Activity Analytics",
+  "@adminGeoAnalytics": {
+    "description": "Admin moderation string: adminGeoAnalytics"
+  },
+  "adminPeriodLive": "Live (15m)",
+  "@adminPeriodLive": {
+    "description": "Admin moderation string: adminPeriodLive"
+  },
+  "adminPeriodDaily": "Daily (24h)",
+  "@adminPeriodDaily": {
+    "description": "Admin moderation string: adminPeriodDaily"
+  },
+  "adminPeriodWeekly": "Weekly (7d)",
+  "@adminPeriodWeekly": {
+    "description": "Admin moderation string: adminPeriodWeekly"
+  },
+  "adminPeriodMonthly": "Monthly (30d)",
+  "@adminPeriodMonthly": {
+    "description": "Admin moderation string: adminPeriodMonthly"
+  },
+  "adminPeriodYearly": "Yearly (365d)",
+  "@adminPeriodYearly": {
+    "description": "Admin moderation string: adminPeriodYearly"
+  },
+  "adminNoActiveUsers": "No active users in this period",
+  "@adminNoActiveUsers": {
+    "description": "Admin moderation string: adminNoActiveUsers"
+  },
+  "adminFilterAll": "All",
+  "@adminFilterAll": {
+    "description": "Admin moderation string: adminFilterAll"
+  },
+  "adminFilterPro": "Pro",
+  "@adminFilterPro": {
+    "description": "Admin moderation string: adminFilterPro"
+  },
+  "adminFilterBanned": "Banned",
+  "@adminFilterBanned": {
+    "description": "Admin moderation string: adminFilterBanned"
+  },
+  "adminFilterRestricted": "Restricted",
+  "@adminFilterRestricted": {
+    "description": "Admin moderation string: adminFilterRestricted"
+  },
+  "adminModerateUser": "Moderate User",
+  "@adminModerateUser": {
+    "description": "Admin moderation string: adminModerateUser"
+  },
+  "adminBanStatusLabel": "Account Suspension / Ban",
+  "@adminBanStatusLabel": {
+    "description": "Admin moderation string: adminBanStatusLabel"
+  },
+  "adminUnbanned": "Unbanned",
+  "@adminUnbanned": {
+    "description": "Admin moderation string: adminUnbanned"
+  },
+  "adminBan24h": "24 Hours",
+  "@adminBan24h": {
+    "description": "Admin moderation string: adminBan24h"
+  },
+  "adminBan7d": "7 Days",
+  "@adminBan7d": {
+    "description": "Admin moderation string: adminBan7d"
+  },
+  "adminBan30d": "30 Days",
+  "@adminBan30d": {
+    "description": "Admin moderation string: adminBan30d"
+  },
+  "adminBanReasonHint": "Reason for suspension (optional)...",
+  "@adminBanReasonHint": {
+    "description": "Admin moderation string: adminBanReasonHint"
+  },
+  "adminFeatureRestrictionsLabel": "Granular Feature Restrictions",
+  "@adminFeatureRestrictionsLabel": {
+    "description": "Admin moderation string: adminFeatureRestrictionsLabel"
+  },
+  "adminRestrictTripCreate": "Restrict Trip Creation",
+  "@adminRestrictTripCreate": {
+    "description": "Admin moderation string: adminRestrictTripCreate"
+  },
+  "adminRestrictExpenseAdd": "Restrict Expense Logging",
+  "@adminRestrictExpenseAdd": {
+    "description": "Admin moderation string: adminRestrictExpenseAdd"
+  },
+  "adminRestrictVaultUpload": "Restrict Vault Uploads",
+  "@adminRestrictVaultUpload": {
+    "description": "Admin moderation string: adminRestrictVaultUpload"
+  },
+  "adminRestrictCloudSync": "Restrict Cloud Sync",
+  "@adminRestrictCloudSync": {
+    "description": "Admin moderation string: adminRestrictCloudSync"
+  },
+  "adminSaveChanges": "Save Changes",
+  "@adminSaveChanges": {
+    "description": "Admin moderation string: adminSaveChanges"
+  },
+  "adminChangesSaved": "Moderation changes saved successfully",
+  "@adminChangesSaved": {
+    "description": "Admin moderation string: adminChangesSaved"
+  },
+  "adminSignOut": "Sign Out",
+  "@adminSignOut": {
+    "description": "Admin moderation string: adminSignOut"
+  },
+  "perMonth": "/ mo",
+  "@perMonth": {
+    "description": "Localization key for perMonth"
+  },
+  "perYear": "/ yr",
+  "@perYear": {
+    "description": "Localization key for perYear"
+  },
+  "storeBillingRequiredTitle": "Store Billing Required",
+  "@storeBillingRequiredTitle": {
+    "description": "Localization key for storeBillingRequiredTitle"
+  },
+  "storeBillingRequiredMessage": "Official Google Play & App Store billing is currently being activated for this production build. Subscription transactions cannot be bypassed for free.",
+  "@storeBillingRequiredMessage": {
+    "description": "Localization key for storeBillingRequiredMessage"
+  },
+  "adminTestPurchaseTitle": "Admin / Sandbox Test Purchase",
+  "@adminTestPurchaseTitle": {
+    "description": "Localization key for adminTestPurchaseTitle"
+  },
+  "adminTestPurchaseMessage": "You are signed in as Super Admin. Would you like to confirm and activate PackBuddy Pro test subscription?",
+  "@adminTestPurchaseMessage": {
+    "description": "Localization key for adminTestPurchaseMessage"
+  },
+  "activateTestPro": "Activate Pro (Test)",
+  "@activateTestPro": {
+    "description": "Localization key for activateTestPro"
+  },
+  "templateSummerTitle": "Beach & Summer Vacation",
+  "@templateSummerTitle": {
+    "description": "Localization key for templateSummerTitle"
+  },
+  "templateSummerDesc": "Essential packing list for sea, sand, sun, and warm weather getaways",
+  "@templateSummerDesc": {
+    "description": "Localization key for templateSummerDesc"
+  },
+  "templateWinterTitle": "Winter & Ski Trip",
+  "@templateWinterTitle": {
+    "description": "Localization key for templateWinterTitle"
+  },
+  "templateWinterDesc": "Protective gear and warm layers for cold climates and ski resorts",
+  "@templateWinterDesc": {
+    "description": "Localization key for templateWinterDesc"
+  },
+  "templateBusinessTitle": "Business & Conference",
+  "@templateBusinessTitle": {
+    "description": "Localization key for templateBusinessTitle"
+  },
+  "templateBusinessDesc": "Tailored packing list for meetings, conferences, and corporate trips",
+  "@templateBusinessDesc": {
+    "description": "Localization key for templateBusinessDesc"
+  },
+  "templateCampingTitle": "Nature & Camping Expedition",
+  "@templateCampingTitle": {
+    "description": "Localization key for templateCampingTitle"
+  },
+  "templateCampingDesc": "Durable outdoor gear for tent camping, trekking, and hiking",
+  "@templateCampingDesc": {
+    "description": "Localization key for templateCampingDesc"
+  },
+  "templateCityTitle": "Weekend City Break",
+  "@templateCityTitle": {
+    "description": "Localization key for templateCityTitle"
+  },
+  "templateCityDesc": "Lightweight and compact essentials for a 2-3 day city getaway",
+  "@templateCityDesc": {
+    "description": "Localization key for templateCityDesc"
+  },
+  "vaultCloudBackupNotice": "Documents are encrypted & backed up to cloud storage for cross-device sync, 15-day account recovery, and safety compliance.",
+  "@vaultCloudBackupNotice": {
+    "description": "Compliance notice for vault cloud backup"
+  },
+  "deleteAccountTitle": "Delete Account",
+  "@deleteAccountTitle": {
+    "description": "Delete account button title"
+  },
+  "deleteAccountConfirmationTitle": "15-Day Account Deletion Request",
+  "@deleteAccountConfirmationTitle": {
+    "description": "Title for 15-day deletion dialog"
+  },
+  "deleteAccountConfirmationMessage": "Your account, trips, expenses, and vault documents will be scheduled for permanent deletion in 15 days.\n\n• Do not log in for 15 days to allow deletion to complete.\n• If you log in within 15 days, your account and all data will be automatically restored.\n\nDo you want to proceed?",
+  "@deleteAccountConfirmationMessage": {
+    "description": "Message explaining 15-day grace period for deletion"
+  },
+  "deleteAccountButton": "Request 15-Day Deletion",
+  "@deleteAccountButton": {
+    "description": "Button confirming deletion request"
+  },
+  "deleteAccountScheduledNotice": "Your account has been scheduled for deletion in 15 days. Do not log in if you wish to permanently delete your account.",
+  "@deleteAccountScheduledNotice": {
+    "description": "Notice after requesting deletion"
+  },
+  "accountRestoredNotice": "Welcome back! Your account deletion was cancelled and all your data has been restored.",
+  "@accountRestoredNotice": {
+    "description": "Notice when account is auto-recovered upon login"
+  },
+  "adminPendingDeletionBadge": "Scheduled for deletion ({days}d remaining)",
+  "@adminPendingDeletionBadge": {
+    "description": "Admin badge for pending deletion",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "adminCancelDeletion": "Cancel Deletion",
+  "@adminCancelDeletion": {
+    "description": "Admin button to cancel account deletion"
+  },
+  "adminPurgeNow": "Purge Data Now",
+  "@adminPurgeNow": {
+    "description": "Admin button to purge user data immediately"
+  },
+  "adminPurgeConfirmTitle": "Permanently Purge User Data?",
+  "@adminPurgeConfirmTitle": {
+    "description": "Purge confirmation dialog title"
+  },
+  "adminPurgeConfirmMessage": "This will immediately and irrevocably delete all cloud trips, expenses, checklists, and vault documents for this user.",
+  "@adminPurgeConfirmMessage": {
+    "description": "Purge confirmation dialog message"
+  },
+  "adminDeletionCancelled": "Account deletion successfully cancelled",
+  "@adminDeletionCancelled": {
+    "description": "Admin deletion cancelled notification"
+  },
+  "adminDataPurged": "All user data was permanently purged",
+  "@adminDataPurged": {
+    "description": "Admin data purged notification"
+  },
+  "adminVaultDocumentsTitle": "Uploaded Vault Documents (Inspect / Moderate)",
+  "@adminVaultDocumentsTitle": {
+    "description": "Title for uploaded vault documents section in admin"
+  },
+  "adminNoDocumentsUploaded": "No vault documents uploaded yet",
+  "@adminNoDocumentsUploaded": {
+    "description": "Empty state for user documents in admin"
+  },
+  "adminInspectDocument": "Inspect",
+  "@adminInspectDocument": {
+    "description": "Inspect document button"
+  },
+  "adminDeleteDocument": "Delete Document",
+  "@adminDeleteDocument": {
+    "description": "Admin delete document button"
+  },
+  "adminDeleteDocumentConfirm": "Are you sure you want to permanently delete this document from the cloud vault?",
+  "@adminDeleteDocumentConfirm": {
+    "description": "Confirmation message for admin deleting document"
+  },
+  "adminDocumentDeleted": "Document successfully deleted by admin",
+  "@adminDocumentDeleted": {
+    "description": "Notification when admin deletes document"
+  },
+  "adminDocumentPreviewTitle": "Document Inspector",
+  "@adminDocumentPreviewTitle": {
+    "description": "Title for admin document preview dialog"
+  },
+  "adminDocumentTypeImage": "IMAGE",
+  "@adminDocumentTypeImage": {
+    "description": "Document type image label"
+  },
+  "adminDocumentTypePdf": "PDF",
+  "@adminDocumentTypePdf": {
+    "description": "Document type PDF label"
+  },
+  "emailVerifySpamFolderTip": "Check Spam / Promotions Folder",
+  "@emailVerifySpamFolderTip": {
+    "description": "Title for spam folder guidance"
+  },
+  "emailVerifySpamFolderDesc": "If you haven't received the link, check your spam or promotions folder for an email from PackBuddy. Verifying your email keeps your cloud vault secure.",
+  "@emailVerifySpamFolderDesc": {
+    "description": "Description for spam folder guidance"
+  },
+  "emailVerifyAutoChecking": "Waiting for verification link... (auto-checking)",
+  "@emailVerifyAutoChecking": {
+    "description": "Polling indicator text"
+  },
+  "currencyConverter": "Currency Converter",
+  "fromCurrency": "From",
+  "toCurrency": "To",
+  "exchangeRate": "Exchange Rate",
+  "liveRates": "Live Rates",
+  "offlineRates": "Offline Rates",
+  "quickConvert": "Quick Currency Converter",
+  "refreshRates": "Refresh Rates",
+  "budgetAnalytics": "Budget Analytics",
+  "categoryDistribution": "Category Distribution",
+  "spendingTrends": "Spending Trends",
+  "dailyBurnRate": "Daily Spend Rate",
+  "projectedTotal": "Projected Total",
+  "budgetStatusOnTrack": "On Track",
+  "budgetStatusOver": "Over Budget",
+  "budgetStatusWarning": "Pacing High",
+  "compareTrips": "Compare Trips",
+  "selectTripsToCompare": "Select Trips to Compare",
+  "selectAtLeastTwoTrips": "Select at least 2 trips to compare",
+  "comparisonSummary": "Comparison Summary",
+  "budgetEfficiency": "Pacing Status",
+  "packingReadiness": "Packing Readiness",
+  "lowestDailyCost": "Most Economical",
+  "highestSpending": "Highest Spend",
+  "sharedTrip": "Shared Trip",
+  "shareTripInvite": "Invite Collaborators",
+  "joinSharedTrip": "Join Shared Trip",
+  "inviteCode": "Invite Code",
+  "enterInviteCode": "Enter 6-character code",
+  "collaborators": "Collaborators",
+  "copyCode": "Copy Code",
+  "codeCopied": "Invite code copied to clipboard",
+  "invalidInviteCode": "Invalid or expired invite code",
+  "joinSuccess": "Successfully joined trip!",
+  "shareTrip": "Share Trip",
+  "shareChecklist": "Share Checklist",
+  "shareBudget": "Share Budget",
+  "shareTripSummary": "Check out my travel plan on PackBuddy!",
+  "shareCopied": "Trip details copied to clipboard",
+  "tripMap": "Travel Map & Route",
+  "openInMaps": "Open in Maps",
+  "openInGoogleMaps": "Open in Google Maps",
+  "openInAppleMaps": "Open in Apple Maps",
+  "waypoints": "Route Waypoints",
+  "addWaypoint": "Add Waypoint",
+  "waypointName": "Place / Hotel / Landmark",
+  "noWaypoints": "No waypoints added yet",
+  "widgetSettings": "Home Screen Widget",
+  "widgetPreview": "Widget Preview",
+  "showCountdown": "Show Countdown",
+  "showPackingProgress": "Show Packing Progress",
+  "showBudgetData": "Show Budget Summary",
+  "widgetSizeSmall": "Small",
+  "widgetSizeMedium": "Medium",
+  "widgetSizeLarge": "Large",
+  "onboardingTitle1": "Plan Trips Effortlessly",
+  "onboardingDesc1": "Organize multi-currency budgets and track daily expenses anywhere in the world.",
+  "onboardingTitle2": "Smart Packing Checklists",
+  "onboardingDesc2": "Airline baggage guidelines and smart category templates ensure you never forget essentials.",
+  "onboardingTitle3": "Collaborate in Real-Time",
+  "onboardingDesc3": "Share your trip plans and checklists with friends and family with simple invite codes.",
+  "onboardingTitle4": "Offline Travel Vault",
+  "onboardingDesc4": "Keep passports, boarding passes, and vouchers encrypted and accessible without internet.",
+  "getStarted": "Get Started",
+  "skip": "Skip",
+  "next": "Next",
+  "replayTour": "Replay App Tour",
+  "signInWithApple": "Sign in with Apple",
+  "appleSignInFailed": "Apple Sign-In failed",
+  "total": "Total",
+  "totalSpent": "Total Spent",
+  "confirm": "Confirm"
 }

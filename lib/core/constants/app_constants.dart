@@ -6,7 +6,7 @@ class AppConstants {
 
   // Database Constants
   static const String databaseName = 'packbuddy.db';
-  static const int databaseVersion = 7;
+  static const int databaseVersion = 9;
 
   // SQLite Table Names
   static const String tableTrips = 'trips';
@@ -15,11 +15,6 @@ class AppConstants {
   static const String tableChecklistItems = 'checklist_items';
   static const String tableSyncMetadata = 'sync_metadata';
 
-  // Shared Preferences Keys
-  static const String prefKeyLocale = 'packbuddy_locale';
-  static const String prefKeyThemeMode = 'packbuddy_theme_mode';
-  static const String prefKeyDefaultCurrency = 'packbuddy_default_currency';
-  static const String prefKeyLastSyncTime = 'packbuddy_last_sync_time';
 
   // Default Values
   static const String defaultCurrency = 'USD';

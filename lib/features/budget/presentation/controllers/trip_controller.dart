@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../core/services/notification_service.dart';
+import '../../../../core/services/preferences_service.dart';
 import '../../../../core/services/telemetry_service.dart';
 import '../../../../data/local_db/database_helper.dart';
 import '../../../../data/sync_engine/sync_engine.dart';
@@ -52,11 +53,16 @@ class TripController extends StateNotifier<TripState> {
   INotificationService get _notifications =>
       _notificationService ?? _ref.read(notificationServiceProvider);
 
+  /// Resets controller state on logout or account switch
+  void resetState() {
+    state = const TripState();
+  }
+
   /// Loads non-deleted trips from SQLite
-  Future<void> loadTrips() async {
+  Future<void> loadTrips({String? userId}) async {
     state = state.copyWith(isLoading: true);
     try {
-      final trips = await _dbHelper.getTrips(includeDeleted: false);
+      final trips = await _dbHelper.getTrips(userId: userId, includeDeleted: false);
       if (!mounted) return;
       state = state.copyWith(
         isLoading: false,
@@ -88,6 +94,12 @@ class TripController extends StateNotifier<TripState> {
     String? transportMode,
     String? notes,
   }) async {
+    // Feature restriction guard (Phase 3)
+    if (PreferencesService.instance.getRestrictedFeatures().contains('trip_create')) {
+      state = state.copyWith(errorMessage: 'restricted_trip_create');
+      return null;
+    }
+
     try {
       final now = DateTime.now();
       final newTrip = Trip(
@@ -197,6 +209,113 @@ class TripController extends StateNotifier<TripState> {
       state = state.copyWith(errorMessage: e.toString());
       return false;
     }
+  }
+
+  /// Generates or retrieves a 6-character collaboration invite code for a trip (Feature F-1)
+  Future<String?> generateInviteCode(String tripId) async {
+    final index = state.trips.indexWhere((t) => t.id == tripId);
+    if (index == -1) return null;
+
+    final trip = state.trips[index];
+    if (trip.inviteCode != null && trip.inviteCode!.isNotEmpty) {
+      return trip.inviteCode;
+    }
+
+    final code = 'PB-${DateTime.now().millisecondsSinceEpoch.toRadixString(36).toUpperCase().padRight(5, '0').substring(0, 5)}';
+    final updated = trip.copyWith(
+      isShared: true,
+      inviteCode: code,
+      sharedRole: 'owner',
+    );
+    await updateTrip(updated);
+    return code;
+  }
+
+  /// Joins a shared trip by 6-character invite code (Feature F-1)
+  Future<Trip?> joinTripByInviteCode(String rawCode, {String? userIdentifier}) async {
+    final code = rawCode.trim().toUpperCase();
+    if (code.isEmpty) return null;
+
+    // First search in local memory
+    Trip? targetTrip;
+    for (final t in state.trips) {
+      if (t.inviteCode?.toUpperCase() == code) {
+        targetTrip = t;
+        break;
+      }
+    }
+
+    // If not found in memory, query SQLite
+    if (targetTrip == null) {
+      final allTrips = await _dbHelper.getTrips(includeDeleted: false);
+      for (final t in allTrips) {
+        if (t.inviteCode?.toUpperCase() == code) {
+          targetTrip = t;
+          break;
+        }
+      }
+    }
+
+    if (targetTrip == null) {
+      // Attempt cloud sync in case another user shared it
+      try {
+        await _ref.read(syncEngineProvider.notifier).performSync();
+        final refreshed = await _dbHelper.getTrips(includeDeleted: false);
+        for (final t in refreshed) {
+          if (t.inviteCode?.toUpperCase() == code) {
+            targetTrip = t;
+            break;
+          }
+        }
+      } catch (_) {}
+    }
+
+    if (targetTrip == null) return null;
+
+    final member = userIdentifier ?? 'Guest Collaborator';
+    final currentCollabs = List<String>.from(targetTrip.collaborators);
+    if (!currentCollabs.contains(member)) {
+      currentCollabs.add(member);
+    }
+
+    final joinedTrip = targetTrip.copyWith(
+      isShared: true,
+      collaborators: currentCollabs,
+    );
+
+    await updateTrip(joinedTrip);
+    return joinedTrip;
+  }
+
+  /// Adds a collaborator email or name to the trip (Feature F-1)
+  Future<bool> addCollaborator(String tripId, String collaborator) async {
+    final index = state.trips.indexWhere((t) => t.id == tripId);
+    if (index == -1) return false;
+
+    final trip = state.trips[index];
+    final updatedList = List<String>.from(trip.collaborators);
+    if (!updatedList.contains(collaborator.trim())) {
+      updatedList.add(collaborator.trim());
+      final updated = trip.copyWith(isShared: true, collaborators: updatedList);
+      await updateTrip(updated);
+      return true;
+    }
+    return false;
+  }
+
+  /// Removes a collaborator from the trip (Feature F-1)
+  Future<bool> removeCollaborator(String tripId, String collaborator) async {
+    final index = state.trips.indexWhere((t) => t.id == tripId);
+    if (index == -1) return false;
+
+    final trip = state.trips[index];
+    final updatedList = List<String>.from(trip.collaborators);
+    if (updatedList.remove(collaborator.trim())) {
+      final updated = trip.copyWith(collaborators: updatedList);
+      await updateTrip(updated);
+      return true;
+    }
+    return false;
   }
 }
 

@@ -218,7 +218,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get annual => 'वार्षिक';
 
   @override
-  String get annualSave => '33% बचाएं';
+  String get annualSave => '58% बचत';
 
   @override
   String get subscribeNow => 'Pro के साथ जारी रखें';
@@ -1221,4 +1221,481 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get adminTotalStorage => 'वॉल्ट स्टोरेज';
+
+  @override
+  String get adminDefaultBanReason => 'प्लेटफ़ॉर्म सेवा की शर्तों का उल्लंघन।';
+
+  @override
+  String get adminPermanentBanTitle => 'खाता स्थायी रूप से निलंबित';
+
+  @override
+  String get adminTemporaryBanTitle => 'खाता अस्थायी रूप से निलंबित';
+
+  @override
+  String get adminAccountSuspendedNotice =>
+      'प्रशासक द्वारा PackBuddy सेवाओं तक पहुंच प्रतिबंधित कर दी गई है।';
+
+  @override
+  String get adminPermanentBan => 'स्थायी प्रतिबंध';
+
+  @override
+  String get adminTemporaryBan => 'अस्थायी प्रतिबंध';
+
+  @override
+  String get adminBanReasonLabel => 'निलंबन का कारण';
+
+  @override
+  String get adminBanExpiresAtLabel => 'निलंबन समाप्ति समय';
+
+  @override
+  String get adminFeatureRestrictedNotice =>
+      'यह क्रिया प्रशासक द्वारा प्रतिबंधित है।';
+
+  @override
+  String get adminGeoAnalytics => 'भौगोलिक एवं गतिविधि विश्लेषण';
+
+  @override
+  String get adminPeriodLive => 'लाइव (15 मिनट)';
+
+  @override
+  String get adminPeriodDaily => 'दैनिक (24 घंटे)';
+
+  @override
+  String get adminPeriodWeekly => 'साप्ताहिक (7 दिन)';
+
+  @override
+  String get adminPeriodMonthly => 'मासिक (30 दिन)';
+
+  @override
+  String get adminPeriodYearly => 'वार्षिक (365 दिन)';
+
+  @override
+  String get adminNoActiveUsers => 'इस अवधि में कोई सक्रिय उपयोगकर्ता नहीं है';
+
+  @override
+  String get adminFilterAll => 'सभी';
+
+  @override
+  String get adminFilterPro => 'Pro';
+
+  @override
+  String get adminFilterBanned => 'प्रतिबंधित';
+
+  @override
+  String get adminFilterRestricted => 'सीमित';
+
+  @override
+  String get adminModerateUser => 'उपयोगकर्ता नियंत्रण';
+
+  @override
+  String get adminBanStatusLabel => 'खाता निलंबन / प्रतिबंध';
+
+  @override
+  String get adminUnbanned => 'अप्रतिबंधित';
+
+  @override
+  String get adminBan24h => '24 घंटे';
+
+  @override
+  String get adminBan7d => '7 दिन';
+
+  @override
+  String get adminBan30d => '30 दिन';
+
+  @override
+  String get adminBanReasonHint => 'निलंबन का कारण (वैकल्पिक)...';
+
+  @override
+  String get adminFeatureRestrictionsLabel => 'विस्तृत सुविधा प्रतिबंध';
+
+  @override
+  String get adminRestrictTripCreate => 'यात्रा निर्माण प्रतिबंधित करें';
+
+  @override
+  String get adminRestrictExpenseAdd => 'व्यय जोड़ना प्रतिबंधित करें';
+
+  @override
+  String get adminRestrictVaultUpload => 'वॉल्ट अपलोड प्रतिबंधित करें';
+
+  @override
+  String get adminRestrictCloudSync => 'क्लाउड सिंक प्रतिबंधित करें';
+
+  @override
+  String get adminSaveChanges => 'बदलाव सहेजें';
+
+  @override
+  String get adminChangesSaved => 'नियंत्रण परिवर्तन सफलतापूर्वक सहेजे गए';
+
+  @override
+  String get adminSignOut => 'साइन आउट';
+
+  @override
+  String get perMonth => '/माह';
+
+  @override
+  String get perYear => '/वर्ष';
+
+  @override
+  String get storeBillingRequiredTitle => 'स्टोर बिलिंग आवश्यक है';
+
+  @override
+  String get storeBillingRequiredMessage =>
+      'इस उत्पादन संस्करण के लिए आधिकारिक Google Play और App Store बिलिंग सक्रिय की जा रही है। सदस्यता को निःशुल्क बाईपास नहीं किया जा सकता है।';
+
+  @override
+  String get adminTestPurchaseTitle => 'व्यवस्थापक / सैंडबॉक्स परीक्षण खरीद';
+
+  @override
+  String get adminTestPurchaseMessage =>
+      'आप सुपर एडमिन के रूप में लॉग इन हैं। क्या आप PackBuddy Pro परीक्षण सदस्यता की पुष्टि और सक्रिय करना चाहते हैं?';
+
+  @override
+  String get activateTestPro => 'Pro सक्रिय करें (परीक्षण)';
+
+  @override
+  String get templateSummerTitle => 'समुद्र तट और गर्मी की छुट्टियां';
+
+  @override
+  String get templateSummerDesc =>
+      'धूप, रेत और गर्म मौसम की यात्राओं के लिए आवश्यक पैकिंग सूची';
+
+  @override
+  String get templateWinterTitle => 'सर्दियों और स्की यात्रा';
+
+  @override
+  String get templateWinterDesc =>
+      'ठंडे मौसम और स्की रिसॉर्ट के लिए गर्म कपड़े और सुरक्षात्मक उपकरण';
+
+  @override
+  String get templateBusinessTitle => 'व्यापार और सम्मेलन यात्रा';
+
+  @override
+  String get templateBusinessDesc =>
+      'व्यावसायिक बैठकों, सम्मेलनों और कॉर्पोरेट दौरों के लिए पैकिंग सूची';
+
+  @override
+  String get templateCampingTitle => 'प्रकृति और कैम्पिंग अभियान';
+
+  @override
+  String get templateCampingDesc =>
+      'टेंट कैंपिंग, ट्रैकिंग और लंबी पैदल यात्रा के लिए मजबूत उपकरण';
+
+  @override
+  String get templateCityTitle => 'सप्ताहांत शहर का दौरा';
+
+  @override
+  String get templateCityDesc =>
+      '2-3 दिनों की शहर की यात्रा के लिए हल्का और सुविधाजनक बैग';
+
+  @override
+  String get vaultCloudBackupNotice =>
+      'दस्तावेज़ एन्क्रिप्टेड हैं और क्रॉस-डिवाइस सिंक, 15-दिन खाता रिकवरी और सुरक्षा के लिए क्लाउड में सुरक्षित संग्रहीत किए जाते हैं।';
+
+  @override
+  String get deleteAccountTitle => 'खाता हटाएं';
+
+  @override
+  String get deleteAccountConfirmationTitle => '15-दिवसीय खाता हटाने का अनुरोध';
+
+  @override
+  String get deleteAccountConfirmationMessage =>
+      'आपका खाता, यात्राएं, खर्च और वॉल्ट दस्तावेज़ 15 दिनों में स्थायी रूप से हटा दिए जाएंगे।\n\n• हटाने की प्रक्रिया पूरी होने के लिए 15 दिनों तक लॉगिन न करें।\n• यदि आप 15 दिनों के भीतर लॉगिन करते हैं, तो आपका खाता और डेटा स्वतः पुनर्स्थापित हो जाएगा।\n\nक्या आप आगे बढ़ना चाहते हैं?';
+
+  @override
+  String get deleteAccountButton => '15-दिन हटाने का अनुरोध करें';
+
+  @override
+  String get deleteAccountScheduledNotice =>
+      'आपका खाता 15 दिनों में हटाने के लिए निर्धारित किया गया है। यदि आप इसे स्थायी रूप से हटाना चाहते हैं तो लॉगिन न करें।';
+
+  @override
+  String get accountRestoredNotice =>
+      'वापसी पर स्वागत है! आपका खाता हटाने का अनुरोध रद्द कर दिया गया है और डेटा पुनर्स्थापित हो गया है।';
+
+  @override
+  String adminPendingDeletionBadge(int days) {
+    return 'हटाने के लिए निर्धारित ($days दिन शेष)';
+  }
+
+  @override
+  String get adminCancelDeletion => 'हटाना रद्द करें';
+
+  @override
+  String get adminPurgeNow => 'डेटा अभी स्थायी हटाएं';
+
+  @override
+  String get adminPurgeConfirmTitle => 'उपयोगकर्ता डेटा स्थायी रूप से मिटाएं?';
+
+  @override
+  String get adminPurgeConfirmMessage =>
+      'यह इस उपयोगकर्ता की सभी यात्राओं, खर्चों, सूचियों और वॉल्ट दस्तावेज़ों को तुरंत और हमेशा के लिए हटा देगा।';
+
+  @override
+  String get adminDeletionCancelled => 'खाता हटाना सफलतापूर्वक रद्द किया गया';
+
+  @override
+  String get adminDataPurged =>
+      'सभी उपयोगकर्ता डेटा स्थायी रूप से मिटा दिया गया';
+
+  @override
+  String get adminVaultDocumentsTitle =>
+      'अपलोड किए गए वॉल्ट दस्तावेज़ (निरीक्षण / मॉडरेशन)';
+
+  @override
+  String get adminNoDocumentsUploaded =>
+      'अभी तक कोई वॉल्ट दस्तावेज़ अपलोड नहीं किया गया है';
+
+  @override
+  String get adminInspectDocument => 'निरीक्षण';
+
+  @override
+  String get adminDeleteDocument => 'दस्तावेज़ हटाएं';
+
+  @override
+  String get adminDeleteDocumentConfirm =>
+      'क्या आप वाकई इस दस्तावेज़ को क्लाउड वॉल्ट से स्थायी रूप से हटाना चाहते हैं?';
+
+  @override
+  String get adminDocumentDeleted =>
+      'व्यवस्थापक द्वारा दस्तावेज़ सफलतापूर्वक हटा दिया गया';
+
+  @override
+  String get adminDocumentPreviewTitle => 'दस्तावेज़ निरीक्षक';
+
+  @override
+  String get adminDocumentTypeImage => 'चित्र';
+
+  @override
+  String get adminDocumentTypePdf => 'PDF';
+
+  @override
+  String get emailVerifySpamFolderTip => 'स्पैम / प्रमोशन फ़ोल्डर जांचें';
+
+  @override
+  String get emailVerifySpamFolderDesc =>
+      'यदि आपको लिंक नहीं मिला है, तो PackBuddy से ईमेल के लिए स्पैम फ़ोल्डर देखें। ईमेल सत्यापन आपके क्लाउड वॉल्ट को सुरक्षित रखता है।';
+
+  @override
+  String get emailVerifyAutoChecking =>
+      'सत्यापन लिंक की प्रतीक्षा की जा रही है... (स्वतः जांच जारी)';
+
+  @override
+  String get currencyConverter => 'मुद्रा परिवर्तक';
+
+  @override
+  String get fromCurrency => 'स्रोत';
+
+  @override
+  String get toCurrency => 'लक्ष्य';
+
+  @override
+  String get exchangeRate => 'विनिमय दर';
+
+  @override
+  String get liveRates => 'लाइव दरें';
+
+  @override
+  String get offlineRates => 'ऑफ़लाइन दरें';
+
+  @override
+  String get quickConvert => 'त्वरित मुद्रा परिवर्तक';
+
+  @override
+  String get refreshRates => 'दरें ताज़ा करें';
+
+  @override
+  String get budgetAnalytics => 'बजट विश्लेषण';
+
+  @override
+  String get categoryDistribution => 'श्रेणीवार खर्च';
+
+  @override
+  String get spendingTrends => 'खर्च के रुझान';
+
+  @override
+  String get dailyBurnRate => 'दैनिक खर्च दर';
+
+  @override
+  String get projectedTotal => 'अनुमानित कुल';
+
+  @override
+  String get budgetStatusOnTrack => 'बजट में';
+
+  @override
+  String get budgetStatusOver => 'बजट से अधिक';
+
+  @override
+  String get budgetStatusWarning => 'तेज़ खर्च गति';
+
+  @override
+  String get compareTrips => 'यात्राओं की तुलना करें';
+
+  @override
+  String get selectTripsToCompare => 'तुलना के लिए यात्राएं चुनें';
+
+  @override
+  String get selectAtLeastTwoTrips => 'कम से कम 2 यात्राएं चुनें';
+
+  @override
+  String get comparisonSummary => 'तुलना सारांश';
+
+  @override
+  String get budgetEfficiency => 'बजट स्थिति';
+
+  @override
+  String get packingReadiness => 'पैकिंग तत्परता';
+
+  @override
+  String get lowestDailyCost => 'सबसे किफायती';
+
+  @override
+  String get highestSpending => 'सर्वाधिक खर्च';
+
+  @override
+  String get sharedTrip => 'साझा यात्रा';
+
+  @override
+  String get shareTripInvite => 'साथियों को आमंत्रित करें';
+
+  @override
+  String get joinSharedTrip => 'साझा यात्रा में शामिल हों';
+
+  @override
+  String get inviteCode => 'आमंत्रण कोड';
+
+  @override
+  String get enterInviteCode => '6-अंकीय कोड दर्ज करें';
+
+  @override
+  String get collaborators => 'सहयोगी';
+
+  @override
+  String get copyCode => 'कोड कॉपी करें';
+
+  @override
+  String get codeCopied => 'आमंत्रण कोड कॉपी किया गया';
+
+  @override
+  String get invalidInviteCode => 'अमान्य या समाप्त कोड';
+
+  @override
+  String get joinSuccess => 'सफलतापूर्वक यात्रा में शामिल हुए!';
+
+  @override
+  String get shareTrip => 'यात्रा साझा करें';
+
+  @override
+  String get shareChecklist => 'चेकलिस्ट साझा करें';
+
+  @override
+  String get shareBudget => 'बजट साझा करें';
+
+  @override
+  String get shareTripSummary => 'PackBuddy पर मेरी यात्रा योजना देखें!';
+
+  @override
+  String get shareCopied => 'यात्रा विवरण कॉपी किया गया';
+
+  @override
+  String get tripMap => 'यात्रा मानचित्र और मार्ग';
+
+  @override
+  String get openInMaps => 'नक्शे में खोलें';
+
+  @override
+  String get openInGoogleMaps => 'Google Maps में खोलें';
+
+  @override
+  String get openInAppleMaps => 'Apple Maps में खोलें';
+
+  @override
+  String get waypoints => 'मार्ग पड़ाव';
+
+  @override
+  String get addWaypoint => 'पड़ाव जोड़ें';
+
+  @override
+  String get waypointName => 'स्थान / होटल / स्थल';
+
+  @override
+  String get noWaypoints => 'अभी कोई पड़ाव नहीं जोड़ा गया';
+
+  @override
+  String get widgetSettings => 'होम स्क्रीन विजेट';
+
+  @override
+  String get widgetPreview => 'विजेट पूर्वावलोकन';
+
+  @override
+  String get showCountdown => 'उलटी गिनती दिखाएं';
+
+  @override
+  String get showPackingProgress => 'पैकिंग प्रगति दिखाएं';
+
+  @override
+  String get showBudgetData => 'बजट सारांश दिखाएं';
+
+  @override
+  String get widgetSizeSmall => 'छोटा';
+
+  @override
+  String get widgetSizeMedium => 'मध्यम';
+
+  @override
+  String get widgetSizeLarge => 'बड़ा';
+
+  @override
+  String get onboardingTitle1 => 'आसान यात्रा योजना';
+
+  @override
+  String get onboardingDesc1 =>
+      'विश्व भर में बहु-मुद्रा बजट प्रबंधित करें और दैनिक खर्च ट्रैक करें।';
+
+  @override
+  String get onboardingTitle2 => 'स्मार्ट पैकिंग चेकलिस्ट';
+
+  @override
+  String get onboardingDesc2 =>
+      'एयरलाइन बैगेज नियम और स्मार्ट टेम्प्लेट आवश्यक सामान भूलने नहीं देते।';
+
+  @override
+  String get onboardingTitle3 => 'सहयोग यात्रा';
+
+  @override
+  String get onboardingDesc3 =>
+      'सरल कोड से परिवार और दोस्तों के साथ यात्रा योजना साझा करें।';
+
+  @override
+  String get onboardingTitle4 => 'सुरक्षित ऑफ़लाइन वॉल्ट';
+
+  @override
+  String get onboardingDesc4 =>
+      'पासपोर्ट और टिकट बिना इंटरनेट सुरक्षित एन्क्रिप्टेड रखें।';
+
+  @override
+  String get getStarted => 'शुरू करें';
+
+  @override
+  String get skip => 'छोड़ें';
+
+  @override
+  String get next => 'आगे';
+
+  @override
+  String get replayTour => 'ऐप टूर फिर से देखें';
+
+  @override
+  String get signInWithApple => 'Apple से साइन इन करें';
+
+  @override
+  String get appleSignInFailed => 'Apple साइन-इन विफल रहा';
+
+  @override
+  String get total => 'कुल';
+
+  @override
+  String get totalSpent => 'कुल खर्च';
+
+  @override
+  String get confirm => 'पुष्टि करें';
 }

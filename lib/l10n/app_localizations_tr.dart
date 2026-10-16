@@ -224,7 +224,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get annual => 'Yıllık';
 
   @override
-  String get annualSave => '%33 Tasarruf';
+  String get annualSave => '%58 Tasarruf';
 
   @override
   String get subscribeNow => 'Pro ile Devam Et';
@@ -1237,4 +1237,482 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get adminTotalStorage => 'Kasa Depolama';
+
+  @override
+  String get adminDefaultBanReason => 'Platform hizmet şartlarının ihlali.';
+
+  @override
+  String get adminPermanentBanTitle => 'Hesap Kalıcı Olarak Askıya Alındı';
+
+  @override
+  String get adminTemporaryBanTitle => 'Hesap Geçici Olarak Askıya Alındı';
+
+  @override
+  String get adminAccountSuspendedNotice =>
+      'PackBuddy hizmetlerine erişim bir yönetici tarafından kısıtlandı.';
+
+  @override
+  String get adminPermanentBan => 'Kalıcı Engel';
+
+  @override
+  String get adminTemporaryBan => 'Geçici Engel';
+
+  @override
+  String get adminBanReasonLabel => 'Askıya Alma Sebebi';
+
+  @override
+  String get adminBanExpiresAtLabel => 'Engel Bitiş Tarihi';
+
+  @override
+  String get adminFeatureRestrictedNotice =>
+      'Bu işlem bir yönetici tarafından kısıtlanmıştır.';
+
+  @override
+  String get adminGeoAnalytics => 'Coğrafi ve Etkinlik Analitiği';
+
+  @override
+  String get adminPeriodLive => 'Canlı (15dk)';
+
+  @override
+  String get adminPeriodDaily => 'Günlük (24s)';
+
+  @override
+  String get adminPeriodWeekly => 'Haftalık (7g)';
+
+  @override
+  String get adminPeriodMonthly => 'Aylık (30g)';
+
+  @override
+  String get adminPeriodYearly => 'Yıllık (365g)';
+
+  @override
+  String get adminNoActiveUsers => 'Bu dönemde aktif kullanıcı yok';
+
+  @override
+  String get adminFilterAll => 'Tümü';
+
+  @override
+  String get adminFilterPro => 'Pro';
+
+  @override
+  String get adminFilterBanned => 'Engellenen';
+
+  @override
+  String get adminFilterRestricted => 'Kısıtlanan';
+
+  @override
+  String get adminModerateUser => 'Kullanıcıyı Yönet';
+
+  @override
+  String get adminBanStatusLabel => 'Hesap Engeli / Askıya Alma';
+
+  @override
+  String get adminUnbanned => 'Engelsiz';
+
+  @override
+  String get adminBan24h => '24 Saat';
+
+  @override
+  String get adminBan7d => '7 Gün';
+
+  @override
+  String get adminBan30d => '30 Gün';
+
+  @override
+  String get adminBanReasonHint => 'Askıya alma nedeni (isteğe bağlı)...';
+
+  @override
+  String get adminFeatureRestrictionsLabel => 'Ayrıntılı Özellik Kısıtlamaları';
+
+  @override
+  String get adminRestrictTripCreate => 'Seyahat Oluşturmayı Kısıtla';
+
+  @override
+  String get adminRestrictExpenseAdd => 'Harcama Eklemeyi Kısıtla';
+
+  @override
+  String get adminRestrictVaultUpload => 'Kasa Yüklemelerini Kısıtla';
+
+  @override
+  String get adminRestrictCloudSync => 'Bulut Senkronizasyonunu Kısıtla';
+
+  @override
+  String get adminSaveChanges => 'Değişiklikleri Kaydet';
+
+  @override
+  String get adminChangesSaved => 'Yönetim değişiklikleri başarıyla kaydedildi';
+
+  @override
+  String get adminSignOut => 'Çıkış Yap';
+
+  @override
+  String get perMonth => '/ ay';
+
+  @override
+  String get perYear => '/ yıl';
+
+  @override
+  String get storeBillingRequiredTitle => 'Mağaza Ödemesi Gerekli';
+
+  @override
+  String get storeBillingRequiredMessage =>
+      'Resmi Google Play ve App Store mağaza ödemeleri bu sürüm için etkinleştirilmektedir. Abonelik işlemleri ücretsiz olarak atlanamaz.';
+
+  @override
+  String get adminTestPurchaseTitle => 'Yönetici / Sandbox Test Satın Alımı';
+
+  @override
+  String get adminTestPurchaseMessage =>
+      'Süper Yönetici olarak oturum açtınız. PackBuddy Pro test aboneliğini onaylayıp aktifleştirmek istiyor musunuz?';
+
+  @override
+  String get activateTestPro => 'Pro\'yu Aktifleştir (Test)';
+
+  @override
+  String get templateSummerTitle => 'Plaj & Yaz Tatili';
+
+  @override
+  String get templateSummerDesc =>
+      'Deniz, kum, güneş ve sıcak hava kaçamakları için eksiksiz bavul hazırlığı';
+
+  @override
+  String get templateWinterTitle => 'Kış & Kayak Seyahati';
+
+  @override
+  String get templateWinterDesc =>
+      'Soğuk iklimler, kayak merkezleri ve kış tatili için koruyucu donanımlar';
+
+  @override
+  String get templateBusinessTitle => 'İş & Konferans Seyahati';
+
+  @override
+  String get templateBusinessDesc =>
+      'Toplantılar, konferanslar ve profesyonel iş gezileri için kusursuz bavul';
+
+  @override
+  String get templateCampingTitle => 'Doğa & Kamp Keşfi';
+
+  @override
+  String get templateCampingDesc =>
+      'Çadır kampı, trekking ve doğa yürüyüşleri için dayanıklı ekipmanlar';
+
+  @override
+  String get templateCityTitle => 'Hafta Sonu Şehir Turu';
+
+  @override
+  String get templateCityDesc =>
+      'Pratik sırt çantasıyla 2-3 günlük rahat ve kompakt şehir kaçamağı';
+
+  @override
+  String get vaultCloudBackupNotice =>
+      'Belgeler; cihazlar arası eşitleme, 15 günlük hesap kurtarma ve güvenlik uyumluluğu için buluta güvenle yedeklenir.';
+
+  @override
+  String get deleteAccountTitle => 'Hesabı Sil';
+
+  @override
+  String get deleteAccountConfirmationTitle => '15 Günlük Hesap Silme Talebi';
+
+  @override
+  String get deleteAccountConfirmationMessage =>
+      'Hesabınız, seyahatleriniz, harcamalarınız ve kasa belgeleriniz 15 gün sonra kalıcı olarak silinmek üzere planlanacaktır.\n\n• Silmenin tamamlanması için 15 gün boyunca giriş yapmayın.\n• 15 gün içinde giriş yaparsanız hesabınız ve tüm verileriniz otomatik olarak geri yüklenir.\n\nDevam etmek istiyor musunuz?';
+
+  @override
+  String get deleteAccountButton => '15 Günlük Silme Talebi Gönder';
+
+  @override
+  String get deleteAccountScheduledNotice =>
+      'Hesabınız 15 gün içinde silinmek üzere planlandı. Kalıcı olarak silinmesini istiyorsanız bu süre boyunca giriş yapmayın.';
+
+  @override
+  String get accountRestoredNotice =>
+      'Tekrar hoş geldiniz! Hesap silme talebiniz iptal edildi ve tüm verileriniz geri yüklendi.';
+
+  @override
+  String adminPendingDeletionBadge(int days) {
+    return 'Silinmesi planlandı ($days gün kaldı)';
+  }
+
+  @override
+  String get adminCancelDeletion => 'Silme Talebini İptal Et';
+
+  @override
+  String get adminPurgeNow => 'Verileri Şimdi Kalıcı Sil';
+
+  @override
+  String get adminPurgeConfirmTitle => 'Kullanıcı Verileri Kalıcı Silinsin mi?';
+
+  @override
+  String get adminPurgeConfirmMessage =>
+      'Bu işlem kullanıcının tüm bulut seyahatlerini, harcamalarını, kontrol listelerini ve kasa belgelerini derhal ve kalıcı olarak silecektir.';
+
+  @override
+  String get adminDeletionCancelled =>
+      'Hesap silme işlemi başarıyla iptal edildi';
+
+  @override
+  String get adminDataPurged => 'Tüm kullanıcı verileri kalıcı olarak silindi';
+
+  @override
+  String get adminVaultDocumentsTitle =>
+      'Yüklenen Kasa Belgeleri (İncele / Yönet)';
+
+  @override
+  String get adminNoDocumentsUploaded => 'Henüz yüklenmiş kasa belgesi yok';
+
+  @override
+  String get adminInspectDocument => 'İncele';
+
+  @override
+  String get adminDeleteDocument => 'Belgeyi Sil';
+
+  @override
+  String get adminDeleteDocumentConfirm =>
+      'Bu belgeyi bulut kasasından kalıcı olarak silmek istediğinizden emin misiniz?';
+
+  @override
+  String get adminDocumentDeleted =>
+      'Belge yönetici tarafından başarıyla silindi';
+
+  @override
+  String get adminDocumentPreviewTitle => 'Belge İnceleyici';
+
+  @override
+  String get adminDocumentTypeImage => 'GÖRSEL';
+
+  @override
+  String get adminDocumentTypePdf => 'PDF';
+
+  @override
+  String get emailVerifySpamFolderTip =>
+      'Gereksiz / Spam Kutusunu Kontrol Edin';
+
+  @override
+  String get emailVerifySpamFolderDesc =>
+      'Doğrulama bağlantısını göremiyorsanız, PackBuddy gönderici adlı e-postayı bulmak için spam veya gereksiz kutunuzu kontrol edin. E-postanızı doğrulamak bulut kasanızı güvende tutar.';
+
+  @override
+  String get emailVerifyAutoChecking =>
+      'Doğrulama bağlantısı bekleniyor... (otomatik kontrol ediliyor)';
+
+  @override
+  String get currencyConverter => 'Döviz Hesaplayıcı';
+
+  @override
+  String get fromCurrency => 'Kaynak';
+
+  @override
+  String get toCurrency => 'Hedef';
+
+  @override
+  String get exchangeRate => 'Döviz Kuru';
+
+  @override
+  String get liveRates => 'Canlı Kurlar';
+
+  @override
+  String get offlineRates => 'Çevrimdışı Kurlar';
+
+  @override
+  String get quickConvert => 'Hızlı Döviz Çevirici';
+
+  @override
+  String get refreshRates => 'Kurları Güncelle';
+
+  @override
+  String get budgetAnalytics => 'Bütçe Analitiği';
+
+  @override
+  String get categoryDistribution => 'Kategori Dağılımı';
+
+  @override
+  String get spendingTrends => 'Harcama Trendleri';
+
+  @override
+  String get dailyBurnRate => 'Günlük Harcama Oranı';
+
+  @override
+  String get projectedTotal => 'Tahmini Toplam';
+
+  @override
+  String get budgetStatusOnTrack => 'Bütçe Dahilinde';
+
+  @override
+  String get budgetStatusOver => 'Bütçe Aşımı';
+
+  @override
+  String get budgetStatusWarning => 'Yüksek Harcama Hızı';
+
+  @override
+  String get compareTrips => 'Seyahatleri Karşılaştır';
+
+  @override
+  String get selectTripsToCompare => 'Karşılaştırılacak Seyahatleri Seç';
+
+  @override
+  String get selectAtLeastTwoTrips =>
+      'Karşılaştırmak için en az 2 seyahat seçin';
+
+  @override
+  String get comparisonSummary => 'Karşılaştırma Özeti';
+
+  @override
+  String get budgetEfficiency => 'Bütçe Durumu';
+
+  @override
+  String get packingReadiness => 'Paketleme Hazırlığı';
+
+  @override
+  String get lowestDailyCost => 'En Ekonomik';
+
+  @override
+  String get highestSpending => 'En Yüksek Harcama';
+
+  @override
+  String get sharedTrip => 'Ortak Seyahat';
+
+  @override
+  String get shareTripInvite => 'Ortak Davet Et';
+
+  @override
+  String get joinSharedTrip => 'Ortak Seyahate Katıl';
+
+  @override
+  String get inviteCode => 'Davet Kodu';
+
+  @override
+  String get enterInviteCode => '6 haneli davet kodunu girin';
+
+  @override
+  String get collaborators => 'Ortaklar';
+
+  @override
+  String get copyCode => 'Kodu Kopyala';
+
+  @override
+  String get codeCopied => 'Davet kodu panoya kopyalandı';
+
+  @override
+  String get invalidInviteCode => 'Geçersiz veya süresi dolmuş davet kodu';
+
+  @override
+  String get joinSuccess => 'Seyahate başarıyla katıldınız!';
+
+  @override
+  String get shareTrip => 'Seyahati Paylaş';
+
+  @override
+  String get shareChecklist => 'Listeyi Paylaş';
+
+  @override
+  String get shareBudget => 'Bütçeyi Paylaş';
+
+  @override
+  String get shareTripSummary => 'PackBuddy ile seyahat planıma göz atın!';
+
+  @override
+  String get shareCopied => 'Seyahat detayları panoya kopyalandı';
+
+  @override
+  String get tripMap => 'Seyahat Haritası & Rota';
+
+  @override
+  String get openInMaps => 'Haritada Aç';
+
+  @override
+  String get openInGoogleMaps => 'Google Haritalar\'da Aç';
+
+  @override
+  String get openInAppleMaps => 'Apple Haritalar\'da Aç';
+
+  @override
+  String get waypoints => 'Rota Durakları';
+
+  @override
+  String get addWaypoint => 'Durak Ekle';
+
+  @override
+  String get waypointName => 'Mekan / Otel / Durak';
+
+  @override
+  String get noWaypoints => 'Henüz durak eklenmedi';
+
+  @override
+  String get widgetSettings => 'Ana Ekran Widget\'ı';
+
+  @override
+  String get widgetPreview => 'Widget Önizleme';
+
+  @override
+  String get showCountdown => 'Geri Sayımı Göster';
+
+  @override
+  String get showPackingProgress => 'Paketleme İlerlemesini Göster';
+
+  @override
+  String get showBudgetData => 'Bütçe Özetini Göster';
+
+  @override
+  String get widgetSizeSmall => 'Küçük';
+
+  @override
+  String get widgetSizeMedium => 'Orta';
+
+  @override
+  String get widgetSizeLarge => 'Geniş';
+
+  @override
+  String get onboardingTitle1 => 'Zahmetsiz Seyahat Planlaması';
+
+  @override
+  String get onboardingDesc1 =>
+      'Dünyanın her yerinde çoklu para birimiyle bütçenizi ve günlük harcamalarınızı yönetin.';
+
+  @override
+  String get onboardingTitle2 => 'Akıllı Paketleme Listeleri';
+
+  @override
+  String get onboardingDesc2 =>
+      'Havayolu bagaj kuralları ve akıllı şablonlarla hiçbir eşyanızı unutmayın.';
+
+  @override
+  String get onboardingTitle3 => 'Birlikte Seyahat Edin';
+
+  @override
+  String get onboardingDesc3 =>
+      'Basit davet kodlarıyla seyahat planlarınızı arkadaşlarınız ve ailenizle paylaşın.';
+
+  @override
+  String get onboardingTitle4 => 'Güvenli Çevrimdışı Kasa';
+
+  @override
+  String get onboardingDesc4 =>
+      'Pasaport, biniş kartı ve rezervasyonlarınızı şifreli ve internetsiz güvenle saklayın.';
+
+  @override
+  String get getStarted => 'Başlayın';
+
+  @override
+  String get skip => 'Atla';
+
+  @override
+  String get next => 'İleri';
+
+  @override
+  String get replayTour => 'Uygulama Turunu Yeniden Başlat';
+
+  @override
+  String get signInWithApple => 'Apple ile Giriş Yap';
+
+  @override
+  String get appleSignInFailed => 'Apple ile giriş başarısız oldu';
+
+  @override
+  String get total => 'Toplam';
+
+  @override
+  String get totalSpent => 'Toplam Harcama';
+
+  @override
+  String get confirm => 'Onayla';
 }

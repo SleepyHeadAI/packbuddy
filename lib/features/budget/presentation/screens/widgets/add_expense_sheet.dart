@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
+import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/expense_controller.dart';
@@ -27,6 +28,20 @@ class AddExpenseSheet extends ConsumerStatefulWidget {
     required String defaultCurrency,
     Expense? expenseToEdit,
   }) {
+    if (expenseToEdit == null &&
+        PreferencesService.instance.getRestrictedFeatures().contains('expense_add')) {
+      final l10n = AppLocalizations.of(context);
+      final msg = l10n != null ? l10n.adminFeatureRestrictedNotice : 'This feature has been restricted by an administrator.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: AppColors.errorPastel,
+          content: Text(msg, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+        ),
+      );
+      return Future.value();
+    }
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,

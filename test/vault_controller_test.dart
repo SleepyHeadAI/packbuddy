@@ -11,7 +11,10 @@ class FakeVaultController extends StateNotifier<VaultState> implements VaultCont
   FakeVaultController([VaultState? state]) : super(state ?? const VaultState(isLoading: false, documents: []));
 
   @override
-  Future<void> loadDocuments({String? tripId}) async {}
+  void resetState() {}
+
+  @override
+  Future<void> loadDocuments({String? tripId, String? userId}) async {}
 
   @override
   Future<Document?> pickAndAddDocument({
@@ -34,6 +37,9 @@ class FakeVaultController extends StateNotifier<VaultState> implements VaultCont
 
   @override
   Future<Document?> addDocument(Document doc) async => doc;
+
+  @override
+  Future<String?> encodeFileForCloud(String filePath) async => null;
 
   @override
   Future<Document?> updateDocument(Document updated) async => updated;

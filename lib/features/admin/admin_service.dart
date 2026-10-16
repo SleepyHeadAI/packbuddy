@@ -1,3 +1,5 @@
+import '../../core/services/telemetry_service.dart';
+import '../vault/domain/document.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -64,8 +66,19 @@ class AdminUserModel {
   final bool emailVerified;
   final DateTime? createdAt;
   final DateTime? lastLoginAt;
+  final DateTime? lastActiveAt;
   final bool isPremium;
   final int totalVaultStorageBytes;
+  final String banStatus; // 'none' | 'temporary' | 'permanent'
+  final String? banExpiresAt;
+  final String? banReason;
+  final List<String> restrictedFeatures;
+  final String countryCode;
+  final String countryName;
+  final String currencyCode;
+  final String deletionStatus; // 'none' | 'pending_deletion'
+  final String? deletionRequestedAt;
+  final String? scheduledPermanentDeletionAt;
 
   const AdminUserModel({
     required this.uid,
@@ -76,9 +89,49 @@ class AdminUserModel {
     this.emailVerified = false,
     this.createdAt,
     this.lastLoginAt,
+    this.lastActiveAt,
     this.isPremium = false,
     this.totalVaultStorageBytes = 0,
+    this.banStatus = 'none',
+    this.banExpiresAt,
+    this.banReason,
+    this.restrictedFeatures = const [],
+    this.countryCode = 'US',
+    this.countryName = 'United States',
+    this.currencyCode = 'USD',
+    this.deletionStatus = 'none',
+    this.deletionRequestedAt,
+    this.scheduledPermanentDeletionAt,
   });
+
+  bool get isCurrentlyBanned {
+    if (banStatus == 'permanent') return true;
+    if (banStatus == 'temporary' && banExpiresAt != null) {
+      try {
+        final expiry = DateTime.parse(banExpiresAt!);
+        return expiry.isAfter(DateTime.now());
+      } catch (_) {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  bool get isRestricted => restrictedFeatures.isNotEmpty;
+
+  int? get daysUntilPermanentDeletion {
+    if (deletionStatus != 'pending_deletion' || scheduledPermanentDeletionAt == null) return null;
+    try {
+      final scheduled = DateTime.parse(scheduledPermanentDeletionAt!);
+      final diff = scheduled.difference(DateTime.now()).inDays;
+      return diff < 0 ? 0 : diff;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  DateTime get effectiveLastActiveAt =>
+      lastActiveAt ?? lastLoginAt ?? createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
 
   factory AdminUserModel.fromMap(String id, Map<String, dynamic> data) {
     DateTime? parseDate(dynamic val) {
@@ -97,8 +150,22 @@ class AdminUserModel {
       emailVerified: data['emailVerified'] as bool? ?? false,
       createdAt: parseDate(data['createdAt']),
       lastLoginAt: parseDate(data['lastLoginAt']),
+      lastActiveAt: parseDate(data['lastActiveAt']),
       isPremium: data['isPremium'] as bool? ?? false,
       totalVaultStorageBytes: (data['totalVaultStorageBytes'] as num?)?.toInt() ?? 0,
+      banStatus: data['banStatus'] as String? ?? 'none',
+      banExpiresAt: data['banExpiresAt'] as String?,
+      banReason: data['banReason'] as String?,
+      restrictedFeatures: (data['restrictedFeatures'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          const [],
+      countryCode: data['countryCode'] as String? ?? 'US',
+      countryName: data['countryName'] as String? ?? 'United States',
+      currencyCode: data['currencyCode'] as String? ?? 'USD',
+      deletionStatus: data['deletionStatus'] as String? ?? 'none',
+      deletionRequestedAt: data['deletionRequestedAt'] as String?,
+      scheduledPermanentDeletionAt: data['scheduledPermanentDeletionAt'] as String?,
     );
   }
 
@@ -111,8 +178,21 @@ class AdminUserModel {
     bool? emailVerified,
     DateTime? createdAt,
     DateTime? lastLoginAt,
+    DateTime? lastActiveAt,
     bool? isPremium,
     int? totalVaultStorageBytes,
+    String? banStatus,
+    String? banExpiresAt,
+    String? banReason,
+    List<String>? restrictedFeatures,
+    String? countryCode,
+    String? countryName,
+    String? currencyCode,
+    String? deletionStatus,
+    String? deletionRequestedAt,
+    String? scheduledPermanentDeletionAt,
+    bool clearBanExpiresAt = false,
+    bool clearBanReason = false,
   }) {
     return AdminUserModel(
       uid: uid ?? this.uid,
@@ -123,8 +203,19 @@ class AdminUserModel {
       emailVerified: emailVerified ?? this.emailVerified,
       createdAt: createdAt ?? this.createdAt,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
+      lastActiveAt: lastActiveAt ?? this.lastActiveAt,
       isPremium: isPremium ?? this.isPremium,
       totalVaultStorageBytes: totalVaultStorageBytes ?? this.totalVaultStorageBytes,
+      banStatus: banStatus ?? this.banStatus,
+      banExpiresAt: clearBanExpiresAt ? null : (banExpiresAt ?? this.banExpiresAt),
+      banReason: clearBanReason ? null : (banReason ?? this.banReason),
+      restrictedFeatures: restrictedFeatures ?? this.restrictedFeatures,
+      countryCode: countryCode ?? this.countryCode,
+      countryName: countryName ?? this.countryName,
+      currencyCode: currencyCode ?? this.currencyCode,
+      deletionStatus: deletionStatus ?? this.deletionStatus,
+      deletionRequestedAt: deletionRequestedAt ?? this.deletionRequestedAt,
+      scheduledPermanentDeletionAt: scheduledPermanentDeletionAt ?? this.scheduledPermanentDeletionAt,
     );
   }
 }
@@ -151,6 +242,18 @@ abstract class AdminService {
   Future<AdminPlatformMetrics> fetchMetrics();
   Future<List<AdminUserModel>> fetchUsers();
   Future<void> toggleUserProStatus(String uid, bool isPremium);
+  Future<void> updateUserModeration({
+    required String uid,
+    required bool isPremium,
+    required String banStatus,
+    String? banExpiresAt,
+    String? banReason,
+    required List<String> restrictedFeatures,
+  });
+  Future<List<VaultDocument>> fetchUserDocuments(String uid);
+  Future<void> deleteUserDocumentAsAdmin({required String uid, required String documentId});
+  Future<void> cancelAccountDeletionAsAdmin(String uid);
+  Future<void> purgeUserDataAsAdmin(String uid);
   bool isCurrentUserAdmin();
 }
 
@@ -300,6 +403,141 @@ class FirebaseAdminService implements AdminService {
       }, SetOptions(merge: true));
     } catch (e) {
       debugPrint('[AdminService] toggleUserProStatus error: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updateUserModeration({
+    required String uid,
+    required bool isPremium,
+    required String banStatus,
+    String? banExpiresAt,
+    String? banReason,
+    required List<String> restrictedFeatures,
+  }) async {
+    final firestore = _effectiveFirestore;
+    if (firestore == null) return;
+
+    try {
+      final updates = <String, dynamic>{
+        'isPremium': isPremium,
+        'banStatus': banStatus,
+        'banExpiresAt': banExpiresAt,
+        'banReason': banReason,
+        'restrictedFeatures': restrictedFeatures,
+        'updatedAt': DateTime.now().toIso8601String(),
+      };
+      await firestore
+          .collection('users')
+          .doc(uid)
+          .set(updates, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('[AdminService] updateUserModeration error: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<VaultDocument>> fetchUserDocuments(String uid) async {
+    final firestore = _effectiveFirestore;
+    if (firestore == null) return [];
+    try {
+      final snapshot = await firestore
+          .collection('documents')
+          .where('user_id', isEqualTo: uid)
+          .get();
+      final docs = <VaultDocument>[];
+      for (final d in snapshot.docs) {
+        try {
+          final doc = VaultDocument.fromJson(d.data());
+          if (!doc.isDeleted) {
+            docs.add(doc);
+          }
+        } catch (_) {}
+      }
+      docs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return docs;
+    } catch (e) {
+      debugPrint('[AdminService] fetchUserDocuments error: $e');
+      return [];
+    }
+  }
+
+  @override
+  Future<void> deleteUserDocumentAsAdmin({
+    required String uid,
+    required String documentId,
+  }) async {
+    final firestore = _effectiveFirestore;
+    if (firestore == null) return;
+    try {
+      await firestore.collection('documents').doc(documentId).set({
+        'is_deleted': true,
+        'isDeleted': true,
+        'updated_at': DateTime.now().millisecondsSinceEpoch,
+        'updatedAt': DateTime.now().toIso8601String(),
+      }, SetOptions(merge: true));
+      TelemetryService.instance.logAdminAction(
+        action: 'delete_user_document',
+        targetUid: uid,
+        details: {'documentId': documentId},
+      );
+    } catch (e) {
+      debugPrint('[AdminService] deleteUserDocumentAsAdmin error: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> cancelAccountDeletionAsAdmin(String uid) async {
+    final firestore = _effectiveFirestore;
+    if (firestore == null) return;
+    try {
+      await firestore.collection('users').doc(uid).set({
+        'deletionStatus': 'none',
+        'deletionRequestedAt': null,
+        'scheduledPermanentDeletionAt': null,
+        'updatedAt': DateTime.now().toIso8601String(),
+      }, SetOptions(merge: true));
+      TelemetryService.instance.logAdminAction(
+        action: 'cancel_account_deletion',
+        targetUid: uid,
+      );
+    } catch (e) {
+      debugPrint('[AdminService] cancelAccountDeletionAsAdmin error: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> purgeUserDataAsAdmin(String uid) async {
+    final firestore = _effectiveFirestore;
+    if (firestore == null) return;
+    try {
+      final collections = ['trips', 'expenses', 'checklist_items', 'documents'];
+      for (final coll in collections) {
+        try {
+          final snap = await firestore.collection(coll).where('user_id', isEqualTo: uid).get();
+          for (final doc in snap.docs) {
+            await doc.reference.delete();
+          }
+        } catch (_) {}
+      }
+      await firestore.collection('users').doc(uid).set({
+        'deletionStatus': 'none',
+        'deletionRequestedAt': null,
+        'scheduledPermanentDeletionAt': null,
+        'isPremium': false,
+        'totalVaultStorageBytes': 0,
+        'updatedAt': DateTime.now().toIso8601String(),
+      }, SetOptions(merge: true));
+      TelemetryService.instance.logAdminAction(
+        action: 'purge_user_data',
+        targetUid: uid,
+      );
+    } catch (e) {
+      debugPrint('[AdminService] purgeUserDataAsAdmin error: $e');
       rethrow;
     }
   }

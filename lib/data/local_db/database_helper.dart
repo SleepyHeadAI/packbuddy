@@ -8,6 +8,7 @@ import '../../features/budget/domain/trip.dart';
 import '../../features/budget/domain/expense.dart';
 import '../../features/vault/domain/document.dart';
 import '../../features/checklist/domain/packing_item.dart';
+import '../../features/checklist/domain/canonical_packing_catalog.dart';
 
 /// SQLite Database Helper providing offline-first local persistence, multi-tenant security, and soft-delete CRUD
 class DatabaseHelper {
@@ -101,6 +102,8 @@ class DatabaseHelper {
         file_type TEXT,
         notes TEXT,
         file_size_bytes INTEGER NOT NULL DEFAULT 0,
+        cloud_data_base64 TEXT,
+        file_extension TEXT,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
         is_deleted INTEGER NOT NULL DEFAULT 0
@@ -208,6 +211,23 @@ class DatabaseHelper {
     if (oldVersion < 7) {
       try {
         await db.execute('ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN file_size_bytes INTEGER NOT NULL DEFAULT 0');
+      } catch (_) {}
+    }
+
+    // Version 8: Deduplicate checklist items sharing canonical key or normalized title
+    if (oldVersion < 8) {
+      try {
+        await deduplicateChecklistItems(executor: db);
+      } catch (_) {}
+    }
+
+    // Version 9: Add cloud_data_base64 and file_extension for cloud vault backup & recovery
+    if (oldVersion < 9) {
+      try {
+        await db.execute('ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN cloud_data_base64 TEXT');
+      } catch (_) {}
+      try {
+        await db.execute('ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN file_extension TEXT');
       } catch (_) {}
     }
   }
@@ -849,6 +869,76 @@ class DatabaseHelper {
       whereArgs: [effectiveUserId],
     );
     return result.map((map) => PackingItem.fromMap(map)).toList();
+  }
+
+  /// Deduplicates checklist items for all users and trips.
+  /// Items sharing the same canonical key or normalized name within the same user & trip are deduplicated.
+  /// Keeps the packed item (if any is packed), or deterministic ID, or latest updated timestamp.
+  /// Returns the count of deleted duplicate rows.
+  Future<int> deduplicateChecklistItems({DatabaseExecutor? executor, String? userId, String? tripId}) async {
+    final db = executor ?? await database;
+    final List<Map<String, dynamic>> rows;
+    if (userId != null && userId.isNotEmpty) {
+      if (tripId != null && tripId.isNotEmpty) {
+        rows = await db.query(
+          AppConstants.tableChecklistItems,
+          where: 'user_id = ? AND trip_id = ?',
+          whereArgs: [userId, tripId],
+        );
+      } else {
+        rows = await db.query(
+          AppConstants.tableChecklistItems,
+          where: 'user_id = ?',
+          whereArgs: [userId],
+        );
+      }
+    } else {
+      rows = await db.query(AppConstants.tableChecklistItems);
+    }
+
+    if (rows.isEmpty) return 0;
+
+    final items = rows.map((r) => PackingItem.fromMap(r)).toList();
+    final Map<String, List<PackingItem>> groups = {};
+
+    for (final item in items) {
+      final key = CanonicalPackingCatalog.resolveCanonicalKey(item.name) ??
+          CanonicalPackingCatalog.normalize(item.name);
+      final groupKey = '${item.userId}:::${item.tripId ?? ""}:::$key';
+      groups.putIfAbsent(groupKey, () => []).add(item);
+    }
+
+    var deletedCount = 0;
+    for (final group in groups.values) {
+      if (group.length <= 1) continue;
+
+      // Sort criteria:
+      // 1. Packed item first
+      // 2. Deterministic ID first (starts with 'default_' or 'tpl_')
+      // 3. Latest updated_at
+      group.sort((a, b) {
+        if (a.isPacked != b.isPacked) {
+          return a.isPacked ? -1 : 1;
+        }
+        final aDeterministic = a.id.startsWith('default_') || a.id.startsWith('tpl_');
+        final bDeterministic = b.id.startsWith('default_') || b.id.startsWith('tpl_');
+        if (aDeterministic != bDeterministic) {
+          return aDeterministic ? -1 : 1;
+        }
+        return b.updatedAt.compareTo(a.updatedAt);
+      });
+
+      for (var i = 1; i < group.length; i++) {
+        final duplicate = group[i];
+        await db.delete(
+          AppConstants.tableChecklistItems,
+          where: 'id = ?',
+          whereArgs: [duplicate.id],
+        );
+        deletedCount++;
+      }
+    }
+    return deletedCount;
   }
 
   Future<void> close() async {

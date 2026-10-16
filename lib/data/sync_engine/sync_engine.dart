@@ -1,3 +1,6 @@
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
+import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,6 +15,7 @@ import '../../features/budget/domain/trip.dart';
 import '../../features/budget/domain/expense.dart';
 import '../../features/vault/domain/document.dart';
 import '../../features/checklist/domain/packing_item.dart';
+import '../../features/checklist/domain/canonical_packing_catalog.dart';
 import '../../core/services/currency_service.dart';
 import '../../core/services/preferences_service.dart';
 import '../../features/auth/auth_controller.dart';
@@ -95,12 +99,24 @@ class SyncEngine extends StateNotifier<SyncState> {
           final data = snapshot.data()!;
           if (data.containsKey('isPremium')) {
             final isPro = data['isPremium'] == true;
-            PreferencesService.instance.setProUser(isPro);
+            PreferencesService.instance.setProUser(isPro, uid: uid);
             onProStatusSynced?.call(isPro);
             final r = ref;
             if (r != null) {
-              r.read(proSubscriptionProvider.notifier).updateProStatus(isPro);
+              r.read(proSubscriptionProvider.notifier).updateProStatus(isPro, uid: uid);
             }
+          }
+          if (data.containsKey('restrictedFeatures')) {
+            final feats = (data['restrictedFeatures'] as List<dynamic>?)
+                    ?.map((e) => e.toString())
+                    .toList() ??
+                <String>[];
+            PreferencesService.instance.setRestrictedFeatures(feats, uid: uid);
+          }
+          if (data.containsKey('banStatus')) {
+            PreferencesService.instance.setBanStatus((data['banStatus'] as String?) ?? 'none', uid: uid);
+            PreferencesService.instance.setBanExpiresAt(data['banExpiresAt'] as String?, uid: uid);
+            PreferencesService.instance.setBanReason(data['banReason'] as String?, uid: uid);
           }
         }
       },
@@ -188,7 +204,23 @@ class SyncEngine extends StateNotifier<SyncState> {
         return;
       }
 
+      // Feature restriction guard (Phase 3): Skip cloud sync if restricted by admin
+      if (PreferencesService.instance.getRestrictedFeatures(uid: uid).contains('cloud_sync')) {
+        state = state.copyWith(
+          status: SyncStatus.idle,
+          errorMessage: 'cloud_sync_restricted',
+        );
+        return;
+      }
+
       final firestore = _firestoreInstance ?? FirebaseFirestore.instance;
+
+      // Update lastActiveAt in Firestore
+      try {
+        await firestore.collection('users').doc(uid).set({
+          'lastActiveAt': DateTime.now().toIso8601String(),
+        }, SetOptions(merge: true));
+      } catch (_) {}
 
       // Remote Pro Status Sync: Fetch users/{uid} and synchronize isPremium
       try {
@@ -197,11 +229,11 @@ class SyncEngine extends StateNotifier<SyncState> {
           final userData = userDoc.data()!;
           if (userData.containsKey('isPremium')) {
             final remoteIsPro = userData['isPremium'] == true;
-            await PreferencesService.instance.setProUser(remoteIsPro);
+            await PreferencesService.instance.setProUser(remoteIsPro, uid: uid);
             onProStatusSynced?.call(remoteIsPro);
             final r = ref;
             if (r != null) {
-              r.read(proSubscriptionProvider.notifier).updateProStatus(remoteIsPro);
+              r.read(proSubscriptionProvider.notifier).updateProStatus(remoteIsPro, uid: uid);
             }
           }
         }
@@ -249,86 +281,142 @@ class SyncEngine extends StateNotifier<SyncState> {
 
       // 1.1 Soft-deleted Trips strictly filtered by user_id
       final deletedTrips = await _dbHelper.getDeletedTrips(userId: uid);
-      for (final trip in deletedTrips) {
-        try {
-          final doc = await firestore.collection('trips').doc(trip.id).get();
-          if (doc.exists && doc.data() != null) {
-            final remoteTrip = Trip.fromJson(doc.data()!);
-            if (remoteTrip.updatedAt.isAfter(trip.updatedAt)) {
-              // Remote edit occurred after local deletion: Remote wins
-              tripsToUpsertLocal.add(remoteTrip);
-              processedItems++;
-              continue;
+      if (deletedTrips.isNotEmpty) {
+        final tripDocs = await Future.wait(
+          deletedTrips.map((trip) async {
+            try {
+              return await firestore.collection('trips').doc(trip.id).get();
+            } catch (e) {
+              debugPrint('[SyncEngine] fetch deleted trip notice: $e');
+              return null;
+            }
+          }),
+        );
+        for (var i = 0; i < deletedTrips.length; i++) {
+          final trip = deletedTrips[i];
+          final doc = tripDocs[i];
+          if (doc != null && doc.exists && doc.data() != null) {
+            try {
+              final remoteTrip = Trip.fromJson(doc.data()!);
+              if (remoteTrip.updatedAt.isAfter(trip.updatedAt)) {
+                tripsToUpsertLocal.add(remoteTrip);
+                processedItems++;
+                continue;
+              }
+            } catch (e) {
+              debugPrint('[SyncEngine] parse remote trip notice: $e');
             }
           }
           batch.delete(firestore.collection('trips').doc(trip.id));
           await queueBatchOp();
-        } catch (_) {}
-        tripIdsToHardDelete.add(trip.id);
-        processedItems++;
+          tripIdsToHardDelete.add(trip.id);
+          processedItems++;
+        }
       }
 
       // 1.2 Soft-deleted Expenses strictly filtered by user_id
       final deletedExpenses = await _dbHelper.getDeletedExpenses(userId: uid);
-      for (final expense in deletedExpenses) {
-        try {
-          final doc = await firestore.collection('expenses').doc(expense.id).get();
-          if (doc.exists && doc.data() != null) {
-            final remoteExpense = Expense.fromJson(doc.data()!);
-            if (remoteExpense.updatedAt.isAfter(expense.updatedAt)) {
-              // Remote edit occurred after local deletion: Remote wins
-              expensesToUpsertLocal.add(remoteExpense);
-              processedItems++;
-              continue;
+      if (deletedExpenses.isNotEmpty) {
+        final expenseDocs = await Future.wait(
+          deletedExpenses.map((expense) async {
+            try {
+              return await firestore.collection('expenses').doc(expense.id).get();
+            } catch (e) {
+              debugPrint('[SyncEngine] fetch deleted expense notice: $e');
+              return null;
+            }
+          }),
+        );
+        for (var i = 0; i < deletedExpenses.length; i++) {
+          final expense = deletedExpenses[i];
+          final doc = expenseDocs[i];
+          if (doc != null && doc.exists && doc.data() != null) {
+            try {
+              final remoteExpense = Expense.fromJson(doc.data()!);
+              if (remoteExpense.updatedAt.isAfter(expense.updatedAt)) {
+                expensesToUpsertLocal.add(remoteExpense);
+                processedItems++;
+                continue;
+              }
+            } catch (e) {
+              debugPrint('[SyncEngine] parse remote expense notice: $e');
             }
           }
           batch.delete(firestore.collection('expenses').doc(expense.id));
           await queueBatchOp();
-        } catch (_) {}
-        expenseIdsToHardDelete.add(expense.id);
-        processedItems++;
+          expenseIdsToHardDelete.add(expense.id);
+          processedItems++;
+        }
       }
 
       // 1.3 Soft-deleted Documents strictly filtered by user_id
       final deletedDocs = await _dbHelper.getDeletedDocuments(userId: uid);
-      for (final doc in deletedDocs) {
-        try {
-          final docSnap = await firestore.collection('documents').doc(doc.id).get();
-          if (docSnap.exists && docSnap.data() != null) {
-            final remoteDoc = Document.fromJson(docSnap.data()!);
-            if (remoteDoc.updatedAt.isAfter(doc.updatedAt)) {
-              // Remote edit occurred after local deletion: Remote wins
-              docsToUpsertLocal.add(remoteDoc);
-              processedItems++;
-              continue;
+      if (deletedDocs.isNotEmpty) {
+        final docSnaps = await Future.wait(
+          deletedDocs.map((doc) async {
+            try {
+              return await firestore.collection('documents').doc(doc.id).get();
+            } catch (e) {
+              debugPrint('[SyncEngine] fetch deleted doc notice: $e');
+              return null;
+            }
+          }),
+        );
+        for (var i = 0; i < deletedDocs.length; i++) {
+          final doc = deletedDocs[i];
+          final docSnap = docSnaps[i];
+          if (docSnap != null && docSnap.exists && docSnap.data() != null) {
+            try {
+              final remoteDoc = Document.fromJson(docSnap.data()!);
+              if (remoteDoc.updatedAt.isAfter(doc.updatedAt)) {
+                docsToUpsertLocal.add(remoteDoc);
+                processedItems++;
+                continue;
+              }
+            } catch (e) {
+              debugPrint('[SyncEngine] parse remote doc notice: $e');
             }
           }
           batch.delete(firestore.collection('documents').doc(doc.id));
           await queueBatchOp();
-        } catch (_) {}
-        docIdsToHardDelete.add(doc.id);
-        processedItems++;
+          docIdsToHardDelete.add(doc.id);
+          processedItems++;
+        }
       }
 
       // 1.4 Soft-deleted Checklist Items strictly filtered by user_id
       final deletedItems = await _dbHelper.getDeletedChecklistItems(userId: uid);
-      for (final item in deletedItems) {
-        try {
-          final doc = await firestore.collection('checklist_items').doc(item.id).get();
-          if (doc.exists && doc.data() != null) {
-            final remoteItem = PackingItem.fromJson(doc.data()!);
-            if (remoteItem.updatedAt.isAfter(item.updatedAt)) {
-              // Remote edit occurred after local deletion: Remote wins
-              itemsToUpsertLocal.add(remoteItem);
-              processedItems++;
-              continue;
+      if (deletedItems.isNotEmpty) {
+        final itemDocs = await Future.wait(
+          deletedItems.map((item) async {
+            try {
+              return await firestore.collection('checklist_items').doc(item.id).get();
+            } catch (e) {
+              debugPrint('[SyncEngine] fetch deleted item notice: $e');
+              return null;
+            }
+          }),
+        );
+        for (var i = 0; i < deletedItems.length; i++) {
+          final item = deletedItems[i];
+          final doc = itemDocs[i];
+          if (doc != null && doc.exists && doc.data() != null) {
+            try {
+              final remoteItem = PackingItem.fromJson(doc.data()!);
+              if (remoteItem.updatedAt.isAfter(item.updatedAt)) {
+                itemsToUpsertLocal.add(remoteItem);
+                processedItems++;
+                continue;
+              }
+            } catch (e) {
+              debugPrint('[SyncEngine] parse remote item notice: $e');
             }
           }
           batch.delete(firestore.collection('checklist_items').doc(item.id));
           await queueBatchOp();
-        } catch (_) {}
-        itemIdsToHardDelete.add(item.id);
-        processedItems++;
+          itemIdsToHardDelete.add(item.id);
+          processedItems++;
+        }
       }
 
       // ===================================================================
@@ -462,27 +550,56 @@ class SyncEngine extends StateNotifier<SyncState> {
       final localDocsMap = <String, Document>{for (final d in localDocs) d.id: d};
 
       for (final localDoc in localDocs) {
-        final remoteDoc = remoteDocsMap[localDoc.id];
+        var docToPush = localDoc;
+        // Ensure local document bytes are encoded for cloud backup
+        if ((docToPush.cloudDataBase64 == null || docToPush.cloudDataBase64!.isEmpty) &&
+            docToPush.localImagePath.isNotEmpty) {
+          try {
+            final f = File(docToPush.localImagePath);
+            if (f.existsSync()) {
+              final bytes = f.readAsBytesSync();
+              const maxBytes = 700 * 1024;
+              final ext = p.extension(docToPush.localImagePath).replaceAll('.', '').toLowerCase();
+              if (bytes.length <= maxBytes) {
+                final payload = base64Encode(bytes);
+                docToPush = docToPush.copyWith(
+                  cloudDataBase64: payload,
+                  fileSizeBytes: bytes.length,
+                  fileExtension: ext.isNotEmpty ? ext : (docToPush.isPdf ? 'pdf' : 'jpg'),
+                );
+                docsToUpsertLocal.add(docToPush);
+              } else {
+                debugPrint('[SyncEngine] Document "${docToPush.title}" exceeds 700KB limit (${bytes.length} bytes). Preserving local copy without byte corruption.');
+                docToPush = docToPush.copyWith(
+                  fileSizeBytes: bytes.length,
+                  fileExtension: ext.isNotEmpty ? ext : (docToPush.isPdf ? 'pdf' : 'jpg'),
+                );
+              }
+            }
+          } catch (_) {}
+        }
+
+        final remoteDoc = remoteDocsMap[docToPush.id];
         if (remoteDoc == null) {
-          if (lastSyncedAt == 0 || localDoc.updatedAt.millisecondsSinceEpoch > lastSyncedAt) {
+          if (lastSyncedAt == 0 || docToPush.updatedAt.millisecondsSinceEpoch > lastSyncedAt) {
             batch.set(
-              firestore.collection('documents').doc(localDoc.id),
-              localDoc.copyWith(userId: uid).toJson(),
+              firestore.collection('documents').doc(docToPush.id),
+              docToPush.copyWith(userId: uid).toJson(),
               SetOptions(merge: true),
             );
             await queueBatchOp();
             processedItems++;
           }
-        } else if (localDoc.updatedAt.isAfter(remoteDoc.updatedAt)) {
+        } else if (docToPush.updatedAt.isAfter(remoteDoc.updatedAt)) {
           // LWW: Local modification is newer -> Overwrite Firestore
           batch.set(
-            firestore.collection('documents').doc(localDoc.id),
-            localDoc.copyWith(userId: uid).toJson(),
+            firestore.collection('documents').doc(docToPush.id),
+            docToPush.copyWith(userId: uid).toJson(),
             SetOptions(merge: true),
           );
           await queueBatchOp();
           processedItems++;
-        } else if (remoteDoc.updatedAt.isAfter(localDoc.updatedAt)) {
+        } else if (remoteDoc.updatedAt.isAfter(docToPush.updatedAt)) {
           // LWW: Remote modification is newer -> Overwrite local SQLite
           docsToUpsertLocal.add(remoteDoc);
           processedItems++;
@@ -496,7 +613,8 @@ class SyncEngine extends StateNotifier<SyncState> {
         }
       }
 
-      // 2.4 Reconcile Checklist Items with Delta Sync & LWW
+      // 2.4 Reconcile Checklist Items with Delta Sync & LWW (with Cross-ID Canonical Deduplication)
+      await _dbHelper.deduplicateChecklistItems(userId: uid);
       Query<Map<String, dynamic>> itemsQuery = firestore
           .collection('checklist_items')
           .where('user_id', isEqualTo: uid);
@@ -514,8 +632,43 @@ class SyncEngine extends StateNotifier<SyncState> {
       final localItems = await _dbHelper.getChecklistItems(userId: uid, includeDeleted: false);
       final localItemsMap = <String, PackingItem>{for (final i in localItems) i.id: i};
 
+      // Map local items by canonical key for cross-id deduplication
+      final localCanonicalMap = <String, PackingItem>{};
+      for (final i in localItems) {
+        final key = CanonicalPackingCatalog.resolveCanonicalKey(i.name) ?? CanonicalPackingCatalog.normalize(i.name);
+        localCanonicalMap['${i.tripId ?? ""}:::$key'] = i;
+      }
+
+      // Remote items deduplication against duplicate Firestore documents
+      final remoteGroups = <String, List<PackingItem>>{};
+      for (final rItem in remoteItemsMap.values) {
+        final rKey = CanonicalPackingCatalog.resolveCanonicalKey(rItem.name) ?? CanonicalPackingCatalog.normalize(rItem.name);
+        final groupKey = '${rItem.tripId ?? ""}:::$rKey';
+        remoteGroups.putIfAbsent(groupKey, () => []).add(rItem);
+      }
+
+      final sanitizedRemoteMap = <String, PackingItem>{};
+      for (final entry in remoteGroups.entries) {
+        final group = entry.value;
+        if (group.length > 1) {
+          group.sort((a, b) {
+            if (a.isPacked != b.isPacked) return a.isPacked ? -1 : 1;
+            final aDet = a.id.startsWith('default_') || a.id.startsWith('tpl_');
+            final bDet = b.id.startsWith('default_') || b.id.startsWith('tpl_');
+            if (aDet != bDet) return aDet ? -1 : 1;
+            return b.updatedAt.compareTo(a.updatedAt);
+          });
+          // Delete remote duplicate docs from Firestore
+          for (var i = 1; i < group.length; i++) {
+            batch.delete(firestore.collection('checklist_items').doc(group[i].id));
+            await queueBatchOp();
+          }
+        }
+        sanitizedRemoteMap[group.first.id] = group.first;
+      }
+
       for (final localItem in localItems) {
-        final remoteItem = remoteItemsMap[localItem.id];
+        final remoteItem = sanitizedRemoteMap[localItem.id];
         if (remoteItem == null) {
           if (lastSyncedAt == 0 || localItem.updatedAt.millisecondsSinceEpoch > lastSyncedAt) {
             batch.set(
@@ -542,16 +695,70 @@ class SyncEngine extends StateNotifier<SyncState> {
         }
       }
 
-      for (final entry in remoteItemsMap.entries) {
+      for (final entry in sanitizedRemoteMap.entries) {
         if (!localItemsMap.containsKey(entry.key)) {
-          itemsToUpsertLocal.add(entry.value);
-          processedItems++;
+          final rItem = entry.value;
+          final rKey = CanonicalPackingCatalog.resolveCanonicalKey(rItem.name) ?? CanonicalPackingCatalog.normalize(rItem.name);
+          final groupKey = '${rItem.tripId ?? ""}:::$rKey';
+          if (localCanonicalMap.containsKey(groupKey)) {
+            // Duplicate item with different ID between remote and local!
+            // Prefer packed state and delete legacy remote doc from Firestore
+            final matchingLocal = localCanonicalMap[groupKey]!;
+            if (rItem.isPacked && !matchingLocal.isPacked) {
+              final updatedLocal = matchingLocal.copyWith(isPacked: true, updatedAt: DateTime.now());
+              itemsToUpsertLocal.add(updatedLocal);
+              batch.set(
+                firestore.collection('checklist_items').doc(matchingLocal.id),
+                updatedLocal.copyWith(userId: uid).toJson(),
+                SetOptions(merge: true),
+              );
+              await queueBatchOp();
+            }
+            batch.delete(firestore.collection('checklist_items').doc(rItem.id));
+            await queueBatchOp();
+          } else {
+            itemsToUpsertLocal.add(rItem);
+            processedItems++;
+          }
         }
       }
 
       // Commit any pending Firestore WriteBatch operations
       if (batchOpCount > 0) {
         await batch.commit();
+      }
+
+      // Restore missing files for documents pulled from cloud vault
+      final resolvedDocsToUpsert = <VaultDocument>[];
+      try {
+        final appDir = await getApplicationDocumentsDirectory();
+        final vaultDir = Directory(p.join(appDir.path, 'vault_docs'));
+        if (!await vaultDir.exists()) {
+          await vaultDir.create(recursive: true);
+        }
+
+        for (final doc in docsToUpsertLocal) {
+          var updatedDoc = doc;
+          final localFile = File(doc.filePath);
+          final fileExists = await localFile.exists();
+
+          if (!fileExists && doc.cloudDataBase64 != null && doc.cloudDataBase64!.isNotEmpty) {
+            try {
+              final bytes = base64Decode(doc.cloudDataBase64!);
+              final ext = doc.fileExtension ?? (doc.filePath.split('.').length > 1 ? doc.filePath.split('.').last : 'bin');
+              final restoredPath = p.join(vaultDir.path, '${doc.id}_restored.$ext');
+              final restoredFile = File(restoredPath);
+              await restoredFile.writeAsBytes(bytes);
+              updatedDoc = doc.copyWith(filePath: restoredPath);
+            } catch (e) {
+              debugPrint('[SyncEngine] Error restoring document file: $e');
+            }
+          }
+          resolvedDocsToUpsert.add(updatedDoc);
+        }
+      } catch (e) {
+        debugPrint('[SyncEngine] Error preparing vault directory for restore: $e');
+        resolvedDocsToUpsert.addAll(docsToUpsertLocal);
       }
 
       // SQLite Transactions: Atomic update on local SQLite to avoid UI freezing
@@ -602,7 +809,7 @@ class SyncEngine extends StateNotifier<SyncState> {
             conflictAlgorithm: ConflictAlgorithm.replace,
           );
         }
-        for (final doc in docsToUpsertLocal) {
+        for (final doc in resolvedDocsToUpsert) {
           await txn.insert(
             AppConstants.tableDocuments,
             doc.copyWith(userId: uid).toMap(),
@@ -616,6 +823,9 @@ class SyncEngine extends StateNotifier<SyncState> {
             conflictAlgorithm: ConflictAlgorithm.replace,
           );
         }
+
+        // Deduplicate checklist items atomically in SQLite after sync upsert
+        await _dbHelper.deduplicateChecklistItems(executor: txn, userId: uid);
 
         // 3. Update last_synced_at metadata in SQLite upon successful sync
         await txn.insert(

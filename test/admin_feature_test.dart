@@ -8,6 +8,7 @@ import 'package:packbuddy/features/admin/admin_controller.dart';
 import 'package:packbuddy/features/admin/admin_dashboard_screen.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/settings/presentation/screens/settings_screen.dart';
+import 'package:packbuddy/features/vault/domain/document.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 /// Fake Firebase [User] for testing
@@ -105,6 +106,51 @@ class MockAdminService implements AdminService {
       usersToReturn[index] = usersToReturn[index].copyWith(isPremium: isPremium);
     }
   }
+
+  final List<Map<String, dynamic>> moderationCalls = [];
+
+  @override
+  Future<void> updateUserModeration({
+    required String uid,
+    required bool isPremium,
+    required String banStatus,
+    String? banExpiresAt,
+    String? banReason,
+    required List<String> restrictedFeatures,
+  }) async {
+    moderationCalls.add({
+      'uid': uid,
+      'isPremium': isPremium,
+      'banStatus': banStatus,
+      'banExpiresAt': banExpiresAt,
+      'banReason': banReason,
+      'restrictedFeatures': restrictedFeatures,
+    });
+    final index = usersToReturn.indexWhere((u) => u.uid == uid);
+    if (index != -1) {
+      usersToReturn[index] = usersToReturn[index].copyWith(
+        isPremium: isPremium,
+        banStatus: banStatus,
+        banExpiresAt: banExpiresAt,
+        banReason: banReason,
+        restrictedFeatures: restrictedFeatures,
+      );
+    }
+  }
+
+  @override
+  Future<List<VaultDocument>> fetchUserDocuments(String uid) async {
+    return [];
+  }
+
+  @override
+  Future<void> deleteUserDocumentAsAdmin({required String uid, required String documentId}) async {}
+
+  @override
+  Future<void> cancelAccountDeletionAsAdmin(String uid) async {}
+
+  @override
+  Future<void> purgeUserDataAsAdmin(String uid) async {}
 }
 
 void main() {

@@ -72,9 +72,7 @@ class Expense {
     return {
       'id': id,
       'userId': userId,
-      'user_id': userId,
       'tripId': tripId,
-      'trip_id': tripId,
       'title': title,
       'amount': amount,
       'currency': currency,
@@ -85,9 +83,7 @@ class Expense {
       'notes': notes,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
-      'updated_at': updatedAt.millisecondsSinceEpoch,
       'isDeleted': isDeleted,
-      'is_deleted': isDeleted,
     };
   }
 

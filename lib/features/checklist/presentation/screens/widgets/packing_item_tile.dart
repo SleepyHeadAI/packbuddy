@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/features/checklist/domain/packing_item.dart';
+import 'package:packbuddy/features/checklist/domain/canonical_packing_catalog.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 /// Highly refined, accessible packing list tile with non-conflicting dismissible swipe gestures,
@@ -208,10 +209,13 @@ class PackingItemTile extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Product Title: multi-line wrapping with clean trailing ellipsis
+                          // Product Title: dynamically localized for catalog/seeded items, or raw custom string
                           // Strikethrough decoration is strictly applied ONLY to this Text widget!
                           Text(
-                            item.name,
+                            CanonicalPackingCatalog.getLocalizedItemName(
+                              item.name,
+                              Localizations.localeOf(context).languageCode,
+                            ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.bodyLarge?.copyWith(
@@ -232,19 +236,47 @@ class PackingItemTile extends StatelessWidget {
                           ),
                           const SizedBox(height: 5),
 
-                          // Category Subtitle
-                          Text(
-                            _getCategoryLabel(item.category, l10n),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w500,
-                              color: theme.colorScheme.onSurfaceVariant.withValues(
-                                alpha: item.isPacked ? 0.5 : 0.8,
+                          // Category Subtitle & Assignee Chip
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  _getCategoryLabel(item.category, l10n),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w500,
+                                    color: theme.colorScheme.onSurfaceVariant.withValues(
+                                      alpha: item.isPacked ? 0.5 : 0.8,
+                                    ),
+                                    decoration: TextDecoration.none,
+                                  ),
+                                ),
                               ),
-                              decoration: TextDecoration.none,
-                            ),
+                              if (item.assignedTo != null && item.assignedTo!.isNotEmpty) ...[
+                                const SizedBox(width: 6),
+                                Flexible(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      '@${item.assignedTo}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ],
                       ),

@@ -1,6 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../features/budget/domain/country.dart';
+import 'preferences_service.dart';
 import '../utils/currency_formatter.dart';
 
 /// Comprehensive Currency Service providing offline-first foreign exchange conversions,
@@ -221,3 +225,123 @@ class CurrencyService {
     return '$symbol$formattedNumber';
   }
 }
+
+/// Automatic Country and Native Currency detector based on device locale & language fallback
+class CountryDetector {
+  CountryDetector._();
+
+  /// Language code to default ISO 3166-1 alpha-2 country fallback mapping
+  static const Map<String, String> languageToCountryFallback = {
+    'tr': 'TR',
+    'en': 'US',
+    'de': 'DE',
+    'fr': 'FR',
+    'ja': 'JP',
+    'es': 'ES',
+    'it': 'IT',
+    'pt': 'BR',
+    'ru': 'RU',
+    'zh': 'CN',
+    'ko': 'KR',
+    'ar': 'AE',
+    'hi': 'IN',
+    'nl': 'NL',
+    'pl': 'PL',
+    'sv': 'SE',
+    'th': 'TH',
+    'vi': 'VN',
+    'id': 'ID',
+    'cs': 'CZ',
+    'el': 'GR',
+    'he': 'IL',
+    'nb': 'NO',
+    'nn': 'NO',
+    'da': 'DK',
+    'uk': 'UA',
+    'hu': 'HU',
+  };
+
+  /// Detects country code from platformDispatcher.locale or fallback mapping
+  static String detectCountryCode() {
+    try {
+      final locale = WidgetsBinding.instance.platformDispatcher.locale;
+      final countryCode = locale.countryCode;
+      if (countryCode != null && countryCode.trim().isNotEmpty) {
+        return countryCode.trim().toUpperCase();
+      }
+      final lang = locale.languageCode.trim().toLowerCase();
+      return languageToCountryFallback[lang] ?? 'US';
+    } catch (_) {
+      return 'US';
+    }
+  }
+
+  /// Resolves detected country entity
+  static Country detectCountry() {
+    final code = detectCountryCode();
+    return Country.findByCode(code) ?? Country.findByCode('US')!;
+  }
+
+  /// Resolves native currency code from detected country
+  static String detectNativeCurrency() {
+    return detectCountry().defaultCurrency;
+  }
+
+  /// Resolves native currency code for a given ISO country code
+  static String getCurrencyForCountry(String countryCode) {
+    final country = Country.findByCode(countryCode.trim().toUpperCase());
+    return country?.defaultCurrency ?? 'USD';
+  }
+
+  /// Resolves ISO country code for a given language code fallback
+  static String getCountryForLanguage(String languageCode) {
+    return languageToCountryFallback[languageCode.trim().toLowerCase()] ?? 'US';
+  }
+}
+
+/// StateNotifier controlling active application currency
+class CurrencyNotifier extends StateNotifier<String> {
+  final PreferencesService _prefs;
+
+  CurrencyNotifier([PreferencesService? prefs])
+      : _prefs = prefs ?? PreferencesService.instance,
+        super(
+          (prefs ?? PreferencesService.instance).getDefaultCurrency() ??
+              CountryDetector.detectNativeCurrency(),
+        );
+
+  /// Loads currency for active user
+  void loadForUser({String? uid}) {
+    final saved = _prefs.getDefaultCurrency(uid: uid);
+    if (saved != null && saved.isNotEmpty) {
+      state = saved;
+    } else {
+      final detected = CountryDetector.detectNativeCurrency();
+      state = detected;
+      _prefs.setDefaultCurrency(detected, uid: uid);
+    }
+  }
+
+  /// Updates active currency
+  Future<void> setCurrency(String currencyCode, {String? uid, bool isManual = true}) async {
+    final code = currencyCode.toUpperCase().trim();
+    state = code;
+    await _prefs.setDefaultCurrency(code, uid: uid);
+    if (isManual) {
+      await _prefs.setUserSelectedCurrency(true, uid: uid);
+    }
+  }
+
+  /// Resets to default detected currency
+  Future<void> resetToDefault({String? uid}) async {
+    final detected = CountryDetector.detectNativeCurrency();
+    state = detected;
+    await _prefs.setDefaultCurrency(detected, uid: uid);
+    await _prefs.setUserSelectedCurrency(false, uid: uid);
+  }
+}
+
+/// Global provider for active app currency
+final currencyProvider = StateNotifierProvider<CurrencyNotifier, String>((ref) {
+  return CurrencyNotifier();
+});

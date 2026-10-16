@@ -221,7 +221,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get annual => 'Jaarlijks';
 
   @override
-  String get annualSave => 'Bespaar 33%';
+  String get annualSave => 'Bespaar 58%';
 
   @override
   String get subscribeNow => 'Doorgaan met Pro';
@@ -1232,4 +1232,484 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get adminTotalStorage => 'Kluisopslag';
+
+  @override
+  String get adminDefaultBanReason =>
+      'Schending van de servicevoorwaarden van het platform.';
+
+  @override
+  String get adminPermanentBanTitle => 'Account permanent opgeschort';
+
+  @override
+  String get adminTemporaryBanTitle => 'Account tijdelijk opgeschort';
+
+  @override
+  String get adminAccountSuspendedNotice =>
+      'Toegang tot PackBuddy-diensten is beperkt door een beheerder.';
+
+  @override
+  String get adminPermanentBan => 'Permanente blokkade';
+
+  @override
+  String get adminTemporaryBan => 'Tijdelijke blokkade';
+
+  @override
+  String get adminBanReasonLabel => 'Reden van opschorting';
+
+  @override
+  String get adminBanExpiresAtLabel => 'Opschorting verloopt op';
+
+  @override
+  String get adminFeatureRestrictedNotice =>
+      'Deze actie is beperkt door een beheerder.';
+
+  @override
+  String get adminGeoAnalytics => 'Geografische en activiteitsanalyse';
+
+  @override
+  String get adminPeriodLive => 'Nu (15m)';
+
+  @override
+  String get adminPeriodDaily => 'Dagelijks (24u)';
+
+  @override
+  String get adminPeriodWeekly => 'Wekelijks (7d)';
+
+  @override
+  String get adminPeriodMonthly => 'Maandelijks (30d)';
+
+  @override
+  String get adminPeriodYearly => 'Jaarlijks (365d)';
+
+  @override
+  String get adminNoActiveUsers => 'Geen actieve gebruikers in deze periode';
+
+  @override
+  String get adminFilterAll => 'Alle';
+
+  @override
+  String get adminFilterPro => 'Pro';
+
+  @override
+  String get adminFilterBanned => 'Geblokkeerd';
+
+  @override
+  String get adminFilterRestricted => 'Beperkt';
+
+  @override
+  String get adminModerateUser => 'Gebruiker modereren';
+
+  @override
+  String get adminBanStatusLabel => 'Accountopschorting / Blokkade';
+
+  @override
+  String get adminUnbanned => 'Niet geblokkeerd';
+
+  @override
+  String get adminBan24h => '24 uur';
+
+  @override
+  String get adminBan7d => '7 dagen';
+
+  @override
+  String get adminBan30d => '30 dagen';
+
+  @override
+  String get adminBanReasonHint => 'Reden voor opschorting (optioneel)...';
+
+  @override
+  String get adminFeatureRestrictionsLabel => 'Granulaire functiebeperkingen';
+
+  @override
+  String get adminRestrictTripCreate => 'Reizen aanmaken beperken';
+
+  @override
+  String get adminRestrictExpenseAdd => 'Uitgaven toevoegen beperken';
+
+  @override
+  String get adminRestrictVaultUpload => 'Kluis-uploads beperken';
+
+  @override
+  String get adminRestrictCloudSync => 'Cloud-synchronisatie beperken';
+
+  @override
+  String get adminSaveChanges => 'Wijzigingen opslaan';
+
+  @override
+  String get adminChangesSaved => 'Moderatiewijzigingen succesvol opgeslagen';
+
+  @override
+  String get adminSignOut => 'Uitloggen';
+
+  @override
+  String get perMonth => '/mnd';
+
+  @override
+  String get perYear => '/jr';
+
+  @override
+  String get storeBillingRequiredTitle => 'Store-betaling vereist';
+
+  @override
+  String get storeBillingRequiredMessage =>
+      'Officiële facturering via Google Play en de App Store wordt momenteel geactiveerd voor deze versie. Abonnementen kunnen niet gratis worden omzeild.';
+
+  @override
+  String get adminTestPurchaseTitle => 'Beheerder / Sandbox test aankoop';
+
+  @override
+  String get adminTestPurchaseMessage =>
+      'U bent ingelogd als hoofdbeheerder. Wilt u het PackBuddy Pro-testabonnement bevestigen en activeren?';
+
+  @override
+  String get activateTestPro => 'Activeer Pro (Test)';
+
+  @override
+  String get templateSummerTitle => 'Strand & Zomervakantie';
+
+  @override
+  String get templateSummerDesc =>
+      'Complete inpaklijst voor zon, zee, strand en warme bestemmingen';
+
+  @override
+  String get templateWinterTitle => 'Winter- & Skivakantie';
+
+  @override
+  String get templateWinterDesc =>
+      'Beschermende kleding en warme uitrusting voor koude oorden en skigebieden';
+
+  @override
+  String get templateBusinessTitle => 'Zaken- & Conferentiereis';
+
+  @override
+  String get templateBusinessDesc =>
+      'Strakke bagage voor vergaderingen, conferenties en zakelijke bezoeken';
+
+  @override
+  String get templateCampingTitle => 'Natuur- & Kampeeravontuur';
+
+  @override
+  String get templateCampingDesc =>
+      'Stevige uitrusting voor tentkamperen, trektochten en wandelingen';
+
+  @override
+  String get templateCityTitle => 'Weekendje Stad';
+
+  @override
+  String get templateCityDesc =>
+      'Compacte en lichte rugzak voor een 2-3 daagse stedentrip';
+
+  @override
+  String get vaultCloudBackupNotice =>
+      'Documenten worden versleuteld en opgeslagen in de cloud voor synchronisatie tussen apparaten, 15 dagen accountherstel en beveiliging.';
+
+  @override
+  String get deleteAccountTitle => 'Account verwijderen';
+
+  @override
+  String get deleteAccountConfirmationTitle =>
+      'Verzoek om account binnen 15 dagen te verwijderen';
+
+  @override
+  String get deleteAccountConfirmationMessage =>
+      'Uw account, reizen, uitgaven en kluisdocumenten worden over 15 dagen definitief verwijderd.\n\n• Log 15 dagen niet in om de verwijdering te voltooien.\n• Als u binnen 15 dagen inlogt, worden uw account en bestanden automatisch hersteld.\n\nWilt u doorgaan?';
+
+  @override
+  String get deleteAccountButton => '15-daagse verwijdering aanvragen';
+
+  @override
+  String get deleteAccountScheduledNotice =>
+      'Uw account wordt over 15 dagen verwijderd. Log niet in als u uw account definitief wilt verwijderen.';
+
+  @override
+  String get accountRestoredNotice =>
+      'Welkom terug! Uw accountverwijdering is geannuleerd en al uw gegevens zijn hersteld.';
+
+  @override
+  String adminPendingDeletionBadge(int days) {
+    return 'Gepland voor verwijdering (nog ${days}d)';
+  }
+
+  @override
+  String get adminCancelDeletion => 'Verwijdering annuleren';
+
+  @override
+  String get adminPurgeNow => 'Gegevens nu wissen';
+
+  @override
+  String get adminPurgeConfirmTitle => 'Gebruikersgegevens definitief wissen?';
+
+  @override
+  String get adminPurgeConfirmMessage =>
+      'Hiermee worden alle reizen, uitgaven, lijsten en kluisdocumenten van deze gebruiker onherroepelijk gewist.';
+
+  @override
+  String get adminDeletionCancelled =>
+      'Accountverwijdering succesvol geannuleerd';
+
+  @override
+  String get adminDataPurged =>
+      'Alle gebruikersgegevens zijn definitief gewist';
+
+  @override
+  String get adminVaultDocumentsTitle =>
+      'Geüploade kluisdocumenten (Inspecteren / Beheren)';
+
+  @override
+  String get adminNoDocumentsUploaded => 'Nog geen kluisdocumenten geüpload';
+
+  @override
+  String get adminInspectDocument => 'Inspecteren';
+
+  @override
+  String get adminDeleteDocument => 'Document verwijderen';
+
+  @override
+  String get adminDeleteDocumentConfirm =>
+      'Weet u zeker dat u dit document definitief uit de cloudkluis wilt verwijderen?';
+
+  @override
+  String get adminDocumentDeleted =>
+      'Document succesvol verwijderd door beheerder';
+
+  @override
+  String get adminDocumentPreviewTitle => 'Documentinspecteur';
+
+  @override
+  String get adminDocumentTypeImage => 'AFBEELDING';
+
+  @override
+  String get adminDocumentTypePdf => 'PDF';
+
+  @override
+  String get emailVerifySpamFolderTip =>
+      'Controleer de map Spam / Ongewenste e-mail';
+
+  @override
+  String get emailVerifySpamFolderDesc =>
+      'Als u de link niet heeft ontvangen, controleer dan uw spambox op een e-mail van PackBuddy. Verificatie beveiligt uw kluis.';
+
+  @override
+  String get emailVerifyAutoChecking =>
+      'Wachten op verificatielink... (automatische controle)';
+
+  @override
+  String get currencyConverter => 'Valutaconverter';
+
+  @override
+  String get fromCurrency => 'Van';
+
+  @override
+  String get toCurrency => 'Naar';
+
+  @override
+  String get exchangeRate => 'Wisselkoers';
+
+  @override
+  String get liveRates => 'Live Koersen';
+
+  @override
+  String get offlineRates => 'Offline Koersen';
+
+  @override
+  String get quickConvert => 'Snelle Valutaconverter';
+
+  @override
+  String get refreshRates => 'Koersen Vernieuwen';
+
+  @override
+  String get budgetAnalytics => 'Budgetanalyse';
+
+  @override
+  String get categoryDistribution => 'Categorieverdeling';
+
+  @override
+  String get spendingTrends => 'Uitgavetrends';
+
+  @override
+  String get dailyBurnRate => 'Dagelijkse Uitgaven';
+
+  @override
+  String get projectedTotal => 'Verwacht Totaal';
+
+  @override
+  String get budgetStatusOnTrack => 'Binnen Budget';
+
+  @override
+  String get budgetStatusOver => 'Budget Overschreden';
+
+  @override
+  String get budgetStatusWarning => 'Hoge Uitgavesnelheid';
+
+  @override
+  String get compareTrips => 'Reizen Vergelijken';
+
+  @override
+  String get selectTripsToCompare => 'Selecteer Reizen om te Vergelijken';
+
+  @override
+  String get selectAtLeastTwoTrips => 'Selecteer minimaal 2 reizen';
+
+  @override
+  String get comparisonSummary => 'Vergelijkingsoverzicht';
+
+  @override
+  String get budgetEfficiency => 'Budgetstatus';
+
+  @override
+  String get packingReadiness => 'Inpakvoortgang';
+
+  @override
+  String get lowestDailyCost => 'Meest Economisch';
+
+  @override
+  String get highestSpending => 'Hoogste Uitgave';
+
+  @override
+  String get sharedTrip => 'Gedeelde Reis';
+
+  @override
+  String get shareTripInvite => 'Reisgenoten Uitnodigen';
+
+  @override
+  String get joinSharedTrip => 'Deelnemen aan Reis';
+
+  @override
+  String get inviteCode => 'Uitnodigingscode';
+
+  @override
+  String get enterInviteCode => 'Voer 6-tekencode in';
+
+  @override
+  String get collaborators => 'Reisgenoten';
+
+  @override
+  String get copyCode => 'Code Kopiëren';
+
+  @override
+  String get codeCopied => 'Uitnodigingscode gekopieerd';
+
+  @override
+  String get invalidInviteCode => 'Ongeldige of verlopen code';
+
+  @override
+  String get joinSuccess => 'Succesvol deelgenomen!';
+
+  @override
+  String get shareTrip => 'Reis Delen';
+
+  @override
+  String get shareChecklist => 'Inpaklijst Delen';
+
+  @override
+  String get shareBudget => 'Budget Delen';
+
+  @override
+  String get shareTripSummary => 'Bekijk mijn reisplan op PackBuddy!';
+
+  @override
+  String get shareCopied => 'Reisgegevens gekopieerd';
+
+  @override
+  String get tripMap => 'Reiskaart & Route';
+
+  @override
+  String get openInMaps => 'Openen in Kaarten';
+
+  @override
+  String get openInGoogleMaps => 'Openen in Google Maps';
+
+  @override
+  String get openInAppleMaps => 'Openen in Apple Kaarten';
+
+  @override
+  String get waypoints => 'Routestops';
+
+  @override
+  String get addWaypoint => 'Stop Toevoegen';
+
+  @override
+  String get waypointName => 'Plaats / Hotel / Bezienswaardigheid';
+
+  @override
+  String get noWaypoints => 'Nog geen stops toegevoegd';
+
+  @override
+  String get widgetSettings => 'Beginschermwidget';
+
+  @override
+  String get widgetPreview => 'Widgetvoorbeeld';
+
+  @override
+  String get showCountdown => 'Aftellen Weergeven';
+
+  @override
+  String get showPackingProgress => 'Inpakvoortgang Weergeven';
+
+  @override
+  String get showBudgetData => 'Budgetoverzicht Weergeven';
+
+  @override
+  String get widgetSizeSmall => 'Klein';
+
+  @override
+  String get widgetSizeMedium => 'Middel';
+
+  @override
+  String get widgetSizeLarge => 'Groot';
+
+  @override
+  String get onboardingTitle1 => 'Moeiteloos Reizen Plannen';
+
+  @override
+  String get onboardingDesc1 =>
+      'Beheer budgetten in meerdere valuta\'s en volg dagelijkse uitgaven overal ter wereld.';
+
+  @override
+  String get onboardingTitle2 => 'Slimme Inpaklijsten';
+
+  @override
+  String get onboardingDesc2 =>
+      'Bagagerichtlijnen en slimme sjablonen voorkomen dat u iets vergeet.';
+
+  @override
+  String get onboardingTitle3 => 'Samen Reizen';
+
+  @override
+  String get onboardingDesc3 =>
+      'Deel plannen en lijsten met familie en vrienden via eenvoudige codes.';
+
+  @override
+  String get onboardingTitle4 => 'Veilige Offline Kluis';
+
+  @override
+  String get onboardingDesc4 =>
+      'Bewaar paspoorten en instapkaarten versleuteld zonder internet.';
+
+  @override
+  String get getStarted => 'Aan de slag';
+
+  @override
+  String get skip => 'Overslaan';
+
+  @override
+  String get next => 'Volgende';
+
+  @override
+  String get replayTour => 'App-tour Opnieuw Bekijken';
+
+  @override
+  String get signInWithApple => 'Inloggen met Apple';
+
+  @override
+  String get appleSignInFailed => 'Inloggen met Apple mislukt';
+
+  @override
+  String get total => 'Totaal';
+
+  @override
+  String get totalSpent => 'Totaal Uitgegeven';
+
+  @override
+  String get confirm => 'Bevestigen';
 }

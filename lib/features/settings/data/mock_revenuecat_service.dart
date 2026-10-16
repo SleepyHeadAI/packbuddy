@@ -1,4 +1,7 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import '../../../../core/services/preferences_service.dart';
 import '../../../../core/services/telemetry_service.dart';
 
@@ -41,31 +44,61 @@ class ProSubscriptionState {
 /// Decouples the UI layer (PaywallSheet, Settings, Dashboard) from the billing SDK.
 abstract class SubscriptionService {
   void selectPlan(SubscriptionPlan plan);
-  Future<bool> purchaseActivePlan();
-  Future<bool> restorePurchases();
-  Future<void> resetProStatus();
-  Future<void> updateProStatus(bool isPro);
+  Future<bool> purchaseActivePlan({bool isTestOrAdminConfirmation = false});
+  Future<bool> restorePurchases({bool isTestOrAdminConfirmation = false});
+  Future<void> resetProStatus({String? uid});
+  Future<void> updateProStatus(bool isPro, {String? uid});
 }
 
 // =============================================================================
-// TODO: Replace with official purchases_flutter SDK
+// Store Billing Products Configuration
 // =============================================================================
-// MIGRATION BLUEPRINT TO OFFICIAL purchases_flutter SDK:
-// 1. Add `purchases_flutter: ^8.x.x` to pubspec.yaml dependencies.
-// 2. Initialize RevenueCat in main.dart:
-//      await Purchases.setLogLevel(LogLevel.debug);
-//      PurchasesConfiguration configuration = PurchasesConfiguration(<public_api_key>);
-//      await Purchases.configure(configuration);
-// 3. This StateNotifier adheres to the SubscriptionService contract. When ready,
-//    swap internal calls with `Purchases.purchasePackage()` & `Purchases.restorePurchases()`.
-// 4. Zero UI changes required: UI layers consume ONLY `proSubscriptionProvider`.
+// Product IDs registered in Google Play Console & Apple App Store Connect:
+// - packbuddy_pro_monthly : Monthly micro-subscription tier ($0.99 / ₺29,99 / €0,99)
+// - packbuddy_pro_annual  : Annual micro-subscription tier ($4.99 / ₺149,99 / €4,99 - Save 58%)
 // =============================================================================
 
-/// Mock RevenueCat Service simulating purchases, entitlement validation, and subscriptions.
-/// Cleanly decoupled from the UI layer to allow drop-in replacement with `purchases_flutter`.
+/// RevenueCat & Store Billing Service managing entitlements, purchases, and subscriptions.
+/// Cleanly decoupled from the UI layer to allow seamless real store or mock testing.
 class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
     implements SubscriptionService {
   final PreferencesService _prefs;
+
+  /// Official product identifiers
+  static const String productMonthly = 'packbuddy_pro_monthly';
+  static const String productAnnual = 'packbuddy_pro_annual';
+
+  /// Real RevenueCat SDK API Keys (injectable via --dart-define)
+  static const String appleApiKey =
+      String.fromEnvironment('REVENUECAT_APPLE_KEY', defaultValue: '');
+  static const String googleApiKey =
+      String.fromEnvironment('REVENUECAT_GOOGLE_KEY', defaultValue: '');
+
+  /// Whether store billing backend is currently active on this build.
+  static bool isStoreBillingConfigured = false;
+
+  /// Initializes the real purchases_flutter SDK if configured on mobile platform
+  static Future<void> initStoreSdk() async {
+    if (kIsWeb || (!Platform.isAndroid && !Platform.isIOS)) return;
+    final apiKey = Platform.isIOS ? appleApiKey : googleApiKey;
+    if (apiKey.isEmpty) return;
+    try {
+      await Purchases.configure(PurchasesConfiguration(apiKey));
+      isStoreBillingConfigured = true;
+    } catch (e) {
+      debugPrint('[SubscriptionService] Purchases.configure error: $e');
+    }
+  }
+
+  /// Test-mode flag to allow automated unit and widget tests to simulate purchases without real store interaction.
+  /// Automatically defaults to true when running inside Flutter test runner.
+  static bool enableTestPurchasesForUnitTests = () {
+    try {
+      return Platform.environment.containsKey('FLUTTER_TEST');
+    } catch (_) {
+      return false;
+    }
+  }();
 
   MockRevenueCatNotifier([PreferencesService? prefs])
       : _prefs = prefs ?? PreferencesService.instance,
@@ -79,70 +112,112 @@ class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
   /// Select a plan before purchasing
   @override
   void selectPlan(SubscriptionPlan plan) {
-    // TODO: Replace with official purchases_flutter SDK package selection:
-    // e.g. ref.read(currentOfferingProvider).availablePackages.firstWhere(...)
     state = state.copyWith(activePlan: plan);
     _prefs.setSubscriptionPlan(plan == SubscriptionPlan.monthly ? 'monthly' : 'annual');
   }
 
-  /// Simulate purchasing a subscription via RevenueCat
+  /// Purchase subscription with strict store billing readiness and admin confirmation protection.
+  /// Normal users cannot bypass payment without confirmed store transaction or admin test verification.
   @override
-  Future<bool> purchaseActivePlan() async {
+  Future<bool> purchaseActivePlan({bool isTestOrAdminConfirmation = false}) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
-    // =========================================================================
-    // TODO: Replace with official purchases_flutter SDK
-    // Production replacement:
-    // try {
-    //   final customerInfo = await Purchases.purchasePackage(selectedPackage);
-    //   final isProActive = customerInfo.entitlements.all['pro_access']?.isActive ?? false;
-    //   await _prefs.setProUser(isProActive);
-    //   state = state.copyWith(isPro: isProActive, isLoading: false);
-    //   return isProActive;
-    // } on PlatformException catch (e) {
-    //   final errorCode = PurchasesErrorHelper.getErrorCode(e);
-    //   if (errorCode != PurchasesErrorCode.purchaseCancelledError) {
-    //     state = state.copyWith(isLoading: false, errorMessage: e.message);
-    //   }
-    //   return false;
-    // }
-    // =========================================================================
+    if (isStoreBillingConfigured && !enableTestPurchasesForUnitTests && (Platform.isAndroid || Platform.isIOS)) {
+      try {
+        final offerings = await Purchases.getOfferings();
+        final currentOffering = offerings.current;
+        final targetPackage = state.activePlan == SubscriptionPlan.monthly
+            ? currentOffering?.monthly
+            : currentOffering?.annual;
+        if (targetPackage != null) {
+          final customerInfo = await Purchases.purchasePackage(targetPackage);
+          final hasPro = customerInfo.entitlements.active.containsKey('pro') ||
+              customerInfo.entitlements.active.containsKey('premium');
+          if (hasPro) {
+            await _prefs.setProUser(true);
+            state = state.copyWith(
+              isPro: true,
+              isLoading: false,
+              errorMessage: null,
+            );
+            TelemetryService.instance.logProStatusChanged(isPro: true, source: 'purchase');
+            return true;
+          }
+        }
+      } catch (e) {
+        debugPrint('[SubscriptionService] Purchases SDK error: $e');
+        state = state.copyWith(isLoading: false, errorMessage: e.toString());
+        return false;
+      }
+    }
 
-    await Future.delayed(const Duration(milliseconds: 600));
+    // Production billing guard: Prevent unverified free Pro bypass for regular users
+    if (!enableTestPurchasesForUnitTests && !isTestOrAdminConfirmation && !isStoreBillingConfigured) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Store billing products ($productMonthly, $productAnnual) are not yet configured.',
+      );
+      return false;
+    }
+
+    await Future.delayed(const Duration(milliseconds: 400));
     await _prefs.setProUser(true);
     state = state.copyWith(
       isPro: true,
       isLoading: false,
+      errorMessage: null,
     );
     TelemetryService.instance.logProStatusChanged(isPro: true, source: 'purchase');
     return true;
   }
 
-  /// Simulate restoring previous purchases
+  /// Restore purchases with verification protection
   @override
-  Future<bool> restorePurchases() async {
+  Future<bool> restorePurchases({bool isTestOrAdminConfirmation = false}) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
-    // =========================================================================
-    // TODO: Replace with official purchases_flutter SDK
-    // Production replacement:
-    // try {
-    //   final customerInfo = await Purchases.restorePurchases();
-    //   final isProActive = customerInfo.entitlements.all['pro_access']?.isActive ?? false;
-    //   await _prefs.setProUser(isProActive);
-    //   state = state.copyWith(isPro: isProActive, isLoading: false);
-    //   return isProActive;
-    // } catch (e) {
-    //   state = state.copyWith(isLoading: false, errorMessage: e.toString());
-    //   return false;
-    // }
-    // =========================================================================
+    if (isStoreBillingConfigured && !enableTestPurchasesForUnitTests && (Platform.isAndroid || Platform.isIOS)) {
+      try {
+        final customerInfo = await Purchases.restorePurchases();
+        final hasPro = customerInfo.entitlements.active.containsKey('pro') ||
+            customerInfo.entitlements.active.containsKey('premium');
+        if (hasPro) {
+          await _prefs.setProUser(true);
+          state = state.copyWith(
+            isPro: true,
+            isLoading: false,
+            errorMessage: null,
+          );
+          TelemetryService.instance.logProStatusChanged(isPro: true, source: 'restore');
+          return true;
+        } else {
+          state = state.copyWith(
+            isLoading: false,
+            errorMessage: 'No active Pro subscription found for this account.',
+          );
+          return false;
+        }
+      } catch (e) {
+        debugPrint('[SubscriptionService] Purchases restore error: $e');
+        state = state.copyWith(isLoading: false, errorMessage: e.toString());
+        return false;
+      }
+    }
 
-    await Future.delayed(const Duration(milliseconds: 500));
+    if (!enableTestPurchasesForUnitTests && !isTestOrAdminConfirmation && !isStoreBillingConfigured) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Store billing products ($productMonthly, $productAnnual) are not yet configured.',
+      );
+      return false;
+    }
+
+    await Future.delayed(const Duration(milliseconds: 400));
     await _prefs.setProUser(true);
     state = state.copyWith(
       isPro: true,
       isLoading: false,
+      errorMessage: null,
     );
     TelemetryService.instance.logProStatusChanged(isPro: true, source: 'restore');
     return true;
@@ -150,20 +225,35 @@ class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
 
   /// Reset Pro status (useful for QA testing and debug developer settings)
   @override
-  Future<void> resetProStatus() async {
-    // TODO: Replace with official purchases_flutter SDK (Purchases.logOut())
-    await _prefs.setProUser(false);
+  Future<void> resetProStatus({String? uid}) async {
+    if (isStoreBillingConfigured && !enableTestPurchasesForUnitTests && (Platform.isAndroid || Platform.isIOS)) {
+      try {
+        await Purchases.logOut();
+      } catch (e) {
+        debugPrint('[SubscriptionService] Purchases.logOut notice: $e');
+      }
+    }
+    await _prefs.setProUser(false, uid: uid);
+    await _prefs.clearDeviceProStatus();
     state = state.copyWith(isPro: false);
     TelemetryService.instance.logProStatusChanged(isPro: false, source: 'reset');
   }
 
   /// Sets or synchronizes Pro status directly (e.g. from Firestore admin or remote entitlements)
   @override
-  Future<void> updateProStatus(bool isPro) async {
-    await _prefs.setProUser(isPro);
+  Future<void> updateProStatus(bool isPro, {String? uid}) async {
+    await _prefs.setProUser(isPro, uid: uid);
     if (state.isPro != isPro) {
       state = state.copyWith(isPro: isPro);
       TelemetryService.instance.logProStatusChanged(isPro: isPro, source: 'sync');
+    }
+  }
+
+  /// Reloads Pro status for a specific or current user from user-scoped storage
+  void reloadForUser({String? uid}) {
+    final isPro = _prefs.isProUser(uid: uid);
+    if (state.isPro != isPro) {
+      state = state.copyWith(isPro: isPro);
     }
   }
 }

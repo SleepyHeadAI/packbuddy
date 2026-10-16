@@ -219,7 +219,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get annual => 'Hàng năm';
 
   @override
-  String get annualSave => 'Tiết kiệm 33%';
+  String get annualSave => 'Tiết kiệm 58%';
 
   @override
   String get subscribeNow => 'Tiếp tục với Pro';
@@ -1231,4 +1231,482 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get adminTotalStorage => 'Dung lượng kho';
+
+  @override
+  String get adminDefaultBanReason =>
+      'Vi phạm điều khoản dịch vụ của nền tảng.';
+
+  @override
+  String get adminPermanentBanTitle => 'Tài khoản bị đình chỉ vĩnh viễn';
+
+  @override
+  String get adminTemporaryBanTitle => 'Tài khoản bị đình chỉ tạm thời';
+
+  @override
+  String get adminAccountSuspendedNotice =>
+      'Quyền truy cập dịch vụ PackBuddy đã bị quản trị viên hạn chế.';
+
+  @override
+  String get adminPermanentBan => 'Khóa vĩnh viễn';
+
+  @override
+  String get adminTemporaryBan => 'Khóa tạm thời';
+
+  @override
+  String get adminBanReasonLabel => 'Lý do đình chỉ';
+
+  @override
+  String get adminBanExpiresAtLabel => 'Thời hạn đình chỉ đến';
+
+  @override
+  String get adminFeatureRestrictedNotice =>
+      'Hành động này bị quản trị viên hạn chế.';
+
+  @override
+  String get adminGeoAnalytics => 'Phân tích địa lý & hoạt động';
+
+  @override
+  String get adminPeriodLive => 'Trực tiếp (15p)';
+
+  @override
+  String get adminPeriodDaily => 'Hàng ngày (24g)';
+
+  @override
+  String get adminPeriodWeekly => 'Hàng tuần (7n)';
+
+  @override
+  String get adminPeriodMonthly => 'Hàng tháng (30n)';
+
+  @override
+  String get adminPeriodYearly => 'Hàng năm (365n)';
+
+  @override
+  String get adminNoActiveUsers =>
+      'Không có người dùng hoạt động trong khoảng thời gian này';
+
+  @override
+  String get adminFilterAll => 'Tất cả';
+
+  @override
+  String get adminFilterPro => 'Pro';
+
+  @override
+  String get adminFilterBanned => 'Đã khóa';
+
+  @override
+  String get adminFilterRestricted => 'Bị hạn chế';
+
+  @override
+  String get adminModerateUser => 'Kiểm duyệt người dùng';
+
+  @override
+  String get adminBanStatusLabel => 'Đình chỉ / Khóa tài khoản';
+
+  @override
+  String get adminUnbanned => 'Hoạt động';
+
+  @override
+  String get adminBan24h => '24 giờ';
+
+  @override
+  String get adminBan7d => '7 ngày';
+
+  @override
+  String get adminBan30d => '30 ngày';
+
+  @override
+  String get adminBanReasonHint => 'Lý do đình chỉ (tùy chọn)...';
+
+  @override
+  String get adminFeatureRestrictionsLabel => 'Hạn chế tính năng chi tiết';
+
+  @override
+  String get adminRestrictTripCreate => 'Hạn chế tạo chuyến đi';
+
+  @override
+  String get adminRestrictExpenseAdd => 'Hạn chế ghi chi tiêu';
+
+  @override
+  String get adminRestrictVaultUpload => 'Hạn chế tải lên két an toàn';
+
+  @override
+  String get adminRestrictCloudSync => 'Hạn chế đồng bộ đám mây';
+
+  @override
+  String get adminSaveChanges => 'Lưu thay đổi';
+
+  @override
+  String get adminChangesSaved => 'Đã lưu thay đổi kiểm duyệt thành công';
+
+  @override
+  String get adminSignOut => 'Đăng xuất';
+
+  @override
+  String get perMonth => '/tháng';
+
+  @override
+  String get perYear => '/năm';
+
+  @override
+  String get storeBillingRequiredTitle => 'Yêu cầu thanh toán qua cửa hàng';
+
+  @override
+  String get storeBillingRequiredMessage =>
+      'Thanh toán chính thức qua Google Play và App Store đang được kích hoạt cho bản dựng này. Không thể bỏ qua thanh toán để nhận miễn phí.';
+
+  @override
+  String get adminTestPurchaseTitle => 'Mua thử nghiệm quản trị viên / Sandbox';
+
+  @override
+  String get adminTestPurchaseMessage =>
+      'Bạn đã đăng nhập với tư cách Quản trị viên cấp cao. Bạn có muốn xác nhận và kích hoạt đăng ký thử nghiệm PackBuddy Pro không?';
+
+  @override
+  String get activateTestPro => 'Kích hoạt Pro (Thử nghiệm)';
+
+  @override
+  String get templateSummerTitle => 'Bãi biển & Nghỉ dưỡng mùa hè';
+
+  @override
+  String get templateSummerDesc =>
+      'Danh sách đồ đạc chuẩn bị cho biển, cát, nắng và thời tiết ấm áp';
+
+  @override
+  String get templateWinterTitle => 'Chuyến đi mùa đông & Trượt tuyết';
+
+  @override
+  String get templateWinterDesc =>
+      'Trang phục ấm áp và đồ bảo hộ cho khí hậu lạnh và khu trượt tuyết';
+
+  @override
+  String get templateBusinessTitle => 'Công tác & Hội nghị';
+
+  @override
+  String get templateBusinessDesc =>
+      'Hành lý chỉn chu cho các cuộc họp, hội thảo và chuyến công tác';
+
+  @override
+  String get templateCampingTitle => 'Khám phá thiên nhiên & Cắm trại';
+
+  @override
+  String get templateCampingDesc =>
+      'Trang thiết bị dã ngoại bền bỉ cho cắm trại lều và leo núi';
+
+  @override
+  String get templateCityTitle => 'Dạo chơi thành phố cuối tuần';
+
+  @override
+  String get templateCityDesc =>
+      'Balo gọn nhẹ và tiện lợi cho chuyến du lịch thành phố 2-3 ngày';
+
+  @override
+  String get vaultCloudBackupNotice =>
+      'Tài liệu được mã hóa và sao lưu lên đám mây để đồng bộ đa thiết bị, khôi phục tài khoản trong 15 ngày và đảm bảo an toàn.';
+
+  @override
+  String get deleteAccountTitle => 'Xóa tài khoản';
+
+  @override
+  String get deleteAccountConfirmationTitle =>
+      'Yêu cầu xóa tài khoản trong 15 ngày';
+
+  @override
+  String get deleteAccountConfirmationMessage =>
+      'Tài khoản, chuyến đi, chi phí và tài liệu trong két an toàn của bạn sẽ được lên lịch xóa vĩnh viễn sau 15 ngày.\n\n• Không đăng nhập trong 15 ngày để quá trình xóa hoàn tất.\n• Nếu bạn đăng nhập lại trong vòng 15 ngày, tài khoản và toàn bộ dữ liệu sẽ tự động được khôi phục.\n\nBạn có muốn tiếp tục không?';
+
+  @override
+  String get deleteAccountButton => 'Yêu cầu xóa trong 15 ngày';
+
+  @override
+  String get deleteAccountScheduledNotice =>
+      'Tài khoản của bạn đã được lên lịch xóa sau 15 ngày. Vui lòng không đăng nhập nếu bạn muốn xóa vĩnh viễn.';
+
+  @override
+  String get accountRestoredNotice =>
+      'Chào mừng bạn quay lại! Yêu cầu xóa tài khoản đã được hủy và toàn bộ dữ liệu đã được khôi phục.';
+
+  @override
+  String adminPendingDeletionBadge(int days) {
+    return 'Lên lịch xóa (còn $days ngày)';
+  }
+
+  @override
+  String get adminCancelDeletion => 'Hủy xóa tài khoản';
+
+  @override
+  String get adminPurgeNow => 'Xóa sạch dữ liệu ngay';
+
+  @override
+  String get adminPurgeConfirmTitle => 'Xóa vĩnh viễn dữ liệu người dùng?';
+
+  @override
+  String get adminPurgeConfirmMessage =>
+      'Hành động này sẽ xóa vĩnh viễn toàn bộ chuyến đi, chi phí, danh sách và tài liệu của người dùng này khỏi đám mây.';
+
+  @override
+  String get adminDeletionCancelled => 'Đã hủy xóa tài khoản thành công';
+
+  @override
+  String get adminDataPurged => 'Đã xóa sạch toàn bộ dữ liệu người dùng';
+
+  @override
+  String get adminVaultDocumentsTitle =>
+      'Tài liệu két an toàn đã tải lên (Kiểm tra / Quản trị)';
+
+  @override
+  String get adminNoDocumentsUploaded =>
+      'Chưa có tài liệu két an toàn nào được tải lên';
+
+  @override
+  String get adminInspectDocument => 'Kiểm tra';
+
+  @override
+  String get adminDeleteDocument => 'Xóa tài liệu';
+
+  @override
+  String get adminDeleteDocumentConfirm =>
+      'Bạn có chắc chắn muốn xóa vĩnh viễn tài liệu này khỏi két an toàn đám mây không?';
+
+  @override
+  String get adminDocumentDeleted => 'Quản trị viên đã xóa tài liệu thành công';
+
+  @override
+  String get adminDocumentPreviewTitle => 'Xem trước tài liệu';
+
+  @override
+  String get adminDocumentTypeImage => 'HÌNH ẢNH';
+
+  @override
+  String get adminDocumentTypePdf => 'PDF';
+
+  @override
+  String get emailVerifySpamFolderTip => 'Kiểm tra hộp thư rác / Quảng cáo';
+
+  @override
+  String get emailVerifySpamFolderDesc =>
+      'Nếu chưa nhận được liên kết, hãy kiểm tra thư mục spam để tìm email từ PackBuddy. Xác minh email giúp bảo vệ két an toàn của bạn.';
+
+  @override
+  String get emailVerifyAutoChecking =>
+      'Đang chờ liên kết xác minh... (tự động kiểm tra)';
+
+  @override
+  String get currencyConverter => 'Chuyển đổi tiền tệ';
+
+  @override
+  String get fromCurrency => 'Từ';
+
+  @override
+  String get toCurrency => 'Sang';
+
+  @override
+  String get exchangeRate => 'Tỷ giá hối đoái';
+
+  @override
+  String get liveRates => 'Tỷ giá trực tiếp';
+
+  @override
+  String get offlineRates => 'Tỷ giá ngoại tuyến';
+
+  @override
+  String get quickConvert => 'Chuyển đổi tiền tệ nhanh';
+
+  @override
+  String get refreshRates => 'Làm mới tỷ giá';
+
+  @override
+  String get budgetAnalytics => 'Phân tích ngân sách';
+
+  @override
+  String get categoryDistribution => 'Phân bổ theo danh mục';
+
+  @override
+  String get spendingTrends => 'Xu hướng chi tiêu';
+
+  @override
+  String get dailyBurnRate => 'Mức chi tiêu hàng ngày';
+
+  @override
+  String get projectedTotal => 'Tổng chi tiêu dự kiến';
+
+  @override
+  String get budgetStatusOnTrack => 'Đúng ngân sách';
+
+  @override
+  String get budgetStatusOver => 'Vượt ngân sách';
+
+  @override
+  String get budgetStatusWarning => 'Chi tiêu nhanh';
+
+  @override
+  String get compareTrips => 'So sánh chuyến đi';
+
+  @override
+  String get selectTripsToCompare => 'Chọn chuyến đi để so sánh';
+
+  @override
+  String get selectAtLeastTwoTrips => 'Chọn ít nhất 2 chuyến đi để so sánh';
+
+  @override
+  String get comparisonSummary => 'Tóm tắt so sánh';
+
+  @override
+  String get budgetEfficiency => 'Trạng thái ngân sách';
+
+  @override
+  String get packingReadiness => 'Mức độ sẵn sàng hành lý';
+
+  @override
+  String get lowestDailyCost => 'Tiết kiệm nhất';
+
+  @override
+  String get highestSpending => 'Chi tiêu nhiều nhất';
+
+  @override
+  String get sharedTrip => 'Chuyến đi chung';
+
+  @override
+  String get shareTripInvite => 'Mời bạn đồng hành';
+
+  @override
+  String get joinSharedTrip => 'Tham gia chuyến đi';
+
+  @override
+  String get inviteCode => 'Mã mời';
+
+  @override
+  String get enterInviteCode => 'Nhập mã 6 ký tự';
+
+  @override
+  String get collaborators => 'Bạn đồng hành';
+
+  @override
+  String get copyCode => 'Sao chép mã';
+
+  @override
+  String get codeCopied => 'Đã sao chép mã mời';
+
+  @override
+  String get invalidInviteCode => 'Mã mời không hợp lệ hoặc đã hết hạn';
+
+  @override
+  String get joinSuccess => 'Tham gia chuyến đi thành công!';
+
+  @override
+  String get shareTrip => 'Chia sẻ chuyến đi';
+
+  @override
+  String get shareChecklist => 'Chia sẻ danh sách';
+
+  @override
+  String get shareBudget => 'Chia sẻ ngân sách';
+
+  @override
+  String get shareTripSummary => 'Xem kế hoạch du lịch của tôi trên PackBuddy!';
+
+  @override
+  String get shareCopied => 'Đã sao chép chi tiết chuyến đi';
+
+  @override
+  String get tripMap => 'Bản đồ & Lộ trình';
+
+  @override
+  String get openInMaps => 'Mở trong Bản đồ';
+
+  @override
+  String get openInGoogleMaps => 'Mở trong Google Maps';
+
+  @override
+  String get openInAppleMaps => 'Mở trong Apple Maps';
+
+  @override
+  String get waypoints => 'Các điểm dừng';
+
+  @override
+  String get addWaypoint => 'Thêm điểm dừng';
+
+  @override
+  String get waypointName => 'Địa điểm / Khách sạn / Thắng cảnh';
+
+  @override
+  String get noWaypoints => 'Chưa có điểm dừng nào';
+
+  @override
+  String get widgetSettings => 'Tiện ích màn hình chính';
+
+  @override
+  String get widgetPreview => 'Xem trước tiện ích';
+
+  @override
+  String get showCountdown => 'Hiển thị đếm ngược';
+
+  @override
+  String get showPackingProgress => 'Hiển thị tiến độ đóng gói';
+
+  @override
+  String get showBudgetData => 'Hiển thị tóm tắt ngân sách';
+
+  @override
+  String get widgetSizeSmall => 'Nhỏ';
+
+  @override
+  String get widgetSizeMedium => 'Vừa';
+
+  @override
+  String get widgetSizeLarge => 'Lớn';
+
+  @override
+  String get onboardingTitle1 => 'Lập kế hoạch dễ dàng';
+
+  @override
+  String get onboardingDesc1 =>
+      'Quản lý ngân sách đa tiền tệ và theo dõi chi tiêu hàng ngày ở bất kỳ đâu trên thế giới.';
+
+  @override
+  String get onboardingTitle2 => 'Danh sách hành lý thông minh';
+
+  @override
+  String get onboardingDesc2 =>
+      'Quy định hành lý của hãng hàng không và các mẫu thông minh giúp bạn không bỏ quên đồ.';
+
+  @override
+  String get onboardingTitle3 => 'Đồng hành theo thời gian thực';
+
+  @override
+  String get onboardingDesc3 =>
+      'Chia sẻ kế hoạch chuyến đi và danh sách đồ với bạn bè bằng mã mời đơn giản.';
+
+  @override
+  String get onboardingTitle4 => 'Két an toàn ngoại tuyến';
+
+  @override
+  String get onboardingDesc4 =>
+      'Lưu trữ hộ chiếu và thẻ lên máy bay an toàn mà không cần mạng internet.';
+
+  @override
+  String get getStarted => 'Bắt đầu ngay';
+
+  @override
+  String get skip => 'Bỏ qua';
+
+  @override
+  String get next => 'Tiếp theo';
+
+  @override
+  String get replayTour => 'Xem lại hướng dẫn ứng dụng';
+
+  @override
+  String get signInWithApple => 'Đăng nhập bằng Apple';
+
+  @override
+  String get appleSignInFailed => 'Đăng nhập bằng Apple thất bại';
+
+  @override
+  String get total => 'Tổng cộng';
+
+  @override
+  String get totalSpent => 'Tổng chi tiêu';
+
+  @override
+  String get confirm => 'Xác nhận';
 }

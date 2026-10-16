@@ -177,8 +177,8 @@ void main() {
       expect(userDocRef.storedData!['isPremium'], isTrue);
     });
 
-    test('Writes isPremium: true to remote if user has local Pro membership', () async {
-      // 1. Arrange: User bought Pro locally
+    test('Enforces remote isPremium as source of truth and prevents local Pro contagion', () async {
+      // 1. Arrange: Stale device Pro flag was true from a previous user session
       await PreferencesService.instance.setProUser(true);
       expect(PreferencesService.instance.isProUser(), isTrue);
 
@@ -191,12 +191,13 @@ void main() {
 
       final authService = FirebaseAuthService(firestore: fakeFirestore);
 
-      // 2. Act:
+      // 2. Act: Different user logs in
       final isPro = await authService.syncUserProfile(testUser);
 
-      // 3. Assert: Remote is updated to true
-      expect(isPro, isTrue);
-      expect(userDocRef.storedData!['isPremium'], isTrue);
+      // 3. Assert: Account B is NOT contaminated, remote remains false, local scoped to user becomes false
+      expect(isPro, isFalse);
+      expect(userDocRef.storedData!['isPremium'], isFalse);
+      expect(PreferencesService.instance.isProUser(uid: testUser.uid), isFalse);
     });
 
     test('Initializes isPremium: false for new registered user', () async {

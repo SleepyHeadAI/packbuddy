@@ -222,7 +222,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get annual => 'Ежегодно';
 
   @override
-  String get annualSave => 'Скидка 33%';
+  String get annualSave => 'Скидка 58%';
 
   @override
   String get subscribeNow => 'Продолжить с Pro';
@@ -1234,4 +1234,482 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get adminTotalStorage => 'Хранилище сейфа';
+
+  @override
+  String get adminDefaultBanReason =>
+      'Нарушение условий обслуживания платформы.';
+
+  @override
+  String get adminPermanentBanTitle => 'Аккаунт заблокирован навсегда';
+
+  @override
+  String get adminTemporaryBanTitle => 'Аккаунт временно заблокирован';
+
+  @override
+  String get adminAccountSuspendedNotice =>
+      'Доступ к сервисам PackBuddy ограничен администратором.';
+
+  @override
+  String get adminPermanentBan => 'Постоянный бан';
+
+  @override
+  String get adminTemporaryBan => 'Временный бан';
+
+  @override
+  String get adminBanReasonLabel => 'Причина блокировки';
+
+  @override
+  String get adminBanExpiresAtLabel => 'Срок блокировки истекает';
+
+  @override
+  String get adminFeatureRestrictedNotice =>
+      'Это действие ограничено администратором.';
+
+  @override
+  String get adminGeoAnalytics => 'Географическая активность и аналитика';
+
+  @override
+  String get adminPeriodLive => 'Сейчас (15м)';
+
+  @override
+  String get adminPeriodDaily => 'За сутки (24ч)';
+
+  @override
+  String get adminPeriodWeekly => 'За неделю (7д)';
+
+  @override
+  String get adminPeriodMonthly => 'За месяц (30д)';
+
+  @override
+  String get adminPeriodYearly => 'За год (365д)';
+
+  @override
+  String get adminNoActiveUsers => 'Нет активных пользователей за этот период';
+
+  @override
+  String get adminFilterAll => 'Все';
+
+  @override
+  String get adminFilterPro => 'Pro';
+
+  @override
+  String get adminFilterBanned => 'Заблокированные';
+
+  @override
+  String get adminFilterRestricted => 'С ограничениями';
+
+  @override
+  String get adminModerateUser => 'Модерация пользователя';
+
+  @override
+  String get adminBanStatusLabel => 'Блокировка аккаунта / Бан';
+
+  @override
+  String get adminUnbanned => 'Разблокирован';
+
+  @override
+  String get adminBan24h => '24 часа';
+
+  @override
+  String get adminBan7d => '7 дней';
+
+  @override
+  String get adminBan30d => '30 дней';
+
+  @override
+  String get adminBanReasonHint => 'Причина блокировки (необязательно)...';
+
+  @override
+  String get adminFeatureRestrictionsLabel => 'Точечные ограничения функций';
+
+  @override
+  String get adminRestrictTripCreate => 'Ограничить создание поездок';
+
+  @override
+  String get adminRestrictExpenseAdd => 'Ограничить добавление расходов';
+
+  @override
+  String get adminRestrictVaultUpload => 'Ограничить загрузку документов';
+
+  @override
+  String get adminRestrictCloudSync => 'Ограничить синхронизацию с облаком';
+
+  @override
+  String get adminSaveChanges => 'Сохранить изменения';
+
+  @override
+  String get adminChangesSaved => 'Изменения модерации успешно сохранены';
+
+  @override
+  String get adminSignOut => 'Выйти';
+
+  @override
+  String get perMonth => '/ мес';
+
+  @override
+  String get perYear => '/ год';
+
+  @override
+  String get storeBillingRequiredTitle => 'Требуется биллинг магазина';
+
+  @override
+  String get storeBillingRequiredMessage =>
+      'Официальный биллинг Google Play и App Store в настоящее время активируется для этой сборки. Подписку нельзя активировать бесплатно.';
+
+  @override
+  String get adminTestPurchaseTitle =>
+      'Тестовая покупка администратора / Sandbox';
+
+  @override
+  String get adminTestPurchaseMessage =>
+      'Вы вошли как супер-администратор. Хотите подтвердить и активировать тестовую подписку PackBuddy Pro?';
+
+  @override
+  String get activateTestPro => 'Активировать Pro (Тест)';
+
+  @override
+  String get templateSummerTitle => 'Пляж и Летний Отпуск';
+
+  @override
+  String get templateSummerDesc =>
+      'Полный список вещей для моря, песка, солнца и теплого отдыха';
+
+  @override
+  String get templateWinterTitle => 'Зимний Отдых и Горные Лыжи';
+
+  @override
+  String get templateWinterDesc =>
+      'Теплая одежда и экипировка для холодных стран и горнолыжных курортов';
+
+  @override
+  String get templateBusinessTitle => 'Бизнес и Конференции';
+
+  @override
+  String get templateBusinessDesc =>
+      'Идеальный багаж для деловых встреч, конференций и командировок';
+
+  @override
+  String get templateCampingTitle => 'Природа и Кемпинг';
+
+  @override
+  String get templateCampingDesc =>
+      'Надежное снаряжение для палаточного лагеря, походов и треккинга';
+
+  @override
+  String get templateCityTitle => 'Выходные в Городе';
+
+  @override
+  String get templateCityDesc =>
+      'Удобный и компактный рюкзак для короткой поездки на 2-3 дня';
+
+  @override
+  String get vaultCloudBackupNotice =>
+      'Документы зашифрованы и сохраняются в облаке для синхронизации, 15-дневного восстановления и безопасности.';
+
+  @override
+  String get deleteAccountTitle => 'Удалить аккаунт';
+
+  @override
+  String get deleteAccountConfirmationTitle =>
+      'Запрос на удаление аккаунта через 15 дней';
+
+  @override
+  String get deleteAccountConfirmationMessage =>
+      'Ваш аккаунт, поездки, расходы и документы сейфа будут запланированы к окончательному удалению через 15 дней.\n\n• Не входите в аккаунт в течение 15 дней для завершения удаления.\n• При входе в течение 15 дней ваш аккаунт и данные будут автоматически восстановлены.\n\nПродолжить?';
+
+  @override
+  String get deleteAccountButton => 'Запросить удаление через 15 дней';
+
+  @override
+  String get deleteAccountScheduledNotice =>
+      'Ваш аккаунт запланирован к удалению через 15 дней. Не входите в аккаунт, если хотите удалить его навсегда.';
+
+  @override
+  String get accountRestoredNotice =>
+      'С возвращением! Запрос на удаление аккаунта отменен, а все данные восстановлены.';
+
+  @override
+  String adminPendingDeletionBadge(int days) {
+    return 'Запланировано к удалению (осталось $days дн.)';
+  }
+
+  @override
+  String get adminCancelDeletion => 'Отменить удаление';
+
+  @override
+  String get adminPurgeNow => 'Удалить данные сейчас';
+
+  @override
+  String get adminPurgeConfirmTitle => 'Удалить данные пользователя навсегда?';
+
+  @override
+  String get adminPurgeConfirmMessage =>
+      'Это немедленно и безвозвратно удалит все поездки, расходы, списки и документы сейфа пользователя.';
+
+  @override
+  String get adminDeletionCancelled => 'Удаление аккаунта успешно отменено';
+
+  @override
+  String get adminDataPurged => 'Все данные пользователя были навсегда удалены';
+
+  @override
+  String get adminVaultDocumentsTitle =>
+      'Загруженные документы сейфа (Проверка / Модерация)';
+
+  @override
+  String get adminNoDocumentsUploaded => 'Документы сейфа еще не загружены';
+
+  @override
+  String get adminInspectDocument => 'Проверить';
+
+  @override
+  String get adminDeleteDocument => 'Удалить документ';
+
+  @override
+  String get adminDeleteDocumentConfirm =>
+      'Вы уверены, что хотите навсегда удалить этот документ из облачного сейфа?';
+
+  @override
+  String get adminDocumentDeleted => 'Документ успешно удален администратором';
+
+  @override
+  String get adminDocumentPreviewTitle => 'Просмотр документов';
+
+  @override
+  String get adminDocumentTypeImage => 'ИЗОБРАЖЕНИЕ';
+
+  @override
+  String get adminDocumentTypePdf => 'PDF';
+
+  @override
+  String get emailVerifySpamFolderTip =>
+      'Проверьте папку «Спам» / «Промоакции»';
+
+  @override
+  String get emailVerifySpamFolderDesc =>
+      'Если письмо со ссылкой не пришло, проверьте папку спама от PackBuddy. Подтверждение почты защищает ваш облачный сейф.';
+
+  @override
+  String get emailVerifyAutoChecking =>
+      'Ожидание ссылки подтверждения... (автоматическая проверка)';
+
+  @override
+  String get currencyConverter => 'Конвертер валют';
+
+  @override
+  String get fromCurrency => 'Из';
+
+  @override
+  String get toCurrency => 'В';
+
+  @override
+  String get exchangeRate => 'Курс обмена';
+
+  @override
+  String get liveRates => 'Текущие курсы';
+
+  @override
+  String get offlineRates => 'Офлайн курсы';
+
+  @override
+  String get quickConvert => 'Быстрый конвертер валют';
+
+  @override
+  String get refreshRates => 'Обновить курсы';
+
+  @override
+  String get budgetAnalytics => 'Аналитика бюджета';
+
+  @override
+  String get categoryDistribution => 'Распределение по категориям';
+
+  @override
+  String get spendingTrends => 'Тренды расходов';
+
+  @override
+  String get dailyBurnRate => 'Дневной расход';
+
+  @override
+  String get projectedTotal => 'Прогноз расходов';
+
+  @override
+  String get budgetStatusOnTrack => 'В рамках бюджета';
+
+  @override
+  String get budgetStatusOver => 'Бюджет превышен';
+
+  @override
+  String get budgetStatusWarning => 'Высокий темп трат';
+
+  @override
+  String get compareTrips => 'Сравнить поездки';
+
+  @override
+  String get selectTripsToCompare => 'Выберите поездки для сравнения';
+
+  @override
+  String get selectAtLeastTwoTrips => 'Выберите не менее 2 поездок';
+
+  @override
+  String get comparisonSummary => 'Итоги сравнения';
+
+  @override
+  String get budgetEfficiency => 'Состояние бюджета';
+
+  @override
+  String get packingReadiness => 'Готовность багажа';
+
+  @override
+  String get lowestDailyCost => 'Самая экономная';
+
+  @override
+  String get highestSpending => 'Наибольшие траты';
+
+  @override
+  String get sharedTrip => 'Совместная поездка';
+
+  @override
+  String get shareTripInvite => 'Пригласить участников';
+
+  @override
+  String get joinSharedTrip => 'Присоединиться к поездке';
+
+  @override
+  String get inviteCode => 'Код приглашения';
+
+  @override
+  String get enterInviteCode => 'Введите 6-значный код';
+
+  @override
+  String get collaborators => 'Участники';
+
+  @override
+  String get copyCode => 'Копировать код';
+
+  @override
+  String get codeCopied => 'Код приглашения скопирован';
+
+  @override
+  String get invalidInviteCode => 'Неверный или устаревший код';
+
+  @override
+  String get joinSuccess => 'Вы успешно присоединились!';
+
+  @override
+  String get shareTrip => 'Поделиться поездкой';
+
+  @override
+  String get shareChecklist => 'Поделиться списком';
+
+  @override
+  String get shareBudget => 'Поделиться бюджетом';
+
+  @override
+  String get shareTripSummary => 'Посмотрите мой план поездки в PackBuddy!';
+
+  @override
+  String get shareCopied => 'Данные поездки скопированы';
+
+  @override
+  String get tripMap => 'Карта и маршрут поездки';
+
+  @override
+  String get openInMaps => 'Открыть в картах';
+
+  @override
+  String get openInGoogleMaps => 'Открыть в Google Maps';
+
+  @override
+  String get openInAppleMaps => 'Открыть в Apple Maps';
+
+  @override
+  String get waypoints => 'Остановки маршрута';
+
+  @override
+  String get addWaypoint => 'Добавить остановку';
+
+  @override
+  String get waypointName => 'Место / Отель / Достопримечательность';
+
+  @override
+  String get noWaypoints => 'Остановки еще не добавлены';
+
+  @override
+  String get widgetSettings => 'Виджет на главном экране';
+
+  @override
+  String get widgetPreview => 'Предпросмотр виджета';
+
+  @override
+  String get showCountdown => 'Показывать обратный отсчет';
+
+  @override
+  String get showPackingProgress => 'Показывать прогресс сборов';
+
+  @override
+  String get showBudgetData => 'Показывать бюджет';
+
+  @override
+  String get widgetSizeSmall => 'Маленький';
+
+  @override
+  String get widgetSizeMedium => 'Средний';
+
+  @override
+  String get widgetSizeLarge => 'Большой';
+
+  @override
+  String get onboardingTitle1 => 'Легкое планирование поездок';
+
+  @override
+  String get onboardingDesc1 =>
+      'Управляйте мультивалютными бюджетами и ежедневными расходами в любой точке мира.';
+
+  @override
+  String get onboardingTitle2 => 'Умные списки вещей';
+
+  @override
+  String get onboardingDesc2 =>
+      'Правила авиакомпаний и шаблоны помогут ничего не забыть.';
+
+  @override
+  String get onboardingTitle3 => 'Путешествуйте вместе';
+
+  @override
+  String get onboardingDesc3 =>
+      'Делитесь планами и списками с друзьями по простому коду.';
+
+  @override
+  String get onboardingTitle4 => 'Безопасный офлайн-сейф';
+
+  @override
+  String get onboardingDesc4 =>
+      'Храните паспорта и билеты зашифрованными без интернета.';
+
+  @override
+  String get getStarted => 'Начать';
+
+  @override
+  String get skip => 'Пропустить';
+
+  @override
+  String get next => 'Далее';
+
+  @override
+  String get replayTour => 'Повторить тур';
+
+  @override
+  String get signInWithApple => 'Войти с Apple';
+
+  @override
+  String get appleSignInFailed => 'Сбой входа с Apple';
+
+  @override
+  String get total => 'Всего';
+
+  @override
+  String get totalSpent => 'Всего потрачено';
+
+  @override
+  String get confirm => 'Подтвердить';
 }

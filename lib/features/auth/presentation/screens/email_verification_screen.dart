@@ -39,7 +39,7 @@ class _EmailVerificationScreenState
 
   void _startPeriodicCheck() {
     _autoCheckTimer?.cancel();
-    _autoCheckTimer = Timer.periodic(const Duration(seconds: 4), (_) async {
+    _autoCheckTimer = Timer.periodic(const Duration(seconds: 3), (_) async {
       if (!mounted) return;
       final isVerified =
           await ref.read(authControllerProvider.notifier).reloadUser();
@@ -232,7 +232,11 @@ class _EmailVerificationScreenState
 
                   // 3. Informational Instruction Card
                   _buildInstructionCard(isDark, l10n),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
+
+                  // 3.5 Spam / Promotions Folder Guidance Card
+                  _buildSpamFolderTipCard(isDark, l10n),
+                  const SizedBox(height: 20),
 
                   // 4. Polling Status Badge
                   _buildPollerIndicator(isDark, l10n),
@@ -287,15 +291,19 @@ class _EmailVerificationScreenState
                                       : Colors.white,
                                 ),
                                 const SizedBox(width: 8),
-                                Text(
-                                  l10n.emailVerifyCheckNow,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: -0.2,
-                                    color: isDark
-                                        ? AppColors.onPrimaryDark
-                                        : Colors.white,
+                                Flexible(
+                                  child: Text(
+                                    l10n.emailVerifyCheckNow,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: -0.2,
+                                      color: isDark
+                                          ? AppColors.onPrimaryDark
+                                          : Colors.white,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -570,6 +578,67 @@ class _EmailVerificationScreenState
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Guidance card helping traveler find email in Spam or Promotions folders
+  Widget _buildSpamFolderTipCard(bool isDark, AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark
+            ? const Color(0xFF1E293B).withValues(alpha: 0.6)
+            : const Color(0xFFFFFBEB),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.mark_as_unread_rounded,
+              size: 20,
+              color: Color(0xFFD97706),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.emailVerifySpamFolderTip,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFFD97706),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  l10n.emailVerifySpamFolderDesc,
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 1.4,
+                    color: isDark
+                        ? AppColors.onSurfaceVariantDark
+                        : const Color(0xFF78350F),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

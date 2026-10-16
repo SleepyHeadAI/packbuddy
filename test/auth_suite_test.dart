@@ -132,6 +132,19 @@ class MockAuthService implements AuthService {
   }
 
   @override
+  Future<UserCredential?> signInWithApple() async {
+    final user = FakeUser(
+      uid: 'uid-apple-789',
+      email: 'traveler@privaterelay.appleid.com',
+      displayName: 'Apple Traveler',
+      emailVerified: true,
+      providerData: [FakeUserInfo(providerId: 'apple.com')],
+    );
+    emitUser(user);
+    return FakeUserCredential(user: user);
+  }
+
+  @override
   Future<void> signOut() async {
     emitUser(null);
   }
@@ -156,6 +169,15 @@ class MockAuthService implements AuthService {
     syncedUser = user;
     return false;
   }
+
+  @override
+  Future<void> updateLastActive(String uid) async {}
+
+  @override
+  void Function(String uid)? onAccountRestoredFromDeletion;
+
+  @override
+  Future<void> requestAccountDeletion(String uid) async {}
 
   void dispose() {
     _controller.close();

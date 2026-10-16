@@ -9,7 +9,11 @@ import 'package:packbuddy/features/budget/domain/country.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/budget/presentation/screens/trip_detail_screen.dart';
+import 'package:packbuddy/features/budget/presentation/screens/trip_comparison_screen.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/add_trip_sheet.dart';
+import 'package:packbuddy/features/budget/presentation/screens/widgets/share_trip_sheet.dart';
+import 'package:packbuddy/features/budget/presentation/widgets/trip_map_preview.dart';
+import 'package:packbuddy/shared/widgets/app_animations.dart';
 
 /// Trips Overview Screen listing upcoming and past trips
 class TripsScreen extends ConsumerWidget {
@@ -147,6 +151,22 @@ class TripsScreen extends ConsumerWidget {
               }
             },
           ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.compare_arrows_rounded),
+              tooltip: l10n.compareTrips,
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const TripComparisonScreen()),
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.group_add_rounded),
+              tooltip: l10n.joinSharedTrip,
+              onPressed: () => JoinTripDialog.show(context),
+            ),
+          ],
         ),
         floatingActionButton: FloatingActionButton.extended(
           heroTag: null,
@@ -206,16 +226,18 @@ class TripsScreen extends ConsumerWidget {
                     final country = Country.findByCode(trip.countryCode);
                     final transportIcon = getTransportIcon(trip.transportMode);
 
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 14),
-                      child: AppCard(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => TripDetailScreen(trip: trip),
-                            ),
-                          );
-                        },
+                    return AppFadeSlide(
+                      delay: Duration(milliseconds: (35 * index).clamp(0, 250)),
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: AppCard(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => TripDetailScreen(trip: trip),
+                              ),
+                            );
+                          },
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -420,10 +442,70 @@ class TripsScreen extends ConsumerWidget {
                                 ],
                               ],
                             ),
+                            const SizedBox(height: 10),
+                            Divider(
+                              height: 1,
+                              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.25),
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                if (trip.isShared) ...[
+                                  Flexible(
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.people_alt_rounded, size: 12, color: theme.colorScheme.primary),
+                                          const SizedBox(width: 4),
+                                          Flexible(
+                                            child: Text(
+                                              l10n.sharedTrip,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w700,
+                                                color: theme.colorScheme.primary,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ] else
+                                  const SizedBox.shrink(),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.share_rounded, size: 18),
+                                      tooltip: l10n.shareTrip,
+                                      visualDensity: VisualDensity.compact,
+                                      onPressed: () => ShareTripSheet.show(context, trip),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.map_rounded, size: 18),
+                                      tooltip: l10n.tripMap,
+                                      visualDensity: VisualDensity.compact,
+                                      onPressed: () => TripMapSheet.show(context, trip: trip),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
-                    );
+                    ),
+                  );
                   },
                 ),
       ),

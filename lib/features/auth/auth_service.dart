@@ -5,7 +5,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../core/services/preferences_service.dart';
+import '../../core/services/currency_service.dart';
 
 /// Contract defining authentication operations for PackBuddy
 abstract class AuthService {
@@ -30,6 +32,9 @@ abstract class AuthService {
   /// Authenticate using Google OAuth
   Future<UserCredential?> signInWithGoogle();
 
+  /// Authenticate using Apple Sign-In (Feature F-15)
+  Future<UserCredential?> signInWithApple();
+
   /// Sign out current user from all providers
   Future<void> signOut();
 
@@ -42,6 +47,16 @@ abstract class AuthService {
   /// Upsert user profile document in Firestore at `users/{uid}` for admin dashboard & reporting
   /// Returns the effective `isPremium` status.
   Future<bool> syncUserProfile(User user);
+
+  /// Callback invoked when an account with pending deletion is recovered upon login
+  void Function(String uid)? get onAccountRestoredFromDeletion;
+  set onAccountRestoredFromDeletion(void Function(String uid)? callback);
+
+  /// Schedules account for deletion in 15 days
+  Future<void> requestAccountDeletion(String uid);
+
+  /// Updates lastActiveAt timestamp for current user in Firestore
+  Future<void> updateLastActive(String uid);
 }
 
 /// Firebase implementation of [AuthService]
@@ -49,6 +64,9 @@ class FirebaseAuthService implements AuthService {
   FirebaseAuth? _auth;
   final GoogleSignIn _googleSignIn;
   final FirebaseFirestore? _firestore;
+
+  @override
+  void Function(String uid)? onAccountRestoredFromDeletion;
 
   static const String _defaultServerClientId =
       '719651073535-34t98obhv0kcpifa6f29tme61s04o2jm.apps.googleusercontent.com';
@@ -136,8 +154,13 @@ class FirebaseAuthService implements AuthService {
         password: password,
       );
 
-      // Automatically dispatch email verification
+      // Automatically dispatch email verification with localized language code
       try {
+        final activeLocale = PreferencesService.instance.getLocale();
+        final langCode = activeLocale?.languageCode ?? 'en';
+        try {
+          await _firebaseAuth.setLanguageCode(langCode);
+        } catch (_) {}
         await credential.user?.sendEmailVerification();
       } catch (verificationError) {
         debugPrint('[FirebaseAuthService] sendEmailVerification warning: $verificationError');
@@ -191,6 +214,42 @@ class FirebaseAuthService implements AuthService {
   }
 
   @override
+  Future<UserCredential?> signInWithApple() async {
+    try {
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final OAuthProvider oAuthProvider = OAuthProvider('apple.com');
+      final AuthCredential credential = oAuthProvider.credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      final userCredential = await _firebaseAuth.signInWithCredential(credential);
+      if (userCredential.user != null) {
+        unawaited(syncUserProfile(userCredential.user!));
+      }
+      return userCredential;
+    } on SignInWithAppleAuthorizationException catch (e) {
+      if (e.code == AuthorizationErrorCode.canceled) {
+        return null;
+      }
+      debugPrint('[FirebaseAuthService] Apple Sign-In authorization error: $e');
+      rethrow;
+    } catch (e, stackTrace) {
+      debugPrint('[FirebaseAuthService] Apple Sign-In exception: $e\n$stackTrace');
+      throw FirebaseAuthException(
+        code: 'apple-sign-in-failed',
+        message: e.toString(),
+      );
+    }
+  }
+
+  @override
   Future<void> signOut() async {
     try {
       await Future.wait([
@@ -210,6 +269,11 @@ class FirebaseAuthService implements AuthService {
     try {
       final user = _firebaseAuth.currentUser;
       if (user != null && !user.emailVerified) {
+        final activeLocale = PreferencesService.instance.getLocale();
+        final langCode = activeLocale?.languageCode ?? 'en';
+        try {
+          await _firebaseAuth.setLanguageCode(langCode);
+        } catch (_) {}
         await user.sendEmailVerification();
       }
     } on FirebaseAuthException {
@@ -245,7 +309,7 @@ class FirebaseAuthService implements AuthService {
   Future<bool> syncUserProfile(User user) async {
     try {
       if (!_isFirebaseReady && _firestore == null) {
-        return PreferencesService.instance.isProUser();
+        return PreferencesService.instance.isProUser(uid: user.uid);
       }
       final firestore = _firestore ?? FirebaseFirestore.instance;
 
@@ -295,20 +359,111 @@ class FirebaseAuthService implements AuthService {
 
       final bool remoteExists = existingDoc?.exists ?? false;
       final remoteData = existingDoc?.data();
-      final localIsPro = PreferencesService.instance.isProUser();
 
+      // STRICT MULTI-ACCOUNT ISOLATION (Phase 1):
+      // Remote Firestore document is the single source of truth for authenticated users.
+      // Brand-new users MUST ALWAYS initialize with isPremium: false.
+      // NEVER promote a new or different account from a stale local device flag!
       bool effectiveIsPremium = false;
-      if (remoteExists && remoteData != null && remoteData['isPremium'] == true) {
-        // Remote is true (e.g. granted by Admin): preserve true and unlock locally
-        effectiveIsPremium = true;
-        await PreferencesService.instance.setProUser(true);
-      } else if (localIsPro) {
-        // Local has Pro (e.g. user bought subscription locally): write true to remote
-        effectiveIsPremium = true;
+      if (remoteExists && remoteData != null && remoteData.containsKey('isPremium')) {
+        effectiveIsPremium = remoteData['isPremium'] == true;
       } else {
-        // Neither remote nor local is Pro (first time creation or non-pro user)
         effectiveIsPremium = false;
       }
+      await PreferencesService.instance.setProUser(effectiveIsPremium, uid: user.uid);
+
+      // AUTO-DETECT COUNTRY & DEFAULT CURRENCY (Phase 2):
+      final remoteCountryCode = remoteData?['countryCode'] as String?;
+      final remoteCountryName = remoteData?['countryName'] as String?;
+      final remoteCurrencyCode = remoteData?['currencyCode'] as String?;
+      final hasManualCurrency = PreferencesService.instance.hasUserSelectedCurrency(uid: user.uid);
+
+      String countryCode = remoteCountryCode ?? '';
+      String countryName = remoteCountryName ?? '';
+      String currencyCode = remoteCurrencyCode ?? '';
+
+      if (hasManualCurrency) {
+        currencyCode = PreferencesService.instance.getDefaultCurrency(uid: user.uid) ??
+            (currencyCode.isNotEmpty ? currencyCode : 'USD');
+      } else if (currencyCode.isEmpty) {
+        final detected = CountryDetector.detectCountry();
+        countryCode = detected.code;
+        countryName = detected.name;
+        currencyCode = detected.defaultCurrency;
+        await PreferencesService.instance.setDefaultCurrency(currencyCode, uid: user.uid);
+        await PreferencesService.instance.setCountryCode(countryCode, uid: user.uid);
+        await PreferencesService.instance.setCountryName(countryName, uid: user.uid);
+      } else {
+        await PreferencesService.instance.setDefaultCurrency(currencyCode, uid: user.uid);
+        if (countryCode.isNotEmpty) {
+          await PreferencesService.instance.setCountryCode(countryCode, uid: user.uid);
+        }
+        if (countryName.isNotEmpty) {
+          await PreferencesService.instance.setCountryName(countryName, uid: user.uid);
+        }
+      }
+
+      if (countryCode.isEmpty) {
+        final detected = CountryDetector.detectCountry();
+        countryCode = detected.code;
+        countryName = detected.name;
+      }
+
+      // 15-DAY GRACE PERIOD DELETION & AUTO-RECOVERY CHECK
+      final remoteDeletionStatus = remoteData?['deletionStatus'] as String? ?? 'none';
+      final remoteScheduledDeletion = remoteData?['scheduledPermanentDeletionAt'] as String?;
+      if (remoteDeletionStatus == 'pending_deletion') {
+        DateTime? scheduledAt;
+        if (remoteScheduledDeletion != null) {
+          scheduledAt = DateTime.tryParse(remoteScheduledDeletion);
+        }
+        final nowUtc = DateTime.now().toUtc();
+        if (scheduledAt != null && nowUtc.isAfter(scheduledAt)) {
+          // 15 Days Expired: Permanently purge all user collections in Firestore
+          try {
+            final collections = ['trips', 'expenses', 'checklist_items', 'documents'];
+            for (final coll in collections) {
+              final snap = await firestore.collection(coll).where('user_id', isEqualTo: user.uid).get();
+              for (final doc in snap.docs) {
+                await doc.reference.delete();
+              }
+            }
+          } catch (e) {
+            debugPrint('[FirebaseAuthService] Error purging expired user data: $e');
+          }
+          await userDocRef.set({
+            'deletionStatus': 'none',
+            'deletionRequestedAt': null,
+            'scheduledPermanentDeletionAt': null,
+            'isPremium': false,
+            'totalVaultStorageBytes': 0,
+            'updatedAt': nowUtc.toIso8601String(),
+          }, SetOptions(merge: true));
+        } else {
+          // Within 15 Days: Auto-recovery
+          await userDocRef.set({
+            'deletionStatus': 'none',
+            'deletionRequestedAt': null,
+            'scheduledPermanentDeletionAt': null,
+            'updatedAt': nowUtc.toIso8601String(),
+          }, SetOptions(merge: true));
+          onAccountRestoredFromDeletion?.call(user.uid);
+        }
+      }
+
+      // MODERATION & BAN STATUS (Phase 3):
+      final banStatus = (remoteData?['banStatus'] as String?) ?? 'none';
+      final banExpiresAt = remoteData?['banExpiresAt'] as String?;
+      final banReason = remoteData?['banReason'] as String?;
+      final restrictedFeatures = (remoteData?['restrictedFeatures'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          <String>[];
+
+      await PreferencesService.instance.setBanStatus(banStatus, uid: user.uid);
+      await PreferencesService.instance.setBanExpiresAt(banExpiresAt, uid: user.uid);
+      await PreferencesService.instance.setBanReason(banReason, uid: user.uid);
+      await PreferencesService.instance.setRestrictedFeatures(restrictedFeatures, uid: user.uid);
 
       final remoteCreatedAt =
           remoteExists && remoteData != null ? remoteData['createdAt'] : null;
@@ -326,14 +481,53 @@ class FirebaseAuthService implements AuthService {
         'emailVerified': emailVerified,
         'createdAt': effectiveCreatedAt,
         'lastLoginAt': now,
+        'lastActiveAt': now,
         'isPremium': effectiveIsPremium,
+        'countryCode': countryCode,
+        'countryName': countryName,
+        'currencyCode': currencyCode,
+        'banStatus': banStatus,
+        'banExpiresAt': banExpiresAt,
+        'banReason': banReason,
+        'restrictedFeatures': restrictedFeatures,
       }, SetOptions(merge: true));
 
       return effectiveIsPremium;
     } catch (e) {
       debugPrint('[FirebaseAuthService] syncUserProfile notice: $e');
-      return PreferencesService.instance.isProUser();
+      return PreferencesService.instance.isProUser(uid: user.uid);
     }
+  }
+
+  @override
+  Future<void> requestAccountDeletion(String uid) async {
+    try {
+      final firestore = _firestore ?? (_isFirebaseReady ? FirebaseFirestore.instance : null);
+      if (firestore != null) {
+        final nowUtc = DateTime.now().toUtc();
+        final scheduledAt = nowUtc.add(const Duration(days: 15));
+        await firestore.collection('users').doc(uid).set({
+          'deletionStatus': 'pending_deletion',
+          'deletionRequestedAt': nowUtc.toIso8601String(),
+          'scheduledPermanentDeletionAt': scheduledAt.toIso8601String(),
+          'updatedAt': nowUtc.toIso8601String(),
+        }, SetOptions(merge: true));
+      }
+    } catch (e) {
+      debugPrint('[FirebaseAuthService] requestAccountDeletion error: $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updateLastActive(String uid) async {
+    try {
+      if (!_isFirebaseReady && _firestore == null) return;
+      final firestore = _firestore ?? FirebaseFirestore.instance;
+      await firestore.collection('users').doc(uid).set({
+        'lastActiveAt': DateTime.now().toIso8601String(),
+      }, SetOptions(merge: true));
+    } catch (_) {}
   }
 }
 

@@ -5,6 +5,7 @@ import '../../../../data/sync_engine/sync_engine.dart';
 import '../../../../core/services/telemetry_service.dart';
 import '../../domain/expense.dart';
 import '../../../../core/services/currency_service.dart';
+import '../../../../core/services/preferences_service.dart';
 
 /// State representation for expenses belonging to a specific trip
 class ExpenseState {
@@ -95,6 +96,12 @@ class ExpenseController extends StateNotifier<ExpenseState> {
     String? paymentMethod,
     String? notes,
   }) async {
+    // Feature restriction guard (Phase 3)
+    if (PreferencesService.instance.getRestrictedFeatures().contains('expense_add')) {
+      state = state.copyWith(errorMessage: 'restricted_expense_add');
+      return null;
+    }
+
     try {
       final trip = await _dbHelper.getTripById(_tripId);
       final tripCurrency = trip?.defaultCurrency ?? currency;

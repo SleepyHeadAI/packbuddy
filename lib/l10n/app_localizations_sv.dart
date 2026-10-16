@@ -222,7 +222,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get annual => 'Årsvis';
 
   @override
-  String get annualSave => 'Spara 33%';
+  String get annualSave => 'Spara 58%';
 
   @override
   String get subscribeNow => 'Fortsätt med Pro';
@@ -1229,4 +1229,480 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get adminTotalStorage => 'Valvlagring';
+
+  @override
+  String get adminDefaultBanReason => 'Brott mot plattformens användarvillkor.';
+
+  @override
+  String get adminPermanentBanTitle => 'Kontot permanent avstängt';
+
+  @override
+  String get adminTemporaryBanTitle => 'Kontot tillfälligt avstängt';
+
+  @override
+  String get adminAccountSuspendedNotice =>
+      'Åtkomst till PackBuddy-tjänster har begränsats av en administratör.';
+
+  @override
+  String get adminPermanentBan => 'Permanent avstängning';
+
+  @override
+  String get adminTemporaryBan => 'Tillfällig avstängning';
+
+  @override
+  String get adminBanReasonLabel => 'Anledning till avstängning';
+
+  @override
+  String get adminBanExpiresAtLabel => 'Avstängningen upphör';
+
+  @override
+  String get adminFeatureRestrictedNotice =>
+      'Denna åtgärd är begränsad av en administratör.';
+
+  @override
+  String get adminGeoAnalytics => 'Geografisk och aktivitetsanalys';
+
+  @override
+  String get adminPeriodLive => 'Realtid (15m)';
+
+  @override
+  String get adminPeriodDaily => 'Dagligen (24t)';
+
+  @override
+  String get adminPeriodWeekly => 'Veckovis (7d)';
+
+  @override
+  String get adminPeriodMonthly => 'Månadsvis (30d)';
+
+  @override
+  String get adminPeriodYearly => 'Årligen (365d)';
+
+  @override
+  String get adminNoActiveUsers => 'Inga aktiva användare under denna period';
+
+  @override
+  String get adminFilterAll => 'Alla';
+
+  @override
+  String get adminFilterPro => 'Pro';
+
+  @override
+  String get adminFilterBanned => 'Avstängda';
+
+  @override
+  String get adminFilterRestricted => 'Begränsade';
+
+  @override
+  String get adminModerateUser => 'Moderera användare';
+
+  @override
+  String get adminBanStatusLabel => 'Kontoavstängning / Spärr';
+
+  @override
+  String get adminUnbanned => 'Inte avstängd';
+
+  @override
+  String get adminBan24h => '24 timmar';
+
+  @override
+  String get adminBan7d => '7 dagar';
+
+  @override
+  String get adminBan30d => '30 dagar';
+
+  @override
+  String get adminBanReasonHint => 'Anledning till avstängning (valfritt)...';
+
+  @override
+  String get adminFeatureRestrictionsLabel =>
+      'Granulära funktionsbegränsningar';
+
+  @override
+  String get adminRestrictTripCreate => 'Begränsa skapande av resor';
+
+  @override
+  String get adminRestrictExpenseAdd => 'Begränsa registrering av utgifter';
+
+  @override
+  String get adminRestrictVaultUpload => 'Begränsa uppladdning till valv';
+
+  @override
+  String get adminRestrictCloudSync => 'Begränsa molnsynkronisering';
+
+  @override
+  String get adminSaveChanges => 'Spara ändringar';
+
+  @override
+  String get adminChangesSaved => 'Modereringsändringar har sparats';
+
+  @override
+  String get adminSignOut => 'Logga ut';
+
+  @override
+  String get perMonth => '/mån';
+
+  @override
+  String get perYear => '/år';
+
+  @override
+  String get storeBillingRequiredTitle => 'Butiksdebitering krävs';
+
+  @override
+  String get storeBillingRequiredMessage =>
+      'Officiell fakturering via Google Play och App Store aktiveras för denna version. Prenumerationer kan inte kringgås gratis.';
+
+  @override
+  String get adminTestPurchaseTitle => 'Admin / Sandbox testköp';
+
+  @override
+  String get adminTestPurchaseMessage =>
+      'Du är inloggad som superadministratör. Vill du bekräfta och aktivera PackBuddy Pro-testprenumerationen?';
+
+  @override
+  String get activateTestPro => 'Aktivera Pro (Test)';
+
+  @override
+  String get templateSummerTitle => 'Strand & Sommarsemester';
+
+  @override
+  String get templateSummerDesc =>
+      'Komplett packlista för sol, bad, strand och varma resmål';
+
+  @override
+  String get templateWinterTitle => 'Vinter- & Skidresa';
+
+  @override
+  String get templateWinterDesc =>
+      'Skyddande utrustning och varma lager för kalla klimat och skidorter';
+
+  @override
+  String get templateBusinessTitle => 'Affärsresa & Konferens';
+
+  @override
+  String get templateBusinessDesc =>
+      'Professionell packning för möten, konferenser och tjänsteresor';
+
+  @override
+  String get templateCampingTitle => 'Natur & Campingexpedition';
+
+  @override
+  String get templateCampingDesc =>
+      'Tålig utrustning för tältning, vandring och friluftsliv';
+
+  @override
+  String get templateCityTitle => 'Weekend i Stan';
+
+  @override
+  String get templateCityDesc =>
+      'Lätt och kompakt packning för en 2-3 dagars storstadshelg';
+
+  @override
+  String get vaultCloudBackupNotice =>
+      'Dokument krypteras och säkerhetskopieras till molnet för synkronisering mellan enheter, 15 dagars kontoåterställning och säkerhet.';
+
+  @override
+  String get deleteAccountTitle => 'Radera konto';
+
+  @override
+  String get deleteAccountConfirmationTitle =>
+      'Begäran om kontoradering inom 15 dagar';
+
+  @override
+  String get deleteAccountConfirmationMessage =>
+      'Ditt konto, dina resor, utgifter och valvdokument schemaläggs för permanent radering om 15 dagar.\n\n• Logga inte in under 15 dagar för att slutföra raderingen.\n• Om du loggar in inom 15 dagar återställs ditt konto och alla data automatiskt.\n\nVill du fortsätta?';
+
+  @override
+  String get deleteAccountButton => 'Begär 15 dagars radering';
+
+  @override
+  String get deleteAccountScheduledNotice =>
+      'Ditt konto har schemalagts för radering om 15 dagar. Logga inte in om du vill radera kontot permanent.';
+
+  @override
+  String get accountRestoredNotice =>
+      'Välkommen tillbaka! Din kontoradering avbröts och alla data har återställts.';
+
+  @override
+  String adminPendingDeletionBadge(int days) {
+    return 'Schemalagt för radering (${days}d kvar)';
+  }
+
+  @override
+  String get adminCancelDeletion => 'Avbryt radering';
+
+  @override
+  String get adminPurgeNow => 'Rensa data nu';
+
+  @override
+  String get adminPurgeConfirmTitle => 'Rensa användardata permanent?';
+
+  @override
+  String get adminPurgeConfirmMessage =>
+      'Detta raderar omedelbart och oåterkalleligt alla resor, utgifter, listor och valvdokument för denna användare.';
+
+  @override
+  String get adminDeletionCancelled => 'Kontoradering avbröts framgångsrikt';
+
+  @override
+  String get adminDataPurged => 'Alla användardata har rensats permanent';
+
+  @override
+  String get adminVaultDocumentsTitle =>
+      'Uppladdade valvdokument (Inspektera / Moderera)';
+
+  @override
+  String get adminNoDocumentsUploaded => 'Inga valvdokument har laddats upp än';
+
+  @override
+  String get adminInspectDocument => 'Inspektera';
+
+  @override
+  String get adminDeleteDocument => 'Radera dokument';
+
+  @override
+  String get adminDeleteDocumentConfirm =>
+      'Är du säker på att du vill radera detta dokument permanent från molnvalvet?';
+
+  @override
+  String get adminDocumentDeleted => 'Dokumentet raderades av administratören';
+
+  @override
+  String get adminDocumentPreviewTitle => 'Dokumentinspektör';
+
+  @override
+  String get adminDocumentTypeImage => 'BILD';
+
+  @override
+  String get adminDocumentTypePdf => 'PDF';
+
+  @override
+  String get emailVerifySpamFolderTip => 'Kontrollera skräppost / kampanjer';
+
+  @override
+  String get emailVerifySpamFolderDesc =>
+      'Om du inte har fått länken, kontrollera skräpposten efter ett e-postmeddelande från PackBuddy. Verifiering skyddar ditt molnvalv.';
+
+  @override
+  String get emailVerifyAutoChecking =>
+      'Väntar på verifieringslänk... (automatisk kontroll)';
+
+  @override
+  String get currencyConverter => 'Valutaomvandlare';
+
+  @override
+  String get fromCurrency => 'Från';
+
+  @override
+  String get toCurrency => 'Till';
+
+  @override
+  String get exchangeRate => 'Växelkurs';
+
+  @override
+  String get liveRates => 'Realtidskurser';
+
+  @override
+  String get offlineRates => 'Offline-kurser';
+
+  @override
+  String get quickConvert => 'Snabb valutaomvandlare';
+
+  @override
+  String get refreshRates => 'Uppdatera kurser';
+
+  @override
+  String get budgetAnalytics => 'Budgetanalys';
+
+  @override
+  String get categoryDistribution => 'Kategorifördelning';
+
+  @override
+  String get spendingTrends => 'Utgiftstrender';
+
+  @override
+  String get dailyBurnRate => 'Daglig utgiftstakt';
+
+  @override
+  String get projectedTotal => 'Beräknad total';
+
+  @override
+  String get budgetStatusOnTrack => 'Inom budget';
+
+  @override
+  String get budgetStatusOver => 'Budget överskriden';
+
+  @override
+  String get budgetStatusWarning => 'Hög utgiftstakt';
+
+  @override
+  String get compareTrips => 'Jämför resor';
+
+  @override
+  String get selectTripsToCompare => 'Välj resor att jämföra';
+
+  @override
+  String get selectAtLeastTwoTrips => 'Välj minst 2 resor';
+
+  @override
+  String get comparisonSummary => 'Jämförelsesammanfattning';
+
+  @override
+  String get budgetEfficiency => 'Budgetstatus';
+
+  @override
+  String get packingReadiness => 'Packningsframsteg';
+
+  @override
+  String get lowestDailyCost => 'Mest ekonomisk';
+
+  @override
+  String get highestSpending => 'Högsta utgift';
+
+  @override
+  String get sharedTrip => 'Delad resa';
+
+  @override
+  String get shareTripInvite => 'Bjud in medresenärer';
+
+  @override
+  String get joinSharedTrip => 'Gå med i delad resa';
+
+  @override
+  String get inviteCode => 'Inbjudningskod';
+
+  @override
+  String get enterInviteCode => 'Ange 6-teckenkod';
+
+  @override
+  String get collaborators => 'Medresenärer';
+
+  @override
+  String get copyCode => 'Kopiera kod';
+
+  @override
+  String get codeCopied => 'Inbjudningskod kopierad';
+
+  @override
+  String get invalidInviteCode => 'Ogiltig eller utgången kod';
+
+  @override
+  String get joinSuccess => 'Gick med i resan!';
+
+  @override
+  String get shareTrip => 'Dela resa';
+
+  @override
+  String get shareChecklist => 'Dela packlista';
+
+  @override
+  String get shareBudget => 'Dela budget';
+
+  @override
+  String get shareTripSummary => 'Kolla in min resplan på PackBuddy!';
+
+  @override
+  String get shareCopied => 'Resedetaljer kopierade';
+
+  @override
+  String get tripMap => 'Reskarta och rutt';
+
+  @override
+  String get openInMaps => 'Öppna i Kartor';
+
+  @override
+  String get openInGoogleMaps => 'Öppna i Google Maps';
+
+  @override
+  String get openInAppleMaps => 'Öppna i Apple Kartor';
+
+  @override
+  String get waypoints => 'Ruttstopp';
+
+  @override
+  String get addWaypoint => 'Lägg till stopp';
+
+  @override
+  String get waypointName => 'Plats / Hotell / Sevärdhet';
+
+  @override
+  String get noWaypoints => 'Inga stopp tillagda ännu';
+
+  @override
+  String get widgetSettings => 'Hemwidget';
+
+  @override
+  String get widgetPreview => 'Förhandsgranskning av widget';
+
+  @override
+  String get showCountdown => 'Visa nedräkning';
+
+  @override
+  String get showPackingProgress => 'Visa packningsframsteg';
+
+  @override
+  String get showBudgetData => 'Visa budgetsammanfattning';
+
+  @override
+  String get widgetSizeSmall => 'Liten';
+
+  @override
+  String get widgetSizeMedium => 'Mellan';
+
+  @override
+  String get widgetSizeLarge => 'Stor';
+
+  @override
+  String get onboardingTitle1 => 'Planera resor enkelt';
+
+  @override
+  String get onboardingDesc1 =>
+      'Hantera budgetar i flera valutor och spåra utgifter i hela världen.';
+
+  @override
+  String get onboardingTitle2 => 'Smarta packlistor';
+
+  @override
+  String get onboardingDesc2 =>
+      'Flygbolagens bagageregler och smarta mallar ser till att du inte glömmer något.';
+
+  @override
+  String get onboardingTitle3 => 'Res tillsammans';
+
+  @override
+  String get onboardingDesc3 =>
+      'Dela resplaner och listor med vänner och familj med enkla koder.';
+
+  @override
+  String get onboardingTitle4 => 'Säkert offline-valv';
+
+  @override
+  String get onboardingDesc4 =>
+      'Förvara pass och boardingkort krypterade utan internet.';
+
+  @override
+  String get getStarted => 'Kom igång';
+
+  @override
+  String get skip => 'Hoppa över';
+
+  @override
+  String get next => 'Nästa';
+
+  @override
+  String get replayTour => 'Spela upp apptur igen';
+
+  @override
+  String get signInWithApple => 'Logga in med Apple';
+
+  @override
+  String get appleSignInFailed => 'Inloggning med Apple misslyckades';
+
+  @override
+  String get total => 'Totalt';
+
+  @override
+  String get totalSpent => 'Totalt spenderat';
+
+  @override
+  String get confirm => 'Bekräfta';
 }

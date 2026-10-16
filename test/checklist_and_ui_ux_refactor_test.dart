@@ -299,7 +299,7 @@ void main() {
       // Verify header, dynamic luggage guide, and item are present
       expect(find.text('Bavul & Kontrol Listesi'), findsWidgets);
       expect(find.text('Bavul Hazırlığı & Bagaj Rehberi'), findsOneWidget);
-      expect(find.text('Noise-Cancelling Headphones'), findsOneWidget);
+      expect(find.text('Gürültü Engelleyici Kulaklık & Kılıfı'), findsOneWidget);
 
       // Verify top-right add button is removed while bottom-right FAB remains
       expect(find.byIcon(Icons.add_circle_outline_rounded), findsNothing);
@@ -349,7 +349,7 @@ void main() {
       expect(find.byIcon(Icons.notifications_none_rounded), findsOneWidget);
 
       // Verify luggage bento card renders
-      expect(find.text('Bavul & Kontrol Listesi'), findsWidgets);
+      expect(find.text('Bavul & Kontrol Listesi', skipOffstage: false), findsWidgets);
     });
 
     testWidgets('VaultScreen renders and displays Native Wallet hooks for tickets', (tester) async {

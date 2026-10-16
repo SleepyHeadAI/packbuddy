@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/vault/presentation/controllers/vault_controller.dart';
 
@@ -25,6 +26,19 @@ class AddDocumentSheet extends ConsumerStatefulWidget {
     String? initialCategory,
     String? initialSubCategory,
   }) {
+    if (PreferencesService.instance.getRestrictedFeatures().contains('vault_upload')) {
+      final l10n = AppLocalizations.of(context);
+      final msg = l10n != null ? l10n.adminFeatureRestrictedNotice : 'This feature has been restricted by an administrator.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: AppColors.errorPastel,
+          content: Text(msg, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+        ),
+      );
+      return Future.value();
+    }
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -436,7 +450,38 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                 ),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 14),
+
+              // Legal Compliance & Cloud Backup Notice
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                    width: 0.8,
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.cloud_done_outlined, size: 16, color: theme.colorScheme.primary),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        l10n.vaultCloudBackupNotice,
+                        style: TextStyle(
+                          fontSize: 11,
+                          height: 1.35,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
 
               // Source Options: Camera, Gallery, PDF/File
               Text(

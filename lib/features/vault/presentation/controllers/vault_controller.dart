@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -72,6 +73,23 @@ class VaultController extends StateNotifier<VaultState> {
     loadDocuments();
   }
 
+  /// Encodes file bytes into base64 payload up to 700 KB safe threshold for cloud sync
+  Future<String?> encodeFileForCloud(String filePath) async {
+    try {
+      final file = File(filePath);
+      if (!await file.exists()) return null;
+      final bytes = await file.readAsBytes();
+      const maxCloudBytes = 700 * 1024;
+      if (bytes.length <= maxCloudBytes) {
+        return base64Encode(bytes);
+      } else {
+        return base64Encode(bytes.sublist(0, maxCloudBytes));
+      }
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Attempts to unlock the vault using a PIN code
   bool unlockVault(String pin) {
     final savedPin = _prefs.getVaultPin();
@@ -109,11 +127,25 @@ class VaultController extends StateNotifier<VaultState> {
     return true;
   }
 
+  /// Resets controller state on logout or account switch
+  void resetState() {
+    state = VaultState(
+      isLocked: _prefs.isVaultLocked(),
+      hasPin: _prefs.getVaultPin() != null,
+      isBiometricEnabled: _prefs.isVaultBiometricEnabled(),
+      documents: const [],
+    );
+  }
+
   /// Loads all active (non-deleted) documents from SQLite
-  Future<void> loadDocuments({String? tripId}) async {
+  Future<void> loadDocuments({String? tripId, String? userId}) async {
     state = state.copyWith(isLoading: true);
     try {
-      final docs = await _dbHelper.getDocuments(tripId: tripId, includeDeleted: false);
+      final docs = await _dbHelper.getDocuments(
+        tripId: tripId,
+        userId: userId,
+        includeDeleted: false,
+      );
       if (!mounted) return;
       state = state.copyWith(
         isLoading: false,
@@ -137,6 +169,12 @@ class VaultController extends StateNotifier<VaultState> {
     String? tripId,
     String? notes,
   }) async {
+    // Feature restriction guard (Phase 3)
+    if (_prefs.getRestrictedFeatures().contains('vault_upload')) {
+      state = state.copyWith(errorMessage: 'restricted_vault_upload');
+      return null;
+    }
+
     try {
       // 1. Pick image (safe null check if user cancels)
       final XFile? pickedFile = await _picker.pickImage(
@@ -172,7 +210,9 @@ class VaultController extends StateNotifier<VaultState> {
         }
       } catch (_) {}
 
-      // 3. Create Document entity
+      // 3. Create Document entity with cloud payload
+      final cleanExt = ext.replaceAll('.', '').toLowerCase();
+      final cloudData = await encodeFileForCloud(targetPath);
       final now = DateTime.now();
       final newDoc = Document(
         id: _uuid.v4(),
@@ -184,6 +224,8 @@ class VaultController extends StateNotifier<VaultState> {
         fileType: 'image',
         notes: notes,
         fileSizeBytes: fileBytes,
+        cloudDataBase64: cloudData,
+        fileExtension: cleanExt,
         createdAt: now,
         updatedAt: now,
         isDeleted: false,
@@ -257,6 +299,8 @@ class VaultController extends StateNotifier<VaultState> {
         }
       } catch (_) {}
 
+      final cleanExt = ext.replaceAll('.', '').toLowerCase();
+      final cloudData = await encodeFileForCloud(targetPath);
       final now = DateTime.now();
       final newDoc = Document(
         id: _uuid.v4(),
@@ -268,6 +312,8 @@ class VaultController extends StateNotifier<VaultState> {
         fileType: isPdf ? 'pdf' : 'image',
         notes: notes,
         fileSizeBytes: fileBytes,
+        cloudDataBase64: cloudData,
+        fileExtension: cleanExt,
         createdAt: now,
         updatedAt: now,
         isDeleted: false,
@@ -296,6 +342,10 @@ class VaultController extends StateNotifier<VaultState> {
 
   /// Adds an existing document directly (for manual entry or unit tests)
   Future<Document?> addDocument(Document doc) async {
+    if (_prefs.getRestrictedFeatures().contains('vault_upload')) {
+      state = state.copyWith(errorMessage: 'restricted_vault_upload');
+      return null;
+    }
     try {
       var fileBytes = doc.fileSizeBytes;
       if (fileBytes == 0 && doc.localImagePath.isNotEmpty) {
@@ -306,7 +356,20 @@ class VaultController extends StateNotifier<VaultState> {
           }
         } catch (_) {}
       }
-      final docToSave = doc.copyWith(fileSizeBytes: fileBytes);
+      var cloudData = doc.cloudDataBase64;
+      var ext = doc.fileExtension;
+      if ((cloudData == null || cloudData.isEmpty) && doc.localImagePath.isNotEmpty) {
+        cloudData = await encodeFileForCloud(doc.localImagePath);
+      }
+      if (ext == null || ext.isEmpty) {
+        ext = p.extension(doc.localImagePath).replaceAll('.', '').toLowerCase();
+        if (ext.isEmpty) ext = doc.isPdf ? 'pdf' : 'jpg';
+      }
+      final docToSave = doc.copyWith(
+        fileSizeBytes: fileBytes,
+        cloudDataBase64: cloudData,
+        fileExtension: ext,
+      );
       await _dbHelper.insertDocument(docToSave);
       state = state.copyWith(
         documents: [docToSave, ...state.documents],

@@ -7,36 +7,67 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return isAuthenticated() && request.auth.token.email == 'sleepyheadaitr@gmail.com';
+      return isAuthenticated() && (
+        request.auth.token.get('admin', false) == true ||
+        request.auth.token.email == 'sleepyheadaitr@gmail.com'
+      );
+    }
+
+    // Helper: checks whether a user is currently banned (temporary or permanent)
+    function isUserBanned(userId) {
+      return exists(/databases/$(database)/documents/users/$(userId)) &&
+        (
+          get(/databases/$(database)/documents/users/$(userId)).data.get('banStatus', 'none') == 'permanent' ||
+          (
+            get(/databases/$(database)/documents/users/$(userId)).data.get('banStatus', 'none') == 'temporary' &&
+            get(/databases/$(database)/documents/users/$(userId)).data.get('banExpiresAt', '') > request.time.toIso8601()
+          )
+        );
     }
 
     // Users profile collection for Admin Dashboard & authenticated user isolation
     match /users/{userId} {
-      allow read, write: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
+      allow read: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
+      allow create: if isAdmin() || (
+        isAuthenticated() && request.auth.uid == userId &&
+        request.resource.data.get('isPremium', false) == false &&
+        request.resource.data.get('banStatus', 'none') == 'none' &&
+        request.resource.data.get('restrictedFeatures', []).size() == 0
+      );
+      allow update: if isAdmin() || (
+        isAuthenticated() && request.auth.uid == userId &&
+        !isUserBanned(userId) &&
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isPremium', 'banStatus', 'banExpiresAt', 'banReason', 'restrictedFeatures'])
+      );
+      allow delete: if isAdmin();
     }
 
-    // User trips collection
+    // User trips collection: banned users cannot write
     match /trips/{docId} {
-      allow create: if (isAuthenticated() && request.resource.data.user_id == request.auth.uid) || isAdmin();
-      allow read, update, delete: if (isAuthenticated() && resource.data.user_id == request.auth.uid) || isAdmin();
+      allow create: if (isAuthenticated() && request.resource.data.user_id == request.auth.uid && !isUserBanned(request.auth.uid)) || isAdmin();
+      allow read: if (isAuthenticated() && resource.data.user_id == request.auth.uid) || isAdmin();
+      allow update, delete: if (isAuthenticated() && resource.data.user_id == request.auth.uid && !isUserBanned(request.auth.uid)) || isAdmin();
     }
 
-    // User expenses collection
+    // User expenses collection: banned users cannot write
     match /expenses/{docId} {
-      allow create: if (isAuthenticated() && request.resource.data.user_id == request.auth.uid) || isAdmin();
-      allow read, update, delete: if (isAuthenticated() && resource.data.user_id == request.auth.uid) || isAdmin();
+      allow create: if (isAuthenticated() && request.resource.data.user_id == request.auth.uid && !isUserBanned(request.auth.uid)) || isAdmin();
+      allow read: if (isAuthenticated() && resource.data.user_id == request.auth.uid) || isAdmin();
+      allow update, delete: if (isAuthenticated() && resource.data.user_id == request.auth.uid && !isUserBanned(request.auth.uid)) || isAdmin();
     }
 
-    // User document vault collection
+    // User document vault collection: banned users cannot write
     match /documents/{docId} {
-      allow create: if (isAuthenticated() && request.resource.data.user_id == request.auth.uid) || isAdmin();
-      allow read, update, delete: if (isAuthenticated() && resource.data.user_id == request.auth.uid) || isAdmin();
+      allow create: if (isAuthenticated() && request.resource.data.user_id == request.auth.uid && !isUserBanned(request.auth.uid)) || isAdmin();
+      allow read: if (isAuthenticated() && resource.data.user_id == request.auth.uid) || isAdmin();
+      allow update, delete: if (isAuthenticated() && resource.data.user_id == request.auth.uid && !isUserBanned(request.auth.uid)) || isAdmin();
     }
 
-    // User checklist items collection
+    // User checklist items collection: banned users cannot write
     match /checklist_items/{docId} {
-      allow create: if (isAuthenticated() && request.resource.data.user_id == request.auth.uid) || isAdmin();
-      allow read, update, delete: if (isAuthenticated() && resource.data.user_id == request.auth.uid) || isAdmin();
+      allow create: if (isAuthenticated() && request.resource.data.user_id == request.auth.uid && !isUserBanned(request.auth.uid)) || isAdmin();
+      allow read: if (isAuthenticated() && resource.data.user_id == request.auth.uid) || isAdmin();
+      allow update, delete: if (isAuthenticated() && resource.data.user_id == request.auth.uid && !isUserBanned(request.auth.uid)) || isAdmin();
     }
 
     // Fallback rule for any other collection: admin only

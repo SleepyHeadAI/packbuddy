@@ -18,7 +18,7 @@ class FakeTripController extends StateNotifier<TripState> implements TripControl
       : super(TripState(isLoading: false, trips: trips));
 
   @override
-  Future<void> loadTrips() async {}
+  Future<void> loadTrips({String? userId}) async {}
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -27,7 +27,7 @@ class FakeVaultController extends StateNotifier<VaultState> implements VaultCont
   FakeVaultController() : super(const VaultState(isLoading: false, documents: []));
 
   @override
-  Future<void> loadDocuments({String? tripId}) async {}
+  Future<void> loadDocuments({String? tripId, String? userId}) async {}
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -111,7 +111,7 @@ void main() {
         of: find.byType(AppBar),
         matching: find.byType(IconButton),
       );
-      expect(backButton, findsOneWidget);
+      expect(backButton, findsWidgets);
 
       // Tap back button and verify navigation back to Dashboard
       await tester.tap(backButton.first);

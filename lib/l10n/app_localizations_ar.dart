@@ -218,7 +218,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get annual => 'سنوي';
 
   @override
-  String get annualSave => 'وفر 33%';
+  String get annualSave => 'وفّر 58%';
 
   @override
   String get subscribeNow => 'المتابعة مع Pro';
@@ -1219,4 +1219,477 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get adminTotalStorage => 'مساحة الخزنة';
+
+  @override
+  String get adminDefaultBanReason => 'انتهاك شروط خدمة المنصة.';
+
+  @override
+  String get adminPermanentBanTitle => 'تم تعليق الحساب نهائيًا';
+
+  @override
+  String get adminTemporaryBanTitle => 'تم تعليق الحساب مؤقتًا';
+
+  @override
+  String get adminAccountSuspendedNotice =>
+      'تم تقييد الوصول إلى خدمات PackBuddy بواسطة المسؤول.';
+
+  @override
+  String get adminPermanentBan => 'حظر دائم';
+
+  @override
+  String get adminTemporaryBan => 'حظر مؤقت';
+
+  @override
+  String get adminBanReasonLabel => 'سبب التعليق';
+
+  @override
+  String get adminBanExpiresAtLabel => 'ينتهي التعليق في';
+
+  @override
+  String get adminFeatureRestrictedNotice => 'هذا الإجراء مقيد بواسطة المسؤول.';
+
+  @override
+  String get adminGeoAnalytics => 'تحليلات الموقع الجغرافي والنشاط';
+
+  @override
+  String get adminPeriodLive => 'مباشر (15 دقيقة)';
+
+  @override
+  String get adminPeriodDaily => 'يومي (24 ساعة)';
+
+  @override
+  String get adminPeriodWeekly => 'أسبوعي (7 أيام)';
+
+  @override
+  String get adminPeriodMonthly => 'شهري (30 يومًا)';
+
+  @override
+  String get adminPeriodYearly => 'سنوي (365 يومًا)';
+
+  @override
+  String get adminNoActiveUsers => 'لا يوجد مستخدمون نشطون في هذه الفترة';
+
+  @override
+  String get adminFilterAll => 'الكل';
+
+  @override
+  String get adminFilterPro => 'Pro';
+
+  @override
+  String get adminFilterBanned => 'محظور';
+
+  @override
+  String get adminFilterRestricted => 'مقيد';
+
+  @override
+  String get adminModerateUser => 'إدارة المستخدم';
+
+  @override
+  String get adminBanStatusLabel => 'تعليق / حظر الحساب';
+
+  @override
+  String get adminUnbanned => 'نشط';
+
+  @override
+  String get adminBan24h => '24 ساعة';
+
+  @override
+  String get adminBan7d => '7 أيام';
+
+  @override
+  String get adminBan30d => '30 يومًا';
+
+  @override
+  String get adminBanReasonHint => 'سبب التعليق (اختياري)...';
+
+  @override
+  String get adminFeatureRestrictionsLabel => 'قيود الميزات الدقيقة';
+
+  @override
+  String get adminRestrictTripCreate => 'تقييد إنشاء الرحلات';
+
+  @override
+  String get adminRestrictExpenseAdd => 'تقييد تسجيل المصاريف';
+
+  @override
+  String get adminRestrictVaultUpload => 'تقييد رفع مستندات الخزينة';
+
+  @override
+  String get adminRestrictCloudSync => 'تقييد المزامنة السحابية';
+
+  @override
+  String get adminSaveChanges => 'حفظ التغييرات';
+
+  @override
+  String get adminChangesSaved => 'تم حفظ تغييرات الإشراف بنجاح';
+
+  @override
+  String get adminSignOut => 'تسجيل الخروج';
+
+  @override
+  String get perMonth => '/شهر';
+
+  @override
+  String get perYear => '/سنة';
+
+  @override
+  String get storeBillingRequiredTitle => 'الدفع عبر المتجر مطلوب';
+
+  @override
+  String get storeBillingRequiredMessage =>
+      'تجري حاليًا تهيئة الدفع الرسمي عبر متجري Google Play وApp Store لهذا الإصدار. لا يمكن تفعيل الاشتراك مجانًا.';
+
+  @override
+  String get adminTestPurchaseTitle => 'شراء تجريبي للمسؤول / Sandbox';
+
+  @override
+  String get adminTestPurchaseMessage =>
+      'لقد سجلت الدخول كمسؤول رئيسي. هل ترغب في تأكيد وتفعيل اشتراك PackBuddy Pro التجريبي؟';
+
+  @override
+  String get activateTestPro => 'تفعيل Pro (تجريبي)';
+
+  @override
+  String get templateSummerTitle => 'الشاطئ وعطلة الصيف';
+
+  @override
+  String get templateSummerDesc =>
+      'قائمة أمتعة متكاملة للبحر والشمس والرحلات الصيفية الدافئة';
+
+  @override
+  String get templateWinterTitle => 'رحلة الشتاء والتزلج';
+
+  @override
+  String get templateWinterDesc =>
+      'معدات واقية وملابس دافئة للمناطق الباردة ومنتجعات التزلج';
+
+  @override
+  String get templateBusinessTitle => 'رحلة عمل ومؤتمرات';
+
+  @override
+  String get templateBusinessDesc =>
+      'حقيبة سفر مهنية مخصصة للاجتماعات والمؤتمرات ورحلات العمل';
+
+  @override
+  String get templateCampingTitle => 'استكشاف الطبيعة والتخييم';
+
+  @override
+  String get templateCampingDesc =>
+      'معدات خارجية متينة وموثوقة للتخييم والمسارات الجبلية';
+
+  @override
+  String get templateCityTitle => 'جولة نهاية الأسبوع في المدينة';
+
+  @override
+  String get templateCityDesc =>
+      'حقيبة ظهر خفيفة ومريحة لرحلة استكشافية بالمدينة مدتها 2-3 أيام';
+
+  @override
+  String get vaultCloudBackupNotice =>
+      'المستندات مشفرة وتُحفظ بأمان في التخزين السحابي للمزامنة بين الأجهزة واستعادة الحساب في غضون 15 يومًا والامتثال للسلامة.';
+
+  @override
+  String get deleteAccountTitle => 'حذف الحساب';
+
+  @override
+  String get deleteAccountConfirmationTitle => 'طلب حذف الحساب خلال 15 يومًا';
+
+  @override
+  String get deleteAccountConfirmationMessage =>
+      'سيتم جدولة حذف حسابك ورحلاتك ومصاريفك ومستندات الخزنة نهائيًا خلال 15 يومًا.\n\n• لا تقم بتسجيل الدخول لمدة 15 يومًا لإتمام الحذف.\n• إذا قمت بتسجيل الدخول خلال 15 يومًا، فستتم استعادة حسابك وجميع بياناتك تلقائيًا.\n\nهل تريد المتابعة؟';
+
+  @override
+  String get deleteAccountButton => 'طلب الحذف خلال 15 يومًا';
+
+  @override
+  String get deleteAccountScheduledNotice =>
+      'تمت جدولة حذف حسابك خلال 15 يومًا. لا تسجل الدخول إذا كنت ترغب في حذفه نهائيًا.';
+
+  @override
+  String get accountRestoredNotice =>
+      'مرحبًا بعودتك! تم إلغاء طلب حذف حسابك واستعادة جميع بياناتك.';
+
+  @override
+  String adminPendingDeletionBadge(int days) {
+    return 'مجدول للحذف (متبقي $days يوم)';
+  }
+
+  @override
+  String get adminCancelDeletion => 'إلغاء الحذف';
+
+  @override
+  String get adminPurgeNow => 'مسح البيانات الآن';
+
+  @override
+  String get adminPurgeConfirmTitle => 'مسح بيانات المستخدم نهائيًا؟';
+
+  @override
+  String get adminPurgeConfirmMessage =>
+      'سيؤدي هذا إلى حذف جميع رحلات ومصاريف وقوائم ومستندات هذا المستخدم من السحابة بشكل نهائي.';
+
+  @override
+  String get adminDeletionCancelled => 'تم إلغاء حذف الحساب بنجاح';
+
+  @override
+  String get adminDataPurged => 'تم مسح جميع بيانات المستخدم نهائيًا';
+
+  @override
+  String get adminVaultDocumentsTitle =>
+      'مستندات الخزنة المرفوعة (فحص / إدارة)';
+
+  @override
+  String get adminNoDocumentsUploaded => 'لم يتم رفع أي مستندات في الخزنة بعد';
+
+  @override
+  String get adminInspectDocument => 'معاينة';
+
+  @override
+  String get adminDeleteDocument => 'حذف المستند';
+
+  @override
+  String get adminDeleteDocumentConfirm =>
+      'هل أنت متأكد من رغبتك في حذف هذا المستند نهائيًا من الخزنة السحابية؟';
+
+  @override
+  String get adminDocumentDeleted => 'تم حذف المستند بنجاح بواسطة المشرف';
+
+  @override
+  String get adminDocumentPreviewTitle => 'معاينة المستند';
+
+  @override
+  String get adminDocumentTypeImage => 'صورة';
+
+  @override
+  String get adminDocumentTypePdf => 'PDF';
+
+  @override
+  String get emailVerifySpamFolderTip =>
+      'تحقق من مجلد الرسائل غير المرغوب فيها';
+
+  @override
+  String get emailVerifySpamFolderDesc =>
+      'إذا لم تتلقَ الرابط، فتحقق من مجلد البريد العشوائي للبحث عن بريد من PackBuddy. يساعد تأكيد البريد في حماية خزنتك.';
+
+  @override
+  String get emailVerifyAutoChecking => 'بانتظار رابط التحقق... (فحص تلقائي)';
+
+  @override
+  String get currencyConverter => 'محول العملات';
+
+  @override
+  String get fromCurrency => 'من';
+
+  @override
+  String get toCurrency => 'إلى';
+
+  @override
+  String get exchangeRate => 'سعر الصرف';
+
+  @override
+  String get liveRates => 'أسعار مباشرة';
+
+  @override
+  String get offlineRates => 'أسعار غير متصلة';
+
+  @override
+  String get quickConvert => 'تحويل سريع للعملات';
+
+  @override
+  String get refreshRates => 'تحديث الأسعار';
+
+  @override
+  String get budgetAnalytics => 'تحليلات الميزانية';
+
+  @override
+  String get categoryDistribution => 'توزيع الفئات';
+
+  @override
+  String get spendingTrends => 'اتجاهات الإنفاق';
+
+  @override
+  String get dailyBurnRate => 'معدل الإنفاق اليومي';
+
+  @override
+  String get projectedTotal => 'الإجمالي المتوقع';
+
+  @override
+  String get budgetStatusOnTrack => 'ضمن الميزانية';
+
+  @override
+  String get budgetStatusOver => 'تجاوز الميزانية';
+
+  @override
+  String get budgetStatusWarning => 'إنفاق سريع';
+
+  @override
+  String get compareTrips => 'مقارنة الرحلات';
+
+  @override
+  String get selectTripsToCompare => 'حدد الرحلات للمقارنة';
+
+  @override
+  String get selectAtLeastTwoTrips => 'اختر رحلتين على الأقل للمقارنة';
+
+  @override
+  String get comparisonSummary => 'ملخص المقارنة';
+
+  @override
+  String get budgetEfficiency => 'حالة الميزانية';
+
+  @override
+  String get packingReadiness => 'جاهزية الأمتعة';
+
+  @override
+  String get lowestDailyCost => 'الأكثر توفيراً';
+
+  @override
+  String get highestSpending => 'الأعلى إنفاقاً';
+
+  @override
+  String get sharedTrip => 'رحلة مشتركة';
+
+  @override
+  String get shareTripInvite => 'دعوة مشاركين';
+
+  @override
+  String get joinSharedTrip => 'الانضمام لرحلة مشتركة';
+
+  @override
+  String get inviteCode => 'رمز الدعوة';
+
+  @override
+  String get enterInviteCode => 'أدخل الرمز المكون من 6 خانات';
+
+  @override
+  String get collaborators => 'المشاركون';
+
+  @override
+  String get copyCode => 'نسخ الرمز';
+
+  @override
+  String get codeCopied => 'تم نسخ رمز الدعوة';
+
+  @override
+  String get invalidInviteCode => 'رمز دعوة غير صالح أو منتهي الصلاحية';
+
+  @override
+  String get joinSuccess => 'تم الانضمام للرحلة بنجاح!';
+
+  @override
+  String get shareTrip => 'مشاركة الرحلة';
+
+  @override
+  String get shareChecklist => 'مشاركة القائمة';
+
+  @override
+  String get shareBudget => 'مشاركة الميزانية';
+
+  @override
+  String get shareTripSummary => 'اطلع على خطة رحلتي عبر PackBuddy!';
+
+  @override
+  String get shareCopied => 'تم نسخ تفاصيل الرحلة';
+
+  @override
+  String get tripMap => 'خريطة ومسار الرحلة';
+
+  @override
+  String get openInMaps => 'فتح في الخرائط';
+
+  @override
+  String get openInGoogleMaps => 'فتح في خرائط Google';
+
+  @override
+  String get openInAppleMaps => 'فتح في خرائط Apple';
+
+  @override
+  String get waypoints => 'محطات المسار';
+
+  @override
+  String get addWaypoint => 'إضافة محطة';
+
+  @override
+  String get waypointName => 'مكان / فندق / معلم';
+
+  @override
+  String get noWaypoints => 'لم تتم إضافة محطات بعد';
+
+  @override
+  String get widgetSettings => 'أداة الشاشة الرئيسية';
+
+  @override
+  String get widgetPreview => 'معاينة الأداة';
+
+  @override
+  String get showCountdown => 'إظهار العد التنازلي';
+
+  @override
+  String get showPackingProgress => 'إظهار تقدم التجهيز';
+
+  @override
+  String get showBudgetData => 'إظهار ملخص الميزانية';
+
+  @override
+  String get widgetSizeSmall => 'صغير';
+
+  @override
+  String get widgetSizeMedium => 'متوسط';
+
+  @override
+  String get widgetSizeLarge => 'كبير';
+
+  @override
+  String get onboardingTitle1 => 'تخطيط سفر سهل';
+
+  @override
+  String get onboardingDesc1 =>
+      'إدارة الميزانيات متعددة العملات وتتبع النفقات اليومية في أي مكان.';
+
+  @override
+  String get onboardingTitle2 => 'قوائم تجهيز ذكية';
+
+  @override
+  String get onboardingDesc2 =>
+      'قواعد أمتعة الطيران والقوالب الذكية تضمن عدم نسيان أي غرض.';
+
+  @override
+  String get onboardingTitle3 => 'تعاون في الوقت الفعلي';
+
+  @override
+  String get onboardingDesc3 =>
+      'شارك خططك وقوائمك مع العائلة والأصدقاء برموز بسيطة.';
+
+  @override
+  String get onboardingTitle4 => 'خزنة آمنة بدون إنترنت';
+
+  @override
+  String get onboardingDesc4 =>
+      'احتفظ بالجوازات وتذاكر الطيران مشفرة وآمنة دون إنترنت.';
+
+  @override
+  String get getStarted => 'ابدأ الآن';
+
+  @override
+  String get skip => 'تخطي';
+
+  @override
+  String get next => 'التالي';
+
+  @override
+  String get replayTour => 'إعادة جولة التطبيق';
+
+  @override
+  String get signInWithApple => 'تسجيل الدخول باستخدام Apple';
+
+  @override
+  String get appleSignInFailed => 'فشل تسجيل الدخول باستخدام Apple';
+
+  @override
+  String get total => 'المجموع';
+
+  @override
+  String get totalSpent => 'إجمالي الإنفاق';
+
+  @override
+  String get confirm => 'تأكيد';
 }

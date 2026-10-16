@@ -83,28 +83,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     await ref.read(authControllerProvider.notifier).signInWithGoogle();
   }
 
-  void _handleApplePlaceholder(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        backgroundColor: AppColors.primaryLight,
-        content: Row(
-          children: [
-            const Icon(Icons.apple, color: Colors.white, size: 22),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                l10n.authAppleComingSoon,
-                style: const TextStyle(color: Colors.white, fontSize: 13),
-              ),
-            ),
-          ],
-        ),
-        duration: const Duration(seconds: 3),
-      ),
-    );
+  Future<void> _handleAppleSignIn() async {
+    ref.read(authControllerProvider.notifier).clearError();
+    try {
+      await ref.read(authControllerProvider.notifier).signInWithApple();
+    } catch (_) {}
   }
 
   void _handleForgotPassword(BuildContext context) {
@@ -778,14 +761,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
                   ),
                   const SizedBox(width: 6),
-                  Text(
-                    l10n.authPasswordRulesTitle,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: isDark
-                          ? AppColors.onSurfaceDark
-                          : AppColors.primaryLight,
+                  Expanded(
+                    child: Text(
+                      l10n.authPasswordRulesTitle,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: isDark
+                            ? AppColors.onSurfaceDark
+                            : AppColors.primaryLight,
+                      ),
                     ),
                   ),
                 ],
@@ -1080,9 +1065,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         ),
         const SizedBox(height: 12),
 
-        // Continue with Apple (Placeholder)
+        // Continue with Apple (Feature F-15)
         BouncyPressable(
-          onTap: isLoading ? null : () => _handleApplePlaceholder(context),
+          onTap: isLoading ? null : _handleAppleSignIn,
           borderRadius: BorderRadius.circular(22),
           child: Container(
             height: 52,
@@ -1177,6 +1162,18 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 ? AppColors.onSurfaceVariantDark.withValues(alpha: 0.7)
                 : AppColors.onSurfaceVariantLight.withValues(alpha: 0.7),
             height: 1.4,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 6),
+        Text(
+          l10n.vaultCloudBackupNotice,
+          style: TextStyle(
+            fontSize: 10,
+            color: isDark
+                ? AppColors.onSurfaceVariantDark.withValues(alpha: 0.55)
+                : AppColors.onSurfaceVariantLight.withValues(alpha: 0.55),
+            height: 1.35,
           ),
           textAlign: TextAlign.center,
         ),

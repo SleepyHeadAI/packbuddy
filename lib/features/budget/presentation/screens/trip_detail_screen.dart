@@ -15,6 +15,8 @@ import 'package:packbuddy/features/budget/presentation/screens/widgets/add_trip_
 import 'package:packbuddy/features/budget/presentation/screens/trips_screen.dart';
 import 'package:packbuddy/features/vault/presentation/screens/vault_screen.dart';
 import 'package:packbuddy/features/checklist/presentation/screens/checklist_screen.dart';
+import 'package:packbuddy/features/budget/presentation/widgets/trip_map_preview.dart';
+import 'package:packbuddy/features/budget/presentation/screens/widgets/share_trip_sheet.dart';
 
 /// Trip Detail and Budget Dashboard Screen
 class TripDetailScreen extends ConsumerWidget {
@@ -204,6 +206,11 @@ class TripDetailScreen extends ConsumerWidget {
           ),
           actions: [
             IconButton(
+              icon: const Icon(Icons.share_rounded),
+              tooltip: l10n.shareTrip,
+              onPressed: () => ShareTripSheet.show(context, currentTrip),
+            ),
+            IconButton(
               icon: const Icon(Icons.edit_outlined),
               tooltip: l10n.editTrip,
               onPressed: () {
@@ -305,12 +312,16 @@ class TripDetailScreen extends ConsumerWidget {
                                 children: [
                                   Icon(transportIcon, size: 13, color: theme.colorScheme.primary),
                                   const SizedBox(width: 5),
-                                  Text(
-                                    _formatTransportMode(currentTrip.transportMode, l10n),
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                      color: theme.colorScheme.primary,
+                                  Flexible(
+                                    child: Text(
+                                      _formatTransportMode(currentTrip.transportMode, l10n),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: theme.colorScheme.primary,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -318,22 +329,29 @@ class TripDetailScreen extends ConsumerWidget {
                             ),
                           ),
                         ],
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.calendar_today_rounded, size: 13, color: theme.colorScheme.secondary),
-                            const SizedBox(width: 5),
-                            Text(
-                              AppDateFormatter.formatDateRange(
-                                currentTrip.startDate,
-                                currentTrip.endDate,
-                                locale: Localizations.localeOf(context).languageCode,
+                        ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width - 64),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.calendar_today_rounded, size: 13, color: theme.colorScheme.secondary),
+                              const SizedBox(width: 5),
+                              Flexible(
+                                child: Text(
+                                  AppDateFormatter.formatDateRange(
+                                    currentTrip.startDate,
+                                    currentTrip.endDate,
+                                    locale: Localizations.localeOf(context).languageCode,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
                               ),
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -387,8 +405,26 @@ class TripDetailScreen extends ConsumerWidget {
                         expenses: expenseState.expenses,
                         tripCurrency: currentTrip.defaultCurrency,
                         totalSpent: expenseState.totalSpent,
+                        trip: currentTrip,
                       ),
                     ],
+                    const SizedBox(height: 16),
+                    TripMapPreviewCard(
+                      trip: currentTrip,
+                      waypoints: currentTrip.waypoints,
+                      onManageRoute: () => TripMapSheet.show(
+                        context,
+                        trip: currentTrip,
+                        initialWaypoints: currentTrip.waypoints,
+                        onWaypointsChanged: (newWaypoints) {
+                          final updatedTrip = currentTrip.copyWith(
+                            waypoints: newWaypoints,
+                            updatedAt: DateTime.now(),
+                          );
+                          ref.read(tripControllerProvider.notifier).updateTrip(updatedTrip);
+                        },
+                      ),
+                    ),
                     if (expenseState.expenses.any((e) =>
                         e.currency.toUpperCase() != currentTrip.defaultCurrency.toUpperCase())) ...[
                       const SizedBox(height: 12),

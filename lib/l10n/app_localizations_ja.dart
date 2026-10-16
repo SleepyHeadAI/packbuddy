@@ -217,7 +217,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get annual => '年額プラン';
 
   @override
-  String get annualSave => '33% お得';
+  String get annualSave => '58%お得';
 
   @override
   String get subscribeNow => 'Proを始める';
@@ -1184,4 +1184,465 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get adminTotalStorage => '保管庫ストレージ';
+
+  @override
+  String get adminDefaultBanReason => 'プラットフォーム利用規約への違反。';
+
+  @override
+  String get adminPermanentBanTitle => 'アカウントが永久に停止されました';
+
+  @override
+  String get adminTemporaryBanTitle => 'アカウントが一時的に停止されました';
+
+  @override
+  String get adminAccountSuspendedNotice =>
+      'PackBuddyサービスへのアクセスが管理者によって制限されました。';
+
+  @override
+  String get adminPermanentBan => '永久BAN';
+
+  @override
+  String get adminTemporaryBan => '一時的BAN';
+
+  @override
+  String get adminBanReasonLabel => '停止理由';
+
+  @override
+  String get adminBanExpiresAtLabel => '停止解除日時';
+
+  @override
+  String get adminFeatureRestrictedNotice => 'この操作は管理者によって制限されています。';
+
+  @override
+  String get adminGeoAnalytics => '地理・アクティビティ分析';
+
+  @override
+  String get adminPeriodLive => 'リアルタイム (15分)';
+
+  @override
+  String get adminPeriodDaily => '日次 (24時間)';
+
+  @override
+  String get adminPeriodWeekly => '週次 (7日間)';
+
+  @override
+  String get adminPeriodMonthly => '月次 (30日間)';
+
+  @override
+  String get adminPeriodYearly => '年次 (365日間)';
+
+  @override
+  String get adminNoActiveUsers => 'この期間のアクティブユーザーはいません';
+
+  @override
+  String get adminFilterAll => 'すべて';
+
+  @override
+  String get adminFilterPro => 'Pro';
+
+  @override
+  String get adminFilterBanned => '停止中';
+
+  @override
+  String get adminFilterRestricted => '制限中';
+
+  @override
+  String get adminModerateUser => 'ユーザーのモデレーション';
+
+  @override
+  String get adminBanStatusLabel => 'アカウント停止 / BAN';
+
+  @override
+  String get adminUnbanned => '制限なし';
+
+  @override
+  String get adminBan24h => '24時間';
+
+  @override
+  String get adminBan7d => '7日間';
+
+  @override
+  String get adminBan30d => '30日間';
+
+  @override
+  String get adminBanReasonHint => '停止理由 (任意)...';
+
+  @override
+  String get adminFeatureRestrictionsLabel => '個別機能の制限';
+
+  @override
+  String get adminRestrictTripCreate => '旅行作成の制限';
+
+  @override
+  String get adminRestrictExpenseAdd => '支出記録の制限';
+
+  @override
+  String get adminRestrictVaultUpload => '保管庫アップロードの制限';
+
+  @override
+  String get adminRestrictCloudSync => 'クラウド同期の制限';
+
+  @override
+  String get adminSaveChanges => '変更を保存';
+
+  @override
+  String get adminChangesSaved => 'モデレーションの変更を保存しました';
+
+  @override
+  String get adminSignOut => 'サインアウト';
+
+  @override
+  String get perMonth => '/月';
+
+  @override
+  String get perYear => '/年';
+
+  @override
+  String get storeBillingRequiredTitle => 'ストア決済が必要です';
+
+  @override
+  String get storeBillingRequiredMessage =>
+      '公式のGoogle PlayおよびApp Storeの決済は、本製品版向けに有効化の準備中です。無料でProを有効化することはできません。';
+
+  @override
+  String get adminTestPurchaseTitle => '管理者 / サンドボックス テスト購入';
+
+  @override
+  String get adminTestPurchaseMessage =>
+      'スーパー管理者としてログインしています。PackBuddy Proのテストサブスクリプションを確定して有効化しますか？';
+
+  @override
+  String get activateTestPro => 'Proを有効化 (テスト)';
+
+  @override
+  String get templateSummerTitle => 'ビーチ＆夏休み旅行';
+
+  @override
+  String get templateSummerDesc => '海、砂浜、太陽、暖かいリゾートに最適なパッキングリスト';
+
+  @override
+  String get templateWinterTitle => '冬＆スキースノボ旅行';
+
+  @override
+  String get templateWinterDesc => '寒冷地やスキー場向けの防寒具と保護用ギア一式';
+
+  @override
+  String get templateBusinessTitle => 'ビジネス＆カンファレンス出張';
+
+  @override
+  String get templateBusinessDesc => '商談、会議、出張に最適なプロフェッショナル装備';
+
+  @override
+  String get templateCampingTitle => '大自然＆キャンプ探検';
+
+  @override
+  String get templateCampingDesc => 'テント泊、トレッキング、ハイキングに適したアウトドアギア';
+
+  @override
+  String get templateCityTitle => '週末シティトリップ';
+
+  @override
+  String get templateCityDesc => '2〜3日の都市旅行にぴったりの身軽でコンパクトなバックパック';
+
+  @override
+  String get vaultCloudBackupNotice =>
+      'ドキュメントは端末間の同期、15日間のアカウント復元、および安全性確保のために暗号化されクラウドにバックアップされます。';
+
+  @override
+  String get deleteAccountTitle => 'アカウントを削除';
+
+  @override
+  String get deleteAccountConfirmationTitle => '15日間のアカウント削除申請';
+
+  @override
+  String get deleteAccountConfirmationMessage =>
+      'アカウント、旅行、経費、および保管庫のドキュメントは15日後に完全削除されるようスケジュールされます。\n\n• 削除を完了するには15日間ログインしないでください。\n• 15日以内に再ログインするとアカウントとデータは自動復元されます。\n\n続行しますか？';
+
+  @override
+  String get deleteAccountButton => '15日間の削除を申請';
+
+  @override
+  String get deleteAccountScheduledNotice =>
+      'アカウントは15日後に削除されるようスケジュールされました。完全に削除したい場合はログインしないでください。';
+
+  @override
+  String get accountRestoredNotice =>
+      'お帰りなさい！アカウント削除申請はキャンセルされ、すべてのデータが復元されました。';
+
+  @override
+  String adminPendingDeletionBadge(int days) {
+    return '削除予定（残り$days日）';
+  }
+
+  @override
+  String get adminCancelDeletion => '削除をキャンセル';
+
+  @override
+  String get adminPurgeNow => '今すぐデータを完全消去';
+
+  @override
+  String get adminPurgeConfirmTitle => 'ユーザーデータを完全に消去しますか？';
+
+  @override
+  String get adminPurgeConfirmMessage =>
+      'この操作により、このユーザーのすべてのクラウド旅行、経費、チェックリスト、および保管庫ドキュメントが直ちに完全削除されます。';
+
+  @override
+  String get adminDeletionCancelled => 'アカウント削除は正常にキャンセルされました';
+
+  @override
+  String get adminDataPurged => 'すべてのユーザーデータが完全に消去されました';
+
+  @override
+  String get adminVaultDocumentsTitle => 'アップロードされた保管庫ドキュメント（検査／管理）';
+
+  @override
+  String get adminNoDocumentsUploaded => 'アップロードされたドキュメントはまだありません';
+
+  @override
+  String get adminInspectDocument => '検査';
+
+  @override
+  String get adminDeleteDocument => 'ドキュメントを削除';
+
+  @override
+  String get adminDeleteDocumentConfirm => 'このドキュメントをクラウド保管庫から完全に削除してもよろしいですか？';
+
+  @override
+  String get adminDocumentDeleted => '管理者がドキュメントを正常に削除しました';
+
+  @override
+  String get adminDocumentPreviewTitle => 'ドキュメント検査';
+
+  @override
+  String get adminDocumentTypeImage => '画像';
+
+  @override
+  String get adminDocumentTypePdf => 'PDF';
+
+  @override
+  String get emailVerifySpamFolderTip => '迷惑メール／プロモーションフォルダを確認';
+
+  @override
+  String get emailVerifySpamFolderDesc =>
+      'リンクが届かない場合は、PackBuddyからのメールについて迷惑メールフォルダを確認してください。メール認証によりクラウド保管庫が保護されます。';
+
+  @override
+  String get emailVerifyAutoChecking => '認証リンクを待機中... (自動確認中)';
+
+  @override
+  String get currencyConverter => '通貨換算ツール';
+
+  @override
+  String get fromCurrency => '換算元';
+
+  @override
+  String get toCurrency => '換算先';
+
+  @override
+  String get exchangeRate => '為替レート';
+
+  @override
+  String get liveRates => 'リアルタイムレート';
+
+  @override
+  String get offlineRates => 'オフラインレート';
+
+  @override
+  String get quickConvert => 'クイック通貨換算';
+
+  @override
+  String get refreshRates => 'レートを更新';
+
+  @override
+  String get budgetAnalytics => '予算分析';
+
+  @override
+  String get categoryDistribution => 'カテゴリー別支出割合';
+
+  @override
+  String get spendingTrends => '支出トレンド';
+
+  @override
+  String get dailyBurnRate => '1日の支出ペース';
+
+  @override
+  String get projectedTotal => '予測総支出';
+
+  @override
+  String get budgetStatusOnTrack => '予算内';
+
+  @override
+  String get budgetStatusOver => '予算超過';
+
+  @override
+  String get budgetStatusWarning => '支出ペース高';
+
+  @override
+  String get compareTrips => '旅行を比較';
+
+  @override
+  String get selectTripsToCompare => '比較する旅行を選択';
+
+  @override
+  String get selectAtLeastTwoTrips => '2つ以上の旅行を選択してください';
+
+  @override
+  String get comparisonSummary => '比較サマリー';
+
+  @override
+  String get budgetEfficiency => '予算状況';
+
+  @override
+  String get packingReadiness => 'パッキング進捗率';
+
+  @override
+  String get lowestDailyCost => '最も経済的';
+
+  @override
+  String get highestSpending => '最高支出';
+
+  @override
+  String get sharedTrip => '共有旅行';
+
+  @override
+  String get shareTripInvite => 'メンバーを招待';
+
+  @override
+  String get joinSharedTrip => '共有旅行に参加';
+
+  @override
+  String get inviteCode => '招待コード';
+
+  @override
+  String get enterInviteCode => '6桁のコードを入力';
+
+  @override
+  String get collaborators => 'メンバー';
+
+  @override
+  String get copyCode => 'コードをコピー';
+
+  @override
+  String get codeCopied => '招待コードをクリップボードにコピーしました';
+
+  @override
+  String get invalidInviteCode => '無効または期限切れのコードです';
+
+  @override
+  String get joinSuccess => '旅行に参加しました！';
+
+  @override
+  String get shareTrip => '旅行を共有';
+
+  @override
+  String get shareChecklist => 'リストを共有';
+
+  @override
+  String get shareBudget => '予算を共有';
+
+  @override
+  String get shareTripSummary => 'PackBuddyで私の旅行計画をチェック！';
+
+  @override
+  String get shareCopied => '旅行の詳細をコピーしました';
+
+  @override
+  String get tripMap => '旅行マップ＆ルート';
+
+  @override
+  String get openInMaps => 'マップで開く';
+
+  @override
+  String get openInGoogleMaps => 'Google マップで開く';
+
+  @override
+  String get openInAppleMaps => 'Apple マップで開く';
+
+  @override
+  String get waypoints => 'ルート中継地点';
+
+  @override
+  String get addWaypoint => '中継地点を追加';
+
+  @override
+  String get waypointName => '場所 / ホテル / 観光地';
+
+  @override
+  String get noWaypoints => '中継地点はまだありません';
+
+  @override
+  String get widgetSettings => 'ホーム画面ウィジェット';
+
+  @override
+  String get widgetPreview => 'ウィジェットのプレビュー';
+
+  @override
+  String get showCountdown => 'カウントダウンを表示';
+
+  @override
+  String get showPackingProgress => 'パッキング進捗を表示';
+
+  @override
+  String get showBudgetData => '予算サマリーを表示';
+
+  @override
+  String get widgetSizeSmall => '小';
+
+  @override
+  String get widgetSizeMedium => '中';
+
+  @override
+  String get widgetSizeLarge => '大';
+
+  @override
+  String get onboardingTitle1 => 'ストレスフリーな旅行計画';
+
+  @override
+  String get onboardingDesc1 => '複数通貨の予算管理と日々の支出を世界中どこでも追跡。';
+
+  @override
+  String get onboardingTitle2 => 'スマートパッキングリスト';
+
+  @override
+  String get onboardingDesc2 => '航空会社の荷物規定とスマートテンプレートで忘れ物ゼロへ。';
+
+  @override
+  String get onboardingTitle3 => 'リアルタイム共同旅行';
+
+  @override
+  String get onboardingDesc3 => 'シンプルな招待コードで旅行計画やリストを家族や友人と共有。';
+
+  @override
+  String get onboardingTitle4 => '安全なオフライン保管庫';
+
+  @override
+  String get onboardingDesc4 => 'パスポートや航空券をオフラインでも安全に暗号化保存。';
+
+  @override
+  String get getStarted => 'はじめる';
+
+  @override
+  String get skip => 'スキップ';
+
+  @override
+  String get next => '次へ';
+
+  @override
+  String get replayTour => 'アプリツアーを再開';
+
+  @override
+  String get signInWithApple => 'Appleでサインイン';
+
+  @override
+  String get appleSignInFailed => 'Appleサインインに失敗しました';
+
+  @override
+  String get total => '合計';
+
+  @override
+  String get totalSpent => '総支出';
+
+  @override
+  String get confirm => '確認';
 }

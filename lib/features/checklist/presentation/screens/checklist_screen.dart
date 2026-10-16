@@ -8,6 +8,8 @@ import 'package:packbuddy/features/checklist/presentation/screens/widgets/add_pa
 import 'package:packbuddy/features/checklist/presentation/screens/widgets/packing_item_tile.dart';
 import 'package:packbuddy/features/checklist/presentation/screens/widgets/smart_templates_sheet.dart';
 import 'package:packbuddy/features/checklist/presentation/screens/widgets/airline_guide_sheet.dart';
+import 'package:packbuddy/features/checklist/domain/canonical_packing_catalog.dart';
+import 'package:packbuddy/core/services/share_service.dart';
 
 /// Principal Flutter UI/UX Checklist & Item Completion Tracking Screen
 class ChecklistScreen extends ConsumerStatefulWidget {
@@ -59,7 +61,11 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
 
   void _showUndoDeleteSnackBar(PackingItem item) {
     final l10n = AppLocalizations.of(context)!;
-    final deletedText = '${item.name} ${l10n.deleted}';
+    final localizedName = CanonicalPackingCatalog.getLocalizedItemName(
+      item.name,
+      Localizations.localeOf(context).languageCode,
+    );
+    final deletedText = '$localizedName ${l10n.deleted}';
     final undoLabel = l10n.undo;
 
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -196,6 +202,18 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
               icon: const Icon(Icons.auto_awesome_rounded),
               tooltip: l10n.readyTemplates,
               onPressed: () => SmartTemplatesSheet.show(context, tripId: widget.tripId),
+            ),
+            // Social Checklist Share (Feature F-8)
+            IconButton(
+              icon: const Icon(Icons.share_rounded),
+              tooltip: l10n.shareChecklist,
+              onPressed: () {
+                ShareService.shareChecklist(
+                  tripTitle: widget.tripTitle ?? 'PackBuddy',
+                  items: checklistState.items,
+                  l10n: l10n,
+                );
+              },
             ),
             const SizedBox(width: 4),
           ],

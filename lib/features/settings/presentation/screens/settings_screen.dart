@@ -15,6 +15,8 @@ import 'package:packbuddy/shared/widgets/app_card.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/admin/admin_service.dart';
 import 'package:packbuddy/features/admin/admin_dashboard_screen.dart';
+import 'package:packbuddy/features/settings/presentation/screens/widgets/home_widget_preview_card.dart';
+import 'package:packbuddy/features/onboarding/presentation/screens/onboarding_screen.dart';
 
 /// Complete Settings screen handling Language, Theme, Sync, and PackBuddy Pro
 class SettingsScreen extends ConsumerWidget {
@@ -117,34 +119,47 @@ class SettingsScreen extends ConsumerWidget {
           _SectionHeader(title: l10n.theme),
           const SizedBox(height: 8),
           AppCard(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SegmentedButton<ThemeMode>(
-                  segments: [
-                    ButtonSegment<ThemeMode>(
-                      value: ThemeMode.system,
-                      label: Text(l10n.themeSystem),
-                      icon: const Icon(Icons.brightness_auto_rounded, size: 18),
+            padding: const EdgeInsets.all(12),
+            child: IntrinsicHeight(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: _ThemeModeCard(
+                      mode: ThemeMode.system,
+                      selectedMode: themeMode,
+                      icon: Icons.brightness_auto_rounded,
+                      label: l10n.themeSystem,
+                      onTap: () {
+                        ref.read(themeModeProvider.notifier).setThemeMode(ThemeMode.system);
+                      },
                     ),
-                    ButtonSegment<ThemeMode>(
-                      value: ThemeMode.light,
-                      label: Text(l10n.themeLight),
-                      icon: const Icon(Icons.light_mode_rounded, size: 18),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _ThemeModeCard(
+                      mode: ThemeMode.light,
+                      selectedMode: themeMode,
+                      icon: Icons.light_mode_rounded,
+                      label: l10n.themeLight,
+                      onTap: () {
+                        ref.read(themeModeProvider.notifier).setThemeMode(ThemeMode.light);
+                      },
                     ),
-                    ButtonSegment<ThemeMode>(
-                      value: ThemeMode.dark,
-                      label: Text(l10n.themeDark),
-                      icon: const Icon(Icons.dark_mode_rounded, size: 18),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _ThemeModeCard(
+                      mode: ThemeMode.dark,
+                      selectedMode: themeMode,
+                      icon: Icons.dark_mode_rounded,
+                      label: l10n.themeDark,
+                      onTap: () {
+                        ref.read(themeModeProvider.notifier).setThemeMode(ThemeMode.dark);
+                      },
                     ),
-                  ],
-                  selected: {themeMode},
-                  onSelectionChanged: (Set<ThemeMode> newSelection) {
-                    ref.read(themeModeProvider.notifier).setThemeMode(newSelection.first);
-                  },
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 24),
@@ -324,6 +339,57 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           _AccountSessionCard(
             isDark: theme.brightness == Brightness.dark,
+          ),
+          const SizedBox(height: 24),
+
+          // 7. Home Screen Widget Preview & Customization (Feature F-9)
+          _SectionHeader(title: l10n.widgetSettings),
+          const SizedBox(height: 8),
+          const HomeWidgetPreviewCard(),
+          const SizedBox(height: 24),
+
+          // 8. Interactive App Tour (Feature F-13)
+          _SectionHeader(title: l10n.replayTour),
+          const SizedBox(height: 8),
+          AppCard(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Material(
+              color: Colors.transparent,
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.auto_stories_rounded,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+                title: Text(
+                  l10n.replayTour,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  l10n.onboardingTitle1,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const OnboardingScreen(isReplay: true),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
           const SizedBox(height: 28),
 
@@ -664,18 +730,22 @@ class _ProBanner extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: isPro ? AppColors.successPastel : AppColors.tertiaryLight,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          isPro ? l10n.activeStatus : l10n.proBadge,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: isPro ? AppColors.successPastel : AppColors.tertiaryLight,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            isPro ? l10n.activeStatus : l10n.proBadge,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -783,12 +853,16 @@ class _AccountSessionCard extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(width: 6),
-                        Text(
-                          l10n.cloudSessionActive,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppColors.successPastel,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 11,
+                        Expanded(
+                          child: Text(
+                            l10n.cloudSessionActive,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppColors.successPastel,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 11,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -807,9 +881,10 @@ class _AccountSessionCard extends ConsumerWidget {
           SizedBox(
             width: double.infinity,
             height: 42,
-            child: OutlinedButton.icon(
+            child: OutlinedButton(
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.errorPastel,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 side: BorderSide(
                   color: AppColors.errorPastel.withValues(alpha: 0.4),
                 ),
@@ -818,11 +893,123 @@ class _AccountSessionCard extends ConsumerWidget {
                 ),
               ),
               onPressed: () => _confirmSignOut(context, ref, l10n),
-              icon: const Icon(Icons.logout_rounded, size: 18),
-              label: Text(
-                l10n.signOutConfirmTitle,
-                style: const TextStyle(fontWeight: FontWeight.w600),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.logout_rounded, size: 18),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      l10n.signOutConfirmTitle,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            height: 38,
+            child: TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.errorPastel.withValues(alpha: 0.8),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              onPressed: () => _confirmAccountDeletion(context, ref, l10n),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.delete_forever_rounded, size: 18),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      l10n.deleteAccountTitle,
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmAccountDeletion(BuildContext context, WidgetRef ref, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: AppColors.errorPastel, size: 24),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                l10n.deleteAccountConfirmationTitle,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.deleteAccountConfirmationMessage,
+                style: const TextStyle(fontSize: 13, height: 1.45),
+              ),
+            ],
+          ),
+        ),
+        actionsOverflowDirection: VerticalDirection.down,
+        actionsOverflowButtonSpacing: 8,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.errorPastel,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              final success = await ref.read(authControllerProvider.notifier).requestAccountDeletion();
+              if (success && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(l10n.deleteAccountScheduledNotice),
+                    backgroundColor: AppColors.errorPastel,
+                    duration: const Duration(seconds: 6),
+                  ),
+                );
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                }
+              }
+            },
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(l10n.deleteAccountButton),
             ),
           ),
         ],
@@ -974,5 +1161,78 @@ class _AdminDashboardBanner extends StatelessWidget {
     );
   }
 }
+
+class _ThemeModeCard extends StatelessWidget {
+  final ThemeMode mode;
+  final ThemeMode selectedMode;
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _ThemeModeCard({
+    required this.mode,
+    required this.selectedMode,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isSelected = mode == selectedMode;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? theme.colorScheme.primaryContainer.withValues(alpha: 0.5)
+              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSelected
+                ? theme.colorScheme.primary
+                : theme.colorScheme.outlineVariant.withValues(alpha: 0.6),
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 20,
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(height: 6),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                label,
+                maxLines: 1,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurface,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 
 

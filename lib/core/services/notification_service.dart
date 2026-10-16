@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-import '../../../features/budget/domain/trip.dart';
-import '../../../features/budget/presentation/controllers/trip_controller.dart';
+import 'package:packbuddy/features/budget/domain/trip.dart';
+import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'preferences_service.dart';
 
 /// Abstract contract for the Smart Notification System in PackBuddy.
@@ -67,10 +68,16 @@ class LocalNotificationService implements INotificationService {
       // 1. Initialize Timezone database
       tz.initializeTimeZones();
       try {
-        final timeZoneName = DateTime.now().timeZoneName;
-        tz.setLocalLocation(tz.getLocation(timeZoneName));
-      } catch (_) {
-        // Fallback: tz.local remains initialized to default
+        final tzInfo = await FlutterTimezone.getLocalTimezone();
+        tz.setLocalLocation(tz.getLocation(tzInfo.identifier));
+      } catch (e) {
+        debugPrint('[LocalNotificationService] FlutterTimezone notice: $e');
+        try {
+          final fallbackName = DateTime.now().timeZoneName;
+          tz.setLocalLocation(tz.getLocation(fallbackName));
+        } catch (_) {
+          // Fallback: tz.local remains initialized to default/UTC
+        }
       }
 
       // 2. Platform initialization settings

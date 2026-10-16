@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/features/checklist/domain/packing_templates.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
+import 'package:packbuddy/features/checklist/domain/canonical_packing_catalog.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 /// Modal bottom sheet allowing users to browse and import curated smart packing templates
@@ -183,14 +184,14 @@ class _SmartTemplatesSheetState extends ConsumerState<SmartTemplatesSheet> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      template.title,
+                                      template.getLocalizedTitle(l10n),
                                       style: theme.textTheme.titleSmall?.copyWith(
                                         fontWeight: FontWeight.w700,
                                       ),
                                     ),
                                     const SizedBox(height: 3),
                                     Text(
-                                      template.description,
+                                      template.getLocalizedDescription(l10n),
                                       style: TextStyle(
                                         fontSize: 11.5,
                                         color: theme.colorScheme.onSurfaceVariant,
@@ -280,7 +281,7 @@ class _SmartTemplatesSheetState extends ConsumerState<SmartTemplatesSheet> {
                                       ),
                                     ),
                                     child: Text(
-                                      '${item.name} (${item.quantity}x)',
+                                      '${CanonicalPackingCatalog.getLocalizedItemName(item.name, Localizations.localeOf(context).languageCode)} (${item.quantity}x)',
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w500,
@@ -330,7 +331,7 @@ class _SmartTemplatesSheetState extends ConsumerState<SmartTemplatesSheet> {
                                   icon: const Icon(Icons.add_task_rounded, size: 18),
                                   label: Flexible(
                                     child: Text(
-                                      '"${template.title}" ${l10n.addTemplateToBaggage}',
+                                      '"${template.getLocalizedTitle(l10n)}" ${l10n.addTemplateToBaggage}',
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(fontWeight: FontWeight.w700),

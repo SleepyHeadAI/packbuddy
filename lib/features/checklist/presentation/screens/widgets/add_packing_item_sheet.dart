@@ -325,9 +325,13 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
                           visualDensity: VisualDensity.compact,
                           onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
                         ),
-                        Text(
-                          '$_quantity ${l10n.pieces}',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                        Flexible(
+                          child: Text(
+                            '$_quantity ${l10n.pieces}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                          ),
                         ),
                         IconButton(
                           icon: Icon(Icons.add, size: 16, color: theme.colorScheme.primary),

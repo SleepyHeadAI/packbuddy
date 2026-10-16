@@ -6,7 +6,7 @@ class AppDateFormatter {
   /// Safely formats a date using MMMd (e.g., '14 Eyl' or 'Sep 14')
   static String formatMMMd(DateTime date, {String? locale}) {
     try {
-      final loc = (locale != null && locale.isNotEmpty) ? locale : 'tr';
+      final loc = (locale != null && locale.isNotEmpty) ? locale : (Intl.defaultLocale ?? 'en');
       return DateFormat.MMMd(loc).format(date);
     } catch (_) {
       try {
@@ -20,7 +20,7 @@ class AppDateFormatter {
   /// Safely formats a date using yMMMd (e.g., '14 Eyl 2026' or 'Sep 14, 2026')
   static String formatYMMMd(DateTime date, {String? locale}) {
     try {
-      final loc = (locale != null && locale.isNotEmpty) ? locale : 'tr';
+      final loc = (locale != null && locale.isNotEmpty) ? locale : (Intl.defaultLocale ?? 'en');
       return DateFormat.yMMMd(loc).format(date);
     } catch (_) {
       try {

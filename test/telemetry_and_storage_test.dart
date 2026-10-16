@@ -39,12 +39,37 @@ class FakeAdminController extends StateNotifier<AdminState>
   Future<void> refreshData() async {}
 
   @override
+  Future<void> loadUsers() async {}
+
+  @override
   void setSearchQuery(String query) {
     state = state.copyWith(searchQuery: query);
   }
 
   @override
   Future<bool> toggleUserProStatus(String uid, bool isPremium) async {
+    return true;
+  }
+
+  @override
+  void setAnalyticsPeriod(AnalyticsPeriod period) {
+    state = state.copyWith(analyticsPeriod: period);
+  }
+
+  @override
+  void setUserFilter(UserFilterChip filter) {
+    state = state.copyWith(userFilter: filter);
+  }
+
+  @override
+  Future<bool> updateUserModeration({
+    required String uid,
+    required bool isPremium,
+    required String banStatus,
+    String? banExpiresAt,
+    String? banReason,
+    required List<String> restrictedFeatures,
+  }) async {
     return true;
   }
 

@@ -224,7 +224,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get annual => 'Tahunan';
 
   @override
-  String get annualSave => 'Hemat 33%';
+  String get annualSave => 'Hemat 58%';
 
   @override
   String get subscribeNow => 'Lanjutkan dengan Pro';
@@ -1236,4 +1236,481 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get adminTotalStorage => 'Penyimpanan Brankas';
+
+  @override
+  String get adminDefaultBanReason =>
+      'Pelanggaran terhadap ketentuan layanan platform.';
+
+  @override
+  String get adminPermanentBanTitle => 'Akun Ditangguhkan Secara Permanen';
+
+  @override
+  String get adminTemporaryBanTitle => 'Akun Ditangguhkan Sementara';
+
+  @override
+  String get adminAccountSuspendedNotice =>
+      'Akses ke layanan PackBuddy telah dibatasi oleh administrator.';
+
+  @override
+  String get adminPermanentBan => 'Blokir Permanen';
+
+  @override
+  String get adminTemporaryBan => 'Blokir Sementara';
+
+  @override
+  String get adminBanReasonLabel => 'Alasan Penangguhan';
+
+  @override
+  String get adminBanExpiresAtLabel => 'Penangguhan Berakhir Pada';
+
+  @override
+  String get adminFeatureRestrictedNotice =>
+      'Tindakan ini dibatasi oleh administrator.';
+
+  @override
+  String get adminGeoAnalytics => 'Analitik Geografis & Aktivitas';
+
+  @override
+  String get adminPeriodLive => 'Langsung (15m)';
+
+  @override
+  String get adminPeriodDaily => 'Harian (24j)';
+
+  @override
+  String get adminPeriodWeekly => 'Mingguan (7h)';
+
+  @override
+  String get adminPeriodMonthly => 'Bulanan (30h)';
+
+  @override
+  String get adminPeriodYearly => 'Tahunan (365h)';
+
+  @override
+  String get adminNoActiveUsers => 'Tidak ada pengguna aktif dalam periode ini';
+
+  @override
+  String get adminFilterAll => 'Semua';
+
+  @override
+  String get adminFilterPro => 'Pro';
+
+  @override
+  String get adminFilterBanned => 'Diblokir';
+
+  @override
+  String get adminFilterRestricted => 'Dibatasi';
+
+  @override
+  String get adminModerateUser => 'Moderasi Pengguna';
+
+  @override
+  String get adminBanStatusLabel => 'Penangguhan / Pemblokiran Akun';
+
+  @override
+  String get adminUnbanned => 'Tidak Diblokir';
+
+  @override
+  String get adminBan24h => '24 Jam';
+
+  @override
+  String get adminBan7d => '7 Hari';
+
+  @override
+  String get adminBan30d => '30 Hari';
+
+  @override
+  String get adminBanReasonHint => 'Alasan penangguhan (opsional)...';
+
+  @override
+  String get adminFeatureRestrictionsLabel => 'Pembatasan Fitur Terperinci';
+
+  @override
+  String get adminRestrictTripCreate => 'Batasi Pembuatan Perjalanan';
+
+  @override
+  String get adminRestrictExpenseAdd => 'Batasi Pencatatan Pengeluaran';
+
+  @override
+  String get adminRestrictVaultUpload => 'Batasi Unggahan Brankas';
+
+  @override
+  String get adminRestrictCloudSync => 'Batasi Sinkronisasi Cloud';
+
+  @override
+  String get adminSaveChanges => 'Simpan Perubahan';
+
+  @override
+  String get adminChangesSaved => 'Perubahan moderasi berhasil disimpan';
+
+  @override
+  String get adminSignOut => 'Keluar';
+
+  @override
+  String get perMonth => '/bln';
+
+  @override
+  String get perYear => '/thn';
+
+  @override
+  String get storeBillingRequiredTitle => 'Penagihan Toko Diperlukan';
+
+  @override
+  String get storeBillingRequiredMessage =>
+      'Penagihan resmi Google Play & App Store saat ini sedang diaktifkan untuk build ini. Transaksi langganan tidak dapat dilewati secara gratis.';
+
+  @override
+  String get adminTestPurchaseTitle => 'Pembelian Uji Coba Admin / Sandbox';
+
+  @override
+  String get adminTestPurchaseMessage =>
+      'Anda masuk sebagai Super Admin. Apakah Anda ingin mengonfirmasi dan mengaktifkan langganan uji coba PackBuddy Pro?';
+
+  @override
+  String get activateTestPro => 'Aktifkan Pro (Uji Coba)';
+
+  @override
+  String get templateSummerTitle => 'Pantai & Liburan Musim Panas';
+
+  @override
+  String get templateSummerDesc =>
+      'Daftar barang penting untuk laut, pasir, matahari, dan liburan tropis';
+
+  @override
+  String get templateWinterTitle => 'Liburan Musim Dingin & Ski';
+
+  @override
+  String get templateWinterDesc =>
+      'Pakaian pelindung dan perlengkapan hangat untuk iklim dingin dan resor ski';
+
+  @override
+  String get templateBusinessTitle => 'Bisnis & Konferensi';
+
+  @override
+  String get templateBusinessDesc =>
+      'Koper rapi untuk pertemuan, konferensi, dan perjalanan dinas';
+
+  @override
+  String get templateCampingTitle => 'Petualangan Alam & Berkemah';
+
+  @override
+  String get templateCampingDesc =>
+      'Peralatan luar ruangan tangguh untuk berkemah dengan tenda dan trekking';
+
+  @override
+  String get templateCityTitle => 'Wisata Akhir Pekan di Kota';
+
+  @override
+  String get templateCityDesc =>
+      'Ransel ringkas dan praktis untuk liburan kota selama 2-3 hari';
+
+  @override
+  String get vaultCloudBackupNotice =>
+      'Dokumen dienkripsi & dicadangkan ke penyimpanan cloud untuk sinkronisasi antar perangkat, pemulihan 15 hari, dan kepatuhan keamanan.';
+
+  @override
+  String get deleteAccountTitle => 'Hapus Akun';
+
+  @override
+  String get deleteAccountConfirmationTitle =>
+      'Permintaan Penghapusan Akun 15 Hari';
+
+  @override
+  String get deleteAccountConfirmationMessage =>
+      'Akun, perjalanan, pengeluaran, dan dokumen brankas Anda akan dijadwalkan untuk dihapus permanen dalam 15 hari.\n\n• Jangan masuk selama 15 hari agar penghapusan selesai.\n• Jika Anda masuk kembali dalam 15 hari, akun dan seluruh data akan dipulihkan otomatis.\n\nApakah Anda ingin melanjutkan?';
+
+  @override
+  String get deleteAccountButton => 'Minta Penghapusan 15 Hari';
+
+  @override
+  String get deleteAccountScheduledNotice =>
+      'Akun Anda dijadwalkan untuk dihapus dalam 15 hari. Jangan masuk jika Anda ingin menghapusnya secara permanen.';
+
+  @override
+  String get accountRestoredNotice =>
+      'Selamat datang kembali! Penghapusan akun dibatalkan dan seluruh data Anda telah dipulihkan.';
+
+  @override
+  String adminPendingDeletionBadge(int days) {
+    return 'Dijadwalkan untuk dihapus (sisa $days hari)';
+  }
+
+  @override
+  String get adminCancelDeletion => 'Batalkan Penghapusan';
+
+  @override
+  String get adminPurgeNow => 'Bersihkan Data Sekarang';
+
+  @override
+  String get adminPurgeConfirmTitle => 'Hapus Data Pengguna Secara Permanen?';
+
+  @override
+  String get adminPurgeConfirmMessage =>
+      'Tindakan ini akan segera dan secara permanen menghapus semua perjalanan, pengeluaran, daftar periksa, dan dokumen brankas pengguna ini.';
+
+  @override
+  String get adminDeletionCancelled => 'Penghapusan akun berhasil dibatalkan';
+
+  @override
+  String get adminDataPurged => 'Semua data pengguna berhasil dihapus permanen';
+
+  @override
+  String get adminVaultDocumentsTitle =>
+      'Dokumen Brankas Diunggah (Periksa / Kelola)';
+
+  @override
+  String get adminNoDocumentsUploaded =>
+      'Belum ada dokumen brankas yang diunggah';
+
+  @override
+  String get adminInspectDocument => 'Periksa';
+
+  @override
+  String get adminDeleteDocument => 'Hapus Dokumen';
+
+  @override
+  String get adminDeleteDocumentConfirm =>
+      'Apakah Anda yakin ingin menghapus permanen dokumen ini dari brankas cloud?';
+
+  @override
+  String get adminDocumentDeleted => 'Dokumen berhasil dihapus oleh admin';
+
+  @override
+  String get adminDocumentPreviewTitle => 'Inspektur Dokumen';
+
+  @override
+  String get adminDocumentTypeImage => 'GAMBAR';
+
+  @override
+  String get adminDocumentTypePdf => 'PDF';
+
+  @override
+  String get emailVerifySpamFolderTip => 'Periksa Folder Spam / Promosi';
+
+  @override
+  String get emailVerifySpamFolderDesc =>
+      'Jika belum menerima tautan, periksa folder spam untuk email dari PackBuddy. Verifikasi email menjaga brankas cloud Anda tetap aman.';
+
+  @override
+  String get emailVerifyAutoChecking =>
+      'Menunggu tautan verifikasi... (memeriksa otomatis)';
+
+  @override
+  String get currencyConverter => 'Konverter Mata Uang';
+
+  @override
+  String get fromCurrency => 'Dari';
+
+  @override
+  String get toCurrency => 'Ke';
+
+  @override
+  String get exchangeRate => 'Nilai Tukar';
+
+  @override
+  String get liveRates => 'Kurs Terkini';
+
+  @override
+  String get offlineRates => 'Kurs Offline';
+
+  @override
+  String get quickConvert => 'Konverter Cepat';
+
+  @override
+  String get refreshRates => 'Perbarui Kurs';
+
+  @override
+  String get budgetAnalytics => 'Analitik Anggaran';
+
+  @override
+  String get categoryDistribution => 'Distribusi Kategori';
+
+  @override
+  String get spendingTrends => 'Tren Pengeluaran';
+
+  @override
+  String get dailyBurnRate => 'Pengeluaran Harian';
+
+  @override
+  String get projectedTotal => 'Proyeksi Total';
+
+  @override
+  String get budgetStatusOnTrack => 'Sesuai Anggaran';
+
+  @override
+  String get budgetStatusOver => 'Melebihi Anggaran';
+
+  @override
+  String get budgetStatusWarning => 'Laju Cepat';
+
+  @override
+  String get compareTrips => 'Bandingkan Perjalanan';
+
+  @override
+  String get selectTripsToCompare => 'Pilih Perjalanan';
+
+  @override
+  String get selectAtLeastTwoTrips => 'Pilih minimal 2 perjalanan';
+
+  @override
+  String get comparisonSummary => 'Ringkasan Perbandingan';
+
+  @override
+  String get budgetEfficiency => 'Status Anggaran';
+
+  @override
+  String get packingReadiness => 'Kesiapan Pengepakan';
+
+  @override
+  String get lowestDailyCost => 'Paling Ekonomis';
+
+  @override
+  String get highestSpending => 'Pengeluaran Tertinggi';
+
+  @override
+  String get sharedTrip => 'Perjalanan Bersama';
+
+  @override
+  String get shareTripInvite => 'Undang Rekan';
+
+  @override
+  String get joinSharedTrip => 'Gabung Perjalanan';
+
+  @override
+  String get inviteCode => 'Kode Undangan';
+
+  @override
+  String get enterInviteCode => 'Masukkan kode 6 karakter';
+
+  @override
+  String get collaborators => 'Rekan';
+
+  @override
+  String get copyCode => 'Salin Kode';
+
+  @override
+  String get codeCopied => 'Kode undangan disalin';
+
+  @override
+  String get invalidInviteCode => 'Kode tidak valid atau kedaluwarsa';
+
+  @override
+  String get joinSuccess => 'Berhasil bergabung!';
+
+  @override
+  String get shareTrip => 'Bagikan Perjalanan';
+
+  @override
+  String get shareChecklist => 'Bagikan Daftar';
+
+  @override
+  String get shareBudget => 'Bagikan Anggaran';
+
+  @override
+  String get shareTripSummary => 'Lihat rencana perjalanan saya di PackBuddy!';
+
+  @override
+  String get shareCopied => 'Detail perjalanan disalin';
+
+  @override
+  String get tripMap => 'Peta & Rute Perjalanan';
+
+  @override
+  String get openInMaps => 'Buka di Peta';
+
+  @override
+  String get openInGoogleMaps => 'Buka di Google Maps';
+
+  @override
+  String get openInAppleMaps => 'Buka di Apple Maps';
+
+  @override
+  String get waypoints => 'Titik Singgah';
+
+  @override
+  String get addWaypoint => 'Tambah Titik Singgah';
+
+  @override
+  String get waypointName => 'Tempat / Hotel / Wisata';
+
+  @override
+  String get noWaypoints => 'Belum ada titik singgah';
+
+  @override
+  String get widgetSettings => 'Widget Layar Utama';
+
+  @override
+  String get widgetPreview => 'Pratinjau Widget';
+
+  @override
+  String get showCountdown => 'Tampilkan Hitung Mundur';
+
+  @override
+  String get showPackingProgress => 'Tampilkan Progres Pengepakan';
+
+  @override
+  String get showBudgetData => 'Tampilkan Ringkasan Anggaran';
+
+  @override
+  String get widgetSizeSmall => 'Kecil';
+
+  @override
+  String get widgetSizeMedium => 'Sedang';
+
+  @override
+  String get widgetSizeLarge => 'Besar';
+
+  @override
+  String get onboardingTitle1 => 'Rencanakan Perjalanan';
+
+  @override
+  String get onboardingDesc1 =>
+      'Kelola anggaran multi-mata uang dan lacak pengeluaran harian di mana saja.';
+
+  @override
+  String get onboardingTitle2 => 'Daftar Pengepakan Pintar';
+
+  @override
+  String get onboardingDesc2 =>
+      'Panduan bagasi maskapai dan templat cerdas agar barang tidak tertinggal.';
+
+  @override
+  String get onboardingTitle3 => 'Kolaborasi Nyata';
+
+  @override
+  String get onboardingDesc3 =>
+      'Bagikan rencana perjalanan dan daftar barang dengan kode undangan sederhana.';
+
+  @override
+  String get onboardingTitle4 => 'Brankas Offline Aman';
+
+  @override
+  String get onboardingDesc4 =>
+      'Simpan paspor dan tiket terenkripsi tanpa internet.';
+
+  @override
+  String get getStarted => 'Mulai';
+
+  @override
+  String get skip => 'Lewati';
+
+  @override
+  String get next => 'Lanjut';
+
+  @override
+  String get replayTour => 'Ulangi Tur Aplikasi';
+
+  @override
+  String get signInWithApple => 'Masuk dengan Apple';
+
+  @override
+  String get appleSignInFailed => 'Gagal masuk dengan Apple';
+
+  @override
+  String get total => 'Total';
+
+  @override
+  String get totalSpent => 'Total Pengeluaran';
+
+  @override
+  String get confirm => 'Konfirmasi';
 }

@@ -225,7 +225,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get annual => 'Ετήσιο';
 
   @override
-  String get annualSave => 'Έκπτωση 33%';
+  String get annualSave => 'Έκπτωση 58%';
 
   @override
   String get subscribeNow => 'Συνέχεια με Pro';
@@ -1247,4 +1247,488 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get adminTotalStorage => 'Χώρος Θησαυρού';
+
+  @override
+  String get adminDefaultBanReason =>
+      'Παραβίαση των όρων χρήσης της πλατφόρμας.';
+
+  @override
+  String get adminPermanentBanTitle => 'Ο λογαριασμός ανεστάλη οριστικά';
+
+  @override
+  String get adminTemporaryBanTitle => 'Ο λογαριασμός ανεστάλη προσωρινά';
+
+  @override
+  String get adminAccountSuspendedNotice =>
+      'Η πρόσβαση στις υπηρεσίες PackBuddy έχει περιοριστεί από διαχειριστή.';
+
+  @override
+  String get adminPermanentBan => 'Μόνιμος αποκλεισμός';
+
+  @override
+  String get adminTemporaryBan => 'Προσωρινός αποκλεισμός';
+
+  @override
+  String get adminBanReasonLabel => 'Αιτία αναστολής';
+
+  @override
+  String get adminBanExpiresAtLabel => 'Η αναστολή λήγει στις';
+
+  @override
+  String get adminFeatureRestrictedNotice =>
+      'Αυτή η ενέργεια έχει περιοριστεί από διαχειριστή.';
+
+  @override
+  String get adminGeoAnalytics => 'Γεωγραφική & Δραστηριότητας Ανάλυση';
+
+  @override
+  String get adminPeriodLive => 'Ζωντανά (15λ)';
+
+  @override
+  String get adminPeriodDaily => 'Ημερήσια (24ω)';
+
+  @override
+  String get adminPeriodWeekly => 'Εβδομαδιαία (7ημ)';
+
+  @override
+  String get adminPeriodMonthly => 'Μηνιαία (30ημ)';
+
+  @override
+  String get adminPeriodYearly => 'Ετήσια (365ημ)';
+
+  @override
+  String get adminNoActiveUsers =>
+      'Δεν υπάρχουν ενεργοί χρήστες σε αυτήν την περίοδο';
+
+  @override
+  String get adminFilterAll => 'Όλα';
+
+  @override
+  String get adminFilterPro => 'Pro';
+
+  @override
+  String get adminFilterBanned => 'Αποκλεισμένοι';
+
+  @override
+  String get adminFilterRestricted => 'Περιορισμένοι';
+
+  @override
+  String get adminModerateUser => 'Διαχείριση χρήστη';
+
+  @override
+  String get adminBanStatusLabel => 'Αναστολή / Αποκλεισμός λογαριασμού';
+
+  @override
+  String get adminUnbanned => 'Ενεργός';
+
+  @override
+  String get adminBan24h => '24 Ώρες';
+
+  @override
+  String get adminBan7d => '7 Ημέρες';
+
+  @override
+  String get adminBan30d => '30 Ημέρες';
+
+  @override
+  String get adminBanReasonHint => 'Αιτία αναστολής (προαιρετικό)...';
+
+  @override
+  String get adminFeatureRestrictionsLabel =>
+      'Λεπτομερείς περιορισμοί λειτουργιών';
+
+  @override
+  String get adminRestrictTripCreate => 'Περιορισμός δημιουργίας ταξιδιού';
+
+  @override
+  String get adminRestrictExpenseAdd => 'Περιορισμός προσθήκης εξόδων';
+
+  @override
+  String get adminRestrictVaultUpload => 'Περιορισμός μεταφόρτωσης θυρίδας';
+
+  @override
+  String get adminRestrictCloudSync => 'Περιορισμός συγχρονισμού cloud';
+
+  @override
+  String get adminSaveChanges => 'Αποθήκευση αλλαγών';
+
+  @override
+  String get adminChangesSaved => 'Οι αλλαγές εποπτείας αποθηκεύτηκαν επιτυχώς';
+
+  @override
+  String get adminSignOut => 'Αποσύνδεση';
+
+  @override
+  String get perMonth => '/μήνα';
+
+  @override
+  String get perYear => '/έτος';
+
+  @override
+  String get storeBillingRequiredTitle => 'Απαιτείται χρέωση καταστήματος';
+
+  @override
+  String get storeBillingRequiredMessage =>
+      'Η επίσημη χρέωση Google Play και App Store ενεργοποιείται για αυτήν την έκδοση. Οι συνδρομές δεν μπορούν να παρακαμφθούν δωρεάν.';
+
+  @override
+  String get adminTestPurchaseTitle =>
+      'Δοκιμαστική αγορά διαχειριστή / Sandbox';
+
+  @override
+  String get adminTestPurchaseMessage =>
+      'Έχετε συνδεθεί ως Super Admin. Θέλετε να επιβεβαιώσετε και να ενεργοποιήσετε τη δοκιμαστική συνδρομή PackBuddy Pro;';
+
+  @override
+  String get activateTestPro => 'Ενεργοποίηση Pro (Δοκιμή)';
+
+  @override
+  String get templateSummerTitle => 'Παραλία & Καλοκαιρινές Διακοπές';
+
+  @override
+  String get templateSummerDesc =>
+      'Πλήρης λίστα για θάλασσα, άμμο, ήλιο και ζεστούς προορισμούς';
+
+  @override
+  String get templateWinterTitle => 'Χειμερινό Ταξίδι & Σκι';
+
+  @override
+  String get templateWinterDesc =>
+      'Ζεστά ρούχα και εξοπλισμός προστασίας για χιονοδρομικά και κρύο κλίμα';
+
+  @override
+  String get templateBusinessTitle => 'Επαγγελματικό Ταξίδι & Συνέδριο';
+
+  @override
+  String get templateBusinessDesc =>
+      'Κομψές αποσκευές για συναντήσεις, συνέδρια και επαγγελματικά ταξίδια';
+
+  @override
+  String get templateCampingTitle => 'Φύση & Κατασκήνωση';
+
+  @override
+  String get templateCampingDesc =>
+      'Ανθεκτικός εξοπλισμός για κάμπινγκ, ορειβασία και πεζοπορία';
+
+  @override
+  String get templateCityTitle => 'Απόδραση Σαββατοκύριακου στην Πόλη';
+
+  @override
+  String get templateCityDesc =>
+      'Πρακτικό και άνετο σακίδιο για ένα 2ήμερο ή 3ήμερο city break';
+
+  @override
+  String get vaultCloudBackupNotice =>
+      'Τα έγγραφα είναι κρυπτογραφημένα και αποθηκεύονται στο cloud για συγχρονισμό, ανάκτηση λογαριασμού 15 ημερών και ασφάλεια.';
+
+  @override
+  String get deleteAccountTitle => 'Διαγραφή λογαριασμού';
+
+  @override
+  String get deleteAccountConfirmationTitle =>
+      'Αίτημα διαγραφής λογαριασμού 15 ημερών';
+
+  @override
+  String get deleteAccountConfirmationMessage =>
+      'Ο λογαριασμός, τα ταξίδια, τα έξοδα και τα έγγραφα του θησαυροφυλακίου σας θα προγραμματιστούν για οριστική διαγραφή σε 15 ημέρες.\n\n• Μην συνδεθείτε για 15 ημέρες ώστε να ολοκληρωθεί η διαγραφή.\n• Εάν συνδεθείτε εντός 15 ημερών, ο λογαριασμός και όλα τα δεδομένα θα αποκατασταθούν αυτόματα.\n\nΘέλετε να συνεχίσετε;';
+
+  @override
+  String get deleteAccountButton => 'Αίτημα διαγραφής 15 ημερών';
+
+  @override
+  String get deleteAccountScheduledNotice =>
+      'Ο λογαριασμός σας έχει προγραμματιστεί για διαγραφή σε 15 ημέρες. Μην συνδεθείτε εάν επιθυμείτε την οριστική διαγραφή του.';
+
+  @override
+  String get accountRestoredNotice =>
+      'Καλώς ήρθατε πίσω! Η διαγραφή του λογαριασμού σας ακυρώθηκε και όλα τα δεδομένα σας αποκαταστάθηκαν.';
+
+  @override
+  String adminPendingDeletionBadge(int days) {
+    return 'Προγραμματισμένη διαγραφή (απομένουν $daysημ.)';
+  }
+
+  @override
+  String get adminCancelDeletion => 'Ακύρωση διαγραφής';
+
+  @override
+  String get adminPurgeNow => 'Εκκαθάριση δεδομένων τώρα';
+
+  @override
+  String get adminPurgeConfirmTitle => 'Οριστική εκκαθάριση δεδομένων χρήστη;';
+
+  @override
+  String get adminPurgeConfirmMessage =>
+      'Αυτό θα διαγράψει άμεσα και αμετάκλητα όλα τα ταξίδια, έξοδα, λίστες και έγγραφα του χρήστη.';
+
+  @override
+  String get adminDeletionCancelled =>
+      'Η διαγραφή λογαριασμού ακυρώθηκε με επιτυχία';
+
+  @override
+  String get adminDataPurged =>
+      'Όλα τα δεδομένα του χρήστη εκκαθαρίστηκαν οριστικά';
+
+  @override
+  String get adminVaultDocumentsTitle =>
+      'Μεταφορτωμένα έγγραφα θησαυροφυλακίου (Επιθεώρηση / Διαχείριση)';
+
+  @override
+  String get adminNoDocumentsUploaded => 'Δεν έχουν μεταφορτωθεί έγγραφα ακόμα';
+
+  @override
+  String get adminInspectDocument => 'Επιθεώρηση';
+
+  @override
+  String get adminDeleteDocument => 'Διαγραφή εγγράφου';
+
+  @override
+  String get adminDeleteDocumentConfirm =>
+      'Είστε βέβαιοι ότι θέλετε να διαγράψετε οριστικά αυτό το έγγραφο από το θησαυροφυλάκιο cloud;';
+
+  @override
+  String get adminDocumentDeleted =>
+      'Το έγγραφο διαγράφηκε επιτυχώς από τον διαχειριστή';
+
+  @override
+  String get adminDocumentPreviewTitle => 'Επιθεωρητής εγγράφων';
+
+  @override
+  String get adminDocumentTypeImage => 'ΕΙΚΟΝΑ';
+
+  @override
+  String get adminDocumentTypePdf => 'PDF';
+
+  @override
+  String get emailVerifySpamFolderTip =>
+      'Ελέγξτε τον φάκελο Ανεπιθύμητων / Προσφορών';
+
+  @override
+  String get emailVerifySpamFolderDesc =>
+      'Εάν δεν λάβατε τον σύνδεσμο, ελέγξτε τα ανεπιθύμητα μηνύματα για email από το PackBuddy. Η επαλήθευση προστατεύει το θησαυροφυλάκιό σας.';
+
+  @override
+  String get emailVerifyAutoChecking =>
+      'Αναμονή για σύνδεσμο επαλήθευσης... (αυτόματος έλεγχος)';
+
+  @override
+  String get currencyConverter => 'Μετατροπέας Νομισμάτων';
+
+  @override
+  String get fromCurrency => 'Από';
+
+  @override
+  String get toCurrency => 'Σε';
+
+  @override
+  String get exchangeRate => 'Συναλλαγματική Ισοτιμία';
+
+  @override
+  String get liveRates => 'Ζωντανές Ισοτιμίες';
+
+  @override
+  String get offlineRates => 'Ισοτιμίες Εκτός Σύνδεσης';
+
+  @override
+  String get quickConvert => 'Γρήγορος Μετατροπέας';
+
+  @override
+  String get refreshRates => 'Ανανέωση Ισοτιμιών';
+
+  @override
+  String get budgetAnalytics => 'Ανάλυση Προϋπολογισμού';
+
+  @override
+  String get categoryDistribution => 'Κατανομή ανά Κατηγορία';
+
+  @override
+  String get spendingTrends => 'Τάσεις Δαπανών';
+
+  @override
+  String get dailyBurnRate => 'Ημερήσιος Ρυθμός Δαπάνης';
+
+  @override
+  String get projectedTotal => 'Προβλεπόμενο Σύνολο';
+
+  @override
+  String get budgetStatusOnTrack => 'Εντός Προϋπολογισμού';
+
+  @override
+  String get budgetStatusOver => 'Υπέρβαση Προϋπολογισμού';
+
+  @override
+  String get budgetStatusWarning => 'Γρήγορος Ρυθμός Δαπανών';
+
+  @override
+  String get compareTrips => 'Σύγκριση Ταξιδιών';
+
+  @override
+  String get selectTripsToCompare => 'Επιλέξτε Ταξίδια για Σύγκριση';
+
+  @override
+  String get selectAtLeastTwoTrips => 'Επιλέξτε τουλάχιστον 2 ταξίδια';
+
+  @override
+  String get comparisonSummary => 'Σύνοψη Σύγκρισης';
+
+  @override
+  String get budgetEfficiency => 'Κατάσταση Προϋπολογισμού';
+
+  @override
+  String get packingReadiness => 'Πρόοδος Πακεταρίσματος';
+
+  @override
+  String get lowestDailyCost => 'Πιο Οικονομικό';
+
+  @override
+  String get highestSpending => 'Υψηλότερη Δαπάνη';
+
+  @override
+  String get sharedTrip => 'Κοινόχρηστο Ταξίδι';
+
+  @override
+  String get shareTripInvite => 'Πρόσκληση Συνταξιδιωτών';
+
+  @override
+  String get joinSharedTrip => 'Συμμετοχή σε Ταξίδι';
+
+  @override
+  String get inviteCode => 'Κωδικός Πρόσκλησης';
+
+  @override
+  String get enterInviteCode => 'Εισαγάγετε 6-ψήφιο κωδικό';
+
+  @override
+  String get collaborators => 'Συνταξιδιώτες';
+
+  @override
+  String get copyCode => 'Αντιγραφή Κωδικού';
+
+  @override
+  String get codeCopied => 'Ο κωδικός πρόσκλησης αντιγράφηκε';
+
+  @override
+  String get invalidInviteCode => 'Μη έγκυρος ή ληγμένος κωδικός';
+
+  @override
+  String get joinSuccess => 'Επιτυχής συμμετοχή στο ταξίδι!';
+
+  @override
+  String get shareTrip => 'Κοινοποίηση Ταξιδιού';
+
+  @override
+  String get shareChecklist => 'Κοινοποίηση Λίστας';
+
+  @override
+  String get shareBudget => 'Κοινοποίηση Προϋπολογισμού';
+
+  @override
+  String get shareTripSummary =>
+      'Δείτε το ταξιδιωτικό μου σχέδιο στο PackBuddy!';
+
+  @override
+  String get shareCopied => 'Οι λεπτομέρειες του ταξιδιού αντιγράφηκαν';
+
+  @override
+  String get tripMap => 'Χάρτης & Διαδρομή Ταξιδιού';
+
+  @override
+  String get openInMaps => 'Άνοιγμα στους Χάρτες';
+
+  @override
+  String get openInGoogleMaps => 'Άνοιγμα στο Google Maps';
+
+  @override
+  String get openInAppleMaps => 'Άνοιγμα στο Apple Maps';
+
+  @override
+  String get waypoints => 'Στάσεις Διαδρομής';
+
+  @override
+  String get addWaypoint => 'Προσθήκη Στάσης';
+
+  @override
+  String get waypointName => 'Τοποθεσία / Ξενοδοχείο / Αξιοθέατο';
+
+  @override
+  String get noWaypoints => 'Δεν προστέθηκαν στάσεις ακόμα';
+
+  @override
+  String get widgetSettings => 'Γραφικό Στοιχείο Αρχικής';
+
+  @override
+  String get widgetPreview => 'Προεπισκόπηση Γραφικού Στοιχείου';
+
+  @override
+  String get showCountdown => 'Εμφάνιση Αντίστροφης Μέτρησης';
+
+  @override
+  String get showPackingProgress => 'Εμφάνιση Προόδου Πακεταρίσματος';
+
+  @override
+  String get showBudgetData => 'Εμφάνιση Σύνοψης Προϋπολογισμού';
+
+  @override
+  String get widgetSizeSmall => 'Μικρό';
+
+  @override
+  String get widgetSizeMedium => 'Μεσαίο';
+
+  @override
+  String get widgetSizeLarge => 'Μεγάλο';
+
+  @override
+  String get onboardingTitle1 => 'Σχεδιάστε Ταξίδια με Ευκολία';
+
+  @override
+  String get onboardingDesc1 =>
+      'Διαχειριστείτε προϋπολογισμούς πολλαπλών νομισμάτων και παρακολουθήστε τα έξοδα οπουδήποτε.';
+
+  @override
+  String get onboardingTitle2 => 'Έξυπνες Λίστες Αποσκευών';
+
+  @override
+  String get onboardingDesc2 =>
+      'Κανόνες αποσκευών αεροπορικών εταιρειών και έξυπνα πρότυπα για να μην ξεχνάτε τίποτα.';
+
+  @override
+  String get onboardingTitle3 => 'Συνεργασία σε Πραγματικό Χρόνο';
+
+  @override
+  String get onboardingDesc3 =>
+      'Μοιραστείτε τα σχέδια και τις λίστες σας με φίλους μέσω απλών κωδικών.';
+
+  @override
+  String get onboardingTitle4 => 'Ασφαλές Θησαυροφυλάκιο Εκτός Σύνδεσης';
+
+  @override
+  String get onboardingDesc4 =>
+      'Διατηρήστε διαβατήρια και εισιτήρια κρυπτογραφημένα χωρίς σύνδεση στο internet.';
+
+  @override
+  String get getStarted => 'Ξεκινήστε';
+
+  @override
+  String get skip => 'Παράλειψη';
+
+  @override
+  String get next => 'Επόμενο';
+
+  @override
+  String get replayTour => 'Επανάληψη Ξενάγησης Εφαρμογής';
+
+  @override
+  String get signInWithApple => 'Σύνδεση μέσω Apple';
+
+  @override
+  String get appleSignInFailed => 'Η σύνδεση μέσω Apple απέτυχε';
+
+  @override
+  String get total => 'Σύνολο';
+
+  @override
+  String get totalSpent => 'Συνολική δαπάνη';
+
+  @override
+  String get confirm => 'Επιβεβαίωση';
 }

@@ -402,7 +402,7 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
 
                       // Notes text
                       Text(
-                        airline.notes,
+                        airline.getLocalizedNotes(Localizations.localeOf(context).languageCode),
                         style: TextStyle(
                           fontSize: 11,
                           color: theme.colorScheme.onSurfaceVariant,

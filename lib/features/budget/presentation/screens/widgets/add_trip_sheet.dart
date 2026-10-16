@@ -7,6 +7,8 @@ import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
+import 'package:packbuddy/core/services/preferences_service.dart';
+import 'package:packbuddy/core/services/currency_service.dart';
 import 'country_picker_sheet.dart';
 
 /// Modal bottom sheet to create or edit a trip with country picker, multi-stop itinerary, transport modes, and notes
@@ -16,6 +18,21 @@ class AddTripSheet extends ConsumerStatefulWidget {
   const AddTripSheet({super.key, this.tripToEdit});
 
   static Future<void> show(BuildContext context, {Trip? tripToEdit}) {
+    if (tripToEdit == null &&
+        PreferencesService.instance.getRestrictedFeatures().contains('trip_create')) {
+      final l10n = AppLocalizations.of(context);
+      final msg = l10n != null ? l10n.adminFeatureRestrictedNotice : 'This feature has been restricted by an administrator.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: AppColors.errorPastel,
+          content: Text(msg, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+        ),
+      );
+      return Future.value();
+    }
+
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -117,6 +134,9 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
       if (t.countryCode != null) {
         _selectedCountry = Country.findByCode(t.countryCode!);
       }
+    } else {
+      _selectedCurrency = PreferencesService.instance.getDefaultCurrency() ??
+          CountryDetector.detectNativeCurrency();
     }
   }
 
@@ -202,7 +222,9 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
           children: [
             const Icon(Icons.edit_road_rounded),
             const SizedBox(width: 10),
-            Text(l10n.customTransportType, style: const TextStyle(fontSize: 18)),
+            Expanded(
+              child: Text(l10n.customTransportType, style: const TextStyle(fontSize: 18)),
+            ),
           ],
         ),
         content: TextField(

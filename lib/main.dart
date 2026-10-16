@@ -10,11 +10,14 @@ import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/services/currency_service.dart';
 import 'core/services/preferences_service.dart';
+import 'features/auth/auth_service.dart';
 import 'features/auth/auth_controller.dart';
 import 'features/auth/auth_screen.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
 import 'core/services/telemetry_service.dart';
 import 'features/auth/presentation/screens/email_verification_screen.dart';
+import 'features/auth/presentation/screens/banned_screen.dart';
+import 'features/admin/user_moderation_provider.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'data/sync_engine/sync_engine.dart';
 
@@ -81,8 +84,11 @@ class _PackBuddyAppState extends ConsumerState<PackBuddyApp>
       final user = ref.read(authUserProvider);
       final isVerified = ref.read(isEmailVerifiedProvider);
       final isPassword = ref.read(authControllerProvider).isPasswordProvider;
-      if (user != null && (isVerified || !isPassword)) {
-        ref.read(syncEngineProvider.notifier).performSync().catchError((_) {});
+      if (user != null) {
+        ref.read(authServiceProvider).updateLastActive(user.uid).catchError((_) {});
+        if (isVerified || !isPassword) {
+          ref.read(syncEngineProvider.notifier).performSync().catchError((_) {});
+        }
       }
     }
   }
@@ -111,6 +117,7 @@ class _PackBuddyAppState extends ConsumerState<PackBuddyApp>
 
 /// Authentication Wall Gate (Zorunlu Giriş & E-posta Doğrulama Duvarı)
 /// - If user is null: strictly [AuthScreen]
+/// - If user is banned: strictly [BannedScreen]
 /// - If user != null BUT emailVerified == false (password provider): strictly [EmailVerificationScreen]
 /// - If user != null AND emailVerified == true: [DashboardScreen]
 class AuthWallGate extends ConsumerWidget {
@@ -119,6 +126,7 @@ class AuthWallGate extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authUserProvider);
+    final moderation = ref.watch(userModerationProvider);
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 350),
@@ -130,28 +138,36 @@ class AuthWallGate extends ConsumerWidget {
           child: child,
         );
       },
-      child: _buildGatedScreen(user),
+      child: _buildGatedScreen(user, moderation),
     );
   }
 
-  Widget _buildGatedScreen(User? user) {
+  Widget _buildGatedScreen(User? user, UserModerationState moderation) {
     // 1. Unauthenticated -> strictly AuthScreen
     if (user == null) {
       return const AuthScreen(key: ValueKey('unauthenticated_auth_wall'));
     }
 
-    // 2. Check provider (password vs social OAuth like Google)
+    // 2. Real-Time Ban Enforcement -> strictly BannedScreen
+    if (moderation.isCurrentlyBanned) {
+      return BannedScreen(
+        key: const ValueKey('banned_lock_screen'),
+        moderation: moderation,
+      );
+    }
+
+    // 3. Check provider (password vs social OAuth like Google)
     final isPasswordProvider = user.providerData.isEmpty ||
         user.providerData.any((p) => p.providerId == 'password');
 
-    // 3. Unverified email for password accounts -> strictly EmailVerificationScreen
+    // 4. Unverified email for password accounts -> strictly EmailVerificationScreen
     if (!user.emailVerified && isPasswordProvider) {
       return const EmailVerificationScreen(
         key: ValueKey('email_verification_wall'),
       );
     }
 
-    // 4. Fully authenticated and verified -> DashboardScreen
+    // 5. Fully authenticated and verified -> DashboardScreen
     return const DashboardScreen(
       key: ValueKey('authenticated_dashboard'),
     );

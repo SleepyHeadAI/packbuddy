@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
 import '../../../../data/local_db/database_helper.dart';
 import '../../../../data/sync_engine/sync_engine.dart';
 import '../../../../core/services/telemetry_service.dart';
 import '../../domain/packing_item.dart';
 import '../../domain/packing_templates.dart';
 import '../../domain/airline_baggage_guide.dart';
+import '../../domain/canonical_packing_catalog.dart';
 
 /// State of the Checklist & Luggage system
 class ChecklistState {
@@ -29,29 +29,74 @@ class ChecklistState {
     this.selectedAirline,
   });
 
+  /// Normalizes and resolves a category string into a language-independent canonical token
+  static String normalizeCategoryToken(String category) {
+    final lower = category.trim().toLowerCase();
+    if (lower.isEmpty ||
+        lower == 'tümü' ||
+        lower == 'all' ||
+        lower == 'alle' ||
+        lower == 'todos' ||
+        lower == 'tous' ||
+        lower == 'все') {
+      return 'all';
+    }
+    if (lower == 'kıyafet' ||
+        lower == 'clothing' ||
+        lower == 'kleidung' ||
+        lower == 'ropa' ||
+        lower == 'vetements' ||
+        lower == 'vêtements' ||
+        lower == 'одежда') {
+      return 'clothing';
+    }
+    if (lower == 'elektronik' ||
+        lower == 'electronics' ||
+        lower == 'electronica' ||
+        lower == 'électronique' ||
+        lower == 'электроника') {
+      return 'electronics';
+    }
+    if (lower == 'kişisel bakım' ||
+        lower == 'toiletries' ||
+        lower == 'personal care' ||
+        lower == 'körperpflege' ||
+        lower == 'higiene' ||
+        lower == 'toilette' ||
+        lower == 'туалетные принадлежности') {
+      return 'toiletries';
+    }
+    if (lower == 'belgeler' ||
+        lower == 'documents' ||
+        lower == 'dokumente' ||
+        lower == 'documentos' ||
+        lower == 'документы') {
+      return 'documents';
+    }
+    if (lower == 'aksesuar' ||
+        lower == 'accessories' ||
+        lower == 'zubehör' ||
+        lower == 'zubehor' ||
+        lower == 'accesorios' ||
+        lower == 'accessoires' ||
+        lower == 'аксессуары') {
+      return 'accessories';
+    }
+    return lower;
+  }
+
   /// Items filtered by active search query and category filter
   List<PackingItem> get filteredItems {
     return items.where((item) {
-      // Category filter
-      if (selectedCategory != null &&
-          selectedCategory!.isNotEmpty &&
-          selectedCategory != 'Tümü' &&
-          selectedCategory != 'All') {
-        final cat = item.category.toLowerCase();
-        final selected = selectedCategory!.toLowerCase();
-        final isMatch = cat == selected ||
-            (selected == 'kıyafet' && cat == 'clothing') ||
-            (selected == 'clothing' && cat == 'kıyafet') ||
-            (selected == 'elektronik' && cat == 'electronics') ||
-            (selected == 'electronics' && cat == 'elektronik') ||
-            (selected == 'kişisel bakım' && cat == 'toiletries') ||
-            (selected == 'toiletries' && cat == 'kişisel bakım') ||
-            (selected == 'belgeler' && cat == 'documents') ||
-            (selected == 'documents' && cat == 'belgeler') ||
-            (selected == 'aksesuar' && cat == 'accessories') ||
-            (selected == 'accessories' && cat == 'aksesuar');
-        if (!isMatch) {
-          return false;
+      // Category filter (Language-independent canonical matching)
+      if (selectedCategory != null && selectedCategory!.isNotEmpty) {
+        final selectedToken = normalizeCategoryToken(selectedCategory!);
+        if (selectedToken != 'all') {
+          final itemToken = normalizeCategoryToken(item.category);
+          if (itemToken != selectedToken &&
+              item.category.toLowerCase() != selectedCategory!.toLowerCase()) {
+            return false;
+          }
         }
       }
 
@@ -109,7 +154,6 @@ class ChecklistState {
 class ChecklistNotifier extends StateNotifier<ChecklistState> {
   final DatabaseHelper _db;
   final Ref? _ref;
-  static const _uuid = Uuid();
 
   ChecklistNotifier([DatabaseHelper? db, ChecklistState? initialState, this._ref])
       : _db = db ?? DatabaseHelper.instance,
@@ -125,10 +169,14 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
     } catch (_) {}
   }
 
-  /// Seed initial representative travel items if database is empty
-  static List<PackingItem> get _seedItems => [
+  /// Seed initial representative travel items with deterministic IDs
+  static List<PackingItem> _buildSeedItems(String? userId) => [
         PackingItem(
-          id: _uuid.v4(),
+          id: CanonicalPackingCatalog.generateDeterministicId(
+            prefix: 'default',
+            userId: userId,
+            canonicalKey: 'headphones',
+          ),
           name: 'Noise-Cancelling Headphones & Case',
           category: 'Elektronik',
           quantity: 1,
@@ -139,7 +187,11 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
           updatedAt: DateTime.now().subtract(const Duration(minutes: 50)),
         ),
         PackingItem(
-          id: _uuid.v4(),
+          id: CanonicalPackingCatalog.generateDeterministicId(
+            prefix: 'default',
+            userId: userId,
+            canonicalKey: 'passport',
+          ),
           name: 'Pasaport, Vize & Uçuş Biletleri',
           category: 'Belgeler',
           quantity: 1,
@@ -150,7 +202,11 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
           updatedAt: DateTime.now().subtract(const Duration(minutes: 45)),
         ),
         PackingItem(
-          id: _uuid.v4(),
+          id: CanonicalPackingCatalog.generateDeterministicId(
+            prefix: 'default',
+            userId: userId,
+            canonicalKey: 'raincoat',
+          ),
           name: 'Hafif Su Geçirmez Yağmurluk',
           category: 'Kıyafet',
           quantity: 1,
@@ -161,7 +217,11 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
           updatedAt: DateTime.now().subtract(const Duration(minutes: 40)),
         ),
         PackingItem(
-          id: _uuid.v4(),
+          id: CanonicalPackingCatalog.generateDeterministicId(
+            prefix: 'default',
+            userId: userId,
+            canonicalKey: 'charger',
+          ),
           name: 'Evrensel Seyahat Prizi & Hızlı Şarj Cihazı',
           category: 'Elektronik',
           quantity: 2,
@@ -172,7 +232,11 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
           updatedAt: DateTime.now().subtract(const Duration(minutes: 35)),
         ),
         PackingItem(
-          id: _uuid.v4(),
+          id: CanonicalPackingCatalog.generateDeterministicId(
+            prefix: 'default',
+            userId: userId,
+            canonicalKey: 'toiletries',
+          ),
           name: 'Kişisel Bakım & Kozmetik Çantası (100ml TSA)',
           category: 'Kişisel Bakım',
           quantity: 1,
@@ -183,7 +247,11 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
           updatedAt: DateTime.now().subtract(const Duration(minutes: 30)),
         ),
         PackingItem(
-          id: _uuid.v4(),
+          id: CanonicalPackingCatalog.generateDeterministicId(
+            prefix: 'default',
+            userId: userId,
+            canonicalKey: 'walking_shoes',
+          ),
           name: 'Konforlu Yürüyüş Ayakkabısı',
           category: 'Kıyafet',
           quantity: 1,
@@ -194,7 +262,11 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
           updatedAt: DateTime.now().subtract(const Duration(minutes: 25)),
         ),
         PackingItem(
-          id: _uuid.v4(),
+          id: CanonicalPackingCatalog.generateDeterministicId(
+            prefix: 'default',
+            userId: userId,
+            canonicalKey: 'thermal_underwear',
+          ),
           name: 'Merino Yün Termal İçlik & Çoraplar',
           category: 'Kıyafet',
           quantity: 3,
@@ -205,7 +277,11 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
           updatedAt: DateTime.now().subtract(const Duration(minutes: 20)),
         ),
         PackingItem(
-          id: _uuid.v4(),
+          id: CanonicalPackingCatalog.generateDeterministicId(
+            prefix: 'default',
+            userId: userId,
+            canonicalKey: 'powerbank',
+          ),
           name: 'Powerbank 20.000 mAh (Uçuş Onaylı)',
           category: 'Elektronik',
           quantity: 1,
@@ -217,20 +293,33 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
         ),
       ];
 
+
+  /// Resets controller state on logout or account switch
+  void resetState() {
+    state = const ChecklistState();
+  }
+
   /// Loads items from database, seeding defaults if empty
-  Future<void> loadItems({String? tripId}) async {
+  Future<void> loadItems({String? tripId, String? userId}) async {
+    if (!mounted) return;
     state = state.copyWith(isLoading: true, activeTripId: tripId);
     try {
-      var items = await _db.getChecklistItems(tripId: tripId);
+      // Deduplicate existing checklist items in SQLite for clean state
+      await _db.deduplicateChecklistItems(userId: userId, tripId: tripId);
+      var items = await _db.getChecklistItems(tripId: tripId, userId: userId);
+      if (!mounted) return;
       if (items.isEmpty && tripId == null) {
-        // Seed default items for a rich first-run experience
-        for (final item in _seedItems) {
-          await _db.insertChecklistItem(item);
+        // Seed default items for a rich first-run experience with deterministic IDs
+        for (final item in _buildSeedItems(userId)) {
+          await _db.insertChecklistItem(item, userId: userId);
         }
-        items = await _db.getChecklistItems();
+        if (!mounted) return;
+        items = await _db.getChecklistItems(userId: userId);
       }
+      if (!mounted) return;
       state = state.copyWith(items: items, isLoading: false);
     } catch (e) {
+      if (!mounted) return;
       state = state.copyWith(
         isLoading: false,
         errorMessage: 'Checklist yüklenemedi: $e',
@@ -267,6 +356,27 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
       newItems[index] = current;
       state = state.copyWith(items: newItems, errorMessage: 'Durum güncellenemedi: $e');
     }
+  }
+
+  /// Assigns an item to a collaborator (Feature F-1)
+  Future<void> assignItem(String id, String? assignedTo) async {
+    final index = state.items.indexWhere((i) => i.id == id);
+    if (index == -1) return;
+
+    final current = state.items[index];
+    final updated = current.copyWith(
+      assignedTo: assignedTo,
+      updatedAt: DateTime.now(),
+    );
+
+    final newItems = List<PackingItem>.from(state.items);
+    newItems[index] = updated;
+    state = state.copyWith(items: newItems);
+
+    try {
+      await _db.updateChecklistItem(updated);
+      _triggerSync();
+    } catch (_) {}
   }
 
   /// Updates quantity via - 1 + stepper (minimum 1)
@@ -375,8 +485,6 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
   /// Bulk adds packing items (e.g. from a Smart Template)
   Future<void> addItems(List<PackingItem> items) async {
     if (items.isEmpty) return;
-    final newItems = [...items, ...state.items];
-    state = state.copyWith(items: newItems);
 
     for (final item in items) {
       try {
@@ -385,6 +493,15 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
         // Continue adding
       }
     }
+    await _db.deduplicateChecklistItems(
+      userId: state.items.isNotEmpty ? state.items.first.userId : null,
+      tripId: state.activeTripId,
+    );
+    final refreshedItems = await _db.getChecklistItems(
+      tripId: state.activeTripId,
+      userId: state.items.isNotEmpty ? state.items.first.userId : null,
+    );
+    state = state.copyWith(items: refreshedItems);
     _triggerSync();
     TelemetryService.instance.logChecklistAction(
       action: 'bulk_add',
@@ -406,24 +523,39 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
 
     // 2. Retain all checked/packed items
     final preservedPackedItems = state.items.where((i) => i.isPacked).toList();
-    final existingPackedNames = preservedPackedItems
-        .map((i) => i.name.toLowerCase().trim())
+    final existingPackedCanonicalKeys = preservedPackedItems
+        .map((i) => CanonicalPackingCatalog.resolveCanonicalKey(i.name) ?? CanonicalPackingCatalog.normalize(i.name))
         .toSet();
 
     // 3. Instantiate new template items (avoid duplicating already packed items)
+    final effectiveUserId = preservedPackedItems.isNotEmpty ? preservedPackedItems.first.userId : null;
     final newPackingItems = template.items
-        .where((t) => !existingPackedNames.contains(t.name.toLowerCase().trim()))
-        .map((t) => t.toPackingItem(tripId: state.activeTripId))
+        .where((t) {
+          final tKey = CanonicalPackingCatalog.resolveCanonicalKey(t.name) ?? CanonicalPackingCatalog.normalize(t.name);
+          return !existingPackedCanonicalKeys.contains(tKey);
+        })
+        .map((t) => t.toPackingItem(tripId: state.activeTripId, userId: effectiveUserId, templateId: template.id))
         .toList();
-
-    // 4. Update state and persist newly imported template items
-    state = state.copyWith(items: [...newPackingItems, ...preservedPackedItems]);
 
     for (final item in newPackingItems) {
       try {
         await _db.insertChecklistItem(item);
       } catch (_) {}
     }
+    // Immediate in-memory state update ensuring reactive UI and unit test resilience
+    final combined = [...preservedPackedItems, ...newPackingItems];
+    state = state.copyWith(items: combined);
+
+    try {
+      await _db.deduplicateChecklistItems(userId: effectiveUserId, tripId: state.activeTripId);
+      final refreshedItems = await _db.getChecklistItems(
+        tripId: state.activeTripId,
+        userId: effectiveUserId,
+      );
+      if (refreshedItems.isNotEmpty) {
+        state = state.copyWith(items: refreshedItems);
+      }
+    } catch (_) {}
     _triggerSync();
     TelemetryService.instance.logChecklistAction(
       action: 'import_template',

@@ -21,6 +21,10 @@ import '../../vault/presentation/controllers/vault_controller.dart';
 import '../../vault/presentation/screens/vault_screen.dart';
 import '../../checklist/presentation/controllers/checklist_controller.dart';
 import '../../checklist/presentation/screens/checklist_screen.dart';
+import '../../auth/auth_controller.dart';
+import '../../budget/presentation/widgets/currency_converter_card.dart';
+import '../../../shared/widgets/app_animations.dart';
+import '../../../core/services/app_widget_service.dart';
 
 /// Sophisticated, cinematic Dashboard for PackBuddy with live Riverpod state integration
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -38,8 +42,27 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     WidgetsBinding.instance.addObserver(this);
     // Automatic Cloud Sync & Local DB Refresh on Dashboard launch (non-blocking)
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAccountRestored();
       _triggerSyncAndRefresh();
     });
+  }
+
+  void _checkAccountRestored() {
+    final authState = ref.read(authControllerProvider);
+    if (authState.wasAccountRestoredFromDeletion) {
+      ref.read(authControllerProvider.notifier).acknowledgeAccountRestored();
+      final l10n = AppLocalizations.of(context);
+      if (l10n != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.accountRestoredNotice),
+            backgroundColor: AppColors.successPastel,
+            duration: const Duration(seconds: 5),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -59,7 +82,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     // Non-blocking automatic cloud sync
     ref.read(syncEngineProvider.notifier).performSync().then((_) {
       if (mounted) {
-        ref.read(tripControllerProvider.notifier).loadTrips();
+        ref.read(tripControllerProvider.notifier).loadTrips().then((_) {
+          final trips = ref.read(tripControllerProvider).trips;
+          final items = ref.read(checklistControllerProvider).items;
+          if (trips.isNotEmpty) {
+            AppWidgetService.updateWidgetPayload(
+              upcomingTrip: trips.first,
+              items: items,
+            );
+          }
+        });
         ref.read(vaultControllerProvider.notifier).loadDocuments();
         ref.read(checklistControllerProvider.notifier).loadItems();
       }
@@ -245,28 +277,33 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             ),
             if (proState.isPro) ...[
               const SizedBox(width: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
-                  ),
-                  borderRadius: BorderRadius.circular(6),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
-                      blurRadius: 4,
-                      offset: const Offset(0, 1),
+              AppPulse(
+                minScale: 0.94,
+                maxScale: 1.05,
+                duration: const Duration(milliseconds: 1600),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
                     ),
-                  ],
-                ),
-                child: const Text(
-                  'PRO',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.5,
+                    borderRadius: BorderRadius.circular(6),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
+                        blurRadius: 4,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: const Text(
+                    'PRO',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                 ),
               ),
@@ -532,31 +569,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     ],
                   ),
                   const SizedBox(height: 12),
-                  // Progress Bar
-                  Stack(
-                    children: [
-                      Container(
-                        height: 7,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 350),
-                            curve: Curves.easeOutCubic,
-                            width: constraints.maxWidth * checklistCompletionRatio.clamp(0.0, 1.0),
-                            height: 7,
-                            decoration: BoxDecoration(
-                              color: checklistStatusColor,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+                  // Animated Progress Bar with subtle glow and easeOutCubic curve
+                  AppAnimatedProgressBar(
+                    progress: checklistCompletionRatio,
+                    height: 7,
+                    backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+                    foregroundColor: checklistStatusColor,
+                    duration: const Duration(milliseconds: 450),
                   ),
                   const SizedBox(height: 10),
                   // Airline Limits & Responsibility Note (Completely overflow safe)
@@ -619,6 +638,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   MaterialPageRoute(builder: (_) => const TripsScreen()),
                 );
               },
+            ),
+            const SizedBox(height: 12),
+
+            _HubFeatureCard(
+              icon: Icons.currency_exchange_rounded,
+              iconColor: const Color(0xFFF59E0B),
+              iconContainerColor: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+              title: l10n.currencyConverter,
+              subtitle: l10n.quickConvert,
+              onTap: () => CurrencyConverterCard.showAsModal(context),
             ),
             const SizedBox(height: 12),
 
@@ -1197,12 +1226,21 @@ class _EmptyTripsPromptCard extends StatelessWidget {
               ],
             ),
           ),
-          FilledButton.tonal(
-            onPressed: onPlanTrip,
-            style: FilledButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          const SizedBox(width: 8),
+          Flexible(
+            child: FilledButton.tonal(
+              onPressed: onPlanTrip,
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                visualDensity: VisualDensity.compact,
+              ),
+              child: Text(
+                l10n.plan,
+                style: const TextStyle(fontWeight: FontWeight.w700),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-            child: Text(l10n.plan, style: const TextStyle(fontWeight: FontWeight.w700)),
           ),
         ],
       ),
