@@ -365,6 +365,12 @@ class _FakeProNotifier extends StateNotifier<ProSubscriptionState> implements Mo
   Future<void> resetProStatus({String? uid}) async {}
 
   @override
+  Future<bool> purchasePlan(String productId, {bool isTestOrAdminConfirmation = false}) async => true;
+
+  @override
+  Future<void> queryProductDetails() async {}
+
+  @override
   Future<void> updateProStatus(bool isPro, {String? uid}) async {
     state = state.copyWith(isPro: isPro);
   }

@@ -15,6 +15,7 @@ import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'document_viewer_screen.dart';
 import 'widgets/add_document_sheet.dart';
 import 'widgets/vault_lock_view.dart';
+import '../../../../core/services/security_service.dart';
 
 /// Redesigned Document Vault screen with pinned passport hero slot, trip filters, and format-specific windows
 class VaultScreen extends ConsumerStatefulWidget {
@@ -35,6 +36,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
   void initState() {
     super.initState();
     _selectedTripFilter = widget.initialTripId;
+    SecurityService.instance.enableSecureScreen();
+  }
+
+  @override
+  void dispose() {
+    SecurityService.instance.disableSecureScreen();
+    super.dispose();
   }
 
   Color _getCategoryColor(String category) {

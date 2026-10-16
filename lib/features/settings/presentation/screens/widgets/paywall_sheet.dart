@@ -37,48 +37,56 @@ class PaywallSheet extends ConsumerWidget {
     final currentCurrency = ref.watch(currencyProvider);
 
     // Affordable, localized micro-subscription tiers adapting cleanly to user currency
-    final String monthlyPriceText;
-    final String annualPriceText;
-    final String annualSubPriceText;
+    final String fallbackMonthlyPriceText;
+    final String fallbackAnnualPriceText;
+    final String fallbackAnnualSubPriceText;
 
     switch (currentCurrency.toUpperCase()) {
       case 'TRY':
-        monthlyPriceText = '₺29,99 ${l10n.perMonth}';
-        annualPriceText = '₺149,99 ${l10n.perYear}';
-        annualSubPriceText = '~₺12,50 ${l10n.perMonth}';
+        fallbackMonthlyPriceText = '₺29,99 ${l10n.perMonth}';
+        fallbackAnnualPriceText = '₺149,99 ${l10n.perYear}';
+        fallbackAnnualSubPriceText = '~₺12,50 ${l10n.perMonth}';
         break;
       case 'EUR':
-        monthlyPriceText = '€0,99 ${l10n.perMonth}';
-        annualPriceText = '€4,99 ${l10n.perYear}';
-        annualSubPriceText = '~€0,41 ${l10n.perMonth}';
+        fallbackMonthlyPriceText = '€0,99 ${l10n.perMonth}';
+        fallbackAnnualPriceText = '€4,99 ${l10n.perYear}';
+        fallbackAnnualSubPriceText = '~€0,41 ${l10n.perMonth}';
         break;
       case 'GBP':
-        monthlyPriceText = '£0.89 ${l10n.perMonth}';
-        annualPriceText = '£4.49 ${l10n.perYear}';
-        annualSubPriceText = '~£0.37 ${l10n.perMonth}';
+        fallbackMonthlyPriceText = '£0.89 ${l10n.perMonth}';
+        fallbackAnnualPriceText = '£4.49 ${l10n.perYear}';
+        fallbackAnnualSubPriceText = '~£0.37 ${l10n.perMonth}';
         break;
       case 'JPY':
-        monthlyPriceText = '¥150 ${l10n.perMonth}';
-        annualPriceText = '¥750 ${l10n.perYear}';
-        annualSubPriceText = '~¥62 ${l10n.perMonth}';
+        fallbackMonthlyPriceText = '¥150 ${l10n.perMonth}';
+        fallbackAnnualPriceText = '¥750 ${l10n.perYear}';
+        fallbackAnnualSubPriceText = '~¥62 ${l10n.perMonth}';
         break;
       case 'AUD':
-        monthlyPriceText = 'A\$1.49 ${l10n.perMonth}';
-        annualPriceText = 'A\$7.49 ${l10n.perYear}';
-        annualSubPriceText = '~A\$0.62 ${l10n.perMonth}';
+        fallbackMonthlyPriceText = 'A\$1.49 ${l10n.perMonth}';
+        fallbackAnnualPriceText = 'A\$7.49 ${l10n.perYear}';
+        fallbackAnnualSubPriceText = '~A\$0.62 ${l10n.perMonth}';
         break;
       case 'CAD':
-        monthlyPriceText = 'CA\$1.39 ${l10n.perMonth}';
-        annualPriceText = 'CA\$6.99 ${l10n.perYear}';
-        annualSubPriceText = '~CA\$0.58 ${l10n.perMonth}';
+        fallbackMonthlyPriceText = 'CA\$1.39 ${l10n.perMonth}';
+        fallbackAnnualPriceText = 'CA\$6.99 ${l10n.perYear}';
+        fallbackAnnualSubPriceText = '~CA\$0.58 ${l10n.perMonth}';
         break;
       case 'USD':
       default:
-        monthlyPriceText = '\$0.99 ${l10n.perMonth}';
-        annualPriceText = '\$4.99 ${l10n.perYear}';
-        annualSubPriceText = '~\$0.41 ${l10n.perMonth}';
+        fallbackMonthlyPriceText = '\$0.99 ${l10n.perMonth}';
+        fallbackAnnualPriceText = '\$4.99 ${l10n.perYear}';
+        fallbackAnnualSubPriceText = '~\$0.41 ${l10n.perMonth}';
         break;
     }
+
+    final monthlyPriceText = proState.monthlyProduct != null
+        ? '${proState.monthlyProduct!.price} ${l10n.perMonth}'
+        : fallbackMonthlyPriceText;
+    final annualPriceText = proState.annualProduct != null
+        ? '${proState.annualProduct!.price} ${l10n.perYear}'
+        : fallbackAnnualPriceText;
+    final annualSubPriceText = fallbackAnnualSubPriceText;
 
     return SafeArea(
       top: false,
@@ -336,26 +344,39 @@ class PaywallSheet extends ConsumerWidget {
                           }
                         } else {
                           // Normal user: Production store billing required, zero free bypass!
-                          if (!context.mounted) return;
-                          await showDialog<void>(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                              icon: const Icon(
-                                Icons.storefront_rounded,
-                                color: AppColors.primaryLight,
-                                size: 36,
-                              ),
-                              title: Text(l10n.storeBillingRequiredTitle),
-                              content: Text(l10n.storeBillingRequiredMessage),
-                              actions: [
-                                FilledButton(
-                                  onPressed: () => Navigator.of(ctx).pop(),
-                                  child: Text(l10n.ok),
+                          final targetProductId = proState.activePlan == SubscriptionPlan.monthly
+                              ? MockRevenueCatNotifier.productMonthly
+                              : MockRevenueCatNotifier.productAnnual;
+
+                          if (proState.products.containsKey(targetProductId)) {
+                            final success = await ref
+                                .read(proSubscriptionProvider.notifier)
+                                .purchasePlan(targetProductId);
+                            if (context.mounted && success) {
+                              Navigator.of(context).pop();
+                            }
+                          } else {
+                            if (!context.mounted) return;
+                            await showDialog<void>(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                icon: const Icon(
+                                  Icons.storefront_rounded,
+                                  color: AppColors.primaryLight,
+                                  size: 36,
                                 ),
-                              ],
-                            ),
-                          );
+                                title: Text(l10n.storeBillingRequiredTitle),
+                                content: Text(l10n.storeBillingRequiredMessage),
+                                actions: [
+                                  FilledButton(
+                                    onPressed: () => Navigator.of(ctx).pop(),
+                                    child: Text(l10n.ok),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
                         }
                       },
                 child: proState.isLoading

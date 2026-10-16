@@ -55,7 +55,8 @@ dependencies:
   file_picker: ^12.3.0
   open_filex: ^4.7.0
 
-  # In-App Purchases (Service Layer Preparation)
+  # In-App Purchases (Official Google Play Billing)
+  in_app_purchase: ^3.2.0
   purchases_flutter: ^8.1.1
 
   # The following adds the Cupertino Icons font to your application.

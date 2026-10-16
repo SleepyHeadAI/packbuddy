@@ -5,14 +5,32 @@ import 'package:intl/intl.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/services/security_service.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
 import '../controllers/vault_controller.dart';
 
-/// Fullscreen zoomable document viewer screen supporting images and PDFs
-class DocumentViewerScreen extends ConsumerWidget {
+/// Fullscreen zoomable document viewer screen supporting images and PDFs with FLAG_SECURE protection
+class DocumentViewerScreen extends ConsumerStatefulWidget {
   final Document document;
 
   const DocumentViewerScreen({super.key, required this.document});
+
+  @override
+  ConsumerState<DocumentViewerScreen> createState() => _DocumentViewerScreenState();
+}
+
+class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
+  @override
+  void initState() {
+    super.initState();
+    SecurityService.instance.enableSecureScreen();
+  }
+
+  @override
+  void dispose() {
+    SecurityService.instance.disableSecureScreen();
+    super.dispose();
+  }
 
   void _showDeleteDialog(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
@@ -29,7 +47,7 @@ class DocumentViewerScreen extends ConsumerWidget {
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: AppColors.errorPastel),
             onPressed: () {
-              ref.read(vaultControllerProvider.notifier).deleteDocument(document.id);
+              ref.read(vaultControllerProvider.notifier).deleteDocument(widget.document.id);
               Navigator.of(ctx).pop(); // close dialog
               Navigator.of(context).pop(); // close viewer
             },
@@ -70,24 +88,24 @@ class DocumentViewerScreen extends ConsumerWidget {
 
   void _openFileExternally(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
-    final file = File(document.localImagePath);
+    final file = File(widget.document.localImagePath);
     if (!file.existsSync()) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.fileNotFoundLocally)),
       );
       return;
     }
-    await OpenFilex.open(document.localImagePath);
+    await OpenFilex.open(widget.document.localImagePath);
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final dateFormat = DateFormat.yMMMd(Localizations.localeOf(context).languageCode);
-    final docFile = File(document.localImagePath);
+    final docFile = File(widget.document.localImagePath);
     final bool fileExists = docFile.existsSync();
-    final bool isPdf = document.isPdf;
+    final bool isPdf = widget.document.isPdf;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -98,7 +116,7 @@ class DocumentViewerScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              document.title,
+              widget.document.title,
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -108,7 +126,7 @@ class DocumentViewerScreen extends ConsumerWidget {
               overflow: TextOverflow.ellipsis,
             ),
             Text(
-              '${_getCategoryLabel(document.category, l10n)} • ${dateFormat.format(document.createdAt)}',
+              '${_getCategoryLabel(widget.document.category, l10n)} • ${dateFormat.format(widget.document.createdAt)}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -126,6 +144,7 @@ class DocumentViewerScreen extends ConsumerWidget {
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline_rounded, color: AppColors.errorPastel),
+            tooltip: l10n.deleteDocument,
             onPressed: () => _showDeleteDialog(context, ref),
           ),
         ],
@@ -151,7 +170,7 @@ class DocumentViewerScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      document.title,
+                      widget.document.title,
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
@@ -193,7 +212,7 @@ class DocumentViewerScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          document.title,
+                          widget.document.title,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             color: Colors.white,
@@ -217,7 +236,7 @@ class DocumentViewerScreen extends ConsumerWidget {
                             ),
                           ),
                         ),
-                        if (document.notes != null && document.notes!.trim().isNotEmpty) ...[
+                        if (widget.document.notes != null && widget.document.notes!.trim().isNotEmpty) ...[
                           const SizedBox(height: 16),
                           Container(
                             padding: const EdgeInsets.all(12),
@@ -226,7 +245,7 @@ class DocumentViewerScreen extends ConsumerWidget {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              document.notes!,
+                              widget.document.notes!,
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.8),
                                 fontSize: 13,

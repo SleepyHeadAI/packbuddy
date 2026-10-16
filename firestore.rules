@@ -32,12 +32,13 @@ service cloud.firestore {
         isAuthenticated() && request.auth.uid == userId &&
         request.resource.data.get('isPremium', false) == false &&
         request.resource.data.get('banStatus', 'none') == 'none' &&
-        request.resource.data.get('restrictedFeatures', []).size() == 0
+        request.resource.data.get('restrictedFeatures', []).size() == 0 &&
+        request.resource.data.get('totalVaultStorageBytes', 0) == 0
       );
       allow update: if isAdmin() || (
         isAuthenticated() && request.auth.uid == userId &&
         !isUserBanned(userId) &&
-        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isPremium', 'banStatus', 'banExpiresAt', 'banReason', 'restrictedFeatures'])
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isPremium', 'banStatus', 'banExpiresAt', 'banReason', 'restrictedFeatures', 'totalVaultStorageBytes'])
       );
       allow delete: if isAdmin();
     }
