@@ -1,1984 +1,2382 @@
-{
-  "@@locale": "en",
-  "appName": "PackBuddy",
-  "@appName": {
-    "description": "The title of the application"
-  },
-  "welcome": "Welcome to PackBuddy",
-  "@welcome": {
-    "description": "Welcome message shown on the dashboard"
-  },
-  "welcomeSubtitle": "Minimalist, offline-first travel assistant & budget manager",
-  "@welcomeSubtitle": {
-    "description": "Subtitle underneath the welcome message"
-  },
-  "budget": "Budget",
-  "@budget": {
-    "description": "Label for budget feature"
-  },
-  "budgetDescription": "Multi-currency travel expense tracking",
-  "@budgetDescription": {
-    "description": "Description of budget feature"
-  },
-  "vault": "Document Vault",
-  "@vault": {
-    "description": "Label for document vault feature"
-  },
-  "vaultDescription": "Passports, tickets and booking vouchers",
-  "@vaultDescription": {
-    "description": "Description of vault feature"
-  },
-  "settings": "Settings",
-  "@settings": {
-    "description": "Label for settings feature"
-  },
-  "settingsDescription": "Preferences, backup and sync configuration",
-  "@settingsDescription": {
-    "description": "Description of settings feature"
-  },
-  "offlineReady": "Offline Ready",
-  "@offlineReady": {
-    "description": "Badge showing offline-first readiness"
-  },
-  "syncReady": "Two-Way Cloud Sync",
-  "@syncReady": {
-    "description": "Badge showing two-way sync readiness"
-  },
-  "syncInProgress": "Syncing...",
-  "@syncInProgress": {
-    "description": "Status text while synchronizing"
-  },
-  "syncUpToDate": "Up to date",
-  "@syncUpToDate": {
-    "description": "Status text when synchronization is up to date"
-  },
-  "syncFailed": "Sync Failed",
-  "@syncFailed": {
-    "description": "Status text when synchronization failed"
-  },
-  "multiCurrency": "Multi-Currency",
-  "@multiCurrency": {
-    "description": "Badge showing multi-currency feature"
-  },
-  "trips": "Trips",
-  "@trips": {
-    "description": "Header for trips screen"
-  },
-  "addTrip": "Add Trip",
-  "@addTrip": {
-    "description": "Button to add a new trip"
-  },
-  "tripName": "Trip Name",
-  "@tripName": {
-    "description": "Input field label for trip title"
-  },
-  "destination": "Destination",
-  "@destination": {
-    "description": "Input field label for destination"
-  },
-  "remaining": "Remaining",
-  "@remaining": {
-    "description": "Remaining budget label"
-  },
-  "spent": "Spent",
-  "@spent": {
-    "description": "Total spent amount label"
-  },
-  "addExpense": "Add Expense",
-  "@addExpense": {
-    "description": "Button to add an expense"
-  },
-  "amount": "Amount",
-  "@amount": {
-    "description": "Expense amount field label"
-  },
-  "category": "Category",
-  "@category": {
-    "description": "Expense category dropdown label"
-  },
-  "food": "Food & Dining",
-  "@food": {
-    "description": "Food category label"
-  },
-  "transport": "Transportation",
-  "@transport": {
-    "description": "Transportation category label"
-  },
-  "accommodation": "Accommodation",
-  "@accommodation": {
-    "description": "Accommodation category label"
-  },
-  "entertainment": "Entertainment",
-  "@entertainment": {
-    "description": "Entertainment category label"
-  },
-  "other": "Other",
-  "@other": {
-    "description": "Other category label"
-  },
-  "save": "Save",
-  "@save": {
-    "description": "Save button label"
-  },
-  "cancel": "Cancel",
-  "@cancel": {
-    "description": "Cancel button label"
-  },
-  "date": "Date",
-  "@date": {
-    "description": "Date label"
-  },
-  "startDate": "Start Date",
-  "@startDate": {
-    "description": "Start date label"
-  },
-  "endDate": "End Date",
-  "@endDate": {
-    "description": "End date label"
-  },
-  "noTripsYet": "No trips planned yet",
-  "@noTripsYet": {
-    "description": "Message when trips list is empty"
-  },
-  "noTripsSubtitle": "Tap the button below to add your first journey",
-  "@noTripsSubtitle": {
-    "description": "Subtitle when trips list is empty"
-  },
-  "noExpensesYet": "No expenses recorded yet",
-  "@noExpensesYet": {
-    "description": "Message when expenses list is empty"
-  },
-  "noExpensesSubtitle": "Track your spendings by adding an expense",
-  "@noExpensesSubtitle": {
-    "description": "Subtitle when expenses list is empty"
-  },
-  "deleteTrip": "Delete Trip",
-  "@deleteTrip": {
-    "description": "Delete trip action"
-  },
-  "deleteTripConfirm": "Are you sure you want to delete this trip?",
-  "@deleteTripConfirm": {
-    "description": "Confirmation message when deleting trip"
-  },
-  "deleteExpense": "Delete Expense",
-  "@deleteExpense": {
-    "description": "Delete expense action"
-  },
-  "addDocument": "Add Document",
-  "@addDocument": {
-    "description": "Add document button label"
-  },
-  "documentName": "Document Name",
-  "@documentName": {
-    "description": "Document name input label"
-  },
-  "passport": "Passport",
-  "@passport": {
-    "description": "Passport category label"
-  },
-  "ticket": "Ticket",
-  "@ticket": {
-    "description": "Ticket category label"
-  },
-  "booking": "Booking Voucher",
-  "@booking": {
-    "description": "Booking voucher category label"
-  },
-  "camera": "Take Photo",
-  "@camera": {
-    "description": "Camera picker button"
-  },
-  "gallery": "Choose from Gallery",
-  "@gallery": {
-    "description": "Gallery picker button"
-  },
-  "viewDocument": "View Document",
-  "@viewDocument": {
-    "description": "View document title"
-  },
-  "noDocumentsYet": "No documents saved yet",
-  "@noDocumentsYet": {
-    "description": "Message when vault is empty"
-  },
-  "noDocumentsSubtitle": "Securely store your passports, tickets and reservations",
-  "@noDocumentsSubtitle": {
-    "description": "Subtitle when vault is empty"
-  },
-  "deleteDocument": "Delete Document",
-  "@deleteDocument": {
-    "description": "Delete document action"
-  },
-  "deleteDocumentConfirm": "Are you sure you want to delete this document?",
-  "@deleteDocumentConfirm": {
-    "description": "Confirmation message when deleting document"
-  },
-  "theme": "Theme",
-  "@theme": {
-    "description": "Theme settings label"
-  },
-  "themeSystem": "System Default",
-  "@themeSystem": {
-    "description": "System default theme option"
-  },
-  "themeLight": "Light",
-  "@themeLight": {
-    "description": "Light theme option"
-  },
-  "themeDark": "Dark",
-  "@themeDark": {
-    "description": "Dark theme option"
-  },
-  "language": "Language",
-  "@language": {
-    "description": "Language settings label"
-  },
-  "syncNow": "Sync Now",
-  "@syncNow": {
-    "description": "Manual sync button label"
-  },
-  "lastSync": "Last Sync",
-  "@lastSync": {
-    "description": "Last sync time label"
-  },
-  "upgradeToPro": "Upgrade to PackBuddy Pro",
-  "@upgradeToPro": {
-    "description": "Upgrade to Pro banner text"
-  },
-  "proBadge": "PRO",
-  "@proBadge": {
-    "description": "Pro badge label"
-  },
-  "proTitle": "PackBuddy Pro",
-  "@proTitle": {
-    "description": "Paywall title"
-  },
-  "proSubtitle": "Unlock limitless travel and ultimate peace of mind",
-  "@proSubtitle": {
-    "description": "Paywall subtitle"
-  },
-  "proFeature1": "Unlimited Trips & Expense Tracking",
-  "@proFeature1": {
-    "description": "Pro feature 1 description"
-  },
-  "proFeature2": "Unlimited Document Vault Storage",
-  "@proFeature2": {
-    "description": "Pro feature 2 description"
-  },
-  "proFeature3": "Automatic Two-Way Cloud Sync",
-  "@proFeature3": {
-    "description": "Pro feature 3 description"
-  },
-  "monthly": "Monthly",
-  "@monthly": {
-    "description": "Monthly subscription label"
-  },
-  "annual": "Annual",
-  "@annual": {
-    "description": "Annual subscription label"
-  },
-  "annualSave": "Save 58%",
-  "@annualSave": {
-    "description": "Annual discount badge"
-  },
-  "subscribeNow": "Continue with Pro",
-  "@subscribeNow": {
-    "description": "Subscription button label"
-  },
-  "purchaseSuccess": "Welcome to PackBuddy Pro!",
-  "@purchaseSuccess": {
-    "description": "Purchase success message"
-  },
-  "architecturePhase": "Phase 5: Full Product & 20 Languages Ready",
-  "@architecturePhase": {
-    "description": "Phase status indicator"
-  },
-  "goodMorning": "Good morning, Traveler ☀️",
-  "@goodMorning": {
-    "description": "Morning greeting"
-  },
-  "goodAfternoon": "Good afternoon, Traveler ✈️",
-  "@goodAfternoon": {
-    "description": "Afternoon greeting"
-  },
-  "goodEvening": "Good evening, Traveler 🌙",
-  "@goodEvening": {
-    "description": "Evening greeting"
-  },
-  "allCategories": "All",
-  "@allCategories": {
-    "description": "All category filter"
-  },
-  "categoryClothing": "Clothing",
-  "@categoryClothing": {
-    "description": "Clothing category"
-  },
-  "categoryElectronics": "Electronics",
-  "@categoryElectronics": {
-    "description": "Electronics category"
-  },
-  "categoryToiletries": "Toiletries",
-  "@categoryToiletries": {
-    "description": "Toiletries category"
-  },
-  "categoryDocuments": "Documents",
-  "@categoryDocuments": {
-    "description": "Documents category"
-  },
-  "categoryAccessories": "Accessories",
-  "@categoryAccessories": {
-    "description": "Accessories category"
-  },
-  "deleted": "deleted",
-  "@deleted": {
-    "description": "Item deleted snackbar label"
-  },
-  "undo": "UNDO",
-  "@undo": {
-    "description": "Undo action label"
-  },
-  "luggageAndChecklist": "Luggage & Checklist",
-  "@luggageAndChecklist": {
-    "description": "Luggage checklist screen title"
-  },
-  "smartPackingTemplates": "Smart Packing Templates",
-  "@smartPackingTemplates": {
-    "description": "Packing templates label"
-  },
-  "airlineBaggageGuide": "Airline Baggage Guide",
-  "@airlineBaggageGuide": {
-    "description": "Airline baggage guide title"
-  },
-  "vaultLocked": "Vault is Locked",
-  "@vaultLocked": {
-    "description": "Vault locked status"
-  },
-  "unlockVault": "Unlock Vault",
-  "@unlockVault": {
-    "description": "Unlock vault action"
-  },
-  "security": "Security",
-  "@security": {
-    "description": "Security settings section"
-  },
-  "upcomingRoute": "Upcoming Route",
-  "@upcomingRoute": {
-    "description": "Upcoming trip badge"
-  },
-  "ongoingTrip": "Ongoing Trip",
-  "@ongoingTrip": {
-    "description": "Ongoing trip badge"
-  },
-  "offlineVault": "Offline Vault",
-  "@offlineVault": {
-    "description": "Offline vault stat label"
-  },
-  "noItemsYet": "No items added yet",
-  "@noItemsYet": {
-    "description": "Empty items state"
-  },
-  "itemsReady": "items ready",
-  "@itemsReady": {
-    "description": "Items packed status"
-  },
-  "listEmpty": "EMPTY LIST",
-  "@listEmpty": {
-    "description": "Empty list badge"
-  },
-  "quickActions": "QUICK ACTIONS",
-  "@quickActions": {
-    "description": "Quick actions section header"
-  },
-  "addItem": "Add Item",
-  "@addItem": {
-    "description": "Add packing item button"
-  },
-  "recentlyAdded": "RECENTLY ADDED ITEMS",
-  "@recentlyAdded": {
-    "description": "Recent items section header"
-  },
-  "travelAssistant": "TRAVEL ASSISTANT",
-  "@travelAssistant": {
-    "description": "Travel assistant section header"
-  },
-  "viewAll": "View All",
-  "@viewAll": {
-    "description": "View all items link"
-  },
-  "allNotificationsUpToDate": "All travel notifications are up to date!",
-  "@allNotificationsUpToDate": {
-    "description": "Notification snackbar"
-  },
-  "createFirstTrip": "Create your first route and budget now.",
-  "@createFirstTrip": {
-    "description": "Empty trips banner subtitle"
-  },
-  "editTrip": "Edit Trip",
-  "@editTrip": {
-    "description": "Edit trip sheet title"
-  },
-  "editExpense": "Edit Expense",
-  "@editExpense": {
-    "description": "Edit expense sheet title"
-  },
-  "expenseTitle": "Expense / Transaction Title",
-  "@expenseTitle": {
-    "description": "Expense title input label"
-  },
-  "expenseTitleHint": "e.g. Dinner, Metro Ticket, Coffee...",
-  "@expenseTitleHint": {
-    "description": "Expense title input hint"
-  },
-  "pleaseEnterExpenseTitle": "Please enter an expense or transaction title",
-  "@pleaseEnterExpenseTitle": {
-    "description": "Expense title validator error"
-  },
-  "customCategoryName": "Custom Category Name",
-  "@customCategoryName": {
-    "description": "Custom category input label"
-  },
-  "customCategoryHint": "e.g. Souvenir, Tip, Museum, Visa, Gas...",
-  "@customCategoryHint": {
-    "description": "Custom category input hint"
-  },
-  "pleaseEnterCustomCategory": "Please enter custom category name",
-  "@pleaseEnterCustomCategory": {
-    "description": "Custom category validator error"
-  },
-  "paymentMethod": "Payment Method",
-  "@paymentMethod": {
-    "description": "Payment method header"
-  },
-  "cash": "Cash",
-  "@cash": {
-    "description": "Cash payment option"
-  },
-  "creditCard": "Credit Card",
-  "@creditCard": {
-    "description": "Credit card payment option"
-  },
-  "debitCard": "Debit Card",
-  "@debitCard": {
-    "description": "Debit card payment option"
-  },
-  "onlinePayment": "Online Payment",
-  "@onlinePayment": {
-    "description": "Online payment option"
-  },
-  "customTransport": "Custom Transport",
-  "@customTransport": {
-    "description": "Custom transport option"
-  },
-  "addCustomTransport": "+ Custom Transport",
-  "@addCustomTransport": {
-    "description": "Add custom transport button"
-  },
-  "itineraryStops": "Itinerary Stops",
-  "@itineraryStops": {
-    "description": "Itinerary stops label"
-  },
-  "destinationHint": "Destination city or country",
-  "@destinationHint": {
-    "description": "Destination field hint"
-  },
-  "baggageAndChecklist": "Luggage & Checklist",
-  "@baggageAndChecklist": {
-    "description": "Luggage & checklist tooltip"
-  },
-  "travelDocuments": "Travel Documents",
-  "@travelDocuments": {
-    "description": "Travel documents tooltip"
-  },
-  "currencySynced": "Exchange rates automatically synchronized",
-  "@currencySynced": {
-    "description": "Currency sync banner"
-  },
-  "offlineRatesActive": "Offline reference rates active (Auto-syncs online)",
-  "@offlineRatesActive": {
-    "description": "Offline rates banner"
-  },
-  "createPinToProtect": "Create a 4-digit PIN code to keep your documents secure.",
-  "@createPinToProtect": {
-    "description": "Vault pin setup description"
-  },
-  "createPinAndProtect": "Create PIN & Protect",
-  "@createPinAndProtect": {
-    "description": "Vault pin setup button"
-  },
-  "continueUnlocked": "Continue Unlocked for Now",
-  "@continueUnlocked": {
-    "description": "Skip pin button"
-  },
-  "changeOrRemovePin": "Change or Remove PIN Code",
-  "@changeOrRemovePin": {
-    "description": "Vault settings pin change title"
-  },
-  "setVaultPin": "Set Vault PIN Code",
-  "@setVaultPin": {
-    "description": "Vault settings pin set title"
-  },
-  "boardingPassAndPass": "Boarding Pass & Travel Pass",
-  "@boardingPassAndPass": {
-    "description": "Boarding pass category"
-  },
-  "offlineAndEncrypted": "Offline & Encrypted",
-  "@offlineAndEncrypted": {
-    "description": "Vault encryption badge"
-  },
-  "searchItems": "Search items",
-  "@searchItems": {
-    "description": "Search items button"
-  },
-  "closeSearch": "Close search",
-  "@closeSearch": {
-    "description": "Close search button"
-  },
-  "readyTemplates": "Ready Templates",
-  "@readyTemplates": {
-    "description": "Templates button"
-  },
-  "searchItemsHint": "Search item name or tag (e.g. carry-on, headphones)...",
-  "@searchItemsHint": {
-    "description": "Search field hint"
-  },
-  "noMatchingItems": "No matching items found",
-  "@noMatchingItems": {
-    "description": "Empty search results message"
-  },
-  "checklistEmpty": "Checklist is empty",
-  "@checklistEmpty": {
-    "description": "Empty checklist message"
-  },
-  "addFirstItem": "Add your first item for your trip",
-  "@addFirstItem": {
-    "description": "Empty checklist subtitle"
-  },
-  "completed": "completed",
-  "@completed": {
-    "description": "Checklist completion status"
-  },
-  "budgetLimit": "Budget Limit",
-  "@budgetLimit": {
-    "description": "Budget limit field label"
-  },
-  "change": "Change",
-  "@change": {
-    "description": "Change action label"
-  },
-  "set": "Set",
-  "@set": {
-    "description": "Set action label"
-  },
-  "notifications": "Notifications",
-  "@notifications": {
-    "description": "Notifications button tooltip"
-  },
-  "plan": "Plan",
-  "@plan": {
-    "description": "Plan trip button"
-  },
-  "preparing": "PREPARING",
-  "@preparing": {
-    "description": "Checklist preparing status"
-  },
-  "tripsPlanned": "trips planned",
-  "@tripsPlanned": {
-    "description": "Trips planned counter label"
-  },
-  "documentsSaved": "saved documents & tickets",
-  "@documentsSaved": {
-    "description": "Documents saved counter label"
-  },
-  "standardBaggageLimitNote": "Standard Limit: Cabin 8 kg • Checked 20-23 kg",
-  "@standardBaggageLimitNote": {
-    "description": "Standard luggage limit note"
-  },
-  "airlineBaggageLimits": "Airline Limits",
-  "@airlineBaggageLimits": {
-    "description": "Airline baggage limits button"
-  },
-  "compartmentBreakdown": "Compartment Breakdown",
-  "@compartmentBreakdown": {
-    "description": "Compartment breakdown title"
-  },
-  "packingTip": "Tip: Rolling clothes instead of folding them saves 30% space.",
-  "@packingTip": {
-    "description": "Smart packing tip banner"
-  },
-  "tryDifferentKeyword": "Try a different keyword or category",
-  "@tryDifferentKeyword": {
-    "description": "Empty search subtitle"
-  },
-  "luggagePreparationGuide": "Luggage Preparation & Baggage Guide",
-  "@luggagePreparationGuide": {
-    "description": "Luggage guide title"
-  },
-  "weighingResponsibilityNote": "⚖️ Weighing responsibility belongs to traveler. Weight calculation is not active.",
-  "@weighingResponsibilityNote": {
-    "description": "Luggage weight disclaimer"
-  },
-  "digitalWallet": "Digital Wallet",
-  "@digitalWallet": {
-    "description": "Digital wallet payment method"
-  },
-  "flight": "Flight",
-  "@flight": {
-    "description": "Flight transport mode"
-  },
-  "bulletTrain": "High-Speed Train",
-  "@bulletTrain": {
-    "description": "High-speed train transport mode"
-  },
-  "train": "Train",
-  "@train": {
-    "description": "Train transport mode"
-  },
-  "car": "Car / Rental",
-  "@car": {
-    "description": "Car transport mode"
-  },
-  "bus": "Bus",
-  "@bus": {
-    "description": "Bus transport mode"
-  },
-  "ferry": "Ferry / Ship",
-  "@ferry": {
-    "description": "Ferry transport mode"
-  },
-  "motorcycle": "Motorcycle",
-  "@motorcycle": {
-    "description": "Motorcycle transport mode"
-  },
-  "camper": "Camper / RV",
-  "@camper": {
-    "description": "Camper transport mode"
-  },
-  "bicycle": "Bicycle",
-  "@bicycle": {
-    "description": "Bicycle transport mode"
-  },
-  "subway": "Subway / Tram",
-  "@subway": {
-    "description": "Subway transport mode"
-  },
-  "hiking": "Hiking / Trekking",
-  "@hiking": {
-    "description": "Hiking transport mode"
-  },
-  "transportMode": "Transport Mode",
-  "@transportMode": {
-    "description": "Transport mode label"
-  },
-  "customTransportType": "Custom Transport Type",
-  "@customTransportType": {
-    "description": "Custom transport dialog title"
-  },
-  "customTransportVehicle": "Vehicle / Transport Mode",
-  "@customTransportVehicle": {
-    "description": "Custom transport field label"
-  },
-  "customTransportHint": "e.g. Helicopter, Yacht, Cable Car, Safari...",
-  "@customTransportHint": {
-    "description": "Custom transport field hint"
-  },
-  "cityOrStopHint": "Enter city or stop (e.g. Paris, Rome, Tokyo)...",
-  "@cityOrStopHint": {
-    "description": "Itinerary stop input hint"
-  },
-  "travelRouteOrStops": "Travel Route / Stops",
-  "@travelRouteOrStops": {
-    "description": "Itinerary stops header"
-  },
-  "addCountry": "Add Country",
-  "@addCountry": {
-    "description": "Add country button"
-  },
-  "tripNameHint": "e.g. Italy Tour, Summer Vacation...",
-  "@tripNameHint": {
-    "description": "Trip name input hint"
-  },
-  "tripNotesLabel": "Trip Notes (Hotel, Reservation, Route...)",
-  "@tripNotesLabel": {
-    "description": "Trip notes field label"
-  },
-  "tripNotesHint": "e.g. Hotel check-in 14:00, don't forget passports...",
-  "@tripNotesHint": {
-    "description": "Trip notes field hint"
-  },
-  "changeCurrency": "Change Currency",
-  "@changeCurrency": {
-    "description": "Change currency tooltip"
-  },
-  "expenseNotesLabel": "Expense Note (Details, Receipt No...)",
-  "@expenseNotesLabel": {
-    "description": "Expense note field label"
-  },
-  "expenseNotesHint": "e.g. Dinner including tip...",
-  "@expenseNotesHint": {
-    "description": "Expense note field hint"
-  },
-  "wrongPinTryAgain": "Incorrect PIN! Please try again.",
-  "@wrongPinTryAgain": {
-    "description": "Wrong PIN snackbar error"
-  },
-  "fourDigitPin": "4-Digit PIN",
-  "@fourDigitPin": {
-    "description": "4-digit PIN input label"
-  },
-  "saveAndOpen": "Save & Unlock",
-  "@saveAndOpen": {
-    "description": "Save PIN and open vault button"
-  },
-  "enterPinToUnlockVault": "Enter your PIN code to access your passports and travel documents",
-  "@enterPinToUnlockVault": {
-    "description": "Vault lock subtitle when PIN is set"
-  },
-  "vaultNotProtectedWithPin": "Your vault is not yet protected with a PIN code",
-  "@vaultNotProtectedWithPin": {
-    "description": "Vault lock subtitle when no PIN"
-  },
-  "lastTrip": "Last Trip",
-  "@lastTrip": {
-    "description": "Last completed trip badge"
-  },
-  "ok": "OK",
-  "@ok": {
-    "description": "OK dialog button"
-  },
-  "custom": "Custom",
-  "@custom": {
-    "description": "Custom prefix label"
-  },
-  "add": "Add",
-  "@add": {
-    "description": "Generic add button"
-  },
-  "close": "Close",
-  "@close": {
-    "description": "Generic close button"
-  },
-  "delete": "Delete",
-  "@delete": {
-    "description": "Generic delete button"
-  },
-  "edit": "Edit",
-  "@edit": {
-    "description": "Generic edit button"
-  },
-  "tickets": "Tickets",
-  "@tickets": {
-    "description": "Tickets category label"
-  },
-  "idAndPassport": "ID & Passport",
-  "@idAndPassport": {
-    "description": "ID & Passport category label"
-  },
-  "healthAndInsurance": "Health & Insurance",
-  "@healthAndInsurance": {
-    "description": "Health & Insurance category label"
-  },
-  "otherDocuments": "Other Documents",
-  "@otherDocuments": {
-    "description": "Other Documents category label"
-  },
-  "allDocuments": "All Documents",
-  "@allDocuments": {
-    "description": "All Documents filter label"
-  },
-  "allTickets": "All Tickets",
-  "@allTickets": {
-    "description": "All Tickets filter label"
-  },
-  "flightTickets": "Flight Tickets",
-  "@flightTickets": {
-    "description": "Flight Tickets filter label"
-  },
-  "busTickets": "Bus Tickets",
-  "@busTickets": {
-    "description": "Bus Tickets filter label"
-  },
-  "ferryBoat": "Ferry / Boat",
-  "@ferryBoat": {
-    "description": "Ferry / Boat filter label"
-  },
-  "trainTickets": "Train Tickets",
-  "@trainTickets": {
-    "description": "Train Tickets filter label"
-  },
-  "allTrips": "All Trips",
-  "@allTrips": {
-    "description": "All Trips filter label"
-  },
-  "general": "General",
-  "@general": {
-    "description": "General scope filter label"
-  },
-  "generalDocumentAllTrips": "🌐 General Document (All Trips)",
-  "@generalDocumentAllTrips": {
-    "description": "General Document dropdown option"
-  },
-  "documentScope": "Document Scope / Trip",
-  "@documentScope": {
-    "description": "Document Scope field label"
-  },
-  "documentNotesLabel": "Document Note (PNR, Seat, Expiry...)",
-  "@documentNotesLabel": {
-    "description": "Document note field label"
-  },
-  "documentNotesHint": "e.g. PNR: TK7890, Seat: 12A, Terminal 2",
-  "@documentNotesHint": {
-    "description": "Document note field hint"
-  },
-  "uploadDocumentPrompt": "Upload Document (Photo or PDF)",
-  "@uploadDocumentPrompt": {
-    "description": "Upload document section header"
-  },
-  "pdfOrFile": "PDF / File",
-  "@pdfOrFile": {
-    "description": "PDF or file picker button"
-  },
-  "ticketTypeSubCategory": "Ticket Type / Sub-Category",
-  "@ticketTypeSubCategory": {
-    "description": "Ticket sub-category header"
-  },
-  "documentNameHint": "e.g. Airline Ticket, Hotel Booking...",
-  "@documentNameHint": {
-    "description": "Document name input hint"
-  },
-  "flightTicket": "Flight Ticket",
-  "@flightTicket": {
-    "description": "Flight ticket sub-category"
-  },
-  "busTicket": "Bus Ticket",
-  "@busTicket": {
-    "description": "Bus ticket sub-category"
-  },
-  "ferryTicket": "Ferry / Boat Ticket",
-  "@ferryTicket": {
-    "description": "Ferry ticket sub-category"
-  },
-  "trainTicket": "Train Ticket",
-  "@trainTicket": {
-    "description": "Train ticket sub-category"
-  },
-  "otherTransport": "Other Transport",
-  "@otherTransport": {
-    "description": "Other transport sub-category"
-  },
-  "myPassport": "My Passport",
-  "@myPassport": {
-    "description": "Default passport document title"
-  },
-  "hotelBooking": "Hotel Reservation",
-  "@hotelBooking": {
-    "description": "Default hotel reservation title"
-  },
-  "mainCategory": "Main Category",
-  "@mainCategory": {
-    "description": "Main category label"
-  },
-  "boardingPassAndTransit": "Boarding Pass & Transit Pass",
-  "@boardingPassAndTransit": {
-    "description": "Boarding pass preview title"
-  },
-  "boardingPassSubtitle": "View document or open in device app",
-  "@boardingPassSubtitle": {
-    "description": "Boarding pass preview subtitle"
-  },
-  "viewDocumentAction": "View Document",
-  "@viewDocumentAction": {
-    "description": "View document action button"
-  },
-  "fileNotFoundLocally": "File not found in local storage yet.",
-  "@fileNotFoundLocally": {
-    "description": "File not found snackbar message"
-  },
-  "openInExternalApp": "Open in Device App",
-  "@openInExternalApp": {
-    "description": "Open in device app action button"
-  },
-  "secureBadge": "SECURE",
-  "@secureBadge": {
-    "description": "Secure badge text"
-  },
-  "savedDocument": "Saved Document",
-  "@savedDocument": {
-    "description": "Saved document counter label"
-  },
-  "readyBadge": "READY",
-  "@readyBadge": {
-    "description": "Ready badge text"
-  },
-  "pinnedBadge": "PINNED",
-  "@pinnedBadge": {
-    "description": "Pinned badge text"
-  },
-  "passportSlot": "Passport Slot",
-  "@passportSlot": {
-    "description": "Passport slot title"
-  },
-  "saveYourPassport": "+ Save Your Passport",
-  "@saveYourPassport": {
-    "description": "Save passport prompt"
-  },
-  "tapToView": "Tap to view",
-  "@tapToView": {
-    "description": "Tap to view hint"
-  },
-  "quickUpload": "Quick upload",
-  "@quickUpload": {
-    "description": "Quick upload hint"
-  },
-  "noDocumentsForFilter": "No documents found matching this filter",
-  "@noDocumentsForFilter": {
-    "description": "Empty state for vault filter"
-  },
-  "pdfFileBadge": "PDF FILE",
-  "@pdfFileBadge": {
-    "description": "PDF file indicator badge"
-  },
-  "pdfBadge": "PDF",
-  "@pdfBadge": {
-    "description": "PDF badge text"
-  },
-  "imageBadge": "IMAGE",
-  "@imageBadge": {
-    "description": "Image badge text"
-  },
-  "addToWallet": "+ Wallet",
-  "@addToWallet": {
-    "description": "Add to wallet button"
-  },
-  "boardingPassOptions": "Boarding Pass Options",
-  "@boardingPassOptions": {
-    "description": "Boarding pass options tooltip"
-  },
-  "openPdf": "Open PDF",
-  "@openPdf": {
-    "description": "Open PDF tooltip"
-  },
-  "vaultPinProtection": "Vault PIN Protection",
-  "@vaultPinProtection": {
-    "description": "Vault PIN protection title"
-  },
-  "pinProtectionActive": "PIN protection active",
-  "@pinProtectionActive": {
-    "description": "PIN protection active subtitle"
-  },
-  "unprotectedSetPin": "Unprotected (Set a PIN)",
-  "@unprotectedSetPin": {
-    "description": "Unprotected subtitle"
-  },
-  "setup": "Set Up",
-  "@setup": {
-    "description": "Set up button text"
-  },
-  "changePinDescription": "Enter a new 4-digit PIN or remove the existing PIN code.",
-  "@changePinDescription": {
-    "description": "Change PIN dialog description"
-  },
-  "setPinDescription": "Enter a 4-digit PIN to protect your passports and documents in the vault.",
-  "@setPinDescription": {
-    "description": "Set PIN dialog description"
-  },
-  "removePin": "Remove PIN",
-  "@removePin": {
-    "description": "Remove PIN button label"
-  },
-  "proActive": "PackBuddy Pro Active",
-  "@proActive": {
-    "description": "PackBuddy Pro active status"
-  },
-  "annualPlan": "Annual Plan ($39.99/yr)",
-  "@annualPlan": {
-    "description": "Annual plan label"
-  },
-  "monthlyPlan": "Monthly Plan ($4.99/mo)",
-  "@monthlyPlan": {
-    "description": "Monthly plan label"
-  },
-  "activePlanLabel": "Subscription Plan",
-  "@activePlanLabel": {
-    "description": "Active subscription plan label"
-  },
-  "editItem": "Edit Item",
-  "@editItem": {
-    "description": "Edit item sheet title"
-  },
-  "addNewItem": "Add New Item",
-  "@addNewItem": {
-    "description": "Add new item sheet title"
-  },
-  "itemName": "Item Name",
-  "@itemName": {
-    "description": "Item name field label"
-  },
-  "itemNameHint": "e.g. Waterproof Jacket, Headphones...",
-  "@itemNameHint": {
-    "description": "Item name field hint"
-  },
-  "pleaseEnterItemName": "Please enter an item name",
-  "@pleaseEnterItemName": {
-    "description": "Item name validation error"
-  },
-  "carryType": "Carry Type",
-  "@carryType": {
-    "description": "Carry type field label"
-  },
-  "compartment": "Compartment / Location",
-  "@compartment": {
-    "description": "Compartment field label"
-  },
-  "pieces": "pcs",
-  "@pieces": {
-    "description": "Pieces / units suffix"
-  },
-  "addToBaggage": "Add to Baggage",
-  "@addToBaggage": {
-    "description": "Add to baggage button"
-  },
-  "itemUpdated": "updated.",
-  "@itemUpdated": {
-    "description": "Item updated snackbar text"
-  },
-  "itemAddedToBaggage": "added to baggage.",
-  "@itemAddedToBaggage": {
-    "description": "Item added to baggage snackbar text"
-  },
-  "markedAsPacked": "Marked as packed",
-  "@markedAsPacked": {
-    "description": "Marked as packed accessibility label"
-  },
-  "notPacked": "Not packed",
-  "@notPacked": {
-    "description": "Not packed accessibility label"
-  },
-  "packed": "Packed",
-  "@packed": {
-    "description": "Packed swipe label"
-  },
-  "smartTemplatesSubtitle": "Transfer curated travel packing lists to your baggage in one tap",
-  "@smartTemplatesSubtitle": {
-    "description": "Smart templates subtitle"
-  },
-  "itemsCount": "Items",
-  "@itemsCount": {
-    "description": "Items count label"
-  },
-  "readyTravelPackage": "Curated Travel Package",
-  "@readyTravelPackage": {
-    "description": "Curated travel package tag"
-  },
-  "contentList": "Contents List:",
-  "@contentList": {
-    "description": "Contents list header"
-  },
-  "templateImportSuccess": "items added from template! 🎉",
-  "@templateImportSuccess": {
-    "description": "Template import success message"
-  },
-  "addTemplateToBaggage": "Add to Baggage",
-  "@addTemplateToBaggage": {
-    "description": "Add template to baggage button"
-  },
-  "currentLimit": "Current Limit",
-  "@currentLimit": {
-    "description": "Current baggage limit label"
-  },
-  "searchAirlineOrCode": "Search airline or code (e.g. THY, PC, LH)...",
-  "@searchAirlineOrCode": {
-    "description": "Search airline input hint"
-  },
-  "activeLimit": "Active Limit",
-  "@activeLimit": {
-    "description": "Active limit badge"
-  },
-  "cabinBaggage": "Cabin Baggage",
-  "@cabinBaggage": {
-    "description": "Cabin baggage label"
-  },
-  "checkedBaggage": "Checked Baggage",
-  "@checkedBaggage": {
-    "description": "Checked baggage label"
-  },
-  "standardEconomy": "Standard Economy",
-  "@standardEconomy": {
-    "description": "Standard economy baggage note"
-  },
-  "limitSelected": "This Limit Selected",
-  "@limitSelected": {
-    "description": "Limit selected button text"
-  },
-  "applyCabinLimit": "Apply Cabin Limit",
-  "@applyCabinLimit": {
-    "description": "Apply cabin limit button text"
-  },
-  "baggageLimitSet": "Baggage limit set to",
-  "@baggageLimitSet": {
-    "description": "Baggage limit set snackbar message"
-  },
-  "lockVault": "Lock Vault",
-  "@lockVault": {
-    "description": "Lock vault button tooltip"
-  },
-  "navHome": "Home",
-  "@navHome": {
-    "description": "Bottom nav home label"
-  },
-  "navTrips": "Trips",
-  "@navTrips": {
-    "description": "Bottom nav trips label"
-  },
-  "navBaggage": "Luggage",
-  "@navBaggage": {
-    "description": "Bottom nav baggage label"
-  },
-  "navVault": "Vault",
-  "@navVault": {
-    "description": "Bottom nav vault label"
-  },
-  "navSettings": "Settings",
-  "@navSettings": {
-    "description": "Bottom nav settings label"
-  },
-  "selectAirlineToCustomize": "Tap to customize limits for your airline",
-  "@selectAirlineToCustomize": {
-    "description": "Prompt to select an airline and customize limits"
-  },
-  "changeAirlineLimit": "Change Airline",
-  "@changeAirlineLimit": {
-    "description": "Button to change current airline limit"
-  },
-  "selectCountryAndRoute": "Select Country & Route",
-  "@selectCountryAndRoute": {
-    "description": "Header title for country and route selection sheet"
-  },
-  "countriesLabel": "Countries",
-  "@countriesLabel": {
-    "description": "Label for count of countries"
-  },
-  "searchCountryOrCity": "Search country or city (e.g. Italy, Tokyo, Paris)...",
-  "@searchCountryOrCity": {
-    "description": "Hint text for country search field"
-  },
-  "noMatchingCountry": "No matching country found",
-  "@noMatchingCountry": {
-    "description": "Empty state text when no country matches search"
-  },
-  "activeStatus": "ACTIVE",
-  "@activeStatus": {
-    "description": "Active subscription status badge"
-  },
-  "authSubtitleSignIn": "Your Luxury Travel Companion • Sign In",
-  "@authSubtitleSignIn": {
-    "description": "Subtitle on Auth screen during sign in"
-  },
-  "authSubtitleSignUp": "Begin a New Journey • Create Account",
-  "@authSubtitleSignUp": {
-    "description": "Subtitle on Auth screen during sign up"
-  },
-  "authSignIn": "Sign In",
-  "@authSignIn": {
-    "description": "Tab/button label for sign in"
-  },
-  "authSignUp": "Sign Up",
-  "@authSignUp": {
-    "description": "Tab/button label for sign up"
-  },
-  "authEmail": "Email Address",
-  "@authEmail": {
-    "description": "Label for email field"
-  },
-  "authEmailHint": "traveler@packbuddy.com",
-  "@authEmailHint": {
-    "description": "Hint for email field"
-  },
-  "authEmailRequired": "Please enter your email address.",
-  "@authEmailRequired": {
-    "description": "Validation message when email is empty"
-  },
-  "authEmailInvalid": "Please enter a valid email address.",
-  "@authEmailInvalid": {
-    "description": "Validation message when email is invalid"
-  },
-  "authPassword": "Password",
-  "@authPassword": {
-    "description": "Label for password field"
-  },
-  "authForgotPassword": "Forgot Password?",
-  "@authForgotPassword": {
-    "description": "Button to trigger forgot password dialog"
-  },
-  "authPasswordRequired": "Please enter your password.",
-  "@authPasswordRequired": {
-    "description": "Validation message when password is empty"
-  },
-  "authPasswordRulesInvalid": "Password does not meet requirements.",
-  "@authPasswordRulesInvalid": {
-    "description": "Validation message when password fails rules"
-  },
-  "authPasswordMinChars": "Password must be at least 6 characters.",
-  "@authPasswordMinChars": {
-    "description": "Validation message for sign in password length"
-  },
-  "authPasswordRulesTitle": "Password Requirements:",
-  "@authPasswordRulesTitle": {
-    "description": "Header for password requirements checklist"
-  },
-  "authRuleMinChars": "At least 8 characters",
-  "@authRuleMinChars": {
-    "description": "Rule requirement: min 8 characters"
-  },
-  "authRuleUppercase": "At least 1 uppercase letter",
-  "@authRuleUppercase": {
-    "description": "Rule requirement: at least 1 uppercase letter"
-  },
-  "authRuleLowercase": "At least 1 lowercase letter",
-  "@authRuleLowercase": {
-    "description": "Rule requirement: at least 1 lowercase letter"
-  },
-  "authRuleDigit": "At least 1 number",
-  "@authRuleDigit": {
-    "description": "Rule requirement: at least 1 digit"
-  },
-  "authConfirmPassword": "Confirm Password",
-  "@authConfirmPassword": {
-    "description": "Label for password confirmation field"
-  },
-  "authConfirmPasswordRequired": "Please confirm your password.",
-  "@authConfirmPasswordRequired": {
-    "description": "Validation message when confirm password is empty"
-  },
-  "authPasswordsDoNotMatch": "Passwords do not match.",
-  "@authPasswordsDoNotMatch": {
-    "description": "Validation message when passwords do not match"
-  },
-  "authCreateAccount": "Create Account",
-  "@authCreateAccount": {
-    "description": "Primary action button to create account"
-  },
-  "authOr": "or",
-  "@authOr": {
-    "description": "Divider text between email and social login"
-  },
-  "authContinueWithGoogle": "Continue with Google",
-  "@authContinueWithGoogle": {
-    "description": "Button to sign in with Google"
-  },
-  "authTermsNotice": "By signing up, you agree to our Terms of Service & Privacy Policy.",
-  "@authTermsNotice": {
-    "description": "Terms of service and privacy policy disclaimer"
-  },
-  "authResetPasswordTitle": "Reset Password",
-  "@authResetPasswordTitle": {
-    "description": "Dialog title for password reset"
-  },
-  "authResetPasswordDescription": "Enter your registered email address to receive a password reset link.",
-  "@authResetPasswordDescription": {
-    "description": "Dialog description for password reset"
-  },
-  "authSendLink": "Send Link",
-  "@authSendLink": {
-    "description": "Button to send password reset link"
-  },
-  "authResetLinkSent": "Password reset link has been sent to your email.",
-  "@authResetLinkSent": {
-    "description": "Snackbar notification after sending password reset link"
-  },
-  "authAppleComingSoon": "Sign in with Apple will be available in the upcoming update!",
-  "@authAppleComingSoon": {
-    "description": "Placeholder notification for Apple sign in"
-  },
-  "emailVerifyTitle": "Verify Your Email",
-  "@emailVerifyTitle": {
-    "description": "Title on email verification screen"
-  },
-  "emailVerifySubtitle": "To protect your travel vault and sync your trips, please verify your email address.",
-  "@emailVerifySubtitle": {
-    "description": "Subtitle on email verification screen"
-  },
-  "emailVerifyInstructionsTitle": "What should you do?",
-  "@emailVerifyInstructionsTitle": {
-    "description": "Header for email verification steps"
-  },
-  "emailVerifyStep1": "Check your inbox and spam folder.",
-  "@emailVerifyStep1": {
-    "description": "Step 1 of email verification"
-  },
-  "emailVerifyStep2": "Click the verification link in the email.",
-  "@emailVerifyStep2": {
-    "description": "Step 2 of email verification"
-  },
-  "emailVerifyStep3": "Wait a few seconds; this screen will proceed automatically.",
-  "@emailVerifyStep3": {
-    "description": "Step 3 of email verification"
-  },
-  "emailVerifyWaiting": "Waiting for verification...",
-  "@emailVerifyWaiting": {
-    "description": "Indicator text while waiting for email verification"
-  },
-  "emailVerifyCheckNow": "I Verified, Continue",
-  "@emailVerifyCheckNow": {
-    "description": "Manual check button on email verification screen"
-  },
-  "emailVerifyResendLink": "Resend Verification Email",
-  "@emailVerifyResendLink": {
-    "description": "Button to resend email verification link"
-  },
-  "emailVerifyResendCooldown": "Resend in {seconds}s",
-  "@emailVerifyResendCooldown": {
-    "description": "Cooldown timer text for resending verification email",
-    "placeholders": {
-      "seconds": {
-        "type": "int",
-        "example": "30"
-      }
-    }
-  },
-  "emailVerifyBackToSignIn": "Back to Sign In",
-  "@emailVerifyBackToSignIn": {
-    "description": "Button to sign out and return to sign in"
-  },
-  "emailVerifyNotVerifiedYet": "Email is not verified yet. Please check your inbox and click the link.",
-  "@emailVerifyNotVerifiedYet": {
-    "description": "Snackbar message when email is still unverified"
-  },
-  "emailVerifyLinkSentSuccess": "Verification email sent! Please check your inbox.",
-  "@emailVerifyLinkSentSuccess": {
-    "description": "Snackbar message when verification email is resent"
-  },
-  "signedInTraveler": "Signed In Traveler",
-  "@signedInTraveler": {
-    "description": "Fallback name for signed in traveler"
-  },
-  "cloudSessionActive": "Cloud Session Active",
-  "@cloudSessionActive": {
-    "description": "Status badge indicating active cloud session"
-  },
-  "signOutConfirmTitle": "Sign Out",
-  "@signOutConfirmTitle": {
-    "description": "Dialog title for sign out confirmation"
-  },
-  "signOutConfirmMessage": "Are you sure you want to sign out? Your travel data remains safely stored on your device.",
-  "@signOutConfirmMessage": {
-    "description": "Dialog content for sign out confirmation"
-  },
-  "notificationsAndReminders": "Notifications & Reminders",
-  "@notificationsAndReminders": {
-    "description": "Header for notifications section in settings"
-  },
-  "packingReminders": "Packing Reminders",
-  "@packingReminders": {
-    "description": "Title for packing reminders setting"
-  },
-  "packingRemindersSubtitle": "Get smart reminders 48h and 24h before departure",
-  "@packingRemindersSubtitle": {
-    "description": "Subtitle for packing reminders setting"
-  },
-  "shopping": "Shopping",
-  "@shopping": {
-    "description": "Expense category shopping"
-  },
-  "authErrorUserNotFound": "No account found with this email address.",
-  "@authErrorUserNotFound": {
-    "description": "Error message when account does not exist"
-  },
-  "authErrorWrongPassword": "Incorrect password entered. Please try again.",
-  "@authErrorWrongPassword": {
-    "description": "Error message when password is wrong"
-  },
-  "authErrorInvalidCredential": "Email or password incorrect. Please check your credentials.",
-  "@authErrorInvalidCredential": {
-    "description": "Error message when credentials are invalid"
-  },
-  "authErrorEmailInUse": "An account already exists with this email address.",
-  "@authErrorEmailInUse": {
-    "description": "Error message when email is already registered"
-  },
-  "authErrorInvalidEmail": "Please enter a valid email address.",
-  "@authErrorInvalidEmail": {
-    "description": "Error message when email format is invalid"
-  },
-  "authErrorWeakPassword": "Password does not meet requirements.",
-  "@authErrorWeakPassword": {
-    "description": "Error message when password is too weak"
-  },
-  "authErrorUserDisabled": "This account has been disabled.",
-  "@authErrorUserDisabled": {
-    "description": "Error message when account is disabled"
-  },
-  "authErrorTooManyRequests": "Too many attempts. Please try again later.",
-  "@authErrorTooManyRequests": {
-    "description": "Error message when rate limited"
-  },
-  "authErrorNetworkFailed": "Network connection error. Please check your internet.",
-  "@authErrorNetworkFailed": {
-    "description": "Error message on network failure"
-  },
-  "authErrorGoogleFailed": "Could not sign in with Google. Please try again.",
-  "@authErrorGoogleFailed": {
-    "description": "Error message on Google sign in failure"
-  },
-  "authErrorVerificationFailed": "Could not send verification email. Please try again later.",
-  "@authErrorVerificationFailed": {
-    "description": "Error message on email verification send failure"
-  },
-  "authErrorGeneric": "Authentication failed. Please try again.",
-  "@authErrorGeneric": {
-    "description": "Generic authentication error message"
-  },
-  "authContinueWithApple": "Continue with Apple",
-  "@authContinueWithApple": {
-    "description": "Button to continue with Apple ID"
-  },
-  "authNoAccount": "Don't have an account? ",
-  "@authNoAccount": {
-    "description": "Prompt asking if traveler needs to register"
-  },
-  "authAlreadyHaveAccount": "Already have an account? ",
-  "@authAlreadyHaveAccount": {
-    "description": "Prompt asking if traveler already has an account"
-  },
-  "accountAndSession": "Account & Session",
-  "@accountAndSession": {
-    "description": "Header for account and session section in settings"
-  },
-  "categorySpendingAnalysis": "Category Spending Breakdown",
-  "@categorySpendingAnalysis": {
-    "description": "Title for category expense breakdown analytics card"
-  },
-  "topSpendingCategory": "Top: {category} ({percentage}%)",
-  "@topSpendingCategory": {
-    "description": "Highlight showing highest spending category and percentage",
-    "placeholders": {
-      "category": {
-        "type": "String",
-        "example": "Food & Dining"
-      },
-      "percentage": {
-        "type": "String",
-        "example": "42"
-      }
-    }
-  },
-  "expenseCount": "{count} Expenses",
-  "@expenseCount": {
-    "description": "Badge showing total count of expenses",
-    "placeholders": {
-      "count": {
-        "type": "int",
-        "example": "12"
-      }
-    }
-  },
-  "boardingPassPassenger": "PASSENGER",
-  "@boardingPassPassenger": {
-    "description": "Passenger label on boarding pass simulation"
-  },
-  "boardingPassGate": "GATE",
-  "@boardingPassGate": {
-    "description": "Gate label on boarding pass simulation"
-  },
-  "boardingPassSampleTraveler": "PACKBUDDY TRAVELER",
-  "@boardingPassSampleTraveler": {
-    "description": "Sample traveler name on boarding pass simulation"
-  },
-  "notification48hTitle": "PackBuddy: Trip to {destination} in 2 days! 🧳",
-  "@notification48hTitle": {
-    "description": "Notification title sent 48 hours before trip departure",
-    "placeholders": {
-      "destination": {
-        "type": "String",
-        "example": "Tokyo"
-      }
-    }
-  },
-  "notification48hBody": "Only 48 hours left until your trip to {destination}! Have you started packing your travel essentials?",
-  "@notification48hBody": {
-    "description": "Notification body sent 48 hours before trip departure",
-    "placeholders": {
-      "destination": {
-        "type": "String",
-        "example": "Tokyo"
-      }
-    }
-  },
-  "notification24hTitle": "PackBuddy: You're Leaving Tomorrow! ✈️",
-  "@notification24hTitle": {
-    "description": "Notification title sent 24 hours before trip departure"
-  },
-  "notification24hBody": "Final packing check! Double-check your passport, tickets, and travel essentials for {destination}.",
-  "@notification24hBody": {
-    "description": "Notification body sent 24 hours before trip departure",
-    "placeholders": {
-      "destination": {
-        "type": "String",
-        "example": "Tokyo"
-      }
-    }
-  },
-  "adminDashboard": "Admin Dashboard",
-  "@adminDashboard": {
-    "description": "Admin dashboard string: adminDashboard"
-  },
-  "adminDashboardDesc": "Global platform metrics and user management",
-  "@adminDashboardDesc": {
-    "description": "Admin dashboard string: adminDashboardDesc"
-  },
-  "adminAccessRestricted": "Access Restricted",
-  "@adminAccessRestricted": {
-    "description": "Admin dashboard string: adminAccessRestricted"
-  },
-  "adminAccessRestrictedDesc": "This area is strictly reserved for authorized administrators.",
-  "@adminAccessRestrictedDesc": {
-    "description": "Admin dashboard string: adminAccessRestrictedDesc"
-  },
-  "adminMetrics": "Platform Metrics",
-  "@adminMetrics": {
-    "description": "Admin dashboard string: adminMetrics"
-  },
-  "adminTotalUsers": "Total Users",
-  "@adminTotalUsers": {
-    "description": "Admin dashboard string: adminTotalUsers"
-  },
-  "adminVerifiedUsers": "Verified Users",
-  "@adminVerifiedUsers": {
-    "description": "Admin dashboard string: adminVerifiedUsers"
-  },
-  "adminProUsers": "Pro Members",
-  "@adminProUsers": {
-    "description": "Admin dashboard string: adminProUsers"
-  },
-  "adminTotalTrips": "Total Trips",
-  "@adminTotalTrips": {
-    "description": "Admin dashboard string: adminTotalTrips"
-  },
-  "adminTotalExpenses": "Total Expenses",
-  "@adminTotalExpenses": {
-    "description": "Admin dashboard string: adminTotalExpenses"
-  },
-  "adminTotalDocs": "Vault Documents",
-  "@adminTotalDocs": {
-    "description": "Admin dashboard string: adminTotalDocs"
-  },
-  "adminTotalItems": "Checklist Items",
-  "@adminTotalItems": {
-    "description": "Admin dashboard string: adminTotalItems"
-  },
-  "adminUserManagement": "User Management",
-  "@adminUserManagement": {
-    "description": "Admin dashboard string: adminUserManagement"
-  },
-  "adminSearchUsers": "Search users by email, name or UID...",
-  "@adminSearchUsers": {
-    "description": "Admin dashboard string: adminSearchUsers"
-  },
-  "adminGrantPro": "Grant Pro",
-  "@adminGrantPro": {
-    "description": "Admin dashboard string: adminGrantPro"
-  },
-  "adminRevokePro": "Revoke Pro",
-  "@adminRevokePro": {
-    "description": "Admin dashboard string: adminRevokePro"
-  },
-  "adminProStatusUpdated": "Pro status successfully updated",
-  "@adminProStatusUpdated": {
-    "description": "Admin dashboard string: adminProStatusUpdated"
-  },
-  "adminNoUsersFound": "No users found",
-  "@adminNoUsersFound": {
-    "description": "Admin dashboard string: adminNoUsersFound"
-  },
-  "adminTotalStorage": "Vault Storage",
-  "@adminTotalStorage": {
-    "description": "Admin dashboard string: adminTotalStorage"
-  },
-  "adminDefaultBanReason": "Violation of platform terms of service.",
-  "@adminDefaultBanReason": {
-    "description": "Admin moderation string: adminDefaultBanReason"
-  },
-  "adminPermanentBanTitle": "Account Permanently Suspended",
-  "@adminPermanentBanTitle": {
-    "description": "Admin moderation string: adminPermanentBanTitle"
-  },
-  "adminTemporaryBanTitle": "Account Temporarily Suspended",
-  "@adminTemporaryBanTitle": {
-    "description": "Admin moderation string: adminTemporaryBanTitle"
-  },
-  "adminAccountSuspendedNotice": "Access to PackBuddy services has been restricted by an administrator.",
-  "@adminAccountSuspendedNotice": {
-    "description": "Admin moderation string: adminAccountSuspendedNotice"
-  },
-  "adminPermanentBan": "Permanent Ban",
-  "@adminPermanentBan": {
-    "description": "Admin moderation string: adminPermanentBan"
-  },
-  "adminTemporaryBan": "Temporary Ban",
-  "@adminTemporaryBan": {
-    "description": "Admin moderation string: adminTemporaryBan"
-  },
-  "adminBanReasonLabel": "Suspension Reason",
-  "@adminBanReasonLabel": {
-    "description": "Admin moderation string: adminBanReasonLabel"
-  },
-  "adminBanExpiresAtLabel": "Suspension Expires At",
-  "@adminBanExpiresAtLabel": {
-    "description": "Admin moderation string: adminBanExpiresAtLabel"
-  },
-  "adminFeatureRestrictedNotice": "This action is restricted by an administrator.",
-  "@adminFeatureRestrictedNotice": {
-    "description": "Admin moderation string: adminFeatureRestrictedNotice"
-  },
-  "adminGeoAnalytics": "Geographic & Activity Analytics",
-  "@adminGeoAnalytics": {
-    "description": "Admin moderation string: adminGeoAnalytics"
-  },
-  "adminPeriodLive": "Live (15m)",
-  "@adminPeriodLive": {
-    "description": "Admin moderation string: adminPeriodLive"
-  },
-  "adminPeriodDaily": "Daily (24h)",
-  "@adminPeriodDaily": {
-    "description": "Admin moderation string: adminPeriodDaily"
-  },
-  "adminPeriodWeekly": "Weekly (7d)",
-  "@adminPeriodWeekly": {
-    "description": "Admin moderation string: adminPeriodWeekly"
-  },
-  "adminPeriodMonthly": "Monthly (30d)",
-  "@adminPeriodMonthly": {
-    "description": "Admin moderation string: adminPeriodMonthly"
-  },
-  "adminPeriodYearly": "Yearly (365d)",
-  "@adminPeriodYearly": {
-    "description": "Admin moderation string: adminPeriodYearly"
-  },
-  "adminNoActiveUsers": "No active users in this period",
-  "@adminNoActiveUsers": {
-    "description": "Admin moderation string: adminNoActiveUsers"
-  },
-  "adminFilterAll": "All",
-  "@adminFilterAll": {
-    "description": "Admin moderation string: adminFilterAll"
-  },
-  "adminFilterPro": "Pro",
-  "@adminFilterPro": {
-    "description": "Admin moderation string: adminFilterPro"
-  },
-  "adminFilterBanned": "Banned",
-  "@adminFilterBanned": {
-    "description": "Admin moderation string: adminFilterBanned"
-  },
-  "adminFilterRestricted": "Restricted",
-  "@adminFilterRestricted": {
-    "description": "Admin moderation string: adminFilterRestricted"
-  },
-  "adminModerateUser": "Moderate User",
-  "@adminModerateUser": {
-    "description": "Admin moderation string: adminModerateUser"
-  },
-  "adminBanStatusLabel": "Account Suspension / Ban",
-  "@adminBanStatusLabel": {
-    "description": "Admin moderation string: adminBanStatusLabel"
-  },
-  "adminUnbanned": "Unbanned",
-  "@adminUnbanned": {
-    "description": "Admin moderation string: adminUnbanned"
-  },
-  "adminBan24h": "24 Hours",
-  "@adminBan24h": {
-    "description": "Admin moderation string: adminBan24h"
-  },
-  "adminBan7d": "7 Days",
-  "@adminBan7d": {
-    "description": "Admin moderation string: adminBan7d"
-  },
-  "adminBan30d": "30 Days",
-  "@adminBan30d": {
-    "description": "Admin moderation string: adminBan30d"
-  },
-  "adminBanReasonHint": "Reason for suspension (optional)...",
-  "@adminBanReasonHint": {
-    "description": "Admin moderation string: adminBanReasonHint"
-  },
-  "adminFeatureRestrictionsLabel": "Granular Feature Restrictions",
-  "@adminFeatureRestrictionsLabel": {
-    "description": "Admin moderation string: adminFeatureRestrictionsLabel"
-  },
-  "adminRestrictTripCreate": "Restrict Trip Creation",
-  "@adminRestrictTripCreate": {
-    "description": "Admin moderation string: adminRestrictTripCreate"
-  },
-  "adminRestrictExpenseAdd": "Restrict Expense Logging",
-  "@adminRestrictExpenseAdd": {
-    "description": "Admin moderation string: adminRestrictExpenseAdd"
-  },
-  "adminRestrictVaultUpload": "Restrict Vault Uploads",
-  "@adminRestrictVaultUpload": {
-    "description": "Admin moderation string: adminRestrictVaultUpload"
-  },
-  "adminRestrictCloudSync": "Restrict Cloud Sync",
-  "@adminRestrictCloudSync": {
-    "description": "Admin moderation string: adminRestrictCloudSync"
-  },
-  "adminSaveChanges": "Save Changes",
-  "@adminSaveChanges": {
-    "description": "Admin moderation string: adminSaveChanges"
-  },
-  "adminChangesSaved": "Moderation changes saved successfully",
-  "@adminChangesSaved": {
-    "description": "Admin moderation string: adminChangesSaved"
-  },
-  "adminSignOut": "Sign Out",
-  "@adminSignOut": {
-    "description": "Admin moderation string: adminSignOut"
-  },
-  "perMonth": "/ mo",
-  "@perMonth": {
-    "description": "Localization key for perMonth"
-  },
-  "perYear": "/ yr",
-  "@perYear": {
-    "description": "Localization key for perYear"
-  },
-  "storeBillingRequiredTitle": "Store Billing Required",
-  "@storeBillingRequiredTitle": {
-    "description": "Localization key for storeBillingRequiredTitle"
-  },
-  "storeBillingRequiredMessage": "Official Google Play & App Store billing is currently being activated for this production build. Subscription transactions cannot be bypassed for free.",
-  "@storeBillingRequiredMessage": {
-    "description": "Localization key for storeBillingRequiredMessage"
-  },
-  "adminTestPurchaseTitle": "Admin / Sandbox Test Purchase",
-  "@adminTestPurchaseTitle": {
-    "description": "Localization key for adminTestPurchaseTitle"
-  },
-  "adminTestPurchaseMessage": "You are signed in as Super Admin. Would you like to confirm and activate PackBuddy Pro test subscription?",
-  "@adminTestPurchaseMessage": {
-    "description": "Localization key for adminTestPurchaseMessage"
-  },
-  "activateTestPro": "Activate Pro (Test)",
-  "@activateTestPro": {
-    "description": "Localization key for activateTestPro"
-  },
-  "templateSummerTitle": "Beach & Summer Vacation",
-  "@templateSummerTitle": {
-    "description": "Localization key for templateSummerTitle"
-  },
-  "templateSummerDesc": "Essential packing list for sea, sand, sun, and warm weather getaways",
-  "@templateSummerDesc": {
-    "description": "Localization key for templateSummerDesc"
-  },
-  "templateWinterTitle": "Winter & Ski Trip",
-  "@templateWinterTitle": {
-    "description": "Localization key for templateWinterTitle"
-  },
-  "templateWinterDesc": "Protective gear and warm layers for cold climates and ski resorts",
-  "@templateWinterDesc": {
-    "description": "Localization key for templateWinterDesc"
-  },
-  "templateBusinessTitle": "Business & Conference",
-  "@templateBusinessTitle": {
-    "description": "Localization key for templateBusinessTitle"
-  },
-  "templateBusinessDesc": "Tailored packing list for meetings, conferences, and corporate trips",
-  "@templateBusinessDesc": {
-    "description": "Localization key for templateBusinessDesc"
-  },
-  "templateCampingTitle": "Nature & Camping Expedition",
-  "@templateCampingTitle": {
-    "description": "Localization key for templateCampingTitle"
-  },
-  "templateCampingDesc": "Durable outdoor gear for tent camping, trekking, and hiking",
-  "@templateCampingDesc": {
-    "description": "Localization key for templateCampingDesc"
-  },
-  "templateCityTitle": "Weekend City Break",
-  "@templateCityTitle": {
-    "description": "Localization key for templateCityTitle"
-  },
-  "templateCityDesc": "Lightweight and compact essentials for a 2-3 day city getaway",
-  "@templateCityDesc": {
-    "description": "Localization key for templateCityDesc"
-  },
-  "vaultCloudBackupNotice": "Documents are encrypted & backed up to cloud storage for cross-device sync, 15-day account recovery, and safety compliance.",
-  "@vaultCloudBackupNotice": {
-    "description": "Compliance notice for vault cloud backup"
-  },
-  "deleteAccountTitle": "Delete Account",
-  "@deleteAccountTitle": {
-    "description": "Delete account button title"
-  },
-  "deleteAccountConfirmationTitle": "15-Day Account Deletion Request",
-  "@deleteAccountConfirmationTitle": {
-    "description": "Title for 15-day deletion dialog"
-  },
-  "deleteAccountConfirmationMessage": "Your account, trips, expenses, and vault documents will be scheduled for permanent deletion in 15 days.\n\n• Do not log in for 15 days to allow deletion to complete.\n• If you log in within 15 days, your account and all data will be automatically restored.\n\nDo you want to proceed?",
-  "@deleteAccountConfirmationMessage": {
-    "description": "Message explaining 15-day grace period for deletion"
-  },
-  "deleteAccountButton": "Request 15-Day Deletion",
-  "@deleteAccountButton": {
-    "description": "Button confirming deletion request"
-  },
-  "deleteAccountScheduledNotice": "Your account has been scheduled for deletion in 15 days. Do not log in if you wish to permanently delete your account.",
-  "@deleteAccountScheduledNotice": {
-    "description": "Notice after requesting deletion"
-  },
-  "accountRestoredNotice": "Welcome back! Your account deletion was cancelled and all your data has been restored.",
-  "@accountRestoredNotice": {
-    "description": "Notice when account is auto-recovered upon login"
-  },
-  "adminPendingDeletionBadge": "Scheduled for deletion ({days}d remaining)",
-  "@adminPendingDeletionBadge": {
-    "description": "Admin badge for pending deletion",
-    "placeholders": {
-      "days": {
-        "type": "int"
-      }
-    }
-  },
-  "adminCancelDeletion": "Cancel Deletion",
-  "@adminCancelDeletion": {
-    "description": "Admin button to cancel account deletion"
-  },
-  "adminPurgeNow": "Purge Data Now",
-  "@adminPurgeNow": {
-    "description": "Admin button to purge user data immediately"
-  },
-  "adminPurgeConfirmTitle": "Permanently Purge User Data?",
-  "@adminPurgeConfirmTitle": {
-    "description": "Purge confirmation dialog title"
-  },
-  "adminPurgeConfirmMessage": "This will immediately and irrevocably delete all cloud trips, expenses, checklists, and vault documents for this user.",
-  "@adminPurgeConfirmMessage": {
-    "description": "Purge confirmation dialog message"
-  },
-  "adminDeletionCancelled": "Account deletion successfully cancelled",
-  "@adminDeletionCancelled": {
-    "description": "Admin deletion cancelled notification"
-  },
-  "adminDataPurged": "All user data was permanently purged",
-  "@adminDataPurged": {
-    "description": "Admin data purged notification"
-  },
-  "adminVaultDocumentsTitle": "Uploaded Vault Documents (Inspect / Moderate)",
-  "@adminVaultDocumentsTitle": {
-    "description": "Title for uploaded vault documents section in admin"
-  },
-  "adminNoDocumentsUploaded": "No vault documents uploaded yet",
-  "@adminNoDocumentsUploaded": {
-    "description": "Empty state for user documents in admin"
-  },
-  "adminInspectDocument": "Inspect",
-  "@adminInspectDocument": {
-    "description": "Inspect document button"
-  },
-  "adminDeleteDocument": "Delete Document",
-  "@adminDeleteDocument": {
-    "description": "Admin delete document button"
-  },
-  "adminDeleteDocumentConfirm": "Are you sure you want to permanently delete this document from the cloud vault?",
-  "@adminDeleteDocumentConfirm": {
-    "description": "Confirmation message for admin deleting document"
-  },
-  "adminDocumentDeleted": "Document successfully deleted by admin",
-  "@adminDocumentDeleted": {
-    "description": "Notification when admin deletes document"
-  },
-  "adminDocumentPreviewTitle": "Document Inspector",
-  "@adminDocumentPreviewTitle": {
-    "description": "Title for admin document preview dialog"
-  },
-  "adminDocumentTypeImage": "IMAGE",
-  "@adminDocumentTypeImage": {
-    "description": "Document type image label"
-  },
-  "adminDocumentTypePdf": "PDF",
-  "@adminDocumentTypePdf": {
-    "description": "Document type PDF label"
-  },
-  "emailVerifySpamFolderTip": "Check Spam / Promotions Folder",
-  "@emailVerifySpamFolderTip": {
-    "description": "Title for spam folder guidance"
-  },
-  "emailVerifySpamFolderDesc": "If you haven't received the link, check your spam or promotions folder for an email from PackBuddy. Verifying your email keeps your cloud vault secure.",
-  "@emailVerifySpamFolderDesc": {
-    "description": "Description for spam folder guidance"
-  },
-  "emailVerifyAutoChecking": "Waiting for verification link... (auto-checking)",
-  "@emailVerifyAutoChecking": {
-    "description": "Polling indicator text"
-  },
-  "currencyConverter": "Currency Converter",
-  "fromCurrency": "From",
-  "toCurrency": "To",
-  "exchangeRate": "Exchange Rate",
-  "liveRates": "Live Rates",
-  "offlineRates": "Offline Rates",
-  "quickConvert": "Quick Currency Converter",
-  "refreshRates": "Refresh Rates",
-  "budgetAnalytics": "Budget Analytics",
-  "categoryDistribution": "Category Distribution",
-  "spendingTrends": "Spending Trends",
-  "dailyBurnRate": "Daily Spend Rate",
-  "projectedTotal": "Projected Total",
-  "budgetStatusOnTrack": "On Track",
-  "budgetStatusOver": "Over Budget",
-  "budgetStatusWarning": "Pacing High",
-  "compareTrips": "Compare Trips",
-  "selectTripsToCompare": "Select Trips to Compare",
-  "selectAtLeastTwoTrips": "Select at least 2 trips to compare",
-  "comparisonSummary": "Comparison Summary",
-  "budgetEfficiency": "Pacing Status",
-  "packingReadiness": "Packing Readiness",
-  "lowestDailyCost": "Most Economical",
-  "highestSpending": "Highest Spend",
-  "sharedTrip": "Shared Trip",
-  "shareTripInvite": "Invite Collaborators",
-  "joinSharedTrip": "Join Shared Trip",
-  "inviteCode": "Invite Code",
-  "enterInviteCode": "Enter 6-character code",
-  "collaborators": "Collaborators",
-  "copyCode": "Copy Code",
-  "codeCopied": "Invite code copied to clipboard",
-  "invalidInviteCode": "Invalid or expired invite code",
-  "joinSuccess": "Successfully joined trip!",
-  "shareTrip": "Share Trip",
-  "shareChecklist": "Share Checklist",
-  "shareBudget": "Share Budget",
-  "shareTripSummary": "Check out my travel plan on PackBuddy!",
-  "shareCopied": "Trip details copied to clipboard",
-  "tripMap": "Travel Map & Route",
-  "openInMaps": "Open in Maps",
-  "openInGoogleMaps": "Open in Google Maps",
-  "openInAppleMaps": "Open in Apple Maps",
-  "waypoints": "Route Waypoints",
-  "addWaypoint": "Add Waypoint",
-  "waypointName": "Place / Hotel / Landmark",
-  "noWaypoints": "No waypoints added yet",
-  "widgetSettings": "Home Screen Widget",
-  "widgetPreview": "Widget Preview",
-  "showCountdown": "Show Countdown",
-  "showPackingProgress": "Show Packing Progress",
-  "showBudgetData": "Show Budget Summary",
-  "widgetSizeSmall": "Small",
-  "widgetSizeMedium": "Medium",
-  "widgetSizeLarge": "Large",
-  "onboardingTitle1": "Plan Trips Effortlessly",
-  "onboardingDesc1": "Organize multi-currency budgets and track daily expenses anywhere in the world.",
-  "onboardingTitle2": "Smart Packing Checklists",
-  "onboardingDesc2": "Airline baggage guidelines and smart category templates ensure you never forget essentials.",
-  "onboardingTitle3": "Collaborate in Real-Time",
-  "onboardingDesc3": "Share your trip plans and checklists with friends and family with simple invite codes.",
-  "onboardingTitle4": "Offline Travel Vault",
-  "onboardingDesc4": "Keep passports, boarding passes, and vouchers encrypted and accessible without internet.",
-  "getStarted": "Get Started",
-  "skip": "Skip",
-  "next": "Next",
-  "replayTour": "Replay App Tour",
-  "signInWithApple": "Sign in with Apple",
-  "appleSignInFailed": "Apple Sign-In failed",
-  "total": "Total",
-  "totalSpent": "Total Spent",
-  "confirm": "Confirm"
+﻿{
+    "@@locale":  "en",
+    "appName":  "PackBuddy",
+    "@appName":  {
+                     "description":  "The title of the application"
+                 },
+    "welcome":  "Welcome to PackBuddy",
+    "@welcome":  {
+                     "description":  "Welcome message shown on the dashboard"
+                 },
+    "welcomeSubtitle":  "Minimalist, offline-first travel assistant \u0026 budget manager",
+    "@welcomeSubtitle":  {
+                             "description":  "Subtitle underneath the welcome message"
+                         },
+    "budget":  "Budget",
+    "@budget":  {
+                    "description":  "Label for budget feature"
+                },
+    "budgetDescription":  "Multi-currency travel expense tracking",
+    "@budgetDescription":  {
+                               "description":  "Description of budget feature"
+                           },
+    "vault":  "Document Vault",
+    "@vault":  {
+                   "description":  "Label for document vault feature"
+               },
+    "vaultDescription":  "Passports, tickets and booking vouchers",
+    "@vaultDescription":  {
+                              "description":  "Description of vault feature"
+                          },
+    "settings":  "Settings",
+    "@settings":  {
+                      "description":  "Label for settings feature"
+                  },
+    "settingsDescription":  "Preferences, backup and sync configuration",
+    "@settingsDescription":  {
+                                 "description":  "Description of settings feature"
+                             },
+    "offlineReady":  "Offline Ready",
+    "@offlineReady":  {
+                          "description":  "Badge showing offline-first readiness"
+                      },
+    "syncReady":  "Two-Way Cloud Sync",
+    "@syncReady":  {
+                       "description":  "Badge showing two-way sync readiness"
+                   },
+    "syncInProgress":  "Syncing...",
+    "@syncInProgress":  {
+                            "description":  "Status text while synchronizing"
+                        },
+    "syncUpToDate":  "Up to date",
+    "@syncUpToDate":  {
+                          "description":  "Status text when synchronization is up to date"
+                      },
+    "syncFailed":  "Sync Failed",
+    "@syncFailed":  {
+                        "description":  "Status text when synchronization failed"
+                    },
+    "multiCurrency":  "Multi-Currency",
+    "@multiCurrency":  {
+                           "description":  "Badge showing multi-currency feature"
+                       },
+    "trips":  "Trips",
+    "@trips":  {
+                   "description":  "Header for trips screen"
+               },
+    "addTrip":  "Add Trip",
+    "@addTrip":  {
+                     "description":  "Button to add a new trip"
+                 },
+    "tripName":  "Trip Name",
+    "@tripName":  {
+                      "description":  "Input field label for trip title"
+                  },
+    "destination":  "Destination",
+    "@destination":  {
+                         "description":  "Input field label for destination"
+                     },
+    "remaining":  "Remaining",
+    "@remaining":  {
+                       "description":  "Remaining budget label"
+                   },
+    "spent":  "Spent",
+    "@spent":  {
+                   "description":  "Total spent amount label"
+               },
+    "addExpense":  "Add Expense",
+    "@addExpense":  {
+                        "description":  "Button to add an expense"
+                    },
+    "amount":  "Amount",
+    "@amount":  {
+                    "description":  "Expense amount field label"
+                },
+    "category":  "Category",
+    "@category":  {
+                      "description":  "Expense category dropdown label"
+                  },
+    "food":  "Food \u0026 Dining",
+    "@food":  {
+                  "description":  "Food category label"
+              },
+    "transport":  "Transportation",
+    "@transport":  {
+                       "description":  "Transportation category label"
+                   },
+    "accommodation":  "Accommodation",
+    "@accommodation":  {
+                           "description":  "Accommodation category label"
+                       },
+    "entertainment":  "Entertainment",
+    "@entertainment":  {
+                           "description":  "Entertainment category label"
+                       },
+    "other":  "Other",
+    "@other":  {
+                   "description":  "Other category label"
+               },
+    "save":  "Save",
+    "@save":  {
+                  "description":  "Save button label"
+              },
+    "cancel":  "Cancel",
+    "@cancel":  {
+                    "description":  "Cancel button label"
+                },
+    "date":  "Date",
+    "@date":  {
+                  "description":  "Date label"
+              },
+    "startDate":  "Start Date",
+    "@startDate":  {
+                       "description":  "Start date label"
+                   },
+    "endDate":  "End Date",
+    "@endDate":  {
+                     "description":  "End date label"
+                 },
+    "noTripsYet":  "No trips planned yet",
+    "@noTripsYet":  {
+                        "description":  "Message when trips list is empty"
+                    },
+    "noTripsSubtitle":  "Tap the button below to add your first journey",
+    "@noTripsSubtitle":  {
+                             "description":  "Subtitle when trips list is empty"
+                         },
+    "noExpensesYet":  "No expenses recorded yet",
+    "@noExpensesYet":  {
+                           "description":  "Message when expenses list is empty"
+                       },
+    "noExpensesSubtitle":  "Track your spendings by adding an expense",
+    "@noExpensesSubtitle":  {
+                                "description":  "Subtitle when expenses list is empty"
+                            },
+    "deleteTrip":  "Delete Trip",
+    "@deleteTrip":  {
+                        "description":  "Delete trip action"
+                    },
+    "deleteTripConfirm":  "Are you sure you want to delete this trip?",
+    "@deleteTripConfirm":  {
+                               "description":  "Confirmation message when deleting trip"
+                           },
+    "deleteExpense":  "Delete Expense",
+    "@deleteExpense":  {
+                           "description":  "Delete expense action"
+                       },
+    "addDocument":  "Add Document",
+    "@addDocument":  {
+                         "description":  "Add document button label"
+                     },
+    "documentName":  "Document Name",
+    "@documentName":  {
+                          "description":  "Document name input label"
+                      },
+    "passport":  "Passport",
+    "@passport":  {
+                      "description":  "Passport category label"
+                  },
+    "ticket":  "Ticket",
+    "@ticket":  {
+                    "description":  "Ticket category label"
+                },
+    "booking":  "Booking Voucher",
+    "@booking":  {
+                     "description":  "Booking voucher category label"
+                 },
+    "camera":  "Take Photo",
+    "@camera":  {
+                    "description":  "Camera picker button"
+                },
+    "gallery":  "Choose from Gallery",
+    "@gallery":  {
+                     "description":  "Gallery picker button"
+                 },
+    "viewDocument":  "View Document",
+    "@viewDocument":  {
+                          "description":  "View document title"
+                      },
+    "noDocumentsYet":  "No documents saved yet",
+    "@noDocumentsYet":  {
+                            "description":  "Message when vault is empty"
+                        },
+    "noDocumentsSubtitle":  "Securely store your passports, tickets and reservations",
+    "@noDocumentsSubtitle":  {
+                                 "description":  "Subtitle when vault is empty"
+                             },
+    "deleteDocument":  "Delete Document",
+    "@deleteDocument":  {
+                            "description":  "Delete document action"
+                        },
+    "deleteDocumentConfirm":  "Are you sure you want to delete this document?",
+    "@deleteDocumentConfirm":  {
+                                   "description":  "Confirmation message when deleting document"
+                               },
+    "theme":  "Theme",
+    "@theme":  {
+                   "description":  "Theme settings label"
+               },
+    "themeSystem":  "System Default",
+    "@themeSystem":  {
+                         "description":  "System default theme option"
+                     },
+    "themeLight":  "Light",
+    "@themeLight":  {
+                        "description":  "Light theme option"
+                    },
+    "themeDark":  "Dark",
+    "@themeDark":  {
+                       "description":  "Dark theme option"
+                   },
+    "language":  "Language",
+    "@language":  {
+                      "description":  "Language settings label"
+                  },
+    "syncNow":  "Sync Now",
+    "@syncNow":  {
+                     "description":  "Manual sync button label"
+                 },
+    "lastSync":  "Last Sync",
+    "@lastSync":  {
+                      "description":  "Last sync time label"
+                  },
+    "upgradeToPro":  "Upgrade to PackBuddy Pro",
+    "@upgradeToPro":  {
+                          "description":  "Upgrade to Pro banner text"
+                      },
+    "proBadge":  "PRO",
+    "@proBadge":  {
+                      "description":  "Pro badge label"
+                  },
+    "proTitle":  "PackBuddy Pro",
+    "@proTitle":  {
+                      "description":  "Paywall title"
+                  },
+    "proSubtitle":  "Unlock limitless travel and ultimate peace of mind",
+    "@proSubtitle":  {
+                         "description":  "Paywall subtitle"
+                     },
+    "proFeature1":  "Unlimited Trips \u0026 Expense Tracking",
+    "@proFeature1":  {
+                         "description":  "Pro feature 1 description"
+                     },
+    "proFeature2":  "Unlimited Document Vault Storage",
+    "@proFeature2":  {
+                         "description":  "Pro feature 2 description"
+                     },
+    "proFeature3":  "Automatic Two-Way Cloud Sync",
+    "@proFeature3":  {
+                         "description":  "Pro feature 3 description"
+                     },
+    "monthly":  "Monthly",
+    "@monthly":  {
+                     "description":  "Monthly subscription label"
+                 },
+    "annual":  "Annual",
+    "@annual":  {
+                    "description":  "Annual subscription label"
+                },
+    "annualSave":  "Save 58%",
+    "@annualSave":  {
+                        "description":  "Annual discount badge"
+                    },
+    "subscribeNow":  "Continue with Pro",
+    "@subscribeNow":  {
+                          "description":  "Subscription button label"
+                      },
+    "purchaseSuccess":  "Welcome to PackBuddy Pro!",
+    "@purchaseSuccess":  {
+                             "description":  "Purchase success message"
+                         },
+    "architecturePhase":  "Phase 5: Full Product \u0026 20 Languages Ready",
+    "@architecturePhase":  {
+                               "description":  "Phase status indicator"
+                           },
+    "goodMorning":  "Good morning, Traveler ☀️",
+    "@goodMorning":  {
+                         "description":  "Morning greeting"
+                     },
+    "goodAfternoon":  "Good afternoon, Traveler ✈️",
+    "@goodAfternoon":  {
+                           "description":  "Afternoon greeting"
+                       },
+    "goodEvening":  "Good evening, Traveler 🌙",
+    "@goodEvening":  {
+                         "description":  "Evening greeting"
+                     },
+    "allCategories":  "All",
+    "@allCategories":  {
+                           "description":  "All category filter"
+                       },
+    "categoryClothing":  "Clothing",
+    "@categoryClothing":  {
+                              "description":  "Clothing category"
+                          },
+    "categoryElectronics":  "Electronics",
+    "@categoryElectronics":  {
+                                 "description":  "Electronics category"
+                             },
+    "categoryToiletries":  "Toiletries",
+    "@categoryToiletries":  {
+                                "description":  "Toiletries category"
+                            },
+    "categoryDocuments":  "Documents",
+    "@categoryDocuments":  {
+                               "description":  "Documents category"
+                           },
+    "categoryAccessories":  "Accessories",
+    "@categoryAccessories":  {
+                                 "description":  "Accessories category"
+                             },
+    "deleted":  "deleted",
+    "@deleted":  {
+                     "description":  "Item deleted snackbar label"
+                 },
+    "undo":  "UNDO",
+    "@undo":  {
+                  "description":  "Undo action label"
+              },
+    "luggageAndChecklist":  "Luggage \u0026 Checklist",
+    "@luggageAndChecklist":  {
+                                 "description":  "Luggage checklist screen title"
+                             },
+    "smartPackingTemplates":  "Smart Packing Templates",
+    "@smartPackingTemplates":  {
+                                   "description":  "Packing templates label"
+                               },
+    "airlineBaggageGuide":  "Airline Baggage Guide",
+    "@airlineBaggageGuide":  {
+                                 "description":  "Airline baggage guide title"
+                             },
+    "vaultLocked":  "Vault is Locked",
+    "@vaultLocked":  {
+                         "description":  "Vault locked status"
+                     },
+    "unlockVault":  "Unlock Vault",
+    "@unlockVault":  {
+                         "description":  "Unlock vault action"
+                     },
+    "security":  "Security",
+    "@security":  {
+                      "description":  "Security settings section"
+                  },
+    "upcomingRoute":  "Upcoming Route",
+    "@upcomingRoute":  {
+                           "description":  "Upcoming trip badge"
+                       },
+    "ongoingTrip":  "Ongoing Trip",
+    "@ongoingTrip":  {
+                         "description":  "Ongoing trip badge"
+                     },
+    "offlineVault":  "Offline Vault",
+    "@offlineVault":  {
+                          "description":  "Offline vault stat label"
+                      },
+    "noItemsYet":  "No items added yet",
+    "@noItemsYet":  {
+                        "description":  "Empty items state"
+                    },
+    "itemsReady":  "items ready",
+    "@itemsReady":  {
+                        "description":  "Items packed status"
+                    },
+    "listEmpty":  "EMPTY LIST",
+    "@listEmpty":  {
+                       "description":  "Empty list badge"
+                   },
+    "quickActions":  "QUICK ACTIONS",
+    "@quickActions":  {
+                          "description":  "Quick actions section header"
+                      },
+    "addItem":  "Add Item",
+    "@addItem":  {
+                     "description":  "Add packing item button"
+                 },
+    "recentlyAdded":  "RECENTLY ADDED ITEMS",
+    "@recentlyAdded":  {
+                           "description":  "Recent items section header"
+                       },
+    "travelAssistant":  "TRAVEL ASSISTANT",
+    "@travelAssistant":  {
+                             "description":  "Travel assistant section header"
+                         },
+    "viewAll":  "View All",
+    "@viewAll":  {
+                     "description":  "View all items link"
+                 },
+    "allNotificationsUpToDate":  "All notifications are up to date.",
+    "@allNotificationsUpToDate":  {
+                                      "description":  "Notification snackbar"
+                                  },
+    "createFirstTrip":  "Create your first route and budget now.",
+    "@createFirstTrip":  {
+                             "description":  "Empty trips banner subtitle"
+                         },
+    "editTrip":  "Edit Trip",
+    "@editTrip":  {
+                      "description":  "Edit trip sheet title"
+                  },
+    "editExpense":  "Edit Expense",
+    "@editExpense":  {
+                         "description":  "Edit expense sheet title"
+                     },
+    "expenseTitle":  "Expense / Transaction Title",
+    "@expenseTitle":  {
+                          "description":  "Expense title input label"
+                      },
+    "expenseTitleHint":  "e.g. Dinner, Metro Ticket, Coffee...",
+    "@expenseTitleHint":  {
+                              "description":  "Expense title input hint"
+                          },
+    "pleaseEnterExpenseTitle":  "Please enter an expense or transaction title",
+    "@pleaseEnterExpenseTitle":  {
+                                     "description":  "Expense title validator error"
+                                 },
+    "customCategoryName":  "Custom Category Name",
+    "@customCategoryName":  {
+                                "description":  "Custom category input label"
+                            },
+    "customCategoryHint":  "e.g. Souvenir, Tip, Museum, Visa, Gas...",
+    "@customCategoryHint":  {
+                                "description":  "Custom category input hint"
+                            },
+    "pleaseEnterCustomCategory":  "Please enter custom category name",
+    "@pleaseEnterCustomCategory":  {
+                                       "description":  "Custom category validator error"
+                                   },
+    "paymentMethod":  "Payment Method",
+    "@paymentMethod":  {
+                           "description":  "Payment method header"
+                       },
+    "cash":  "Cash",
+    "@cash":  {
+                  "description":  "Cash payment option"
+              },
+    "creditCard":  "Credit Card",
+    "@creditCard":  {
+                        "description":  "Credit card payment option"
+                    },
+    "debitCard":  "Debit Card",
+    "@debitCard":  {
+                       "description":  "Debit card payment option"
+                   },
+    "onlinePayment":  "Online Payment",
+    "@onlinePayment":  {
+                           "description":  "Online payment option"
+                       },
+    "customTransport":  "Custom Transport",
+    "@customTransport":  {
+                             "description":  "Custom transport option"
+                         },
+    "addCustomTransport":  "+ Custom Transport",
+    "@addCustomTransport":  {
+                                "description":  "Add custom transport button"
+                            },
+    "itineraryStops":  "Itinerary Stops",
+    "@itineraryStops":  {
+                            "description":  "Itinerary stops label"
+                        },
+    "destinationHint":  "Destination city or country",
+    "@destinationHint":  {
+                             "description":  "Destination field hint"
+                         },
+    "baggageAndChecklist":  "Luggage \u0026 Checklist",
+    "@baggageAndChecklist":  {
+                                 "description":  "Luggage \u0026 checklist tooltip"
+                             },
+    "travelDocuments":  "Travel Documents",
+    "@travelDocuments":  {
+                             "description":  "Travel documents tooltip"
+                         },
+    "currencySynced":  "Exchange rates automatically synchronized",
+    "@currencySynced":  {
+                            "description":  "Currency sync banner"
+                        },
+    "offlineRatesActive":  "Offline reference rates active (Auto-syncs online)",
+    "@offlineRatesActive":  {
+                                "description":  "Offline rates banner"
+                            },
+    "createPinToProtect":  "Create a 4-digit PIN code to keep your documents secure.",
+    "@createPinToProtect":  {
+                                "description":  "Vault pin setup description"
+                            },
+    "createPinAndProtect":  "Create PIN \u0026 Protect",
+    "@createPinAndProtect":  {
+                                 "description":  "Vault pin setup button"
+                             },
+    "continueUnlocked":  "Continue Unlocked for Now",
+    "@continueUnlocked":  {
+                              "description":  "Skip pin button"
+                          },
+    "changeOrRemovePin":  "Change or Remove PIN Code",
+    "@changeOrRemovePin":  {
+                               "description":  "Vault settings pin change title"
+                           },
+    "setVaultPin":  "Set Vault PIN Code",
+    "@setVaultPin":  {
+                         "description":  "Vault settings pin set title"
+                     },
+    "boardingPassAndPass":  "Boarding Pass \u0026 Travel Pass",
+    "@boardingPassAndPass":  {
+                                 "description":  "Boarding pass category"
+                             },
+    "offlineAndEncrypted":  "Offline \u0026 Encrypted",
+    "@offlineAndEncrypted":  {
+                                 "description":  "Vault encryption badge"
+                             },
+    "searchItems":  "Search items",
+    "@searchItems":  {
+                         "description":  "Search items button"
+                     },
+    "closeSearch":  "Close search",
+    "@closeSearch":  {
+                         "description":  "Close search button"
+                     },
+    "readyTemplates":  "Ready Templates",
+    "@readyTemplates":  {
+                            "description":  "Templates button"
+                        },
+    "searchItemsHint":  "Search item name or tag (e.g. carry-on, headphones)...",
+    "@searchItemsHint":  {
+                             "description":  "Search field hint"
+                         },
+    "noMatchingItems":  "No matching items found",
+    "@noMatchingItems":  {
+                             "description":  "Empty search results message"
+                         },
+    "checklistEmpty":  "Checklist is empty",
+    "@checklistEmpty":  {
+                            "description":  "Empty checklist message"
+                        },
+    "addFirstItem":  "Add your first item for your trip",
+    "@addFirstItem":  {
+                          "description":  "Empty checklist subtitle"
+                      },
+    "completed":  "completed",
+    "@completed":  {
+                       "description":  "Checklist completion status"
+                   },
+    "budgetLimit":  "Budget Limit",
+    "@budgetLimit":  {
+                         "description":  "Budget limit field label"
+                     },
+    "change":  "Change",
+    "@change":  {
+                    "description":  "Change action label"
+                },
+    "set":  "Set",
+    "@set":  {
+                 "description":  "Set action label"
+             },
+    "notifications":  "Notifications",
+    "@notifications":  {
+                           "description":  "Notifications button tooltip"
+                       },
+    "plan":  "Plan",
+    "@plan":  {
+                  "description":  "Plan trip button"
+              },
+    "preparing":  "PREPARING",
+    "@preparing":  {
+                       "description":  "Checklist preparing status"
+                   },
+    "tripsPlanned":  "trips planned",
+    "@tripsPlanned":  {
+                          "description":  "Trips planned counter label"
+                      },
+    "documentsSaved":  "saved documents \u0026 tickets",
+    "@documentsSaved":  {
+                            "description":  "Documents saved counter label"
+                        },
+    "standardBaggageLimitNote":  "Standard Limit: Cabin 8 kg • Checked 20-23 kg",
+    "@standardBaggageLimitNote":  {
+                                      "description":  "Standard luggage limit note"
+                                  },
+    "airlineBaggageLimits":  "Airline Limits",
+    "@airlineBaggageLimits":  {
+                                  "description":  "Airline baggage limits button"
+                              },
+    "compartmentBreakdown":  "Compartment Breakdown",
+    "@compartmentBreakdown":  {
+                                  "description":  "Compartment breakdown title"
+                              },
+    "packingTip":  "Tip: Rolling clothes instead of folding them saves 30% space.",
+    "@packingTip":  {
+                        "description":  "Smart packing tip banner"
+                    },
+    "tryDifferentKeyword":  "Try a different keyword or category",
+    "@tryDifferentKeyword":  {
+                                 "description":  "Empty search subtitle"
+                             },
+    "luggagePreparationGuide":  "Luggage Preparation \u0026 Baggage Guide",
+    "@luggagePreparationGuide":  {
+                                     "description":  "Luggage guide title"
+                                 },
+    "weighingResponsibilityNote":  "⚖️ Weighing responsibility belongs to traveler. Weight calculation is not active.",
+    "@weighingResponsibilityNote":  {
+                                        "description":  "Luggage weight disclaimer"
+                                    },
+    "digitalWallet":  "Digital Wallet",
+    "@digitalWallet":  {
+                           "description":  "Digital wallet payment method"
+                       },
+    "flight":  "Flight",
+    "@flight":  {
+                    "description":  "Flight transport mode"
+                },
+    "bulletTrain":  "High-Speed Train",
+    "@bulletTrain":  {
+                         "description":  "High-speed train transport mode"
+                     },
+    "train":  "Train",
+    "@train":  {
+                   "description":  "Train transport mode"
+               },
+    "car":  "Car / Rental",
+    "@car":  {
+                 "description":  "Car transport mode"
+             },
+    "bus":  "Bus",
+    "@bus":  {
+                 "description":  "Bus transport mode"
+             },
+    "ferry":  "Ferry / Ship",
+    "@ferry":  {
+                   "description":  "Ferry transport mode"
+               },
+    "motorcycle":  "Motorcycle",
+    "@motorcycle":  {
+                        "description":  "Motorcycle transport mode"
+                    },
+    "camper":  "Camper / RV",
+    "@camper":  {
+                    "description":  "Camper transport mode"
+                },
+    "bicycle":  "Bicycle",
+    "@bicycle":  {
+                     "description":  "Bicycle transport mode"
+                 },
+    "subway":  "Subway / Tram",
+    "@subway":  {
+                    "description":  "Subway transport mode"
+                },
+    "hiking":  "Hiking / Trekking",
+    "@hiking":  {
+                    "description":  "Hiking transport mode"
+                },
+    "transportMode":  "Transport Mode",
+    "@transportMode":  {
+                           "description":  "Transport mode label"
+                       },
+    "customTransportType":  "Custom Transport Type",
+    "@customTransportType":  {
+                                 "description":  "Custom transport dialog title"
+                             },
+    "customTransportVehicle":  "Vehicle / Transport Mode",
+    "@customTransportVehicle":  {
+                                    "description":  "Custom transport field label"
+                                },
+    "customTransportHint":  "e.g. Helicopter, Yacht, Cable Car, Safari...",
+    "@customTransportHint":  {
+                                 "description":  "Custom transport field hint"
+                             },
+    "cityOrStopHint":  "Enter city or stop (e.g. Paris, Rome, Tokyo)...",
+    "@cityOrStopHint":  {
+                            "description":  "Itinerary stop input hint"
+                        },
+    "travelRouteOrStops":  "Travel Route / Stops",
+    "@travelRouteOrStops":  {
+                                "description":  "Itinerary stops header"
+                            },
+    "addCountry":  "Add Country",
+    "@addCountry":  {
+                        "description":  "Add country button"
+                    },
+    "tripNameHint":  "e.g. Italy Tour, Summer Vacation...",
+    "@tripNameHint":  {
+                          "description":  "Trip name input hint"
+                      },
+    "tripNotesLabel":  "Trip Notes (Hotel, Reservation, Route...)",
+    "@tripNotesLabel":  {
+                            "description":  "Trip notes field label"
+                        },
+    "tripNotesHint":  "e.g. Hotel check-in 14:00, don\u0027t forget passports...",
+    "@tripNotesHint":  {
+                           "description":  "Trip notes field hint"
+                       },
+    "changeCurrency":  "Change Currency",
+    "@changeCurrency":  {
+                            "description":  "Change currency tooltip"
+                        },
+    "expenseNotesLabel":  "Expense Note (Details, Receipt No...)",
+    "@expenseNotesLabel":  {
+                               "description":  "Expense note field label"
+                           },
+    "expenseNotesHint":  "e.g. Dinner including tip...",
+    "@expenseNotesHint":  {
+                              "description":  "Expense note field hint"
+                          },
+    "wrongPinTryAgain":  "Incorrect PIN! Please try again.",
+    "@wrongPinTryAgain":  {
+                              "description":  "Wrong PIN snackbar error"
+                          },
+    "fourDigitPin":  "4-Digit PIN",
+    "@fourDigitPin":  {
+                          "description":  "4-digit PIN input label"
+                      },
+    "saveAndOpen":  "Save \u0026 Unlock",
+    "@saveAndOpen":  {
+                         "description":  "Save PIN and open vault button"
+                     },
+    "enterPinToUnlockVault":  "Enter your PIN code to access your passports and travel documents",
+    "@enterPinToUnlockVault":  {
+                                   "description":  "Vault lock subtitle when PIN is set"
+                               },
+    "vaultNotProtectedWithPin":  "Your vault is not yet protected with a PIN code",
+    "@vaultNotProtectedWithPin":  {
+                                      "description":  "Vault lock subtitle when no PIN"
+                                  },
+    "lastTrip":  "Last Trip",
+    "@lastTrip":  {
+                      "description":  "Last completed trip badge"
+                  },
+    "ok":  "OK",
+    "@ok":  {
+                "description":  "OK dialog button"
+            },
+    "custom":  "Custom",
+    "@custom":  {
+                    "description":  "Custom prefix label"
+                },
+    "add":  "Add",
+    "@add":  {
+                 "description":  "Generic add button"
+             },
+    "close":  "Close",
+    "@close":  {
+                   "description":  "Generic close button"
+               },
+    "delete":  "Delete",
+    "@delete":  {
+                    "description":  "Generic delete button"
+                },
+    "edit":  "Edit",
+    "@edit":  {
+                  "description":  "Generic edit button"
+              },
+    "tickets":  "Tickets",
+    "@tickets":  {
+                     "description":  "Tickets category label"
+                 },
+    "idAndPassport":  "ID \u0026 Passport",
+    "@idAndPassport":  {
+                           "description":  "ID \u0026 Passport category label"
+                       },
+    "healthAndInsurance":  "Health \u0026 Insurance",
+    "@healthAndInsurance":  {
+                                "description":  "Health \u0026 Insurance category label"
+                            },
+    "otherDocuments":  "Other Documents",
+    "@otherDocuments":  {
+                            "description":  "Other Documents category label"
+                        },
+    "allDocuments":  "All Documents",
+    "@allDocuments":  {
+                          "description":  "All Documents filter label"
+                      },
+    "allTickets":  "All Tickets",
+    "@allTickets":  {
+                        "description":  "All Tickets filter label"
+                    },
+    "flightTickets":  "Flight Tickets",
+    "@flightTickets":  {
+                           "description":  "Flight Tickets filter label"
+                       },
+    "busTickets":  "Bus Tickets",
+    "@busTickets":  {
+                        "description":  "Bus Tickets filter label"
+                    },
+    "ferryBoat":  "Ferry / Boat",
+    "@ferryBoat":  {
+                       "description":  "Ferry / Boat filter label"
+                   },
+    "trainTickets":  "Train Tickets",
+    "@trainTickets":  {
+                          "description":  "Train Tickets filter label"
+                      },
+    "allTrips":  "All Trips",
+    "@allTrips":  {
+                      "description":  "All Trips filter label"
+                  },
+    "general":  "General",
+    "@general":  {
+                     "description":  "General scope filter label"
+                 },
+    "generalDocumentAllTrips":  "🌐 General Document (All Trips)",
+    "@generalDocumentAllTrips":  {
+                                     "description":  "General Document dropdown option"
+                                 },
+    "documentScope":  "Document Scope / Trip",
+    "@documentScope":  {
+                           "description":  "Document Scope field label"
+                       },
+    "documentNotesLabel":  "Document Note (PNR, Seat, Expiry...)",
+    "@documentNotesLabel":  {
+                                "description":  "Document note field label"
+                            },
+    "documentNotesHint":  "e.g. PNR: TK7890, Seat: 12A, Terminal 2",
+    "@documentNotesHint":  {
+                               "description":  "Document note field hint"
+                           },
+    "uploadDocumentPrompt":  "Upload Document (Photo or PDF)",
+    "@uploadDocumentPrompt":  {
+                                  "description":  "Upload document section header"
+                              },
+    "pdfOrFile":  "PDF / File",
+    "@pdfOrFile":  {
+                       "description":  "PDF or file picker button"
+                   },
+    "ticketTypeSubCategory":  "Ticket Type / Sub-Category",
+    "@ticketTypeSubCategory":  {
+                                   "description":  "Ticket sub-category header"
+                               },
+    "documentNameHint":  "e.g. Airline Ticket, Hotel Booking...",
+    "@documentNameHint":  {
+                              "description":  "Document name input hint"
+                          },
+    "flightTicket":  "Flight Ticket",
+    "@flightTicket":  {
+                          "description":  "Flight ticket sub-category"
+                      },
+    "busTicket":  "Bus Ticket",
+    "@busTicket":  {
+                       "description":  "Bus ticket sub-category"
+                   },
+    "ferryTicket":  "Ferry / Boat Ticket",
+    "@ferryTicket":  {
+                         "description":  "Ferry ticket sub-category"
+                     },
+    "trainTicket":  "Train Ticket",
+    "@trainTicket":  {
+                         "description":  "Train ticket sub-category"
+                     },
+    "otherTransport":  "Other Transport",
+    "@otherTransport":  {
+                            "description":  "Other transport sub-category"
+                        },
+    "myPassport":  "My Passport",
+    "@myPassport":  {
+                        "description":  "Default passport document title"
+                    },
+    "hotelBooking":  "Hotel Reservation",
+    "@hotelBooking":  {
+                          "description":  "Default hotel reservation title"
+                      },
+    "mainCategory":  "Main Category",
+    "@mainCategory":  {
+                          "description":  "Main category label"
+                      },
+    "boardingPassAndTransit":  "Boarding Pass \u0026 Transit Pass",
+    "@boardingPassAndTransit":  {
+                                    "description":  "Boarding pass preview title"
+                                },
+    "boardingPassSubtitle":  "View document or open in device app",
+    "@boardingPassSubtitle":  {
+                                  "description":  "Boarding pass preview subtitle"
+                              },
+    "viewDocumentAction":  "View Document",
+    "@viewDocumentAction":  {
+                                "description":  "View document action button"
+                            },
+    "fileNotFoundLocally":  "File not found in local storage yet.",
+    "@fileNotFoundLocally":  {
+                                 "description":  "File not found snackbar message"
+                             },
+    "openInExternalApp":  "Open in Device App",
+    "@openInExternalApp":  {
+                               "description":  "Open in device app action button"
+                           },
+    "secureBadge":  "SECURE",
+    "@secureBadge":  {
+                         "description":  "Secure badge text"
+                     },
+    "savedDocument":  "Saved Document",
+    "@savedDocument":  {
+                           "description":  "Saved document counter label"
+                       },
+    "readyBadge":  "READY",
+    "@readyBadge":  {
+                        "description":  "Ready badge text"
+                    },
+    "pinnedBadge":  "PINNED",
+    "@pinnedBadge":  {
+                         "description":  "Pinned badge text"
+                     },
+    "passportSlot":  "Passport Slot",
+    "@passportSlot":  {
+                          "description":  "Passport slot title"
+                      },
+    "saveYourPassport":  "+ Save Your Passport",
+    "@saveYourPassport":  {
+                              "description":  "Save passport prompt"
+                          },
+    "tapToView":  "Tap to view",
+    "@tapToView":  {
+                       "description":  "Tap to view hint"
+                   },
+    "quickUpload":  "Quick upload",
+    "@quickUpload":  {
+                         "description":  "Quick upload hint"
+                     },
+    "noDocumentsForFilter":  "No documents found matching this filter",
+    "@noDocumentsForFilter":  {
+                                  "description":  "Empty state for vault filter"
+                              },
+    "pdfFileBadge":  "PDF FILE",
+    "@pdfFileBadge":  {
+                          "description":  "PDF file indicator badge"
+                      },
+    "pdfBadge":  "PDF",
+    "@pdfBadge":  {
+                      "description":  "PDF badge text"
+                  },
+    "imageBadge":  "IMAGE",
+    "@imageBadge":  {
+                        "description":  "Image badge text"
+                    },
+    "addToWallet":  "+ Wallet",
+    "@addToWallet":  {
+                         "description":  "Add to wallet button"
+                     },
+    "boardingPassOptions":  "Boarding Pass Options",
+    "@boardingPassOptions":  {
+                                 "description":  "Boarding pass options tooltip"
+                             },
+    "openPdf":  "Open PDF",
+    "@openPdf":  {
+                     "description":  "Open PDF tooltip"
+                 },
+    "vaultPinProtection":  "Vault PIN Protection",
+    "@vaultPinProtection":  {
+                                "description":  "Vault PIN protection title"
+                            },
+    "pinProtectionActive":  "PIN protection active",
+    "@pinProtectionActive":  {
+                                 "description":  "PIN protection active subtitle"
+                             },
+    "unprotectedSetPin":  "Unprotected (Set a PIN)",
+    "@unprotectedSetPin":  {
+                               "description":  "Unprotected subtitle"
+                           },
+    "setup":  "Set Up",
+    "@setup":  {
+                   "description":  "Set up button text"
+               },
+    "changePinDescription":  "Enter a new 4-digit PIN or remove the existing PIN code.",
+    "@changePinDescription":  {
+                                  "description":  "Change PIN dialog description"
+                              },
+    "setPinDescription":  "Enter a 4-digit PIN to protect your passports and documents in the vault.",
+    "@setPinDescription":  {
+                               "description":  "Set PIN dialog description"
+                           },
+    "removePin":  "Remove PIN",
+    "@removePin":  {
+                       "description":  "Remove PIN button label"
+                   },
+    "proActive":  "PackBuddy Pro Active",
+    "@proActive":  {
+                       "description":  "PackBuddy Pro active status"
+                   },
+    "annualPlan":  "Annual Plan ($39.99/yr)",
+    "@annualPlan":  {
+                        "description":  "Annual plan label"
+                    },
+    "monthlyPlan":  "Monthly Plan ($4.99/mo)",
+    "@monthlyPlan":  {
+                         "description":  "Monthly plan label"
+                     },
+    "activePlanLabel":  "Subscription Plan",
+    "@activePlanLabel":  {
+                             "description":  "Active subscription plan label"
+                         },
+    "editItem":  "Edit Item",
+    "@editItem":  {
+                      "description":  "Edit item sheet title"
+                  },
+    "addNewItem":  "Add New Item",
+    "@addNewItem":  {
+                        "description":  "Add new item sheet title"
+                    },
+    "itemName":  "Item Name",
+    "@itemName":  {
+                      "description":  "Item name field label"
+                  },
+    "itemNameHint":  "e.g. Waterproof Jacket, Headphones...",
+    "@itemNameHint":  {
+                          "description":  "Item name field hint"
+                      },
+    "pleaseEnterItemName":  "Please enter an item name",
+    "@pleaseEnterItemName":  {
+                                 "description":  "Item name validation error"
+                             },
+    "carryType":  "Carry Type",
+    "@carryType":  {
+                       "description":  "Carry type field label"
+                   },
+    "compartment":  "Compartment / Location",
+    "@compartment":  {
+                         "description":  "Compartment field label"
+                     },
+    "pieces":  "pcs",
+    "@pieces":  {
+                    "description":  "Pieces / units suffix"
+                },
+    "addToBaggage":  "Add to Baggage",
+    "@addToBaggage":  {
+                          "description":  "Add to baggage button"
+                      },
+    "itemUpdated":  "updated.",
+    "@itemUpdated":  {
+                         "description":  "Item updated snackbar text"
+                     },
+    "itemAddedToBaggage":  "added to baggage.",
+    "@itemAddedToBaggage":  {
+                                "description":  "Item added to baggage snackbar text"
+                            },
+    "markedAsPacked":  "Marked as packed",
+    "@markedAsPacked":  {
+                            "description":  "Marked as packed accessibility label"
+                        },
+    "notPacked":  "Not packed",
+    "@notPacked":  {
+                       "description":  "Not packed accessibility label"
+                   },
+    "packed":  "Packed",
+    "@packed":  {
+                    "description":  "Packed swipe label"
+                },
+    "smartTemplatesSubtitle":  "Transfer curated travel packing lists to your baggage in one tap",
+    "@smartTemplatesSubtitle":  {
+                                    "description":  "Smart templates subtitle"
+                                },
+    "itemsCount":  "Items",
+    "@itemsCount":  {
+                        "description":  "Items count label"
+                    },
+    "readyTravelPackage":  "Curated Travel Package",
+    "@readyTravelPackage":  {
+                                "description":  "Curated travel package tag"
+                            },
+    "contentList":  "Contents List:",
+    "@contentList":  {
+                         "description":  "Contents list header"
+                     },
+    "templateImportSuccess":  "items added from template! 🎉",
+    "@templateImportSuccess":  {
+                                   "description":  "Template import success message"
+                               },
+    "addTemplateToBaggage":  "Add to Baggage",
+    "@addTemplateToBaggage":  {
+                                  "description":  "Add template to baggage button"
+                              },
+    "currentLimit":  "Current Limit",
+    "@currentLimit":  {
+                          "description":  "Current baggage limit label"
+                      },
+    "searchAirlineOrCode":  "Search airline or code (e.g. THY, PC, LH)...",
+    "@searchAirlineOrCode":  {
+                                 "description":  "Search airline input hint"
+                             },
+    "activeLimit":  "Active Limit",
+    "@activeLimit":  {
+                         "description":  "Active limit badge"
+                     },
+    "cabinBaggage":  "Cabin Baggage",
+    "@cabinBaggage":  {
+                          "description":  "Cabin baggage label"
+                      },
+    "checkedBaggage":  "Checked Baggage",
+    "@checkedBaggage":  {
+                            "description":  "Checked baggage label"
+                        },
+    "standardEconomy":  "Standard Economy",
+    "@standardEconomy":  {
+                             "description":  "Standard economy baggage note"
+                         },
+    "limitSelected":  "This Limit Selected",
+    "@limitSelected":  {
+                           "description":  "Limit selected button text"
+                       },
+    "applyCabinLimit":  "Apply Cabin Limit",
+    "@applyCabinLimit":  {
+                             "description":  "Apply cabin limit button text"
+                         },
+    "baggageLimitSet":  "Baggage limit set to",
+    "@baggageLimitSet":  {
+                             "description":  "Baggage limit set snackbar message"
+                         },
+    "lockVault":  "Lock Vault",
+    "@lockVault":  {
+                       "description":  "Lock vault button tooltip"
+                   },
+    "navHome":  "Home",
+    "@navHome":  {
+                     "description":  "Bottom nav home label"
+                 },
+    "navTrips":  "Trips",
+    "@navTrips":  {
+                      "description":  "Bottom nav trips label"
+                  },
+    "navBaggage":  "Luggage",
+    "@navBaggage":  {
+                        "description":  "Bottom nav baggage label"
+                    },
+    "navVault":  "Vault",
+    "@navVault":  {
+                      "description":  "Bottom nav vault label"
+                  },
+    "navSettings":  "Settings",
+    "@navSettings":  {
+                         "description":  "Bottom nav settings label"
+                     },
+    "selectAirlineToCustomize":  "Tap to customize limits for your airline",
+    "@selectAirlineToCustomize":  {
+                                      "description":  "Prompt to select an airline and customize limits"
+                                  },
+    "changeAirlineLimit":  "Change Airline",
+    "@changeAirlineLimit":  {
+                                "description":  "Button to change current airline limit"
+                            },
+    "selectCountryAndRoute":  "Select Country \u0026 Route",
+    "@selectCountryAndRoute":  {
+                                   "description":  "Header title for country and route selection sheet"
+                               },
+    "countriesLabel":  "Countries",
+    "@countriesLabel":  {
+                            "description":  "Label for count of countries"
+                        },
+    "searchCountryOrCity":  "Search country or city (e.g. Italy, Tokyo, Paris)...",
+    "@searchCountryOrCity":  {
+                                 "description":  "Hint text for country search field"
+                             },
+    "noMatchingCountry":  "No matching country found",
+    "@noMatchingCountry":  {
+                               "description":  "Empty state text when no country matches search"
+                           },
+    "activeStatus":  "ACTIVE",
+    "@activeStatus":  {
+                          "description":  "Active subscription status badge"
+                      },
+    "authSubtitleSignIn":  "Your Luxury Travel Companion • Sign In",
+    "@authSubtitleSignIn":  {
+                                "description":  "Subtitle on Auth screen during sign in"
+                            },
+    "authSubtitleSignUp":  "Begin a New Journey • Create Account",
+    "@authSubtitleSignUp":  {
+                                "description":  "Subtitle on Auth screen during sign up"
+                            },
+    "authSignIn":  "Sign In",
+    "@authSignIn":  {
+                        "description":  "Tab/button label for sign in"
+                    },
+    "authSignUp":  "Sign Up",
+    "@authSignUp":  {
+                        "description":  "Tab/button label for sign up"
+                    },
+    "authEmail":  "Email Address",
+    "@authEmail":  {
+                       "description":  "Label for email field"
+                   },
+    "authEmailHint":  "traveler@packbuddy.com",
+    "@authEmailHint":  {
+                           "description":  "Hint for email field"
+                       },
+    "authEmailRequired":  "Please enter your email address.",
+    "@authEmailRequired":  {
+                               "description":  "Validation message when email is empty"
+                           },
+    "authEmailInvalid":  "Please enter a valid email address.",
+    "@authEmailInvalid":  {
+                              "description":  "Validation message when email is invalid"
+                          },
+    "authPassword":  "Password",
+    "@authPassword":  {
+                          "description":  "Label for password field"
+                      },
+    "authForgotPassword":  "Forgot Password?",
+    "@authForgotPassword":  {
+                                "description":  "Button to trigger forgot password dialog"
+                            },
+    "authPasswordRequired":  "Please enter your password.",
+    "@authPasswordRequired":  {
+                                  "description":  "Validation message when password is empty"
+                              },
+    "authPasswordRulesInvalid":  "Password does not meet requirements.",
+    "@authPasswordRulesInvalid":  {
+                                      "description":  "Validation message when password fails rules"
+                                  },
+    "authPasswordMinChars":  "Password must be at least 6 characters.",
+    "@authPasswordMinChars":  {
+                                  "description":  "Validation message for sign in password length"
+                              },
+    "authPasswordRulesTitle":  "Password Requirements:",
+    "@authPasswordRulesTitle":  {
+                                    "description":  "Header for password requirements checklist"
+                                },
+    "authRuleMinChars":  "At least 8 characters",
+    "@authRuleMinChars":  {
+                              "description":  "Rule requirement: min 8 characters"
+                          },
+    "authRuleUppercase":  "At least 1 uppercase letter",
+    "@authRuleUppercase":  {
+                               "description":  "Rule requirement: at least 1 uppercase letter"
+                           },
+    "authRuleLowercase":  "At least 1 lowercase letter",
+    "@authRuleLowercase":  {
+                               "description":  "Rule requirement: at least 1 lowercase letter"
+                           },
+    "authRuleDigit":  "At least 1 number",
+    "@authRuleDigit":  {
+                           "description":  "Rule requirement: at least 1 digit"
+                       },
+    "authConfirmPassword":  "Confirm Password",
+    "@authConfirmPassword":  {
+                                 "description":  "Label for password confirmation field"
+                             },
+    "authConfirmPasswordRequired":  "Please confirm your password.",
+    "@authConfirmPasswordRequired":  {
+                                         "description":  "Validation message when confirm password is empty"
+                                     },
+    "authPasswordsDoNotMatch":  "Passwords do not match.",
+    "@authPasswordsDoNotMatch":  {
+                                     "description":  "Validation message when passwords do not match"
+                                 },
+    "authCreateAccount":  "Create Account",
+    "@authCreateAccount":  {
+                               "description":  "Primary action button to create account"
+                           },
+    "authOr":  "or",
+    "@authOr":  {
+                    "description":  "Divider text between email and social login"
+                },
+    "authContinueWithGoogle":  "Continue with Google",
+    "@authContinueWithGoogle":  {
+                                    "description":  "Button to sign in with Google"
+                                },
+    "authTermsNotice":  "By signing up, you agree to our Terms of Service \u0026 Privacy Policy.",
+    "@authTermsNotice":  {
+                             "description":  "Terms of service and privacy policy disclaimer"
+                         },
+    "authResetPasswordTitle":  "Reset Password",
+    "@authResetPasswordTitle":  {
+                                    "description":  "Dialog title for password reset"
+                                },
+    "authResetPasswordDescription":  "Enter your registered email address to receive a password reset link.",
+    "@authResetPasswordDescription":  {
+                                          "description":  "Dialog description for password reset"
+                                      },
+    "authSendLink":  "Send Link",
+    "@authSendLink":  {
+                          "description":  "Button to send password reset link"
+                      },
+    "authResetLinkSent":  "Password reset link has been sent to your email.",
+    "@authResetLinkSent":  {
+                               "description":  "Snackbar notification after sending password reset link"
+                           },
+    "authAppleComingSoon":  "Sign in with Apple will be available in the upcoming update!",
+    "@authAppleComingSoon":  {
+                                 "description":  "Placeholder notification for Apple sign in"
+                             },
+    "emailVerifyTitle":  "Verify Your Email",
+    "@emailVerifyTitle":  {
+                              "description":  "Title on email verification screen"
+                          },
+    "emailVerifySubtitle":  "To protect your travel vault and sync your trips, please verify your email address.",
+    "@emailVerifySubtitle":  {
+                                 "description":  "Subtitle on email verification screen"
+                             },
+    "emailVerifyInstructionsTitle":  "What should you do?",
+    "@emailVerifyInstructionsTitle":  {
+                                          "description":  "Header for email verification steps"
+                                      },
+    "emailVerifyStep1":  "Check your inbox and spam folder.",
+    "@emailVerifyStep1":  {
+                              "description":  "Step 1 of email verification"
+                          },
+    "emailVerifyStep2":  "Click the verification link in the email.",
+    "@emailVerifyStep2":  {
+                              "description":  "Step 2 of email verification"
+                          },
+    "emailVerifyStep3":  "Wait a few seconds; this screen will proceed automatically.",
+    "@emailVerifyStep3":  {
+                              "description":  "Step 3 of email verification"
+                          },
+    "emailVerifyWaiting":  "Waiting for verification...",
+    "@emailVerifyWaiting":  {
+                                "description":  "Indicator text while waiting for email verification"
+                            },
+    "emailVerifyCheckNow":  "I Verified, Continue",
+    "@emailVerifyCheckNow":  {
+                                 "description":  "Manual check button on email verification screen"
+                             },
+    "emailVerifyResendLink":  "Resend Verification Email",
+    "@emailVerifyResendLink":  {
+                                   "description":  "Button to resend email verification link"
+                               },
+    "emailVerifyResendCooldown":  "Resend in {seconds}s",
+    "@emailVerifyResendCooldown":  {
+                                       "description":  "Cooldown timer text for resending verification email",
+                                       "placeholders":  {
+                                                            "seconds":  {
+                                                                            "type":  "int",
+                                                                            "example":  "30"
+                                                                        }
+                                                        }
+                                   },
+    "emailVerifyBackToSignIn":  "Back to Sign In",
+    "@emailVerifyBackToSignIn":  {
+                                     "description":  "Button to sign out and return to sign in"
+                                 },
+    "emailVerifyNotVerifiedYet":  "Email is not verified yet. Please check your inbox and click the link.",
+    "@emailVerifyNotVerifiedYet":  {
+                                       "description":  "Snackbar message when email is still unverified"
+                                   },
+    "emailVerifyLinkSentSuccess":  "Verification email sent! Please check your inbox.",
+    "@emailVerifyLinkSentSuccess":  {
+                                        "description":  "Snackbar message when verification email is resent"
+                                    },
+    "signedInTraveler":  "Signed In Traveler",
+    "@signedInTraveler":  {
+                              "description":  "Fallback name for signed in traveler"
+                          },
+    "cloudSessionActive":  "Cloud Session Active",
+    "@cloudSessionActive":  {
+                                "description":  "Status badge indicating active cloud session"
+                            },
+    "signOutConfirmTitle":  "Sign Out",
+    "@signOutConfirmTitle":  {
+                                 "description":  "Dialog title for sign out confirmation"
+                             },
+    "signOutConfirmMessage":  "Are you sure you want to sign out? Your travel data remains safely stored on your device.",
+    "@signOutConfirmMessage":  {
+                                   "description":  "Dialog content for sign out confirmation"
+                               },
+    "notificationsAndReminders":  "Notifications \u0026 Reminders",
+    "@notificationsAndReminders":  {
+                                       "description":  "Header for notifications section in settings"
+                                   },
+    "packingReminders":  "Packing Reminders",
+    "@packingReminders":  {
+                              "description":  "Title for packing reminders setting"
+                          },
+    "packingRemindersSubtitle":  "Get smart reminders 48h and 24h before departure",
+    "@packingRemindersSubtitle":  {
+                                      "description":  "Subtitle for packing reminders setting"
+                                  },
+    "shopping":  "Shopping",
+    "@shopping":  {
+                      "description":  "Expense category shopping"
+                  },
+    "authErrorUserNotFound":  "No account found with this email address.",
+    "@authErrorUserNotFound":  {
+                                   "description":  "Error message when account does not exist"
+                               },
+    "authErrorWrongPassword":  "Incorrect password entered. Please try again.",
+    "@authErrorWrongPassword":  {
+                                    "description":  "Error message when password is wrong"
+                                },
+    "authErrorInvalidCredential":  "Email or password incorrect. Please check your credentials.",
+    "@authErrorInvalidCredential":  {
+                                        "description":  "Error message when credentials are invalid"
+                                    },
+    "authErrorEmailInUse":  "An account already exists with this email address.",
+    "@authErrorEmailInUse":  {
+                                 "description":  "Error message when email is already registered"
+                             },
+    "authErrorInvalidEmail":  "Please enter a valid email address.",
+    "@authErrorInvalidEmail":  {
+                                   "description":  "Error message when email format is invalid"
+                               },
+    "authErrorWeakPassword":  "Password does not meet requirements.",
+    "@authErrorWeakPassword":  {
+                                   "description":  "Error message when password is too weak"
+                               },
+    "authErrorUserDisabled":  "This account has been disabled.",
+    "@authErrorUserDisabled":  {
+                                   "description":  "Error message when account is disabled"
+                               },
+    "authErrorTooManyRequests":  "Too many attempts. Please try again later.",
+    "@authErrorTooManyRequests":  {
+                                      "description":  "Error message when rate limited"
+                                  },
+    "authErrorNetworkFailed":  "Network connection error. Please check your internet.",
+    "@authErrorNetworkFailed":  {
+                                    "description":  "Error message on network failure"
+                                },
+    "authErrorGoogleFailed":  "Could not sign in with Google. Please try again.",
+    "@authErrorGoogleFailed":  {
+                                   "description":  "Error message on Google sign in failure"
+                               },
+    "authErrorVerificationFailed":  "Could not send verification email. Please try again later.",
+    "@authErrorVerificationFailed":  {
+                                         "description":  "Error message on email verification send failure"
+                                     },
+    "authErrorGeneric":  "Authentication failed. Please try again.",
+    "@authErrorGeneric":  {
+                              "description":  "Generic authentication error message"
+                          },
+    "authContinueWithApple":  "Continue with Apple",
+    "@authContinueWithApple":  {
+                                   "description":  "Button to continue with Apple ID"
+                               },
+    "authNoAccount":  "Don\u0027t have an account? ",
+    "@authNoAccount":  {
+                           "description":  "Prompt asking if traveler needs to register"
+                       },
+    "authAlreadyHaveAccount":  "Already have an account? ",
+    "@authAlreadyHaveAccount":  {
+                                    "description":  "Prompt asking if traveler already has an account"
+                                },
+    "accountAndSession":  "Account \u0026 Session",
+    "@accountAndSession":  {
+                               "description":  "Header for account and session section in settings"
+                           },
+    "categorySpendingAnalysis":  "Category Spending Breakdown",
+    "@categorySpendingAnalysis":  {
+                                      "description":  "Title for category expense breakdown analytics card"
+                                  },
+    "topSpendingCategory":  "Top: {category} ({percentage}%)",
+    "@topSpendingCategory":  {
+                                 "description":  "Highlight showing highest spending category and percentage",
+                                 "placeholders":  {
+                                                      "category":  {
+                                                                       "type":  "String",
+                                                                       "example":  "Food \u0026 Dining"
+                                                                   },
+                                                      "percentage":  {
+                                                                         "type":  "String",
+                                                                         "example":  "42"
+                                                                     }
+                                                  }
+                             },
+    "expenseCount":  "{count} Expenses",
+    "@expenseCount":  {
+                          "description":  "Badge showing total count of expenses",
+                          "placeholders":  {
+                                               "count":  {
+                                                             "type":  "int",
+                                                             "example":  "12"
+                                                         }
+                                           }
+                      },
+    "boardingPassPassenger":  "PASSENGER",
+    "@boardingPassPassenger":  {
+                                   "description":  "Passenger label on boarding pass simulation"
+                               },
+    "boardingPassGate":  "GATE",
+    "@boardingPassGate":  {
+                              "description":  "Gate label on boarding pass simulation"
+                          },
+    "boardingPassSampleTraveler":  "PACKBUDDY TRAVELER",
+    "@boardingPassSampleTraveler":  {
+                                        "description":  "Sample traveler name on boarding pass simulation"
+                                    },
+    "notification48hTitle":  "PackBuddy: Trip to {destination} in 2 days! 🧳",
+    "@notification48hTitle":  {
+                                  "description":  "Notification title sent 48 hours before trip departure",
+                                  "placeholders":  {
+                                                       "destination":  {
+                                                                           "type":  "String",
+                                                                           "example":  "Tokyo"
+                                                                       }
+                                                   }
+                              },
+    "notification48hBody":  "Only 48 hours left until your trip to {destination}! Have you started packing your travel essentials?",
+    "@notification48hBody":  {
+                                 "description":  "Notification body sent 48 hours before trip departure",
+                                 "placeholders":  {
+                                                      "destination":  {
+                                                                          "type":  "String",
+                                                                          "example":  "Tokyo"
+                                                                      }
+                                                  }
+                             },
+    "notification24hTitle":  "PackBuddy: You\u0027re Leaving Tomorrow! ✈️",
+    "@notification24hTitle":  {
+                                  "description":  "Notification title sent 24 hours before trip departure"
+                              },
+    "notification24hBody":  "Final packing check! Double-check your passport, tickets, and travel essentials for {destination}.",
+    "@notification24hBody":  {
+                                 "description":  "Notification body sent 24 hours before trip departure",
+                                 "placeholders":  {
+                                                      "destination":  {
+                                                                          "type":  "String",
+                                                                          "example":  "Tokyo"
+                                                                      }
+                                                  }
+                             },
+    "adminDashboard":  "Admin Dashboard",
+    "@adminDashboard":  {
+                            "description":  "Admin dashboard string: adminDashboard"
+                        },
+    "adminDashboardDesc":  "Global platform metrics and user management",
+    "@adminDashboardDesc":  {
+                                "description":  "Admin dashboard string: adminDashboardDesc"
+                            },
+    "adminAccessRestricted":  "Access Restricted",
+    "@adminAccessRestricted":  {
+                                   "description":  "Admin dashboard string: adminAccessRestricted"
+                               },
+    "adminAccessRestrictedDesc":  "This area is strictly reserved for authorized administrators.",
+    "@adminAccessRestrictedDesc":  {
+                                       "description":  "Admin dashboard string: adminAccessRestrictedDesc"
+                                   },
+    "adminMetrics":  "Platform Metrics",
+    "@adminMetrics":  {
+                          "description":  "Admin dashboard string: adminMetrics"
+                      },
+    "adminTotalUsers":  "Total Users",
+    "@adminTotalUsers":  {
+                             "description":  "Admin dashboard string: adminTotalUsers"
+                         },
+    "adminVerifiedUsers":  "Verified Users",
+    "@adminVerifiedUsers":  {
+                                "description":  "Admin dashboard string: adminVerifiedUsers"
+                            },
+    "adminProUsers":  "Pro Members",
+    "@adminProUsers":  {
+                           "description":  "Admin dashboard string: adminProUsers"
+                       },
+    "adminTotalTrips":  "Total Trips",
+    "@adminTotalTrips":  {
+                             "description":  "Admin dashboard string: adminTotalTrips"
+                         },
+    "adminTotalExpenses":  "Total Expenses",
+    "@adminTotalExpenses":  {
+                                "description":  "Admin dashboard string: adminTotalExpenses"
+                            },
+    "adminTotalDocs":  "Vault Documents",
+    "@adminTotalDocs":  {
+                            "description":  "Admin dashboard string: adminTotalDocs"
+                        },
+    "adminTotalItems":  "Checklist Items",
+    "@adminTotalItems":  {
+                             "description":  "Admin dashboard string: adminTotalItems"
+                         },
+    "adminUserManagement":  "User Management",
+    "@adminUserManagement":  {
+                                 "description":  "Admin dashboard string: adminUserManagement"
+                             },
+    "adminSearchUsers":  "Search users by email, name or UID...",
+    "@adminSearchUsers":  {
+                              "description":  "Admin dashboard string: adminSearchUsers"
+                          },
+    "adminGrantPro":  "Grant Pro",
+    "@adminGrantPro":  {
+                           "description":  "Admin dashboard string: adminGrantPro"
+                       },
+    "adminRevokePro":  "Revoke Pro",
+    "@adminRevokePro":  {
+                            "description":  "Admin dashboard string: adminRevokePro"
+                        },
+    "adminProStatusUpdated":  "Pro status successfully updated",
+    "@adminProStatusUpdated":  {
+                                   "description":  "Admin dashboard string: adminProStatusUpdated"
+                               },
+    "adminNoUsersFound":  "No users found",
+    "@adminNoUsersFound":  {
+                               "description":  "Admin dashboard string: adminNoUsersFound"
+                           },
+    "adminTotalStorage":  "Vault Storage",
+    "@adminTotalStorage":  {
+                               "description":  "Admin dashboard string: adminTotalStorage"
+                           },
+    "adminDefaultBanReason":  "Violation of platform terms of service.",
+    "@adminDefaultBanReason":  {
+                                   "description":  "Admin moderation string: adminDefaultBanReason"
+                               },
+    "adminPermanentBanTitle":  "Account Permanently Suspended",
+    "@adminPermanentBanTitle":  {
+                                    "description":  "Admin moderation string: adminPermanentBanTitle"
+                                },
+    "adminTemporaryBanTitle":  "Account Temporarily Suspended",
+    "@adminTemporaryBanTitle":  {
+                                    "description":  "Admin moderation string: adminTemporaryBanTitle"
+                                },
+    "adminAccountSuspendedNotice":  "Access to PackBuddy services has been restricted by an administrator.",
+    "@adminAccountSuspendedNotice":  {
+                                         "description":  "Admin moderation string: adminAccountSuspendedNotice"
+                                     },
+    "adminPermanentBan":  "Permanent Ban",
+    "@adminPermanentBan":  {
+                               "description":  "Admin moderation string: adminPermanentBan"
+                           },
+    "adminTemporaryBan":  "Temporary Ban",
+    "@adminTemporaryBan":  {
+                               "description":  "Admin moderation string: adminTemporaryBan"
+                           },
+    "adminBanReasonLabel":  "Suspension Reason",
+    "@adminBanReasonLabel":  {
+                                 "description":  "Admin moderation string: adminBanReasonLabel"
+                             },
+    "adminBanExpiresAtLabel":  "Suspension Expires At",
+    "@adminBanExpiresAtLabel":  {
+                                    "description":  "Admin moderation string: adminBanExpiresAtLabel"
+                                },
+    "adminFeatureRestrictedNotice":  "This action is restricted by an administrator.",
+    "@adminFeatureRestrictedNotice":  {
+                                          "description":  "Admin moderation string: adminFeatureRestrictedNotice"
+                                      },
+    "adminGeoAnalytics":  "Geographic \u0026 Activity Analytics",
+    "@adminGeoAnalytics":  {
+                               "description":  "Admin moderation string: adminGeoAnalytics"
+                           },
+    "adminPeriodLive":  "Live (15m)",
+    "@adminPeriodLive":  {
+                             "description":  "Admin moderation string: adminPeriodLive"
+                         },
+    "adminPeriodDaily":  "Daily (24h)",
+    "@adminPeriodDaily":  {
+                              "description":  "Admin moderation string: adminPeriodDaily"
+                          },
+    "adminPeriodWeekly":  "Weekly (7d)",
+    "@adminPeriodWeekly":  {
+                               "description":  "Admin moderation string: adminPeriodWeekly"
+                           },
+    "adminPeriodMonthly":  "Monthly (30d)",
+    "@adminPeriodMonthly":  {
+                                "description":  "Admin moderation string: adminPeriodMonthly"
+                            },
+    "adminPeriodYearly":  "Yearly (365d)",
+    "@adminPeriodYearly":  {
+                               "description":  "Admin moderation string: adminPeriodYearly"
+                           },
+    "adminNoActiveUsers":  "No active users in this period",
+    "@adminNoActiveUsers":  {
+                                "description":  "Admin moderation string: adminNoActiveUsers"
+                            },
+    "adminFilterAll":  "All",
+    "@adminFilterAll":  {
+                            "description":  "Admin moderation string: adminFilterAll"
+                        },
+    "adminFilterPro":  "Pro",
+    "@adminFilterPro":  {
+                            "description":  "Admin moderation string: adminFilterPro"
+                        },
+    "adminFilterBanned":  "Banned",
+    "@adminFilterBanned":  {
+                               "description":  "Admin moderation string: adminFilterBanned"
+                           },
+    "adminFilterRestricted":  "Restricted",
+    "@adminFilterRestricted":  {
+                                   "description":  "Admin moderation string: adminFilterRestricted"
+                               },
+    "adminModerateUser":  "Moderate User",
+    "@adminModerateUser":  {
+                               "description":  "Admin moderation string: adminModerateUser"
+                           },
+    "adminBanStatusLabel":  "Account Suspension / Ban",
+    "@adminBanStatusLabel":  {
+                                 "description":  "Admin moderation string: adminBanStatusLabel"
+                             },
+    "adminUnbanned":  "Unbanned",
+    "@adminUnbanned":  {
+                           "description":  "Admin moderation string: adminUnbanned"
+                       },
+    "adminBan24h":  "24 Hours",
+    "@adminBan24h":  {
+                         "description":  "Admin moderation string: adminBan24h"
+                     },
+    "adminBan7d":  "7 Days",
+    "@adminBan7d":  {
+                        "description":  "Admin moderation string: adminBan7d"
+                    },
+    "adminBan30d":  "30 Days",
+    "@adminBan30d":  {
+                         "description":  "Admin moderation string: adminBan30d"
+                     },
+    "adminBanReasonHint":  "Reason for suspension (optional)...",
+    "@adminBanReasonHint":  {
+                                "description":  "Admin moderation string: adminBanReasonHint"
+                            },
+    "adminFeatureRestrictionsLabel":  "Granular Feature Restrictions",
+    "@adminFeatureRestrictionsLabel":  {
+                                           "description":  "Admin moderation string: adminFeatureRestrictionsLabel"
+                                       },
+    "adminRestrictTripCreate":  "Restrict Trip Creation",
+    "@adminRestrictTripCreate":  {
+                                     "description":  "Admin moderation string: adminRestrictTripCreate"
+                                 },
+    "adminRestrictExpenseAdd":  "Restrict Expense Logging",
+    "@adminRestrictExpenseAdd":  {
+                                     "description":  "Admin moderation string: adminRestrictExpenseAdd"
+                                 },
+    "adminRestrictVaultUpload":  "Restrict Vault Uploads",
+    "@adminRestrictVaultUpload":  {
+                                      "description":  "Admin moderation string: adminRestrictVaultUpload"
+                                  },
+    "adminRestrictCloudSync":  "Restrict Cloud Sync",
+    "@adminRestrictCloudSync":  {
+                                    "description":  "Admin moderation string: adminRestrictCloudSync"
+                                },
+    "adminSaveChanges":  "Save Changes",
+    "@adminSaveChanges":  {
+                              "description":  "Admin moderation string: adminSaveChanges"
+                          },
+    "adminChangesSaved":  "Moderation changes saved successfully",
+    "@adminChangesSaved":  {
+                               "description":  "Admin moderation string: adminChangesSaved"
+                           },
+    "adminSignOut":  "Sign Out",
+    "@adminSignOut":  {
+                          "description":  "Admin moderation string: adminSignOut"
+                      },
+    "perMonth":  "/ mo",
+    "@perMonth":  {
+                      "description":  "Localization key for perMonth"
+                  },
+    "perYear":  "/ yr",
+    "@perYear":  {
+                     "description":  "Localization key for perYear"
+                 },
+    "storeBillingRequiredTitle":  "Store Billing Required",
+    "@storeBillingRequiredTitle":  {
+                                       "description":  "Localization key for storeBillingRequiredTitle"
+                                   },
+    "storeBillingRequiredMessage":  "Official Google Play \u0026 App Store billing is currently being activated for this production build. Subscription transactions cannot be bypassed for free.",
+    "@storeBillingRequiredMessage":  {
+                                         "description":  "Localization key for storeBillingRequiredMessage"
+                                     },
+    "adminTestPurchaseTitle":  "Admin / Sandbox Test Purchase",
+    "@adminTestPurchaseTitle":  {
+                                    "description":  "Localization key for adminTestPurchaseTitle"
+                                },
+    "adminTestPurchaseMessage":  "You are signed in as Super Admin. Would you like to confirm and activate PackBuddy Pro test subscription?",
+    "@adminTestPurchaseMessage":  {
+                                      "description":  "Localization key for adminTestPurchaseMessage"
+                                  },
+    "activateTestPro":  "Activate Pro (Test)",
+    "@activateTestPro":  {
+                             "description":  "Localization key for activateTestPro"
+                         },
+    "templateSummerTitle":  "Beach \u0026 Summer Vacation",
+    "@templateSummerTitle":  {
+                                 "description":  "Localization key for templateSummerTitle"
+                             },
+    "templateSummerDesc":  "Essential packing list for sea, sand, sun, and warm weather getaways",
+    "@templateSummerDesc":  {
+                                "description":  "Localization key for templateSummerDesc"
+                            },
+    "templateWinterTitle":  "Winter \u0026 Ski Trip",
+    "@templateWinterTitle":  {
+                                 "description":  "Localization key for templateWinterTitle"
+                             },
+    "templateWinterDesc":  "Protective gear and warm layers for cold climates and ski resorts",
+    "@templateWinterDesc":  {
+                                "description":  "Localization key for templateWinterDesc"
+                            },
+    "templateBusinessTitle":  "Business \u0026 Conference",
+    "@templateBusinessTitle":  {
+                                   "description":  "Localization key for templateBusinessTitle"
+                               },
+    "templateBusinessDesc":  "Tailored packing list for meetings, conferences, and corporate trips",
+    "@templateBusinessDesc":  {
+                                  "description":  "Localization key for templateBusinessDesc"
+                              },
+    "templateCampingTitle":  "Nature \u0026 Camping Expedition",
+    "@templateCampingTitle":  {
+                                  "description":  "Localization key for templateCampingTitle"
+                              },
+    "templateCampingDesc":  "Durable outdoor gear for tent camping, trekking, and hiking",
+    "@templateCampingDesc":  {
+                                 "description":  "Localization key for templateCampingDesc"
+                             },
+    "templateCityTitle":  "Weekend City Break",
+    "@templateCityTitle":  {
+                               "description":  "Localization key for templateCityTitle"
+                           },
+    "templateCityDesc":  "Lightweight and compact essentials for a 2-3 day city getaway",
+    "@templateCityDesc":  {
+                              "description":  "Localization key for templateCityDesc"
+                          },
+    "vaultCloudBackupNotice":  "Documents are encrypted \u0026 backed up to cloud storage for cross-device sync, 15-day account recovery, and safety compliance.",
+    "@vaultCloudBackupNotice":  {
+                                    "description":  "Compliance notice for vault cloud backup"
+                                },
+    "deleteAccountTitle":  "Delete Account",
+    "@deleteAccountTitle":  {
+                                "description":  "Delete account button title"
+                            },
+    "deleteAccountConfirmationTitle":  "15-Day Account Deletion Request",
+    "@deleteAccountConfirmationTitle":  {
+                                            "description":  "Title for 15-day deletion dialog"
+                                        },
+    "deleteAccountConfirmationMessage":  "Your account, trips, expenses, and vault documents will be scheduled for permanent deletion in 15 days.\n\n• Do not log in for 15 days to allow deletion to complete.\n• If you log in within 15 days, your account and all data will be automatically restored.\n\nDo you want to proceed?",
+    "@deleteAccountConfirmationMessage":  {
+                                              "description":  "Message explaining 15-day grace period for deletion"
+                                          },
+    "deleteAccountButton":  "Request 15-Day Deletion",
+    "@deleteAccountButton":  {
+                                 "description":  "Button confirming deletion request"
+                             },
+    "deleteAccountScheduledNotice":  "Your account has been scheduled for deletion in 15 days. Do not log in if you wish to permanently delete your account.",
+    "@deleteAccountScheduledNotice":  {
+                                          "description":  "Notice after requesting deletion"
+                                      },
+    "accountRestoredNotice":  "Welcome back! Your account deletion was cancelled and all your data has been restored.",
+    "@accountRestoredNotice":  {
+                                   "description":  "Notice when account is auto-recovered upon login"
+                               },
+    "adminPendingDeletionBadge":  "Scheduled for deletion ({days}d remaining)",
+    "@adminPendingDeletionBadge":  {
+                                       "description":  "Admin badge for pending deletion",
+                                       "placeholders":  {
+                                                            "days":  {
+                                                                         "type":  "int"
+                                                                     }
+                                                        }
+                                   },
+    "adminCancelDeletion":  "Cancel Deletion",
+    "@adminCancelDeletion":  {
+                                 "description":  "Admin button to cancel account deletion"
+                             },
+    "adminPurgeNow":  "Purge Data Now",
+    "@adminPurgeNow":  {
+                           "description":  "Admin button to purge user data immediately"
+                       },
+    "adminPurgeConfirmTitle":  "Permanently Purge User Data?",
+    "@adminPurgeConfirmTitle":  {
+                                    "description":  "Purge confirmation dialog title"
+                                },
+    "adminPurgeConfirmMessage":  "This will immediately and irrevocably delete all cloud trips, expenses, checklists, and vault documents for this user.",
+    "@adminPurgeConfirmMessage":  {
+                                      "description":  "Purge confirmation dialog message"
+                                  },
+    "adminDeletionCancelled":  "Account deletion successfully cancelled",
+    "@adminDeletionCancelled":  {
+                                    "description":  "Admin deletion cancelled notification"
+                                },
+    "adminDataPurged":  "All user data was permanently purged",
+    "@adminDataPurged":  {
+                             "description":  "Admin data purged notification"
+                         },
+    "adminVaultDocumentsTitle":  "Uploaded Vault Documents (Inspect / Moderate)",
+    "@adminVaultDocumentsTitle":  {
+                                      "description":  "Title for uploaded vault documents section in admin"
+                                  },
+    "adminNoDocumentsUploaded":  "No vault documents uploaded yet",
+    "@adminNoDocumentsUploaded":  {
+                                      "description":  "Empty state for user documents in admin"
+                                  },
+    "adminInspectDocument":  "Inspect",
+    "@adminInspectDocument":  {
+                                  "description":  "Inspect document button"
+                              },
+    "adminDeleteDocument":  "Delete Document",
+    "@adminDeleteDocument":  {
+                                 "description":  "Admin delete document button"
+                             },
+    "adminDeleteDocumentConfirm":  "Are you sure you want to permanently delete this document from the cloud vault?",
+    "@adminDeleteDocumentConfirm":  {
+                                        "description":  "Confirmation message for admin deleting document"
+                                    },
+    "adminDocumentDeleted":  "Document successfully deleted by admin",
+    "@adminDocumentDeleted":  {
+                                  "description":  "Notification when admin deletes document"
+                              },
+    "adminDocumentPreviewTitle":  "Document Inspector",
+    "@adminDocumentPreviewTitle":  {
+                                       "description":  "Title for admin document preview dialog"
+                                   },
+    "adminDocumentTypeImage":  "IMAGE",
+    "@adminDocumentTypeImage":  {
+                                    "description":  "Document type image label"
+                                },
+    "adminDocumentTypePdf":  "PDF",
+    "@adminDocumentTypePdf":  {
+                                  "description":  "Document type PDF label"
+                              },
+    "emailVerifySpamFolderTip":  "Check Spam / Promotions Folder",
+    "@emailVerifySpamFolderTip":  {
+                                      "description":  "Title for spam folder guidance"
+                                  },
+    "emailVerifySpamFolderDesc":  "If you haven\u0027t received the link, check your spam or promotions folder for an email from PackBuddy. Verifying your email keeps your cloud vault secure.",
+    "@emailVerifySpamFolderDesc":  {
+                                       "description":  "Description for spam folder guidance"
+                                   },
+    "emailVerifyAutoChecking":  "Waiting for verification link... (auto-checking)",
+    "@emailVerifyAutoChecking":  {
+                                     "description":  "Polling indicator text"
+                                 },
+    "currencyConverter":  "Currency Converter",
+    "fromCurrency":  "From",
+    "toCurrency":  "To",
+    "exchangeRate":  "Exchange Rate",
+    "liveRates":  "Live Rates",
+    "offlineRates":  "Offline Rates",
+    "quickConvert":  "Quick Currency Converter",
+    "refreshRates":  "Refresh Rates",
+    "budgetAnalytics":  "Budget Analytics",
+    "categoryDistribution":  "Category Distribution",
+    "spendingTrends":  "Spending Trends",
+    "dailyBurnRate":  "Daily Spend Rate",
+    "projectedTotal":  "Projected Total",
+    "budgetStatusOnTrack":  "On Track",
+    "budgetStatusOver":  "Over Budget",
+    "budgetStatusWarning":  "Pacing High",
+    "compareTrips":  "Compare Trips",
+    "selectTripsToCompare":  "Select Trips to Compare",
+    "selectAtLeastTwoTrips":  "Select at least 2 trips to compare",
+    "comparisonSummary":  "Comparison Summary",
+    "budgetEfficiency":  "Pacing Status",
+    "packingReadiness":  "Packing Readiness",
+    "lowestDailyCost":  "Most Economical",
+    "highestSpending":  "Highest Spend",
+    "sharedTrip":  "Shared Trip",
+    "shareTripInvite":  "Invite Collaborators",
+    "joinSharedTrip":  "Join Shared Trip",
+    "inviteCode":  "Invite Code",
+    "enterInviteCode":  "Enter 6-character code",
+    "collaborators":  "Collaborators",
+    "copyCode":  "Copy Code",
+    "codeCopied":  "Invite code copied to clipboard",
+    "invalidInviteCode":  "Invalid or expired invite code",
+    "joinSuccess":  "Successfully joined trip!",
+    "shareTrip":  "Share Trip",
+    "shareChecklist":  "Share Checklist",
+    "shareBudget":  "Share Budget",
+    "shareTripSummary":  "Check out my travel plan on PackBuddy!",
+    "shareCopied":  "Trip details copied to clipboard",
+    "tripMap":  "Travel Map \u0026 Route",
+    "openInMaps":  "Open in Maps",
+    "openInGoogleMaps":  "Open in Google Maps",
+    "openInAppleMaps":  "Open in Apple Maps",
+    "waypoints":  "Route Waypoints",
+    "addWaypoint":  "Add Waypoint",
+    "waypointName":  "Place / Hotel / Landmark",
+    "noWaypoints":  "No waypoints added yet",
+    "widgetSettings":  "Home Screen Widget",
+    "widgetPreview":  "Widget Preview",
+    "showCountdown":  "Show Countdown",
+    "showPackingProgress":  "Show Packing Progress",
+    "showBudgetData":  "Show Budget Summary",
+    "widgetSizeSmall":  "Small",
+    "widgetSizeMedium":  "Medium",
+    "widgetSizeLarge":  "Large",
+    "onboardingTitle1":  "Plan Trips Effortlessly",
+    "onboardingDesc1":  "Organize multi-currency budgets and track daily expenses anywhere in the world.",
+    "onboardingTitle2":  "Smart Packing Checklists",
+    "onboardingDesc2":  "Airline baggage guidelines and smart category templates ensure you never forget essentials.",
+    "onboardingTitle3":  "Collaborate in Real-Time",
+    "onboardingDesc3":  "Share your trip plans and checklists with friends and family with simple invite codes.",
+    "onboardingTitle4":  "Offline Travel Vault",
+    "onboardingDesc4":  "Keep passports, boarding passes, and vouchers encrypted and accessible without internet.",
+    "getStarted":  "Get Started",
+    "skip":  "Skip",
+    "next":  "Next",
+    "replayTour":  "Replay App Tour",
+    "signInWithApple":  "Sign in with Apple",
+    "appleSignInFailed":  "Apple Sign-In failed",
+    "total":  "Total",
+    "totalSpent":  "Total Spent",
+    "confirm":  "Confirm",
+    "vaultBiometricReason":  "Verify your fingerprint or face to unlock your travel vault",
+    "biometricsFailed":  "Biometric verification failed or was cancelled.",
+    "customBaggageLimitPrompt":  "Set custom limit (kg)",
+    "testNotificationSent":  "Test notification sent to your device.",
+    "pinWidgetSuccess":  "Widget added to home screen.",
+    "pinWidgetGuide":  "Long-press your home screen and choose Widgets \u003e PackBuddy to add.",
+    "scheduledRemindersCount":  "{count} scheduled trip reminders",
+    "@scheduledRemindersCount":  {
+                                     "description":  "Number of scheduled trip reminders",
+                                     "placeholders":  {
+                                                          "count":  {
+                                                                        "type":  "int"
+                                                                    }
+                                                      }
+                                 },
+    "packingRemindersScheduled48h":  "48 hours before: Smart packing reminder scheduled",
+    "packingRemindersScheduled24h":  "24 hours before: Final checklist check reminder scheduled",
+    "testNotificationAction":  "Test Notifications",
+    "noUpcomingRemindersDesc":  "When you plan a trip, departure reminders and packing preparation alerts will appear here.",
+    "clearAll":  "Clear All",
+    "notificationHistory":  "Notification History",
+    "upcomingReminders":  "Upcoming Reminders",
+    "daysRemaining":  "{days} days left",
+    "@daysRemaining":  {
+                           "description":  "Days remaining until trip",
+                           "placeholders":  {
+                                                "days":  {
+                                                             "type":  "int"
+                                                         }
+                                            }
+                       },
+    "today":  "Today",
+    "biometricUnlock":  "Biometric Unlock",
+    "biometricUnlockSubtitle":  "Unlock vault with fingerprint or Face ID",
+    "setPinFirstToEnableBiometrics":  "Set a PIN first to enable biometrics",
+    "passportSummaryShared":  "Passport summary ready to share!",
+    "@passportSummaryShared":  {
+                                   "description":  "Toast notification when passport summary is shared"
+                               },
+    "sharePassportTooltip":  "Share Passport",
+    "@sharePassportTooltip":  {
+                                  "description":  "Tooltip for passport sharing action button"
+                              },
+    "visitedCountryStatus":  "You visited this country",
+    "@visitedCountryStatus":  {
+                                  "description":  "Status indicating user has visited this country"
+                              },
+    "worldTravelMapTitle":  "World Travel Map",
+    "@worldTravelMapTitle":  {
+                                 "description":  "Header title for World Travel Map"
+                             },
+    "worldTravelMapSubtitle":  "Colorize visited \u0026 wishlist countries",
+    "@worldTravelMapSubtitle":  {
+                                    "description":  "Subtitle explaining map colorization"
+                                },
+    "worldTravelMapStats":  "{visited} Visited • {wishlist} Wishlist • %{percentage} Explored",
+    "@worldTravelMapStats":  {
+                                 "description":  "Formatted summary stats on travel map showcase",
+                                 "placeholders":  {
+                                                      "visited":  {
+                                                                      "type":  "int"
+                                                                  },
+                                                      "wishlist":  {
+                                                                       "type":  "int"
+                                                                   },
+                                                      "percentage":  {
+                                                                         "type":  "String"
+                                                                     }
+                                                  }
+                             },
+    "mapLegendBeen":  "Visited",
+    "@mapLegendBeen":  {
+                           "description":  "Legend label for visited countries"
+                       },
+    "mapLegendWant":  "Wishlist",
+    "@mapLegendWant":  {
+                           "description":  "Legend label for wishlist countries"
+                       },
+    "mapLegendUnvisited":  "Unvisited",
+    "@mapLegendUnvisited":  {
+                                "description":  "Legend label for unvisited countries"
+                            },
+    "mapLegendVisitedCity":  "Visited City",
+    "@mapLegendVisitedCity":  {
+                                  "description":  "Legend label for visited cities"
+                              },
+    "mapLegendWishlistCity":  "Wishlist City",
+    "@mapLegendWishlistCity":  {
+                                   "description":  "Legend label for wishlist cities"
+                               },
+    "mapLegendCapital":  "Capital",
+    "@mapLegendCapital":  {
+                              "description":  "Legend label for capital cities"
+                          },
+    "zoomIn":  "Zoom In",
+    "@zoomIn":  {
+                    "description":  "Zoom in button tooltip"
+                },
+    "zoomOut":  "Zoom Out",
+    "@zoomOut":  {
+                     "description":  "Zoom out button tooltip"
+                 },
+    "resetZoom":  "Reset",
+    "@resetZoom":  {
+                       "description":  "Reset zoom button tooltip"
+                   },
+    "countriesTab":  "Countries",
+    "@countriesTab":  {
+                          "description":  "Tab title for countries view"
+                      },
+    "citiesTab":  "Cities",
+    "@citiesTab":  {
+                       "description":  "Tab title for cities view"
+                   },
+    "searchCountryOrCapital":  "Search country or capital (e.g. Italy, Japan)...",
+    "@searchCountryOrCapital":  {
+                                    "description":  "Hint text in travel map search box"
+                                },
+    "basedOnUnCountries":  "Based on 195 UN countries",
+    "@basedOnUnCountries":  {
+                                "description":  "Footnote indicating 195 UN countries baseline"
+                            },
+    "countriesAndTerritories":  "Countries \u0026 Territories",
+    "@countriesAndTerritories":  {
+                                     "description":  "Card header for countries and territories list"
+                                 },
+    "visitedStat":  "visited",
+    "@visitedStat":  {
+                         "description":  "Short label for visited status"
+                     },
+    "countryUnit":  "countries",
+    "@countryUnit":  {
+                         "description":  "Unit label for countries"
+                     },
+    "moreCountries":  "+ {count} more countries",
+    "@moreCountries":  {
+                           "description":  "Badge text for additional visited countries count",
+                           "placeholders":  {
+                                                "count":  {
+                                                              "type":  "int"
+                                                          }
+                                            }
+                       },
+    "tripsUnit":  "trips",
+    "@tripsUnit":  {
+                       "description":  "Unit label for trips"
+                   },
+    "citiesUnit":  "cities",
+    "@citiesUnit":  {
+                        "description":  "Unit label for cities"
+                    },
+    "continentsUnit":  "continents",
+    "@continentsUnit":  {
+                            "description":  "Unit label for continents"
+                        },
+    "ofTheWorld":  "of the world",
+    "@ofTheWorld":  {
+                        "description":  "Label for percentage of the world explored"
+                    },
+    "daysUnit":  "days",
+    "@daysUnit":  {
+                      "description":  "Unit label for travel days"
+                  },
+    "allFilter":  "All",
+    "@allFilter":  {
+                       "description":  "Filter chip label for all items"
+                   },
+    "visitedFilter":  "Visited",
+    "@visitedFilter":  {
+                           "description":  "Filter chip label for visited items"
+                       },
+    "wishlistFilter":  "Wishlist",
+    "@wishlistFilter":  {
+                            "description":  "Filter chip label for wishlist items"
+                        },
+    "continentEurope":  "Europe",
+    "@continentEurope":  {
+                             "description":  "Continent name Europe"
+                         },
+    "continentAsia":  "Asia",
+    "@continentAsia":  {
+                           "description":  "Continent name Asia"
+                       },
+    "continentAmericas":  "Americas",
+    "@continentAmericas":  {
+                               "description":  "Continent name Americas"
+                           },
+    "continentAfrica":  "Africa",
+    "@continentAfrica":  {
+                             "description":  "Continent name Africa"
+                         },
+    "continentOceania":  "Oceania",
+    "@continentOceania":  {
+                              "description":  "Continent name Oceania"
+                          },
+    "markAsVisitedTooltip":  "Mark as Visited",
+    "@markAsVisitedTooltip":  {
+                                  "description":  "Tooltip to mark country as visited"
+                              },
+    "markAsWishlistTooltip":  "Mark as Wishlist",
+    "@markAsWishlistTooltip":  {
+                                   "description":  "Tooltip to mark country as wishlist"
+                               },
+    "visitDateLabel":  "Visit Date",
+    "@visitDateLabel":  {
+                            "description":  "Label for visit date"
+                        },
+    "coordinatesLabel":  "Coordinates",
+    "@coordinatesLabel":  {
+                              "description":  "Label for geographical coordinates"
+                          },
+    "airlineSelectedMessage":  "{airline} ({limit} kg) selected.",
+    "@airlineSelectedMessage":  {
+                                    "description":  "Toast notification when airline baggage policy is selected",
+                                    "placeholders":  {
+                                                         "airline":  {
+                                                                         "type":  "String"
+                                                                     },
+                                                         "limit":  {
+                                                                       "type":  "String"
+                                                                   }
+                                                     }
+                                },
+    "amountCopied":  "{amount} copied!",
+    "@amountCopied":  {
+                          "description":  "Toast notification when converted amount is copied",
+                          "placeholders":  {
+                                               "amount":  {
+                                                              "type":  "String"
+                                                          }
+                                           }
+                      },
+    "noticeMessage":  "Notice: {error}",
+    "@noticeMessage":  {
+                           "description":  "Informational notice message",
+                           "placeholders":  {
+                                                "error":  {
+                                                              "type":  "String"
+                                                          }
+                                            }
+                       },
+    "collaboratorEmailOrNameHint":  "e.g. alex@example.com / Name",
+    "@collaboratorEmailOrNameHint":  {
+                                         "description":  "Hint text for inviting trip collaborator"
+                                     },
+    "tripCodePlaceholder":  "e.g. PB-A1B2C",
+    "@tripCodePlaceholder":  {
+                                 "description":  "Hint text for entering trip invite code"
+                             },
+    "authAppleSignInComingSoon":  "Sign in with Apple is currently not active. It will be available very soon.",
+    "@authAppleSignInComingSoon":  {
+                                       "description":  "Notice explaining Apple Sign In is coming soon"
+                                   },
+    "proStoreComingSoonTitle":  "PackBuddy Pro Coming Soon",
+    "@proStoreComingSoonTitle":  {
+                                     "description":  "Dialog title for upcoming store in-app purchase release"
+                                 },
+    "proStoreComingSoonDesc":  "PackBuddy Pro store subscriptions are currently not active. They will be available in the Google Play Store and App Store very soon.",
+    "@proStoreComingSoonDesc":  {
+                                    "description":  "Dialog description for upcoming store in-app purchase release"
+                                },
+    "planTripToCountry":  "Plan Trip to {country}",
+    "@planTripToCountry":  {
+                               "description":  "Button label to plan a trip to selected country",
+                               "placeholders":  {
+                                                    "country":  {
+                                                                    "type":  "String"
+                                                                }
+                                                }
+                           },
+    "noVisitedCountriesYet":  "No visited countries marked yet. Tap countries on the map or list below to fill them with color!",
+    "@noVisitedCountriesYet":  {
+                                   "description":  "Empty state message when no countries have been visited"
+                               },
+    "navMap":  "Map",
+    "mapLegendLived":  "Lived",
+    "livedFilter":  "Lived",
+    "markAsLivedTooltip":  "Mark as lived country",
+    "livedCountryStatus":  "You lived in this country",
+    "@navMap":  {
+                    "description":  "Bottom navigation bar label for travel map"
+                },
+    "@mapLegendLived":  {
+                            "description":  "Legend label for lived in country status"
+                        },
+    "@livedFilter":  {
+                         "description":  "Filter chip label for lived in countries"
+                     },
+    "@markAsLivedTooltip":  {
+                                "description":  "Tooltip for marking a country as lived in"
+                            },
+    "@livedCountryStatus":  {
+                                "description":  "Detail status message when a country was lived in"
+                            },
+    "shareStory":  "Share to Story",
+    "shareStorySubtitle":  "Share on Instagram, Snapchat or with friends",
+    "shareStoryPreview":  "Story Preview",
+    "generatingStoryImage":  "Generating story image...",
+    "storyCardTagline":  "My World Travel Map",
+    "storyWatermark":  "Explored with PackBuddy",
+    "shareImageButton":  "Share as Story",
+    "shareTextButton":  "Share as Text",
+    "@shareStory":  {
+                        "description":  "Button label to share travel map as social story"
+                    },
+    "@shareStorySubtitle":  {
+                                "description":  "Subtitle explaining story sharing to Instagram/Snapchat"
+                            },
+    "@shareStoryPreview":  {
+                               "description":  "Title for story card preview dialog"
+                           },
+    "@generatingStoryImage":  {
+                                  "description":  "Loading message while rendering story image"
+                              },
+    "@storyCardTagline":  {
+                              "description":  "Tagline on the story card"
+                          },
+    "@storyWatermark":  {
+                            "description":  "App watermark text on story card"
+                        },
+    "@shareImageButton":  {
+                              "description":  "Button to trigger image story share"
+                          },
+    "@shareTextButton":  {
+                             "description":  "Button to trigger text summary share"
+                         },
+    "globe3D":  "3D Globe",
+    "@globe3D":  {
+                     "description":  "3D Globe mode button label"
+                 },
+    "globeRotateHint":  "Drag to rotate • Tap",
+    "@globeRotateHint":  {
+                             "description":  "Interactive hint label for 3D Globe gesture rotation"
+                         },
+    "cyprusRegion":  "Cyprus Region",
+    "@cyprusRegion":  {
+                          "description":  "Cyprus island disambiguation header"
+                      },
+    "storyThemeMidnight":  "Midnight",
+    "@storyThemeMidnight":  {
+                                "description":  "Theme palette name for Midnight"
+                            },
+    "storyThemeSunset":  "Sunset",
+    "@storyThemeSunset":  {
+                              "description":  "Theme palette name for Sunset"
+                          },
+    "storyThemeAtlas":  "Atlas",
+    "@storyThemeAtlas":  {
+                             "description":  "Theme palette name for Atlas"
+                         },
+    "storyThemeMinimal":  "Minimal",
+    "@storyThemeMinimal":  {
+                               "description":  "Theme palette name for Minimal"
+                           },
+    "storyThemeDune":  "Dune",
+    "@storyThemeDune":  {
+                            "description":  "Theme palette name for Dune/Sand"
+                        },
+    "storyThemeOcean":  "Ocean",
+    "@storyThemeOcean":  {
+                             "description":  "Theme palette name for Ocean"
+                         },
+    "addWidgetToHomeScreen":  "Add Widget to Home Screen",
+    "@addWidgetToHomeScreen":  {
+                                   "description":  "Button label to pin/add widget to user home screen"
+                               },
+    "pdfError":  "PDF Error",
+    "@pdfError":  {
+                      "description":  "Label displayed when PDF fails to render"
+                  },
+    "storyLayoutShowcase":  "Showcase",
+    "@storyLayoutShowcase":  {
+                                 "description":  "storyLayoutShowcase label"
+                             },
+    "passportEntryVisas":  "Entry Visas \u0026 Stamps",
+    "@passportEntryVisas":  {
+                                "description":  "passportEntryVisas label"
+                            },
+    "passportOfficialDocument":  "Official Travel Passport",
+    "@passportOfficialDocument":  {
+                                      "description":  "passportOfficialDocument label"
+                                  },
+    "storyLayoutMinimal":  "Minimal",
+    "@storyLayoutMinimal":  {
+                                "description":  "storyLayoutMinimal label"
+                            },
+    "passportWorldCitizen":  "World Citizen",
+    "@passportWorldCitizen":  {
+                                  "description":  "passportWorldCitizen label"
+                              },
+    "storyLayoutPassport":  "Passport",
+    "@storyLayoutPassport":  {
+                                 "description":  "storyLayoutPassport label"
+                             },
+    "storyLayoutClassic":  "Classic",
+    "@storyLayoutClassic":  {
+                                "description":  "storyLayoutClassic label"
+                            }
 }

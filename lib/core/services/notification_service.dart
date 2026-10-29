@@ -240,15 +240,29 @@ class LocalNotificationService implements INotificationService {
 
       final tzDateTime = _convertToTzDateTime(scheduledDate);
 
-      await _plugin.zonedSchedule(
-        id: id,
-        scheduledDate: tzDateTime,
-        notificationDetails: notificationDetails,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        title: title,
-        body: body,
-        payload: payload,
-      );
+      try {
+        await _plugin.zonedSchedule(
+          id: id,
+          scheduledDate: tzDateTime,
+          notificationDetails: notificationDetails,
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          title: title,
+          body: body,
+          payload: payload,
+        );
+      } catch (exactAlarmError) {
+        // Resilient fallback for Android 14+ or devices where exact alarm permission is restricted
+        debugPrint('[LocalNotificationService] Exact alarm rejected, falling back to inexact: $exactAlarmError');
+        await _plugin.zonedSchedule(
+          id: id,
+          scheduledDate: tzDateTime,
+          notificationDetails: notificationDetails,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          title: title,
+          body: body,
+          payload: payload,
+        );
+      }
     } catch (e) {
       debugPrint('[LocalNotificationService] Failed to schedule notification #$id: $e');
     }

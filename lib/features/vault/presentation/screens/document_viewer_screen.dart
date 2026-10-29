@@ -3,13 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:pdfx/pdfx.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/services/security_service.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
 import '../controllers/vault_controller.dart';
 
-/// Fullscreen zoomable document viewer screen supporting images and PDFs with FLAG_SECURE protection
+/// Fullscreen zoomable document viewer screen supporting images and full in-app PDF viewing with FLAG_SECURE protection
 class DocumentViewerScreen extends ConsumerStatefulWidget {
   final Document document;
 
@@ -20,14 +21,35 @@ class DocumentViewerScreen extends ConsumerStatefulWidget {
 }
 
 class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
+  PdfControllerPinch? _pdfController;
+  int _pdfPagesCount = 0;
+  int _pdfCurrentPage = 1;
+  bool _pdfError = false;
+  String? _pdfErrorMessage;
+
   @override
   void initState() {
     super.initState();
     SecurityService.instance.enableSecureScreen();
+
+    if (widget.document.isPdf) {
+      final file = File(widget.document.localImagePath);
+      if (file.existsSync()) {
+        try {
+          _pdfController = PdfControllerPinch(
+            document: PdfDocument.openFile(widget.document.localImagePath),
+          );
+        } catch (e) {
+          _pdfError = true;
+          _pdfErrorMessage = e.toString();
+        }
+      }
+    }
   }
 
   @override
   void dispose() {
+    _pdfController?.dispose();
     SecurityService.instance.disableSecureScreen();
     super.dispose();
   }
@@ -189,90 +211,7 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
                 ),
               )
             : isPdf
-                ? SingleChildScrollView(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(28),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFE53935).withValues(alpha: 0.15),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: const Color(0xFFE53935).withValues(alpha: 0.4),
-                              width: 2,
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.picture_as_pdf_rounded,
-                            size: 64,
-                            color: Color(0xFFE53935),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          widget.document.title,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            l10n.pdfBadge,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.9),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        if (widget.document.notes != null && widget.document.notes!.trim().isNotEmpty) ...[
-                          const SizedBox(height: 16),
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              widget.document.notes!,
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.8),
-                                fontSize: 13,
-                              ),
-                            ),
-                          ),
-                        ],
-                        const SizedBox(height: 32),
-                        FilledButton.icon(
-                          style: FilledButton.styleFrom(
-                            backgroundColor: const Color(0xFFE53935),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                          onPressed: () => _openFileExternally(context),
-                          icon: const Icon(Icons.open_in_browser_rounded, size: 20),
-                          label: Text(
-                            l10n.openPdf,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
+                ? _buildPdfViewer(context, l10n)
                 : InteractiveViewer(
                     panEnabled: true,
                     minScale: 0.8,
@@ -283,6 +222,167 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
                     ),
                   ),
       ),
+    );
+  }
+
+  Widget _buildPdfViewer(BuildContext context, AppLocalizations l10n) {
+    if (_pdfError || _pdfController == null) {
+      return Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE53935).withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.error_outline_rounded, size: 54, color: Color(0xFFE53935)),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              widget.document.title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _pdfErrorMessage ?? l10n.fileNotFoundLocally,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 13),
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              style: FilledButton.styleFrom(backgroundColor: const Color(0xFFE53935)),
+              onPressed: () => _openFileExternally(context),
+              icon: const Icon(Icons.open_in_browser_rounded),
+              label: Text(l10n.openInExternalApp),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: PdfViewPinch(
+            controller: _pdfController!,
+            onDocumentLoaded: (document) {
+              if (mounted) {
+                setState(() {
+                  _pdfPagesCount = document.pagesCount;
+                });
+              }
+            },
+            onPageChanged: (page) {
+              if (mounted) {
+                setState(() {
+                  _pdfCurrentPage = page;
+                });
+              }
+            },
+            builders: PdfViewPinchBuilders<DefaultBuilderOptions>(
+              options: const DefaultBuilderOptions(),
+              documentLoaderBuilder: (_) => const Center(
+                child: CircularProgressIndicator(color: Colors.white),
+              ),
+              pageLoaderBuilder: (_) => const Center(
+                child: CircularProgressIndicator(color: Colors.white),
+              ),
+              errorBuilder: (_, error) => Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.broken_image_rounded, color: Color(0xFFE53935), size: 48),
+                    const SizedBox(height: 12),
+                    Text(
+                      '${l10n.pdfError}: $error',
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton(
+                      onPressed: () => _openFileExternally(context),
+                      child: Text(l10n.openInExternalApp),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+
+        // Floating Page Counter & Controls
+        if (_pdfPagesCount > 0)
+          Positioned(
+            bottom: 24,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.75),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (_pdfPagesCount > 1) ...[
+                      InkWell(
+                        onTap: _pdfCurrentPage > 1
+                            ? () => _pdfController?.previousPage(
+                                  duration: const Duration(milliseconds: 250),
+                                  curve: Curves.easeOut,
+                                )
+                            : null,
+                        child: Icon(
+                          Icons.chevron_left_rounded,
+                          color: _pdfCurrentPage > 1 ? Colors.white : Colors.white38,
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                    ],
+                    Text(
+                      '$_pdfCurrentPage / $_pdfPagesCount',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                    if (_pdfPagesCount > 1) ...[
+                      const SizedBox(width: 6),
+                      InkWell(
+                        onTap: _pdfCurrentPage < _pdfPagesCount
+                            ? () => _pdfController?.nextPage(
+                                  duration: const Duration(milliseconds: 250),
+                                  curve: Curves.easeOut,
+                                )
+                            : null,
+                        child: Icon(
+                          Icons.chevron_right_rounded,
+                          color: _pdfCurrentPage < _pdfPagesCount ? Colors.white : Colors.white38,
+                          size: 22,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

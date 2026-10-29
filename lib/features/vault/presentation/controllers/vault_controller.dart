@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
@@ -8,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:packbuddy/data/local_db/database_helper.dart';
 import 'package:packbuddy/data/sync_engine/sync_engine.dart';
+import 'package:packbuddy/core/services/biometric_service.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/services/telemetry_service.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
@@ -73,17 +77,19 @@ class VaultController extends StateNotifier<VaultState> {
     loadDocuments();
   }
 
-  /// Encodes file bytes into base64 payload up to 700 KB safe threshold for cloud sync
+  /// Encodes file bytes into base64 payload safely for cloud sync without byte truncation
   Future<String?> encodeFileForCloud(String filePath) async {
     try {
       final file = File(filePath);
       if (!await file.exists()) return null;
       final bytes = await file.readAsBytes();
-      const maxCloudBytes = 700 * 1024;
+      const maxCloudBytes = 750 * 1024;
       if (bytes.length <= maxCloudBytes) {
         return base64Encode(bytes);
       } else {
-        return base64Encode(bytes.sublist(0, maxCloudBytes));
+        // Never corrupt binary files by byte-slicing!
+        // Large files are safely preserved in local offline storage.
+        return null;
       }
     } catch (_) {
       return null;
@@ -107,24 +113,77 @@ class VaultController extends StateNotifier<VaultState> {
     state = state.copyWith(isLocked: true);
   }
 
-  /// Sets a new PIN code for vault protection
+  /// Sets a new PIN code for vault protection and syncs to cloud
   Future<void> setPin(String pin) async {
     await _prefs.setVaultPin(pin);
     state = state.copyWith(hasPin: true);
+    await _syncSecuritySettingsToCloud(pin: pin, updatePin: true);
   }
 
-  /// Removes the vault PIN code
+  /// Removes the vault PIN code and syncs to cloud
   Future<void> removePin() async {
     await _prefs.setVaultPin(null);
     await _prefs.setVaultLocked(false);
     state = state.copyWith(hasPin: false, isLocked: false);
+    await _syncSecuritySettingsToCloud(pin: null, updatePin: true);
   }
 
-  /// Unlocks the vault via biometric verification
-  bool authenticateWithBiometrics() {
-    _prefs.setVaultLocked(false);
-    state = state.copyWith(isLocked: false);
-    return true;
+  /// Unlocks the vault via real biometric verification (Fingerprint / Face ID)
+  Future<bool> authenticateWithBiometrics({String? reason}) async {
+    final success = await BiometricService.instance.authenticate(
+      localizedReason: reason ?? 'Kasanın kilidini açmak için parmak izinizi doğrulayın',
+    );
+    if (success) {
+      _prefs.setVaultLocked(false);
+      state = state.copyWith(isLocked: false);
+      return true;
+    }
+    return false;
+  }
+
+  /// Sets or updates biometric authentication preference and syncs to cloud
+  Future<void> setBiometricEnabled(bool enabled) async {
+    await _prefs.setVaultBiometricEnabled(enabled);
+    state = state.copyWith(isBiometricEnabled: enabled);
+    await _syncSecuritySettingsToCloud(biometricEnabled: enabled);
+  }
+
+  /// Synchronizes security settings (PIN code and biometric enablement) to Firestore cloud
+  Future<void> _syncSecuritySettingsToCloud({
+    String? pin,
+    bool updatePin = false,
+    bool? biometricEnabled,
+  }) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+      final data = <String, dynamic>{
+        'updatedAt': DateTime.now().toUtc().toIso8601String(),
+      };
+      if (updatePin) {
+        data['vaultPin'] = pin;
+        data['vaultPinUpdatedAt'] = DateTime.now().toUtc().toIso8601String();
+      }
+      if (biometricEnabled != null) {
+        data['vaultBiometricEnabled'] = biometricEnabled;
+        data['vaultBiometricUpdatedAt'] = DateTime.now().toUtc().toIso8601String();
+      }
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set(
+        data,
+        SetOptions(merge: true),
+      );
+    } catch (e) {
+      debugPrint('[VaultController] sync security settings notice: $e');
+    }
+  }
+
+  /// Refreshes security lock, pin, and biometric state when account changes or cloud sync completes
+  void refreshSecurityState() {
+    state = state.copyWith(
+      isLocked: _prefs.isVaultLocked(),
+      hasPin: _prefs.getVaultPin() != null,
+      isBiometricEnabled: _prefs.isVaultBiometricEnabled(),
+    );
   }
 
   /// Resets controller state on logout or account switch
@@ -139,6 +198,7 @@ class VaultController extends StateNotifier<VaultState> {
 
   /// Loads all active (non-deleted) documents from SQLite
   Future<void> loadDocuments({String? tripId, String? userId}) async {
+    refreshSecurityState();
     state = state.copyWith(isLoading: true);
     try {
       final docs = await _dbHelper.getDocuments(
@@ -176,11 +236,12 @@ class VaultController extends StateNotifier<VaultState> {
     }
 
     try {
-      // 1. Pick image (safe null check if user cancels)
+      // 1. Pick image (safe null check if user cancels, optimized resolution for cloud storage)
       final XFile? pickedFile = await _picker.pickImage(
         source: source,
-        imageQuality: 85,
-        maxWidth: 1920,
+        imageQuality: 75,
+        maxWidth: 1280,
+        maxHeight: 1280,
       );
 
       if (pickedFile == null) {
@@ -214,8 +275,10 @@ class VaultController extends StateNotifier<VaultState> {
       final cleanExt = ext.replaceAll('.', '').toLowerCase();
       final cloudData = await encodeFileForCloud(targetPath);
       final now = DateTime.now();
+      final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
       final newDoc = Document(
         id: _uuid.v4(),
+        userId: currentUid,
         title: title,
         category: category,
         subCategory: subCategory,
@@ -302,8 +365,10 @@ class VaultController extends StateNotifier<VaultState> {
       final cleanExt = ext.replaceAll('.', '').toLowerCase();
       final cloudData = await encodeFileForCloud(targetPath);
       final now = DateTime.now();
+      final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
       final newDoc = Document(
         id: _uuid.v4(),
+        userId: currentUid,
         title: title,
         category: category,
         subCategory: subCategory,
@@ -365,7 +430,9 @@ class VaultController extends StateNotifier<VaultState> {
         ext = p.extension(doc.localImagePath).replaceAll('.', '').toLowerCase();
         if (ext.isEmpty) ext = doc.isPdf ? 'pdf' : 'jpg';
       }
+      final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
       final docToSave = doc.copyWith(
+        userId: (doc.userId.isEmpty && currentUid.isNotEmpty) ? currentUid : doc.userId,
         fileSizeBytes: fileBytes,
         cloudDataBase64: cloudData,
         fileExtension: ext,

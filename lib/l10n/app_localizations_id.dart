@@ -320,8 +320,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get viewAll => 'Lihat Semua';
 
   @override
-  String get allNotificationsUpToDate =>
-      'Semua notifikasi perjalanan sudah diperbarui!';
+  String get allNotificationsUpToDate => 'Semua notifikasi sudah diperbarui.';
 
   @override
   String get createFirstTrip => 'Buat rute dan anggaran pertama Anda sekarang.';
@@ -1713,4 +1712,334 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get confirm => 'Konfirmasi';
+
+  @override
+  String get vaultBiometricReason =>
+      'Verifikasi sidik jari atau wajah Anda untuk membuka brankas perjalanan';
+
+  @override
+  String get biometricsFailed => 'Verifikasi biometrik gagal atau dibatalkan.';
+
+  @override
+  String get customBaggageLimitPrompt => 'Atur batas kustom (kg)';
+
+  @override
+  String get testNotificationSent =>
+      'Notifikasi uji coba dikirim ke perangkat Anda.';
+
+  @override
+  String get pinWidgetSuccess => 'Widget ditambahkan ke layar utama.';
+
+  @override
+  String get pinWidgetGuide =>
+      'Tekan lama layar utama lalu pilih Widget > PackBuddy.';
+
+  @override
+  String scheduledRemindersCount(int count) {
+    return '$count pengingat perjalanan terjadwal';
+  }
+
+  @override
+  String get packingRemindersScheduled48h =>
+      '48 jam sebelumnya: Pengingat cerdas berkemas dijadwalkan';
+
+  @override
+  String get packingRemindersScheduled24h =>
+      '24 jam sebelumnya: Pengecekan daftar terakhir';
+
+  @override
+  String get testNotificationAction => 'Uji Notifikasi';
+
+  @override
+  String get noUpcomingRemindersDesc =>
+      'Saat Anda merencanakan perjalanan, pengingat akan muncul di sini.';
+
+  @override
+  String get clearAll => 'Hapus Semua';
+
+  @override
+  String get notificationHistory => 'Riwayat Notifikasi';
+
+  @override
+  String get upcomingReminders => 'Pengingat Mendatang';
+
+  @override
+  String daysRemaining(int days) {
+    return 'Tersisa $days hari';
+  }
+
+  @override
+  String get today => 'Hari Ini';
+
+  @override
+  String get biometricUnlock => 'Buka Kunci Biometrik';
+
+  @override
+  String get biometricUnlockSubtitle =>
+      'Buka brankas dengan sidik jari atau Face ID';
+
+  @override
+  String get setPinFirstToEnableBiometrics =>
+      'Atur PIN terlebih dahulu untuk mengaktifkan biometrik';
+
+  @override
+  String get passportSummaryShared => 'Ringkasan paspor siap dibagikan!';
+
+  @override
+  String get sharePassportTooltip => 'Bagikan Paspor';
+
+  @override
+  String get visitedCountryStatus => 'Anda telah mengunjungi negara ini';
+
+  @override
+  String get worldTravelMapTitle => 'Peta Perjalanan Dunia Saya';
+
+  @override
+  String get worldTravelMapSubtitle =>
+      'Warnai negara yang telah dikunjungi & diimpikan';
+
+  @override
+  String worldTravelMapStats(int visited, int wishlist, String percentage) {
+    return '$visited Dikunjungi • $wishlist Impian • %$percentage Dijelajahi';
+  }
+
+  @override
+  String get mapLegendBeen => 'Dikunjungi';
+
+  @override
+  String get mapLegendWant => 'Impian';
+
+  @override
+  String get mapLegendUnvisited => 'Belum dikunjungi';
+
+  @override
+  String get mapLegendVisitedCity => 'Kota yang Dikunjungi';
+
+  @override
+  String get mapLegendWishlistCity => 'Kota Impian';
+
+  @override
+  String get mapLegendCapital => 'Ibu Kota';
+
+  @override
+  String get zoomIn => 'Perbesar';
+
+  @override
+  String get zoomOut => 'Perkecil';
+
+  @override
+  String get resetZoom => 'Atur Ulang';
+
+  @override
+  String get countriesTab => 'Negara';
+
+  @override
+  String get citiesTab => 'Kota';
+
+  @override
+  String get searchCountryOrCapital =>
+      'Cari negara atau ibu kota (misal: Italia, Jepang)...';
+
+  @override
+  String get basedOnUnCountries => 'Berdasarkan 195 negara anggota PBB';
+
+  @override
+  String get countriesAndTerritories => 'Negara & Wilayah';
+
+  @override
+  String get visitedStat => 'dikunjungi';
+
+  @override
+  String get countryUnit => 'negara';
+
+  @override
+  String moreCountries(int count) {
+    return '+ $count negara lainnya';
+  }
+
+  @override
+  String get tripsUnit => 'perjalanan';
+
+  @override
+  String get citiesUnit => 'kota';
+
+  @override
+  String get continentsUnit => 'benua';
+
+  @override
+  String get ofTheWorld => 'dari dunia';
+
+  @override
+  String get daysUnit => 'hari';
+
+  @override
+  String get allFilter => 'Semua';
+
+  @override
+  String get visitedFilter => 'Dikunjungi';
+
+  @override
+  String get wishlistFilter => 'Daftar Impian';
+
+  @override
+  String get continentEurope => 'Eropa';
+
+  @override
+  String get continentAsia => 'Asia';
+
+  @override
+  String get continentAmericas => 'Amerika';
+
+  @override
+  String get continentAfrica => 'Afrika';
+
+  @override
+  String get continentOceania => 'Oseania';
+
+  @override
+  String get markAsVisitedTooltip => 'Tandai sudah dikunjungi';
+
+  @override
+  String get markAsWishlistTooltip => 'Tandai sebagai impian';
+
+  @override
+  String get visitDateLabel => 'Tanggal Kunjungan';
+
+  @override
+  String get coordinatesLabel => 'Koordinat';
+
+  @override
+  String airlineSelectedMessage(String airline, String limit) {
+    return '$airline ($limit kg) dipilih.';
+  }
+
+  @override
+  String amountCopied(String amount) {
+    return '$amount disalin!';
+  }
+
+  @override
+  String noticeMessage(String error) {
+    return 'Pemberitahuan: $error';
+  }
+
+  @override
+  String get collaboratorEmailOrNameHint => 'misal: alex@example.com / Nama';
+
+  @override
+  String get tripCodePlaceholder => 'misal: PB-A1B2C';
+
+  @override
+  String get authAppleSignInComingSoon =>
+      'Masuk dengan Apple saat ini belum aktif. Fitur ini akan segera tersedia.';
+
+  @override
+  String get proStoreComingSoonTitle => 'PackBuddy Pro Segera Hadir';
+
+  @override
+  String get proStoreComingSoonDesc =>
+      'Langganan toko PackBuddy Pro saat ini belum aktif. Fitur ini akan segera tersedia di Google Play dan App Store.';
+
+  @override
+  String planTripToCountry(String country) {
+    return 'Rencanakan Perjalanan ke $country';
+  }
+
+  @override
+  String get noVisitedCountriesYet =>
+      'Belum ada negara yang ditandai telah dikunjungi. Ketuk negara pada peta atau daftar di bawah untuk mewarnainya!';
+
+  @override
+  String get navMap => 'Peta';
+
+  @override
+  String get mapLegendLived => 'Tinggal';
+
+  @override
+  String get livedFilter => 'Tinggal';
+
+  @override
+  String get markAsLivedTooltip => 'Tandai sebagai negara tempat tinggal';
+
+  @override
+  String get livedCountryStatus => 'Anda pernah tinggal di negara ini';
+
+  @override
+  String get shareStory => 'Bagikan ke Cerita';
+
+  @override
+  String get shareStorySubtitle =>
+      'Bagikan di Instagram, Snapchat, atau ke teman';
+
+  @override
+  String get shareStoryPreview => 'Pratinjau Cerita';
+
+  @override
+  String get generatingStoryImage => 'Menyiapkan gambar cerita...';
+
+  @override
+  String get storyCardTagline => 'Peta Perjalanan Duniaku';
+
+  @override
+  String get storyWatermark => 'Ditelusuri bersama PackBuddy';
+
+  @override
+  String get shareImageButton => 'Bagikan sebagai Cerita';
+
+  @override
+  String get shareTextButton => 'Bagikan sebagai teks';
+
+  @override
+  String get globe3D => 'Bola Dunia 3D';
+
+  @override
+  String get globeRotateHint => 'Geser untuk memutar • Ketuk';
+
+  @override
+  String get cyprusRegion => 'Wilayah Siprus';
+
+  @override
+  String get storyThemeMidnight => 'Tengah Malam';
+
+  @override
+  String get storyThemeSunset => 'Matahari Terbenam';
+
+  @override
+  String get storyThemeAtlas => 'Atlas';
+
+  @override
+  String get storyThemeMinimal => 'Minimalis';
+
+  @override
+  String get storyThemeDune => 'Bukit Pasir';
+
+  @override
+  String get storyThemeOcean => 'Samudra';
+
+  @override
+  String get addWidgetToHomeScreen => 'Tambahkan Widget ke Layar Utama';
+
+  @override
+  String get pdfError => 'Kesalahan PDF';
+
+  @override
+  String get storyLayoutShowcase => 'Etalase';
+
+  @override
+  String get passportEntryVisas => 'Visa Masuk & Cap';
+
+  @override
+  String get passportOfficialDocument => 'Paspor Perjalanan Resmi';
+
+  @override
+  String get storyLayoutMinimal => 'Minimal';
+
+  @override
+  String get passportWorldCitizen => 'Warga Dunia';
+
+  @override
+  String get storyLayoutPassport => 'Paspor';
+
+  @override
+  String get storyLayoutClassic => 'Klasik';
 }

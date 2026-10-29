@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
@@ -229,6 +230,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
         ),
         body: SafeArea(
           child: CustomScrollView(
+            scrollCacheExtent: const ScrollCacheExtent.pixels(600.0),
             physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
             slivers: [
               // 1. Collapsible Instant Search Bar (Animated expansion/collapse)
@@ -712,6 +714,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                         );
                       },
                       childCount: filteredItems.length,
+                      addRepaintBoundaries: true,
                     ),
                   ),
                 ),

@@ -97,12 +97,13 @@ class PreferencesService {
     await _prefs?.setString(keyLocale, locale.languageCode);
   }
 
-  // --- Pro Status & Plan (Strictly Scoped Per User) ---
+  // --- Pro Status & Plan (Strictly Scoped Per User with Device Purchase Protection) ---
   bool isProUser({String? uid}) {
     final effectiveUid = _resolveEffectiveUid(uid);
     if (effectiveUid != null) {
       return _prefs?.getBool('${keyIsPro}_$effectiveUid') ?? false;
     }
+    // Guaranteed fallback: Check device-level Google Play purchase flag
     return _prefs?.getBool(keyIsPro) ?? false;
   }
 
@@ -311,34 +312,66 @@ class PreferencesService {
   }
 
 
-  // --- Vault Security & PIN ---
-  String? getVaultPin() {
-    return _prefs?.getString(keyVaultPin);
+  String _vaultPinKey(String? uid) {
+    final effective = _resolveEffectiveUid(uid);
+    return effective != null ? '${keyVaultPin}_$effective' : keyVaultPin;
   }
 
-  Future<void> setVaultPin(String? pin) async {
+  String _vaultBiometricKey(String? uid) {
+    final effective = _resolveEffectiveUid(uid);
+    return effective != null ? '${keyVaultBiometricEnabled}_$effective' : keyVaultBiometricEnabled;
+  }
+
+  String _vaultLockedKey(String? uid) {
+    final effective = _resolveEffectiveUid(uid);
+    return effective != null ? '${keyVaultLocked}_$effective' : keyVaultLocked;
+  }
+
+  // --- Vault Security & PIN ---
+  String? getVaultPin({String? uid}) {
+    final key = _vaultPinKey(uid);
+    final val = _prefs?.getString(key);
+    if (val != null && val.isNotEmpty) return val;
+    // Fallback to legacy/guest device-level pin
+    final legacy = _prefs?.getString(keyVaultPin);
+    if (legacy != null && legacy.isNotEmpty) return legacy;
+    return null;
+  }
+
+  Future<void> setVaultPin(String? pin, {String? uid}) async {
+    final key = _vaultPinKey(uid);
     if (pin == null) {
+      await _prefs?.remove(key);
       await _prefs?.remove(keyVaultPin);
     } else {
+      await _prefs?.setString(key, pin);
       await _prefs?.setString(keyVaultPin, pin);
     }
   }
 
-  bool isVaultBiometricEnabled() {
+  bool isVaultBiometricEnabled({String? uid}) {
+    final key = _vaultBiometricKey(uid);
+    final val = _prefs?.getBool(key);
+    if (val != null) return val;
     return _prefs?.getBool(keyVaultBiometricEnabled) ?? false;
   }
 
-  Future<void> setVaultBiometricEnabled(bool enabled) async {
+  Future<void> setVaultBiometricEnabled(bool enabled, {String? uid}) async {
+    final key = _vaultBiometricKey(uid);
+    await _prefs?.setBool(key, enabled);
     await _prefs?.setBool(keyVaultBiometricEnabled, enabled);
   }
 
-  bool isVaultLocked() {
+  bool isVaultLocked({String? uid}) {
     // If PIN is set, vault is locked by default on launch
-    final hasPin = getVaultPin() != null;
-    return _prefs?.getBool(keyVaultLocked) ?? hasPin;
+    final hasPin = getVaultPin(uid: uid) != null;
+    final key = _vaultLockedKey(uid);
+    return _prefs?.getBool(key) ?? _prefs?.getBool(keyVaultLocked) ?? hasPin;
   }
 
-  Future<void> setVaultLocked(bool locked) async {
+  Future<void> setVaultLocked(bool locked, {String? uid}) async {
+    final key = _vaultLockedKey(uid);
+    await _prefs?.setBool(key, locked);
     await _prefs?.setBool(keyVaultLocked, locked);
   }
 
@@ -369,4 +402,14 @@ class PreferencesService {
 
   bool isWidgetShowBudget() => _prefs?.getBool(keyWidgetShowBudget) ?? true;
   Future<void> setWidgetShowBudget(bool show) async => _prefs?.setBool(keyWidgetShowBudget, show);
+
+  // --- Notifications Center Unread Tracking & History ---
+  static const String keyLastReadNotificationsAt = 'notifications_last_read_timestamp';
+  int getLastReadNotificationsAt() => _prefs?.getInt(keyLastReadNotificationsAt) ?? 0;
+  Future<void> setLastReadNotificationsAt(int timestamp) async => _prefs?.setInt(keyLastReadNotificationsAt, timestamp);
+
+  static const String keyNotificationHistoryList = 'notification_history_json_list';
+  List<String> getNotificationHistory() => _prefs?.getStringList(keyNotificationHistoryList) ?? [];
+  Future<void> saveNotificationHistory(List<String> items) async => _prefs?.setStringList(keyNotificationHistoryList, items);
+  Future<void> clearNotificationHistory() async => _prefs?.remove(keyNotificationHistoryList);
 }

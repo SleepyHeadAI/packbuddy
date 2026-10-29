@@ -6,6 +6,7 @@ import '../../domain/packing_item.dart';
 import '../../domain/packing_templates.dart';
 import '../../domain/airline_baggage_guide.dart';
 import '../../domain/canonical_packing_catalog.dart';
+import '../../../auth/auth_controller.dart';
 
 /// State of the Checklist & Luggage system
 class ChecklistState {
@@ -465,19 +466,23 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
 
   /// Adds a new packing item
   Future<void> addItem(PackingItem item) async {
-    final newItems = [item, ...state.items];
+    final currentUid = _ref?.read(authUserProvider)?.uid ?? '';
+    final itemToSave = (item.userId.isEmpty && currentUid.isNotEmpty)
+        ? item.copyWith(userId: currentUid)
+        : item;
+    final newItems = [itemToSave, ...state.items];
     state = state.copyWith(items: newItems);
 
     try {
-      await _db.insertChecklistItem(item);
+      await _db.insertChecklistItem(itemToSave);
       _triggerSync();
       TelemetryService.instance.logChecklistAction(
         action: 'add',
-        category: item.category,
+        category: itemToSave.category,
         itemCount: 1,
       );
     } catch (e) {
-      newItems.removeWhere((i) => i.id == item.id);
+      newItems.removeWhere((i) => i.id == itemToSave.id);
       state = state.copyWith(items: newItems, errorMessage: 'Eşya eklenemedi: $e');
     }
   }
@@ -485,10 +490,14 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
   /// Bulk adds packing items (e.g. from a Smart Template)
   Future<void> addItems(List<PackingItem> items) async {
     if (items.isEmpty) return;
+    final currentUid = _ref?.read(authUserProvider)?.uid ?? '';
 
     for (final item in items) {
       try {
-        await _db.insertChecklistItem(item);
+        final itemToSave = (item.userId.isEmpty && currentUid.isNotEmpty)
+            ? item.copyWith(userId: currentUid)
+            : item;
+        await _db.insertChecklistItem(itemToSave);
       } catch (e) {
         // Continue adding
       }

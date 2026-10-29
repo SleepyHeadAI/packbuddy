@@ -313,7 +313,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get viewAll => '查看全部';
 
   @override
-  String get allNotificationsUpToDate => '所有旅行提醒均为最新！';
+  String get allNotificationsUpToDate => '所有通知均已是最新状态。';
 
   @override
   String get createFirstTrip => '立即创建您的第一条行程与预算。';
@@ -1641,4 +1641,321 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get confirm => '确认';
+
+  @override
+  String get vaultBiometricReason => '验证指纹或面容以解锁旅行保险箱';
+
+  @override
+  String get biometricsFailed => '生物识别验证失败或已取消。';
+
+  @override
+  String get customBaggageLimitPrompt => '设置自定义限制 (kg)';
+
+  @override
+  String get testNotificationSent => '测试通知已发送至您的设备。';
+
+  @override
+  String get pinWidgetSuccess => '小组件已添加到主屏幕。';
+
+  @override
+  String get pinWidgetGuide => '长按主屏幕并选择 小组件 > PackBuddy 添加。';
+
+  @override
+  String scheduledRemindersCount(int count) {
+    return '已安排 $count 个行程提醒';
+  }
+
+  @override
+  String get packingRemindersScheduled48h => '出发前48小时：已安排智能打包提醒';
+
+  @override
+  String get packingRemindersScheduled24h => '出发前24小时：已安排最终物品核查提醒';
+
+  @override
+  String get testNotificationAction => '测试通知';
+
+  @override
+  String get noUpcomingRemindersDesc => '添加行程后，出发前的准备提醒将显示在此处。';
+
+  @override
+  String get clearAll => '清除全部';
+
+  @override
+  String get notificationHistory => '通知历史';
+
+  @override
+  String get upcomingReminders => '即将到来的提醒';
+
+  @override
+  String daysRemaining(int days) {
+    return '还剩 $days 天';
+  }
+
+  @override
+  String get today => '今天';
+
+  @override
+  String get biometricUnlock => '生物识别解锁';
+
+  @override
+  String get biometricUnlockSubtitle => '使用指纹或面容ID解锁凭证保管库';
+
+  @override
+  String get setPinFirstToEnableBiometrics => '请先设置PIN码以启用生物识别';
+
+  @override
+  String get passportSummaryShared => '护照摘要已准备好分享！';
+
+  @override
+  String get sharePassportTooltip => '分享护照';
+
+  @override
+  String get visitedCountryStatus => '您已到访过该国家';
+
+  @override
+  String get worldTravelMapTitle => '我的世界旅行地图';
+
+  @override
+  String get worldTravelMapSubtitle => '点亮去过的和想去的国家';
+
+  @override
+  String worldTravelMapStats(int visited, int wishlist, String percentage) {
+    return '$visited 已到访 • $wishlist 想去 • %$percentage 已探索';
+  }
+
+  @override
+  String get mapLegendBeen => '去过';
+
+  @override
+  String get mapLegendWant => '想去';
+
+  @override
+  String get mapLegendUnvisited => '未去过';
+
+  @override
+  String get mapLegendVisitedCity => '去过的城市';
+
+  @override
+  String get mapLegendWishlistCity => '想去的城市';
+
+  @override
+  String get mapLegendCapital => '首都';
+
+  @override
+  String get zoomIn => '放大';
+
+  @override
+  String get zoomOut => '缩小';
+
+  @override
+  String get resetZoom => '重置';
+
+  @override
+  String get countriesTab => '国家';
+
+  @override
+  String get citiesTab => '城市';
+
+  @override
+  String get searchCountryOrCapital => '搜索国家或首都（例如意大利、日本）...';
+
+  @override
+  String get basedOnUnCountries => '基于 195 个联合国成员国';
+
+  @override
+  String get countriesAndTerritories => '国家与地区';
+
+  @override
+  String get visitedStat => '已到访';
+
+  @override
+  String get countryUnit => '国家';
+
+  @override
+  String moreCountries(int count) {
+    return '+ 另外 $count 个国家';
+  }
+
+  @override
+  String get tripsUnit => '趟旅行';
+
+  @override
+  String get citiesUnit => '座城市';
+
+  @override
+  String get continentsUnit => '大洲';
+
+  @override
+  String get ofTheWorld => '全球';
+
+  @override
+  String get daysUnit => '天';
+
+  @override
+  String get allFilter => '全部';
+
+  @override
+  String get visitedFilter => '已去过';
+
+  @override
+  String get wishlistFilter => '想去清单';
+
+  @override
+  String get continentEurope => '欧洲';
+
+  @override
+  String get continentAsia => '亚洲';
+
+  @override
+  String get continentAmericas => '美洲';
+
+  @override
+  String get continentAfrica => '非洲';
+
+  @override
+  String get continentOceania => '大洋洲';
+
+  @override
+  String get markAsVisitedTooltip => '标记为已去过';
+
+  @override
+  String get markAsWishlistTooltip => '标记为想去';
+
+  @override
+  String get visitDateLabel => '到访日期';
+
+  @override
+  String get coordinatesLabel => '坐标';
+
+  @override
+  String airlineSelectedMessage(String airline, String limit) {
+    return '已选择 $airline ($limit kg)。';
+  }
+
+  @override
+  String amountCopied(String amount) {
+    return '$amount 已复制！';
+  }
+
+  @override
+  String noticeMessage(String error) {
+    return '提示：$error';
+  }
+
+  @override
+  String get collaboratorEmailOrNameHint => '例如 alex@example.com / 姓名';
+
+  @override
+  String get tripCodePlaceholder => '例如 PB-A1B2C';
+
+  @override
+  String get authAppleSignInComingSoon => '通过 Apple 登录功能目前尚未启用，即将推出。';
+
+  @override
+  String get proStoreComingSoonTitle => 'PackBuddy Pro 即将推出';
+
+  @override
+  String get proStoreComingSoonDesc =>
+      'PackBuddy Pro 商店订阅功能目前尚未启用，即将登陆 Google Play 和 App Store。';
+
+  @override
+  String planTripToCountry(String country) {
+    return '规划前往$country的行程';
+  }
+
+  @override
+  String get noVisitedCountriesYet => '尚未标记任何去过的国家。点击地图或下方列表中的国家即可涂色！';
+
+  @override
+  String get navMap => '地图';
+
+  @override
+  String get mapLegendLived => '居住过';
+
+  @override
+  String get livedFilter => '居住过';
+
+  @override
+  String get markAsLivedTooltip => '标记为曾居住的国家';
+
+  @override
+  String get livedCountryStatus => '你曾在这个国家居住过';
+
+  @override
+  String get shareStory => '分享到快拍';
+
+  @override
+  String get shareStorySubtitle => '分享到 Instagram、Snapchat 或与朋友分享';
+
+  @override
+  String get shareStoryPreview => '快拍预览';
+
+  @override
+  String get generatingStoryImage => '正在生成快拍图片...';
+
+  @override
+  String get storyCardTagline => '我的世界旅行地图';
+
+  @override
+  String get storyWatermark => '用 PackBuddy 探索世界';
+
+  @override
+  String get shareImageButton => '分享为快拍';
+
+  @override
+  String get shareTextButton => '分享为文字';
+
+  @override
+  String get globe3D => '3D地球仪';
+
+  @override
+  String get globeRotateHint => '拖动以旋转 • 轻触';
+
+  @override
+  String get cyprusRegion => '塞浦路斯地区';
+
+  @override
+  String get storyThemeMidnight => '午夜';
+
+  @override
+  String get storyThemeSunset => '日落';
+
+  @override
+  String get storyThemeAtlas => '地图集';
+
+  @override
+  String get storyThemeMinimal => '极简';
+
+  @override
+  String get storyThemeDune => '沙丘';
+
+  @override
+  String get storyThemeOcean => '海洋';
+
+  @override
+  String get addWidgetToHomeScreen => '将小组件添加到主屏幕';
+
+  @override
+  String get pdfError => 'PDF错误';
+
+  @override
+  String get storyLayoutShowcase => '橱窗';
+
+  @override
+  String get passportEntryVisas => '入境签证与盖章';
+
+  @override
+  String get passportOfficialDocument => '官方旅行护照';
+
+  @override
+  String get storyLayoutMinimal => '简约';
+
+  @override
+  String get passportWorldCitizen => '世界公民';
+
+  @override
+  String get storyLayoutPassport => '护照';
+
+  @override
+  String get storyLayoutClassic => '经典';
 }

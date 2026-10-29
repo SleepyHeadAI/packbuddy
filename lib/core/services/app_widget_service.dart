@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/budget/domain/trip.dart';
 import '../../features/budget/domain/expense.dart';
@@ -73,6 +74,18 @@ class AppWidgetService {
 
       if (upcomingTrip == null) {
         await prefs.remove(keyWidgetPayload);
+        try {
+          await HomeWidget.saveWidgetData<String>('trip_title', 'PackBuddy');
+          await HomeWidget.saveWidgetData<String>('trip_destination', '');
+          await HomeWidget.saveWidgetData<int>('trip_days', 0);
+          await HomeWidget.saveWidgetData<String>('trip_packing', '0/0');
+          await HomeWidget.saveWidgetData<String>('trip_budget', '');
+          await HomeWidget.updateWidget(
+            name: 'PackBuddyWidgetProvider',
+            androidName: 'PackBuddyWidgetProvider',
+            iOSName: 'PackBuddyWidget',
+          );
+        } catch (_) {}
         return;
       }
 
@@ -110,6 +123,20 @@ class AppWidgetService {
       );
 
       await prefs.setString(keyWidgetPayload, jsonEncode(payload.toJson()));
+
+      // Synchronize with Native Home Screen Widget (Android AppWidget & iOS WidgetKit)
+      try {
+        await HomeWidget.saveWidgetData<String>('trip_title', payload.tripTitle ?? '');
+        await HomeWidget.saveWidgetData<String>('trip_destination', payload.destination ?? '');
+        await HomeWidget.saveWidgetData<int>('trip_days', payload.daysUntil);
+        await HomeWidget.saveWidgetData<String>('trip_packing', '${payload.packedItems}/${payload.totalItems}');
+        await HomeWidget.saveWidgetData<String>('trip_budget', payload.budgetSpent ?? '');
+        await HomeWidget.updateWidget(
+          name: 'PackBuddyWidgetProvider',
+          androidName: 'PackBuddyWidgetProvider',
+          iOSName: 'PackBuddyWidget',
+        );
+      } catch (_) {}
     } catch (_) {}
   }
 

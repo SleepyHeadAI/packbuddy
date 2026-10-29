@@ -13,6 +13,7 @@ import 'package:packbuddy/features/budget/presentation/screens/trip_comparison_s
 import 'package:packbuddy/features/budget/presentation/screens/widgets/add_trip_sheet.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/share_trip_sheet.dart';
 import 'package:packbuddy/features/budget/presentation/widgets/trip_map_preview.dart';
+import 'package:packbuddy/features/travel_map/presentation/screens/travel_map_screen.dart';
 import 'package:packbuddy/shared/widgets/app_animations.dart';
 
 /// Trips Overview Screen listing upcoming and past trips
@@ -152,6 +153,15 @@ class TripsScreen extends ConsumerWidget {
             },
           ),
           actions: [
+            IconButton(
+              icon: const Icon(Icons.public_rounded),
+              tooltip: l10n.tripMap,
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const TravelMapScreen()),
+                );
+              },
+            ),
             IconButton(
               icon: const Icon(Icons.compare_arrows_rounded),
               tooltip: l10n.compareTrips,
@@ -495,7 +505,18 @@ class TripsScreen extends ConsumerWidget {
                                       icon: const Icon(Icons.map_rounded, size: 18),
                                       tooltip: l10n.tripMap,
                                       visualDensity: VisualDensity.compact,
-                                      onPressed: () => TripMapSheet.show(context, trip: trip),
+                                      onPressed: () => TripMapSheet.show(
+                                        context,
+                                        trip: trip,
+                                        initialWaypoints: trip.waypoints,
+                                        onWaypointsChanged: (newWaypoints) {
+                                          final updated = trip.copyWith(
+                                            waypoints: newWaypoints,
+                                            updatedAt: DateTime.now(),
+                                          );
+                                          ref.read(tripControllerProvider.notifier).updateTrip(updated);
+                                        },
+                                      ),
                                     ),
                                   ],
                                 ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:packbuddy/core/services/biometric_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import '../../controllers/vault_controller.dart';
@@ -16,6 +17,51 @@ class VaultLockView extends ConsumerStatefulWidget {
 class _VaultLockViewState extends ConsumerState<VaultLockView> {
   String _enteredPin = '';
   bool _isError = false;
+  bool _canCheckBiometrics = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkBiometrics();
+  }
+
+  Future<void> _checkBiometrics() async {
+    final available = await BiometricService.instance.isBiometricsAvailable();
+    if (mounted) {
+      setState(() => _canCheckBiometrics = available);
+      final vaultState = ref.read(vaultControllerProvider);
+      if (available && vaultState.isBiometricEnabled && vaultState.hasPin) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && ref.read(vaultControllerProvider).isLocked) {
+            _triggerBiometricAuth();
+          }
+        });
+      }
+    }
+  }
+
+  Future<void> _triggerBiometricAuth() async {
+    HapticFeedback.mediumImpact();
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final reason = l10n?.vaultBiometricReason ??
+        'Kasanın kilidini açmak için parmak izinizi doğrulayın';
+    final failMsg = l10n?.biometricsFailed ??
+        'Biyometrik doğrulama başarısız oldu veya iptal edildi.';
+    final success = await ref
+        .read(vaultControllerProvider.notifier)
+        .authenticateWithBiometrics(reason: reason);
+    if (!success && mounted) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(failMsg),
+          backgroundColor: AppColors.errorPastel,
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
 
   void _onDigitPressed(String digit) {
     if (_enteredPin.length < 4) {
@@ -224,13 +270,13 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         // Biometric / FaceID trigger
-                        _buildActionButton(
-                          icon: Icons.fingerprint_rounded,
-                          onTap: () {
-                            HapticFeedback.mediumImpact();
-                            ref.read(vaultControllerProvider.notifier).authenticateWithBiometrics();
-                          },
-                        ),
+                        if (_canCheckBiometrics && vaultState.isBiometricEnabled)
+                          _buildActionButton(
+                            icon: Icons.fingerprint_rounded,
+                            onTap: _triggerBiometricAuth,
+                          )
+                        else
+                          const SizedBox(width: 68, height: 68),
                         _buildNumberKey('0'),
                         // Backspace
                         _buildActionButton(

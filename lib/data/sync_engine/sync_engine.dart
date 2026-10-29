@@ -20,6 +20,9 @@ import '../../core/services/currency_service.dart';
 import '../../core/services/preferences_service.dart';
 import '../../features/auth/auth_controller.dart';
 import '../../features/settings/data/mock_revenuecat_service.dart';
+import '../../features/vault/presentation/controllers/vault_controller.dart';
+import '../../features/travel_map/data/travel_map_service.dart';
+import '../../features/travel_map/presentation/controllers/travel_map_controller.dart';
 
 /// Sync Status enumeration for UI and State Management
 enum SyncStatus {
@@ -222,23 +225,44 @@ class SyncEngine extends StateNotifier<SyncState> {
         }, SetOptions(merge: true));
       } catch (_) {}
 
-      // Remote Pro Status Sync: Fetch users/{uid} and synchronize isPremium
+      // Remote Pro Status Sync: Fetch users/{uid} and synchronize isPremium without demoting active local Pro
       try {
         final userDoc = await firestore.collection('users').doc(uid).get();
+        final localIsPro = PreferencesService.instance.isProUser(uid: uid) ||
+            PreferencesService.instance.isProUser();
+        bool effectiveIsPro = localIsPro;
         if (userDoc.exists && userDoc.data() != null) {
           final userData = userDoc.data()!;
           if (userData.containsKey('isPremium')) {
             final remoteIsPro = userData['isPremium'] == true;
-            await PreferencesService.instance.setProUser(remoteIsPro, uid: uid);
-            onProStatusSynced?.call(remoteIsPro);
-            final r = ref;
-            if (r != null) {
-              r.read(proSubscriptionProvider.notifier).updateProStatus(remoteIsPro, uid: uid);
-            }
+            effectiveIsPro = remoteIsPro || localIsPro;
           }
+          if (userData.containsKey('vaultPin')) {
+            final remotePin = userData['vaultPin'] as String?;
+            await PreferencesService.instance.setVaultPin(remotePin, uid: uid);
+          }
+          if (userData.containsKey('vaultBiometricEnabled')) {
+            final remoteBio = userData['vaultBiometricEnabled'] == true;
+            await PreferencesService.instance.setVaultBiometricEnabled(remoteBio, uid: uid);
+          }
+        }
+        await PreferencesService.instance.setProUser(effectiveIsPro, uid: uid);
+        onProStatusSynced?.call(effectiveIsPro);
+        final r = ref;
+        if (r != null) {
+          r.read(proSubscriptionProvider.notifier).updateProStatus(effectiveIsPro, uid: uid);
+          r.read(vaultControllerProvider.notifier).refreshSecurityState();
         }
       } catch (e) {
         debugPrint('[SyncEngine] Pro status sync notice: $e');
+      }
+
+      // World Travel Map Two-Way Cloud Sync
+      try {
+        await TravelMapService.instance.syncWithCloud(uid: uid);
+        ref?.read(travelMapControllerProvider.notifier).loadCountries(userId: uid);
+      } catch (e) {
+        debugPrint('[SyncEngine] Travel map sync in performSync notice: $e');
       }
 
       int processedItems = 0;
@@ -424,7 +448,7 @@ class SyncEngine extends StateNotifier<SyncState> {
       // Multi-tenant & Delta Sync with WriteBatch & SQLite Transactions
       // ===================================================================
 
-      // 2.1 Reconcile Trips with Delta Sync & LWW
+      // 2.1 Reconcile Trips with Delta Sync & LWW (Owner trips + Shared collaborative trips)
       Query<Map<String, dynamic>> tripsQuery = firestore
           .collection('trips')
           .where('user_id', isEqualTo: uid);
@@ -438,6 +462,19 @@ class SyncEngine extends StateNotifier<SyncState> {
           remoteTripsMap[doc.id] = Trip.fromJson(doc.data());
         } catch (_) {}
       }
+
+      // Also pull collaborative trips where user is a participant
+      try {
+        final collabSnap = await firestore
+            .collection('trips')
+            .where('collaborators', arrayContains: uid)
+            .get();
+        for (final doc in collabSnap.docs) {
+          try {
+            remoteTripsMap[doc.id] = Trip.fromJson(doc.data());
+          } catch (_) {}
+        }
+      } catch (_) {}
 
       final localTrips = await _dbHelper.getTrips(userId: uid, includeDeleted: false);
       final localTripsMap = <String, Trip>{for (final t in localTrips) t.id: t};

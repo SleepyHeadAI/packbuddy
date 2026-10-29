@@ -123,7 +123,7 @@ void main() {
       expect(props['email'], 'traveler@packbuddy.app');
       expect(props['name'], 'Pack Traveler');
       expect(props['is_pro'], true);
-      expect(props['project_id'], 305038);
+      expect(props['project_id'], anyOf(equals(0), equals(305038)));
       expect(props['total_storage_bytes'], 1048576);
       expect(props['locale'], 'tr');
 

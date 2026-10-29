@@ -317,7 +317,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get viewAll => 'Alles Bekijken';
 
   @override
-  String get allNotificationsUpToDate => 'Alle reismeldingen zijn up-to-date!';
+  String get allNotificationsUpToDate => 'Alle meldingen zijn up-to-date.';
 
   @override
   String get createFirstTrip => 'Maak nu je eerste route en budget aan.';
@@ -1712,4 +1712,333 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get confirm => 'Bevestigen';
+
+  @override
+  String get vaultBiometricReason =>
+      'Verifieer uw vingerafdruk of gezicht om uw reissluis te ontgrendelen';
+
+  @override
+  String get biometricsFailed =>
+      'Biometrische verificatie mislukt of geannuleerd.';
+
+  @override
+  String get customBaggageLimitPrompt => 'Aangepaste limiet instellen (kg)';
+
+  @override
+  String get testNotificationSent => 'Testmelding verzonden naar uw apparaat.';
+
+  @override
+  String get pinWidgetSuccess => 'Widget toegevoegd aan het startscherm.';
+
+  @override
+  String get pinWidgetGuide =>
+      'Houd het startscherm ingedrukt en kies Widgets > PackBuddy.';
+
+  @override
+  String scheduledRemindersCount(int count) {
+    return '$count geplande reisherinneringen';
+  }
+
+  @override
+  String get packingRemindersScheduled48h =>
+      '48 uur van tevoren: Slimme inpakherinnering gepland';
+
+  @override
+  String get packingRemindersScheduled24h =>
+      '24 uur van tevoren: Laatste controle herinnering gepland';
+
+  @override
+  String get testNotificationAction => 'Meldingen testen';
+
+  @override
+  String get noUpcomingRemindersDesc =>
+      'Als u een reis toevoegt, verschijnen herinneringen hier.';
+
+  @override
+  String get clearAll => 'Alles wissen';
+
+  @override
+  String get notificationHistory => 'Meldingsgeschiedenis';
+
+  @override
+  String get upcomingReminders => 'Aankomende herinneringen';
+
+  @override
+  String daysRemaining(int days) {
+    return 'Nog $days dagen';
+  }
+
+  @override
+  String get today => 'Vandaag';
+
+  @override
+  String get biometricUnlock => 'Biometrische ontgrendeling';
+
+  @override
+  String get biometricUnlockSubtitle =>
+      'Kluis ontgrendelen met vingerafdruk of Face ID';
+
+  @override
+  String get setPinFirstToEnableBiometrics =>
+      'Stel eerst een pincode in om biometrie in te schakelen';
+
+  @override
+  String get passportSummaryShared => 'Paspoortoverzicht klaar om te delen!';
+
+  @override
+  String get sharePassportTooltip => 'Paspoort delen';
+
+  @override
+  String get visitedCountryStatus => 'Je hebt dit land bezocht';
+
+  @override
+  String get worldTravelMapTitle => 'Mijn wereldreiskaart';
+
+  @override
+  String get worldTravelMapSubtitle => 'Kleur bezochte en gewenste landen in';
+
+  @override
+  String worldTravelMapStats(int visited, int wishlist, String percentage) {
+    return '$visited Bezocht • $wishlist Wensenlijst • %$percentage Ontdekt';
+  }
+
+  @override
+  String get mapLegendBeen => 'Bezocht';
+
+  @override
+  String get mapLegendWant => 'Wensenlijst';
+
+  @override
+  String get mapLegendUnvisited => 'Niet bezocht';
+
+  @override
+  String get mapLegendVisitedCity => 'Bezochte stad';
+
+  @override
+  String get mapLegendWishlistCity => 'Wensstad';
+
+  @override
+  String get mapLegendCapital => 'Hoofdstad';
+
+  @override
+  String get zoomIn => 'Inzoomen';
+
+  @override
+  String get zoomOut => 'Uitzoomen';
+
+  @override
+  String get resetZoom => 'Herstellen';
+
+  @override
+  String get countriesTab => 'Landen';
+
+  @override
+  String get citiesTab => 'Steden';
+
+  @override
+  String get searchCountryOrCapital =>
+      'Zoek land of hoofdstad (bijv. Italië, Japan)...';
+
+  @override
+  String get basedOnUnCountries => 'Gebaseerd op 195 VN-landen';
+
+  @override
+  String get countriesAndTerritories => 'Landen & Gebieden';
+
+  @override
+  String get visitedStat => 'bezocht';
+
+  @override
+  String get countryUnit => 'landen';
+
+  @override
+  String moreCountries(int count) {
+    return '+ nog $count landen';
+  }
+
+  @override
+  String get tripsUnit => 'reizen';
+
+  @override
+  String get citiesUnit => 'steden';
+
+  @override
+  String get continentsUnit => 'continenten';
+
+  @override
+  String get ofTheWorld => 'van de wereld';
+
+  @override
+  String get daysUnit => 'dagen';
+
+  @override
+  String get allFilter => 'Alle';
+
+  @override
+  String get visitedFilter => 'Bezocht';
+
+  @override
+  String get wishlistFilter => 'Wensenlijst';
+
+  @override
+  String get continentEurope => 'Europa';
+
+  @override
+  String get continentAsia => 'Azië';
+
+  @override
+  String get continentAmericas => 'Amerika';
+
+  @override
+  String get continentAfrica => 'Afrika';
+
+  @override
+  String get continentOceania => 'Oceanië';
+
+  @override
+  String get markAsVisitedTooltip => 'Markeer als bezocht';
+
+  @override
+  String get markAsWishlistTooltip => 'Markeer als wens';
+
+  @override
+  String get visitDateLabel => 'Bezoeksdatum';
+
+  @override
+  String get coordinatesLabel => 'Coördinaten';
+
+  @override
+  String airlineSelectedMessage(String airline, String limit) {
+    return '$airline ($limit kg) geselecteerd.';
+  }
+
+  @override
+  String amountCopied(String amount) {
+    return '$amount gekopieerd!';
+  }
+
+  @override
+  String noticeMessage(String error) {
+    return 'Kennisgeving: $error';
+  }
+
+  @override
+  String get collaboratorEmailOrNameHint => 'bijv. alex@example.com / Naam';
+
+  @override
+  String get tripCodePlaceholder => 'bijv. PB-A1B2C';
+
+  @override
+  String get authAppleSignInComingSoon =>
+      'Inloggen met Apple is momenteel niet actief. Het zal zeer binnenkort beschikbaar zijn.';
+
+  @override
+  String get proStoreComingSoonTitle => 'PackBuddy Pro binnenkort beschikbaar';
+
+  @override
+  String get proStoreComingSoonDesc =>
+      'PackBuddy Pro-winkelabonnementen zijn momenteel niet actief. Ze zullen zeer binnenkort beschikbaar zijn in Google Play en de App Store.';
+
+  @override
+  String planTripToCountry(String country) {
+    return 'Reis naar $country plannen';
+  }
+
+  @override
+  String get noVisitedCountriesYet =>
+      'Nog geen bezochte landen gemarkeerd. Tik op landen op de kaart of lijst hieronder om ze in te kleuren!';
+
+  @override
+  String get navMap => 'Kaart';
+
+  @override
+  String get mapLegendLived => 'Geleefd';
+
+  @override
+  String get livedFilter => 'Geleefd';
+
+  @override
+  String get markAsLivedTooltip => 'Markeren als gewoond land';
+
+  @override
+  String get livedCountryStatus => 'U hebt in dit land gewoond';
+
+  @override
+  String get shareStory => 'Deel in Verhaal';
+
+  @override
+  String get shareStorySubtitle =>
+      'Deel op Instagram, Snapchat of met vrienden';
+
+  @override
+  String get shareStoryPreview => 'Verhaal Voorvertoning';
+
+  @override
+  String get generatingStoryImage => 'Verhaalafbeelding genereren...';
+
+  @override
+  String get storyCardTagline => 'Mijn Wereldreiskaart';
+
+  @override
+  String get storyWatermark => 'Ontdekt met PackBuddy';
+
+  @override
+  String get shareImageButton => 'Delen als Verhaal';
+
+  @override
+  String get shareTextButton => 'Delen als tekst';
+
+  @override
+  String get globe3D => '3D-wereldbol';
+
+  @override
+  String get globeRotateHint => 'Sleep om te draaien • Tik';
+
+  @override
+  String get cyprusRegion => 'Regio Cyprus';
+
+  @override
+  String get storyThemeMidnight => 'Middernacht';
+
+  @override
+  String get storyThemeSunset => 'Zonsondergang';
+
+  @override
+  String get storyThemeAtlas => 'Atlas';
+
+  @override
+  String get storyThemeMinimal => 'Minimaal';
+
+  @override
+  String get storyThemeDune => 'Duin';
+
+  @override
+  String get storyThemeOcean => 'Oceaan';
+
+  @override
+  String get addWidgetToHomeScreen => 'Widget toevoegen aan startscherm';
+
+  @override
+  String get pdfError => 'PDF-fout';
+
+  @override
+  String get storyLayoutShowcase => 'Vitrine';
+
+  @override
+  String get passportEntryVisas => 'Inreisvisa & stempels';
+
+  @override
+  String get passportOfficialDocument => 'Officieel reispaspoort';
+
+  @override
+  String get storyLayoutMinimal => 'Minimaal';
+
+  @override
+  String get passportWorldCitizen => 'Wereldburger';
+
+  @override
+  String get storyLayoutPassport => 'Paspoort';
+
+  @override
+  String get storyLayoutClassic => 'Klassiek';
 }

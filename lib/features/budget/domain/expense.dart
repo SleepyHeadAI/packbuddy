@@ -72,18 +72,25 @@ class Expense {
     return {
       'id': id,
       'userId': userId,
+      'user_id': userId,
       'tripId': tripId,
+      'trip_id': tripId,
       'title': title,
       'amount': amount,
       'currency': currency,
       'category': category,
       'date': date.toIso8601String(),
       'receiptPath': receiptPath,
+      'receipt_path': receiptPath,
       'paymentMethod': paymentMethod,
+      'payment_method': paymentMethod,
       'notes': notes,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'created_at': createdAt.millisecondsSinceEpoch,
+      'updated_at': updatedAt.millisecondsSinceEpoch,
       'isDeleted': isDeleted,
+      'is_deleted': isDeleted ? 1 : 0,
     };
   }
 

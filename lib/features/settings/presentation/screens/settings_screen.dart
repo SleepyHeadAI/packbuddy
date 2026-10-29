@@ -16,6 +16,7 @@ import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/admin/admin_service.dart';
 import 'package:packbuddy/features/admin/admin_dashboard_screen.dart';
 import 'package:packbuddy/features/settings/presentation/screens/widgets/home_widget_preview_card.dart';
+import 'package:packbuddy/core/services/biometric_service.dart';
 import 'package:packbuddy/features/onboarding/presentation/screens/onboarding_screen.dart';
 
 /// Complete Settings screen handling Language, Theme, Sync, and PackBuddy Pro
@@ -254,7 +255,15 @@ class SettingsScreen extends ConsumerWidget {
             child: Material(
               color: Colors.transparent,
               child: SwitchListTile.adaptive(
+                key: const Key('packing_reminders_switch_tile'),
                 contentPadding: EdgeInsets.zero,
+                activeThumbColor: theme.colorScheme.primary,
+                thumbIcon: WidgetStateProperty.resolveWith<Icon?>((Set<WidgetState> states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return const Icon(Icons.check, size: 14, color: Colors.white);
+                  }
+                  return const Icon(Icons.close, size: 14, color: Colors.grey);
+                }),
                 secondary: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
@@ -298,37 +307,118 @@ class SettingsScreen extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Material(
               color: Colors.transparent,
-              child: ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: vaultState.hasPin
-                      ? AppColors.successPastel.withValues(alpha: 0.15)
-                      : theme.colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  vaultState.hasPin ? Icons.lock_rounded : Icons.lock_open_rounded,
-                  color: vaultState.hasPin ? AppColors.successPastel : theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              title: Text(
-                l10n.vaultPinProtection,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-              subtitle: Text(
-                vaultState.hasPin ? l10n.pinProtectionActive : l10n.unprotectedSetPin,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              trailing: TextButton(
-                onPressed: () => _showPinDialog(context, ref, vaultState.hasPin),
-                child: Text(vaultState.hasPin ? l10n.change : l10n.setup),
+              child: Column(
+                children: [
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: vaultState.hasPin
+                            ? AppColors.successPastel.withValues(alpha: 0.15)
+                            : theme.colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        vaultState.hasPin ? Icons.lock_rounded : Icons.lock_open_rounded,
+                        color: vaultState.hasPin ? AppColors.successPastel : theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    title: Text(
+                      l10n.vaultPinProtection,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Text(
+                      vaultState.hasPin ? l10n.pinProtectionActive : l10n.unprotectedSetPin,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    trailing: TextButton(
+                      onPressed: () => _showPinDialog(context, ref, vaultState.hasPin),
+                      child: Text(vaultState.hasPin ? l10n.change : l10n.setup),
+                    ),
+                  ),
+                  Divider(
+                    height: 1,
+                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                  ),
+                  SwitchListTile.adaptive(
+                    key: const Key('biometric_unlock_switch_tile'),
+                    contentPadding: EdgeInsets.zero,
+                    activeThumbColor: AppColors.primaryLight,
+                    thumbIcon: WidgetStateProperty.resolveWith<Icon?>((Set<WidgetState> states) {
+                      if (states.contains(WidgetState.selected)) {
+                        return const Icon(Icons.check, size: 14, color: Colors.white);
+                      }
+                      return const Icon(Icons.close, size: 14, color: Colors.grey);
+                    }),
+                    secondary: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: (vaultState.isBiometricEnabled && vaultState.hasPin)
+                            ? AppColors.primaryLight.withValues(alpha: 0.15)
+                            : theme.colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.fingerprint_rounded,
+                        color: (vaultState.isBiometricEnabled && vaultState.hasPin)
+                            ? AppColors.primaryLight
+                            : theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    title: Text(
+                      l10n.biometricUnlock,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Text(
+                      !vaultState.hasPin
+                          ? l10n.setPinFirstToEnableBiometrics
+                          : l10n.biometricUnlockSubtitle,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    value: vaultState.isBiometricEnabled && vaultState.hasPin,
+                    onChanged: (enabled) async {
+                      if (!vaultState.hasPin) {
+                        _showPinDialog(context, ref, false);
+                        return;
+                      }
+                      if (enabled) {
+                        final available = await BiometricService.instance.isBiometricsAvailable();
+                        if (!available && context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(l10n.biometricsFailed),
+                              backgroundColor: AppColors.errorPastel,
+                            ),
+                          );
+                          return;
+                        }
+                        final authSuccess = await BiometricService.instance.authenticate(
+                          localizedReason: l10n.vaultBiometricReason,
+                        );
+                        if (authSuccess) {
+                          await ref.read(vaultControllerProvider.notifier).setBiometricEnabled(true);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(l10n.biometricUnlock),
+                                backgroundColor: AppColors.successPastel,
+                              ),
+                            );
+                          }
+                        }
+                      } else {
+                        await ref.read(vaultControllerProvider.notifier).setBiometricEnabled(false);
+                      }
+                    },
+                  ),
+                ],
               ),
             ),
-          ),
           ),
           const SizedBox(height: 24),
 

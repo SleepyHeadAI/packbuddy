@@ -149,7 +149,7 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
             ),
           ),
 
-          // Search Box & Custom Limit Quick Action
+          // Search Box
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
             child: TextField(
@@ -184,6 +184,74 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
             ),
           ),
 
+          // Custom Baggage Limit Quick Action
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.tune_rounded, size: 18, color: theme.colorScheme.primary),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: _customLimitController,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      style: const TextStyle(fontSize: 12.5),
+                      decoration: InputDecoration(
+                        isDense: true,
+                        hintText: l10n.customBaggageLimitPrompt,
+                        hintStyle: TextStyle(fontSize: 11.5, color: theme.colorScheme.onSurfaceVariant),
+                        suffixText: 'kg',
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(vertical: 6),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  FilledButton.tonal(
+                    onPressed: () {
+                      final val = double.tryParse(_customLimitController.text.trim());
+                      if (val != null && val > 0 && val <= 100) {
+                        final customRule = AirlineBaggageRule(
+                          airlineName: 'Özel Limit',
+                          iataCode: 'CUSTOM',
+                          countryFlag: '✈️',
+                          cabinLimitKg: 8.0,
+                          cabinDimensions: '55x40x20 cm',
+                          checkedLimitKg: val,
+                          notes: 'Özel belirlenen bagaj limiti.',
+                        );
+                        ref.read(checklistControllerProvider.notifier).selectAirline(customRule);
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${l10n.baggageLimitSet} ${val.toStringAsFixed(0)} kg'),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                        );
+                      }
+                    },
+                    style: FilledButton.styleFrom(
+                      visualDensity: VisualDensity.compact,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: Text(l10n.save, style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
           const SizedBox(height: 6),
           const Divider(height: 1),
 
@@ -199,17 +267,30 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
                 final isCurrent = selectedAirline != null &&
                     selectedAirline.iataCode == airline.iataCode;
 
-                return Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: isCurrent
-                          ? theme.colorScheme.primary
-                          : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
-                      width: isCurrent ? 1.8 : 1,
-                    ),
+                return InkWell(
+                  onTap: () {
+                    ref.read(checklistControllerProvider.notifier).selectAirline(airline);
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(l10n.airlineSelectedMessage(airline.airlineName, '${airline.checkedLimitKg.toInt()}')),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(18),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: isCurrent
+                            ? theme.colorScheme.primary
+                            : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
+                        width: isCurrent ? 2 : 1,
+                      ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
@@ -268,6 +349,8 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
                               ),
                               child: Text(
                                 l10n.activeLimit,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700,
@@ -411,8 +494,9 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
                       ),
                     ],
                   ),
-                );
-              },
+                ),
+              );
+            },
             ),
           ),
         ],

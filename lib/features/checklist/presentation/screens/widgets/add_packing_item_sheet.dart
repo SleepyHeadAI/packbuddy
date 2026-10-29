@@ -113,6 +113,9 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
       case 'aksesuar':
       case 'accessories':
         return l10n.categoryAccessories;
+      case 'diğer':
+      case 'other':
+        return l10n.other;
       default:
         return cat;
     }

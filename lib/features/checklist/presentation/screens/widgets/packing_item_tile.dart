@@ -180,17 +180,44 @@ class PackingItemTile extends StatelessWidget {
                             child: child,
                           ),
                           child: item.isPacked
-                              ? Icon(
-                                  Icons.check_circle_rounded,
+                              ? Container(
                                   key: const ValueKey('packed'),
-                                  color: AppColors.successPastel,
-                                  size: 24,
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.successPastel,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.successPastel.withValues(alpha: 0.35),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(
+                                    Icons.check_rounded,
+                                    color: Colors.white,
+                                    size: 15,
+                                  ),
                                 )
-                              : Icon(
-                                  Icons.radio_button_unchecked_rounded,
+                              : Container(
                                   key: const ValueKey('unpacked'),
-                                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-                                  size: 24,
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: theme.colorScheme.outline.withValues(alpha: 0.7),
+                                      width: 1.8,
+                                    ),
+                                  ),
+                                  child: Icon(
+                                    Icons.check_rounded,
+                                    size: 14,
+                                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                                  ),
                                 ),
                         ),
                         onPressed: () {

@@ -320,7 +320,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get viewAll => 'Tümünü Gör';
 
   @override
-  String get allNotificationsUpToDate => 'Tüm seyahat bildirimleriniz güncel!';
+  String get allNotificationsUpToDate => 'Tüm bildirimleriniz güncel.';
 
   @override
   String get createFirstTrip => 'İlk rotanı ve bütçeni hemen oluştur.';
@@ -1715,4 +1715,335 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get confirm => 'Onayla';
+
+  @override
+  String get vaultBiometricReason =>
+      'Seyahat kasanızın kilidini açmak için parmak izinizi veya yüzünüzü doğrulayın';
+
+  @override
+  String get biometricsFailed =>
+      'Biyometrik doğrulama başarısız oldu veya iptal edildi.';
+
+  @override
+  String get customBaggageLimitPrompt => 'Özel limit belirle (kg)';
+
+  @override
+  String get testNotificationSent => 'Test bildirimi cihazınıza gönderildi.';
+
+  @override
+  String get pinWidgetSuccess => 'Araç takımı ana ekrana eklendi.';
+
+  @override
+  String get pinWidgetGuide =>
+      'Ana ekrana uzun basarak \"Araç Takımları (Widget)\" menüsünden PackBuddy\'yi ekleyebilirsiniz.';
+
+  @override
+  String scheduledRemindersCount(int count) {
+    return '$count planlanan seyahat hatırlatıcısı';
+  }
+
+  @override
+  String get packingRemindersScheduled48h =>
+      '48 saat önce: Akıllı valiz hazırlığı hatırlatıcısı planlandı';
+
+  @override
+  String get packingRemindersScheduled24h =>
+      '24 saat önce: Son eksik kontrolü hatırlatıcısı planlandı';
+
+  @override
+  String get testNotificationAction => 'Bildirimleri Test Et';
+
+  @override
+  String get noUpcomingRemindersDesc =>
+      'Yeni bir seyahat eklediğinizde yola çıkış öncesi valiz hazırlık hatırlatıcıları burada görünecektir.';
+
+  @override
+  String get clearAll => 'Tümünü Temizle';
+
+  @override
+  String get notificationHistory => 'Bildirim Geçmişi';
+
+  @override
+  String get upcomingReminders => 'Yaklaşan Hatırlatıcılar';
+
+  @override
+  String daysRemaining(int days) {
+    return '$days gün kaldı';
+  }
+
+  @override
+  String get today => 'Bugün';
+
+  @override
+  String get biometricUnlock => 'Biyometrik Kilit Açma';
+
+  @override
+  String get biometricUnlockSubtitle =>
+      'Kasa kilidini parmak izi veya Face ID ile açın';
+
+  @override
+  String get setPinFirstToEnableBiometrics =>
+      'Biyometriği etkinleştirmek için önce PIN oluşturun';
+
+  @override
+  String get passportSummaryShared => 'Pasaport özeti paylaşıma hazırlandı!';
+
+  @override
+  String get sharePassportTooltip => 'Pasaportu Paylaş';
+
+  @override
+  String get visitedCountryStatus => 'Bu ülkeyi ziyaret ettiniz';
+
+  @override
+  String get worldTravelMapTitle => 'Dünya Seyahat Haritam';
+
+  @override
+  String get worldTravelMapSubtitle =>
+      'Gezdiğin ve hedeflediğin ülkeleri renklendir';
+
+  @override
+  String worldTravelMapStats(int visited, int wishlist, String percentage) {
+    return '$visited Gezilen • $wishlist Hedef • %$percentage Keşfedildi';
+  }
+
+  @override
+  String get mapLegendBeen => 'Gezilen';
+
+  @override
+  String get mapLegendWant => 'Hedef';
+
+  @override
+  String get mapLegendUnvisited => 'Gezilmedi';
+
+  @override
+  String get mapLegendVisitedCity => 'Gezilen Şehir';
+
+  @override
+  String get mapLegendWishlistCity => 'Hedef Şehir';
+
+  @override
+  String get mapLegendCapital => 'Başkent';
+
+  @override
+  String get zoomIn => 'Yakınlaştır';
+
+  @override
+  String get zoomOut => 'Uzaklaştır';
+
+  @override
+  String get resetZoom => 'Sıfırla';
+
+  @override
+  String get countriesTab => 'Ülkeler';
+
+  @override
+  String get citiesTab => 'Şehirler';
+
+  @override
+  String get searchCountryOrCapital =>
+      'Ülke veya şehir ara (örn. İtalya, Japonya)...';
+
+  @override
+  String get basedOnUnCountries =>
+      '195 BM (Birleşmiş Milletler) ülkesi baz alınmıştır';
+
+  @override
+  String get countriesAndTerritories => 'Ülkeler & Bölgeler';
+
+  @override
+  String get visitedStat => 'Ziyaret Edildi';
+
+  @override
+  String get countryUnit => 'ülke';
+
+  @override
+  String moreCountries(int count) {
+    return '+ $count daha fazla ülke';
+  }
+
+  @override
+  String get tripsUnit => 'seyahat';
+
+  @override
+  String get citiesUnit => 'şehir';
+
+  @override
+  String get continentsUnit => 'kıta';
+
+  @override
+  String get ofTheWorld => 'dünya';
+
+  @override
+  String get daysUnit => 'gün';
+
+  @override
+  String get allFilter => 'Tümü';
+
+  @override
+  String get visitedFilter => 'Gezilenler';
+
+  @override
+  String get wishlistFilter => 'Hedefler';
+
+  @override
+  String get continentEurope => 'Avrupa';
+
+  @override
+  String get continentAsia => 'Asya';
+
+  @override
+  String get continentAmericas => 'Amerika';
+
+  @override
+  String get continentAfrica => 'Afrika';
+
+  @override
+  String get continentOceania => 'Okyanusya';
+
+  @override
+  String get markAsVisitedTooltip => 'Gezildi olarak işaretle';
+
+  @override
+  String get markAsWishlistTooltip => 'Hedef olarak işaretle';
+
+  @override
+  String get visitDateLabel => 'Ziyaret Tarihi';
+
+  @override
+  String get coordinatesLabel => 'Koordinatlar';
+
+  @override
+  String airlineSelectedMessage(String airline, String limit) {
+    return '$airline ($limit kg) seçildi.';
+  }
+
+  @override
+  String amountCopied(String amount) {
+    return '$amount kopyalandı!';
+  }
+
+  @override
+  String noticeMessage(String error) {
+    return 'Bildirim: $error';
+  }
+
+  @override
+  String get collaboratorEmailOrNameHint => 'örn. alex@example.com / İsim';
+
+  @override
+  String get tripCodePlaceholder => 'örn. PB-A1B2C';
+
+  @override
+  String get authAppleSignInComingSoon =>
+      'Apple ile Giriş Yap özelliği şu anda aktif değildir. Çok yakında kullanıma sunulacaktır.';
+
+  @override
+  String get proStoreComingSoonTitle => 'PackBuddy Pro Yakında Aktif';
+
+  @override
+  String get proStoreComingSoonDesc =>
+      'PackBuddy Pro mağaza abonelikleri şu anda aktif değildir. Çok yakında Google Play ve App Store üzerinden kullanıma sunulacaktır.';
+
+  @override
+  String planTripToCountry(String country) {
+    return '$country Seyahati Planla';
+  }
+
+  @override
+  String get noVisitedCountriesYet =>
+      'Henüz gezdiğin bir ülke işaretlemedin. Haritadan veya aşağıdaki listeden dokunarak hemen renklendir!';
+
+  @override
+  String get navMap => 'Harita';
+
+  @override
+  String get mapLegendLived => 'Yaşadığım';
+
+  @override
+  String get livedFilter => 'Yaşadıklarım';
+
+  @override
+  String get markAsLivedTooltip => 'Yaşadığım ülke olarak işaretle';
+
+  @override
+  String get livedCountryStatus => 'Bu ülkede yaşadınız';
+
+  @override
+  String get shareStory => 'Hikayede Paylaş';
+
+  @override
+  String get shareStorySubtitle =>
+      'Instagram, Snapchat veya arkadaşlarınla paylaş';
+
+  @override
+  String get shareStoryPreview => 'Hikaye Önizleme';
+
+  @override
+  String get generatingStoryImage => 'Hikaye görseli hazırlanıyor...';
+
+  @override
+  String get storyCardTagline => 'Dünya Seyahat Haritam';
+
+  @override
+  String get storyWatermark => 'PackBuddy ile keşfedildi';
+
+  @override
+  String get shareImageButton => 'Hikaye Olarak Paylaş';
+
+  @override
+  String get shareTextButton => 'Metin Olarak Paylaş';
+
+  @override
+  String get globe3D => '3D Küre';
+
+  @override
+  String get globeRotateHint => 'Döndürmek için kaydır • Dokun';
+
+  @override
+  String get cyprusRegion => 'Kıbrıs Bölgesi';
+
+  @override
+  String get storyThemeMidnight => 'Gece';
+
+  @override
+  String get storyThemeSunset => 'Gün Batımı';
+
+  @override
+  String get storyThemeAtlas => 'Atlas';
+
+  @override
+  String get storyThemeMinimal => 'Minimal';
+
+  @override
+  String get storyThemeDune => 'Kum';
+
+  @override
+  String get storyThemeOcean => 'Okyanus';
+
+  @override
+  String get addWidgetToHomeScreen => 'Ana Ekrana Widget Ekle';
+
+  @override
+  String get pdfError => 'PDF Hatası';
+
+  @override
+  String get storyLayoutShowcase => 'Vitrin';
+
+  @override
+  String get passportEntryVisas => 'Giriş Vizeleri ve Mühürler';
+
+  @override
+  String get passportOfficialDocument => 'Resmi Seyahat Pasaportu';
+
+  @override
+  String get storyLayoutMinimal => 'Minimal';
+
+  @override
+  String get passportWorldCitizen => 'Dünya Vatandaşı';
+
+  @override
+  String get storyLayoutPassport => 'Pasaport';
+
+  @override
+  String get storyLayoutClassic => 'Klasik';
 }

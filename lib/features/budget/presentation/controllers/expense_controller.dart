@@ -6,6 +6,7 @@ import '../../../../core/services/telemetry_service.dart';
 import '../../domain/expense.dart';
 import '../../../../core/services/currency_service.dart';
 import '../../../../core/services/preferences_service.dart';
+import '../../../auth/auth_controller.dart';
 
 /// State representation for expenses belonging to a specific trip
 class ExpenseState {
@@ -106,8 +107,10 @@ class ExpenseController extends StateNotifier<ExpenseState> {
       final trip = await _dbHelper.getTripById(_tripId);
       final tripCurrency = trip?.defaultCurrency ?? currency;
       final now = DateTime.now();
+      final currentUid = _ref.read(authUserProvider)?.uid ?? '';
       final newExpense = Expense(
         id: _uuid.v4(),
+        userId: currentUid,
         tripId: _tripId,
         title: title,
         amount: amount,

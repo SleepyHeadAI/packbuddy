@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/core/services/app_widget_service.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
@@ -121,9 +122,10 @@ void main() {
 
     testWidgets('CurrencyConverterCard renders, swaps currencies and converts', (tester) async {
       await tester.pumpWidget(
-        const ProviderScope(
+        ProviderScope(
           child: MaterialApp(
-            home: Scaffold(
+            theme: AppTheme.lightTheme,
+            home: const Scaffold(
               body: SingleChildScrollView(
                 child: CurrencyConverterCard(),
               ),
@@ -455,6 +457,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
+            theme: AppTheme.lightTheme,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             locale: const Locale('en'),
@@ -517,6 +520,7 @@ void main() {
             tripControllerProvider.overrideWith((ref) => MockTripNotifier([tripA, tripB])),
           ],
           child: MaterialApp(
+            theme: AppTheme.lightTheme,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             locale: const Locale('en'),
@@ -547,6 +551,7 @@ void main() {
     testWidgets('OnboardingScreen navigates 4 tour slides and reaches Get Started', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          theme: AppTheme.lightTheme,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           locale: const Locale('en'),

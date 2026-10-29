@@ -258,7 +258,7 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
                     child: TextField(
                       controller: _collabController,
                       decoration: InputDecoration(
-                        hintText: 'alex@example.com / Name',
+                        hintText: l10n?.collaboratorEmailOrNameHint ?? 'alex@example.com / Name',
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                         border: OutlineInputBorder(
@@ -453,7 +453,7 @@ class _JoinTripDialogState extends State<JoinTripDialog> {
                 controller: _codeController,
                 textCapitalization: TextCapitalization.characters,
                 decoration: InputDecoration(
-                  hintText: 'e.g. PB-A1B2C',
+                  hintText: l10n?.tripCodePlaceholder ?? 'e.g. PB-A1B2C',
                   errorText: _error,
                   prefixIcon: const Icon(Icons.vpn_key_rounded, size: 20),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),

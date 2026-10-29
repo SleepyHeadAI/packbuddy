@@ -54,7 +54,6 @@ class AddTripSheet extends ConsumerStatefulWidget {
 class _AddTripSheetState extends ConsumerState<AddTripSheet> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
-  final _destinationController = TextEditingController();
   final _stopInputController = TextEditingController();
   final _budgetController = TextEditingController();
   final _notesController = TextEditingController();
@@ -63,54 +62,9 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
   DateTime _endDate = DateTime.now().add(const Duration(days: 5));
   String _selectedCurrency = 'TRY';
   Country? _selectedCountry;
-  String _selectedTransport = 'Flight';
-  String? _customTransport;
 
   // Multi-destination list of stops / cities / countries
   final List<String> _itineraryStops = [];
-
-  static const List<Map<String, dynamic>> _presetTransportModes = [
-    {'key': 'Flight', 'icon': Icons.flight_rounded},
-    {'key': 'BulletTrain', 'icon': Icons.directions_railway_rounded},
-    {'key': 'Train', 'icon': Icons.train_rounded},
-    {'key': 'Car', 'icon': Icons.directions_car_rounded},
-    {'key': 'Bus', 'icon': Icons.directions_bus_rounded},
-    {'key': 'Ship', 'icon': Icons.directions_boat_rounded},
-    {'key': 'Motorcycle', 'icon': Icons.two_wheeler_rounded},
-    {'key': 'Camper', 'icon': Icons.airport_shuttle_rounded},
-    {'key': 'Bicycle', 'icon': Icons.pedal_bike_rounded},
-    {'key': 'Subway', 'icon': Icons.tram_rounded},
-    {'key': 'Hiking', 'icon': Icons.hiking_rounded},
-  ];
-
-  String _getTransportLabel(String key, AppLocalizations l10n) {
-    switch (key) {
-      case 'Flight':
-        return l10n.flight;
-      case 'BulletTrain':
-        return l10n.bulletTrain;
-      case 'Train':
-        return l10n.train;
-      case 'Car':
-        return l10n.car;
-      case 'Bus':
-        return l10n.bus;
-      case 'Ship':
-        return l10n.ferry;
-      case 'Motorcycle':
-        return l10n.motorcycle;
-      case 'Camper':
-        return l10n.camper;
-      case 'Bicycle':
-        return l10n.bicycle;
-      case 'Subway':
-        return l10n.subway;
-      case 'Hiking':
-        return l10n.hiking;
-      default:
-        return key;
-    }
-  }
 
   @override
   void initState() {
@@ -118,7 +72,6 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
     if (widget.tripToEdit != null) {
       final t = widget.tripToEdit!;
       _titleController.text = t.title;
-      _destinationController.text = t.destination;
       _startDate = t.startDate;
       _endDate = t.endDate;
       _selectedCurrency = t.defaultCurrency;
@@ -128,11 +81,17 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
       if (t.notes != null) {
         _notesController.text = t.notes!;
       }
-      if (t.transportMode != null) {
-        _selectedTransport = t.transportMode!;
-      }
       if (t.countryCode != null) {
         _selectedCountry = Country.findByCode(t.countryCode!);
+      }
+      if (t.destination.isNotEmpty) {
+        final parts = t.destination.split(RegExp(r'\s*➔\s*'));
+        for (final p in parts) {
+          final trimmed = p.trim();
+          if (trimmed.isNotEmpty && !_itineraryStops.contains(trimmed)) {
+            _itineraryStops.add(trimmed);
+          }
+        }
       }
     } else {
       _selectedCurrency = PreferencesService.instance.getDefaultCurrency() ??
@@ -143,7 +102,6 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
   @override
   void dispose() {
     _titleController.dispose();
-    _destinationController.dispose();
     _stopInputController.dispose();
     _budgetController.dispose();
     _notesController.dispose();
@@ -180,11 +138,11 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
     if (country != null) {
       setState(() {
         _selectedCountry = country;
-        final countryLabel = '${country.flag} ${country.localName}';
+        final langCode = Localizations.localeOf(context).languageCode;
+        final countryLabel = '${country.flag} ${country.getLocalizedName(langCode)}';
         if (!_itineraryStops.contains(countryLabel)) {
           _itineraryStops.add(countryLabel);
         }
-        _destinationController.text = _itineraryStops.join(' ➔ ');
         if (CurrencyFormatter.supportedCurrencies.contains(country.defaultCurrency)) {
           _selectedCurrency = country.defaultCurrency;
         }
@@ -199,7 +157,6 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
         if (!_itineraryStops.contains(text)) {
           _itineraryStops.add(text);
         }
-        _destinationController.text = _itineraryStops.join(' ➔ ');
         _stopInputController.clear();
       });
     }
@@ -208,63 +165,10 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
   void _removeStop(int index) {
     setState(() {
       _itineraryStops.removeAt(index);
-      _destinationController.text = _itineraryStops.join(' ➔ ');
     });
   }
 
-  Future<void> _showCustomTransportDialog() async {
-    final l10n = AppLocalizations.of(context)!;
-    final controller = TextEditingController(text: _customTransport ?? '');
-    await showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Row(
-          children: [
-            const Icon(Icons.edit_road_rounded),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(l10n.customTransportType, style: const TextStyle(fontSize: 18)),
-            ),
-          ],
-        ),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          textCapitalization: TextCapitalization.words,
-          decoration: InputDecoration(
-            labelText: l10n.customTransportVehicle,
-            hintText: l10n.customTransportHint,
-            prefixIcon: const Icon(Icons.commute_rounded),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () {
-              final val = controller.text.trim();
-              if (val.isNotEmpty) {
-                setState(() {
-                  _customTransport = val;
-                  _selectedTransport = val;
-                });
-              }
-              Navigator.of(ctx).pop();
-            },
-            child: Text(l10n.ok),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _submit() {
-    if (_destinationController.text.trim().isEmpty && _itineraryStops.isNotEmpty) {
-      _destinationController.text = _itineraryStops.join(' ➔ ');
-    }
-
     if (_formKey.currentState?.validate() ?? false) {
       final double? budget = _budgetController.text.trim().isNotEmpty
           ? double.tryParse(_budgetController.text.trim())
@@ -274,9 +178,9 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
           ? _notesController.text.trim()
           : null;
 
-      final finalDestination = _destinationController.text.trim().isNotEmpty
-          ? _destinationController.text.trim()
-          : (_itineraryStops.isNotEmpty ? _itineraryStops.join(' ➔ ') : 'Seyahat Rotası');
+      final finalDestination = _itineraryStops.isNotEmpty
+          ? _itineraryStops.join(' ➔ ')
+          : _titleController.text.trim();
 
       if (widget.tripToEdit != null) {
         final updated = widget.tripToEdit!.copyWith(
@@ -287,7 +191,6 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
           defaultCurrency: _selectedCurrency,
           budgetLimit: budget,
           countryCode: _selectedCountry?.code,
-          transportMode: _selectedTransport,
           notes: notes,
           updatedAt: DateTime.now(),
         );
@@ -305,7 +208,6 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
             defaultCurrency: _selectedCurrency,
             budgetLimit: budget,
             countryCode: _selectedCountry?.code,
-            transportMode: _selectedTransport,
             notes: notes,
           );
 
@@ -503,133 +405,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                   ),
                 ),
               ],
-              const SizedBox(height: 8),
-
-              // Destination Summary / Manual Text
-              TextFormField(
-                controller: _destinationController,
-                textCapitalization: TextCapitalization.words,
-                decoration: InputDecoration(
-                  labelText: l10n.destination,
-                  hintText: l10n.destinationHint,
-                  prefixIcon: const Icon(Icons.place_outlined, size: 20),
-                ),
-                validator: (value) {
-                  if (_itineraryStops.isEmpty && (value == null || value.trim().isEmpty)) {
-                    return l10n.destination;
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
-              // Transport Mode Chips with Preset + Custom
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Text(
-                      l10n.transportMode,
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  if (_customTransport != null) ...[
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        '${l10n.custom}: $_customTransport',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.end,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-              const SizedBox(height: 8),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    ..._presetTransportModes.map((m) {
-                      final isSelected = _selectedTransport == m['key'];
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: ChoiceChip(
-                          avatar: Icon(
-                            m['icon'] as IconData,
-                            size: 16,
-                            color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.primary,
-                          ),
-                          label: Text(_getTransportLabel(m['key'] as String, l10n)),
-                          selected: isSelected,
-                          selectedColor: theme.colorScheme.primary,
-                          labelStyle: TextStyle(
-                            color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                          ),
-                          onSelected: (val) {
-                            if (val) {
-                              setState(() {
-                                _selectedTransport = m['key'] as String;
-                              });
-                            }
-                          },
-                        ),
-                      );
-                    }),
-                    // Custom Transport Chip
-                    if (_customTransport != null) ...[
-                      () {
-                        final isCustomSelected = _selectedTransport == _customTransport;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: ChoiceChip(
-                            avatar: Icon(
-                              Icons.commute_rounded,
-                              size: 16,
-                              color: isCustomSelected ? theme.colorScheme.onPrimary : theme.colorScheme.primary,
-                            ),
-                            label: Text(_customTransport!),
-                            selected: isCustomSelected,
-                            selectedColor: theme.colorScheme.primary,
-                            labelStyle: TextStyle(
-                              color: isCustomSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                            ),
-                            onSelected: (val) {
-                              if (val) {
-                                setState(() => _selectedTransport = _customTransport!);
-                              }
-                            },
-                          ),
-                        );
-                      }(),
-                    ],
-                    // Add Custom Action Chip
-                    ActionChip(
-                      avatar: const Icon(Icons.add_rounded, size: 16),
-                      label: Text(l10n.addCustomTransport),
-                      backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                      labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                      onPressed: _showCustomTransportDialog,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
               // Budget Limit & 28+ Currency Selector
               Row(
@@ -746,7 +522,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.check_circle_outline_rounded, size: 20),
+                    const Icon(Icons.check_rounded, size: 20),
                     const SizedBox(width: 8),
                     Flexible(
                       child: Text(

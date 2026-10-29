@@ -10,8 +10,9 @@ void main() {
 
   print('All keys in app_en.arb (${keys.length} total):');
   for (final k in keys) {
-    if (k.toLowerCase().contains('account') ||
-        k.toLowerCase().contains('session')) {
+    if (k.toLowerCase().contains('apply') ||
+        k.toLowerCase().contains('save') ||
+        k.toLowerCase().contains('confirm')) {
       print('  $k: ${enJson[k]}');
     }
   }

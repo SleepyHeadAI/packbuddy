@@ -28,11 +28,11 @@ class TelemetryService {
 
   static const String posthogApiKey = String.fromEnvironment(
     'POSTHOG_API_KEY',
-    defaultValue: 'phc_zJWTksx4JFN95rKAsfPxR9fUeQLFyM9ArCb9ZUkVjLeK',
+    defaultValue: '',
   );
   static const int posthogProjectId = int.fromEnvironment(
     'POSTHOG_PROJECT_ID',
-    defaultValue: 305038,
+    defaultValue: 0,
   );
   static const String posthogHost = String.fromEnvironment(
     'POSTHOG_HOST',
@@ -48,6 +48,10 @@ class TelemetryService {
 
   /// Initializes PostHog SDK programmatically with EU Cloud, Session Replay & PII text masking
   Future<void> init() async {
+    if (posthogApiKey.isEmpty) {
+      debugPrint('[TelemetryService] POSTHOG_API_KEY is not configured. Running in secure offline mode.');
+      return;
+    }
     try {
       final config = PostHogConfig(posthogApiKey);
       config.host = posthogHost;

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:path/path.dart';
@@ -36,7 +37,7 @@ class DatabaseHelper {
     final documentsDirectory = await getApplicationDocumentsDirectory();
     final path = join(documentsDirectory.path, fileName);
 
-    return await openDatabase(
+    final db = await openDatabase(
       path,
       version: AppConstants.databaseVersion,
       onConfigure: (db) async {
@@ -45,6 +46,28 @@ class DatabaseHelper {
       onCreate: _createDB,
       onUpgrade: _onUpgradeDB,
     );
+
+    // Self-healing schema validation on open: guarantees missing columns are added on any existing device
+    await _ensureSchemaIntegrity(db);
+
+    return db;
+  }
+
+  /// Verifies critical table columns exist and dynamically creates them if missing
+  static Future<void> _ensureSchemaIntegrity(Database db) async {
+    try {
+      final info = await db.rawQuery('PRAGMA table_info(${AppConstants.tableChecklistItems})');
+      final cols = info.map((row) => (row['name'] as String?)?.toLowerCase()).toSet();
+      if (!cols.contains('assigned_to')) {
+        await db.execute('ALTER TABLE ${AppConstants.tableChecklistItems} ADD COLUMN assigned_to TEXT');
+      }
+      if (!cols.contains('packed_by')) {
+        await db.execute('ALTER TABLE ${AppConstants.tableChecklistItems} ADD COLUMN packed_by TEXT');
+      }
+      if (!cols.contains('user_id')) {
+        await db.execute("ALTER TABLE ${AppConstants.tableChecklistItems} ADD COLUMN user_id TEXT NOT NULL DEFAULT ''");
+      }
+    } catch (_) {}
   }
 
   Future<void> _createDB(Database db, int version) async {
@@ -126,6 +149,8 @@ class DatabaseHelper {
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
         is_deleted INTEGER NOT NULL DEFAULT 0,
+        assigned_to TEXT,
+        packed_by TEXT,
         FOREIGN KEY (trip_id) REFERENCES ${AppConstants.tableTrips}(id) ON DELETE SET NULL
       )
     ''');
@@ -194,16 +219,16 @@ class DatabaseHelper {
     // Version 6: Multi-tenant user_id column migration for security isolation
     if (oldVersion < 6) {
       try {
-        await db.execute('ALTER TABLE ${AppConstants.tableTrips} ADD COLUMN user_id TEXT NOT NULL DEFAULT ""');
+        await db.execute("ALTER TABLE ${AppConstants.tableTrips} ADD COLUMN user_id TEXT NOT NULL DEFAULT ''");
       } catch (_) {}
       try {
-        await db.execute('ALTER TABLE ${AppConstants.tableExpenses} ADD COLUMN user_id TEXT NOT NULL DEFAULT ""');
+        await db.execute("ALTER TABLE ${AppConstants.tableExpenses} ADD COLUMN user_id TEXT NOT NULL DEFAULT ''");
       } catch (_) {}
       try {
-        await db.execute('ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN user_id TEXT NOT NULL DEFAULT ""');
+        await db.execute("ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN user_id TEXT NOT NULL DEFAULT ''");
       } catch (_) {}
       try {
-        await db.execute('ALTER TABLE ${AppConstants.tableChecklistItems} ADD COLUMN user_id TEXT NOT NULL DEFAULT ""');
+        await db.execute("ALTER TABLE ${AppConstants.tableChecklistItems} ADD COLUMN user_id TEXT NOT NULL DEFAULT ''");
       } catch (_) {}
     }
 
@@ -230,6 +255,16 @@ class DatabaseHelper {
         await db.execute('ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN file_extension TEXT');
       } catch (_) {}
     }
+
+    // Version 10: Add assigned_to and packed_by columns to checklist_items table
+    if (oldVersion < 10) {
+      try {
+        await db.execute('ALTER TABLE ${AppConstants.tableChecklistItems} ADD COLUMN assigned_to TEXT');
+      } catch (_) {}
+      try {
+        await db.execute('ALTER TABLE ${AppConstants.tableChecklistItems} ADD COLUMN packed_by TEXT');
+      } catch (_) {}
+    }
   }
 
   /// Completely wipes all local SQLite tables (useful for sign-outs)
@@ -250,6 +285,18 @@ class DatabaseHelper {
       await txn.delete(AppConstants.tableTrips);
       await txn.delete(AppConstants.tableSyncMetadata);
     });
+
+    try {
+      final appDir = await getApplicationDocumentsDirectory();
+      final vaultDir = Directory(join(appDir.path, 'vault'));
+      if (await vaultDir.exists()) {
+        await vaultDir.delete(recursive: true);
+      }
+      final vaultDocsDir = Directory(join(appDir.path, 'vault_docs'));
+      if (await vaultDocsDir.exists()) {
+        await vaultDocsDir.delete(recursive: true);
+      }
+    } catch (_) {}
   }
 
   /// Retrieves the last synced timestamp (in milliseconds since epoch) from SQLite
@@ -299,12 +346,53 @@ class DatabaseHelper {
     );
   }
 
-  /// Retrieves trips strictly filtered by userId. By default only active (non-deleted) trips are returned.
+  /// Migrates all guest/offline data (where user_id is empty or null) to the given authenticated userId
+  Future<void> migrateGuestDataToUser(String uid) async {
+    if (uid.isEmpty) return;
+    try {
+      final db = await database;
+      await db.transaction((txn) async {
+        await txn.update(
+          AppConstants.tableTrips,
+          {'user_id': uid},
+          where: 'user_id = ? OR user_id IS NULL',
+          whereArgs: [''],
+        );
+        await txn.update(
+          AppConstants.tableExpenses,
+          {'user_id': uid},
+          where: 'user_id = ? OR user_id IS NULL',
+          whereArgs: [''],
+        );
+        await txn.update(
+          AppConstants.tableChecklistItems,
+          {'user_id': uid},
+          where: 'user_id = ? OR user_id IS NULL',
+          whereArgs: [''],
+        );
+        await txn.update(
+          AppConstants.tableDocuments,
+          {'user_id': uid},
+          where: 'user_id = ? OR user_id IS NULL',
+          whereArgs: [''],
+        );
+      });
+    } catch (e) {
+      debugPrint('[DatabaseHelper] migrateGuestDataToUser notice: $e');
+    }
+  }
+
+  /// Retrieves trips. By default only active (non-deleted) trips are returned.
   Future<List<Trip>> getTrips({String? userId, bool includeDeleted = false}) async {
     final db = await database;
     final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
-    final conditions = <String>['user_id = ?'];
-    final args = <dynamic>[effectiveUserId];
+    final conditions = <String>[];
+    final args = <dynamic>[];
+
+    if (effectiveUserId.isNotEmpty) {
+      conditions.add("(user_id = ? OR user_id = '' OR user_id IS NULL OR notes LIKE '%isShared%true%' OR notes LIKE '%\"isShared\":true%')");
+      args.add(effectiveUserId);
+    }
 
     if (!includeDeleted) {
       conditions.add('is_deleted = 0');
@@ -312,21 +400,29 @@ class DatabaseHelper {
 
     final result = await db.query(
       AppConstants.tableTrips,
-      where: conditions.join(' AND '),
-      whereArgs: args,
+      where: conditions.isNotEmpty ? conditions.join(' AND ') : null,
+      whereArgs: args.isNotEmpty ? args : null,
       orderBy: 'start_date DESC',
     );
     return result.map((map) => Trip.fromMap(map)).toList();
   }
 
-  /// Retrieves a single trip by ID strictly filtered by userId
+  /// Retrieves a single trip by ID
   Future<Trip?> getTripById(String id, {String? userId}) async {
     final db = await database;
     final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
+    final conditions = <String>['id = ?'];
+    final args = <dynamic>[id];
+
+    if (effectiveUserId.isNotEmpty) {
+      conditions.add("(user_id = ? OR user_id = '' OR user_id IS NULL OR notes LIKE '%isShared%true%' OR notes LIKE '%\"isShared\":true%')");
+      args.add(effectiveUserId);
+    }
+
     final maps = await db.query(
       AppConstants.tableTrips,
-      where: 'id = ? AND user_id = ?',
-      whereArgs: [id, effectiveUserId],
+      where: conditions.join(' AND '),
+      whereArgs: args,
     );
     if (maps.isNotEmpty) {
       return Trip.fromMap(maps.first);
@@ -334,7 +430,7 @@ class DatabaseHelper {
     return null;
   }
 
-  /// Updates an existing trip strictly filtered by userId
+  /// Updates an existing trip
   Future<int> updateTrip(Trip trip, {String? userId}) async {
     final db = await database;
     final effectiveUserId = (userId != null && userId.isNotEmpty)
@@ -347,8 +443,8 @@ class DatabaseHelper {
     return await db.update(
       AppConstants.tableTrips,
       updatedTrip.toMap(),
-      where: 'id = ? AND user_id = ?',
-      whereArgs: [trip.id, effectiveUserId],
+      where: 'id = ?',
+      whereArgs: [trip.id],
     );
   }
 
@@ -484,7 +580,7 @@ class DatabaseHelper {
     );
   }
 
-  /// Retrieves expenses strictly filtered by userId. Can be filtered by tripId. Non-deleted by default.
+  /// Retrieves expenses. Can be filtered by tripId. Non-deleted by default.
   Future<List<Expense>> getExpenses({
     String? tripId,
     String? userId,
@@ -492,34 +588,37 @@ class DatabaseHelper {
   }) async {
     final db = await database;
     final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
-    final conditions = <String>['user_id = ?'];
-    final args = <dynamic>[effectiveUserId];
+    final conditions = <String>[];
+    final args = <dynamic>[];
+
+    if (tripId != null) {
+      conditions.add('trip_id = ?');
+      args.add(tripId);
+    } else if (effectiveUserId.isNotEmpty) {
+      conditions.add("(user_id = ? OR user_id = '' OR user_id IS NULL)");
+      args.add(effectiveUserId);
+    }
 
     if (!includeDeleted) {
       conditions.add('is_deleted = 0');
     }
-    if (tripId != null) {
-      conditions.add('trip_id = ?');
-      args.add(tripId);
-    }
 
     final result = await db.query(
       AppConstants.tableExpenses,
-      where: conditions.join(' AND '),
-      whereArgs: args,
+      where: conditions.isNotEmpty ? conditions.join(' AND ') : null,
+      whereArgs: args.isNotEmpty ? args : null,
       orderBy: 'date DESC',
     );
     return result.map((map) => Expense.fromMap(map)).toList();
   }
 
-  /// Retrieves a single expense by ID strictly filtered by userId
+  /// Retrieves a single expense by ID
   Future<Expense?> getExpenseById(String id, {String? userId}) async {
     final db = await database;
-    final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
     final maps = await db.query(
       AppConstants.tableExpenses,
-      where: 'id = ? AND user_id = ?',
-      whereArgs: [id, effectiveUserId],
+      where: 'id = ?',
+      whereArgs: [id],
     );
     if (maps.isNotEmpty) {
       return Expense.fromMap(maps.first);
@@ -527,7 +626,7 @@ class DatabaseHelper {
     return null;
   }
 
-  /// Updates an existing expense strictly filtered by userId
+  /// Updates an existing expense
   Future<int> updateExpense(Expense expense, {String? userId}) async {
     final db = await database;
     final effectiveUserId = (userId != null && userId.isNotEmpty)
@@ -540,8 +639,8 @@ class DatabaseHelper {
     return await db.update(
       AppConstants.tableExpenses,
       updatedExpense.toMap(),
-      where: 'id = ? AND user_id = ?',
-      whereArgs: [expense.id, effectiveUserId],
+      where: 'id = ?',
+      whereArgs: [expense.id],
     );
   }
 
@@ -630,7 +729,7 @@ class DatabaseHelper {
     );
   }
 
-  /// Retrieves documents strictly filtered by userId. By default only active (non-deleted) documents are returned.
+  /// Retrieves documents. By default only active (non-deleted) documents are returned.
   Future<List<Document>> getDocuments({
     String? tripId,
     String? userId,
@@ -638,21 +737,25 @@ class DatabaseHelper {
   }) async {
     final db = await database;
     final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
-    final conditions = <String>['user_id = ?'];
-    final args = <dynamic>[effectiveUserId];
+    final conditions = <String>[];
+    final args = <dynamic>[];
+
+    if (tripId != null) {
+      conditions.add('trip_id = ?');
+      args.add(tripId);
+    } else if (effectiveUserId.isNotEmpty) {
+      conditions.add("(user_id = ? OR user_id = '' OR user_id IS NULL)");
+      args.add(effectiveUserId);
+    }
 
     if (!includeDeleted) {
       conditions.add('is_deleted = 0');
     }
-    if (tripId != null) {
-      conditions.add('trip_id = ?');
-      args.add(tripId);
-    }
 
     final result = await db.query(
       AppConstants.tableDocuments,
-      where: conditions.join(' AND '),
-      whereArgs: args,
+      where: conditions.isNotEmpty ? conditions.join(' AND ') : null,
+      whereArgs: args.isNotEmpty ? args : null,
       orderBy: 'created_at DESC',
     );
     return result.map((map) => Document.fromMap(map)).toList();
@@ -668,14 +771,13 @@ class DatabaseHelper {
     return total;
   }
 
-  /// Retrieves a single document by ID strictly filtered by userId
+  /// Retrieves a single document by ID
   Future<Document?> getDocumentById(String id, {String? userId}) async {
     final db = await database;
-    final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
     final maps = await db.query(
       AppConstants.tableDocuments,
-      where: 'id = ? AND user_id = ?',
-      whereArgs: [id, effectiveUserId],
+      where: 'id = ?',
+      whereArgs: [id],
     );
     if (maps.isNotEmpty) {
       return Document.fromMap(maps.first);
@@ -683,7 +785,7 @@ class DatabaseHelper {
     return null;
   }
 
-  /// Updates an existing document strictly filtered by userId
+  /// Updates an existing document
   Future<int> updateDocument(Document document, {String? userId}) async {
     final db = await database;
     final effectiveUserId = (userId != null && userId.isNotEmpty)
@@ -696,8 +798,8 @@ class DatabaseHelper {
     return await db.update(
       AppConstants.tableDocuments,
       updatedDoc.toMap(),
-      where: 'id = ? AND user_id = ?',
-      whereArgs: [document.id, effectiveUserId],
+      where: 'id = ?',
+      whereArgs: [document.id],
     );
   }
 
@@ -757,7 +859,7 @@ class DatabaseHelper {
     );
   }
 
-  /// Retrieves checklist items strictly filtered by userId, optionally filtered by tripId
+  /// Retrieves checklist items, optionally filtered by tripId
   Future<List<PackingItem>> getChecklistItems({
     String? tripId,
     String? userId,
@@ -765,27 +867,31 @@ class DatabaseHelper {
   }) async {
     final db = await database;
     final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
-    final conditions = <String>['user_id = ?'];
-    final args = <dynamic>[effectiveUserId];
+    final conditions = <String>[];
+    final args = <dynamic>[];
+
+    if (tripId != null) {
+      conditions.add('trip_id = ?');
+      args.add(tripId);
+    } else if (effectiveUserId.isNotEmpty) {
+      conditions.add("(user_id = ? OR user_id = '' OR user_id IS NULL)");
+      args.add(effectiveUserId);
+    }
 
     if (!includeDeleted) {
       conditions.add('is_deleted = 0');
     }
-    if (tripId != null) {
-      conditions.add('trip_id = ?');
-      args.add(tripId);
-    }
 
     final result = await db.query(
       AppConstants.tableChecklistItems,
-      where: conditions.join(' AND '),
-      whereArgs: args,
+      where: conditions.isNotEmpty ? conditions.join(' AND ') : null,
+      whereArgs: args.isNotEmpty ? args : null,
       orderBy: 'is_packed ASC, created_at DESC',
     );
     return result.map((map) => PackingItem.fromMap(map)).toList();
   }
 
-  /// Updates an existing checklist item strictly filtered by userId
+  /// Updates an existing checklist item
   Future<int> updateChecklistItem(PackingItem item, {String? userId}) async {
     final db = await database;
     final effectiveUserId = (userId != null && userId.isNotEmpty)
@@ -798,8 +904,8 @@ class DatabaseHelper {
     return await db.update(
       AppConstants.tableChecklistItems,
       updatedItem.toMap(),
-      where: 'id = ? AND user_id = ?',
-      whereArgs: [item.id, effectiveUserId],
+      where: 'id = ?',
+      whereArgs: [item.id],
     );
   }
 

@@ -126,16 +126,6 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
     return docNorm.toLowerCase() == filterNorm.toLowerCase();
   }
 
-  bool _isTransitOrTicket(String category) {
-    final cat = category.toLowerCase();
-    return cat == 'ticket' ||
-        cat == 'bilet' ||
-        cat == 'transit' ||
-        cat == 'boarding pass' ||
-        cat == 'biniş kartı' ||
-        cat == 'booking' ||
-        cat == 'rezervasyon';
-  }
 
   void _showUndoDeleteSnackBar(BuildContext context, Document doc) {
     final l10n = AppLocalizations.of(context)!;
@@ -199,312 +189,6 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
     );
   }
 
-  void _showNativeWalletSheet(BuildContext context, Document doc) {
-    final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      sheetAnimationStyle: const AnimationStyle(
-        duration: Duration(milliseconds: 250),
-        curve: Curves.easeOutCubic,
-        reverseDuration: Duration(milliseconds: 200),
-        reverseCurve: Curves.easeInCubic,
-      ),
-      builder: (ctx) {
-        return RepaintBoundary(
-          child: SafeArea(
-            top: false,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
-                    blurRadius: 24,
-                    offset: const Offset(0, -6),
-                  ),
-                ],
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.outline.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 18),
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0284C7).withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(Icons.confirmation_number_rounded, color: Color(0xFF0284C7), size: 22),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.boardingPassAndTransit,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.3,
-                          ),
-                        ),
-                        Text(
-                          l10n.boardingPassSubtitle,
-                          style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              // Realistic Pass Card Preview
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: const Color(0xFF334155), width: 1.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Row(
-                            children: [
-                              const Icon(Icons.flight_takeoff_rounded, color: Color(0xFF38BDF8), size: 18),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  doc.title.toUpperCase(),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 13,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF38BDF8).withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Text(
-                            'TRANSIT PASS',
-                            style: TextStyle(
-                              color: Color(0xFF38BDF8),
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Divider(color: Color(0xFF334155), height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(l10n.boardingPassPassenger, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 9, fontWeight: FontWeight.bold)),
-                              const SizedBox(height: 2),
-                              Text(l10n.boardingPassSampleTraveler, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(l10n.boardingPassGate, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 9, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 2),
-                            Text('A14 • 12B', style: TextStyle(color: theme.colorScheme.primary, fontSize: 13, fontWeight: FontWeight.w800)),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
-                    // Simulated barcode strip
-                    Container(
-                      height: 38,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: List.generate(
-                          28,
-                          (i) => Container(
-                            width: (i % 3 == 0) ? 3 : (i % 2 == 0 ? 2 : 1),
-                            height: 26,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 22),
-
-              // Action 1: Görüntüle
-              InkWell(
-                onTap: () {
-                  Navigator.of(ctx).pop();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => DocumentViewerScreen(document: doc)),
-                  );
-                },
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: theme.colorScheme.primary.withValues(alpha: 0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.visibility_rounded, color: theme.colorScheme.onPrimary, size: 20),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          l10n.viewDocumentAction,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: theme.colorScheme.onPrimary,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 15,
-                            letterSpacing: -0.2,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // Action 2: Harici Uygulamada Aç
-              InkWell(
-                onTap: () async {
-                  Navigator.of(ctx).pop();
-                  final path = doc.localImagePath;
-                  if (File(path).existsSync()) {
-                    await OpenFilex.open(path);
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(l10n.fileNotFoundLocally),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  }
-                },
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: isDark ? const Color(0xFF475569) : const Color(0xFFE2E8F0),
-                      width: 1.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.open_in_new_rounded, color: theme.colorScheme.onSurface, size: 18),
-                      const SizedBox(width: 10),
-                      Flexible(
-                        child: Text(
-                          l10n.openInExternalApp,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: theme.colorScheme.onSurface,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 15,
-                            letterSpacing: -0.2,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ),
-  );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -1300,8 +984,6 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                   )
                               : null;
 
-                          final isTransit = _isTransitOrTicket(doc.category);
-
                           return Dismissible(
                             key: ValueKey('vault_doc_${doc.id}'),
                             direction: DismissDirection.horizontal,
@@ -1319,24 +1001,20 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                               alignment: Alignment.centerRight,
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               decoration: BoxDecoration(
-                                color: isTransit ? const Color(0xFF0284C7) : theme.colorScheme.primary,
+                                color: theme.colorScheme.primary,
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: Icon(
-                                isTransit ? Icons.wallet_rounded : Icons.visibility_rounded,
+                              child: const Icon(
+                                Icons.visibility_rounded,
                                 color: Colors.white,
                                 size: 24,
                               ),
                             ),
                             confirmDismiss: (direction) async {
                               if (direction == DismissDirection.endToStart) {
-                                if (isTransit) {
-                                  _showNativeWalletSheet(context, doc);
-                                } else {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(builder: (_) => DocumentViewerScreen(document: doc)),
-                                  );
-                                }
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(builder: (_) => DocumentViewerScreen(document: doc)),
+                                );
                                 return false;
                               } else if (direction == DismissDirection.startToEnd) {
                                 ref.read(vaultControllerProvider.notifier).deleteDocument(doc.id);
@@ -1452,40 +1130,6 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                             onPressed: () => _showDeleteDialog(context, doc),
                                           ),
                                         ),
-
-                                        // Native Wallet overlay badge for Transit / Ticket
-                                        if (isTransit)
-                                          Positioned(
-                                            bottom: 8,
-                                            right: 8,
-                                            child: InkWell(
-                                              onTap: () => _showNativeWalletSheet(context, doc),
-                                              borderRadius: BorderRadius.circular(14),
-                                              child: Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3.5),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.black.withValues(alpha: 0.75),
-                                                  borderRadius: BorderRadius.circular(14),
-                                                  border: Border.all(color: const Color(0xFF38BDF8), width: 1),
-                                                ),
-                                                child: Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    const Icon(Icons.wallet_rounded, color: Color(0xFF38BDF8), size: 12),
-                                                    const SizedBox(width: 4),
-                                                    Text(
-                                                      l10n.addToWallet,
-                                                      style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 9.5,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
                                       ],
                                     ),
                                   ),
@@ -1527,16 +1171,6 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                                 ),
                                               ),
                                             ),
-                                            if (isTransit) ...[
-                                              const SizedBox(width: 4),
-                                              IconButton(
-                                                icon: const Icon(Icons.wallet_rounded, size: 16, color: Color(0xFF0284C7)),
-                                                padding: EdgeInsets.zero,
-                                                constraints: const BoxConstraints(),
-                                                tooltip: l10n.boardingPassOptions,
-                                                onPressed: () => _showNativeWalletSheet(context, doc),
-                                              ),
-                                            ],
                                             if (isPdf) ...[
                                               const SizedBox(width: 4),
                                               IconButton(

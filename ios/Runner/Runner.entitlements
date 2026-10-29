@@ -7,5 +7,10 @@
 	<array>
 		<string>Default</string>
 	</array>
+	<!-- App Group for Home Screen Widget synchronization -->
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.com.sleepyhead.packbuddy</string>
+	</array>
 </dict>
 </plist>

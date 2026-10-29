@@ -161,7 +161,9 @@ class PackingItem {
     return {
       'id': id,
       'userId': userId,
+      'user_id': userId,
       'tripId': tripId,
+      'trip_id': tripId,
       'name': name,
       'category': category,
       'quantity': quantity,
@@ -171,9 +173,14 @@ class PackingItem {
       'compartment': compartment,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'created_at': createdAt.millisecondsSinceEpoch,
+      'updated_at': updatedAt.millisecondsSinceEpoch,
       'isDeleted': isDeleted,
+      'is_deleted': isDeleted ? 1 : 0,
       'assignedTo': assignedTo,
+      'assigned_to': assignedTo,
       'packedBy': packedBy,
+      'packed_by': packedBy,
     };
   }
 

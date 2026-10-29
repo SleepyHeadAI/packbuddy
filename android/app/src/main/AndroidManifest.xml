@@ -8,6 +8,8 @@
 
     <!-- Camera permission for Document Vault and Receipt Scanning -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Biometric Authentication for Vault -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
     <!-- Storage permissions for older Android versions (SDK <= 32) -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
@@ -27,7 +29,7 @@
         android:label="packbuddy"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:allowBackup="false">
+        android:allowBackup="true">
 
         <!-- PostHog EU Cloud Configuration -->
         <meta-data
@@ -50,6 +52,17 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
                 <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
+        </receiver>
+        <!-- Home Screen App Widget -->
+        <receiver
+            android:name=".PackBuddyWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/packbuddy_widget_info" />
         </receiver>
         <activity
             android:name=".MainActivity"
@@ -88,6 +101,18 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="geo" />
         </intent>
     </queries>
 </manifest>

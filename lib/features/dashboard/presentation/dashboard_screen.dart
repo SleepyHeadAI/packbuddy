@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +15,7 @@ import '../../budget/domain/trip.dart';
 import '../../budget/presentation/controllers/trip_controller.dart';
 import '../../budget/presentation/screens/trips_screen.dart';
 import '../../budget/presentation/screens/trip_detail_screen.dart';
+import '../../budget/presentation/screens/trip_comparison_screen.dart';
 import '../../budget/presentation/screens/widgets/add_trip_sheet.dart';
 import '../../settings/data/mock_revenuecat_service.dart';
 import '../../settings/presentation/screens/settings_screen.dart';
@@ -25,6 +27,10 @@ import '../../auth/auth_controller.dart';
 import '../../budget/presentation/widgets/currency_converter_card.dart';
 import '../../../shared/widgets/app_animations.dart';
 import '../../../core/services/app_widget_service.dart';
+import '../../../core/services/preferences_service.dart';
+import '../../travel_map/presentation/screens/travel_map_screen.dart';
+import '../../travel_map/presentation/controllers/travel_map_controller.dart';
+import 'widgets/notifications_center_sheet.dart';
 
 /// Sophisticated, cinematic Dashboard for PackBuddy with live Riverpod state integration
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -45,6 +51,27 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       _checkAccountRestored();
       _triggerSyncAndRefresh();
     });
+  }
+
+  bool _hasUnreadNotifications(List<Trip> trips) {
+    final lastRead = PreferencesService.instance.getLastReadNotificationsAt();
+    final now = DateTime.now();
+    final hasUpcoming = trips.any((t) =>
+        !t.isDeleted &&
+        t.startDate.isAfter(now.subtract(const Duration(hours: 12))) &&
+        t.startDate.difference(now).inDays <= 7);
+    if (hasUpcoming && (now.millisecondsSinceEpoch - lastRead) > 43200000) {
+      return true;
+    }
+    final history = PreferencesService.instance.getNotificationHistory();
+    if (history.isNotEmpty) {
+      try {
+        final latest = jsonDecode(history.first) as Map<String, dynamic>;
+        final ts = latest['timestamp'] as int? ?? 0;
+        if (ts > lastRead) return true;
+      } catch (_) {}
+    }
+    return false;
   }
 
   void _checkAccountRestored() {
@@ -94,6 +121,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         });
         ref.read(vaultControllerProvider.notifier).loadDocuments();
         ref.read(checklistControllerProvider.notifier).loadItems();
+        ref.read(travelMapControllerProvider.notifier).loadCountries();
       }
     }).catchError((_) {});
   }
@@ -143,6 +171,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     final vaultState = ref.watch(vaultControllerProvider);
     final checklistState = ref.watch(checklistControllerProvider);
     final proState = ref.watch(proSubscriptionProvider);
+    final travelMapState = ref.watch(travelMapControllerProvider);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final dateFormat = DateFormat.MMMd(currentLocale.languageCode);
@@ -235,54 +264,32 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 12,
+        titleSpacing: 20,
+        centerTitle: false,
         title: Row(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Profile Avatar with Status Dot
-            Stack(
-              alignment: Alignment.bottomRight,
-              children: [
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: theme.colorScheme.primaryContainer,
-                  child: Icon(
-                    Icons.person_rounded,
-                    size: 18,
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-                Container(
-                  width: 7,
-                  height: 7,
-                  decoration: BoxDecoration(
-                    color: AppColors.successPastel,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: theme.colorScheme.surface,
-                      width: 1.5,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(width: 8),
             Flexible(
               child: Text(
                 l10n.appName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5, fontSize: 17),
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.5,
+                  fontSize: 22,
+                ),
               ),
             ),
             if (proState.isPro) ...[
-              const SizedBox(width: 6),
+              const SizedBox(width: 8),
               AppPulse(
                 minScale: 0.94,
                 maxScale: 1.05,
                 duration: const Duration(milliseconds: 1600),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
@@ -300,8 +307,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     'PRO',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 9,
-                      fontWeight: FontWeight.w800,
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w900,
                       letterSpacing: 0.5,
                     ),
                   ),
@@ -317,29 +324,25 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               alignment: Alignment.topRight,
               children: [
                 const Icon(Icons.notifications_none_rounded, size: 21),
-                Container(
-                  width: 6,
-                  height: 6,
-                  margin: const EdgeInsets.only(top: 1, right: 1),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFEF4444),
-                    shape: BoxShape.circle,
+                if (_hasUnreadNotifications(tripState.trips))
+                  Container(
+                    width: 7,
+                    height: 7,
+                    margin: const EdgeInsets.only(top: 1, right: 1),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFEF4444),
+                      shape: BoxShape.circle,
+                    ),
                   ),
-                ),
               ],
             ),
             visualDensity: VisualDensity.compact,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             tooltip: l10n.notifications,
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(l10n.allNotificationsUpToDate),
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              );
+            onPressed: () async {
+              await NotificationsCenterSheet.show(context);
+              if (mounted) setState(() {});
             },
           ),
           const SizedBox(width: 4),
@@ -402,22 +405,87 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 96),
           children: [
-            // 1. Inspiring Hero Greeting Banner
-            _HeroGreetingCard(
-              greeting: _getTimeBasedGreeting(l10n),
-              title: l10n.welcome,
-              subtitle: l10n.welcomeSubtitle,
-              syncLabel: syncLabel,
-              syncIcon: syncIcon,
-              syncBgColor: syncBgColor,
-              syncTextColor: syncTextColor,
-              onSyncTap: () {
-                ref.read(syncEngineProvider.notifier).performSync();
-              },
+            // 1. My Trips Section (Seyahatler) at the very top
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.flight_takeoff_rounded,
+                        size: 17,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      l10n.trips,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    if (tripCount > 0) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '$tripCount',
+                          style: TextStyle(
+                            color: theme.colorScheme.primary,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      _createSmoothRoute(const TripsScreen()),
+                    );
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        l10n.viewAll,
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 11,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 8),
 
-            // 2. Active / Upcoming Trip Card (or Quick Start Card)
+            // Active / Upcoming Trip Card (or Quick Start Card)
             if (upcomingTrip != null) ...[
               _UpcomingTripHighlightCard(
                 trip: upcomingTrip,
@@ -431,11 +499,85 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   );
                 },
               ),
+              if (tripState.trips.length > 1) ...[
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 38,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: tripState.trips.length,
+                    separatorBuilder: (_, _) => const SizedBox(width: 8),
+                    itemBuilder: (context, index) {
+                      final t = tripState.trips[index];
+                      final isCurrent = t.id == upcomingTrip.id;
+                      final tCountry = Country.findByCode(t.countryCode);
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => TripDetailScreen(trip: t),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: isCurrent
+                                ? theme.colorScheme.primary.withValues(alpha: 0.15)
+                                : (isDark ? const Color(0xFF1E293B) : Colors.white),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isCurrent
+                                  ? theme.colorScheme.primary.withValues(alpha: 0.4)
+                                  : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (tCountry != null) ...[
+                                Text(tCountry.flag, style: const TextStyle(fontSize: 14)),
+                                const SizedBox(width: 5),
+                              ],
+                              Text(
+                                t.destination.isNotEmpty ? t.destination : t.title,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: isCurrent ? FontWeight.w800 : FontWeight.w600,
+                                  color: isCurrent
+                                      ? theme.colorScheme.primary
+                                      : (isDark ? Colors.white70 : Colors.black87),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ] else ...[
               _EmptyTripsPromptCard(
                 onPlanTrip: () => AddTripSheet.show(context),
               ),
             ],
+            const SizedBox(height: 18),
+
+            // 2. Inspiring Hero Greeting Banner
+            _HeroGreetingCard(
+              greeting: _getTimeBasedGreeting(l10n),
+              title: l10n.welcome,
+              subtitle: l10n.welcomeSubtitle,
+              syncLabel: syncLabel,
+              syncIcon: syncIcon,
+              syncBgColor: syncBgColor,
+              syncTextColor: syncTextColor,
+              onSyncTap: () {
+                ref.read(syncEngineProvider.notifier).performSync();
+              },
+            ),
             const SizedBox(height: 20),
 
             // 3. Bento Summary Grid (Trips Counter & Vault Counter)
@@ -611,9 +753,103 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 18),
 
-            const SizedBox(height: 12),
+            // World Travel Map Showcase Banner (Been & Skratch style)
+            AppCard(
+              padding: const EdgeInsets.all(16),
+              onTap: () {
+                Navigator.of(context).push(
+                  _createSmoothRoute(const TravelMapScreen()),
+                );
+              },
+              child: Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF10B981), Color(0xFF0D9488)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF10B981).withValues(alpha: 0.35),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.public_rounded,
+                        color: Colors.white,
+                        size: 26,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                l10n.worldTravelMapTitle,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Text(
+                                'Been & Skratch',
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF10B981),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          l10n.worldTravelMapStats(
+                            travelMapState.visitedCount,
+                            travelMapState.wishlistCount,
+                            travelMapState.worldPercentage.toStringAsFixed(1),
+                          ),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                            fontSize: 11.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 13,
+                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
 
             // Features Hub
             Text(
@@ -642,12 +878,41 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             const SizedBox(height: 12),
 
             _HubFeatureCard(
+              icon: Icons.public_rounded,
+              iconColor: const Color(0xFF0EA5E9),
+              iconContainerColor: const Color(0xFF0EA5E9).withValues(alpha: 0.15),
+              title: l10n.worldTravelMapTitle,
+              subtitle: l10n.worldTravelMapSubtitle,
+              badgeText: travelMapState.visitedCount > 0 ? '${travelMapState.visitedCount}' : null,
+              onTap: () {
+                Navigator.of(context).push(
+                  _createSmoothRoute(const TravelMapScreen()),
+                );
+              },
+            ),
+            const SizedBox(height: 12),
+
+            _HubFeatureCard(
               icon: Icons.currency_exchange_rounded,
               iconColor: const Color(0xFFF59E0B),
               iconContainerColor: const Color(0xFFF59E0B).withValues(alpha: 0.15),
               title: l10n.currencyConverter,
               subtitle: l10n.quickConvert,
               onTap: () => CurrencyConverterCard.showAsModal(context),
+            ),
+            const SizedBox(height: 12),
+
+            _HubFeatureCard(
+              icon: Icons.compare_arrows_rounded,
+              iconColor: const Color(0xFF6366F1),
+              iconContainerColor: const Color(0xFF6366F1).withValues(alpha: 0.15),
+              title: l10n.compareTrips,
+              subtitle: l10n.comparisonSummary,
+              onTap: () {
+                Navigator.of(context).push(
+                  _createSmoothRoute(const TripComparisonScreen()),
+                );
+              },
             ),
             const SizedBox(height: 12),
 
@@ -743,7 +1008,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 // Already on Dashboard
               } else if (index == 1) {
                 Navigator.of(context).push(
-                  _createSmoothRoute(const TripsScreen()),
+                  _createSmoothRoute(const TravelMapScreen()),
                 );
               } else if (index == 2) {
                 Navigator.of(context).push(
@@ -761,14 +1026,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             },
             destinations: [
               NavigationDestination(
-                icon: const Icon(Icons.dashboard_outlined, size: 22),
-                selectedIcon: Icon(Icons.dashboard_rounded, size: 22, color: theme.colorScheme.primary),
+                icon: const Icon(Icons.home_outlined, size: 22),
+                selectedIcon: Icon(Icons.home_rounded, size: 22, color: theme.colorScheme.primary),
                 label: l10n.navHome,
               ),
               NavigationDestination(
-                icon: const Icon(Icons.flight_takeoff_outlined, size: 22),
-                selectedIcon: Icon(Icons.flight_takeoff_rounded, size: 22, color: theme.colorScheme.primary),
-                label: l10n.navTrips,
+                icon: const Icon(Icons.public_outlined, size: 22),
+                selectedIcon: Icon(Icons.public_rounded, size: 22, color: theme.colorScheme.primary),
+                label: l10n.navMap,
               ),
               NavigationDestination(
                 icon: const Icon(Icons.checklist_rounded, size: 22),

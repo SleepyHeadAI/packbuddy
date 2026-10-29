@@ -63,7 +63,13 @@ class FakeVaultController extends StateNotifier<VaultState> implements VaultCont
   Future<void> removePin() async {}
 
   @override
-  bool authenticateWithBiometrics() => true;
+  Future<bool> authenticateWithBiometrics({String? reason}) async => true;
+
+  @override
+  Future<void> setBiometricEnabled(bool enabled) async {}
+
+  @override
+  void refreshSecurityState() {}
 }
 
 void main() {

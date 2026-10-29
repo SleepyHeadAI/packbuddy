@@ -12,6 +12,7 @@ import '../settings/data/mock_revenuecat_service.dart';
 import '../budget/presentation/controllers/trip_controller.dart';
 import '../checklist/presentation/controllers/checklist_controller.dart';
 import '../vault/presentation/controllers/vault_controller.dart';
+import '../travel_map/presentation/controllers/travel_map_controller.dart';
 import '../admin/user_moderation_provider.dart';
 
 /// State representation for Authentication operations
@@ -112,6 +113,8 @@ class AuthController extends StateNotifier<AuthState> {
       final isPro = await _authService.syncUserProfile(user);
       _ref?.read(proSubscriptionProvider.notifier).updateProStatus(isPro, uid: user.uid);
       _ref?.read(currencyProvider.notifier).loadForUser(uid: user.uid);
+      _ref?.read(vaultControllerProvider.notifier).refreshSecurityState();
+      _ref?.read(travelMapControllerProvider.notifier).loadCountries(userId: user.uid);
 
       int? totalStorage;
       try {
@@ -142,11 +145,23 @@ class AuthController extends StateNotifier<AuthState> {
           _syncProfileAndNotify(user);
           if (r != null) {
             try {
+              // 1. Initial quick load from local SQLite/Prefs
               r.read(tripControllerProvider.notifier).loadTrips(userId: user.uid);
               r.read(checklistControllerProvider.notifier).loadItems(userId: user.uid);
               r.read(vaultControllerProvider.notifier).loadDocuments(userId: user.uid);
+              r.read(travelMapControllerProvider.notifier).loadCountries(userId: user.uid);
               r.read(currencyProvider.notifier).loadForUser(uid: user.uid);
               r.read(proSubscriptionProvider.notifier).reloadForUser(uid: user.uid);
+
+              // 2. Immediate two-way Cloud Sync upon login:
+              // Pulls all remote trips, expenses, documents, checklist items, and travel map countries
+              // from Firestore into local storage, then refreshes the controllers!
+              r.read(syncEngineProvider.notifier).performSync().then((_) {
+                r.read(tripControllerProvider.notifier).loadTrips(userId: user.uid);
+                r.read(checklistControllerProvider.notifier).loadItems(userId: user.uid);
+                r.read(vaultControllerProvider.notifier).loadDocuments(userId: user.uid);
+                r.read(travelMapControllerProvider.notifier).loadCountries(userId: user.uid);
+              }).catchError((_) {});
             } catch (_) {}
           }
         } else {
@@ -156,6 +171,7 @@ class AuthController extends StateNotifier<AuthState> {
               r.read(tripControllerProvider.notifier).resetState();
               r.read(checklistControllerProvider.notifier).resetState();
               r.read(vaultControllerProvider.notifier).resetState();
+              r.read(travelMapControllerProvider.notifier).resetState();
               r.read(proSubscriptionProvider.notifier).resetProStatus();
               r.read(currencyProvider.notifier).resetToDefault();
               r.read(userModerationProvider.notifier).reset();
@@ -335,6 +351,22 @@ class AuthController extends StateNotifier<AuthState> {
     }
   }
 
+  /// Sends password reset link to user's email address
+  Future<bool> sendPasswordResetEmail(String email) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      await _authService.sendPasswordResetEmail(email: email.trim());
+      state = state.copyWith(isLoading: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: _formatAuthError(e),
+      );
+      return false;
+    }
+  }
+
   /// Requests 15-day grace period account deletion
   Future<bool> requestAccountDeletion() async {
     final user = state.user;
@@ -356,6 +388,9 @@ class AuthController extends StateNotifier<AuthState> {
       try {
         await PreferencesService.instance.clearDeviceProStatus();
         await PreferencesService.instance.setProUser(false);
+        await PreferencesService.instance.setVaultPin(null);
+        await PreferencesService.instance.setVaultBiometricEnabled(false);
+        await PreferencesService.instance.setVaultLocked(false);
       } catch (_) {}
 
       if (r != null) {
@@ -390,18 +425,10 @@ class AuthController extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true);
     try {
       unawaited(TelemetryService.instance.resetUser());
-      // Ensure previous user's local SQLite data is completely wiped from device before signing out
-      try {
-        await DatabaseHelper.instance.clearAllData();
-      } catch (dbErr) {
-        debugPrint('[AuthController] clearAllData notice: $dbErr');
-      }
 
-      // Clear device-level Pro status flag
-      try {
-        await PreferencesService.instance.clearDeviceProStatus();
-        await PreferencesService.instance.setProUser(false);
-      } catch (_) {}
+      // Safe Sign Out: Do NOT wipe local SQLite tables!
+      // Offline/local trips, expenses, and checklist items must persist safely on the device.
+      // Pro entitlement purchased on the device via Google Play must NEVER be wiped.
 
       // Immediately reset all domain controllers so zero data leaks to the next account
       final r = _ref;

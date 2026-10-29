@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
+import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/core/theme/theme_provider.dart';
 import 'package:packbuddy/features/admin/admin_service.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
@@ -179,11 +180,12 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(
+          child: MaterialApp(
+            theme: AppTheme.lightTheme,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            locale: Locale('en'),
-            home: Scaffold(body: PaywallSheet()),
+            locale: const Locale('en'),
+            home: const Scaffold(body: PaywallSheet()),
           ),
         ),
       );
@@ -198,9 +200,9 @@ void main() {
       await tester.tap(subscribeBtn);
       await tester.pumpAndSettle();
 
-      // Store billing required dialog is displayed
-      expect(find.text('Store Billing Required'), findsOneWidget);
-      expect(find.textContaining('Official Google Play & App Store billing'), findsOneWidget);
+      // Inactive coming soon notice dialog is displayed
+      expect(find.text('PackBuddy Pro Coming Soon'), findsOneWidget);
+      expect(find.textContaining('currently not active'), findsOneWidget);
 
       // Dismiss dialog
       await tester.tap(find.text('OK'));
@@ -233,11 +235,12 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const MaterialApp(
+          child: MaterialApp(
+            theme: AppTheme.lightTheme,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            locale: Locale('en'),
-            home: Scaffold(body: PaywallSheet()),
+            locale: const Locale('en'),
+            home: const Scaffold(body: PaywallSheet()),
           ),
         ),
       );
@@ -434,11 +437,12 @@ void main() {
               size: Size(320, 568),
               textScaler: TextScaler.linear(1.15),
             ),
-            child: const MaterialApp(
+            child: MaterialApp(
+              theme: AppTheme.lightTheme,
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
-              locale: Locale('ru'),
-              home: SettingsScreen(),
+              locale: const Locale('ru'),
+              home: const SettingsScreen(),
             ),
           ),
         ),
@@ -486,11 +490,12 @@ void main() {
               size: Size(320, 568),
               textScaler: TextScaler.linear(1.15),
             ),
-            child: const MaterialApp(
+            child: MaterialApp(
+              theme: AppTheme.lightTheme,
               localizationsDelegates: AppLocalizations.localizationsDelegates,
               supportedLocales: AppLocalizations.supportedLocales,
-              locale: Locale('tr'),
-              home: SettingsScreen(),
+              locale: const Locale('tr'),
+              home: const SettingsScreen(),
             ),
           ),
         ),

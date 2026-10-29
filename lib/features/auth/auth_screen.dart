@@ -85,9 +85,23 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
   Future<void> _handleAppleSignIn() async {
     ref.read(authControllerProvider.notifier).clearError();
-    try {
-      await ref.read(authControllerProvider.notifier).signInWithApple();
-    } catch (_) {}
+    final l10n = AppLocalizations.of(context)!;
+    final message = l10n.authAppleSignInComingSoon;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.info_outline_rounded, color: Colors.white, size: 20),
+            const SizedBox(width: 12),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: const Color(0xFF1E293B),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
   }
 
   void _handleForgotPassword(BuildContext context) {
@@ -128,16 +142,45 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               backgroundColor: AppColors.primaryLight,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
-            onPressed: () {
+            onPressed: () async {
+              final email = emailCtrl.text.trim();
+              if (email.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    backgroundColor: AppColors.errorPastel,
+                    content: Text(l10n.authErrorInvalidEmail),
+                  ),
+                );
+                return;
+              }
               Navigator.of(ctx).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  backgroundColor: AppColors.successPastel,
-                  content: Text(l10n.authResetLinkSent),
-                ),
-              );
+              final success = await ref
+                  .read(authControllerProvider.notifier)
+                  .sendPasswordResetEmail(email);
+              if (context.mounted) {
+                if (success) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      backgroundColor: AppColors.successPastel,
+                      content: Text(l10n.authResetLinkSent),
+                    ),
+                  );
+                } else {
+                  final err = ref.read(authControllerProvider).errorMessage ?? l10n.authErrorUserNotFound;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      backgroundColor: AppColors.errorPastel,
+                      content: Text(err),
+                    ),
+                  );
+                }
+              }
             },
             child: Text(l10n.authSendLink),
           ),
@@ -170,6 +213,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         return l10n.authErrorGoogleFailed;
       case 'email-verification-failed':
         return l10n.authErrorVerificationFailed;
+      case 'apple-sign-in-unsupported':
+      case 'apple-sign-in-failed':
+        return l10n.authAppleSignInComingSoon;
       default:
         return l10n.authErrorGeneric;
     }

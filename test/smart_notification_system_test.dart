@@ -267,7 +267,10 @@ void main() {
       await tester.drag(find.byType(ListView), const Offset(0, -350));
       await tester.pumpAndSettle();
 
-      final switchFinder = find.byType(Switch);
+      final switchFinder = find.descendant(
+        of: find.byKey(const Key('packing_reminders_switch_tile')),
+        matching: find.byType(Switch),
+      );
       expect(switchFinder, findsOneWidget);
 
       // Tap Switch to toggle OFF

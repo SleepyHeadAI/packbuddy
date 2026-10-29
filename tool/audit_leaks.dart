@@ -65,6 +65,8 @@ void main() {
           'Bilet',      // Valid in pl
           'Kategori',   // Valid in id, sv
           'PackBuddy Pro Aktif', // Valid in id (Aktif = active)
+          'Amerika',    // Valid in de, id, nl, sv
+          'Afrika',     // Valid in de, id, nl, sv
         };
         if (v == trVal &&
             trVal.length > 3 &&

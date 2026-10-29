@@ -154,6 +154,13 @@ class MockAuthService implements AuthService {
     emailVerificationSent = true;
   }
 
+  bool passwordResetEmailSent = false;
+
+  @override
+  Future<void> sendPasswordResetEmail({required String email}) async {
+    passwordResetEmailSent = true;
+  }
+
   @override
   Future<User?> reloadUser() async {
     reloadUserCalled = true;
@@ -568,11 +575,12 @@ void main() {
           overrides: [
             authServiceProvider.overrideWithValue(mockAuth),
           ],
-          child: const MaterialApp(
+          child: MaterialApp(
+            theme: ThemeData(splashFactory: InkRipple.splashFactory),
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            locale: Locale('tr'),
-            home: EmailVerificationScreen(),
+            locale: const Locale('tr'),
+            home: const EmailVerificationScreen(),
           ),
         ),
       );

@@ -92,12 +92,17 @@ class Document {
     return {
       'id': id,
       'userId': userId,
+      'user_id': userId,
       'title': title,
       'category': category,
       'subCategory': subCategory,
+      'sub_category': subCategory,
       'localImagePath': localImagePath,
+      'local_image_path': localImagePath,
       'tripId': tripId,
+      'trip_id': tripId,
       'fileType': fileType ?? (isPdf ? 'pdf' : 'image'),
+      'file_type': fileType ?? (isPdf ? 'pdf' : 'image'),
       'notes': notes,
       'fileSizeBytes': fileSizeBytes,
       'file_size_bytes': fileSizeBytes,
@@ -107,7 +112,10 @@ class Document {
       'file_extension': fileExtension,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'created_at': createdAt.millisecondsSinceEpoch,
+      'updated_at': updatedAt.millisecondsSinceEpoch,
       'isDeleted': isDeleted,
+      'is_deleted': isDeleted ? 1 : 0,
     };
   }
 

@@ -322,7 +322,7 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get allNotificationsUpToDate =>
-      'Όλες οι ειδοποιήσεις είναι ενημερωμένες!';
+      'Όλες οι ειδοποιήσεις είναι ενημερωμένες.';
 
   @override
   String get createFirstTrip =>
@@ -1731,4 +1731,336 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get confirm => 'Επιβεβαίωση';
+
+  @override
+  String get vaultBiometricReason =>
+      'Επαληθεύστε το δακτυλικό αποτύπωμα ή το πρόσωπό σας για να ξεκλειδώσετε το ταξιδιωτικό σας θησαυροφυλάκιο';
+
+  @override
+  String get biometricsFailed => 'Η βιομετρική επαλήθευση απέτυχε ή ακυρώθηκε.';
+
+  @override
+  String get customBaggageLimitPrompt => 'Ορισμός προσαρμοσμένου ορίου (kg)';
+
+  @override
+  String get testNotificationSent =>
+      'Η δοκιμαστική ειδοποίηση στάλθηκε στη συσκευή σας.';
+
+  @override
+  String get pinWidgetSuccess =>
+      'Το γραφικό στοιχείο προστέθηκε στην αρχική οθόνη.';
+
+  @override
+  String get pinWidgetGuide =>
+      'Πατήστε παρατεταμένα στην αρχική οθόνη και επιλέξτε Γραφικά στοιχεία > PackBuddy.';
+
+  @override
+  String scheduledRemindersCount(int count) {
+    return '$count προγραμματισμένες υπενθυμίσεις ταξιδιού';
+  }
+
+  @override
+  String get packingRemindersScheduled48h =>
+      '48 ώρες πριν: Προγραμματίστηκε υπενθύμιση πακεταρίσματος';
+
+  @override
+  String get packingRemindersScheduled24h =>
+      '24 ώρες πριν: Τελικός έλεγχος λίστας';
+
+  @override
+  String get testNotificationAction => 'Δοκιμή ειδοποιήσεων';
+
+  @override
+  String get noUpcomingRemindersDesc =>
+      'Όταν προγραμματίζετε ταξίδι, οι υπενθυμίσεις θα εμφανίζονται εδώ.';
+
+  @override
+  String get clearAll => 'Εκκαθάριση όλων';
+
+  @override
+  String get notificationHistory => 'Ιστορικό ειδοποιήσεων';
+
+  @override
+  String get upcomingReminders => 'Επερχόμενες υπενθυμίσεις';
+
+  @override
+  String daysRemaining(int days) {
+    return 'Απομένουν $days ημέρες';
+  }
+
+  @override
+  String get today => 'Σήμερα';
+
+  @override
+  String get biometricUnlock => 'Βιομετρικό ξεκλείδωμα';
+
+  @override
+  String get biometricUnlockSubtitle =>
+      'Ξεκλείδωμα θυρίδας με δακτυλικό αποτύπωμα ή Face ID';
+
+  @override
+  String get setPinFirstToEnableBiometrics =>
+      'Ορίστε πρώτα PIN για να ενεργοποιήσετε τα βιομετρικά';
+
+  @override
+  String get passportSummaryShared =>
+      'Η σύνοψη διαβατηρίου είναι έτοιμη για κοινοποίηση!';
+
+  @override
+  String get sharePassportTooltip => 'Κοινοποίηση διαβατηρίου';
+
+  @override
+  String get visitedCountryStatus => 'Έχετε επισκεφθεί αυτή τη χώρα';
+
+  @override
+  String get worldTravelMapTitle => 'Ο παγκόσμιος ταξιδιωτικός μου χάρτης';
+
+  @override
+  String get worldTravelMapSubtitle =>
+      'Χρωματίστε τις χώρες που επισκεφθήκατε και επιθυμείτε';
+
+  @override
+  String worldTravelMapStats(int visited, int wishlist, String percentage) {
+    return '$visited Επισκεφθείσες • $wishlist Επιθυμητές • %$percentage Εξερευνήθηκαν';
+  }
+
+  @override
+  String get mapLegendBeen => 'Επισκέφθηκα';
+
+  @override
+  String get mapLegendWant => 'Επιθυμητό';
+
+  @override
+  String get mapLegendUnvisited => 'Μη επισκεφθέν';
+
+  @override
+  String get mapLegendVisitedCity => 'Επισκεφθείσα πόλη';
+
+  @override
+  String get mapLegendWishlistCity => 'Επιθυμητή πόλη';
+
+  @override
+  String get mapLegendCapital => 'Πρωτεύουσα';
+
+  @override
+  String get zoomIn => 'Μεγέθυνση';
+
+  @override
+  String get zoomOut => 'Σμίκρυνση';
+
+  @override
+  String get resetZoom => 'Επαναφορά';
+
+  @override
+  String get countriesTab => 'Χώρες';
+
+  @override
+  String get citiesTab => 'Πόλεις';
+
+  @override
+  String get searchCountryOrCapital =>
+      'Αναζήτηση χώρας ή πρωτεύουσας (π.χ. Ιταλία, Ιαπωνία)...';
+
+  @override
+  String get basedOnUnCountries => 'Βασισμένο σε 195 χώρες του ΟΗΕ';
+
+  @override
+  String get countriesAndTerritories => 'Χώρες και Εδάφη';
+
+  @override
+  String get visitedStat => 'επισκέφθηκαν';
+
+  @override
+  String get countryUnit => 'χώρες';
+
+  @override
+  String moreCountries(int count) {
+    return '+ $count ακόμη χώρες';
+  }
+
+  @override
+  String get tripsUnit => 'ταξίδια';
+
+  @override
+  String get citiesUnit => 'πόλεις';
+
+  @override
+  String get continentsUnit => 'ήπειροι';
+
+  @override
+  String get ofTheWorld => 'του κόσμου';
+
+  @override
+  String get daysUnit => 'ημέρες';
+
+  @override
+  String get allFilter => 'Όλα';
+
+  @override
+  String get visitedFilter => 'Επισκεφθέντα';
+
+  @override
+  String get wishlistFilter => 'Επιθυμίες';
+
+  @override
+  String get continentEurope => 'Ευρώπη';
+
+  @override
+  String get continentAsia => 'Ασία';
+
+  @override
+  String get continentAmericas => 'Αμερική';
+
+  @override
+  String get continentAfrica => 'Αφρική';
+
+  @override
+  String get continentOceania => 'Ωκεανία';
+
+  @override
+  String get markAsVisitedTooltip => 'Σήμανση ως επισκεφθέν';
+
+  @override
+  String get markAsWishlistTooltip => 'Σήμανση ως επιθυμητό';
+
+  @override
+  String get visitDateLabel => 'Ημερομηνία επίσκεψης';
+
+  @override
+  String get coordinatesLabel => 'Συντεταγμένες';
+
+  @override
+  String airlineSelectedMessage(String airline, String limit) {
+    return 'Επιλέχθηκε: $airline ($limit kg).';
+  }
+
+  @override
+  String amountCopied(String amount) {
+    return 'Αντιγράφηκε: $amount!';
+  }
+
+  @override
+  String noticeMessage(String error) {
+    return 'Ειδοποίηση: $error';
+  }
+
+  @override
+  String get collaboratorEmailOrNameHint => 'π.χ. alex@example.com / Όνομα';
+
+  @override
+  String get tripCodePlaceholder => 'π.χ. PB-A1B2C';
+
+  @override
+  String get authAppleSignInComingSoon =>
+      'Η σύνδεση μέσω Apple δεν είναι διαθέσιμη αυτή τη στιγμή. Θα είναι διαθέσιμη πολύ σύντομα.';
+
+  @override
+  String get proStoreComingSoonTitle => 'Το PackBuddy Pro έρχεται σύντομα';
+
+  @override
+  String get proStoreComingSoonDesc =>
+      'Οι συνδρομές καταστήματος PackBuddy Pro δεν είναι ενεργές προς το παρόν. Θα είναι διαθέσιμες πολύ σύντομα στα Google Play και App Store.';
+
+  @override
+  String planTripToCountry(String country) {
+    return 'Σχεδιάστε ταξίδι σε $country';
+  }
+
+  @override
+  String get noVisitedCountriesYet =>
+      'Δεν έχουν επισημανθεί ακόμη χώρες που επισκεφτήκατε. Πατήστε χώρες στον χάρτη ή στην παρακάτω λίστα για να τις χρωματίσετε!';
+
+  @override
+  String get navMap => 'Χάρτης';
+
+  @override
+  String get mapLegendLived => 'Έζησα';
+
+  @override
+  String get livedFilter => 'Έζησα';
+
+  @override
+  String get markAsLivedTooltip => 'Σημείωση ως χώρα διαμονής';
+
+  @override
+  String get livedCountryStatus => 'Έχετε ζήσει σε αυτή τη χώρα';
+
+  @override
+  String get shareStory => 'Κοινοποίηση σε Ιστορία';
+
+  @override
+  String get shareStorySubtitle =>
+      'Μοιραστείτε στο Instagram, Snapchat ή με φίλους';
+
+  @override
+  String get shareStoryPreview => 'Προεπισκόπηση Ιστορίας';
+
+  @override
+  String get generatingStoryImage => 'Δημιουργία εικόνας ιστορίας...';
+
+  @override
+  String get storyCardTagline => 'Ο Παγκόσμιος Χάρτης Ταξιδιών μου';
+
+  @override
+  String get storyWatermark => 'Εξερευνήθηκε με το PackBuddy';
+
+  @override
+  String get shareImageButton => 'Κοινοποίηση ως Ιστορία';
+
+  @override
+  String get shareTextButton => 'Κοινοποίηση ως κείμενο';
+
+  @override
+  String get globe3D => '3D Υδρόγειος';
+
+  @override
+  String get globeRotateHint => 'Σύρετε για περιστροφή • Πατήστε';
+
+  @override
+  String get cyprusRegion => 'Περιοχή Κύπρου';
+
+  @override
+  String get storyThemeMidnight => 'Μεσάνυχτα';
+
+  @override
+  String get storyThemeSunset => 'Ηλιοβασίλεμα';
+
+  @override
+  String get storyThemeAtlas => 'Άτλας';
+
+  @override
+  String get storyThemeMinimal => 'Μίνιμαλ';
+
+  @override
+  String get storyThemeDune => 'Αμμόλοφος';
+
+  @override
+  String get storyThemeOcean => 'Ωκεανός';
+
+  @override
+  String get addWidgetToHomeScreen => 'Προσθήκη widget στην αρχική οθόνη';
+
+  @override
+  String get pdfError => 'Σφάλμα PDF';
+
+  @override
+  String get storyLayoutShowcase => 'Βιτρίνα';
+
+  @override
+  String get passportEntryVisas => 'Θεωρήσεις εισόδου και σφραγίδες';
+
+  @override
+  String get passportOfficialDocument => 'Επίσημο ταξιδιωτικό διαβατήριο';
+
+  @override
+  String get storyLayoutMinimal => 'Μίνιμαλ';
+
+  @override
+  String get passportWorldCitizen => 'Πολίτης του κόσμου';
+
+  @override
+  String get storyLayoutPassport => 'Διαβατήριο';
+
+  @override
+  String get storyLayoutClassic => 'Κλασικό';
 }

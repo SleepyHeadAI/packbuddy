@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
+import 'package:packbuddy/features/travel_map/presentation/widgets/country_flag.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 /// Searchable modal bottom sheet to select travel destinations & countries
@@ -28,12 +29,16 @@ class CountryPickerSheet extends StatefulWidget {
 
 class _CountryPickerSheetState extends State<CountryPickerSheet> {
   final _searchController = TextEditingController();
-  List<Country> _filtered = Country.allCountries;
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
-    _searchController.addListener(_onSearchChanged);
+    _searchController.addListener(() {
+      setState(() {
+        _searchQuery = _searchController.text.trim().toLowerCase();
+      });
+    });
   }
 
   @override
@@ -42,29 +47,35 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
     super.dispose();
   }
 
-  void _onSearchChanged() {
-    final query = _searchController.text.trim().toLowerCase();
-    setState(() {
-      if (query.isEmpty) {
-        _filtered = Country.allCountries;
-      } else {
-        _filtered = Country.allCountries.where((c) {
-          final matchName = c.name.toLowerCase().contains(query);
-          final matchLocal = c.localName.toLowerCase().contains(query);
-          final matchCode = c.code.toLowerCase().contains(query);
-          final matchCity = c.popularDestinations.any((d) => d.toLowerCase().contains(query));
-          return matchName || matchLocal || matchCode || matchCity;
-        }).toList();
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final isDark = theme.brightness == Brightness.dark;
-    final popularQuickCountries = Country.allCountries.take(8).toList();
+    final locale = Localizations.localeOf(context).languageCode;
+
+    // 1. Sort all countries strictly alphabetically based on the user's active locale
+    final sortedAllCountries = List<Country>.from(Country.allCountries)
+      ..sort((a, b) => a.getLocalizedName(locale).toLowerCase().compareTo(b.getLocalizedName(locale).toLowerCase()));
+
+    // 2. Filter countries based on search query
+    final filtered = _searchQuery.isEmpty
+        ? sortedAllCountries
+        : sortedAllCountries.where((c) {
+            final loc = c.getLocalizedName(locale).toLowerCase();
+            final en = c.name.toLowerCase();
+            final tr = c.localName.toLowerCase();
+            final code = c.code.toLowerCase();
+            final matchCity = c.popularDestinations.any((d) => d.toLowerCase().contains(_searchQuery));
+            return loc.contains(_searchQuery) || en.contains(_searchQuery) || tr.contains(_searchQuery) || code.contains(_searchQuery) || matchCity;
+          }).toList();
+
+    // 3. Quick popular countries localized
+    const popularCodes = ['TR', 'DE', 'US', 'FR', 'IT', 'ES', 'GB', 'JP'];
+    final popularQuickCountries = popularCodes
+        .map((code) => Country.findByCode(code))
+        .whereType<Country>()
+        .toList();
 
     return Container(
       constraints: BoxConstraints(
@@ -116,7 +127,7 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '${_filtered.length} ${l10n.countriesLabel}',
+                  '${filtered.length} ${l10n.countriesLabel}',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -142,7 +153,7 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
           ),
           const SizedBox(height: 12),
 
-          // Quick Selection Chips for top destinations
+          // Quick Selection Chips for top destinations (Localized)
           if (_searchController.text.isEmpty) ...[
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -151,8 +162,8 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: ActionChip(
-                      avatar: Text(country.flag, style: const TextStyle(fontSize: 16)),
-                      label: Text(country.localName, style: const TextStyle(fontSize: 12)),
+                      avatar: CountryFlag(code: country.code, fallbackEmoji: country.flag, size: 16),
+                      label: Text(country.getLocalizedName(locale), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                       backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                       side: BorderSide(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4)),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -167,9 +178,9 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
 
           const Divider(height: 1),
 
-          // Country List
+          // Country List (Strictly Alphabetical in Active Locale)
           Expanded(
-            child: _filtered.isEmpty
+            child: filtered.isEmpty
                 ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -191,10 +202,11 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
                   )
                 : ListView.separated(
                     padding: const EdgeInsets.symmetric(vertical: 8),
-                    itemCount: _filtered.length,
+                    itemCount: filtered.length,
                     separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
                     itemBuilder: (context, index) {
-                      final country = _filtered[index];
+                      final country = filtered[index];
+                      final localizedName = country.getLocalizedName(locale);
 
                       return ListTile(
                         contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -206,26 +218,28 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
                             color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Text(
-                            country.flag,
-                            style: const TextStyle(fontSize: 24),
+                          child: CountryFlag(
+                            code: country.code,
+                            fallbackEmoji: country.flag,
+                            size: 24,
                           ),
                         ),
                         title: Text.rich(
                           TextSpan(
-                            text: country.localName,
+                            text: localizedName,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
                             ),
                             children: [
-                              TextSpan(
-                                text: ' (${country.name})',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                  fontWeight: FontWeight.normal,
+                              if (localizedName.toLowerCase() != country.name.toLowerCase())
+                                TextSpan(
+                                  text: ' (${country.name})',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                 ),
-                              ),
                             ],
                           ),
                           maxLines: 1,

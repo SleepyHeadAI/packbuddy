@@ -318,7 +318,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get viewAll => 'Visa alla';
 
   @override
-  String get allNotificationsUpToDate => 'Alla resenotiser är uppdaterade!';
+  String get allNotificationsUpToDate => 'Alla aviseringar är uppdaterade.';
 
   @override
   String get createFirstTrip => 'Skapa din första rutt och budget nu.';
@@ -1705,4 +1705,334 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get confirm => 'Bekräfta';
+
+  @override
+  String get vaultBiometricReason =>
+      'Verifiera fingeravtryck eller ansikte för att låsa upp ditt resvalv';
+
+  @override
+  String get biometricsFailed =>
+      'Biometrisk verifiering misslyckades eller avbröts.';
+
+  @override
+  String get customBaggageLimitPrompt => 'Ange anpassad gräns (kg)';
+
+  @override
+  String get testNotificationSent => 'Testavisering skickad till din enhet.';
+
+  @override
+  String get pinWidgetSuccess => 'Widget lades till på hemskärmen.';
+
+  @override
+  String get pinWidgetGuide =>
+      'Tryck länge på hemskärmen och välj Widgets > PackBuddy.';
+
+  @override
+  String scheduledRemindersCount(int count) {
+    return '$count schemalagda resepåminnelser';
+  }
+
+  @override
+  String get packingRemindersScheduled48h =>
+      '48 timmar innan: Smart packpåminnelse schemalagd';
+
+  @override
+  String get packingRemindersScheduled24h =>
+      '24 timmar innan: Sista checklistkontroll schemalagd';
+
+  @override
+  String get testNotificationAction => 'Testa aviseringar';
+
+  @override
+  String get noUpcomingRemindersDesc =>
+      'När du planerar en resa visas påminnelser här.';
+
+  @override
+  String get clearAll => 'Rensa alla';
+
+  @override
+  String get notificationHistory => 'Aviseringshistorik';
+
+  @override
+  String get upcomingReminders => 'Kommande påminnelser';
+
+  @override
+  String daysRemaining(int days) {
+    return '$days dagar kvar';
+  }
+
+  @override
+  String get today => 'Idag';
+
+  @override
+  String get biometricUnlock => 'Biometrisk upplåsning';
+
+  @override
+  String get biometricUnlockSubtitle =>
+      'Lås upp valvet med fingeravtryck eller Face ID';
+
+  @override
+  String get setPinFirstToEnableBiometrics =>
+      'Ställ in en PIN först för att aktivera biometri';
+
+  @override
+  String get passportSummaryShared => 'Passöversikt redo att delas!';
+
+  @override
+  String get sharePassportTooltip => 'Dela pass';
+
+  @override
+  String get visitedCountryStatus => 'Du har besökt detta land';
+
+  @override
+  String get worldTravelMapTitle => 'Min världskarta över resor';
+
+  @override
+  String get worldTravelMapSubtitle =>
+      'Färglägg besökta länder och önskeländer';
+
+  @override
+  String worldTravelMapStats(int visited, int wishlist, String percentage) {
+    return '$visited Besökta • $wishlist Önskade • %$percentage Utforskade';
+  }
+
+  @override
+  String get mapLegendBeen => 'Besökt';
+
+  @override
+  String get mapLegendWant => 'Önskelista';
+
+  @override
+  String get mapLegendUnvisited => 'Icke besökt';
+
+  @override
+  String get mapLegendVisitedCity => 'Besökt stad';
+
+  @override
+  String get mapLegendWishlistCity => 'Önskad stad';
+
+  @override
+  String get mapLegendCapital => 'Huvudstad';
+
+  @override
+  String get zoomIn => 'Zooma in';
+
+  @override
+  String get zoomOut => 'Zooma ut';
+
+  @override
+  String get resetZoom => 'Återställ';
+
+  @override
+  String get countriesTab => 'Länder';
+
+  @override
+  String get citiesTab => 'Städer';
+
+  @override
+  String get searchCountryOrCapital =>
+      'Sök land eller huvudstad (t.ex. Italien, Japan)...';
+
+  @override
+  String get basedOnUnCountries => 'Baserat på 195 FN-länder';
+
+  @override
+  String get countriesAndTerritories => 'Länder & Territorier';
+
+  @override
+  String get visitedStat => 'besökt';
+
+  @override
+  String get countryUnit => 'länder';
+
+  @override
+  String moreCountries(int count) {
+    return '+ $count fler länder';
+  }
+
+  @override
+  String get tripsUnit => 'resor';
+
+  @override
+  String get citiesUnit => 'städer';
+
+  @override
+  String get continentsUnit => 'kontinenter';
+
+  @override
+  String get ofTheWorld => 'av världen';
+
+  @override
+  String get daysUnit => 'dagar';
+
+  @override
+  String get allFilter => 'Alla';
+
+  @override
+  String get visitedFilter => 'Besökta';
+
+  @override
+  String get wishlistFilter => 'Önskelista';
+
+  @override
+  String get continentEurope => 'Europa';
+
+  @override
+  String get continentAsia => 'Asien';
+
+  @override
+  String get continentAmericas => 'Amerika';
+
+  @override
+  String get continentAfrica => 'Afrika';
+
+  @override
+  String get continentOceania => 'Oceanien';
+
+  @override
+  String get markAsVisitedTooltip => 'Markera som besökt';
+
+  @override
+  String get markAsWishlistTooltip => 'Markera som önskat';
+
+  @override
+  String get visitDateLabel => 'Besöksdatum';
+
+  @override
+  String get coordinatesLabel => 'Koordinater';
+
+  @override
+  String airlineSelectedMessage(String airline, String limit) {
+    return '$airline ($limit kg) vald.';
+  }
+
+  @override
+  String amountCopied(String amount) {
+    return '$amount kopierat!';
+  }
+
+  @override
+  String noticeMessage(String error) {
+    return 'Meddelande: $error';
+  }
+
+  @override
+  String get collaboratorEmailOrNameHint => 't.ex. alex@example.com / Namn';
+
+  @override
+  String get tripCodePlaceholder => 't.ex. PB-A1B2C';
+
+  @override
+  String get authAppleSignInComingSoon =>
+      'Logga in med Apple är för närvarande inte aktivt. Det kommer att vara tillgängligt mycket snart.';
+
+  @override
+  String get proStoreComingSoonTitle => 'PackBuddy Pro kommer snart';
+
+  @override
+  String get proStoreComingSoonDesc =>
+      'PackBuddy Pro-butiksprenumerationer är inte aktiva just nu. De kommer snart att finnas i Google Play och App Store.';
+
+  @override
+  String planTripToCountry(String country) {
+    return 'Planera resa till $country';
+  }
+
+  @override
+  String get noVisitedCountriesYet =>
+      'Inga besökta länder markerade än. Tryck på länder på kartan eller listan nedan för att färglägga dem!';
+
+  @override
+  String get navMap => 'Karta';
+
+  @override
+  String get mapLegendLived => 'Bott';
+
+  @override
+  String get livedFilter => 'Bott';
+
+  @override
+  String get markAsLivedTooltip => 'Markera som hemland/bott i';
+
+  @override
+  String get livedCountryStatus => 'Du har bott i detta land';
+
+  @override
+  String get shareStory => 'Dela till Händelse';
+
+  @override
+  String get shareStorySubtitle =>
+      'Dela på Instagram, Snapchat eller med vänner';
+
+  @override
+  String get shareStoryPreview => 'Förhandsgranska Händelse';
+
+  @override
+  String get generatingStoryImage => 'Genererar händelsebild...';
+
+  @override
+  String get storyCardTagline => 'Min Världsresekarta';
+
+  @override
+  String get storyWatermark => 'Utforskat med PackBuddy';
+
+  @override
+  String get shareImageButton => 'Dela som Händelse';
+
+  @override
+  String get shareTextButton => 'Dela som text';
+
+  @override
+  String get globe3D => '3D-glob';
+
+  @override
+  String get globeRotateHint => 'Dra för att rotera • Tryck';
+
+  @override
+  String get cyprusRegion => 'Cypern-regionen';
+
+  @override
+  String get storyThemeMidnight => 'Midnatt';
+
+  @override
+  String get storyThemeSunset => 'Solnedgång';
+
+  @override
+  String get storyThemeAtlas => 'Atlas';
+
+  @override
+  String get storyThemeMinimal => 'Minimal';
+
+  @override
+  String get storyThemeDune => 'Sanddyn';
+
+  @override
+  String get storyThemeOcean => 'Ocean';
+
+  @override
+  String get addWidgetToHomeScreen => 'Lägg till widget på startskärmen';
+
+  @override
+  String get pdfError => 'PDF-fel';
+
+  @override
+  String get storyLayoutShowcase => 'Monter';
+
+  @override
+  String get passportEntryVisas => 'Inresevisum och stämplar';
+
+  @override
+  String get passportOfficialDocument => 'Officiellt resepass';
+
+  @override
+  String get storyLayoutMinimal => 'Minimal';
+
+  @override
+  String get passportWorldCitizen => 'Världsmedborgare';
+
+  @override
+  String get storyLayoutPassport => 'Pass';
+
+  @override
+  String get storyLayoutClassic => 'Klassisk';
 }

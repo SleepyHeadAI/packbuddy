@@ -1,3 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../core/services/notification_service.dart';
@@ -6,6 +9,9 @@ import '../../../../core/services/telemetry_service.dart';
 import '../../../../data/local_db/database_helper.dart';
 import '../../../../data/sync_engine/sync_engine.dart';
 import '../../domain/trip.dart';
+import '../../domain/expense.dart';
+import '../../../checklist/domain/packing_item.dart';
+import '../../../auth/auth_controller.dart';
 
 /// State representation for trips list
 class TripState {
@@ -102,8 +108,10 @@ class TripController extends StateNotifier<TripState> {
 
     try {
       final now = DateTime.now();
+      final currentUid = _ref.read(authUserProvider)?.uid ?? '';
       final newTrip = Trip(
         id: _uuid.v4(),
+        userId: currentUid,
         title: title,
         destination: destination,
         startDate: startDate,
@@ -236,7 +244,7 @@ class TripController extends StateNotifier<TripState> {
     final code = rawCode.trim().toUpperCase();
     if (code.isEmpty) return null;
 
-    // First search in local memory
+    // 1. Search in local memory
     Trip? targetTrip;
     for (final t in state.trips) {
       if (t.inviteCode?.toUpperCase() == code) {
@@ -245,7 +253,7 @@ class TripController extends StateNotifier<TripState> {
       }
     }
 
-    // If not found in memory, query SQLite
+    // 2. Search in SQLite
     if (targetTrip == null) {
       final allTrips = await _dbHelper.getTrips(includeDeleted: false);
       for (final t in allTrips) {
@@ -253,6 +261,33 @@ class TripController extends StateNotifier<TripState> {
           targetTrip = t;
           break;
         }
+      }
+    }
+
+    // 3. Search in Cloud Firestore if not found locally
+    if (targetTrip == null && Firebase.apps.isNotEmpty) {
+      try {
+        final firestore = FirebaseFirestore.instance;
+        var snap = await firestore
+            .collection('trips')
+            .where('inviteCode', isEqualTo: code)
+            .limit(1)
+            .get();
+
+        if (snap.docs.isEmpty) {
+          snap = await firestore
+              .collection('trips')
+              .where('invite_code', isEqualTo: code)
+              .limit(1)
+              .get();
+        }
+
+        if (snap.docs.isNotEmpty) {
+          final doc = snap.docs.first;
+          targetTrip = Trip.fromJson(doc.data());
+        }
+      } catch (e) {
+        // Fallback gracefully
       }
     }
 
@@ -272,18 +307,69 @@ class TripController extends StateNotifier<TripState> {
 
     if (targetTrip == null) return null;
 
-    final member = userIdentifier ?? 'Guest Collaborator';
+    final currentUid = FirebaseAuth.instance.currentUser?.uid;
+    final currentEmail = FirebaseAuth.instance.currentUser?.email;
+    final member = userIdentifier ?? currentEmail ?? currentUid ?? 'Collaborator';
     final currentCollabs = List<String>.from(targetTrip.collaborators);
     if (!currentCollabs.contains(member)) {
       currentCollabs.add(member);
+    }
+    if (currentUid != null && !currentCollabs.contains(currentUid)) {
+      currentCollabs.add(currentUid);
     }
 
     final joinedTrip = targetTrip.copyWith(
       isShared: true,
       collaborators: currentCollabs,
+      updatedAt: DateTime.now(),
     );
 
-    await updateTrip(joinedTrip);
+    // Save joined trip to local SQLite
+    await _dbHelper.insertTrip(joinedTrip);
+
+    // Sync remote Firestore document so all members see the new collaborator
+    if (Firebase.apps.isNotEmpty) {
+      try {
+        final firestore = FirebaseFirestore.instance;
+        await firestore
+            .collection('trips')
+            .doc(joinedTrip.id)
+            .set(joinedTrip.toJson(), SetOptions(merge: true));
+
+        // Pull expenses for this shared trip into local SQLite
+        final expSnap = await firestore
+            .collection('expenses')
+            .where('trip_id', isEqualTo: joinedTrip.id)
+            .get();
+        for (final d in expSnap.docs) {
+          try {
+            await _dbHelper.insertExpense(Expense.fromJson(d.data()));
+          } catch (_) {}
+        }
+
+        // Pull packing checklist items for this shared trip into local SQLite
+        final itemSnap = await firestore
+            .collection('checklist_items')
+            .where('trip_id', isEqualTo: joinedTrip.id)
+            .get();
+        for (final d in itemSnap.docs) {
+          try {
+            await _dbHelper.insertChecklistItem(PackingItem.fromJson(d.data()));
+          } catch (_) {}
+        }
+      } catch (_) {}
+    }
+
+    // Update in-memory state
+    final updatedList = List<Trip>.from(state.trips);
+    final existingIdx = updatedList.indexWhere((t) => t.id == joinedTrip.id);
+    if (existingIdx >= 0) {
+      updatedList[existingIdx] = joinedTrip;
+    } else {
+      updatedList.insert(0, joinedTrip);
+    }
+    state = state.copyWith(trips: updatedList);
+
     return joinedTrip;
   }
 

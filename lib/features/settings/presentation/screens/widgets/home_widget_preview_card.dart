@@ -1,21 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:home_widget/home_widget.dart';
+import 'package:packbuddy/data/local_db/database_helper.dart';
+import 'package:packbuddy/core/services/app_widget_service.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/features/budget/domain/expense.dart';
+import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
+import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 /// In-App Home Screen Widget Preview & Customization Card (Feature F-9)
-class HomeWidgetPreviewCard extends StatefulWidget {
+class HomeWidgetPreviewCard extends ConsumerStatefulWidget {
   const HomeWidgetPreviewCard({super.key});
 
   @override
-  State<HomeWidgetPreviewCard> createState() => _HomeWidgetPreviewCardState();
+  ConsumerState<HomeWidgetPreviewCard> createState() => _HomeWidgetPreviewCardState();
 }
 
-class _HomeWidgetPreviewCardState extends State<HomeWidgetPreviewCard> {
+class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
   int _selectedSize = 1; // 0: Small, 1: Medium, 2: Large
   late bool _showCountdown;
   late bool _showPacking;
   late bool _showBudget;
+  AppWidgetData? _widgetData;
 
   @override
   void initState() {
@@ -24,6 +32,103 @@ class _HomeWidgetPreviewCardState extends State<HomeWidgetPreviewCard> {
     _showCountdown = prefs.isWidgetShowCountdown();
     _showPacking = prefs.isWidgetShowPacking();
     _showBudget = prefs.isWidgetShowBudget();
+    _loadPayload();
+  }
+
+  Future<void> _loadPayload() async {
+    final data = await AppWidgetService.getWidgetPayload();
+    if (mounted) {
+      setState(() {
+        _widgetData = data;
+      });
+    }
+  }
+
+  Future<void> _pinWidgetToHomeScreen() async {
+    try {
+      final tripState = ref.read(tripControllerProvider);
+      final checklistState = ref.read(checklistControllerProvider);
+      final now = DateTime.now();
+      final upcoming = tripState.trips
+          .where((t) => !t.isDeleted && t.startDate.isAfter(now.subtract(const Duration(days: 1))))
+          .toList()
+        ..sort((a, b) => a.startDate.compareTo(b.startDate));
+
+      final nextTrip = upcoming.isNotEmpty ? upcoming.first : null;
+      final List<Expense> expenses = nextTrip != null
+          ? await DatabaseHelper.instance.getExpenses(tripId: nextTrip.id, includeDeleted: false)
+          : const <Expense>[];
+
+      await AppWidgetService.updateWidgetPayload(
+        upcomingTrip: nextTrip,
+        items: checklistState.items,
+        expenses: expenses,
+      );
+
+      final isSupported = await HomeWidget.isRequestPinWidgetSupported() ?? false;
+      if (isSupported) {
+        await HomeWidget.requestPinWidget(
+          name: 'PackBuddyWidgetProvider',
+          androidName: 'PackBuddyWidgetProvider',
+          qualifiedAndroidName: 'com.sleepyhead.packbuddy.PackBuddyWidgetProvider',
+        );
+        if (mounted) {
+          final l10n = AppLocalizations.of(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      l10n?.pinWidgetSuccess ?? 'Widget ana ekrana eklendi.',
+                    ),
+                  ),
+                ],
+              ),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: const Color(0xFF059669),
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          final l10n = AppLocalizations.of(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.touch_app_rounded, color: Colors.white, size: 20),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      l10n?.pinWidgetGuide ??
+                          'Ana ekranınıza uzun basarak Widget\'lar > PackBuddy seçeneğiyle widget ekleyebilirsiniz.',
+                    ),
+                  ),
+                ],
+              ),
+              behavior: SnackBarBehavior.floating,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
+      }
+    } catch (_) {
+      if (mounted) {
+        final l10n = AppLocalizations.of(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              l10n?.pinWidgetGuide ??
+                  'Ana ekranınıza uzun basarak Widget\'lar > PackBuddy seçeneğiyle widget ekleyebilirsiniz.',
+            ),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _updateCountdown(bool val) async {
@@ -158,6 +263,24 @@ class _HomeWidgetPreviewCardState extends State<HomeWidgetPreviewCard> {
             value: _showBudget,
             onChanged: _updateBudget,
           ),
+          const SizedBox(height: 14),
+
+          // Pin Widget to Home Screen Action Button
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.tonalIcon(
+              onPressed: _pinWidgetToHomeScreen,
+              icon: const Icon(Icons.add_to_home_screen_rounded, size: 18),
+              label: Text(
+                l10n?.addWidgetToHomeScreen ?? 'Add Widget to Home Screen',
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+              ),
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -201,6 +324,17 @@ class _HomeWidgetPreviewCardState extends State<HomeWidgetPreviewCard> {
       2 => 210.0,
       _ => 130.0,
     };
+
+    final String tripTitle = _widgetData?.tripTitle ?? l10n?.appName ?? 'PackBuddy';
+    final String destination = _widgetData?.destination ?? 'Plan your next trip';
+    final String daysText = _widgetData != null && _widgetData!.daysUntil > 0
+        ? '${_widgetData!.daysUntil}d'
+        : (_widgetData != null ? '0d' : '-');
+    final int totalItems = _widgetData?.totalItems ?? 0;
+    final int packedItems = _widgetData?.packedItems ?? 0;
+    final int packingPercent = _widgetData?.packingPercent ?? 0;
+    final double packingProgress = totalItems > 0 ? (packedItems / totalItems).clamp(0.0, 1.0) : 0.0;
+    final String budgetSpent = _widgetData?.budgetSpent ?? '';
 
     return FittedBox(
       fit: BoxFit.scaleDown,
@@ -260,7 +394,7 @@ class _HomeWidgetPreviewCardState extends State<HomeWidgetPreviewCard> {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
-                      '3d',
+                      daysText,
                       style: TextStyle(
                         fontSize: 9.5,
                         fontWeight: FontWeight.w800,
@@ -271,93 +405,81 @@ class _HomeWidgetPreviewCardState extends State<HomeWidgetPreviewCard> {
               ],
             ),
 
-          // Destination
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Paris Getaway',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              Text(
-                'France',
-                style: TextStyle(
-                  fontSize: 10,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-
-          // Packing Progress
-          if (_showPacking) ...[
+            // Destination / Title
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        '${l10n?.shareChecklist ?? "Packing"}: 18/24',
-                        style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Text('75%', style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700)),
-                  ],
+                Text(
+                  tripTitle,
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 3),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(2),
-                  child: LinearProgressIndicator(
-                    value: 0.75,
-                    minHeight: 4,
-                    backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.successPastel),
+                Text(
+                  destination,
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
-          ],
 
-          // Budget Summary (Medium / Large)
-          if (_showBudget && _selectedSize != 0) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: Text(
-                    '${l10n?.spent ?? "Spent"}: \$620',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurfaceVariant),
+            // Packing Progress
+            if (_showPacking) ...[
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          '${l10n?.shareChecklist ?? "Packing"}: $packedItems/$totalItems',
+                          style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Text('$packingPercent%', style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700)),
+                    ],
                   ),
-                ),
-                const SizedBox(width: 4),
-                Flexible(
-                  child: Text(
-                    '${l10n?.remaining ?? "Rem"}: \$1,880',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.end,
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      color: theme.colorScheme.primary,
+                  const SizedBox(height: 3),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(2),
+                    child: LinearProgressIndicator(
+                      value: packingProgress,
+                      minHeight: 4,
+                      backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.successPastel),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+            ],
+
+            // Budget Summary (Medium / Large)
+            if (_showBudget && _selectedSize != 0) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: Text(
+                      budgetSpent.isNotEmpty ? '${l10n?.spent ?? "Spent"}: $budgetSpent' : (l10n?.budget ?? 'Budget'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurfaceVariant),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ],
-        ],
+        ),
       ),
-    ),
-  );
+    );
   }
 }

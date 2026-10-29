@@ -343,40 +343,36 @@ class PaywallSheet extends ConsumerWidget {
                             );
                           }
                         } else {
-                          // Normal user: Production store billing required, zero free bypass!
-                          final targetProductId = proState.activePlan == SubscriptionPlan.monthly
-                              ? MockRevenueCatNotifier.productMonthly
-                              : MockRevenueCatNotifier.productAnnual;
-
-                          if (proState.products.containsKey(targetProductId)) {
-                            final success = await ref
-                                .read(proSubscriptionProvider.notifier)
-                                .purchasePlan(targetProductId);
-                            if (context.mounted && success) {
-                              Navigator.of(context).pop();
-                            }
-                          } else {
-                            if (!context.mounted) return;
-                            await showDialog<void>(
-                              context: context,
-                              builder: (ctx) => AlertDialog(
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                icon: const Icon(
-                                  Icons.storefront_rounded,
-                                  color: AppColors.primaryLight,
-                                  size: 36,
-                                ),
-                                title: Text(l10n.storeBillingRequiredTitle),
-                                content: Text(l10n.storeBillingRequiredMessage),
-                                actions: [
-                                  FilledButton(
+                          // Normal user: Inactive notice (coming soon in store release)
+                          if (!context.mounted) return;
+                          await showDialog<void>(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              icon: const Icon(
+                                Icons.workspace_premium_rounded,
+                                color: AppColors.primaryLight,
+                                size: 36,
+                              ),
+                              title: Text(
+                                l10n.proStoreComingSoonTitle,
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              content: Text(
+                                l10n.proStoreComingSoonDesc,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 14, height: 1.4),
+                              ),
+                              actions: [
+                                Center(
+                                  child: FilledButton(
                                     onPressed: () => Navigator.of(ctx).pop(),
                                     child: Text(l10n.ok),
                                   ),
-                                ],
-                              ),
-                            );
-                          }
+                                ),
+                              ],
+                            ),
+                          );
                         }
                       },
                 child: proState.isLoading
@@ -499,7 +495,6 @@ class _PlanOptionCard extends StatelessWidget {
                   child: Text(
                     title,
                     maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -507,17 +502,17 @@ class _PlanOptionCard extends StatelessWidget {
                 ),
                 if (badge != null) ...[
                   const SizedBox(width: 4),
-                  Flexible(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: AppColors.tertiaryLight,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.tertiaryLight,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
                       child: Text(
                         badge!,
                         maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 9.5,

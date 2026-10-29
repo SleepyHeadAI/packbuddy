@@ -7,7 +7,6 @@ import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
 import 'package:packbuddy/data/local_db/database_helper.dart';
-import 'package:packbuddy/features/budget/presentation/controllers/expense_controller.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/checklist/domain/packing_item.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
@@ -59,20 +58,13 @@ class _TripComparisonScreenState extends ConsumerState<TripComparisonScreen> {
 
     final allTrips = tripState.trips.where((t) => !t.isDeleted).toList();
 
-    // Live sync expense controllers for compared trips
-    for (final tripId in _selectedTripIds) {
-      ref.listen(expenseControllerProvider(tripId), (_, next) => _loadExpenses());
-    }
+    final effectiveSelectedIds = _selectedTripIds.isNotEmpty
+        ? _selectedTripIds
+        : (allTrips.length >= 2
+            ? {allTrips[0].id, allTrips[1].id}
+            : (allTrips.isNotEmpty ? {allTrips[0].id} : <String>{}));
 
-    // Auto-select first two trips if none selected
-    if (_selectedTripIds.isEmpty && allTrips.length >= 2) {
-      _selectedTripIds.add(allTrips[0].id);
-      _selectedTripIds.add(allTrips[1].id);
-    } else if (_selectedTripIds.isEmpty && allTrips.isNotEmpty) {
-      _selectedTripIds.add(allTrips[0].id);
-    }
-
-    final selectedTrips = allTrips.where((t) => _selectedTripIds.contains(t.id)).toList();
+    final selectedTrips = allTrips.where((t) => effectiveSelectedIds.contains(t.id)).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -128,7 +120,7 @@ class _TripComparisonScreenState extends ConsumerState<TripComparisonScreen> {
                       spacing: 8,
                       runSpacing: 8,
                       children: allTrips.map((trip) {
-                        final isSelected = _selectedTripIds.contains(trip.id);
+                        final isSelected = effectiveSelectedIds.contains(trip.id);
                         return FilterChip(
                           label: Text(
                             trip.title.isNotEmpty ? trip.title : trip.destination,
@@ -140,6 +132,9 @@ class _TripComparisonScreenState extends ConsumerState<TripComparisonScreen> {
                           selected: isSelected,
                           onSelected: (selected) {
                             setState(() {
+                              if (_selectedTripIds.isEmpty) {
+                                _selectedTripIds.addAll(effectiveSelectedIds);
+                              }
                               if (selected) {
                                 _selectedTripIds.add(trip.id);
                               } else {

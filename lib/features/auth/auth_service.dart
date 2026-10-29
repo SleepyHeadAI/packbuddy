@@ -8,6 +8,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../core/services/preferences_service.dart';
 import '../../core/services/currency_service.dart';
+import '../../data/local_db/database_helper.dart';
+import '../travel_map/data/travel_map_service.dart';
 
 /// Contract defining authentication operations for PackBuddy
 abstract class AuthService {
@@ -57,6 +59,9 @@ abstract class AuthService {
 
   /// Updates lastActiveAt timestamp for current user in Firestore
   Future<void> updateLastActive(String uid);
+
+  /// Send password reset link to user's email address
+  Future<void> sendPasswordResetEmail({required String email});
 }
 
 /// Firebase implementation of [AuthService]
@@ -215,6 +220,12 @@ class FirebaseAuthService implements AuthService {
 
   @override
   Future<UserCredential?> signInWithApple() async {
+    if (!kIsWeb && defaultTargetPlatform != TargetPlatform.iOS && defaultTargetPlatform != TargetPlatform.macOS) {
+      throw FirebaseAuthException(
+        code: 'apple-sign-in-unsupported',
+        message: 'Sign in with Apple is only supported on iOS and macOS devices.',
+      );
+    }
     try {
       final appleCredential = await SignInWithApple.getAppleIDCredential(
         scopes: [
@@ -281,6 +292,25 @@ class FirebaseAuthService implements AuthService {
     } catch (e) {
       throw FirebaseAuthException(
         code: 'email-verification-failed',
+        message: e.toString(),
+      );
+    }
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail({required String email}) async {
+    try {
+      final activeLocale = PreferencesService.instance.getLocale();
+      final langCode = activeLocale?.languageCode ?? 'en';
+      try {
+        await _firebaseAuth.setLanguageCode(langCode);
+      } catch (_) {}
+      await _firebaseAuth.sendPasswordResetEmail(email: email.trim());
+    } on FirebaseAuthException {
+      rethrow;
+    } catch (e) {
+      throw FirebaseAuthException(
+        code: 'reset-password-failed',
         message: e.toString(),
       );
     }
@@ -360,17 +390,30 @@ class FirebaseAuthService implements AuthService {
       final bool remoteExists = existingDoc?.exists ?? false;
       final remoteData = existingDoc?.data();
 
-      // STRICT MULTI-ACCOUNT ISOLATION (Phase 1):
-      // Remote Firestore document is the single source of truth for authenticated users.
-      // Brand-new users MUST ALWAYS initialize with isPremium: false.
-      // NEVER promote a new or different account from a stale local device flag!
-      bool effectiveIsPremium = false;
-      if (remoteExists && remoteData != null && remoteData.containsKey('isPremium')) {
-        effectiveIsPremium = remoteData['isPremium'] == true;
+      // PRO ENTITLEMENT PERSISTENCE & CONTAGION PREVENTION:
+      // If remote user document exists and specifies isPremium, it is the authoritative source of truth.
+      // If it's a new registration or converting guest, inherit local device pro status.
+      final bool remoteHasIsPremium = remoteExists && remoteData != null && remoteData.containsKey('isPremium');
+      final bool remoteIsPremium = remoteHasIsPremium && (remoteData['isPremium'] == true);
+      final bool localScopedPro = PreferencesService.instance.isProUser(uid: user.uid);
+      final bool localDevicePro = PreferencesService.instance.isProUser();
+
+      final bool effectiveIsPremium;
+      if (remoteHasIsPremium) {
+        effectiveIsPremium = remoteIsPremium;
       } else {
-        effectiveIsPremium = false;
+        effectiveIsPremium = localScopedPro || localDevicePro;
       }
+
       await PreferencesService.instance.setProUser(effectiveIsPremium, uid: user.uid);
+
+      // ADOPT GUEST DATA:
+      // Automatically migrate offline/guest trips, expenses, and documents to the logged-in user
+      try {
+        await DatabaseHelper.instance.migrateGuestDataToUser(user.uid);
+      } catch (e) {
+        debugPrint('[FirebaseAuthService] migrateGuestDataToUser notice: $e');
+      }
 
       // AUTO-DETECT COUNTRY & DEFAULT CURRENCY (Phase 2):
       final remoteCountryCode = remoteData?['countryCode'] as String?;
@@ -464,6 +507,69 @@ class FirebaseAuthService implements AuthService {
       await PreferencesService.instance.setBanExpiresAt(banExpiresAt, uid: user.uid);
       await PreferencesService.instance.setBanReason(banReason, uid: user.uid);
       await PreferencesService.instance.setRestrictedFeatures(restrictedFeatures, uid: user.uid);
+
+      // VAULT SECURITY (PIN & BIOMETRICS) CLOUD SYNCHRONIZATION:
+      // Link security credentials directly to the logged-in user's account in Firestore
+      final remoteVaultPin = remoteData?['vaultPin'] as String?;
+      final remoteVaultBiometric = remoteData?['vaultBiometricEnabled'] as bool?;
+
+      if (remoteVaultPin != null && remoteVaultPin.isNotEmpty) {
+        await PreferencesService.instance.setVaultPin(remoteVaultPin, uid: user.uid);
+      } else if (remoteData != null && remoteData.containsKey('vaultPin') && remoteVaultPin == null) {
+        // Explicitly removed in cloud
+        await PreferencesService.instance.setVaultPin(null, uid: user.uid);
+      } else {
+        // Adopt local/device PIN into account and sync to cloud if user had set one offline
+        final localPin = PreferencesService.instance.getVaultPin(uid: user.uid) ??
+            PreferencesService.instance.getVaultPin();
+        if (localPin != null && localPin.isNotEmpty) {
+          await PreferencesService.instance.setVaultPin(localPin, uid: user.uid);
+          await userDocRef.set({
+            'vaultPin': localPin,
+            'vaultPinUpdatedAt': now,
+          }, SetOptions(merge: true));
+        }
+      }
+
+      if (remoteVaultBiometric != null) {
+        await PreferencesService.instance.setVaultBiometricEnabled(remoteVaultBiometric, uid: user.uid);
+      } else {
+        final localBio = PreferencesService.instance.isVaultBiometricEnabled(uid: user.uid) ||
+            PreferencesService.instance.isVaultBiometricEnabled();
+        if (localBio) {
+          await PreferencesService.instance.setVaultBiometricEnabled(true, uid: user.uid);
+          await userDocRef.set({
+            'vaultBiometricEnabled': true,
+            'vaultBiometricUpdatedAt': now,
+          }, SetOptions(merge: true));
+        }
+      }
+
+      // WORLD TRAVEL MAP PERSISTENCE & RESTORE:
+      // Synchronize marked countries between local storage and Firestore users/{uid}
+      try {
+        if (remoteData != null && remoteData.containsKey('travelMapCountries')) {
+          final remoteCountries = remoteData['travelMapCountries'];
+          if (remoteCountries is Map && remoteCountries.isNotEmpty) {
+            await TravelMapService.instance.restoreFromCloud(
+              Map<String, dynamic>.from(remoteCountries),
+              uid: user.uid,
+            );
+          }
+        } else {
+          // If Firestore is empty, adopt any countries user marked as guest and back up to account
+          final localCountries = await TravelMapService.instance.getRawSavedMap();
+          if (localCountries.isNotEmpty) {
+            await userDocRef.set({
+              'travelMapCountries': localCountries,
+              'travelMapUpdatedAt': now,
+            }, SetOptions(merge: true));
+            await TravelMapService.instance.restoreFromCloud(localCountries, uid: user.uid);
+          }
+        }
+      } catch (e) {
+        debugPrint('[FirebaseAuthService] Travel map sync in syncUserProfile notice: $e');
+      }
 
       final remoteCreatedAt =
           remoteExists && remoteData != null ? remoteData['createdAt'] : null;

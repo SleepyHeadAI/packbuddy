@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/features/budget/domain/geocoding_helper.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/domain/trip_waypoint.dart';
+import 'package:packbuddy/features/travel_map/data/world_countries_data.dart';
+import 'package:packbuddy/features/travel_map/presentation/screens/travel_map_screen.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -113,24 +116,78 @@ class TripMapPreviewCard extends StatelessWidget {
     this.onManageRoute,
   });
 
-  static Future<void> launchMaps(String query) async {
-    final encoded = Uri.encodeComponent(query);
-    final googleMapsUrl = Uri.parse('https://www.google.com/maps/search/?api=1&query=$encoded');
-    try {
-      if (await canLaunchUrl(googleMapsUrl)) {
-        await launchUrl(googleMapsUrl, mode: LaunchMode.externalApplication);
+  /// Extracts individual stops from raw multi-destination strings
+  static List<String> parseRouteStops(String raw) {
+    if (raw.trim().isEmpty) return [];
+    final parts = raw.split(RegExp(r'\s*(?:➔|->|•|\||,)\s*'));
+    final stops = <String>[];
+    for (final part in parts) {
+      final trimmed = part.trim();
+      if (trimmed.isNotEmpty && !stops.contains(trimmed)) {
+        stops.add(trimmed);
       }
-    } catch (_) {}
+    }
+    return stops.isNotEmpty ? stops : [raw.trim()];
   }
 
-  static Future<void> launchDirections(String destination) async {
-    final encoded = Uri.encodeComponent(destination);
-    final directionsUrl = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$encoded');
-    try {
-      if (await canLaunchUrl(directionsUrl)) {
-        await launchUrl(directionsUrl, mode: LaunchMode.externalApplication);
+  /// Strips emojis and flag characters so Google Maps search can geocode cleanly
+  static String cleanStopForMaps(String stop) {
+    return stop
+        .replaceAll(RegExp(r'[\u{1F1E6}-\u{1F1FF}]{2}', unicode: true), '')
+        .replaceAll(RegExp(r'[^\w\s\u00C0-\u017F\u0400-\u04FF\u0600-\u06FF\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF\.,\-]'), '')
+        .trim();
+  }
+
+  /// Launches Google Maps with multi-stop directions or single destination search
+  static Future<void> launchMaps(String query) async {
+    final stops = parseRouteStops(query);
+    Uri targetUri;
+
+    if (stops.length >= 2) {
+      final origin = cleanStopForMaps(stops.first);
+      final dest = cleanStopForMaps(stops.last);
+      final intermediate = stops
+          .sublist(1, stops.length - 1)
+          .map(cleanStopForMaps)
+          .where((s) => s.isNotEmpty)
+          .toList();
+
+      var url = 'https://www.google.com/maps/dir/?api=1&origin=${Uri.encodeComponent(origin)}&destination=${Uri.encodeComponent(dest)}';
+      if (intermediate.isNotEmpty) {
+        url += '&waypoints=${intermediate.map(Uri.encodeComponent).join('|')}';
       }
-    } catch (_) {}
+      targetUri = Uri.parse(url);
+    } else {
+      final clean = stops.isNotEmpty ? cleanStopForMaps(stops.first) : cleanStopForMaps(query);
+      targetUri = Uri.parse('https://www.google.com/maps/search/?api=1&query=${Uri.encodeComponent(clean)}');
+    }
+
+    try {
+      final launched = await launchUrl(targetUri, mode: LaunchMode.externalApplication);
+      if (!launched) {
+        await launchUrl(targetUri, mode: LaunchMode.platformDefault);
+      }
+    } catch (_) {
+      try {
+        await launchUrl(targetUri, mode: LaunchMode.platformDefault);
+      } catch (_) {}
+    }
+  }
+
+  /// Opens turn-by-turn directions to a specific stop or waypoint
+  static Future<void> launchDirections(String destination) async {
+    final clean = cleanStopForMaps(destination);
+    final directionsUrl = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=${Uri.encodeComponent(clean)}');
+    try {
+      final launched = await launchUrl(directionsUrl, mode: LaunchMode.externalApplication);
+      if (!launched) {
+        await launchUrl(directionsUrl, mode: LaunchMode.platformDefault);
+      }
+    } catch (_) {
+      try {
+        await launchUrl(directionsUrl, mode: LaunchMode.platformDefault);
+      } catch (_) {}
+    }
   }
 
   @override
@@ -140,6 +197,8 @@ class TripMapPreviewCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
 
     final destination = trip.destination;
+    final stops = parseRouteStops(destination);
+    final matchedCountry = WorldCountriesData.matchCountry(destination);
 
     return Container(
       width: double.infinity,
@@ -156,7 +215,7 @@ class TripMapPreviewCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Visual Map Canvas
+          // Visual Map Canvas with Route Highlights
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(21)),
             child: SizedBox(
@@ -167,7 +226,7 @@ class TripMapPreviewCard extends StatelessWidget {
                   Positioned.fill(
                     child: CustomPaint(
                       painter: RouteMapPainter(
-                        waypointCount: waypoints.length,
+                        waypointCount: stops.length > 2 ? stops.length - 2 : waypoints.length,
                         primaryColor: theme.colorScheme.primary,
                         secondaryColor: theme.colorScheme.secondary,
                         isDark: isDark,
@@ -182,21 +241,21 @@ class TripMapPreviewCard extends StatelessWidget {
                         maxWidth: MediaQuery.of(context).size.width * 0.65,
                       ),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: (isDark ? Colors.black : Colors.white).withValues(alpha: 0.85),
-                          borderRadius: BorderRadius.circular(8),
+                          color: (isDark ? Colors.black : Colors.white).withValues(alpha: 0.88),
+                          borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.08),
-                              blurRadius: 4,
+                              color: Colors.black.withValues(alpha: 0.1),
+                              blurRadius: 6,
                             ),
                           ],
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.place_rounded, size: 12, color: theme.colorScheme.primary),
+                            Icon(Icons.place_rounded, size: 14, color: theme.colorScheme.primary),
                             const SizedBox(width: 4),
                             Flexible(
                               child: Text(
@@ -215,10 +274,98 @@ class TripMapPreviewCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if (stops.length >= 2)
+                    Positioned(
+                      bottom: 8,
+                      left: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withValues(alpha: 0.9),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          '${stops.length} ${l10n?.itineraryStops ?? 'Stops'}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
           ),
+
+          // Multi-Stop Interactive Horizontal Chips
+          if (stops.length >= 2) ...[
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, top: 12),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: stops.asMap().entries.map((entry) {
+                    final idx = entry.key;
+                    final stop = entry.value;
+                    final isLast = idx == stops.length - 1;
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        InkWell(
+                          onTap: () => launchDirections(stop),
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircleAvatar(
+                                  radius: 8,
+                                  backgroundColor: theme.colorScheme.primary,
+                                  child: Text(
+                                    '${idx + 1}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  stop,
+                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        if (!isLast) ...[
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: Icon(
+                              Icons.arrow_forward_rounded,
+                              size: 14,
+                              color: theme.colorScheme.primary.withValues(alpha: 0.6),
+                            ),
+                          ),
+                        ],
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ],
 
           // Map Details & Action Row
           Padding(
@@ -234,7 +381,7 @@ class TripMapPreviewCard extends StatelessWidget {
                   children: [
                     ConstrainedBox(
                       constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width > 360 ? 180 : 150,
+                        maxWidth: MediaQuery.of(context).size.width > 360 ? 180 : 130,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -245,10 +392,15 @@ class TripMapPreviewCard extends StatelessWidget {
                               fontWeight: FontWeight.w800,
                             ),
                           ),
+                          const SizedBox(height: 2),
                           Text(
-                            waypoints.isEmpty
-                                ? (l10n?.noWaypoints ?? 'No waypoints added yet')
-                                : '${waypoints.length} • ${l10n?.waypoints ?? 'Route Waypoints'}',
+                            stops.length >= 2
+                                ? '${stops.first} ➔ ${stops.last}'
+                                : (waypoints.isEmpty
+                                    ? (l10n?.noWaypoints ?? 'No waypoints added yet')
+                                    : '${waypoints.length} • ${l10n?.waypoints ?? 'Route Waypoints'}'),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 11.5,
                               color: theme.colorScheme.onSurfaceVariant,
@@ -289,6 +441,32 @@ class TripMapPreviewCard extends StatelessWidget {
                     ),
                   ),
                 ],
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    icon: const Icon(Icons.public_rounded, size: 16),
+                    label: Text(
+                      matchedCountry != null
+                          ? '${matchedCountry.flag} ${matchedCountry.nameTr} • Dünya Haritasında Gör'
+                          : 'Dünya Seyahat Haritam (Been & Skratch)',
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFF10B981),
+                      foregroundColor: Colors.white,
+                      visualDensity: VisualDensity.compact,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const TravelMapScreen()),
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
           ),
@@ -361,11 +539,16 @@ class _TripMapSheetState extends State<TripMapSheet> {
     final name = _nameController.text.trim();
     if (name.isEmpty) return;
 
+    final coords = GeocodingHelper.resolveCoordinates(name) ??
+        GeocodingHelper.resolveCoordinates(widget.trip.destination);
+
     final newWaypoint = TripWaypoint(
       id: 'wp_${DateTime.now().millisecondsSinceEpoch}',
       tripId: widget.trip.id,
       name: name,
       category: _selectedCategory,
+      latitude: coords?['latitude'],
+      longitude: coords?['longitude'],
       address: _addressController.text.trim().isNotEmpty ? _addressController.text.trim() : null,
       orderIndex: _waypoints.length,
     );
@@ -542,9 +725,32 @@ class _TripMapSheetState extends State<TripMapSheet> {
                         Icon(_getCategoryIcon(wp.category), size: 18, color: theme.colorScheme.primary),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: Text(
-                            wp.name,
-                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                wp.name,
+                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                              ),
+                              if (wp.latitude != null && wp.longitude != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 2),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.gps_fixed_rounded, size: 11, color: theme.colorScheme.primary),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '${wp.latitude!.toStringAsFixed(2)}° N, ${wp.longitude!.toStringAsFixed(2)}° E',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w500,
+                                          color: theme.colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                         IconButton(

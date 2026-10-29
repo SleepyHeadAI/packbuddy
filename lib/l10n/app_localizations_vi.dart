@@ -316,8 +316,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get viewAll => 'Xem tất cả';
 
   @override
-  String get allNotificationsUpToDate =>
-      'Mọi thông báo chuyến đi đều mới nhất!';
+  String get allNotificationsUpToDate => 'Tất cả thông báo đều được cập nhật.';
 
   @override
   String get createFirstTrip => 'Tạo lộ trình và ngân sách đầu tiên ngay.';
@@ -1709,4 +1708,335 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get confirm => 'Xác nhận';
+
+  @override
+  String get vaultBiometricReason =>
+      'Xác minh vân tay hoặc khuôn mặt để mở khóa kho lưu trữ du lịch của bạn';
+
+  @override
+  String get biometricsFailed =>
+      'Xác minh sinh trắc học thất bại hoặc đã bị hủy.';
+
+  @override
+  String get customBaggageLimitPrompt => 'Đặt giới hạn tùy chỉnh (kg)';
+
+  @override
+  String get testNotificationSent =>
+      'Thông báo thử nghiệm đã gửi đến thiết bị của bạn.';
+
+  @override
+  String get pinWidgetSuccess => 'Tiện ích đã được thêm vào màn hình chính.';
+
+  @override
+  String get pinWidgetGuide =>
+      'Nhấn giữ màn hình chính và chọn Tiện ích > PackBuddy.';
+
+  @override
+  String scheduledRemindersCount(int count) {
+    return '$count lời nhắc chuyến đi đã lên lịch';
+  }
+
+  @override
+  String get packingRemindersScheduled48h =>
+      'Trước 48 giờ: Đã lên lịch nhắc nhở đóng gói hành lý';
+
+  @override
+  String get packingRemindersScheduled24h =>
+      'Trước 24 giờ: Kiểm tra danh sách hành lý lần cuối';
+
+  @override
+  String get testNotificationAction => 'Kiểm tra thông báo';
+
+  @override
+  String get noUpcomingRemindersDesc =>
+      'Khi bạn thêm chuyến đi, lời nhắc sẽ xuất hiện ở đây.';
+
+  @override
+  String get clearAll => 'Xóa tất cả';
+
+  @override
+  String get notificationHistory => 'Lịch sử thông báo';
+
+  @override
+  String get upcomingReminders => 'Lời nhắc sắp tới';
+
+  @override
+  String daysRemaining(int days) {
+    return 'Còn $days ngày';
+  }
+
+  @override
+  String get today => 'Hôm nay';
+
+  @override
+  String get biometricUnlock => 'Mở khóa sinh trắc học';
+
+  @override
+  String get biometricUnlockSubtitle =>
+      'Mở khóa kho lưu trữ bằng vân tay hoặc Face ID';
+
+  @override
+  String get setPinFirstToEnableBiometrics =>
+      'Thiết lập mã PIN trước để bật sinh trắc học';
+
+  @override
+  String get passportSummaryShared =>
+      'Tóm tắt hộ chiếu đã sẵn sàng để chia sẻ!';
+
+  @override
+  String get sharePassportTooltip => 'Chia sẻ hộ chiếu';
+
+  @override
+  String get visitedCountryStatus => 'Bạn đã đến thăm quốc gia này';
+
+  @override
+  String get worldTravelMapTitle => 'Bản đồ du lịch thế giới của tôi';
+
+  @override
+  String get worldTravelMapSubtitle => 'Tô màu các quốc gia đã đến và muốn đến';
+
+  @override
+  String worldTravelMapStats(int visited, int wishlist, String percentage) {
+    return '$visited Đã đến • $wishlist Muốn đến • %$percentage Đã khám phá';
+  }
+
+  @override
+  String get mapLegendBeen => 'Đã đi';
+
+  @override
+  String get mapLegendWant => 'Muốn đi';
+
+  @override
+  String get mapLegendUnvisited => 'Chưa đi';
+
+  @override
+  String get mapLegendVisitedCity => 'Thành phố đã đến';
+
+  @override
+  String get mapLegendWishlistCity => 'Thành phố muốn đến';
+
+  @override
+  String get mapLegendCapital => 'Thủ đô';
+
+  @override
+  String get zoomIn => 'Phóng to';
+
+  @override
+  String get zoomOut => 'Thu nhỏ';
+
+  @override
+  String get resetZoom => 'Đặt lại';
+
+  @override
+  String get countriesTab => 'Quốc gia';
+
+  @override
+  String get citiesTab => 'Thành phố';
+
+  @override
+  String get searchCountryOrCapital =>
+      'Tìm kiếm quốc gia hoặc thủ đô (vd: Ý, Nhật Bản)...';
+
+  @override
+  String get basedOnUnCountries => 'Dựa trên 195 quốc gia thuộc Liên Hợp Quốc';
+
+  @override
+  String get countriesAndTerritories => 'Quốc gia & Vùng lãnh thổ';
+
+  @override
+  String get visitedStat => 'đã đến';
+
+  @override
+  String get countryUnit => 'quốc gia';
+
+  @override
+  String moreCountries(int count) {
+    return '+ thêm $count quốc gia';
+  }
+
+  @override
+  String get tripsUnit => 'chuyến đi';
+
+  @override
+  String get citiesUnit => 'thành phố';
+
+  @override
+  String get continentsUnit => 'châu lục';
+
+  @override
+  String get ofTheWorld => 'thế giới';
+
+  @override
+  String get daysUnit => 'ngày';
+
+  @override
+  String get allFilter => 'Tất cả';
+
+  @override
+  String get visitedFilter => 'Đã đến';
+
+  @override
+  String get wishlistFilter => 'Muốn đến';
+
+  @override
+  String get continentEurope => 'Châu Âu';
+
+  @override
+  String get continentAsia => 'Châu Á';
+
+  @override
+  String get continentAmericas => 'Châu Mỹ';
+
+  @override
+  String get continentAfrica => 'Châu Phi';
+
+  @override
+  String get continentOceania => 'Châu Đại Dương';
+
+  @override
+  String get markAsVisitedTooltip => 'Đánh dấu là đã đến';
+
+  @override
+  String get markAsWishlistTooltip => 'Đánh dấu là muốn đến';
+
+  @override
+  String get visitDateLabel => 'Ngày đến thăm';
+
+  @override
+  String get coordinatesLabel => 'Tọa độ';
+
+  @override
+  String airlineSelectedMessage(String airline, String limit) {
+    return 'Đã chọn $airline ($limit kg).';
+  }
+
+  @override
+  String amountCopied(String amount) {
+    return 'Đã sao chép $amount!';
+  }
+
+  @override
+  String noticeMessage(String error) {
+    return 'Thông báo: $error';
+  }
+
+  @override
+  String get collaboratorEmailOrNameHint => 'vd: alex@example.com / Tên';
+
+  @override
+  String get tripCodePlaceholder => 'vd: PB-A1B2C';
+
+  @override
+  String get authAppleSignInComingSoon =>
+      'Đăng nhập bằng Apple hiện chưa khả dụng. Tính năng sẽ sớm ra mắt.';
+
+  @override
+  String get proStoreComingSoonTitle => 'PackBuddy Pro sắp ra mắt';
+
+  @override
+  String get proStoreComingSoonDesc =>
+      'Gói đăng ký PackBuddy Pro trên cửa hàng hiện chưa khả dụng. Sẽ sớm có mặt trên Google Play và App Store.';
+
+  @override
+  String planTripToCountry(String country) {
+    return 'Lên kế hoạch du lịch đến $country';
+  }
+
+  @override
+  String get noVisitedCountriesYet =>
+      'Chưa đánh dấu quốc gia đã đến. Nhấn vào các quốc gia trên bản đồ hoặc danh sách bên dưới để tô màu!';
+
+  @override
+  String get navMap => 'Bản đồ';
+
+  @override
+  String get mapLegendLived => 'Đã sống';
+
+  @override
+  String get livedFilter => 'Đã sống';
+
+  @override
+  String get markAsLivedTooltip => 'Đánh dấu là quốc gia từng sinh sống';
+
+  @override
+  String get livedCountryStatus => 'Bạn đã từng sống tại quốc gia này';
+
+  @override
+  String get shareStory => 'Chia sẻ lên Tin';
+
+  @override
+  String get shareStorySubtitle =>
+      'Chia sẻ trên Instagram, Snapchat hoặc với bạn bè';
+
+  @override
+  String get shareStoryPreview => 'Xem trước Tin';
+
+  @override
+  String get generatingStoryImage => 'Đang tạo hình ảnh tin...';
+
+  @override
+  String get storyCardTagline => 'Bản Đồ Du Lịch Thế Giới Của Tôi';
+
+  @override
+  String get storyWatermark => 'Khám phá cùng PackBuddy';
+
+  @override
+  String get shareImageButton => 'Chia sẻ dưới dạng Tin';
+
+  @override
+  String get shareTextButton => 'Chia sẻ dạng văn bản';
+
+  @override
+  String get globe3D => 'Quả địa cầu 3D';
+
+  @override
+  String get globeRotateHint => 'Kéo để xoay • Nhấn';
+
+  @override
+  String get cyprusRegion => 'Khu vực Síp';
+
+  @override
+  String get storyThemeMidnight => 'Nửa đêm';
+
+  @override
+  String get storyThemeSunset => 'Hoàng hôn';
+
+  @override
+  String get storyThemeAtlas => 'Bản đồ';
+
+  @override
+  String get storyThemeMinimal => 'Tối giản';
+
+  @override
+  String get storyThemeDune => 'Cồn cát';
+
+  @override
+  String get storyThemeOcean => 'Đại dương';
+
+  @override
+  String get addWidgetToHomeScreen => 'Thêm tiện ích vào màn hình chính';
+
+  @override
+  String get pdfError => 'Lỗi PDF';
+
+  @override
+  String get storyLayoutShowcase => 'Trưng bày';
+
+  @override
+  String get passportEntryVisas => 'Thị thực nhập cảnh & Con dấu';
+
+  @override
+  String get passportOfficialDocument => 'Hộ chiếu du lịch chính thức';
+
+  @override
+  String get storyLayoutMinimal => 'Tối giản';
+
+  @override
+  String get passportWorldCitizen => 'Công dân toàn cầu';
+
+  @override
+  String get storyLayoutPassport => 'Hộ chiếu';
+
+  @override
+  String get storyLayoutClassic => 'Cổ điển';
 }

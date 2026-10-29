@@ -318,7 +318,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get viewAll => 'Смотреть все';
 
   @override
-  String get allNotificationsUpToDate => 'Все уведомления обновлены!';
+  String get allNotificationsUpToDate => 'Все уведомления актуальны.';
 
   @override
   String get createFirstTrip => 'Создайте маршрут и бюджет прямо сейчас.';
@@ -1712,4 +1712,335 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get confirm => 'Подтвердить';
+
+  @override
+  String get vaultBiometricReason =>
+      'Подтвердите отпечаток пальца или лицо для разблокировки сейфа';
+
+  @override
+  String get biometricsFailed =>
+      'Биометрическая проверка не удалась или была отменена.';
+
+  @override
+  String get customBaggageLimitPrompt => 'Указать свой лимит (кг)';
+
+  @override
+  String get testNotificationSent =>
+      'Тестовое уведомление отправлено на ваше устройство.';
+
+  @override
+  String get pinWidgetSuccess => 'Виджет добавлен на главный экран.';
+
+  @override
+  String get pinWidgetGuide =>
+      'Удерживайте палец на главном экране и выберите Виджеты > PackBuddy.';
+
+  @override
+  String scheduledRemindersCount(int count) {
+    return '$count запланированных напоминаний о поездках';
+  }
+
+  @override
+  String get packingRemindersScheduled48h =>
+      'За 48 часов: Напоминание о сборе вещей запланировано';
+
+  @override
+  String get packingRemindersScheduled24h =>
+      'За 24 часа: Финальная проверка списка вещей';
+
+  @override
+  String get testNotificationAction => 'Тест уведомлений';
+
+  @override
+  String get noUpcomingRemindersDesc =>
+      'Когда вы запланируете поездку, здесь появятся напоминания перед выездом.';
+
+  @override
+  String get clearAll => 'Очистить все';
+
+  @override
+  String get notificationHistory => 'История уведомлений';
+
+  @override
+  String get upcomingReminders => 'Предстоящие напоминания';
+
+  @override
+  String daysRemaining(int days) {
+    return 'Осталось $days дн.';
+  }
+
+  @override
+  String get today => 'Сегодня';
+
+  @override
+  String get biometricUnlock => 'Биометрическая разблокировка';
+
+  @override
+  String get biometricUnlockSubtitle =>
+      'Разблокируйте сейф по отпечатку или Face ID';
+
+  @override
+  String get setPinFirstToEnableBiometrics =>
+      'Сначала задайте PIN-код для включения биометрии';
+
+  @override
+  String get passportSummaryShared => 'Сводка паспорта готова к отправке!';
+
+  @override
+  String get sharePassportTooltip => 'Поделиться паспортом';
+
+  @override
+  String get visitedCountryStatus => 'Вы посетили эту страну';
+
+  @override
+  String get worldTravelMapTitle => 'Моя карта путешествий по миру';
+
+  @override
+  String get worldTravelMapSubtitle =>
+      'Отмечайте посещенные страны и список желаний';
+
+  @override
+  String worldTravelMapStats(int visited, int wishlist, String percentage) {
+    return '$visited Посещено • $wishlist В планах • %$percentage Исследовано';
+  }
+
+  @override
+  String get mapLegendBeen => 'Посещено';
+
+  @override
+  String get mapLegendWant => 'В планах';
+
+  @override
+  String get mapLegendUnvisited => 'Не посещено';
+
+  @override
+  String get mapLegendVisitedCity => 'Посещенный город';
+
+  @override
+  String get mapLegendWishlistCity => 'Город мечты';
+
+  @override
+  String get mapLegendCapital => 'Столица';
+
+  @override
+  String get zoomIn => 'Приблизить';
+
+  @override
+  String get zoomOut => 'Отдалить';
+
+  @override
+  String get resetZoom => 'Сбросить';
+
+  @override
+  String get countriesTab => 'Страны';
+
+  @override
+  String get citiesTab => 'Города';
+
+  @override
+  String get searchCountryOrCapital =>
+      'Поиск страны или столицы (напр. Италия, Япония)...';
+
+  @override
+  String get basedOnUnCountries => 'На основе 195 стран ООН';
+
+  @override
+  String get countriesAndTerritories => 'Страны и территории';
+
+  @override
+  String get visitedStat => 'посещено';
+
+  @override
+  String get countryUnit => 'стран';
+
+  @override
+  String moreCountries(int count) {
+    return '+ еще $count стран';
+  }
+
+  @override
+  String get tripsUnit => 'поездок';
+
+  @override
+  String get citiesUnit => 'городов';
+
+  @override
+  String get continentsUnit => 'континентов';
+
+  @override
+  String get ofTheWorld => 'мира';
+
+  @override
+  String get daysUnit => 'дней';
+
+  @override
+  String get allFilter => 'Все';
+
+  @override
+  String get visitedFilter => 'Посещенные';
+
+  @override
+  String get wishlistFilter => 'Планы';
+
+  @override
+  String get continentEurope => 'Европа';
+
+  @override
+  String get continentAsia => 'Азия';
+
+  @override
+  String get continentAmericas => 'Америка';
+
+  @override
+  String get continentAfrica => 'Африка';
+
+  @override
+  String get continentOceania => 'Океания';
+
+  @override
+  String get markAsVisitedTooltip => 'Отметить как посещенное';
+
+  @override
+  String get markAsWishlistTooltip => 'Добавить в планы';
+
+  @override
+  String get visitDateLabel => 'Дата визита';
+
+  @override
+  String get coordinatesLabel => 'Координаты';
+
+  @override
+  String airlineSelectedMessage(String airline, String limit) {
+    return '$airline ($limit кг) выбрано.';
+  }
+
+  @override
+  String amountCopied(String amount) {
+    return '$amount скопировано!';
+  }
+
+  @override
+  String noticeMessage(String error) {
+    return 'Уведомление: $error';
+  }
+
+  @override
+  String get collaboratorEmailOrNameHint => 'напр. alex@example.com / Имя';
+
+  @override
+  String get tripCodePlaceholder => 'напр. PB-A1B2C';
+
+  @override
+  String get authAppleSignInComingSoon =>
+      'Вход через Apple в данный момент недоступен. Функция появится в ближайшее время.';
+
+  @override
+  String get proStoreComingSoonTitle => 'PackBuddy Pro скоро появится';
+
+  @override
+  String get proStoreComingSoonDesc =>
+      'Подписки PackBuddy Pro в магазине сейчас не активны. Они появятся в Google Play и App Store в ближайшее время.';
+
+  @override
+  String planTripToCountry(String country) {
+    return 'Спланировать поездку в $country';
+  }
+
+  @override
+  String get noVisitedCountriesYet =>
+      'Посещённые страны ещё не отмечены. Нажмите на страны на карте или в списке ниже, чтобы раскрасить их!';
+
+  @override
+  String get navMap => 'Карта';
+
+  @override
+  String get mapLegendLived => 'Проживал';
+
+  @override
+  String get livedFilter => 'Проживал';
+
+  @override
+  String get markAsLivedTooltip => 'Отметить как страну проживания';
+
+  @override
+  String get livedCountryStatus => 'Вы проживали в этой стране';
+
+  @override
+  String get shareStory => 'Поделиться в Истории';
+
+  @override
+  String get shareStorySubtitle =>
+      'Поделитесь в Instagram, Snapchat или с друзьями';
+
+  @override
+  String get shareStoryPreview => 'Предпросмотр Истории';
+
+  @override
+  String get generatingStoryImage => 'Создание изображения для истории...';
+
+  @override
+  String get storyCardTagline => 'Моя Карта Путешествий по Миру';
+
+  @override
+  String get storyWatermark => 'Исследовано с PackBuddy';
+
+  @override
+  String get shareImageButton => 'Поделиться историей';
+
+  @override
+  String get shareTextButton => 'Поделиться текстом';
+
+  @override
+  String get globe3D => '3D Глобус';
+
+  @override
+  String get globeRotateHint => 'Потяните для вращения • Нажмите';
+
+  @override
+  String get cyprusRegion => 'Регион Кипр';
+
+  @override
+  String get storyThemeMidnight => 'Полночь';
+
+  @override
+  String get storyThemeSunset => 'Закат';
+
+  @override
+  String get storyThemeAtlas => 'Атлас';
+
+  @override
+  String get storyThemeMinimal => 'Минимал';
+
+  @override
+  String get storyThemeDune => 'Дюна';
+
+  @override
+  String get storyThemeOcean => 'Океан';
+
+  @override
+  String get addWidgetToHomeScreen => 'Добавить виджет на главный экран';
+
+  @override
+  String get pdfError => 'Ошибка PDF';
+
+  @override
+  String get storyLayoutShowcase => 'Витрина';
+
+  @override
+  String get passportEntryVisas => 'Въездные визы и штампы';
+
+  @override
+  String get passportOfficialDocument => 'Официальный загранпаспорт';
+
+  @override
+  String get storyLayoutMinimal => 'Минимал';
+
+  @override
+  String get passportWorldCitizen => 'Гражданин мира';
+
+  @override
+  String get storyLayoutPassport => 'Паспорт';
+
+  @override
+  String get storyLayoutClassic => 'Классика';
 }

@@ -319,7 +319,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get viewAll => 'Mostra Tutto';
 
   @override
-  String get allNotificationsUpToDate => 'Tutte le notifiche sono aggiornate!';
+  String get allNotificationsUpToDate => 'Tutte le notifiche sono aggiornate.';
 
   @override
   String get createFirstTrip => 'Crea subito il tuo primo itinerario e budget.';
@@ -1719,4 +1719,334 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get confirm => 'Conferma';
+
+  @override
+  String get vaultBiometricReason =>
+      'Verifica la tua impronta digitale o il volto per sbloccare la cassaforte';
+
+  @override
+  String get biometricsFailed => 'Verifica biometrica fallita o annullata.';
+
+  @override
+  String get customBaggageLimitPrompt => 'Imposta limite personalizzato (kg)';
+
+  @override
+  String get testNotificationSent =>
+      'Notifica di test inviata al tuo dispositivo.';
+
+  @override
+  String get pinWidgetSuccess => 'Widget aggiunto alla schermata iniziale.';
+
+  @override
+  String get pinWidgetGuide =>
+      'Tieni premuta la schermata iniziale e seleziona Widget > PackBuddy.';
+
+  @override
+  String scheduledRemindersCount(int count) {
+    return '$count promemoria di viaggio programmati';
+  }
+
+  @override
+  String get packingRemindersScheduled48h =>
+      '48 ore prima: Promemoria bagagli programmato';
+
+  @override
+  String get packingRemindersScheduled24h =>
+      '24 ore prima: Controllo finale della lista';
+
+  @override
+  String get testNotificationAction => 'Testa notifiche';
+
+  @override
+  String get noUpcomingRemindersDesc =>
+      'Quando pianifichi un viaggio, i promemoria di partenza appariranno qui.';
+
+  @override
+  String get clearAll => 'Cancella tutto';
+
+  @override
+  String get notificationHistory => 'Cronologia notifiche';
+
+  @override
+  String get upcomingReminders => 'Prossimi promemoria';
+
+  @override
+  String daysRemaining(int days) {
+    return '$days giorni rimanenti';
+  }
+
+  @override
+  String get today => 'Oggi';
+
+  @override
+  String get biometricUnlock => 'Sblocco biometrico';
+
+  @override
+  String get biometricUnlockSubtitle =>
+      'Sblocca la cassaforte con impronta o Face ID';
+
+  @override
+  String get setPinFirstToEnableBiometrics =>
+      'Imposta prima un PIN per abilitare la biometria';
+
+  @override
+  String get passportSummaryShared =>
+      'Riepilogo del passaporto pronto per la condivisione!';
+
+  @override
+  String get sharePassportTooltip => 'Condividi passaporto';
+
+  @override
+  String get visitedCountryStatus => 'Hai visitato questo paese';
+
+  @override
+  String get worldTravelMapTitle => 'La mia mappa dei viaggi nel mondo';
+
+  @override
+  String get worldTravelMapSubtitle => 'Colora i paesi visitati e desiderati';
+
+  @override
+  String worldTravelMapStats(int visited, int wishlist, String percentage) {
+    return '$visited Visitati • $wishlist Desiderati • %$percentage Esplorato';
+  }
+
+  @override
+  String get mapLegendBeen => 'Visitato';
+
+  @override
+  String get mapLegendWant => 'Desiderato';
+
+  @override
+  String get mapLegendUnvisited => 'Non visitato';
+
+  @override
+  String get mapLegendVisitedCity => 'Città visitata';
+
+  @override
+  String get mapLegendWishlistCity => 'Città desiderata';
+
+  @override
+  String get mapLegendCapital => 'Capitale';
+
+  @override
+  String get zoomIn => 'Ingrandisci';
+
+  @override
+  String get zoomOut => 'Rimpicciolisci';
+
+  @override
+  String get resetZoom => 'Ripristina';
+
+  @override
+  String get countriesTab => 'Paesi';
+
+  @override
+  String get citiesTab => 'Città';
+
+  @override
+  String get searchCountryOrCapital =>
+      'Cerca paese o capitale (es. Italia, Giappone)...';
+
+  @override
+  String get basedOnUnCountries => 'Basato su 195 paesi dell\'ONU';
+
+  @override
+  String get countriesAndTerritories => 'Paesi e territori';
+
+  @override
+  String get visitedStat => 'visitato';
+
+  @override
+  String get countryUnit => 'paesi';
+
+  @override
+  String moreCountries(int count) {
+    return '+ $count altri paesi';
+  }
+
+  @override
+  String get tripsUnit => 'viaggi';
+
+  @override
+  String get citiesUnit => 'città';
+
+  @override
+  String get continentsUnit => 'continenti';
+
+  @override
+  String get ofTheWorld => 'del mondo';
+
+  @override
+  String get daysUnit => 'giorni';
+
+  @override
+  String get allFilter => 'Tutti';
+
+  @override
+  String get visitedFilter => 'Visitati';
+
+  @override
+  String get wishlistFilter => 'Desiderati';
+
+  @override
+  String get continentEurope => 'Europa';
+
+  @override
+  String get continentAsia => 'Asia';
+
+  @override
+  String get continentAmericas => 'Americhe';
+
+  @override
+  String get continentAfrica => 'Africa';
+
+  @override
+  String get continentOceania => 'Oceania';
+
+  @override
+  String get markAsVisitedTooltip => 'Segna come visitato';
+
+  @override
+  String get markAsWishlistTooltip => 'Segna come desiderato';
+
+  @override
+  String get visitDateLabel => 'Data di visita';
+
+  @override
+  String get coordinatesLabel => 'Coordinate';
+
+  @override
+  String airlineSelectedMessage(String airline, String limit) {
+    return '$airline ($limit kg) selezionato.';
+  }
+
+  @override
+  String amountCopied(String amount) {
+    return '$amount copiato!';
+  }
+
+  @override
+  String noticeMessage(String error) {
+    return 'Avviso: $error';
+  }
+
+  @override
+  String get collaboratorEmailOrNameHint => 'es. alex@example.com / Nome';
+
+  @override
+  String get tripCodePlaceholder => 'es. PB-A1B2C';
+
+  @override
+  String get authAppleSignInComingSoon =>
+      'Accedi con Apple non è attualmente attivo. Sarà disponibile molto presto.';
+
+  @override
+  String get proStoreComingSoonTitle => 'PackBuddy Pro presto disponibile';
+
+  @override
+  String get proStoreComingSoonDesc =>
+      'Gli abbonamenti PackBuddy Pro non sono attualmente attivi. Saranno disponibili a breve su Google Play e App Store.';
+
+  @override
+  String planTripToCountry(String country) {
+    return 'Pianifica viaggio in $country';
+  }
+
+  @override
+  String get noVisitedCountriesYet =>
+      'Nessun paese visitato contrassegnato finora. Tocca i paesi sulla mappa o nell\'elenco in basso per colorarli!';
+
+  @override
+  String get navMap => 'Mappa';
+
+  @override
+  String get mapLegendLived => 'Abitato';
+
+  @override
+  String get livedFilter => 'Abitati';
+
+  @override
+  String get markAsLivedTooltip => 'Segna come paese in cui hai vissuto';
+
+  @override
+  String get livedCountryStatus => 'Hai vissuto in questo paese';
+
+  @override
+  String get shareStory => 'Condividi nelle Storie';
+
+  @override
+  String get shareStorySubtitle =>
+      'Condividi su Instagram, Snapchat o con gli amici';
+
+  @override
+  String get shareStoryPreview => 'Anteprima Storia';
+
+  @override
+  String get generatingStoryImage => 'Creazione immagine storia...';
+
+  @override
+  String get storyCardTagline => 'La Mia Mappa dei Viaggi Nel Mondo';
+
+  @override
+  String get storyWatermark => 'Esplorato con PackBuddy';
+
+  @override
+  String get shareImageButton => 'Condividi come Storia';
+
+  @override
+  String get shareTextButton => 'Condividi come testo';
+
+  @override
+  String get globe3D => 'Globo 3D';
+
+  @override
+  String get globeRotateHint => 'Trascina per ruotare • Tocca';
+
+  @override
+  String get cyprusRegion => 'Regione di Cipro';
+
+  @override
+  String get storyThemeMidnight => 'Mezzanotte';
+
+  @override
+  String get storyThemeSunset => 'Tramonto';
+
+  @override
+  String get storyThemeAtlas => 'Atlante';
+
+  @override
+  String get storyThemeMinimal => 'Minimale';
+
+  @override
+  String get storyThemeDune => 'Duna';
+
+  @override
+  String get storyThemeOcean => 'Oceano';
+
+  @override
+  String get addWidgetToHomeScreen => 'Aggiungi widget alla schermata iniziale';
+
+  @override
+  String get pdfError => 'Errore PDF';
+
+  @override
+  String get storyLayoutShowcase => 'Vetrina';
+
+  @override
+  String get passportEntryVisas => 'Visti d\'ingresso e timbri';
+
+  @override
+  String get passportOfficialDocument => 'Passaporto di viaggio ufficiale';
+
+  @override
+  String get storyLayoutMinimal => 'Minimale';
+
+  @override
+  String get passportWorldCitizen => 'Cittadino del mondo';
+
+  @override
+  String get storyLayoutPassport => 'Passaporto';
+
+  @override
+  String get storyLayoutClassic => 'Classico';
 }

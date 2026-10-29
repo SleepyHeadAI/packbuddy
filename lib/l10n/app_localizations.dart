@@ -743,7 +743,7 @@ abstract class AppLocalizations {
   /// Notification snackbar
   ///
   /// In en, this message translates to:
-  /// **'All travel notifications are up to date!'**
+  /// **'All notifications are up to date.'**
   String get allNotificationsUpToDate;
 
   /// Empty trips banner subtitle
@@ -3361,6 +3361,606 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Confirm'**
   String get confirm;
+
+  /// No description provided for @vaultBiometricReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify your fingerprint or face to unlock your travel vault'**
+  String get vaultBiometricReason;
+
+  /// No description provided for @biometricsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric verification failed or was cancelled.'**
+  String get biometricsFailed;
+
+  /// No description provided for @customBaggageLimitPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Set custom limit (kg)'**
+  String get customBaggageLimitPrompt;
+
+  /// No description provided for @testNotificationSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Test notification sent to your device.'**
+  String get testNotificationSent;
+
+  /// No description provided for @pinWidgetSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Widget added to home screen.'**
+  String get pinWidgetSuccess;
+
+  /// No description provided for @pinWidgetGuide.
+  ///
+  /// In en, this message translates to:
+  /// **'Long-press your home screen and choose Widgets > PackBuddy to add.'**
+  String get pinWidgetGuide;
+
+  /// Number of scheduled trip reminders
+  ///
+  /// In en, this message translates to:
+  /// **'{count} scheduled trip reminders'**
+  String scheduledRemindersCount(int count);
+
+  /// No description provided for @packingRemindersScheduled48h.
+  ///
+  /// In en, this message translates to:
+  /// **'48 hours before: Smart packing reminder scheduled'**
+  String get packingRemindersScheduled48h;
+
+  /// No description provided for @packingRemindersScheduled24h.
+  ///
+  /// In en, this message translates to:
+  /// **'24 hours before: Final checklist check reminder scheduled'**
+  String get packingRemindersScheduled24h;
+
+  /// No description provided for @testNotificationAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Test Notifications'**
+  String get testNotificationAction;
+
+  /// No description provided for @noUpcomingRemindersDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'When you plan a trip, departure reminders and packing preparation alerts will appear here.'**
+  String get noUpcomingRemindersDesc;
+
+  /// No description provided for @clearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear All'**
+  String get clearAll;
+
+  /// No description provided for @notificationHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification History'**
+  String get notificationHistory;
+
+  /// No description provided for @upcomingReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming Reminders'**
+  String get upcomingReminders;
+
+  /// Days remaining until trip
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days left'**
+  String daysRemaining(int days);
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @biometricUnlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric Unlock'**
+  String get biometricUnlock;
+
+  /// No description provided for @biometricUnlockSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock vault with fingerprint or Face ID'**
+  String get biometricUnlockSubtitle;
+
+  /// No description provided for @setPinFirstToEnableBiometrics.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a PIN first to enable biometrics'**
+  String get setPinFirstToEnableBiometrics;
+
+  /// Toast notification when passport summary is shared
+  ///
+  /// In en, this message translates to:
+  /// **'Passport summary ready to share!'**
+  String get passportSummaryShared;
+
+  /// Tooltip for passport sharing action button
+  ///
+  /// In en, this message translates to:
+  /// **'Share Passport'**
+  String get sharePassportTooltip;
+
+  /// Status indicating user has visited this country
+  ///
+  /// In en, this message translates to:
+  /// **'You visited this country'**
+  String get visitedCountryStatus;
+
+  /// Header title for World Travel Map
+  ///
+  /// In en, this message translates to:
+  /// **'World Travel Map'**
+  String get worldTravelMapTitle;
+
+  /// Subtitle explaining map colorization
+  ///
+  /// In en, this message translates to:
+  /// **'Colorize visited & wishlist countries'**
+  String get worldTravelMapSubtitle;
+
+  /// Formatted summary stats on travel map showcase
+  ///
+  /// In en, this message translates to:
+  /// **'{visited} Visited • {wishlist} Wishlist • %{percentage} Explored'**
+  String worldTravelMapStats(int visited, int wishlist, String percentage);
+
+  /// Legend label for visited countries
+  ///
+  /// In en, this message translates to:
+  /// **'Visited'**
+  String get mapLegendBeen;
+
+  /// Legend label for wishlist countries
+  ///
+  /// In en, this message translates to:
+  /// **'Wishlist'**
+  String get mapLegendWant;
+
+  /// Legend label for unvisited countries
+  ///
+  /// In en, this message translates to:
+  /// **'Unvisited'**
+  String get mapLegendUnvisited;
+
+  /// Legend label for visited cities
+  ///
+  /// In en, this message translates to:
+  /// **'Visited City'**
+  String get mapLegendVisitedCity;
+
+  /// Legend label for wishlist cities
+  ///
+  /// In en, this message translates to:
+  /// **'Wishlist City'**
+  String get mapLegendWishlistCity;
+
+  /// Legend label for capital cities
+  ///
+  /// In en, this message translates to:
+  /// **'Capital'**
+  String get mapLegendCapital;
+
+  /// Zoom in button tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom In'**
+  String get zoomIn;
+
+  /// Zoom out button tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom Out'**
+  String get zoomOut;
+
+  /// Reset zoom button tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get resetZoom;
+
+  /// Tab title for countries view
+  ///
+  /// In en, this message translates to:
+  /// **'Countries'**
+  String get countriesTab;
+
+  /// Tab title for cities view
+  ///
+  /// In en, this message translates to:
+  /// **'Cities'**
+  String get citiesTab;
+
+  /// Hint text in travel map search box
+  ///
+  /// In en, this message translates to:
+  /// **'Search country or capital (e.g. Italy, Japan)...'**
+  String get searchCountryOrCapital;
+
+  /// Footnote indicating 195 UN countries baseline
+  ///
+  /// In en, this message translates to:
+  /// **'Based on 195 UN countries'**
+  String get basedOnUnCountries;
+
+  /// Card header for countries and territories list
+  ///
+  /// In en, this message translates to:
+  /// **'Countries & Territories'**
+  String get countriesAndTerritories;
+
+  /// Short label for visited status
+  ///
+  /// In en, this message translates to:
+  /// **'visited'**
+  String get visitedStat;
+
+  /// Unit label for countries
+  ///
+  /// In en, this message translates to:
+  /// **'countries'**
+  String get countryUnit;
+
+  /// Badge text for additional visited countries count
+  ///
+  /// In en, this message translates to:
+  /// **'+ {count} more countries'**
+  String moreCountries(int count);
+
+  /// Unit label for trips
+  ///
+  /// In en, this message translates to:
+  /// **'trips'**
+  String get tripsUnit;
+
+  /// Unit label for cities
+  ///
+  /// In en, this message translates to:
+  /// **'cities'**
+  String get citiesUnit;
+
+  /// Unit label for continents
+  ///
+  /// In en, this message translates to:
+  /// **'continents'**
+  String get continentsUnit;
+
+  /// Label for percentage of the world explored
+  ///
+  /// In en, this message translates to:
+  /// **'of the world'**
+  String get ofTheWorld;
+
+  /// Unit label for travel days
+  ///
+  /// In en, this message translates to:
+  /// **'days'**
+  String get daysUnit;
+
+  /// Filter chip label for all items
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get allFilter;
+
+  /// Filter chip label for visited items
+  ///
+  /// In en, this message translates to:
+  /// **'Visited'**
+  String get visitedFilter;
+
+  /// Filter chip label for wishlist items
+  ///
+  /// In en, this message translates to:
+  /// **'Wishlist'**
+  String get wishlistFilter;
+
+  /// Continent name Europe
+  ///
+  /// In en, this message translates to:
+  /// **'Europe'**
+  String get continentEurope;
+
+  /// Continent name Asia
+  ///
+  /// In en, this message translates to:
+  /// **'Asia'**
+  String get continentAsia;
+
+  /// Continent name Americas
+  ///
+  /// In en, this message translates to:
+  /// **'Americas'**
+  String get continentAmericas;
+
+  /// Continent name Africa
+  ///
+  /// In en, this message translates to:
+  /// **'Africa'**
+  String get continentAfrica;
+
+  /// Continent name Oceania
+  ///
+  /// In en, this message translates to:
+  /// **'Oceania'**
+  String get continentOceania;
+
+  /// Tooltip to mark country as visited
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Visited'**
+  String get markAsVisitedTooltip;
+
+  /// Tooltip to mark country as wishlist
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Wishlist'**
+  String get markAsWishlistTooltip;
+
+  /// Label for visit date
+  ///
+  /// In en, this message translates to:
+  /// **'Visit Date'**
+  String get visitDateLabel;
+
+  /// Label for geographical coordinates
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinates'**
+  String get coordinatesLabel;
+
+  /// Toast notification when airline baggage policy is selected
+  ///
+  /// In en, this message translates to:
+  /// **'{airline} ({limit} kg) selected.'**
+  String airlineSelectedMessage(String airline, String limit);
+
+  /// Toast notification when converted amount is copied
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} copied!'**
+  String amountCopied(String amount);
+
+  /// Informational notice message
+  ///
+  /// In en, this message translates to:
+  /// **'Notice: {error}'**
+  String noticeMessage(String error);
+
+  /// Hint text for inviting trip collaborator
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. alex@example.com / Name'**
+  String get collaboratorEmailOrNameHint;
+
+  /// Hint text for entering trip invite code
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. PB-A1B2C'**
+  String get tripCodePlaceholder;
+
+  /// Notice explaining Apple Sign In is coming soon
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Apple is currently not active. It will be available very soon.'**
+  String get authAppleSignInComingSoon;
+
+  /// Dialog title for upcoming store in-app purchase release
+  ///
+  /// In en, this message translates to:
+  /// **'PackBuddy Pro Coming Soon'**
+  String get proStoreComingSoonTitle;
+
+  /// Dialog description for upcoming store in-app purchase release
+  ///
+  /// In en, this message translates to:
+  /// **'PackBuddy Pro store subscriptions are currently not active. They will be available in the Google Play Store and App Store very soon.'**
+  String get proStoreComingSoonDesc;
+
+  /// Button label to plan a trip to selected country
+  ///
+  /// In en, this message translates to:
+  /// **'Plan Trip to {country}'**
+  String planTripToCountry(String country);
+
+  /// Empty state message when no countries have been visited
+  ///
+  /// In en, this message translates to:
+  /// **'No visited countries marked yet. Tap countries on the map or list below to fill them with color!'**
+  String get noVisitedCountriesYet;
+
+  /// Bottom navigation bar label for travel map
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get navMap;
+
+  /// Legend label for lived in country status
+  ///
+  /// In en, this message translates to:
+  /// **'Lived'**
+  String get mapLegendLived;
+
+  /// Filter chip label for lived in countries
+  ///
+  /// In en, this message translates to:
+  /// **'Lived'**
+  String get livedFilter;
+
+  /// Tooltip for marking a country as lived in
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as lived country'**
+  String get markAsLivedTooltip;
+
+  /// Detail status message when a country was lived in
+  ///
+  /// In en, this message translates to:
+  /// **'You lived in this country'**
+  String get livedCountryStatus;
+
+  /// Button label to share travel map as social story
+  ///
+  /// In en, this message translates to:
+  /// **'Share to Story'**
+  String get shareStory;
+
+  /// Subtitle explaining story sharing to Instagram/Snapchat
+  ///
+  /// In en, this message translates to:
+  /// **'Share on Instagram, Snapchat or with friends'**
+  String get shareStorySubtitle;
+
+  /// Title for story card preview dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Story Preview'**
+  String get shareStoryPreview;
+
+  /// Loading message while rendering story image
+  ///
+  /// In en, this message translates to:
+  /// **'Generating story image...'**
+  String get generatingStoryImage;
+
+  /// Tagline on the story card
+  ///
+  /// In en, this message translates to:
+  /// **'My World Travel Map'**
+  String get storyCardTagline;
+
+  /// App watermark text on story card
+  ///
+  /// In en, this message translates to:
+  /// **'Explored with PackBuddy'**
+  String get storyWatermark;
+
+  /// Button to trigger image story share
+  ///
+  /// In en, this message translates to:
+  /// **'Share as Story'**
+  String get shareImageButton;
+
+  /// Button to trigger text summary share
+  ///
+  /// In en, this message translates to:
+  /// **'Share as Text'**
+  String get shareTextButton;
+
+  /// 3D Globe mode button label
+  ///
+  /// In en, this message translates to:
+  /// **'3D Globe'**
+  String get globe3D;
+
+  /// Interactive hint label for 3D Globe gesture rotation
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to rotate • Tap'**
+  String get globeRotateHint;
+
+  /// Cyprus island disambiguation header
+  ///
+  /// In en, this message translates to:
+  /// **'Cyprus Region'**
+  String get cyprusRegion;
+
+  /// Theme palette name for Midnight
+  ///
+  /// In en, this message translates to:
+  /// **'Midnight'**
+  String get storyThemeMidnight;
+
+  /// Theme palette name for Sunset
+  ///
+  /// In en, this message translates to:
+  /// **'Sunset'**
+  String get storyThemeSunset;
+
+  /// Theme palette name for Atlas
+  ///
+  /// In en, this message translates to:
+  /// **'Atlas'**
+  String get storyThemeAtlas;
+
+  /// Theme palette name for Minimal
+  ///
+  /// In en, this message translates to:
+  /// **'Minimal'**
+  String get storyThemeMinimal;
+
+  /// Theme palette name for Dune/Sand
+  ///
+  /// In en, this message translates to:
+  /// **'Dune'**
+  String get storyThemeDune;
+
+  /// Theme palette name for Ocean
+  ///
+  /// In en, this message translates to:
+  /// **'Ocean'**
+  String get storyThemeOcean;
+
+  /// Button label to pin/add widget to user home screen
+  ///
+  /// In en, this message translates to:
+  /// **'Add Widget to Home Screen'**
+  String get addWidgetToHomeScreen;
+
+  /// Label displayed when PDF fails to render
+  ///
+  /// In en, this message translates to:
+  /// **'PDF Error'**
+  String get pdfError;
+
+  /// storyLayoutShowcase label
+  ///
+  /// In en, this message translates to:
+  /// **'Showcase'**
+  String get storyLayoutShowcase;
+
+  /// passportEntryVisas label
+  ///
+  /// In en, this message translates to:
+  /// **'Entry Visas & Stamps'**
+  String get passportEntryVisas;
+
+  /// passportOfficialDocument label
+  ///
+  /// In en, this message translates to:
+  /// **'Official Travel Passport'**
+  String get passportOfficialDocument;
+
+  /// storyLayoutMinimal label
+  ///
+  /// In en, this message translates to:
+  /// **'Minimal'**
+  String get storyLayoutMinimal;
+
+  /// passportWorldCitizen label
+  ///
+  /// In en, this message translates to:
+  /// **'World Citizen'**
+  String get passportWorldCitizen;
+
+  /// storyLayoutPassport label
+  ///
+  /// In en, this message translates to:
+  /// **'Passport'**
+  String get storyLayoutPassport;
+
+  /// storyLayoutClassic label
+  ///
+  /// In en, this message translates to:
+  /// **'Classic'**
+  String get storyLayoutClassic;
 }
 
 class _AppLocalizationsDelegate

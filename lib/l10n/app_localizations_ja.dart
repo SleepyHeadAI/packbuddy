@@ -313,7 +313,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get viewAll => 'すべて表示';
 
   @override
-  String get allNotificationsUpToDate => '通知はすべて最新です！';
+  String get allNotificationsUpToDate => 'すべての通知は最新です。';
 
   @override
   String get createFirstTrip => '最初のルートと予算を作成しましょう。';
@@ -1645,4 +1645,323 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get confirm => '確認';
+
+  @override
+  String get vaultBiometricReason => 'トラベル保管庫のロックを解除するには指紋または顔を認証してください';
+
+  @override
+  String get biometricsFailed => '生体認証に失敗したか、キャンセルされました。';
+
+  @override
+  String get customBaggageLimitPrompt => 'カスタム制限を設定 (kg)';
+
+  @override
+  String get testNotificationSent => 'テスト通知をお使いのデバイスに送信しました。';
+
+  @override
+  String get pinWidgetSuccess => 'ウィジェットがホーム画面に追加されました。';
+
+  @override
+  String get pinWidgetGuide => 'ホーム画面を長押しして「ウィジェット > PackBuddy」を選択してください。';
+
+  @override
+  String scheduledRemindersCount(int count) {
+    return '$count件の旅行リマインダーが設定されています';
+  }
+
+  @override
+  String get packingRemindersScheduled48h => '48時間前：スマートパッキング通知がスケジュールされました';
+
+  @override
+  String get packingRemindersScheduled24h => '24時間前：最終チェックリスト確認通知がスケジュールされました';
+
+  @override
+  String get testNotificationAction => '通知をテスト';
+
+  @override
+  String get noUpcomingRemindersDesc => '旅行を追加すると、出発前の準備リマインダーがここに表示されます。';
+
+  @override
+  String get clearAll => 'すべて消去';
+
+  @override
+  String get notificationHistory => '通知履歴';
+
+  @override
+  String get upcomingReminders => '今後のリマインダー';
+
+  @override
+  String daysRemaining(int days) {
+    return 'あと$days日';
+  }
+
+  @override
+  String get today => '今日';
+
+  @override
+  String get biometricUnlock => '生体認証ロック解除';
+
+  @override
+  String get biometricUnlockSubtitle => '指紋またはFace IDで保管庫をロック解除';
+
+  @override
+  String get setPinFirstToEnableBiometrics => '生体認証を有効にするには、まずPINを設定してください';
+
+  @override
+  String get passportSummaryShared => 'パスポートの概要を共有する準備ができました！';
+
+  @override
+  String get sharePassportTooltip => 'パスポートを共有';
+
+  @override
+  String get visitedCountryStatus => 'この国を訪れました';
+
+  @override
+  String get worldTravelMapTitle => '世界旅行マップ';
+
+  @override
+  String get worldTravelMapSubtitle => '訪れた国と行きたい国を色分け';
+
+  @override
+  String worldTravelMapStats(int visited, int wishlist, String percentage) {
+    return '$visited 訪問済み • $wishlist 行きたい • %$percentage 探索済み';
+  }
+
+  @override
+  String get mapLegendBeen => '訪問済み';
+
+  @override
+  String get mapLegendWant => '行きたい';
+
+  @override
+  String get mapLegendUnvisited => '未訪問';
+
+  @override
+  String get mapLegendVisitedCity => '訪問した都市';
+
+  @override
+  String get mapLegendWishlistCity => '行きたい都市';
+
+  @override
+  String get mapLegendCapital => '首都';
+
+  @override
+  String get zoomIn => '拡大';
+
+  @override
+  String get zoomOut => '縮小';
+
+  @override
+  String get resetZoom => 'リセット';
+
+  @override
+  String get countriesTab => '国';
+
+  @override
+  String get citiesTab => '都市';
+
+  @override
+  String get searchCountryOrCapital => '国または首都を検索（例：イタリア、日本）...';
+
+  @override
+  String get basedOnUnCountries => '国連加盟195か国に基づく';
+
+  @override
+  String get countriesAndTerritories => '国と地域';
+
+  @override
+  String get visitedStat => '訪問済み';
+
+  @override
+  String get countryUnit => 'か国';
+
+  @override
+  String moreCountries(int count) {
+    return '+ その他 $count か国';
+  }
+
+  @override
+  String get tripsUnit => '回の旅行';
+
+  @override
+  String get citiesUnit => '都市';
+
+  @override
+  String get continentsUnit => '大陸';
+
+  @override
+  String get ofTheWorld => '世界';
+
+  @override
+  String get daysUnit => '日';
+
+  @override
+  String get allFilter => 'すべて';
+
+  @override
+  String get visitedFilter => '訪問済み';
+
+  @override
+  String get wishlistFilter => '行きたい場所';
+
+  @override
+  String get continentEurope => 'ヨーロッパ';
+
+  @override
+  String get continentAsia => 'アジア';
+
+  @override
+  String get continentAmericas => 'アメリカ';
+
+  @override
+  String get continentAfrica => 'アフリカ';
+
+  @override
+  String get continentOceania => 'オセアニア';
+
+  @override
+  String get markAsVisitedTooltip => '訪問済みとしてマーク';
+
+  @override
+  String get markAsWishlistTooltip => '行きたい場所としてマーク';
+
+  @override
+  String get visitDateLabel => '訪問日';
+
+  @override
+  String get coordinatesLabel => '座標';
+
+  @override
+  String airlineSelectedMessage(String airline, String limit) {
+    return '$airline ($limit kg) を選択しました。';
+  }
+
+  @override
+  String amountCopied(String amount) {
+    return '$amount をコピーしました！';
+  }
+
+  @override
+  String noticeMessage(String error) {
+    return 'お知らせ：$error';
+  }
+
+  @override
+  String get collaboratorEmailOrNameHint => '例：alex@example.com / 名前';
+
+  @override
+  String get tripCodePlaceholder => '例：PB-A1B2C';
+
+  @override
+  String get authAppleSignInComingSoon =>
+      'Appleでサインインは現在利用できません。近日中に利用可能になります。';
+
+  @override
+  String get proStoreComingSoonTitle => 'PackBuddy Pro 近日公開';
+
+  @override
+  String get proStoreComingSoonDesc =>
+      'PackBuddy Proのストア定期購入は現在利用できません。まもなくGoogle PlayおよびApp Storeで利用可能になります。';
+
+  @override
+  String planTripToCountry(String country) {
+    return '$countryへの旅行を計画';
+  }
+
+  @override
+  String get noVisitedCountriesYet =>
+      'まだ訪れた国が登録されていません。地図または下のリストから国をタップして色を塗りましょう！';
+
+  @override
+  String get navMap => 'マップ';
+
+  @override
+  String get mapLegendLived => '居住歴';
+
+  @override
+  String get livedFilter => '居住歴';
+
+  @override
+  String get markAsLivedTooltip => '住んだことのある国としてマーク';
+
+  @override
+  String get livedCountryStatus => 'この国に住んだことがあります';
+
+  @override
+  String get shareStory => 'ストーリーでシェア';
+
+  @override
+  String get shareStorySubtitle => 'InstagramやSnapchat、友達にシェア';
+
+  @override
+  String get shareStoryPreview => 'ストーリープレビュー';
+
+  @override
+  String get generatingStoryImage => 'ストーリー画像を生成中...';
+
+  @override
+  String get storyCardTagline => '私の世界旅行マップ';
+
+  @override
+  String get storyWatermark => 'PackBuddyで探索';
+
+  @override
+  String get shareImageButton => 'ストーリーとしてシェア';
+
+  @override
+  String get shareTextButton => 'テキストでシェア';
+
+  @override
+  String get globe3D => '3D地球儀';
+
+  @override
+  String get globeRotateHint => 'ドラッグで回転 • タップ';
+
+  @override
+  String get cyprusRegion => 'キプロス地域';
+
+  @override
+  String get storyThemeMidnight => 'ミッドナイト';
+
+  @override
+  String get storyThemeSunset => '夕焼け';
+
+  @override
+  String get storyThemeAtlas => 'アトラス';
+
+  @override
+  String get storyThemeMinimal => 'ミニマル';
+
+  @override
+  String get storyThemeDune => '砂丘';
+
+  @override
+  String get storyThemeOcean => 'オーシャン';
+
+  @override
+  String get addWidgetToHomeScreen => 'ホーム画面にウィジェットを追加';
+
+  @override
+  String get pdfError => 'PDFエラー';
+
+  @override
+  String get storyLayoutShowcase => 'ショーケース';
+
+  @override
+  String get passportEntryVisas => '入国ビザ＆スタンプ';
+
+  @override
+  String get passportOfficialDocument => '公式パスポート';
+
+  @override
+  String get storyLayoutMinimal => 'ミニマル';
+
+  @override
+  String get passportWorldCitizen => '世界市民';
+
+  @override
+  String get storyLayoutPassport => 'パスポート';
+
+  @override
+  String get storyLayoutClassic => 'クラシック';
 }

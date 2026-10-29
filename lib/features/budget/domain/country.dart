@@ -1,3 +1,5 @@
+import 'country_localization.dart';
+
 /// Domain entity representing a Country for travel destination routes
 class Country {
   final String code;
@@ -15,6 +17,16 @@ class Country {
     required this.defaultCurrency,
     this.popularDestinations = const [],
   });
+
+  /// Returns the country name localized according to languageCode (e.g. 'en', 'tr', 'es', 'de', 'fr', etc.)
+  String getLocalizedName(String languageCode) {
+    final lang = languageCode.toLowerCase();
+    if (lang == 'tr') return localName;
+    if (lang == 'en') return name;
+    final translated = CountryLocalization.getCountryName(code, lang);
+    if (translated != null && translated.isNotEmpty) return translated;
+    return name;
+  }
 
   /// Master directory of world travel destinations (UN members + observers + Kosovo & KKTC)
   static const List<Country> allCountries = [

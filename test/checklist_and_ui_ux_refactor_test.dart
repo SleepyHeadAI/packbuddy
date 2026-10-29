@@ -352,7 +352,7 @@ void main() {
       expect(find.text('Bavul & Kontrol Listesi', skipOffstage: false), findsWidgets);
     });
 
-    testWidgets('VaultScreen renders and displays Native Wallet hooks for tickets', (tester) async {
+    testWidgets('VaultScreen renders and displays ticket documents as standard files without removed native wallet simulation', (tester) async {
       final ticketDoc = Document(
         id: 'ticket-1',
         title: 'Istanbul - Paris Flight Pass',
@@ -380,9 +380,11 @@ void main() {
 
       await tester.pump();
 
-      // Verify Vault screen and Wallet hook icon are present on the ticket card
+      // Verify Vault screen renders the ticket document cleanly
       expect(find.byType(VaultScreen), findsOneWidget);
-      expect(find.byIcon(Icons.wallet_rounded), findsWidgets);
+      expect(find.text('Istanbul - Paris Flight Pass'), findsOneWidget);
+      // Verify simulated native wallet button is completely removed
+      expect(find.byIcon(Icons.wallet_rounded), findsNothing);
     });
   });
 }

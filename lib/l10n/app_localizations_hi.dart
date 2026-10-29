@@ -314,7 +314,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get viewAll => 'सभी देखें';
 
   @override
-  String get allNotificationsUpToDate => 'सभी यात्रा सूचनाएं अपडेट हैं!';
+  String get allNotificationsUpToDate => 'सभी सूचनाएं अद्यतित हैं।';
 
   @override
   String get createFirstTrip => 'अपना पहला रूट और बजट अभी बनाएं।';
@@ -1698,4 +1698,334 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get confirm => 'पुष्टि करें';
+
+  @override
+  String get vaultBiometricReason =>
+      'अपनी यात्रा तिजोरी को अनलॉक करने के लिए फ़िंगरप्रिंट या चेहरे की पुष्टि करें';
+
+  @override
+  String get biometricsFailed =>
+      'बायोमेट्रिक सत्यापन विफल रहा या रद्द कर दिया गया।';
+
+  @override
+  String get customBaggageLimitPrompt => 'कस्टम सीमा सेट करें (किग्रा)';
+
+  @override
+  String get testNotificationSent => 'आपके डिवाइस पर परीक्षण सूचना भेजी गई।';
+
+  @override
+  String get pinWidgetSuccess => 'विजेट होम स्क्रीन में जोड़ा गया।';
+
+  @override
+  String get pinWidgetGuide =>
+      'होम स्क्रीन को दबाकर रखें और विजेट्स > PackBuddy चुनें।';
+
+  @override
+  String scheduledRemindersCount(int count) {
+    return '$count निर्धारित यात्रा अनुस्मारक';
+  }
+
+  @override
+  String get packingRemindersScheduled48h =>
+      '48 घंटे पहले: पैकिंग रिमाइंडर शेड्यूल किया गया';
+
+  @override
+  String get packingRemindersScheduled24h =>
+      '24 घंटे पहले: अंतिम चेकलिस्ट जांच रिमाइंडर';
+
+  @override
+  String get testNotificationAction => 'सूचनाएं परीक्षण करें';
+
+  @override
+  String get noUpcomingRemindersDesc =>
+      'जब आप यात्रा की योजना बनाते हैं, तो रिमाइंडर यहां दिखाई देंगे।';
+
+  @override
+  String get clearAll => 'सभी साफ करें';
+
+  @override
+  String get notificationHistory => 'अधिसूचना इतिहास';
+
+  @override
+  String get upcomingReminders => 'आगामी अनुस्मारक';
+
+  @override
+  String daysRemaining(int days) {
+    return '$days दिन शेष';
+  }
+
+  @override
+  String get today => 'आज';
+
+  @override
+  String get biometricUnlock => 'बायोमेट्रिक अनलॉक';
+
+  @override
+  String get biometricUnlockSubtitle =>
+      'फ़िंगरप्रिंट या फ़ेस आईडी से वॉल्ट अनलॉक करें';
+
+  @override
+  String get setPinFirstToEnableBiometrics =>
+      'बायोमेट्रिक्स सक्षम करने के लिए पहले पिन सेट करें';
+
+  @override
+  String get passportSummaryShared =>
+      'पासपोर्ट सारांश साझा करने के लिए तैयार है!';
+
+  @override
+  String get sharePassportTooltip => 'पासपोर्ट साझा करें';
+
+  @override
+  String get visitedCountryStatus => 'आप इस देश की यात्रा कर चुके हैं';
+
+  @override
+  String get worldTravelMapTitle => 'मेरा विश्व यात्रा मानचित्र';
+
+  @override
+  String get worldTravelMapSubtitle => 'देखे गए और पसंदीदा देशों को रंगीन करें';
+
+  @override
+  String worldTravelMapStats(int visited, int wishlist, String percentage) {
+    return '$visited घूमे गए • $wishlist इच्छा सूची • %$percentage खोजे गए';
+  }
+
+  @override
+  String get mapLegendBeen => 'घूमा हुआ';
+
+  @override
+  String get mapLegendWant => 'इच्छा';
+
+  @override
+  String get mapLegendUnvisited => 'नहीं घूमा';
+
+  @override
+  String get mapLegendVisitedCity => 'घूमा हुआ शहर';
+
+  @override
+  String get mapLegendWishlistCity => 'पसंदीदा शहर';
+
+  @override
+  String get mapLegendCapital => 'राजधानी';
+
+  @override
+  String get zoomIn => 'ज़ूम इन';
+
+  @override
+  String get zoomOut => 'ज़ूम आउट';
+
+  @override
+  String get resetZoom => 'रीसेट';
+
+  @override
+  String get countriesTab => 'देश';
+
+  @override
+  String get citiesTab => 'शहर';
+
+  @override
+  String get searchCountryOrCapital =>
+      'देश या राजधानी खोजें (उदा. इटली, जापान)...';
+
+  @override
+  String get basedOnUnCountries => '195 संयुक्त राष्ट्र देशों पर आधारित';
+
+  @override
+  String get countriesAndTerritories => 'देश और क्षेत्र';
+
+  @override
+  String get visitedStat => 'घूमा हुआ';
+
+  @override
+  String get countryUnit => 'देश';
+
+  @override
+  String moreCountries(int count) {
+    return '+ $count और देश';
+  }
+
+  @override
+  String get tripsUnit => 'यात्राएं';
+
+  @override
+  String get citiesUnit => 'शहर';
+
+  @override
+  String get continentsUnit => 'महाद्वीप';
+
+  @override
+  String get ofTheWorld => 'दुनिया का';
+
+  @override
+  String get daysUnit => 'दिन';
+
+  @override
+  String get allFilter => 'सभी';
+
+  @override
+  String get visitedFilter => 'घूमे हुए';
+
+  @override
+  String get wishlistFilter => 'इच्छा सूची';
+
+  @override
+  String get continentEurope => 'यूरोप';
+
+  @override
+  String get continentAsia => 'एशिया';
+
+  @override
+  String get continentAmericas => 'अमेरिका';
+
+  @override
+  String get continentAfrica => 'अफ्रीका';
+
+  @override
+  String get continentOceania => 'ओशिनिया';
+
+  @override
+  String get markAsVisitedTooltip => 'घूमे हुए के रूप में चिह्नित करें';
+
+  @override
+  String get markAsWishlistTooltip => 'इच्छा सूची में जोड़ें';
+
+  @override
+  String get visitDateLabel => 'यात्रा की तारीख';
+
+  @override
+  String get coordinatesLabel => 'निर्देशांक';
+
+  @override
+  String airlineSelectedMessage(String airline, String limit) {
+    return '$airline ($limit किग्रा) चुना गया।';
+  }
+
+  @override
+  String amountCopied(String amount) {
+    return '$amount कॉपी किया गया!';
+  }
+
+  @override
+  String noticeMessage(String error) {
+    return 'सूचना: $error';
+  }
+
+  @override
+  String get collaboratorEmailOrNameHint => 'उदा. alex@example.com / नाम';
+
+  @override
+  String get tripCodePlaceholder => 'उदा. PB-A1B2C';
+
+  @override
+  String get authAppleSignInComingSoon =>
+      'Apple के साथ साइन इन वर्तमान में सक्रिय नहीं है। यह बहुत जल्द उपलब्ध होगा।';
+
+  @override
+  String get proStoreComingSoonTitle => 'PackBuddy Pro जल्द आ रहा है';
+
+  @override
+  String get proStoreComingSoonDesc =>
+      'PackBuddy Pro स्टोर सदस्यता वर्तमान में सक्रिय नहीं है। यह बहुत जल्द Google Play और App Store पर उपलब्ध होगी।';
+
+  @override
+  String planTripToCountry(String country) {
+    return '$country की यात्रा की योजना बनाएं';
+  }
+
+  @override
+  String get noVisitedCountriesYet =>
+      'अभी तक कोई देखा गया देश चिह्नित नहीं है। उन्हें रंगने के लिए मानचित्र या नीचे दी गई सूची पर देशों पर टैप करें!';
+
+  @override
+  String get navMap => 'मानचित्र';
+
+  @override
+  String get mapLegendLived => 'रहा हुआ';
+
+  @override
+  String get livedFilter => 'रहा हुआ';
+
+  @override
+  String get markAsLivedTooltip => 'निवास किए गए देश के रूप में चिह्नित करें';
+
+  @override
+  String get livedCountryStatus => 'आप इस देश में रहे हैं';
+
+  @override
+  String get shareStory => 'स्टोरी पर साझा करें';
+
+  @override
+  String get shareStorySubtitle =>
+      'इंस्टाग्राम, स्नैपचैट या दोस्तों के साथ साझा करें';
+
+  @override
+  String get shareStoryPreview => 'स्टोरी पूर्वावलोकन';
+
+  @override
+  String get generatingStoryImage => 'स्टोरी छवि तैयार की जा रही है...';
+
+  @override
+  String get storyCardTagline => 'मेरा विश्व यात्रा मानचित्र';
+
+  @override
+  String get storyWatermark => 'PackBuddy के साथ खोजा गया';
+
+  @override
+  String get shareImageButton => 'स्टोरी के रूप में साझा करें';
+
+  @override
+  String get shareTextButton => 'टेक्स्ट के रूप में साझा करें';
+
+  @override
+  String get globe3D => '3D ग्लोब';
+
+  @override
+  String get globeRotateHint => 'घुमाने के लिए खींचें • स्पर्श करें';
+
+  @override
+  String get cyprusRegion => 'साइप्रस क्षेत्र';
+
+  @override
+  String get storyThemeMidnight => 'मध्यरात्रि';
+
+  @override
+  String get storyThemeSunset => 'सूर्यास्त';
+
+  @override
+  String get storyThemeAtlas => 'एटलस';
+
+  @override
+  String get storyThemeMinimal => 'न्यूनतम';
+
+  @override
+  String get storyThemeDune => 'रेत का टीला';
+
+  @override
+  String get storyThemeOcean => 'महासागर';
+
+  @override
+  String get addWidgetToHomeScreen => 'होम स्क्रीन पर विजेट जोड़ें';
+
+  @override
+  String get pdfError => 'PDF त्रुटि';
+
+  @override
+  String get storyLayoutShowcase => 'शोकेस';
+
+  @override
+  String get passportEntryVisas => 'प्रवेश वीज़ा और टिकट';
+
+  @override
+  String get passportOfficialDocument => 'आधिकारिक यात्रा पासपोर्ट';
+
+  @override
+  String get storyLayoutMinimal => 'मिनिमल';
+
+  @override
+  String get passportWorldCitizen => 'विश्व नागरिक';
+
+  @override
+  String get storyLayoutPassport => 'पासपोर्ट';
+
+  @override
+  String get storyLayoutClassic => 'क्लासिक';
 }

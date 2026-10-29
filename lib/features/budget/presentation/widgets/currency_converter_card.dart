@@ -398,9 +398,10 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
                     onPressed: () {
                       final formatted = CurrencyFormatter.format(converted, currency: _toCurrency);
                       Clipboard.setData(ClipboardData(text: formatted));
+                      final l10n = AppLocalizations.of(context);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('$formatted copied!'),
+                          content: Text(l10n?.amountCopied(formatted) ?? '$formatted copied!'),
                           duration: const Duration(seconds: 2),
                           behavior: SnackBarBehavior.floating,
                         ),

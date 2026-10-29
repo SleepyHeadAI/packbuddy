@@ -313,7 +313,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get viewAll => '전체 보기';
 
   @override
-  String get allNotificationsUpToDate => '모든 여행 알림이 최신 상태입니다!';
+  String get allNotificationsUpToDate => '모든 알림이 최신 상태입니다.';
 
   @override
   String get createFirstTrip => '지금 첫 번째 여행과 예산을 만드세요.';
@@ -1645,4 +1645,323 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get confirm => '확인';
+
+  @override
+  String get vaultBiometricReason => '여행 보관함의 잠금을 해제하려면 지문 또는 얼굴을 인증하세요';
+
+  @override
+  String get biometricsFailed => '생체 인증에 실패했거나 취소되었습니다.';
+
+  @override
+  String get customBaggageLimitPrompt => '사용자 지정 한도 설정 (kg)';
+
+  @override
+  String get testNotificationSent => '테스트 알림이 기기로 전송되었습니다.';
+
+  @override
+  String get pinWidgetSuccess => '위젯이 홈 화면에 추가되었습니다.';
+
+  @override
+  String get pinWidgetGuide => '홈 화면을 길게 누르고 위젯 > PackBuddy를 선택하세요.';
+
+  @override
+  String scheduledRemindersCount(int count) {
+    return '$count개의 예정된 여행 알림';
+  }
+
+  @override
+  String get packingRemindersScheduled48h => '48시간 전: 스마트 짐 싸기 알림이 예약되었습니다';
+
+  @override
+  String get packingRemindersScheduled24h => '24시간 전: 최종 체크리스트 점검 알림 예약';
+
+  @override
+  String get testNotificationAction => '알림 테스트';
+
+  @override
+  String get noUpcomingRemindersDesc => '새 여행을 추가하면 출발 전 짐 준비 알림이 여기에 표시됩니다.';
+
+  @override
+  String get clearAll => '모두 지우기';
+
+  @override
+  String get notificationHistory => '알림 내역';
+
+  @override
+  String get upcomingReminders => '예정된 알림';
+
+  @override
+  String daysRemaining(int days) {
+    return '$days일 남음';
+  }
+
+  @override
+  String get today => '오늘';
+
+  @override
+  String get biometricUnlock => '생체 인식 잠금 해제';
+
+  @override
+  String get biometricUnlockSubtitle => '지문 또는 Face ID로 보관함 잠금 해제';
+
+  @override
+  String get setPinFirstToEnableBiometrics => '생체 인식을 사용하려면 먼저 PIN을 설정하세요';
+
+  @override
+  String get passportSummaryShared => '여권 요약 공유 준비 완료!';
+
+  @override
+  String get sharePassportTooltip => '여권 공유';
+
+  @override
+  String get visitedCountryStatus => '이 국가를 방문했습니다';
+
+  @override
+  String get worldTravelMapTitle => '세계 여행 지도';
+
+  @override
+  String get worldTravelMapSubtitle => '방문한 국가와 위시리스트 국가 색칠하기';
+
+  @override
+  String worldTravelMapStats(int visited, int wishlist, String percentage) {
+    return '$visited 방문함 • $wishlist 위시리스트 • %$percentage 탐험함';
+  }
+
+  @override
+  String get mapLegendBeen => '방문함';
+
+  @override
+  String get mapLegendWant => '위시리스트';
+
+  @override
+  String get mapLegendUnvisited => '미방문';
+
+  @override
+  String get mapLegendVisitedCity => '방문한 도시';
+
+  @override
+  String get mapLegendWishlistCity => '위시리스트 도시';
+
+  @override
+  String get mapLegendCapital => '수도';
+
+  @override
+  String get zoomIn => '확대';
+
+  @override
+  String get zoomOut => '축소';
+
+  @override
+  String get resetZoom => '초기화';
+
+  @override
+  String get countriesTab => '국가';
+
+  @override
+  String get citiesTab => '도시';
+
+  @override
+  String get searchCountryOrCapital => '국가 또는 수도 검색 (예: 이탈리아, 일본)...';
+
+  @override
+  String get basedOnUnCountries => '195개 UN 가입국 기준';
+
+  @override
+  String get countriesAndTerritories => '국가 및 지역';
+
+  @override
+  String get visitedStat => '방문함';
+
+  @override
+  String get countryUnit => '개국';
+
+  @override
+  String moreCountries(int count) {
+    return '+ $count개 국가 더보기';
+  }
+
+  @override
+  String get tripsUnit => '회 여행';
+
+  @override
+  String get citiesUnit => '개 도시';
+
+  @override
+  String get continentsUnit => '개 대륙';
+
+  @override
+  String get ofTheWorld => '전 세계';
+
+  @override
+  String get daysUnit => '일';
+
+  @override
+  String get allFilter => '전체';
+
+  @override
+  String get visitedFilter => '방문한 곳';
+
+  @override
+  String get wishlistFilter => '위시리스트';
+
+  @override
+  String get continentEurope => '유럽';
+
+  @override
+  String get continentAsia => '아시아';
+
+  @override
+  String get continentAmericas => '아메리카';
+
+  @override
+  String get continentAfrica => '아프리카';
+
+  @override
+  String get continentOceania => '오세아니아';
+
+  @override
+  String get markAsVisitedTooltip => '방문함으로 표시';
+
+  @override
+  String get markAsWishlistTooltip => '위시리스트로 표시';
+
+  @override
+  String get visitDateLabel => '방문 날짜';
+
+  @override
+  String get coordinatesLabel => '좌표';
+
+  @override
+  String airlineSelectedMessage(String airline, String limit) {
+    return '$airline ($limit kg) 선택됨.';
+  }
+
+  @override
+  String amountCopied(String amount) {
+    return '$amount 복사됨!';
+  }
+
+  @override
+  String noticeMessage(String error) {
+    return '알림: $error';
+  }
+
+  @override
+  String get collaboratorEmailOrNameHint => '예: alex@example.com / 이름';
+
+  @override
+  String get tripCodePlaceholder => '예: PB-A1B2C';
+
+  @override
+  String get authAppleSignInComingSoon =>
+      'Apple로 로그인은 현재 지원되지 않습니다. 곧 제공될 예정입니다.';
+
+  @override
+  String get proStoreComingSoonTitle => 'PackBuddy Pro 곧 출시';
+
+  @override
+  String get proStoreComingSoonDesc =>
+      'PackBuddy Pro 스토어 구독은 현재 지원되지 않습니다. 곧 Google Play 및 App Store에서 제공될 예정입니다.';
+
+  @override
+  String planTripToCountry(String country) {
+    return '$country 여행 계획';
+  }
+
+  @override
+  String get noVisitedCountriesYet =>
+      '아직 방문한 국가가 표시되지 않았습니다. 지도나 아래 목록에서 국가를 탭하여 색칠하세요!';
+
+  @override
+  String get navMap => '지도';
+
+  @override
+  String get mapLegendLived => '거주함';
+
+  @override
+  String get livedFilter => '거주함';
+
+  @override
+  String get markAsLivedTooltip => '거주한 국가로 표시';
+
+  @override
+  String get livedCountryStatus => '이 국가에 거주했습니다';
+
+  @override
+  String get shareStory => '스토리에 공유';
+
+  @override
+  String get shareStorySubtitle => 'Instagram, Snapchat 또는 친구들과 공유하세요';
+
+  @override
+  String get shareStoryPreview => '스토리 미리보기';
+
+  @override
+  String get generatingStoryImage => '스토리 이미지 생성 중...';
+
+  @override
+  String get storyCardTagline => '나의 세계 여행 지도';
+
+  @override
+  String get storyWatermark => 'PackBuddy와 함께 탐험함';
+
+  @override
+  String get shareImageButton => '스토리로 공유';
+
+  @override
+  String get shareTextButton => '텍스트로 공유';
+
+  @override
+  String get globe3D => '3D 지구본';
+
+  @override
+  String get globeRotateHint => '드래그하여 회전 • 탭';
+
+  @override
+  String get cyprusRegion => '키프로스 지역';
+
+  @override
+  String get storyThemeMidnight => '자정';
+
+  @override
+  String get storyThemeSunset => '일몰';
+
+  @override
+  String get storyThemeAtlas => '아틀라스';
+
+  @override
+  String get storyThemeMinimal => '미니멀';
+
+  @override
+  String get storyThemeDune => '모래언덕';
+
+  @override
+  String get storyThemeOcean => '대양';
+
+  @override
+  String get addWidgetToHomeScreen => '홈 화면에 위젯 추가';
+
+  @override
+  String get pdfError => 'PDF 오류';
+
+  @override
+  String get storyLayoutShowcase => '쇼케이스';
+
+  @override
+  String get passportEntryVisas => '입국 비자 및 스탬프';
+
+  @override
+  String get passportOfficialDocument => '공식 여행 여권';
+
+  @override
+  String get storyLayoutMinimal => '미니멀';
+
+  @override
+  String get passportWorldCitizen => '세계 시민';
+
+  @override
+  String get storyLayoutPassport => '여권';
+
+  @override
+  String get storyLayoutClassic => '클래식';
 }
