@@ -2042,4 +2042,59 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get storyLayoutClassic => 'Klasik';
+
+  @override
+  String get storeUnavailableMessage =>
+      'Koneksi ke toko sedang tidak tersedia. Silakan periksa jaringan dan coba lagi.';
+
+  @override
+  String get emergencyGuideTitle => 'Panduan Darurat & Lokal (SOS)';
+
+  @override
+  String get emergencyPolice => 'Polisi';
+
+  @override
+  String get emergencyAmbulance => 'Ambulans';
+
+  @override
+  String get emergencyFire => 'Pemadam Kebakaran';
+
+  @override
+  String get emergencyGeneralSos => 'Panggilan Darurat Umum (SOS)';
+
+  @override
+  String get emergencyPowerPlugs => 'Tipe Steker & Voltase';
+
+  @override
+  String get emergencyPhrases => 'Ungkapan Penting Lokal';
+
+  @override
+  String get emergencyCopyTooltip => 'Salin nomor darurat';
+
+  @override
+  String get emergencyCopied => 'Nomor darurat disalin ke papan klip';
+
+  @override
+  String get phraseHello => 'Halo';
+
+  @override
+  String get phraseThankYou => 'Terima kasih';
+
+  @override
+  String get phraseHowMuch => 'Berapa harganya?';
+
+  @override
+  String get phraseHelp => 'Tolong / Keadaan Darurat';
+
+  @override
+  String get phraseHospital => 'Di mana rumah sakit?';
+
+  @override
+  String get phraseEnglish => 'Bisa bicara bahasa Inggris?';
+
+  @override
+  String get budgetAlert85 => 'Mendekati batas (85%)';
+
+  @override
+  String get budgetAlert100 => 'Batas anggaran terlampaui!';
 }

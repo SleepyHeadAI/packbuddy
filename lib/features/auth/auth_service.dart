@@ -546,27 +546,9 @@ class FirebaseAuthService implements AuthService {
       }
 
       // WORLD TRAVEL MAP PERSISTENCE & RESTORE:
-      // Synchronize marked countries between local storage and Firestore users/{uid}
+      // Perform bidirectional cloud sync and merge between local storage and Firestore users/{uid}
       try {
-        if (remoteData != null && remoteData.containsKey('travelMapCountries')) {
-          final remoteCountries = remoteData['travelMapCountries'];
-          if (remoteCountries is Map && remoteCountries.isNotEmpty) {
-            await TravelMapService.instance.restoreFromCloud(
-              Map<String, dynamic>.from(remoteCountries),
-              uid: user.uid,
-            );
-          }
-        } else {
-          // If Firestore is empty, adopt any countries user marked as guest and back up to account
-          final localCountries = await TravelMapService.instance.getRawSavedMap();
-          if (localCountries.isNotEmpty) {
-            await userDocRef.set({
-              'travelMapCountries': localCountries,
-              'travelMapUpdatedAt': now,
-            }, SetOptions(merge: true));
-            await TravelMapService.instance.restoreFromCloud(localCountries, uid: user.uid);
-          }
-        }
+        await TravelMapService.instance.syncWithCloud(uid: user.uid);
       } catch (e) {
         debugPrint('[FirebaseAuthService] Travel map sync in syncUserProfile notice: $e');
       }

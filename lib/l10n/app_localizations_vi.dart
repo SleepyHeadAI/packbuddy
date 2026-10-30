@@ -2039,4 +2039,59 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get storyLayoutClassic => 'Cổ điển';
+
+  @override
+  String get storeUnavailableMessage =>
+      'Kết nối cửa hàng hiện không khả dụng. Vui lòng thử lại sau.';
+
+  @override
+  String get emergencyGuideTitle => 'Khẩn Cấp & Hướng Dẫn Bản Địa (SOS)';
+
+  @override
+  String get emergencyPolice => 'Cảnh sát';
+
+  @override
+  String get emergencyAmbulance => 'Cấp cứu';
+
+  @override
+  String get emergencyFire => 'Cứu hỏa';
+
+  @override
+  String get emergencyGeneralSos => 'Khẩn cấp chung (SOS)';
+
+  @override
+  String get emergencyPowerPlugs => 'Loại phích cắm & Điện áp';
+
+  @override
+  String get emergencyPhrases => 'Mẫu câu bản địa thiết yếu';
+
+  @override
+  String get emergencyCopyTooltip => 'Sao chép số khẩn cấp';
+
+  @override
+  String get emergencyCopied => 'Đã sao chép số khẩn cấp';
+
+  @override
+  String get phraseHello => 'Xin chào';
+
+  @override
+  String get phraseThankYou => 'Cảm ơn';
+
+  @override
+  String get phraseHowMuch => 'Cái này giá bao nhiêu?';
+
+  @override
+  String get phraseHelp => 'Cứu tôi với / Khẩn cấp';
+
+  @override
+  String get phraseHospital => 'Bệnh viện ở đâu?';
+
+  @override
+  String get phraseEnglish => 'Bạn có nói tiếng Anh không?';
+
+  @override
+  String get budgetAlert85 => 'Gần đạt hạn mức (85%)';
+
+  @override
+  String get budgetAlert100 => 'Vượt quá ngân sách!';
 }

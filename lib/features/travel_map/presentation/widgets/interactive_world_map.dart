@@ -97,12 +97,18 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
         .firstOrNull;
 
     if (matched == null && name.isNotEmpty) {
-      final cleanName = name.trim().toLowerCase();
-      matched = WorldCountriesData.allCountries
-          .where((c) =>
-              c.nameEn.toLowerCase() == cleanName ||
-              c.nameTr.toLowerCase() == cleanName)
+      matched = WorldCountriesData.matchCountry(name);
+    }
+
+    matched ??= WorldCountriesData.matchCountry(cleanId);
+
+    if (matched != null) {
+      final userSaved = widget.countries
+          .where((c) => c.code.toUpperCase() == matched!.code.toUpperCase())
           .firstOrNull;
+      if (userSaved != null) {
+        matched = userSaved;
+      }
     }
 
     if (matched == null && cleanId.length == 2) {
@@ -308,7 +314,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
 
     // Build the dynamic country polygon color mapping (Lived: Green, Been: Orange, Skratch: Coral Red)
     final colorMap = <String, Color>{};
@@ -469,7 +475,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
-                              '🌐 ${l10n.globe3D}',
+                              '🌐 ${l10n?.globe3D ?? "3D Globe"}',
                               style: TextStyle(
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.w800,

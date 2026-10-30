@@ -2021,4 +2021,59 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get storyLayoutClassic => 'كلاسيكي';
+
+  @override
+  String get storeUnavailableMessage =>
+      'الاتصال بالمتجر غير متاح حالياً. يرجى التحقق من اتصالك والمحاولة لاحقاً.';
+
+  @override
+  String get emergencyGuideTitle => 'دليل الطوارئ والعبارات المحلية (SOS)';
+
+  @override
+  String get emergencyPolice => 'الشرطة';
+
+  @override
+  String get emergencyAmbulance => 'الإسعاف';
+
+  @override
+  String get emergencyFire => 'الإطفاء والدفاع المدني';
+
+  @override
+  String get emergencyGeneralSos => 'طوارئ عامة (SOS)';
+
+  @override
+  String get emergencyPowerPlugs => 'أنواع القوابس والجهد الكهربائي';
+
+  @override
+  String get emergencyPhrases => 'عبارات محلية أساسية';
+
+  @override
+  String get emergencyCopyTooltip => 'نسخ رقم الطوارئ';
+
+  @override
+  String get emergencyCopied => 'تم نسخ رقم الطوارئ إلى الحافظة';
+
+  @override
+  String get phraseHello => 'مرحباً';
+
+  @override
+  String get phraseThankYou => 'شكراً جزيلاً';
+
+  @override
+  String get phraseHowMuch => 'بكم هذا؟';
+
+  @override
+  String get phraseHelp => 'النجدة / حالة طارئة';
+
+  @override
+  String get phraseHospital => 'أين أقرب مستشفى؟';
+
+  @override
+  String get phraseEnglish => 'هل تتحدث الإنجليزية؟';
+
+  @override
+  String get budgetAlert85 => 'الاقتراب من الحد (85%)';
+
+  @override
+  String get budgetAlert100 => 'تم تجاوز ميزانية الرحلة!';
 }

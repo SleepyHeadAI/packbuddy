@@ -2046,4 +2046,59 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get storyLayoutClassic => 'Klasik';
+
+  @override
+  String get storeUnavailableMessage =>
+      'Mağaza bağlantısı şu anda kurulamadı. Lütfen internet bağlantınızı kontrol edip tekrar deneyiniz.';
+
+  @override
+  String get emergencyGuideTitle => 'Acil Durum & Yerel Rehber (SOS)';
+
+  @override
+  String get emergencyPolice => 'Polis';
+
+  @override
+  String get emergencyAmbulance => 'Ambulans';
+
+  @override
+  String get emergencyFire => 'İtfaiye';
+
+  @override
+  String get emergencyGeneralSos => 'Genel Acil Durum (SOS)';
+
+  @override
+  String get emergencyPowerPlugs => 'Priz Tipi & Standart Voltaj';
+
+  @override
+  String get emergencyPhrases => 'Temel Yerel İfadeler';
+
+  @override
+  String get emergencyCopyTooltip => 'Acil numarayı kopyala';
+
+  @override
+  String get emergencyCopied => 'Acil durum numarası panoya kopyalandı';
+
+  @override
+  String get phraseHello => 'Merhaba';
+
+  @override
+  String get phraseThankYou => 'Teşekkürler';
+
+  @override
+  String get phraseHowMuch => 'Bu ne kadar?';
+
+  @override
+  String get phraseHelp => 'İmdat / Yardım edin';
+
+  @override
+  String get phraseHospital => 'Hastane nerede?';
+
+  @override
+  String get phraseEnglish => 'İngilizce biliyor musunuz?';
+
+  @override
+  String get budgetAlert85 => 'Bütçe sınırına yaklaşıldı (%85)';
+
+  @override
+  String get budgetAlert100 => 'Bütçe limiti aşıldı!';
 }

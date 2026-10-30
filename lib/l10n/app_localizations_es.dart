@@ -2057,4 +2057,59 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get storyLayoutClassic => 'Clásico';
+
+  @override
+  String get storeUnavailableMessage =>
+      'La conexión con la tienda no está disponible actualmente. Por favor, inténtelo de nuevo más tarde.';
+
+  @override
+  String get emergencyGuideTitle => 'Guía de Emergencia y Local (SOS)';
+
+  @override
+  String get emergencyPolice => 'Policía';
+
+  @override
+  String get emergencyAmbulance => 'Ambulancia';
+
+  @override
+  String get emergencyFire => 'Bomberos';
+
+  @override
+  String get emergencyGeneralSos => 'Emergencias Generales (SOS)';
+
+  @override
+  String get emergencyPowerPlugs => 'Tipo de enchufe y voltaje';
+
+  @override
+  String get emergencyPhrases => 'Frases locales esenciales';
+
+  @override
+  String get emergencyCopyTooltip => 'Copiar número de emergencia';
+
+  @override
+  String get emergencyCopied => 'Número de emergencia copiado';
+
+  @override
+  String get phraseHello => 'Hola';
+
+  @override
+  String get phraseThankYou => 'Muchas gracias';
+
+  @override
+  String get phraseHowMuch => '¿Cuánto cuesta esto?';
+
+  @override
+  String get phraseHelp => '¡Ayuda! / ¡Emergencia!';
+
+  @override
+  String get phraseHospital => '¿Dónde está el hospital?';
+
+  @override
+  String get phraseEnglish => '¿Habla inglés?';
+
+  @override
+  String get budgetAlert85 => 'Límite cercano (85%)';
+
+  @override
+  String get budgetAlert100 => '¡Límite de presupuesto superado!';
 }

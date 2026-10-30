@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -22,6 +23,42 @@ class VaultScreen extends ConsumerStatefulWidget {
   final String? initialTripId;
 
   const VaultScreen({super.key, this.initialTripId});
+
+  static String getCategoryLabel(String cat, AppLocalizations l10n) {
+    switch (cat.toLowerCase()) {
+      case 'passport':
+      case 'pasaport':
+      case 'id & passport':
+      case 'kimlik & pasaport':
+        return l10n.idAndPassport;
+      case 'ticket':
+      case 'bilet':
+      case 'tickets':
+      case 'biletler':
+        return l10n.tickets;
+      case 'booking':
+      case 'rezervasyon':
+      case 'hotel booking':
+      case 'otel rezervasyonu':
+      case 'konaklama':
+      case 'accommodation':
+        return l10n.accommodation;
+      case 'health':
+      case 'sağlık':
+      case 'insurance':
+      case 'sigorta':
+      case 'health & insurance':
+      case 'sağlık & sigorta':
+        return l10n.healthAndInsurance;
+      case 'other':
+      case 'diğer':
+      case 'other documents':
+      case 'diğer belgeler':
+        return l10n.otherDocuments;
+      default:
+        return cat;
+    }
+  }
 
   @override
   ConsumerState<VaultScreen> createState() => _VaultScreenState();
@@ -294,7 +331,8 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
           : vaultState.isLocked
               ? const VaultLockView()
               : CustomScrollView(
-              slivers: [
+                  scrollCacheExtent: const ScrollCacheExtent.pixels(600.0),
+                  slivers: [
                 // Top Hero Row: Quick Vault Card (Left) & Pinned Passport Window (Right)
                 SliverToBoxAdapter(
                   child: Padding(
@@ -984,8 +1022,9 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                   )
                               : null;
 
-                          return Dismissible(
-                            key: ValueKey('vault_doc_${doc.id}'),
+                          return RepaintBoundary(
+                            child: Dismissible(
+                              key: ValueKey('vault_doc_${doc.id}'),
                             direction: DismissDirection.horizontal,
                             dragStartBehavior: DragStartBehavior.down,
                             background: Container(
@@ -1157,7 +1196,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                                     const SizedBox(width: 4),
                                                     Flexible(
                                                       child: Text(
-                                                        doc.category,
+                                                        VaultScreen.getCategoryLabel(doc.category, l10n),
                                                         style: TextStyle(
                                                           fontSize: 10,
                                                           fontWeight: FontWeight.bold,
@@ -1229,6 +1268,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                 ],
                               ),
                             ),
+                          ),
                           );
                         },
                         childCount: filteredDocuments.length,

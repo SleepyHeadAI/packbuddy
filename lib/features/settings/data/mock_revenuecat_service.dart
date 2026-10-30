@@ -285,10 +285,15 @@ class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
       if (!allowSandbox) {
         state = state.copyWith(
           isLoading: false,
-          errorMessage: 'Store billing products ($productMonthly, $productAnnual) are not yet configured.',
+          errorMessage: 'store_unavailable',
         );
         return false;
       }
+    }
+
+    // Automatically trigger fresh queryProductDetails if not yet cached in state
+    if (state.products[productId] == null && isStoreBillingConfigured && !enableTestPurchasesForUnitTests) {
+      await queryProductDetails();
     }
 
     // Check if store product is loaded and available
@@ -313,7 +318,7 @@ class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
     if (!allowSandbox) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Store billing products ($productMonthly, $productAnnual) are not yet configured.',
+        errorMessage: 'store_unavailable',
       );
       return false;
     }

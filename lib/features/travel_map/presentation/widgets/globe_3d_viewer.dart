@@ -130,8 +130,15 @@ class _Globe3DViewerState extends State<Globe3DViewer> {
       match ??= WorldCountriesData.allCountries
           .where((c) => c.code.toUpperCase() == cleanCode)
           .firstOrNull;
+      match ??= WorldCountriesData.matchCountry(cleanCode);
 
       if (match != null) {
+        final userSaved = widget.countries
+            .where((c) => c.code.toUpperCase() == match!.code.toUpperCase())
+            .firstOrNull;
+        if (userSaved != null) {
+          match = userSaved;
+        }
         widget.onCountryTap(match);
       }
     }

@@ -79,6 +79,15 @@ class TripController extends StateNotifier<TripState> {
       try {
         _notifications.syncAllTripReminders(trips);
       } catch (_) {}
+
+      // Register real-time live listeners for shared collaborative trips
+      for (final t in trips) {
+        if (t.isShared || t.collaborators.isNotEmpty) {
+          try {
+            _ref.read(syncEngineProvider.notifier).listenToSharedTrip(t.id);
+          } catch (_) {}
+        }
+      }
     } catch (e) {
       if (!mounted) return;
       state = state.copyWith(
@@ -173,6 +182,13 @@ class TripController extends StateNotifier<TripState> {
       }
 
       state = state.copyWith(trips: updatedList);
+
+      // Start real-time live listener if this trip is collaborative
+      if (tripToSave.isShared || tripToSave.collaborators.isNotEmpty) {
+        try {
+          _ref.read(syncEngineProvider.notifier).listenToSharedTrip(tripToSave.id);
+        } catch (_) {}
+      }
 
       // Reschedule packing reminders with updated departure dates
       try {
@@ -369,6 +385,11 @@ class TripController extends StateNotifier<TripState> {
       updatedList.insert(0, joinedTrip);
     }
     state = state.copyWith(trips: updatedList);
+
+    // Start real-time live listener for this newly joined shared trip
+    try {
+      _ref.read(syncEngineProvider.notifier).listenToSharedTrip(joinedTrip.id);
+    } catch (_) {}
 
     return joinedTrip;
   }

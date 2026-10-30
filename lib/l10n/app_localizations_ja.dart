@@ -1964,4 +1964,58 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get storyLayoutClassic => 'クラシック';
+
+  @override
+  String get storeUnavailableMessage => '現在ストアに接続できません。通信環境を確認して再度お試しください。';
+
+  @override
+  String get emergencyGuideTitle => '緊急連絡先＆トラベルガイド (SOS)';
+
+  @override
+  String get emergencyPolice => '警察';
+
+  @override
+  String get emergencyAmbulance => '救急車';
+
+  @override
+  String get emergencyFire => '消防';
+
+  @override
+  String get emergencyGeneralSos => '総合緊急通報 (SOS)';
+
+  @override
+  String get emergencyPowerPlugs => 'プラグ形状・電圧仕様';
+
+  @override
+  String get emergencyPhrases => '旅行で役立つ必須フレーズ';
+
+  @override
+  String get emergencyCopyTooltip => '緊急通報番号をコピー';
+
+  @override
+  String get emergencyCopied => '緊急通報番号をクリップボードにコピーしました';
+
+  @override
+  String get phraseHello => 'こんにちは';
+
+  @override
+  String get phraseThankYou => 'ありがとうございます';
+
+  @override
+  String get phraseHowMuch => 'いくらですか？';
+
+  @override
+  String get phraseHelp => '助けてください / 緊急です';
+
+  @override
+  String get phraseHospital => '病院はどこですか？';
+
+  @override
+  String get phraseEnglish => '英語を話せますか？';
+
+  @override
+  String get budgetAlert85 => '予算上限に接近中 (85%)';
+
+  @override
+  String get budgetAlert100 => '予算上限を超過しました！';
 }

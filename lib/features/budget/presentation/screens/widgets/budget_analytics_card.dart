@@ -204,35 +204,39 @@ class BudgetAnalyticsCard extends StatelessWidget {
       }
     }
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: isDark
-            ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
-            : theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: isDark
-                ? Colors.black.withValues(alpha: 0.30)
-                : const Color(0xFF0F172A).withValues(alpha: 0.03),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
+    final hasBudget = trip?.budgetLimit != null && trip!.budgetLimit! > 0;
+    final budgetRatio = hasBudget ? (totalSpent / trip!.budgetLimit!) : 0.0;
+
+    return RepaintBoundary(
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: isDark
+              ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
+              : theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(
+            color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+            width: 1,
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Row
-          Row(
-            children: [
-              Container(
+          boxShadow: [
+            BoxShadow(
+              color: isDark
+                  ? Colors.black.withValues(alpha: 0.30)
+                  : const Color(0xFF0F172A).withValues(alpha: 0.03),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header Row
+            Row(
+              children: [
+                Container(
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
@@ -295,6 +299,46 @@ class BudgetAnalyticsCard extends StatelessWidget {
               ),
             ],
           ),
+          if (hasBudget && budgetRatio >= 0.85) ...[
+            const SizedBox(height: 14),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: (budgetRatio >= 1.0 ? AppColors.errorPastel : AppColors.warningPastel)
+                    .withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: (budgetRatio >= 1.0 ? AppColors.errorPastel : AppColors.warningPastel)
+                      .withValues(alpha: 0.4),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    budgetRatio >= 1.0 ? Icons.error_outline_rounded : Icons.warning_amber_rounded,
+                    size: 16,
+                    color: budgetRatio >= 1.0 ? AppColors.errorPastel : AppColors.warningPastel,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      budgetRatio >= 1.0
+                          ? (l10n?.budgetAlert100 ?? 'Budget limit exceeded!')
+                          : (l10n?.budgetAlert85 ?? 'Approaching limit (85%)'),
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                        color: budgetRatio >= 1.0 ? AppColors.errorPastel : AppColors.warningPastel,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 18),
 
           // Donut Chart & Center Summary
@@ -572,6 +616,7 @@ class BudgetAnalyticsCard extends StatelessWidget {
           }),
         ],
       ),
+    ),
     );
   }
 }

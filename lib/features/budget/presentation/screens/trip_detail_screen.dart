@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
@@ -17,6 +18,7 @@ import 'package:packbuddy/features/vault/presentation/screens/vault_screen.dart'
 import 'package:packbuddy/features/checklist/presentation/screens/checklist_screen.dart';
 import 'package:packbuddy/features/budget/presentation/widgets/trip_map_preview.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/share_trip_sheet.dart';
+import 'package:packbuddy/features/budget/presentation/screens/widgets/emergency_guide_sheet.dart';
 
 /// Trip Detail and Budget Dashboard Screen
 class TripDetailScreen extends ConsumerWidget {
@@ -239,6 +241,11 @@ class TripDetailScreen extends ConsumerWidget {
                 );
               },
             ),
+            IconButton(
+              icon: const Icon(Icons.sos_rounded, color: AppColors.errorPastel),
+              tooltip: l10n.emergencyGuideTitle,
+              onPressed: () => EmergencyGuideSheet.show(context, currentTrip),
+            ),
           ],
         ),
         floatingActionButton: FloatingActionButton.extended(
@@ -263,6 +270,7 @@ class TripDetailScreen extends ConsumerWidget {
           },
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
+            scrollCacheExtent: const ScrollCacheExtent.pixels(600.0),
             slivers: [
             // Trip Info & Budget Header
             SliverToBoxAdapter(
@@ -425,6 +433,66 @@ class TripDetailScreen extends ConsumerWidget {
                         },
                       ),
                     ),
+                    const SizedBox(height: 12),
+                    // Emergency & Local Guide (SOS) Offline Banner Card
+                    InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () => EmergencyGuideSheet.show(context, currentTrip),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: AppColors.errorPastel.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: AppColors.errorPastel.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.errorPastel.withValues(alpha: 0.15),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.sos_rounded,
+                                color: AppColors.errorPastel,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    l10n.emergencyGuideTitle,
+                                    style: theme.textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      color: theme.colorScheme.onSurface,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '${currentTrip.destination} • 112 / 911',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                     if (expenseState.expenses.any((e) =>
                         e.currency.toUpperCase() != currentTrip.defaultCurrency.toUpperCase())) ...[
                       const SizedBox(height: 12),
@@ -530,8 +598,9 @@ class TripDetailScreen extends ConsumerWidget {
                       final icon = _getCategoryIcon(expense.category);
                       final paymentIcon = _getPaymentIcon(expense.paymentMethod);
 
-                      return Dismissible(
-                        key: ValueKey(expense.id),
+                      return RepaintBoundary(
+                        child: Dismissible(
+                          key: ValueKey(expense.id),
                         direction: DismissDirection.endToStart,
                         background: Container(
                           alignment: Alignment.centerRight,
@@ -728,6 +797,7 @@ class TripDetailScreen extends ConsumerWidget {
                               ],
                             ),
                           ),
+                        ),
                         ),
                       );
                     },

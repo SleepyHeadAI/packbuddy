@@ -14,6 +14,7 @@ import 'package:packbuddy/data/sync_engine/sync_engine.dart';
 import 'package:packbuddy/core/services/biometric_service.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/services/telemetry_service.dart';
+import 'package:packbuddy/core/services/security_service.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
 
 /// State representation for Document Vault
@@ -82,7 +83,10 @@ class VaultController extends StateNotifier<VaultState> {
     try {
       final file = File(filePath);
       if (!await file.exists()) return null;
-      final bytes = await file.readAsBytes();
+      var bytes = await file.readAsBytes();
+      if (SecurityService.instance.isEncrypted(bytes)) {
+        bytes = await SecurityService.instance.decryptBytes(bytes);
+      }
       const maxCloudBytes = 750 * 1024;
       if (bytes.length <= maxCloudBytes) {
         return base64Encode(bytes);
@@ -131,7 +135,7 @@ class VaultController extends StateNotifier<VaultState> {
   /// Unlocks the vault via real biometric verification (Fingerprint / Face ID)
   Future<bool> authenticateWithBiometrics({String? reason}) async {
     final success = await BiometricService.instance.authenticate(
-      localizedReason: reason ?? 'Kasanın kilidini açmak için parmak izinizi doğrulayın',
+      localizedReason: reason ?? 'Verify your fingerprint or face to unlock your travel vault',
     );
     if (success) {
       _prefs.setVaultLocked(false);
@@ -261,15 +265,11 @@ class VaultController extends StateNotifier<VaultState> {
       final targetPath = p.join(vaultDir.path, fileName);
 
       final originalFile = File(pickedFile.path);
-      await originalFile.copy(targetPath);
-
-      var fileBytes = 0;
-      try {
-        final targetFile = File(targetPath);
-        if (await targetFile.exists()) {
-          fileBytes = await targetFile.length();
-        }
-      } catch (_) {}
+      final rawBytes = await originalFile.readAsBytes();
+      final encryptedBytes = await SecurityService.instance.encryptBytes(rawBytes);
+      final targetFile = File(targetPath);
+      await targetFile.writeAsBytes(encryptedBytes);
+      final fileBytes = rawBytes.length;
 
       // 3. Create Document entity with cloud payload
       final cleanExt = ext.replaceAll('.', '').toLowerCase();
@@ -352,15 +352,11 @@ class VaultController extends StateNotifier<VaultState> {
       final targetPath = p.join(vaultDir.path, fileName);
 
       final originalFile = File(pickedPath);
-      await originalFile.copy(targetPath);
-
-      var fileBytes = 0;
-      try {
-        final targetFile = File(targetPath);
-        if (await targetFile.exists()) {
-          fileBytes = await targetFile.length();
-        }
-      } catch (_) {}
+      final rawBytes = await originalFile.readAsBytes();
+      final encryptedBytes = await SecurityService.instance.encryptBytes(rawBytes);
+      final targetFile = File(targetPath);
+      await targetFile.writeAsBytes(encryptedBytes);
+      final fileBytes = rawBytes.length;
 
       final cleanExt = ext.replaceAll('.', '').toLowerCase();
       final cloudData = await encodeFileForCloud(targetPath);

@@ -103,8 +103,8 @@ class TravelMapService {
 
     final effectiveUid = _resolveUid(uid);
 
-    // Self-healing cloud fallback: If local is empty and user is logged in, attempt to restore from Firestore
-    if (savedMap.isEmpty && effectiveUid != null && _isFirebaseReady) {
+    // Self-healing cloud fallback: If user is logged in, restore and merge any remote countries from Firestore
+    if (effectiveUid != null && _isFirebaseReady) {
       try {
         final doc = await FirebaseFirestore.instance
             .collection('users')

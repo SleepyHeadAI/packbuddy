@@ -1964,4 +1964,59 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get storyLayoutClassic => '클래식';
+
+  @override
+  String get storeUnavailableMessage =>
+      '현재 스토어에 연결할 수 없습니다. 네트워크 확인 후 다시 시도해 주세요.';
+
+  @override
+  String get emergencyGuideTitle => '긴급 연락처 및 현지 회화 (SOS)';
+
+  @override
+  String get emergencyPolice => '경찰';
+
+  @override
+  String get emergencyAmbulance => '구급차';
+
+  @override
+  String get emergencyFire => '소방서';
+
+  @override
+  String get emergencyGeneralSos => '통합 긴급구조 (SOS)';
+
+  @override
+  String get emergencyPowerPlugs => '플러그 규격 및 사용 전압';
+
+  @override
+  String get emergencyPhrases => '필수 현지 회화 표현';
+
+  @override
+  String get emergencyCopyTooltip => '긴급 번호 복사';
+
+  @override
+  String get emergencyCopied => '긴급 번호가 클립보드에 복사되었습니다';
+
+  @override
+  String get phraseHello => '안녕하세요';
+
+  @override
+  String get phraseThankYou => '감사합니다';
+
+  @override
+  String get phraseHowMuch => '얼마예요?';
+
+  @override
+  String get phraseHelp => '도와주세요 / 응급상황입니다';
+
+  @override
+  String get phraseHospital => '병원이 어디에 있나요?';
+
+  @override
+  String get phraseEnglish => '영어 하실 수 있나요?';
+
+  @override
+  String get budgetAlert85 => '예산 한도 접근 (85%)';
+
+  @override
+  String get budgetAlert100 => '예산 한도를 초과했습니다!';
 }

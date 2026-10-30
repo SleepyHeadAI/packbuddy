@@ -25,6 +25,7 @@ class BudgetProgressCard extends StatelessWidget {
     final hasBudget = budgetLimit != null && budgetLimit! > 0;
     final remaining = hasBudget ? (budgetLimit! - totalSpent) : 0.0;
     final progress = hasBudget ? (totalSpent / budgetLimit!).clamp(0.0, 1.0) : 0.0;
+    final ratio = hasBudget ? (totalSpent / budgetLimit!) : 0.0;
 
     // Pastel dynamic color based on budget health
     Color progressColor;
@@ -36,53 +37,92 @@ class BudgetProgressCard extends StatelessWidget {
       progressColor = theme.colorScheme.primary;
     }
 
-    return AppCard(
-      padding: const EdgeInsets.all(18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Text(
-                  l10n.budget,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.3,
+    return RepaintBoundary(
+      child: AppCard(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Text(
+                    l10n.budget,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.3,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                ),
+                if (hasBudget) ...[
+                  const SizedBox(width: 8),
+                  TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0.0, end: progress),
+                    duration: const Duration(milliseconds: 750),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, val, _) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: progressColor.withValues(alpha: 0.18),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '%${(val * 100).toInt()}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: progressColor,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ],
+            ),
+            if (hasBudget && ratio >= 0.85) ...[
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: (ratio >= 1.0 ? AppColors.errorPastel : AppColors.warningPastel)
+                      .withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: (ratio >= 1.0 ? AppColors.errorPastel : AppColors.warningPastel)
+                        .withValues(alpha: 0.4),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      ratio >= 1.0 ? Icons.error_outline_rounded : Icons.warning_amber_rounded,
+                      size: 16,
+                      color: ratio >= 1.0 ? AppColors.errorPastel : AppColors.warningPastel,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        ratio >= 1.0 ? l10n.budgetAlert100 : l10n.budgetAlert85,
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w700,
+                          color: ratio >= 1.0 ? AppColors.errorPastel : AppColors.warningPastel,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              if (hasBudget) ...[
-                const SizedBox(width: 8),
-                TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0.0, end: progress),
-                  duration: const Duration(milliseconds: 750),
-                  curve: Curves.easeOutCubic,
-                  builder: (context, val, _) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: progressColor.withValues(alpha: 0.18),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        '%${(val * 100).toInt()}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: progressColor,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
             ],
-          ),
-          const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
           // Smooth Animated Progress Bar (Linear)
           if (hasBudget) ...[
@@ -173,6 +213,7 @@ class BudgetProgressCard extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }

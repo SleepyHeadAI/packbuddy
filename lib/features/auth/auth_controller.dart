@@ -214,7 +214,7 @@ class AuthController extends StateNotifier<AuthState> {
         password: password,
       );
       if (credential.user != null) {
-        _syncProfileAndNotify(credential.user!);
+        await _syncProfileAndNotify(credential.user!);
       }
       state = state.copyWith(
         user: credential.user,
@@ -243,7 +243,7 @@ class AuthController extends StateNotifier<AuthState> {
         password: password,
       );
       if (credential.user != null) {
-        _syncProfileAndNotify(credential.user!);
+        await _syncProfileAndNotify(credential.user!);
       }
       state = state.copyWith(
         user: credential.user,
@@ -271,7 +271,7 @@ class AuthController extends StateNotifier<AuthState> {
         return false;
       }
       if (credential.user != null) {
-        _syncProfileAndNotify(credential.user!);
+        await _syncProfileAndNotify(credential.user!);
       }
       state = state.copyWith(
         user: credential.user,
@@ -299,7 +299,7 @@ class AuthController extends StateNotifier<AuthState> {
         return false;
       }
       if (credential.user != null) {
-        _syncProfileAndNotify(credential.user!);
+        await _syncProfileAndNotify(credential.user!);
       }
       state = state.copyWith(
         user: credential.user,

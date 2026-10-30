@@ -2028,4 +2028,59 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get storyLayoutClassic => 'คลาสสิก';
+
+  @override
+  String get storeUnavailableMessage =>
+      'ไม่สามารถเชื่อมต่อร้านค้าได้ในขณะนี้ โปรดลองใหม่อีกครั้ง';
+
+  @override
+  String get emergencyGuideTitle => 'คู่มือเหตุฉุกเฉินและข้อมูลท้องถิ่น (SOS)';
+
+  @override
+  String get emergencyPolice => 'ตำรวจ';
+
+  @override
+  String get emergencyAmbulance => 'รถพยาบาลฉุกเฉิน';
+
+  @override
+  String get emergencyFire => 'สถานีดับเพลิง';
+
+  @override
+  String get emergencyGeneralSos => 'สายด่วนฉุกเฉิน (SOS)';
+
+  @override
+  String get emergencyPowerPlugs => 'ประเภทปลั๊กไฟและแรงดันไฟฟ้า';
+
+  @override
+  String get emergencyPhrases => 'วลีสำคัญภาษาท้องถิ่น';
+
+  @override
+  String get emergencyCopyTooltip => 'คัดลอกหมายเลขฉุกเฉิน';
+
+  @override
+  String get emergencyCopied => 'คัดลอกหมายเลขฉุกเฉินแล้ว';
+
+  @override
+  String get phraseHello => 'สวัสดี';
+
+  @override
+  String get phraseThankYou => 'ขอบคุณ';
+
+  @override
+  String get phraseHowMuch => 'ราคาเท่าไหร่?';
+
+  @override
+  String get phraseHelp => 'ช่วยด้วย / เหตุฉุกเฉิน';
+
+  @override
+  String get phraseHospital => 'โรงพยาบาลอยู่ที่ไหน?';
+
+  @override
+  String get phraseEnglish => 'คุณพูดภาษาอังกฤษได้ไหม?';
+
+  @override
+  String get budgetAlert85 => 'ใกล้ถึงขีดจำกัดแล้ว (85%)';
+
+  @override
+  String get budgetAlert100 => 'เกินงบประมาณที่ตั้งไว้!';
 }

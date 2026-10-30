@@ -2035,4 +2035,59 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get storyLayoutClassic => 'Klassisk';
+
+  @override
+  String get storeUnavailableMessage =>
+      'Butiksanslutningen är för närvarande inte tillgänglig. Försök igen senare.';
+
+  @override
+  String get emergencyGuideTitle => 'Nödguide & Lokala Fraser (SOS)';
+
+  @override
+  String get emergencyPolice => 'Polis';
+
+  @override
+  String get emergencyAmbulance => 'Ambulans';
+
+  @override
+  String get emergencyFire => 'Räddningstjänst';
+
+  @override
+  String get emergencyGeneralSos => 'Allmänt Nödnummer (SOS)';
+
+  @override
+  String get emergencyPowerPlugs => 'Stickkontakter & nätspänning';
+
+  @override
+  String get emergencyPhrases => 'Viktiga lokala fraser';
+
+  @override
+  String get emergencyCopyTooltip => 'Kopiera nödnummer';
+
+  @override
+  String get emergencyCopied => 'Nödnummer kopierat till urklipp';
+
+  @override
+  String get phraseHello => 'Hej';
+
+  @override
+  String get phraseThankYou => 'Tack så mycket';
+
+  @override
+  String get phraseHowMuch => 'Hur mycket kostar det?';
+
+  @override
+  String get phraseHelp => 'Hjälp / Nödsituation';
+
+  @override
+  String get phraseHospital => 'Var ligger sjukhuset?';
+
+  @override
+  String get phraseEnglish => 'Talar du engelska?';
+
+  @override
+  String get budgetAlert85 => 'Närmar sig budgetgränsen (85%)';
+
+  @override
+  String get budgetAlert100 => 'Budgetgränsen överskriden!';
 }

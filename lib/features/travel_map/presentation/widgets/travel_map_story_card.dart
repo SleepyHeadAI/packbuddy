@@ -854,7 +854,7 @@ class TravelMapStoryCard extends StatelessWidget {
                 border: Border.all(color: palette.accentColor.withValues(alpha: 0.5)),
               ),
               child: Text(
-                '%${worldPercentage.toStringAsFixed(1)} DÜNYA',
+                '%${worldPercentage.toStringAsFixed(1)} ${l10n.ofTheWorld.toUpperCase()}',
                 style: TextStyle(
                   color: palette.accentColor,
                   fontWeight: FontWeight.w800,
@@ -1164,6 +1164,8 @@ class TravelMapStoryCard extends StatelessWidget {
             fontWeight: FontWeight.w600,
             fontSize: 10.5,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
@@ -1200,6 +1202,8 @@ class TravelMapStoryCard extends StatelessWidget {
                 fontWeight: FontWeight.w600,
                 fontSize: 9.5,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -1227,6 +1231,8 @@ class TravelMapStoryCard extends StatelessWidget {
             fontSize: 10.5,
             fontWeight: FontWeight.w600,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );

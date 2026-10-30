@@ -3961,6 +3961,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Classic'**
   String get storyLayoutClassic;
+
+  /// No description provided for @storeUnavailableMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Store connection is currently unavailable. Please check your internet connection and try again.'**
+  String get storeUnavailableMessage;
+
+  /// No description provided for @emergencyGuideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency & Local Guide (SOS)'**
+  String get emergencyGuideTitle;
+
+  /// No description provided for @emergencyPolice.
+  ///
+  /// In en, this message translates to:
+  /// **'Police'**
+  String get emergencyPolice;
+
+  /// No description provided for @emergencyAmbulance.
+  ///
+  /// In en, this message translates to:
+  /// **'Ambulance'**
+  String get emergencyAmbulance;
+
+  /// No description provided for @emergencyFire.
+  ///
+  /// In en, this message translates to:
+  /// **'Fire Service'**
+  String get emergencyFire;
+
+  /// No description provided for @emergencyGeneralSos.
+  ///
+  /// In en, this message translates to:
+  /// **'General Emergency (SOS)'**
+  String get emergencyGeneralSos;
+
+  /// No description provided for @emergencyPowerPlugs.
+  ///
+  /// In en, this message translates to:
+  /// **'Power Plugs & Standard Voltage'**
+  String get emergencyPowerPlugs;
+
+  /// No description provided for @emergencyPhrases.
+  ///
+  /// In en, this message translates to:
+  /// **'Essential Local Phrases'**
+  String get emergencyPhrases;
+
+  /// No description provided for @emergencyCopyTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy emergency number'**
+  String get emergencyCopyTooltip;
+
+  /// No description provided for @emergencyCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency number copied to clipboard'**
+  String get emergencyCopied;
+
+  /// No description provided for @phraseHello.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello'**
+  String get phraseHello;
+
+  /// No description provided for @phraseThankYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you'**
+  String get phraseThankYou;
+
+  /// No description provided for @phraseHowMuch.
+  ///
+  /// In en, this message translates to:
+  /// **'How much is this?'**
+  String get phraseHowMuch;
+
+  /// No description provided for @phraseHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Help / Emergency'**
+  String get phraseHelp;
+
+  /// No description provided for @phraseHospital.
+  ///
+  /// In en, this message translates to:
+  /// **'Where is the hospital?'**
+  String get phraseHospital;
+
+  /// No description provided for @phraseEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you speak English?'**
+  String get phraseEnglish;
+
+  /// No description provided for @budgetAlert85.
+  ///
+  /// In en, this message translates to:
+  /// **'Approaching limit (85%)'**
+  String get budgetAlert85;
+
+  /// No description provided for @budgetAlert100.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget limit exceeded!'**
+  String get budgetAlert100;
 }
 
 class _AppLocalizationsDelegate

@@ -94,7 +94,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)?.noticeMessage('Share error') ?? 'Share failed')),
+          SnackBar(content: Text(AppLocalizations.of(context)?.authErrorGeneric ?? 'Action failed')),
         );
       }
     } finally {
@@ -555,8 +555,8 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                 const SizedBox(height: 2),
                                 Text(
                                   latestCountry.capital.isNotEmpty
-                                      ? '${latestCountry.continent} • ${l10n.mapLegendCapital}: ${latestCountry.capital}'
-                                      : latestCountry.continent,
+                                      ? '${_getLocalizedContinentName(latestCountry.continent, l10n)} • ${l10n.mapLegendCapital}: ${latestCountry.capital}'
+                                      : _getLocalizedContinentName(latestCountry.continent, l10n),
                                   style: TextStyle(
                                     fontSize: 12.5,
                                     color: theme.colorScheme.onSurfaceVariant,
@@ -798,9 +798,13 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                           );
                         },
                         icon: const Icon(Icons.flight_takeoff_rounded, size: 18),
-                        label: Text(
-                          l10n.planTripToCountry(latestCountry.getLocalizedName(currentLang)),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        label: Flexible(
+                          child: Text(
+                            l10n.planTripToCountry(latestCountry.getLocalizedName(currentLang)),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
                     ],
@@ -905,44 +909,52 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              _buildMetric(
-                                title: l10n.mapLegendLived,
-                                value: '${mapState.totalLived}',
-                                color: const Color(0xFF10B981),
-                                icon: Icons.home_rounded,
+                              Expanded(
+                                child: _buildMetric(
+                                  title: l10n.mapLegendLived,
+                                  value: '${mapState.totalLived}',
+                                  color: const Color(0xFF10B981),
+                                  icon: Icons.home_rounded,
+                                ),
                               ),
                               Container(
                                 width: 1,
                                 height: 38,
                                 color: theme.colorScheme.outlineVariant,
                               ),
-                              _buildMetric(
-                                title: l10n.mapLegendBeen,
-                                value: '${mapState.totalVisited}',
-                                color: const Color(0xFFEA580C),
-                                icon: Icons.flight_takeoff_rounded,
+                              Expanded(
+                                child: _buildMetric(
+                                  title: l10n.mapLegendBeen,
+                                  value: '${mapState.totalVisited}',
+                                  color: const Color(0xFFEA580C),
+                                  icon: Icons.flight_takeoff_rounded,
+                                ),
                               ),
                               Container(
                                 width: 1,
                                 height: 38,
                                 color: theme.colorScheme.outlineVariant,
                               ),
-                              _buildMetric(
-                                title: l10n.mapLegendWant,
-                                value: '${mapState.totalWishlist}',
-                                color: const Color(0xFFEF4444),
-                                icon: Icons.explore_rounded,
+                              Expanded(
+                                child: _buildMetric(
+                                  title: l10n.mapLegendWant,
+                                  value: '${mapState.totalWishlist}',
+                                  color: const Color(0xFFEF4444),
+                                  icon: Icons.explore_rounded,
+                                ),
                               ),
                               Container(
                                 width: 1,
                                 height: 38,
                                 color: theme.colorScheme.outlineVariant,
                               ),
-                              _buildMetric(
-                                title: l10n.ofTheWorld,
-                                value: '%${mapState.worldPercentage.toStringAsFixed(1)}',
-                                color: theme.colorScheme.primary,
-                                icon: Icons.public_rounded,
+                              Expanded(
+                                child: _buildMetric(
+                                  title: l10n.ofTheWorld,
+                                  value: '%${mapState.worldPercentage.toStringAsFixed(1)}',
+                                  color: theme.colorScheme.primary,
+                                  icon: Icons.public_rounded,
+                                ),
                               ),
                             ],
                           ),
@@ -1131,7 +1143,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                               borderRadius: BorderRadius.circular(18),
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
-                                width: 146,
+                                width: 156,
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
                                 decoration: BoxDecoration(
                                   color: isDark ? const Color(0xFF1E293B) : Colors.white,
@@ -1180,14 +1192,19 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(
-                                          '${cp.visitedCountries}/${cp.totalCountries} ${l10n.countryUnit}',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w600,
-                                            color: isDark ? Colors.white70 : const Color(0xFF64748B),
+                                        Expanded(
+                                          child: Text(
+                                            '${cp.visitedCountries}/${cp.totalCountries} ${l10n.countryUnit}',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                              color: isDark ? Colors.white70 : const Color(0xFF64748B),
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
+                                        const SizedBox(width: 4),
                                         Text(
                                           '%${cp.percentage.toStringAsFixed(0)}',
                                           style: TextStyle(
@@ -1351,6 +1368,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
     required IconData icon,
   }) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Row(
           mainAxisSize: MainAxisSize.min,
@@ -1368,12 +1386,21 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
           ],
         ),
         const SizedBox(height: 2),
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 11,
-            color: Colors.grey,
-            fontWeight: FontWeight.w600,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 11,
+                color: Colors.grey,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ),
       ],
@@ -1463,7 +1490,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
             children: [
               Expanded(
                 child: Text(
-                  country.continent,
+                  _getLocalizedContinentName(country.continent, l10n),
                   style: TextStyle(
                     fontSize: 12,
                     color: theme.colorScheme.onSurfaceVariant,

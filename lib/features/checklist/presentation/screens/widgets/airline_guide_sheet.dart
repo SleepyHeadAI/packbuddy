@@ -221,13 +221,13 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
                       final val = double.tryParse(_customLimitController.text.trim());
                       if (val != null && val > 0 && val <= 100) {
                         final customRule = AirlineBaggageRule(
-                          airlineName: 'Özel Limit',
+                          airlineName: '${l10n.customBaggageLimitPrompt} (${val.toStringAsFixed(0)} kg)',
                           iataCode: 'CUSTOM',
                           countryFlag: '✈️',
                           cabinLimitKg: 8.0,
                           cabinDimensions: '55x40x20 cm',
                           checkedLimitKg: val,
-                          notes: 'Özel belirlenen bagaj limiti.',
+                          notes: '${l10n.baggageLimitSet} ${val.toStringAsFixed(0)} kg',
                         );
                         ref.read(checklistControllerProvider.notifier).selectAirline(customRule);
                         Navigator.pop(context);

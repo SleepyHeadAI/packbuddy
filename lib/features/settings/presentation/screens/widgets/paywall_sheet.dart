@@ -343,36 +343,54 @@ class PaywallSheet extends ConsumerWidget {
                             );
                           }
                         } else {
-                          // Normal user: Inactive notice (coming soon in store release)
+                          // Normal user: Trigger real Google Play / App Store purchase flow directly!
+                          final success = await ref
+                              .read(proSubscriptionProvider.notifier)
+                              .purchaseActivePlan();
+
                           if (!context.mounted) return;
-                          await showDialog<void>(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                              icon: const Icon(
-                                Icons.workspace_premium_rounded,
-                                color: AppColors.primaryLight,
-                                size: 36,
-                              ),
-                              title: Text(
-                                l10n.proStoreComingSoonTitle,
-                                style: const TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              content: Text(
-                                l10n.proStoreComingSoonDesc,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(fontSize: 14, height: 1.4),
-                              ),
-                              actions: [
-                                Center(
-                                  child: FilledButton(
-                                    onPressed: () => Navigator.of(ctx).pop(),
-                                    child: Text(l10n.ok),
-                                  ),
+
+                          if (success) {
+                            Navigator.of(context).pop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Row(
+                                  children: [
+                                    const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                                    const SizedBox(width: 12),
+                                    Expanded(child: Text(l10n.purchaseSuccess)),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          );
+                                backgroundColor: AppColors.successPastel,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                            );
+                          } else {
+                            final errorMsg = ref.read(proSubscriptionProvider).errorMessage;
+                            if (errorMsg != null && errorMsg.isNotEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Row(
+                                    children: [
+                                      const Icon(Icons.info_outline_rounded, color: Colors.white, size: 20),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          errorMsg == 'store_unavailable'
+                                              ? l10n.storeUnavailableMessage
+                                              : errorMsg,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  backgroundColor: theme.colorScheme.error,
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                              );
+                            }
+                          }
                         }
                       },
                 child: proState.isLoading

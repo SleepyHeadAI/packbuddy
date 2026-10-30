@@ -143,12 +143,7 @@ void main() {
       await tester.tap(subscribeBtn);
       await tester.pumpAndSettle();
 
-      // Friendly coming soon dialog is shown
-      expect(find.text('PackBuddy Pro Yakında Aktif'), findsOneWidget);
-      expect(find.textContaining('şu anda aktif değildir'), findsOneWidget);
-
-      await tester.tap(find.text('Tamam'));
-      await tester.pumpAndSettle();
+      // Real store purchase flow triggered, coming soon dialog is completely removed
       expect(find.text('PackBuddy Pro Yakında Aktif'), findsNothing);
     });
 
@@ -179,8 +174,8 @@ void main() {
       await tester.tap(subscribeBtn);
       await tester.pumpAndSettle();
 
-      expect(find.text('PackBuddy Pro bald verfügbar'), findsOneWidget);
-      expect(find.textContaining('derzeit nicht aktiv'), findsOneWidget);
+      // Real store purchase flow triggered, coming soon dialog is completely removed
+      expect(find.text('PackBuddy Pro bald verfügbar'), findsNothing);
     });
   });
 
@@ -305,6 +300,13 @@ void main() {
     });
 
     testWidgets('TravelMapScreen renders search bar, continent chips and discovery progress bar', (tester) async {
+      tester.view.physicalSize = const Size(800, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(

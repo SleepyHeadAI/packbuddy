@@ -1958,4 +1958,58 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get storyLayoutClassic => '经典';
+
+  @override
+  String get storeUnavailableMessage => '目前无法连接到应用商店。请检查网络连接后重试。';
+
+  @override
+  String get emergencyGuideTitle => '紧急求助与当地指南 (SOS)';
+
+  @override
+  String get emergencyPolice => '报警电话';
+
+  @override
+  String get emergencyAmbulance => '急救中心';
+
+  @override
+  String get emergencyFire => '火警电话';
+
+  @override
+  String get emergencyGeneralSos => '综合紧急求助 (SOS)';
+
+  @override
+  String get emergencyPowerPlugs => '电源插头类型与电压';
+
+  @override
+  String get emergencyPhrases => '当地实用应急短语';
+
+  @override
+  String get emergencyCopyTooltip => '复制紧急求助电话';
+
+  @override
+  String get emergencyCopied => '求助电话已复制到剪贴板';
+
+  @override
+  String get phraseHello => '你好';
+
+  @override
+  String get phraseThankYou => '谢谢';
+
+  @override
+  String get phraseHowMuch => '这个多少钱？';
+
+  @override
+  String get phraseHelp => '救命 / 紧急情况';
+
+  @override
+  String get phraseHospital => '请问医院在哪里？';
+
+  @override
+  String get phraseEnglish => '你会说英语吗？';
+
+  @override
+  String get budgetAlert85 => '接近预算上限 (85%)';
+
+  @override
+  String get budgetAlert100 => '预算已超支！';
 }

@@ -104,7 +104,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                   Expanded(
                     child: Text(
                       l10n?.pinWidgetGuide ??
-                          'Ana ekranınıza uzun basarak Widget\'lar > PackBuddy seçeneğiyle widget ekleyebilirsiniz.',
+                          'Long-press your home screen and choose Widgets > PackBuddy to add.',
                     ),
                   ),
                 ],
@@ -122,7 +122,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
           SnackBar(
             content: Text(
               l10n?.pinWidgetGuide ??
-                  'Ana ekranınıza uzun basarak Widget\'lar > PackBuddy seçeneğiyle widget ekleyebilirsiniz.',
+                  'Long-press your home screen and choose Widgets > PackBuddy to add.',
             ),
             behavior: SnackBarBehavior.floating,
           ),
@@ -326,7 +326,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
     };
 
     final String tripTitle = _widgetData?.tripTitle ?? l10n?.appName ?? 'PackBuddy';
-    final String destination = _widgetData?.destination ?? 'Plan your next trip';
+    final String destination = _widgetData?.destination ?? l10n?.destination ?? 'Plan your next trip';
     final String daysText = _widgetData != null && _widgetData!.daysUntil > 0
         ? '${_widgetData!.daysUntil}d'
         : (_widgetData != null ? '0d' : '-');

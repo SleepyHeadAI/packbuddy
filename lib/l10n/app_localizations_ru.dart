@@ -2043,4 +2043,59 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get storyLayoutClassic => 'Классика';
+
+  @override
+  String get storeUnavailableMessage =>
+      'Подключение к магазину временно недоступно. Пожалуйста, повторите попытку позже.';
+
+  @override
+  String get emergencyGuideTitle => 'Экстренные службы и разговорник (SOS)';
+
+  @override
+  String get emergencyPolice => 'Полиция';
+
+  @override
+  String get emergencyAmbulance => 'Скорая помощь';
+
+  @override
+  String get emergencyFire => 'Пожарная служба';
+
+  @override
+  String get emergencyGeneralSos => 'Единая служба спасения (SOS)';
+
+  @override
+  String get emergencyPowerPlugs => 'Типы розеток и напряжение сети';
+
+  @override
+  String get emergencyPhrases => 'Основные фразы на местном языке';
+
+  @override
+  String get emergencyCopyTooltip => 'Скопировать номер экстренной службы';
+
+  @override
+  String get emergencyCopied => 'Номер скопирован в буфер обмена';
+
+  @override
+  String get phraseHello => 'Здравствуйте';
+
+  @override
+  String get phraseThankYou => 'Спасибо';
+
+  @override
+  String get phraseHowMuch => 'Сколько это стоит?';
+
+  @override
+  String get phraseHelp => 'Помогите / Чрезвычайная ситуация';
+
+  @override
+  String get phraseHospital => 'Где находится больница?';
+
+  @override
+  String get phraseEnglish => 'Вы говорите по-английски?';
+
+  @override
+  String get budgetAlert85 => 'Приближение к лимиту (85%)';
+
+  @override
+  String get budgetAlert100 => 'Лимит бюджета превышен!';
 }

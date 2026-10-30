@@ -409,47 +409,53 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Icon(
-                        Icons.flight_takeoff_rounded,
-                        size: 17,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      l10n.trips,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                    if (tripCount > 0) ...[
-                      const SizedBox(width: 8),
+                Expanded(
+                  child: Row(
+                    children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Text(
-                          '$tripCount',
-                          style: TextStyle(
-                            color: theme.colorScheme.primary,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                          ),
+                        child: Icon(
+                          Icons.flight_takeoff_rounded,
+                          size: 17,
+                          color: theme.colorScheme.primary,
                         ),
                       ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          l10n.trips,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.3,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (tripCount > 0) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            '$tripCount',
+                            style: TextStyle(
+                              color: theme.colorScheme.primary,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
                 TextButton(
                   style: TextButton.styleFrom(
@@ -736,7 +742,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                         Expanded(
                           child: Text(
                             checklistState.selectedAirline != null
-                                ? '${checklistState.selectedAirline!.countryFlag} ${checklistState.selectedAirline!.airlineName} • Kabin ${checklistState.selectedAirline!.cabinLimitKg.toInt()} kg'
+                                ? '${checklistState.selectedAirline!.countryFlag} ${checklistState.selectedAirline!.airlineName} • ${l10n.cabinBaggage} ${checklistState.selectedAirline!.cabinLimitKg.toInt()} kg'
                                 : l10n.standardBaggageLimitNote,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -837,6 +843,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                             color: theme.colorScheme.onSurfaceVariant,
                             fontSize: 11.5,
                           ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),

@@ -2063,4 +2063,60 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get storyLayoutClassic => 'Κλασικό';
+
+  @override
+  String get storeUnavailableMessage =>
+      'Η σύνδεση με το κατάστημα δεν είναι διαθέσιμη. Παρακαλούμε δοκιμάστε αργότερα.';
+
+  @override
+  String get emergencyGuideTitle =>
+      'Οδηγός Έκτακτης Ανάγκης & Τοπικές Φράσεις (SOS)';
+
+  @override
+  String get emergencyPolice => 'Αστυνομία';
+
+  @override
+  String get emergencyAmbulance => 'Ασθενοφόρο';
+
+  @override
+  String get emergencyFire => 'Πυροσβεστική';
+
+  @override
+  String get emergencyGeneralSos => 'Γενικός Αριθμός Έκτακτης Ανάγκης (SOS)';
+
+  @override
+  String get emergencyPowerPlugs => 'Τύπος πρίζας & τάση δικτύου';
+
+  @override
+  String get emergencyPhrases => 'Βασικές τοπικές φράσεις';
+
+  @override
+  String get emergencyCopyTooltip => 'Αντιγραφή αριθμού έκτακτης ανάγκης';
+
+  @override
+  String get emergencyCopied => 'Ο αριθμός αντιγράφηκε στο πρόχειρο';
+
+  @override
+  String get phraseHello => 'Γειά σας';
+
+  @override
+  String get phraseThankYou => 'Ευχαριστώ';
+
+  @override
+  String get phraseHowMuch => 'Πόσο κοστίζει αυτό;';
+
+  @override
+  String get phraseHelp => 'Βοήθεια / Έκτακτη ανάγκη';
+
+  @override
+  String get phraseHospital => 'Πού είναι το νοσοκομείο;';
+
+  @override
+  String get phraseEnglish => 'Μιλάτε αγγλικά;';
+
+  @override
+  String get budgetAlert85 => 'Προσέγγιση ορίου (85%)';
+
+  @override
+  String get budgetAlert100 => 'Υπέρβαση προϋπολογισμού!';
 }

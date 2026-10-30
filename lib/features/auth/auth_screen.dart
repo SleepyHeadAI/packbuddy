@@ -83,27 +83,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     await ref.read(authControllerProvider.notifier).signInWithGoogle();
   }
 
-  Future<void> _handleAppleSignIn() async {
-    ref.read(authControllerProvider.notifier).clearError();
-    final l10n = AppLocalizations.of(context)!;
-    final message = l10n.authAppleSignInComingSoon;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.info_outline_rounded, color: Colors.white, size: 20),
-            const SizedBox(width: 12),
-            Expanded(child: Text(message)),
-          ],
-        ),
-        backgroundColor: const Color(0xFF1E293B),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
-  }
-
   void _handleForgotPassword(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final emailCtrl = TextEditingController(text: _emailController.text);
@@ -1096,57 +1075,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     fit: BoxFit.scaleDown,
                     child: Text(
                       l10n.authContinueWithGoogle,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.2,
-                        color: isDark ? AppColors.onSurfaceDark : Colors.black87,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-
-        // Continue with Apple (Feature F-15)
-        BouncyPressable(
-          onTap: isLoading ? null : _handleAppleSignIn,
-          borderRadius: BorderRadius.circular(22),
-          child: Container(
-            height: 52,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(
-                color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
-                width: 1.2,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.03),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.apple,
-                  size: 22,
-                  color: isDark ? AppColors.onSurfaceDark : Colors.black,
-                ),
-                const SizedBox(width: 12),
-                Flexible(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      l10n.authContinueWithApple,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,

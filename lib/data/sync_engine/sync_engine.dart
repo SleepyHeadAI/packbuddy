@@ -3,6 +3,7 @@ import 'package:path/path.dart' as p;
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -18,11 +19,15 @@ import '../../features/checklist/domain/packing_item.dart';
 import '../../features/checklist/domain/canonical_packing_catalog.dart';
 import '../../core/services/currency_service.dart';
 import '../../core/services/preferences_service.dart';
+import '../../core/services/security_service.dart';
 import '../../features/auth/auth_controller.dart';
 import '../../features/settings/data/mock_revenuecat_service.dart';
 import '../../features/vault/presentation/controllers/vault_controller.dart';
 import '../../features/travel_map/data/travel_map_service.dart';
 import '../../features/travel_map/presentation/controllers/travel_map_controller.dart';
+import '../../features/budget/presentation/controllers/trip_controller.dart';
+import '../../features/budget/presentation/controllers/expense_controller.dart';
+import '../../features/checklist/presentation/controllers/checklist_controller.dart';
 
 /// Sync Status enumeration for UI and State Management
 enum SyncStatus {
@@ -70,6 +75,12 @@ class SyncEngine extends StateNotifier<SyncState> {
   final Ref? ref;
   final void Function(bool isPro)? onProStatusSynced;
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _userDocSubscription;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
+  final Map<String, List<StreamSubscription>> _sharedTripSubscriptions = {};
+  Timer? _debounceTimer;
+  Timer? _heartbeatTimer;
+  Timer? _retryTimer;
+  int _retryCount = 0;
 
   SyncEngine({
     DatabaseHelper? dbHelper,
@@ -80,7 +91,73 @@ class SyncEngine extends StateNotifier<SyncState> {
   })  : _dbHelper = dbHelper ?? DatabaseHelper.instance,
         _firestoreInstance = firestore,
         _authInstance = auth,
-        super(const SyncState());
+        super(const SyncState()) {
+    _initConnectivityListener();
+    _startPeriodicHeartbeat();
+  }
+
+  /// Automatically monitors device network connectivity and schedules sync on restore
+  void _initConnectivityListener() {
+    if (Platform.environment.containsKey('FLUTTER_TEST')) return;
+    try {
+      _connectivitySubscription = Connectivity().onConnectivityChanged.listen(
+        (List<ConnectivityResult> results) {
+          final isConnected = results.any((r) => r != ConnectivityResult.none);
+          if (isConnected) {
+            debugPrint('[SyncEngine] Connectivity restored ($results) -> scheduling debounced auto-sync');
+            _scheduleDebouncedSync(delay: const Duration(milliseconds: 1500));
+          } else {
+            debugPrint('[SyncEngine] Connectivity lost -> state set to offlineReady');
+            if (mounted && state.status != SyncStatus.syncing) {
+              state = state.copyWith(status: SyncStatus.noInternet);
+            }
+          }
+        },
+        onError: (err) {
+          debugPrint('[SyncEngine] Connectivity listener notice: $err');
+        },
+      );
+    } catch (e) {
+      debugPrint('[SyncEngine] Failed to initialize connectivity listener: $e');
+    }
+  }
+
+  /// Debounces rapid network triggers or back-to-back writes
+  void _scheduleDebouncedSync({Duration delay = const Duration(milliseconds: 1500)}) {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(delay, () {
+      if (mounted && !_isSyncing) {
+        performSync();
+      }
+    });
+  }
+
+  /// Periodic silent background heartbeat (every 5 minutes) to sync multi-device modifications
+  void _startPeriodicHeartbeat() {
+    if (Platform.environment.containsKey('FLUTTER_TEST')) return;
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = Timer.periodic(const Duration(minutes: 5), (_) {
+      if (mounted && !_isSyncing && state.status != SyncStatus.syncing) {
+        performSync();
+      }
+    });
+  }
+
+  /// Schedules exponential backoff retry upon sync errors (15s, 30s, 45s...)
+  void _scheduleRetry() {
+    if (Platform.environment.containsKey('FLUTTER_TEST')) return;
+    _retryTimer?.cancel();
+    if (_retryCount < 5) {
+      _retryCount++;
+      final delaySeconds = _retryCount * 15;
+      debugPrint('[SyncEngine] Scheduling automatic retry #$_retryCount in $delaySeconds seconds...');
+      _retryTimer = Timer(Duration(seconds: delaySeconds), () {
+        if (mounted && !_isSyncing) {
+          performSync();
+        }
+      });
+    }
+  }
 
   /// Listens to real-time changes to the user's profile in Firestore (e.g., remote Admin Pro grants/revokes)
   void listenToUserDoc(String uid) {
@@ -133,11 +210,132 @@ class SyncEngine extends StateNotifier<SyncState> {
   void cancelUserDocSubscription() {
     _userDocSubscription?.cancel();
     _userDocSubscription = null;
+    cancelAllSharedTripListeners();
+  }
+
+  /// Subscribes to real-time changes for a shared trip and its items & expenses (Phase 2)
+  void listenToSharedTrip(String tripId) {
+    if (_sharedTripSubscriptions.containsKey(tripId)) return;
+    bool isFirebaseReady = false;
+    try {
+      isFirebaseReady = Firebase.apps.isNotEmpty;
+    } catch (_) {}
+    if (!isFirebaseReady && _firestoreInstance == null) return;
+    final firestore = _firestoreInstance ?? FirebaseFirestore.instance;
+
+    final subs = <StreamSubscription>[];
+
+    // 1. Listen to shared trip document itself
+    final tripSub = firestore.collection('trips').doc(tripId).snapshots().listen((snap) async {
+      if (!snap.exists || snap.data() == null) return;
+      try {
+        final updatedTrip = Trip.fromJson(snap.data()!);
+        await _dbHelper.insertTrip(updatedTrip);
+        final currentUid = _authInstance?.currentUser?.uid ?? FirebaseAuth.instance.currentUser?.uid;
+        if (currentUid != null) {
+          ref?.read(tripControllerProvider.notifier).loadTrips(userId: currentUid);
+        }
+      } catch (e) {
+        debugPrint('[SyncEngine] Real-time trip update error: $e');
+      }
+    }, onError: (e) => debugPrint('[SyncEngine] Trip snapshot error: $e'));
+    subs.add(tripSub);
+
+    // 2. Listen to checklist items for this trip
+    final itemsSub = firestore
+        .collection('checklist_items')
+        .where('trip_id', isEqualTo: tripId)
+        .snapshots()
+        .listen((snap) async {
+      bool changed = false;
+      for (final docChange in snap.docChanges) {
+        try {
+          final data = docChange.doc.data();
+          if (data == null) continue;
+          if (docChange.type == DocumentChangeType.removed) {
+            await _dbHelper.deleteChecklistItem(docChange.doc.id);
+            changed = true;
+          } else {
+            final item = PackingItem.fromJson(data);
+            await _dbHelper.insertChecklistItem(item);
+            changed = true;
+          }
+        } catch (e) {
+          debugPrint('[SyncEngine] Real-time checklist item sync error: $e');
+        }
+      }
+      if (changed) {
+        final currentUid = _authInstance?.currentUser?.uid ?? FirebaseAuth.instance.currentUser?.uid;
+        if (currentUid != null) {
+          ref?.read(checklistControllerProvider.notifier).loadItems(userId: currentUid);
+        }
+      }
+    }, onError: (e) => debugPrint('[SyncEngine] Checklist snapshot error: $e'));
+    subs.add(itemsSub);
+
+    // 3. Listen to expenses for this trip
+    final expensesSub = firestore
+        .collection('expenses')
+        .where('trip_id', isEqualTo: tripId)
+        .snapshots()
+        .listen((snap) async {
+      bool changed = false;
+      for (final docChange in snap.docChanges) {
+        try {
+          final data = docChange.doc.data();
+          if (data == null) continue;
+          if (docChange.type == DocumentChangeType.removed) {
+            await _dbHelper.deleteExpense(docChange.doc.id);
+            changed = true;
+          } else {
+            final exp = Expense.fromJson(data);
+            await _dbHelper.insertExpense(exp);
+            changed = true;
+          }
+        } catch (e) {
+          debugPrint('[SyncEngine] Real-time expense sync error: $e');
+        }
+      }
+      if (changed) {
+        try {
+          ref?.read(expenseControllerProvider(tripId).notifier).loadExpenses();
+        } catch (_) {}
+      }
+    }, onError: (e) => debugPrint('[SyncEngine] Expense snapshot error: $e'));
+    subs.add(expensesSub);
+
+    _sharedTripSubscriptions[tripId] = subs;
+    debugPrint('[SyncEngine] Started real-time live stream for shared trip $tripId');
+  }
+
+  /// Cancels live listeners for a specific shared trip
+  void cancelSharedTripListener(String tripId) {
+    final subs = _sharedTripSubscriptions.remove(tripId);
+    if (subs != null) {
+      for (final s in subs) {
+        s.cancel();
+      }
+    }
+  }
+
+  /// Cancels all active shared trip listeners to prevent memory leaks
+  void cancelAllSharedTripListeners() {
+    for (final subs in _sharedTripSubscriptions.values) {
+      for (final s in subs) {
+        s.cancel();
+      }
+    }
+    _sharedTripSubscriptions.clear();
   }
 
   @override
   void dispose() {
     _userDocSubscription?.cancel();
+    _connectivitySubscription?.cancel();
+    cancelAllSharedTripListeners();
+    _debounceTimer?.cancel();
+    _heartbeatTimer?.cancel();
+    _retryTimer?.cancel();
     super.dispose();
   }
 
@@ -202,7 +400,7 @@ class SyncEngine extends StateNotifier<SyncState> {
       if (uid == null) {
         state = state.copyWith(
           status: SyncStatus.idle,
-          errorMessage: 'Kullanıcı oturumu bulunamadı.',
+          errorMessage: 'user_session_not_found',
         );
         return;
       }
@@ -401,6 +599,15 @@ class SyncEngine extends StateNotifier<SyncState> {
               debugPrint('[SyncEngine] parse remote doc notice: $e');
             }
           }
+          // Delete any chunks subcollection in Firestore to keep database clean
+          try {
+            final chunksSnap = await firestore.collection('documents').doc(doc.id).collection('chunks').get();
+            for (final c in chunksSnap.docs) {
+              batch.delete(c.reference);
+              await queueBatchOp();
+            }
+          } catch (_) {}
+
           batch.delete(firestore.collection('documents').doc(doc.id));
           await queueBatchOp();
           docIdsToHardDelete.add(doc.id);
@@ -595,9 +802,9 @@ class SyncEngine extends StateNotifier<SyncState> {
             final f = File(docToPush.localImagePath);
             if (f.existsSync()) {
               final bytes = f.readAsBytesSync();
-              const maxBytes = 700 * 1024;
+              const maxDirectBytes = 700 * 1024;
               final ext = p.extension(docToPush.localImagePath).replaceAll('.', '').toLowerCase();
-              if (bytes.length <= maxBytes) {
+              if (bytes.length <= maxDirectBytes) {
                 final payload = base64Encode(bytes);
                 docToPush = docToPush.copyWith(
                   cloudDataBase64: payload,
@@ -606,11 +813,33 @@ class SyncEngine extends StateNotifier<SyncState> {
                 );
                 docsToUpsertLocal.add(docToPush);
               } else {
-                debugPrint('[SyncEngine] Document "${docToPush.title}" exceeds 700KB limit (${bytes.length} bytes). Preserving local copy without byte corruption.');
+                // Large document (>700KB up to 10MB): chunk into Firestore subcollection
+                final payload = base64Encode(bytes);
                 docToPush = docToPush.copyWith(
                   fileSizeBytes: bytes.length,
                   fileExtension: ext.isNotEmpty ? ext : (docToPush.isPdf ? 'pdf' : 'jpg'),
+                  cloudDataBase64: '',
                 );
+                if (bytes.length <= 10 * 1024 * 1024) {
+                  const chunkSize = 400 * 1024;
+                  final totalChunks = (payload.length / chunkSize).ceil();
+                  for (int i = 0; i < totalChunks; i++) {
+                    final start = i * chunkSize;
+                    final end = (start + chunkSize < payload.length) ? start + chunkSize : payload.length;
+                    final chunkStr = payload.substring(start, end);
+                    batch.set(
+                      firestore.collection('documents').doc(docToPush.id).collection('chunks').doc('chunk_$i'),
+                      {
+                        'index': i,
+                        'total': totalChunks,
+                        'chunk': chunkStr,
+                        'updated_at': docToPush.updatedAt.millisecondsSinceEpoch,
+                      },
+                      SetOptions(merge: true),
+                    );
+                    await queueBatchOp();
+                  }
+                }
               }
             }
           } catch (_) {}
@@ -779,16 +1008,45 @@ class SyncEngine extends StateNotifier<SyncState> {
           final localFile = File(doc.filePath);
           final fileExists = await localFile.exists();
 
-          if (!fileExists && doc.cloudDataBase64 != null && doc.cloudDataBase64!.isNotEmpty) {
-            try {
-              final bytes = base64Decode(doc.cloudDataBase64!);
-              final ext = doc.fileExtension ?? (doc.filePath.split('.').length > 1 ? doc.filePath.split('.').last : 'bin');
-              final restoredPath = p.join(vaultDir.path, '${doc.id}_restored.$ext');
-              final restoredFile = File(restoredPath);
-              await restoredFile.writeAsBytes(bytes);
-              updatedDoc = doc.copyWith(filePath: restoredPath);
-            } catch (e) {
-              debugPrint('[SyncEngine] Error restoring document file: $e');
+          if (!fileExists) {
+            Uint8List? fileBytes;
+            if (doc.cloudDataBase64 != null && doc.cloudDataBase64!.isNotEmpty) {
+              try {
+                fileBytes = base64Decode(doc.cloudDataBase64!);
+              } catch (_) {}
+            } else if (doc.fileSizeBytes > 0) {
+              // Try restoring from chunks subcollection in Firestore
+              try {
+                final chunksSnap = await firestore
+                    .collection('documents')
+                    .doc(doc.id)
+                    .collection('chunks')
+                    .orderBy('index')
+                    .get();
+                if (chunksSnap.docs.isNotEmpty) {
+                  final buffer = StringBuffer();
+                  for (final c in chunksSnap.docs) {
+                    final piece = c.data()['chunk'] as String?;
+                    if (piece != null) buffer.write(piece);
+                  }
+                  fileBytes = base64Decode(buffer.toString());
+                }
+              } catch (e) {
+                debugPrint('[SyncEngine] Error restoring chunked document: $e');
+              }
+            }
+
+            if (fileBytes != null) {
+              try {
+                final ext = doc.fileExtension ?? (doc.filePath.split('.').length > 1 ? doc.filePath.split('.').last : 'bin');
+                final restoredPath = p.join(vaultDir.path, '${doc.id}_restored.$ext');
+                final restoredFile = File(restoredPath);
+                final encryptedBytes = await SecurityService.instance.encryptBytes(fileBytes);
+                await restoredFile.writeAsBytes(encryptedBytes);
+                updatedDoc = doc.copyWith(filePath: restoredPath);
+              } catch (e) {
+                debugPrint('[SyncEngine] Error writing restored file: $e');
+              }
             }
           }
           resolvedDocsToUpsert.add(updatedDoc);
@@ -896,11 +1154,34 @@ class SyncEngine extends StateNotifier<SyncState> {
         lastSyncTime: DateTime.fromMillisecondsSinceEpoch(syncStartTime),
         syncedCount: processedItems,
       );
+
+      // Reset retry count on successful sync
+      _retryCount = 0;
+      _retryTimer?.cancel();
+
+      // Ensure real-time live listeners are active for all shared collaborative trips
+      for (final trip in tripsToUpsertLocal) {
+        if (trip.isShared || trip.collaborators.isNotEmpty) {
+          listenToSharedTrip(trip.id);
+        }
+      }
+
+      // Refresh active domain UI controllers from newly synced local SQLite
+      final r = ref;
+      if (r != null) {
+        try {
+          r.read(tripControllerProvider.notifier).loadTrips(userId: uid);
+          r.read(checklistControllerProvider.notifier).loadItems(userId: uid);
+          r.read(vaultControllerProvider.notifier).loadDocuments(userId: uid);
+          r.read(travelMapControllerProvider.notifier).loadCountries(userId: uid);
+        } catch (_) {}
+      }
     } catch (e) {
       state = state.copyWith(
         status: SyncStatus.failed,
         errorMessage: e.toString(),
       );
+      _scheduleRetry();
     } finally {
       _isSyncing = false;
     }
@@ -913,6 +1194,8 @@ final syncEngineProvider = StateNotifierProvider<SyncEngine, SyncState>((ref) {
   ref.listen<User?>(authUserProvider, (prev, next) {
     if (next != null) {
       engine.listenToUserDoc(next.uid);
+      // Auto-trigger full two-way sync as soon as user logs in or switches
+      engine.performSync();
     } else {
       engine.cancelUserDocSubscription();
     }
@@ -920,6 +1203,8 @@ final syncEngineProvider = StateNotifierProvider<SyncEngine, SyncState>((ref) {
   final initialUser = ref.read(authUserProvider);
   if (initialUser != null) {
     engine.listenToUserDoc(initialUser.uid);
+    // Cold start auto-sync if user is already authenticated
+    Future.microtask(() => engine.performSync());
   }
   return engine;
 });

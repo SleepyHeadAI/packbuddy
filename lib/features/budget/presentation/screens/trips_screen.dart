@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
@@ -229,6 +230,7 @@ class TripsScreen extends ConsumerWidget {
                   ),
                 )
               : ListView.builder(
+                  scrollCacheExtent: const ScrollCacheExtent.pixels(600.0),
                   padding: const EdgeInsets.only(left: 20, right: 20, top: 12, bottom: 90),
                   itemCount: tripState.trips.length,
                   itemBuilder: (context, index) {
@@ -236,7 +238,8 @@ class TripsScreen extends ConsumerWidget {
                     final country = Country.findByCode(trip.countryCode);
                     final transportIcon = getTransportIcon(trip.transportMode);
 
-                    return AppFadeSlide(
+                    return RepaintBoundary(
+                      child: AppFadeSlide(
                       delay: Duration(milliseconds: (35 * index).clamp(0, 250)),
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 14),
@@ -526,8 +529,9 @@ class TripsScreen extends ConsumerWidget {
                         ),
                       ),
                     ),
-                  );
-                  },
+                  ),
+                );
+              },
                 ),
       ),
     );

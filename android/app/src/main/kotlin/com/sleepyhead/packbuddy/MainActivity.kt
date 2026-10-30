@@ -3,7 +3,6 @@ package com.sleepyhead.packbuddy
 import android.os.Build
 import android.os.Bundle
 import android.view.Display
-import android.view.Surface
 import android.view.WindowManager
 import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterFragmentActivity
@@ -47,10 +46,6 @@ class MainActivity : FlutterFragmentActivity() {
                         params.preferredDisplayModeId = bestMode.modeId
                         window.attributes = params
                     }
-                }
-
-                if (Build.VERSION.SDK_INT >= 34) {
-                    window.setFrameRateCategory(Surface.FRAME_RATE_CATEGORY_HIGH)
                 }
             } catch (_: Exception) {
                 // Ignore if device restricts dynamic mode switching

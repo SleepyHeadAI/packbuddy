@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
@@ -26,23 +28,56 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
   int _pdfCurrentPage = 1;
   bool _pdfError = false;
   String? _pdfErrorMessage;
+  Uint8List? _decryptedBytes;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     SecurityService.instance.enableSecureScreen();
+    _loadFileBytes();
+  }
 
-    if (widget.document.isPdf) {
+  Future<void> _loadFileBytes() async {
+    try {
       final file = File(widget.document.localImagePath);
-      if (file.existsSync()) {
-        try {
-          _pdfController = PdfControllerPinch(
-            document: PdfDocument.openFile(widget.document.localImagePath),
-          );
-        } catch (e) {
+      if (await file.exists()) {
+        final rawBytes = await file.readAsBytes();
+        final bytes = await SecurityService.instance.decryptBytes(rawBytes);
+        if (mounted) {
+          setState(() {
+            _decryptedBytes = bytes;
+            _isLoading = false;
+          });
+          if (widget.document.isPdf) {
+            try {
+              _pdfController = PdfControllerPinch(
+                document: PdfDocument.openData(bytes),
+              );
+            } catch (e) {
+              if (mounted) {
+                setState(() {
+                  _pdfError = true;
+                  _pdfErrorMessage = e.toString();
+                });
+              }
+            }
+          }
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
           _pdfError = true;
           _pdfErrorMessage = e.toString();
-        }
+        });
       }
     }
   }
@@ -103,6 +138,11 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
       case 'health & insurance':
       case 'sağlık & sigorta':
         return l10n.healthAndInsurance;
+      case 'other':
+      case 'diğer':
+      case 'other documents':
+      case 'diğer belgeler':
+        return l10n.otherDocuments;
       default:
         return cat;
     }
@@ -117,7 +157,21 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
       );
       return;
     }
-    await OpenFilex.open(widget.document.localImagePath);
+    try {
+      final rawBytes = await file.readAsBytes();
+      if (SecurityService.instance.isEncrypted(rawBytes)) {
+        final decryptedBytes = await SecurityService.instance.decryptBytes(rawBytes);
+        final tempDir = await getTemporaryDirectory();
+        final ext = widget.document.isPdf ? 'pdf' : 'png';
+        final tempFile = File('${tempDir.path}/pb_vault_preview_${widget.document.id}.$ext');
+        await tempFile.writeAsBytes(decryptedBytes);
+        await OpenFilex.open(tempFile.path);
+      } else {
+        await OpenFilex.open(widget.document.localImagePath);
+      }
+    } catch (e) {
+      await OpenFilex.open(widget.document.localImagePath);
+    }
   }
 
   @override
@@ -172,55 +226,57 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
         ],
       ),
       body: Center(
-        child: !fileExists
-            ? Container(
-                padding: const EdgeInsets.all(32),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.insert_drive_file_outlined,
-                        size: 48,
-                        color: theme.colorScheme.primary,
-                      ),
+        child: _isLoading
+            ? const CircularProgressIndicator(color: Colors.white)
+            : !fileExists || _decryptedBytes == null
+                ? Container(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primaryContainer.withValues(alpha: 0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.insert_drive_file_outlined,
+                            size: 48,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          widget.document.title,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          l10n.fileNotFoundLocally,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.white.withValues(alpha: 0.6),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
-                    Text(
-                      widget.document.title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
+                  )
+                : isPdf
+                    ? _buildPdfViewer(context, l10n)
+                    : InteractiveViewer(
+                        panEnabled: true,
+                        minScale: 0.8,
+                        maxScale: 4.0,
+                        child: Image.memory(
+                          _decryptedBytes!,
+                          fit: BoxFit.contain,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      l10n.fileNotFoundLocally,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.white.withValues(alpha: 0.6),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            : isPdf
-                ? _buildPdfViewer(context, l10n)
-                : InteractiveViewer(
-                    panEnabled: true,
-                    minScale: 0.8,
-                    maxScale: 4.0,
-                    child: Image.file(
-                      docFile,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
       ),
     );
   }

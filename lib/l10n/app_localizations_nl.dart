@@ -2041,4 +2041,59 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get storyLayoutClassic => 'Klassiek';
+
+  @override
+  String get storeUnavailableMessage =>
+      'Winkelverbinding is momenteel niet beschikbaar. Probeer het later opnieuw.';
+
+  @override
+  String get emergencyGuideTitle => 'Noodgeval & Lokale Gids (SOS)';
+
+  @override
+  String get emergencyPolice => 'Politie';
+
+  @override
+  String get emergencyAmbulance => 'Ambulance';
+
+  @override
+  String get emergencyFire => 'Brandweer';
+
+  @override
+  String get emergencyGeneralSos => 'Algemeen Alarmnummer (SOS)';
+
+  @override
+  String get emergencyPowerPlugs => 'Stekkertype & Netspanning';
+
+  @override
+  String get emergencyPhrases => 'Essentiële lokale zinnen';
+
+  @override
+  String get emergencyCopyTooltip => 'Noodnummer kopiëren';
+
+  @override
+  String get emergencyCopied => 'Noodnummer gekopieerd naar klembord';
+
+  @override
+  String get phraseHello => 'Hallo / Goedendag';
+
+  @override
+  String get phraseThankYou => 'Dank u wel';
+
+  @override
+  String get phraseHowMuch => 'Hoeveel kost dit?';
+
+  @override
+  String get phraseHelp => 'Help / Noodgeval';
+
+  @override
+  String get phraseHospital => 'Waar is het ziekenhuis?';
+
+  @override
+  String get phraseEnglish => 'Spreekt u Engels?';
+
+  @override
+  String get budgetAlert85 => 'Limiet bijna bereikt (85%)';
+
+  @override
+  String get budgetAlert100 => 'Budgetlimiet overschreden!';
 }

@@ -2028,4 +2028,59 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get storyLayoutClassic => 'क्लासिक';
+
+  @override
+  String get storeUnavailableMessage =>
+      'वर्तमान में स्टोर से संपर्क नहीं हो पा रहा है। कृपया बाद में पुनः प्रयास करें।';
+
+  @override
+  String get emergencyGuideTitle => 'आपातकालीन सहायता और स्थानीय गाइड (SOS)';
+
+  @override
+  String get emergencyPolice => 'पुलिस';
+
+  @override
+  String get emergencyAmbulance => 'एम्बुलेंस';
+
+  @override
+  String get emergencyFire => 'दमकल सेवा';
+
+  @override
+  String get emergencyGeneralSos => 'सामान्य आपातकालीन (SOS)';
+
+  @override
+  String get emergencyPowerPlugs => 'पावर प्लग और वोल्टेज';
+
+  @override
+  String get emergencyPhrases => 'आवश्यक स्थानीय वाक्यांश';
+
+  @override
+  String get emergencyCopyTooltip => 'आपातकालीन नंबर कॉपी करें';
+
+  @override
+  String get emergencyCopied => 'नंबर क्लिपबोर्ड पर कॉपी हो गया';
+
+  @override
+  String get phraseHello => 'नमस्ते';
+
+  @override
+  String get phraseThankYou => 'धन्यवाद';
+
+  @override
+  String get phraseHowMuch => 'यह कितने का है?';
+
+  @override
+  String get phraseHelp => 'मदद कीजिए / आपातकाल';
+
+  @override
+  String get phraseHospital => 'अस्पताल कहाँ है?';
+
+  @override
+  String get phraseEnglish => 'क्या आप अंग्रेज़ी बोलते हैं?';
+
+  @override
+  String get budgetAlert85 => 'बजट सीमा निकट (85%)';
+
+  @override
+  String get budgetAlert100 => 'बजट सीमा पार हो गई!';
 }

@@ -42,6 +42,9 @@ class PackingItemTile extends StatelessWidget {
       case 'aksesuar':
       case 'accessories':
         return l10n.categoryAccessories;
+      case 'diğer':
+      case 'other':
+        return l10n.other;
       default:
         return cat;
     }
@@ -53,8 +56,9 @@ class PackingItemTile extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+    return RepaintBoundary(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       child: Dismissible(
         key: ValueKey('packing_item_${item.id}'),
         direction: DismissDirection.horizontal,
@@ -395,6 +399,7 @@ class PackingItemTile extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

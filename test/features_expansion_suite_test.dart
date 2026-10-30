@@ -581,15 +581,8 @@ void main() {
     });
   });
 
-  group('F-15 Apple Sign-In Authentication Tests', () {
-    test('AuthService.signInWithApple delegates to platform credential', () async {
-      final mockAuth = MockAuthServiceWithApple();
-      await mockAuth.signInWithApple();
-
-      expect(mockAuth.appleSignInCalled, isTrue);
-    });
-
-    testWidgets('AuthScreen renders Apple Sign-In button cleanly', (tester) async {
+  group('F-15 Android-First Authentication Tests', () {
+    testWidgets('AuthScreen does not render Apple Sign-In button on Android launch', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
@@ -603,8 +596,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(AuthScreen), findsOneWidget);
-      expect(find.text('Continue with Apple'), findsOneWidget);
-      expect(find.byIcon(Icons.apple), findsOneWidget);
+      expect(find.text('Continue with Apple'), findsNothing);
+      expect(find.byIcon(Icons.apple), findsNothing);
     });
   });
 

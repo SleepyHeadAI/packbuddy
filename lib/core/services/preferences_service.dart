@@ -375,6 +375,17 @@ class PreferencesService {
     await _prefs?.setBool(keyVaultLocked, locked);
   }
 
+  // --- Vault AES-256 At-Rest Encryption ---
+  static const String keyVaultAesKey = 'packbuddy_vault_aes_key';
+
+  String? getVaultEncryptionKey() {
+    return _prefs?.getString(keyVaultAesKey);
+  }
+
+  Future<void> setVaultEncryptionKey(String keyBase64) async {
+    await _prefs?.setString(keyVaultAesKey, keyBase64);
+  }
+
   // --- Smart Notifications & Packing Reminders ---
   bool isPackingRemindersEnabled() {
     return _prefs?.getBool(keyPackingRemindersEnabled) ?? true;
