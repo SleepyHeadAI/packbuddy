@@ -175,11 +175,27 @@ class TravelMapService {
     // 2. Immediately backup to Firestore under users/{uid}
     if (effectiveUid != null && _isFirebaseReady) {
       try {
-        await FirebaseFirestore.instance.collection('users').doc(effectiveUid).set({
-          'travelMapCountries': savedMap,
-          'travelMapUpdatedAt': DateTime.now().toIso8601String(),
-        }, SetOptions(merge: true));
+        if (status == CountryStatus.none) {
+          // Explicitly delete country keys from Firestore map so they don't resurrect
+          await FirebaseFirestore.instance.collection('users').doc(effectiveUid).update({
+            'travelMapCountries.$keyUpper': FieldValue.delete(),
+            'travelMapCountries.${keyUpper.toLowerCase()}': FieldValue.delete(),
+            'travelMapUpdatedAt': DateTime.now().toIso8601String(),
+          });
+        } else {
+          await FirebaseFirestore.instance.collection('users').doc(effectiveUid).set({
+            'travelMapCountries': savedMap,
+            'travelMapUpdatedAt': DateTime.now().toIso8601String(),
+          }, SetOptions(merge: true));
+        }
       } catch (e) {
+        // Fallback: replace entire map directly
+        try {
+          await FirebaseFirestore.instance.collection('users').doc(effectiveUid).set({
+            'travelMapCountries': savedMap,
+            'travelMapUpdatedAt': DateTime.now().toIso8601String(),
+          }, SetOptions(merge: true));
+        } catch (_) {}
         debugPrint('[TravelMapService] Error backing up travel map to Firestore: $e');
       }
     }

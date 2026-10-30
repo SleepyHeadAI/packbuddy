@@ -65,10 +65,12 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
 
   // Multi-destination list of stops / cities / countries
   final List<String> _itineraryStops = [];
+  List<Country> _countrySuggestions = [];
 
   @override
   void initState() {
     super.initState();
+    _stopInputController.addListener(_onStopInputChanged);
     if (widget.tripToEdit != null) {
       final t = widget.tripToEdit!;
       _titleController.text = t.title;
@@ -101,11 +103,59 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
 
   @override
   void dispose() {
+    _stopInputController.removeListener(_onStopInputChanged);
     _titleController.dispose();
     _stopInputController.dispose();
     _budgetController.dispose();
     _notesController.dispose();
     super.dispose();
+  }
+
+  void _onStopInputChanged() {
+    final query = _stopInputController.text.trim().toLowerCase();
+    if (query.length < 2) {
+      if (_countrySuggestions.isNotEmpty) {
+        setState(() => _countrySuggestions = []);
+      }
+      return;
+    }
+
+    final langCode = Localizations.localeOf(context).languageCode;
+    final prefixMatches = <Country>[];
+    final containsMatches = <Country>[];
+
+    for (final c in Country.allCountries) {
+      final locName = c.getLocalizedName(langCode).toLowerCase();
+      final engName = c.name.toLowerCase();
+      final localName = c.localName.toLowerCase();
+
+      if (locName.startsWith(query) || engName.startsWith(query) || localName.startsWith(query)) {
+        prefixMatches.add(c);
+      } else if (locName.contains(query) || engName.contains(query) || localName.contains(query)) {
+        containsMatches.add(c);
+      }
+    }
+
+    final combined = [...prefixMatches, ...containsMatches].take(5).toList();
+    setState(() {
+      _countrySuggestions = combined;
+    });
+  }
+
+  void _selectCountrySuggestion(Country country) {
+    final langCode = Localizations.localeOf(context).languageCode;
+    final label = '${country.flag} ${country.getLocalizedName(langCode)}';
+    setState(() {
+      if (!_itineraryStops.contains(label)) {
+        _itineraryStops.add(label);
+      }
+      _selectedCountry = country;
+      if (CurrencyFormatter.supportedCurrencies.contains(country.defaultCurrency)) {
+        _selectedCurrency = country.defaultCurrency;
+      }
+      _stopInputController.clear();
+      _countrySuggestions = [];
+    });
   }
 
   Future<void> _pickDateRange() async {
@@ -169,18 +219,45 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
   }
 
   void _submit() {
+    final l10n = AppLocalizations.of(context)!;
+    final textStop = _stopInputController.text.trim();
+    if (textStop.isNotEmpty && !_itineraryStops.contains(textStop)) {
+      _itineraryStops.add(textStop);
+      _stopInputController.clear();
+      _countrySuggestions = [];
+    }
+
+    if (_itineraryStops.isEmpty) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: AppColors.errorPastel,
+          content: Text(
+            l10n.travelRouteOrStops,
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          ),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
     if (_formKey.currentState?.validate() ?? false) {
       final double? budget = _budgetController.text.trim().isNotEmpty
           ? double.tryParse(_budgetController.text.trim())
           : null;
 
+      if (budget == null || budget <= 0) {
+        return;
+      }
+
       final notes = _notesController.text.trim().isNotEmpty
           ? _notesController.text.trim()
           : null;
 
-      final finalDestination = _itineraryStops.isNotEmpty
-          ? _itineraryStops.join(' ➔ ')
-          : _titleController.text.trim();
+      final finalDestination = _itineraryStops.join(' ➔ ');
 
       if (widget.tripToEdit != null) {
         final updated = widget.tripToEdit!.copyWith(
@@ -345,6 +422,61 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                 ],
               ),
 
+              // Dynamic Country Autocomplete Suggestions
+              if (_countrySuggestions.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Container(
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHigh,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.3)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.08),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: _countrySuggestions.map((c) {
+                        final langCode = Localizations.localeOf(context).languageCode;
+                        final cName = c.getLocalizedName(langCode);
+                        return InkWell(
+                          onTap: () => _selectCountrySuggestion(c),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            child: Row(
+                              children: [
+                                Text(c.flag, style: const TextStyle(fontSize: 20)),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    '$cName (${c.code})',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 13.5,
+                                    ),
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.north_west_rounded,
+                                  size: 16,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ],
+
               // Itinerary stops chips
               if (_itineraryStops.isNotEmpty) ...[
                 const SizedBox(height: 10),
@@ -421,11 +553,12 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                         prefixIcon: const Icon(Icons.attach_money_rounded, size: 20),
                       ),
                       validator: (value) {
-                        if (value != null && value.trim().isNotEmpty) {
-                          final parsed = double.tryParse(value.trim());
-                          if (parsed == null || parsed <= 0) {
-                            return l10n.budget;
-                          }
+                        if (value == null || value.trim().isEmpty) {
+                          return l10n.budget;
+                        }
+                        final parsed = double.tryParse(value.trim());
+                        if (parsed == null || parsed <= 0) {
+                          return l10n.budget;
                         }
                         return null;
                       },

@@ -16,7 +16,7 @@ import 'package:packbuddy/features/budget/presentation/screens/widgets/add_trip_
 import 'package:packbuddy/features/budget/presentation/screens/trips_screen.dart';
 import 'package:packbuddy/features/vault/presentation/screens/vault_screen.dart';
 import 'package:packbuddy/features/checklist/presentation/screens/checklist_screen.dart';
-import 'package:packbuddy/features/budget/presentation/widgets/trip_map_preview.dart';
+import 'package:packbuddy/features/budget/domain/emergency_guide.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/share_trip_sheet.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/emergency_guide_sheet.dart';
 
@@ -416,82 +416,74 @@ class TripDetailScreen extends ConsumerWidget {
                         trip: currentTrip,
                       ),
                     ],
-                    const SizedBox(height: 16),
-                    TripMapPreviewCard(
-                      trip: currentTrip,
-                      waypoints: currentTrip.waypoints,
-                      onManageRoute: () => TripMapSheet.show(
-                        context,
-                        trip: currentTrip,
-                        initialWaypoints: currentTrip.waypoints,
-                        onWaypointsChanged: (newWaypoints) {
-                          final updatedTrip = currentTrip.copyWith(
-                            waypoints: newWaypoints,
-                            updatedAt: DateTime.now(),
-                          );
-                          ref.read(tripControllerProvider.notifier).updateTrip(updatedTrip);
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 14),
                     // Emergency & Local Guide (SOS) Offline Banner Card
-                    InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: () => EmergencyGuideSheet.show(context, currentTrip),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: AppColors.errorPastel.withValues(alpha: 0.08),
+                    Builder(
+                      builder: (context) {
+                        final guides = EmergencyGuide.forTrip(currentTrip);
+                        final guideSub = guides.map((g) => '${g.countryName}: SOS ${g.generalSos}').join(' • ');
+
+                        return InkWell(
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: AppColors.errorPastel.withValues(alpha: 0.3),
+                          onTap: () => EmergencyGuideSheet.show(context, currentTrip),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: AppColors.errorPastel.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: AppColors.errorPastel.withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.errorPastel.withValues(alpha: 0.15),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.sos_rounded,
+                                    color: AppColors.errorPastel,
+                                    size: 20,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        l10n.emergencyGuideTitle,
+                                        style: theme.textTheme.titleSmall?.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                          color: theme.colorScheme.onSurface,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        guideSub.isNotEmpty ? guideSub : currentTrip.destination,
+                                        style: theme.textTheme.bodySmall?.copyWith(
+                                          color: theme.colorScheme.onSurfaceVariant,
+                                          fontSize: 11,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 14,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: AppColors.errorPastel.withValues(alpha: 0.15),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.sos_rounded,
-                                color: AppColors.errorPastel,
-                                size: 20,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    l10n.emergencyGuideTitle,
-                                    style: theme.textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w700,
-                                      color: theme.colorScheme.onSurface,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '${currentTrip.destination} • 112 / 911',
-                                    style: theme.textTheme.bodySmall?.copyWith(
-                                      color: theme.colorScheme.onSurfaceVariant,
-                                      fontSize: 11,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 14,
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ],
-                        ),
-                      ),
+                        );
+                      },
                     ),
                     if (expenseState.expenses.any((e) =>
                         e.currency.toUpperCase() != currentTrip.defaultCurrency.toUpperCase())) ...[

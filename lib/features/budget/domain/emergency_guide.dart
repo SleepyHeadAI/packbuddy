@@ -1,4 +1,5 @@
 import 'country.dart';
+import 'trip.dart';
 
 /// Represents an essential phrase in local script with phonetic pronunciation
 class LocalPhrase {
@@ -36,6 +37,74 @@ class EmergencyGuide {
     required this.powerPlugs,
     required this.phrases,
   });
+
+  /// Resolves all emergency guides for a given trip (supports multi-country destinations).
+  static List<EmergencyGuide> forTrip(Trip trip) {
+    final list = <EmergencyGuide>[];
+    final seenCodes = <String>{};
+
+    void addGuide(String? code, [String? name]) {
+      if (code == null || code.trim().isEmpty) return;
+      final upper = code.trim().toUpperCase();
+      if (seenCodes.contains(upper)) return;
+      seenCodes.add(upper);
+      list.add(forCountry(upper, name));
+    }
+
+    if (trip.countryCode != null && trip.countryCode!.isNotEmpty) {
+      addGuide(trip.countryCode);
+    }
+
+    if (trip.destination.isNotEmpty) {
+      final parts = trip.destination.split(RegExp(r'\s*(?:➔|-|,|/|&|\+)\s*'));
+      for (final part in parts) {
+        final clean = part.trim();
+        if (clean.isEmpty) continue;
+        final cleanLower = clean.toLowerCase();
+        final cleanUpper = clean.toUpperCase();
+
+        Country? matched;
+        // 1. Exact match on code, name, localName, or flag
+        for (final c in Country.allCountries) {
+          if (cleanUpper == c.code ||
+              cleanLower == c.name.toLowerCase() ||
+              cleanLower == c.localName.toLowerCase() ||
+              clean.contains(c.flag)) {
+            matched = c;
+            break;
+          }
+        }
+        // 2. Substring match for cities or longer phrases (e.g., "Munich, Germany" or "Berlin, Almanya")
+        if (matched == null) {
+          for (final c in Country.allCountries) {
+            if (cleanLower.contains(c.name.toLowerCase()) ||
+                cleanLower.contains(c.localName.toLowerCase())) {
+              matched = c;
+              break;
+            }
+          }
+        }
+        // 3. Match by popular destinations/cities (e.g. "Priştine", "Berlin")
+        if (matched == null) {
+          for (final c in Country.allCountries) {
+            if (c.popularDestinations.any((p) => cleanLower.contains(p.toLowerCase()))) {
+              matched = c;
+              break;
+            }
+          }
+        }
+
+        if (matched != null) {
+          addGuide(matched.code, matched.name);
+        }
+      }
+    }
+
+    if (list.isEmpty) {
+      list.add(forCountry(trip.countryCode, trip.destination));
+    }
+    return list;
+  }
 
   /// Resolves the emergency guide for a given country code or destination name.
   /// Always returns a valid guide with smart fallback.
@@ -217,7 +286,52 @@ class EmergencyGuide {
     LocalPhrase(key: 'phraseEnglish', phrase: 'هل تتحدث الإنجليزية؟ (Hal tatakallam al-ingliziyya?)', pronunciation: 'hahl tah-tah-kah-lahm ahl-eeng-lee-ZEE-yah', meaningEn: 'Do you speak English?'),
   ];
 
+  static const List<LocalPhrase> _albanianPhrases = [
+    LocalPhrase(key: 'phraseHello', phrase: 'Përshëndetje', pronunciation: 'per-shen-DET-yeh', meaningEn: 'Hello'),
+    LocalPhrase(key: 'phraseThankYou', phrase: 'Faleminderit', pronunciation: 'fah-leh-meen-DEH-reet', meaningEn: 'Thank you'),
+    LocalPhrase(key: 'phraseHowMuch', phrase: 'Sa kushton?', pronunciation: 'sah KOOSH-tohn', meaningEn: 'How much is this?'),
+    LocalPhrase(key: 'phraseHelp', phrase: 'Ndihmë! Urgjencë!', pronunciation: 'n-DEE-muh oor-GYEN-tsuh', meaningEn: 'Help / Emergency'),
+    LocalPhrase(key: 'phraseHospital', phrase: 'Ku është spitali?', pronunciation: 'koo USHT spee-TAH-lee', meaningEn: 'Where is the hospital?'),
+    LocalPhrase(key: 'phraseEnglish', phrase: 'A flisni anglisht?', pronunciation: 'ah FLEES-nee ahng-LEESHT', meaningEn: 'Do you speak English?'),
+  ];
+
   static final Map<String, EmergencyGuide> _guides = {
+    // Kosovo
+    'XK': const EmergencyGuide(
+      countryCode: 'XK',
+      countryName: 'Kosovo',
+      police: '192',
+      ambulance: '194',
+      fire: '193',
+      generalSos: '112',
+      powerPlugs: 'Type C / F (230V, 50Hz)',
+      phrases: _albanianPhrases,
+    ),
+
+    // Switzerland
+    'CH': const EmergencyGuide(
+      countryCode: 'CH',
+      countryName: 'Switzerland',
+      police: '117',
+      ambulance: '144',
+      fire: '118',
+      generalSos: '112',
+      powerPlugs: 'Type J (230V, 50Hz)',
+      phrases: _germanPhrases,
+    ),
+
+    // Austria
+    'AT': const EmergencyGuide(
+      countryCode: 'AT',
+      countryName: 'Austria',
+      police: '133',
+      ambulance: '144',
+      fire: '122',
+      generalSos: '112',
+      powerPlugs: 'Type C / F (230V, 50Hz)',
+      phrases: _germanPhrases,
+    ),
+
     // Turkey & KKTC
     'TR': const EmergencyGuide(
       countryCode: 'TR',

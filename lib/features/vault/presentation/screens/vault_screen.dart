@@ -16,6 +16,8 @@ import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'document_viewer_screen.dart';
 import 'widgets/add_document_sheet.dart';
 import 'widgets/vault_lock_view.dart';
+import 'widgets/vault_thumbnail_widget.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../../../core/services/security_service.dart';
 
 /// Redesigned Document Vault screen with pinned passport hero slot, trip filters, and format-specific windows
@@ -163,6 +165,35 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
     return docNorm.toLowerCase() == filterNorm.toLowerCase();
   }
 
+
+  void _openPdfSafely(BuildContext context, Document doc) async {
+    final l10n = AppLocalizations.of(context)!;
+    final file = File(doc.localImagePath);
+    if (!file.existsSync()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.fileNotFoundLocally)),
+      );
+      return;
+    }
+    try {
+      final rawBytes = await file.readAsBytes();
+      if (SecurityService.instance.isEncrypted(rawBytes)) {
+        final decryptedBytes = await SecurityService.instance.decryptBytes(rawBytes);
+        final tempDir = await getTemporaryDirectory();
+        final tempFile = File('${tempDir.path}/pb_vault_preview_${doc.id}.pdf');
+        await tempFile.writeAsBytes(decryptedBytes);
+        await OpenFilex.open(tempFile.path);
+      } else {
+        await OpenFilex.open(doc.localImagePath);
+      }
+    } catch (_) {
+      if (context.mounted) {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => DocumentViewerScreen(document: doc)),
+        );
+      }
+    }
+  }
 
   void _showUndoDeleteSnackBar(BuildContext context, Document doc) {
     final l10n = AppLocalizations.of(context)!;
@@ -1008,8 +1039,6 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
                           final doc = filteredDocuments[index];
-                          final file = File(doc.localImagePath);
-                          final exists = file.existsSync();
                           final categoryColor = _getCategoryColor(doc.category);
                           final categoryIcon = _getCategoryIcon(doc.category, doc.subCategory);
                           final isPdf = doc.isPdf;
@@ -1083,53 +1112,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                           borderRadius: const BorderRadius.vertical(
                                             top: Radius.circular(20),
                                           ),
-                                          child: isPdf
-                                              ? Container(
-                                                  color: const Color(0xFFE53935).withValues(alpha: 0.1),
-                                                  child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    children: [
-                                                      Container(
-                                                        padding: const EdgeInsets.all(14),
-                                                        decoration: BoxDecoration(
-                                                          color: const Color(0xFFE53935).withValues(alpha: 0.15),
-                                                          shape: BoxShape.circle,
-                                                        ),
-                                                        child: const Icon(
-                                                          Icons.picture_as_pdf_rounded,
-                                                          size: 36,
-                                                          color: Color(0xFFE53935),
-                                                        ),
-                                                      ),
-                                                      const SizedBox(height: 6),
-                                                      Text(
-                                                        l10n.pdfFileBadge,
-                                                        style: TextStyle(
-                                                          fontSize: 10,
-                                                          fontWeight: FontWeight.bold,
-                                                          color: Color(0xFFE53935),
-                                                          letterSpacing: 0.5,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                )
-                                              : exists
-                                                  ? Image.file(
-                                                      file,
-                                                      fit: BoxFit.cover,
-                                                      width: double.infinity,
-                                                    )
-                                                  : Container(
-                                                      color: categoryColor.withValues(alpha: 0.12),
-                                                      child: Center(
-                                                        child: Icon(
-                                                          categoryIcon,
-                                                          size: 38,
-                                                          color: categoryColor,
-                                                        ),
-                                                      ),
-                                                    ),
+                                          child: VaultThumbnailWidget(
+                                            document: doc,
+                                            categoryColor: categoryColor,
+                                            categoryIcon: categoryIcon,
+                                            fit: BoxFit.cover,
+                                          ),
                                         ),
 
                                         // PDF or Image badge
@@ -1217,7 +1205,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                                 padding: EdgeInsets.zero,
                                                 constraints: const BoxConstraints(),
                                                 tooltip: l10n.openPdf,
-                                                onPressed: () => OpenFilex.open(doc.localImagePath),
+                                                onPressed: () => _openPdfSafely(context, doc),
                                               ),
                                             ],
                                           ],

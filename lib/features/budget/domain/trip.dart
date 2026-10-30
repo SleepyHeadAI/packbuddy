@@ -238,13 +238,13 @@ class Trip {
     }
 
     return Trip(
-      id: json['id'] as String,
+      id: (json['id'] ?? '') as String,
       userId: (json['user_id'] ?? json['userId'] ?? '') as String,
-      title: json['title'] as String,
-      destination: json['destination'] as String,
+      title: (json['title'] ?? '') as String,
+      destination: (json['destination'] ?? '') as String,
       startDate: parseDate(json['startDate'] ?? json['start_date']),
       endDate: parseDate(json['endDate'] ?? json['end_date']),
-      defaultCurrency: json['defaultCurrency'] as String? ?? 'USD',
+      defaultCurrency: (json['defaultCurrency'] ?? json['default_currency'] ?? 'USD') as String,
       budgetLimit: (json['budgetLimit'] as num?)?.toDouble(),
       countryCode: json['countryCode'] as String?,
       transportMode: json['transportMode'] as String?,

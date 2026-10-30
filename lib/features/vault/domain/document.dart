@@ -136,9 +136,9 @@ class Document {
         (ext == 'pdf' || localPath.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image');
 
     return Document(
-      id: json['id'] as String,
+      id: (json['id'] ?? '') as String,
       userId: (json['user_id'] ?? json['userId'] ?? '') as String,
-      title: json['title'] as String,
+      title: (json['title'] ?? '') as String,
       category: json['category'] as String? ?? 'Other',
       subCategory: (json['subCategory'] ?? json['sub_category']) as String?,
       localImagePath: localPath,

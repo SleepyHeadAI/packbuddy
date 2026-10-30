@@ -587,7 +587,9 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                 onTap: () {
                                   sheetRef.read(travelMapControllerProvider.notifier).setCountryStatus(
                                         code: latestCountry.code,
-                                        status: CountryStatus.lived,
+                                        status: latestCountry.isLived
+                                            ? CountryStatus.none
+                                            : CountryStatus.lived,
                                       );
                                 },
                                 borderRadius: BorderRadius.circular(12),
@@ -645,7 +647,9 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                 onTap: () {
                                   sheetRef.read(travelMapControllerProvider.notifier).setCountryStatus(
                                         code: latestCountry.code,
-                                        status: CountryStatus.visited,
+                                        status: latestCountry.isVisited
+                                            ? CountryStatus.none
+                                            : CountryStatus.visited,
                                         visitedDate: latestCountry.visitedDate ?? DateTime.now(),
                                       );
                                 },
@@ -704,7 +708,9 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                 onTap: () {
                                   sheetRef.read(travelMapControllerProvider.notifier).setCountryStatus(
                                         code: latestCountry.code,
-                                        status: CountryStatus.wishlist,
+                                        status: latestCountry.isWishlist
+                                            ? CountryStatus.none
+                                            : CountryStatus.wishlist,
                                       );
                                 },
                                 borderRadius: BorderRadius.circular(12),
@@ -778,7 +784,29 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      if (latestCountry.status != CountryStatus.none) ...[
+                        const SizedBox(height: 10),
+                        OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: theme.colorScheme.error,
+                            side: BorderSide(color: theme.colorScheme.error.withValues(alpha: 0.4)),
+                            padding: const EdgeInsets.symmetric(vertical: 11),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          ),
+                          onPressed: () {
+                            sheetRef.read(travelMapControllerProvider.notifier).setCountryStatus(
+                                  code: latestCountry.code,
+                                  status: CountryStatus.none,
+                                );
+                          },
+                          icon: const Icon(Icons.delete_sweep_rounded, size: 18),
+                          label: Text(
+                            l10n.delete,
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 14),
 
                       // Action Button: Seyahat Planla
                       FilledButton.icon(

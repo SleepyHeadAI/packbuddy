@@ -555,7 +555,7 @@ class TravelMapStoryCard extends StatelessWidget {
 
         // Dynamic All-Visited Flags Showcase
         if (visitedCountries.isNotEmpty)
-          _buildFlagsGrid(visitedCountries, palette),
+          _buildFlagsGrid(visitedCountries, palette, l10n),
       ],
     );
   }
@@ -716,7 +716,10 @@ class TravelMapStoryCard extends StatelessWidget {
               ],
             ),
           ),
-          _buildFlagsGrid(visitedCountries, palette),
+          if (visitedCountries.length <= 4)
+            _buildPassportVisaStamps(visitedCountries, palette, l10n)
+          else
+            _buildFlagsGrid(visitedCountries, palette, l10n),
         ],
       ],
     );
@@ -813,7 +816,7 @@ class TravelMapStoryCard extends StatelessWidget {
 
         // Flag strip
         if (visitedCountries.isNotEmpty)
-          _buildFlagsGrid(visitedCountries, palette),
+          _buildFlagsGrid(visitedCountries, palette, l10n),
       ],
     );
   }
@@ -904,7 +907,7 @@ class TravelMapStoryCard extends StatelessWidget {
                 ),
                 // Flags Grid inside HUD
                 if (visitedCountries.isNotEmpty)
-                  _buildFlagsGrid(visitedCountries, palette),
+                  _buildFlagsGrid(visitedCountries, palette, l10n),
               ],
             ),
           ),
@@ -1238,40 +1241,221 @@ class TravelMapStoryCard extends StatelessWidget {
     );
   }
 
-  Widget _buildFlagsGrid(List<TravelCountry> visitedCountries, StoryCardPalette palette) {
+  Widget _buildPassportVisaStamps(List<TravelCountry> visitedCountries, StoryCardPalette palette, AppLocalizations l10n) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: palette.tileBackground,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: palette.tileBorder),
+      ),
+      child: Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        alignment: WrapAlignment.center,
+        children: visitedCountries.take(4).map((c) {
+          final isEven = c.code.hashCode % 2 == 0;
+          final angle = isEven ? -0.04 : 0.04;
+          final stampColor = c.isLived ? palette.livedColor : palette.accentColor;
+
+          return Transform.rotate(
+            angle: angle,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: stampColor.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: stampColor.withValues(alpha: 0.65),
+                  width: 1.5,
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CountryFlag(code: c.code, fallbackEmoji: c.flag, size: 16),
+                      const SizedBox(width: 6),
+                      Text(
+                        c.code.toUpperCase(),
+                        style: TextStyle(
+                          color: stampColor,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 12,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    '★ ADMITTED ★',
+                    style: TextStyle(
+                      color: stampColor.withValues(alpha: 0.8),
+                      fontWeight: FontWeight.w800,
+                      fontSize: 8,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                  Text(
+                    c.getLocalizedName(l10n.localeName),
+                    style: TextStyle(
+                      color: palette.textColor,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 9.5,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildFlagsGrid(List<TravelCountry> visitedCountries, StoryCardPalette palette, AppLocalizations l10n) {
     final count = visitedCountries.length;
+
+    // Rich Country Cards layout when few countries are visited (prevents empty, boring voids)
+    if (count <= 6) {
+      if (count == 0) {
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: palette.tileBackground,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: palette.tileBorder),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.explore_outlined, color: palette.accentColor, size: 20),
+              const SizedBox(width: 10),
+              Flexible(
+                child: Text(
+                  'Yeni rotalar, yeni maceralar • Keşfetmeye başla',
+                  style: TextStyle(
+                    color: palette.subtextColor,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: palette.tileBackground,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: palette.tileBorder),
+        ),
+        child: Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          alignment: WrapAlignment.center,
+          children: visitedCountries.map((c) {
+            final isLived = c.isLived;
+            final statusColor = isLived ? palette.livedColor : palette.visitedColor;
+            final statusText = isLived ? 'Lived' : 'Visited';
+
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: palette.isLight
+                    ? Colors.black.withValues(alpha: 0.04)
+                    : Colors.white.withValues(alpha: 0.07),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: statusColor.withValues(alpha: 0.4)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CountryFlag(
+                    code: c.code,
+                    fallbackEmoji: c.flag,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 7),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 95),
+                    child: Text(
+                      c.getLocalizedName(l10n.localeName),
+                      style: TextStyle(
+                        color: palette.textColor,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: statusColor.withValues(alpha: 0.18),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      statusText,
+                      style: TextStyle(
+                        color: statusColor,
+                        fontSize: 8,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+      );
+    }
+
     final double flagSize;
     final double spacing;
     final double runSpacing;
     final EdgeInsets pad;
 
-    if (count <= 6) {
-      flagSize = 22.0;
-      spacing = 8.0;
-      runSpacing = 6.0;
-      pad = const EdgeInsets.symmetric(horizontal: 14, vertical: 10);
-    } else if (count <= 15) {
-      flagSize = 18.0;
+    if (count <= 15) {
+      flagSize = 20.0;
       spacing = 6.0;
       runSpacing = 5.0;
       pad = const EdgeInsets.symmetric(horizontal: 12, vertical: 8);
     } else if (count <= 30) {
-      flagSize = 15.0;
+      flagSize = 16.0;
       spacing = 4.5;
       runSpacing = 4.0;
       pad = const EdgeInsets.symmetric(horizontal: 10, vertical: 7);
     } else if (count <= 60) {
-      flagSize = 12.0;
+      flagSize = 13.0;
       spacing = 3.5;
       runSpacing = 3.0;
       pad = const EdgeInsets.symmetric(horizontal: 8, vertical: 6);
     } else if (count <= 100) {
-      flagSize = 10.0;
+      flagSize = 10.5;
       spacing = 2.5;
       runSpacing = 2.0;
       pad = const EdgeInsets.symmetric(horizontal: 6, vertical: 5);
     } else if (count <= 150) {
-      flagSize = 8.5;
+      flagSize = 9.0;
       spacing = 1.8;
       runSpacing = 1.8;
       pad = const EdgeInsets.symmetric(horizontal: 5, vertical: 4);

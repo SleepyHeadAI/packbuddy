@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/features/budget/domain/country.dart';
 import 'package:packbuddy/features/budget/domain/emergency_guide.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
-class EmergencyGuideSheet extends StatelessWidget {
+class EmergencyGuideSheet extends StatefulWidget {
   final Trip trip;
 
   const EmergencyGuideSheet({super.key, required this.trip});
@@ -19,6 +20,13 @@ class EmergencyGuideSheet extends StatelessWidget {
     );
   }
 
+  @override
+  State<EmergencyGuideSheet> createState() => _EmergencyGuideSheetState();
+}
+
+class _EmergencyGuideSheetState extends State<EmergencyGuideSheet> {
+  int _selectedCountryIndex = 0;
+
   void _copyToClipboard(BuildContext context, String text, String label) {
     Clipboard.setData(ClipboardData(text: text));
     final l10n = AppLocalizations.of(context)!;
@@ -30,6 +38,17 @@ class EmergencyGuideSheet extends StatelessWidget {
         behavior: SnackBarBehavior.floating,
       ),
     );
+  }
+
+  String _getCountryDisplayName(EmergencyGuide guide, AppLocalizations l10n) {
+    final c = Country.findByCode(guide.countryCode);
+    if (c != null) {
+      if (l10n.localeName.startsWith('tr')) {
+        return c.localName;
+      }
+      return c.name;
+    }
+    return guide.countryName;
   }
 
   String _getPhraseLabel(String key, AppLocalizations l10n) {
@@ -55,7 +74,9 @@ class EmergencyGuideSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final guide = EmergencyGuide.forCountry(trip.countryCode, trip.destination);
+    final allGuides = EmergencyGuide.forTrip(widget.trip);
+    final selectedIndex = _selectedCountryIndex < allGuides.length ? _selectedCountryIndex : 0;
+    final guide = allGuides[selectedIndex];
 
     return Container(
       decoration: BoxDecoration(
@@ -106,7 +127,7 @@ class EmergencyGuideSheet extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '${guide.countryName} (${guide.countryCode})',
+                        '${_getCountryDisplayName(guide, l10n)} (${guide.countryCode})',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -121,6 +142,39 @@ class EmergencyGuideSheet extends StatelessWidget {
               ],
             ),
           ),
+
+          // Multi-country selector tabs if trip spans multiple countries
+          if (allGuides.length > 1) ...[
+            Container(
+              height: 42,
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: allGuides.length,
+                separatorBuilder: (ctx, i) => const SizedBox(width: 8),
+                itemBuilder: (ctx, idx) {
+                  final g = allGuides[idx];
+                  final isSelected = idx == selectedIndex;
+                  return ChoiceChip(
+                    label: Text(
+                      '${_getCountryDisplayName(g, l10n)} (${g.countryCode})',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        color: isSelected ? Colors.white : theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    selected: isSelected,
+                    selectedColor: AppColors.errorPastel,
+                    onSelected: (val) {
+                      if (val) setState(() => _selectedCountryIndex = idx);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+
           const Divider(height: 1),
 
           // Content

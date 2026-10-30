@@ -823,6 +823,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                             .toggleUserProStatus(user.uid, newVal);
 
                         if (success && context.mounted) {
+                          ScaffoldMessenger.of(context).clearSnackBars();
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               behavior: SnackBarBehavior.floating,
@@ -831,10 +832,10 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                               ),
                               backgroundColor: AppColors.primaryLight,
                               content: Text(
-                                '${l10n.adminProStatusUpdated}: ${newVal ? l10n.adminGrantPro : l10n.adminRevokePro} (${user.email})',
-                                style: const TextStyle(color: Colors.white, fontSize: 13),
+                                '${l10n.adminProStatusUpdated}: ${newVal ? l10n.adminGrantPro : l10n.adminRevokePro} (${user.email.isNotEmpty ? user.email : user.uid})',
+                                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
                               ),
-                              duration: const Duration(seconds: 2),
+                              duration: const Duration(milliseconds: 900),
                             ),
                           );
                         }
@@ -1079,6 +1080,7 @@ class _UserModerationBottomSheetState
       setState(() => _isSaving = false);
       if (success) {
         Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             behavior: SnackBarBehavior.floating,

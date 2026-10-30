@@ -339,14 +339,23 @@ class SyncEngine extends StateNotifier<SyncState> {
     super.dispose();
   }
 
-  /// Simple and fast check for internet connection
+  /// Simple, fast, and resilient check for internet connection with multi-host fallback
   Future<bool> hasInternetConnection() async {
     if (Platform.environment.containsKey('FLUTTER_TEST')) {
       return false;
     }
     try {
       final result = await InternetAddress.lookup('google.com').timeout(
-        const Duration(seconds: 3),
+        const Duration(seconds: 6),
+      );
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } catch (_) {}
+
+    try {
+      final result = await InternetAddress.lookup('cloudflare.com').timeout(
+        const Duration(seconds: 4),
       );
       return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
     } catch (_) {
@@ -355,17 +364,27 @@ class SyncEngine extends StateNotifier<SyncState> {
   }
 
   bool _isSyncing = false;
+  Future<void>? _activeSyncFuture;
 
   /// Returns true if a synchronization process is actively executing
   bool get isSyncing => _isSyncing;
 
-  /// Executes two-way bidirectional sync between local SQLite and Cloud Firestore
-  Future<void> performSync() async {
-    // Concurrency guard: Prevent race condition if triggered multiple times simultaneously
-    if (_isSyncing || state.status == SyncStatus.syncing) {
-      return;
+  /// Executes two-way bidirectional sync between local SQLite and Cloud Firestore.
+  /// Uses Future Memoization: multiple concurrent callers await the single active synchronization.
+  Future<void> performSync() {
+    if (_activeSyncFuture != null) {
+      debugPrint('[SyncEngine] Sync already in progress, awaiting active sync Future');
+      return _activeSyncFuture!;
     }
 
+    _activeSyncFuture = _executeSync().whenComplete(() {
+      _activeSyncFuture = null;
+    });
+
+    return _activeSyncFuture!;
+  }
+
+  Future<void> _executeSync() async {
     _isSyncing = true;
 
     try {
@@ -373,6 +392,7 @@ class SyncEngine extends StateNotifier<SyncState> {
       final isOnline = await hasInternetConnection();
       if (!isOnline) {
         state = state.copyWith(status: SyncStatus.noInternet);
+        _scheduleRetry();
         return;
       }
 
@@ -655,19 +675,60 @@ class SyncEngine extends StateNotifier<SyncState> {
       // Multi-tenant & Delta Sync with WriteBatch & SQLite Transactions
       // ===================================================================
 
-      // 2.1 Reconcile Trips with Delta Sync & LWW (Owner trips + Shared collaborative trips)
-      Query<Map<String, dynamic>> tripsQuery = firestore
-          .collection('trips')
-          .where('user_id', isEqualTo: uid);
-      if (lastSyncedAt > 0) {
-        tripsQuery = tripsQuery.where('updated_at', isGreaterThan: lastSyncedAt);
-      }
-      final remoteTripsSnapshot = await tripsQuery.get();
-      final remoteTripsMap = <String, Trip>{};
-      for (final doc in remoteTripsSnapshot.docs) {
+      // Helper to fetch documents from Firestore supporting both snake_case (user_id) and camelCase (userId)
+      Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchDualDocs(
+        String collectionName,
+      ) async {
+        final results = <String, QueryDocumentSnapshot<Map<String, dynamic>>>{};
+
+        // Query 1: user_id == uid (primary snake_case column)
         try {
-          remoteTripsMap[doc.id] = Trip.fromJson(doc.data());
-        } catch (_) {}
+          Query<Map<String, dynamic>> q1 = firestore
+              .collection(collectionName)
+              .where('user_id', isEqualTo: uid);
+          if (lastSyncedAt > 0) {
+            q1 = q1.where('updated_at', isGreaterThan: lastSyncedAt);
+          }
+          final snap1 = await q1.get();
+          for (final doc in snap1.docs) {
+            results[doc.id] = doc;
+          }
+        } catch (e) {
+          debugPrint('[SyncEngine] Query by user_id on $collectionName notice: $e');
+        }
+
+        // Query 2: userId == uid (legacy / cross-platform camelCase compatibility)
+        try {
+          Query<Map<String, dynamic>> q2 = firestore
+              .collection(collectionName)
+              .where('userId', isEqualTo: uid);
+          if (lastSyncedAt > 0) {
+            q2 = q2.where('updated_at', isGreaterThan: lastSyncedAt);
+          }
+          final snap2 = await q2.get();
+          for (final doc in snap2.docs) {
+            results[doc.id] = doc;
+          }
+        } catch (e) {
+          debugPrint('[SyncEngine] Query by userId on $collectionName notice: $e');
+        }
+
+        return results.values.toList();
+      }
+
+      // 2.1 Reconcile Trips with Delta Sync & LWW (Owner trips + Shared collaborative trips)
+      final remoteTripsDocs = await fetchDualDocs('trips');
+      final remoteTripsMap = <String, Trip>{};
+      for (final doc in remoteTripsDocs) {
+        try {
+          final data = Map<String, dynamic>.from(doc.data());
+          data['id'] = (data['id'] != null && data['id'].toString().isNotEmpty) ? data['id'] : doc.id;
+          data['user_id'] = data['user_id'] ?? data['userId'] ?? uid;
+          data['userId'] = data['userId'] ?? data['user_id'] ?? uid;
+          remoteTripsMap[doc.id] = Trip.fromJson(data);
+        } catch (e) {
+          debugPrint('[SyncEngine] Trip parsing notice: $e');
+        }
       }
 
       // Also pull collaborative trips where user is a participant
@@ -678,7 +739,11 @@ class SyncEngine extends StateNotifier<SyncState> {
             .get();
         for (final doc in collabSnap.docs) {
           try {
-            remoteTripsMap[doc.id] = Trip.fromJson(doc.data());
+            final data = Map<String, dynamic>.from(doc.data());
+            data['id'] = (data['id'] != null && data['id'].toString().isNotEmpty) ? data['id'] : doc.id;
+            data['user_id'] = data['user_id'] ?? data['userId'] ?? uid;
+            data['userId'] = data['userId'] ?? data['user_id'] ?? uid;
+            remoteTripsMap[doc.id] = Trip.fromJson(data);
           } catch (_) {}
         }
       } catch (_) {}
@@ -723,18 +788,18 @@ class SyncEngine extends StateNotifier<SyncState> {
       }
 
       // 2.2 Reconcile Expenses with Delta Sync & LWW
-      Query<Map<String, dynamic>> expensesQuery = firestore
-          .collection('expenses')
-          .where('user_id', isEqualTo: uid);
-      if (lastSyncedAt > 0) {
-        expensesQuery = expensesQuery.where('updated_at', isGreaterThan: lastSyncedAt);
-      }
-      final remoteExpensesSnapshot = await expensesQuery.get();
+      final remoteExpensesDocs = await fetchDualDocs('expenses');
       final remoteExpensesMap = <String, Expense>{};
-      for (final doc in remoteExpensesSnapshot.docs) {
+      for (final doc in remoteExpensesDocs) {
         try {
-          remoteExpensesMap[doc.id] = Expense.fromJson(doc.data());
-        } catch (_) {}
+          final data = Map<String, dynamic>.from(doc.data());
+          data['id'] = (data['id'] != null && data['id'].toString().isNotEmpty) ? data['id'] : doc.id;
+          data['user_id'] = data['user_id'] ?? data['userId'] ?? uid;
+          data['userId'] = data['userId'] ?? data['user_id'] ?? uid;
+          remoteExpensesMap[doc.id] = Expense.fromJson(data);
+        } catch (e) {
+          debugPrint('[SyncEngine] Expense parsing notice: $e');
+        }
       }
 
       final localExpenses = await _dbHelper.getExpenses(userId: uid, includeDeleted: false);
@@ -776,18 +841,18 @@ class SyncEngine extends StateNotifier<SyncState> {
       }
 
       // 2.3 Reconcile Documents with Delta Sync & LWW
-      Query<Map<String, dynamic>> docsQuery = firestore
-          .collection('documents')
-          .where('user_id', isEqualTo: uid);
-      if (lastSyncedAt > 0) {
-        docsQuery = docsQuery.where('updated_at', isGreaterThan: lastSyncedAt);
-      }
-      final remoteDocsSnapshot = await docsQuery.get();
+      final remoteDocsList = await fetchDualDocs('documents');
       final remoteDocsMap = <String, Document>{};
-      for (final doc in remoteDocsSnapshot.docs) {
+      for (final doc in remoteDocsList) {
         try {
-          remoteDocsMap[doc.id] = Document.fromJson(doc.data());
-        } catch (_) {}
+          final data = Map<String, dynamic>.from(doc.data());
+          data['id'] = (data['id'] != null && data['id'].toString().isNotEmpty) ? data['id'] : doc.id;
+          data['user_id'] = data['user_id'] ?? data['userId'] ?? uid;
+          data['userId'] = data['userId'] ?? data['user_id'] ?? uid;
+          remoteDocsMap[doc.id] = Document.fromJson(data);
+        } catch (e) {
+          debugPrint('[SyncEngine] Document parsing notice: $e');
+        }
       }
 
       final localDocs = await _dbHelper.getDocuments(userId: uid, includeDeleted: false);
@@ -881,18 +946,18 @@ class SyncEngine extends StateNotifier<SyncState> {
 
       // 2.4 Reconcile Checklist Items with Delta Sync & LWW (with Cross-ID Canonical Deduplication)
       await _dbHelper.deduplicateChecklistItems(userId: uid);
-      Query<Map<String, dynamic>> itemsQuery = firestore
-          .collection('checklist_items')
-          .where('user_id', isEqualTo: uid);
-      if (lastSyncedAt > 0) {
-        itemsQuery = itemsQuery.where('updated_at', isGreaterThan: lastSyncedAt);
-      }
-      final remoteItemsSnapshot = await itemsQuery.get();
+      final remoteItemsDocs = await fetchDualDocs('checklist_items');
       final remoteItemsMap = <String, PackingItem>{};
-      for (final doc in remoteItemsSnapshot.docs) {
+      for (final doc in remoteItemsDocs) {
         try {
-          remoteItemsMap[doc.id] = PackingItem.fromJson(doc.data());
-        } catch (_) {}
+          final data = Map<String, dynamic>.from(doc.data());
+          data['id'] = (data['id'] != null && data['id'].toString().isNotEmpty) ? data['id'] : doc.id;
+          data['user_id'] = data['user_id'] ?? data['userId'] ?? uid;
+          data['userId'] = data['userId'] ?? data['user_id'] ?? uid;
+          remoteItemsMap[doc.id] = PackingItem.fromJson(data);
+        } catch (e) {
+          debugPrint('[SyncEngine] PackingItem parsing notice: $e');
+        }
       }
 
       final localItems = await _dbHelper.getChecklistItems(userId: uid, includeDeleted: false);

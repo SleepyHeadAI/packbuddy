@@ -106,12 +106,12 @@ class Expense {
     }
 
     return Expense(
-      id: json['id'] as String,
+      id: (json['id'] ?? '') as String,
       userId: (json['user_id'] ?? json['userId'] ?? '') as String,
       tripId: (json['tripId'] ?? json['trip_id'] ?? '') as String,
-      title: json['title'] as String,
-      amount: (json['amount'] as num).toDouble(),
-      currency: json['currency'] as String? ?? 'USD',
+      title: (json['title'] ?? '') as String,
+      amount: ((json['amount'] as num?) ?? 0.0).toDouble(),
+      currency: (json['currency'] as String?) ?? 'USD',
       category: json['category'] as String? ?? 'General',
       date: parseDate(json['date']),
       receiptPath: json['receiptPath'] as String?,

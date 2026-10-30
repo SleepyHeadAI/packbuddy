@@ -398,14 +398,21 @@ class FirebaseAuthService implements AuthService {
       final bool localScopedPro = PreferencesService.instance.isProUser(uid: user.uid);
       final bool localDevicePro = PreferencesService.instance.isProUser();
 
-      final bool effectiveIsPremium;
-      if (remoteHasIsPremium) {
-        effectiveIsPremium = remoteIsPremium;
-      } else {
-        effectiveIsPremium = localScopedPro || localDevicePro;
-      }
+      final bool effectiveIsPremium = remoteIsPremium || localScopedPro || (!remoteHasIsPremium && localDevicePro);
 
       await PreferencesService.instance.setProUser(effectiveIsPremium, uid: user.uid);
+
+      // If user has local Pro but remote was not marked Pro, persist to Firestore
+      if (effectiveIsPremium && !remoteIsPremium) {
+        try {
+          await userDocRef.set({
+            'isPremium': true,
+            'proSyncedAt': DateTime.now().toIso8601String(),
+          }, SetOptions(merge: true));
+        } catch (e) {
+          debugPrint('[FirebaseAuthService] Error syncing effective pro to Firestore: $e');
+        }
+      }
 
       // ADOPT GUEST DATA:
       // Automatically migrate offline/guest trips, expenses, and documents to the logged-in user

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -220,9 +221,10 @@ class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
           );
 
           // 3. Update Firestore users/{uid} with isPremium: true, subscriptionProductId, subscriptionPurchaseId, subscriptionUpdatedAt
-          if (currentUid != null && _firestore != null) {
+          final firestore = _firestore ?? (Firebase.apps.isNotEmpty ? FirebaseFirestore.instance : null);
+          if (currentUid != null && firestore != null) {
             try {
-              await _firestore!.collection('users').doc(currentUid).set({
+              await firestore.collection('users').doc(currentUid).set({
                 'isPremium': true,
                 'subscriptionProductId': purchaseDetails.productID,
                 'subscriptionPurchaseId': purchaseDetails.purchaseID ?? '',
@@ -272,6 +274,16 @@ class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
       }
       final currentUid = _auth?.currentUser?.uid;
       await _prefs.setProUser(true, uid: currentUid);
+      if (currentUid != null) {
+        try {
+          await FirebaseFirestore.instance.collection('users').doc(currentUid).set({
+            'isPremium': true,
+            'proPurchasedAt': DateTime.now().toIso8601String(),
+          }, SetOptions(merge: true));
+        } catch (e) {
+          debugPrint('[SubscriptionService] Error syncing isPremium to Firestore: $e');
+        }
+      }
       state = state.copyWith(isPro: true, isLoading: false, errorMessage: null);
       TelemetryService.instance.logProStatusChanged(isPro: true, source: 'purchase');
       return true;
@@ -326,6 +338,17 @@ class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
     await Future.delayed(const Duration(milliseconds: 300));
     final currentUid = _auth?.currentUser?.uid;
     await _prefs.setProUser(true, uid: currentUid);
+    final firestore = _firestore ?? (Firebase.apps.isNotEmpty ? FirebaseFirestore.instance : null);
+    if (currentUid != null && firestore != null) {
+      try {
+        await firestore.collection('users').doc(currentUid).set({
+          'isPremium': true,
+          'proPurchasedAt': DateTime.now().toIso8601String(),
+        }, SetOptions(merge: true));
+      } catch (e) {
+        debugPrint('[SubscriptionService] Firestore admin test purchase error: $e');
+      }
+    }
     state = state.copyWith(isPro: true, isLoading: false, errorMessage: null);
     TelemetryService.instance.logProStatusChanged(isPro: true, source: 'admin_test_purchase');
     return true;
@@ -346,6 +369,16 @@ class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
       }
       final currentUid = _auth?.currentUser?.uid;
       await _prefs.setProUser(true, uid: currentUid);
+      if (currentUid != null) {
+        try {
+          await FirebaseFirestore.instance.collection('users').doc(currentUid).set({
+            'isPremium': true,
+            'proPurchasedAt': DateTime.now().toIso8601String(),
+          }, SetOptions(merge: true));
+        } catch (e) {
+          debugPrint('[SubscriptionService] Error syncing isPremium to Firestore: $e');
+        }
+      }
       state = state.copyWith(isPro: true, isLoading: false, errorMessage: null);
       TelemetryService.instance.logProStatusChanged(isPro: true, source: 'restore');
       return true;
