@@ -2030,6 +2030,15 @@ class AppLocalizationsHi extends AppLocalizations {
   String get storyLayoutClassic => 'क्लासिक';
 
   @override
+  String get storyLayoutJourney => 'यात्रा';
+
+  @override
+  String get storyLayoutPolaroid => 'पोस्टकार्ड';
+
+  @override
+  String get storyLayoutInfographic => 'इन्फोग्राफिक';
+
+  @override
   String get storeUnavailableMessage =>
       'वर्तमान में स्टोर से संपर्क नहीं हो पा रहा है। कृपया बाद में पुनः प्रयास करें।';
 
@@ -2083,4 +2092,34 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get budgetAlert100 => 'बजट सीमा पार हो गई!';
+
+  @override
+  String get addCustomLocation => 'कस्टम स्थान जोड़ें';
+
+  @override
+  String get customLocation => 'कस्टम स्थान';
+
+  @override
+  String get customLocationHint => 'उदा. मेरा गाँव, फार्महाउस, कैंप साइट...';
+
+  @override
+  String get customLocationDescription =>
+      'गाँव, देहात, कैंप साइट या मानचित्र से बाहर का स्थान जोड़ें।';
+
+  @override
+  String get addAsCustomLocation => 'कस्टम स्थान के रूप में जोड़ें';
+
+  @override
+  String get customLocationTooltip => 'कस्टम स्थान जोड़ें (उदा. मेरा गाँव)';
+
+  @override
+  String notACountryOrCityPrompt(Object query) {
+    return '\"$query\" सत्यापित देश या शहर सूची में नहीं मिला। क्या आप इसे कस्टम स्थान के रूप में जोड़ना चाहते हैं?';
+  }
+
+  @override
+  String get cityLabel => 'शहर';
+
+  @override
+  String get countryLabel => 'देश';
 }

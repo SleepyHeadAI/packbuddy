@@ -323,3 +323,46 @@ class Trip {
     );
   }
 }
+
+/// Operational state of a trip relative to the current local calendar date
+enum TripStatus {
+  ongoing,
+  upcoming,
+  past,
+}
+
+/// Extension providing clear temporal status and day counts for Trips
+extension TripStatusX on Trip {
+  TripStatus get status {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final start = DateTime(startDate.year, startDate.month, startDate.day);
+    final end = DateTime(endDate.year, endDate.month, endDate.day);
+
+    if ((today.isAfter(start) || today.isAtSameMomentAs(start)) &&
+        (today.isBefore(end) || today.isAtSameMomentAs(end))) {
+      return TripStatus.ongoing;
+    } else if (start.isAfter(today)) {
+      return TripStatus.upcoming;
+    } else {
+      return TripStatus.past;
+    }
+  }
+
+  bool get isOngoing => status == TripStatus.ongoing;
+  bool get isUpcoming => status == TripStatus.upcoming;
+  bool get isPast => status == TripStatus.past;
+
+  int get daysUntilStart {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final start = DateTime(startDate.year, startDate.month, startDate.day);
+    return start.difference(today).inDays;
+  }
+
+  int get totalDays {
+    final diff = endDate.difference(startDate).inDays;
+    return diff <= 0 ? 1 : diff + 1;
+  }
+}
+

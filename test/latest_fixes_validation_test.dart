@@ -1,8 +1,8 @@
-import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:packbuddy/core/services/security_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:packbuddy/core/services/preferences_service.dart';
+import 'package:packbuddy/features/checklist/domain/canonical_packing_catalog.dart';
 import 'package:packbuddy/features/vault/presentation/screens/widgets/vault_thumbnail_widget.dart';
 import 'package:packbuddy/features/budget/domain/emergency_guide.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
@@ -11,6 +11,7 @@ import 'package:packbuddy/features/vault/domain/document.dart';
 import 'package:packbuddy/features/checklist/domain/packing_item.dart';
 import 'package:packbuddy/features/travel_map/data/world_countries_data.dart';
 import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
+import 'package:packbuddy/features/travel_map/presentation/widgets/travel_map_story_card.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/emergency_guide_sheet.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
@@ -304,6 +305,188 @@ void main() {
 
       await tester.pumpAndSettle();
       expect(find.text('PDF BELGESİ'), findsOneWidget);
+    });
+  });
+
+  group('6. Bavul Eşya Silme ve Geri Gelmeme (Resurrection Prevention) Testleri', () {
+    test('PreferencesService tracks hasSeededChecklist per user', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await PreferencesService.init();
+
+      await prefs.setSeededChecklist(false, uid: 'test_user_seed');
+      expect(prefs.hasSeededChecklist(uid: 'test_user_seed'), false);
+
+      await prefs.setSeededChecklist(true, uid: 'test_user_seed');
+      expect(prefs.hasSeededChecklist(uid: 'test_user_seed'), true);
+
+      // Separate user is not affected
+      expect(prefs.hasSeededChecklist(uid: 'different_user'), false);
+    });
+
+    test('Deleted items canonical key resolution correctly matches English and Turkish seeds', () {
+      final itemTr = PackingItem(
+        id: 'item_tr_1',
+        name: 'Pasaport, Vize & Uçuş Biletleri',
+        category: 'Belgeler',
+        quantity: 1,
+        isPacked: false,
+        createdAt: now,
+        updatedAt: now,
+      );
+
+      final itemEn = PackingItem(
+        id: 'item_en_1',
+        name: 'Passport, Visa & Flight Tickets',
+        category: 'Documents',
+        quantity: 1,
+        isPacked: false,
+        createdAt: now,
+        updatedAt: now,
+      );
+
+      final keyTr = CanonicalPackingCatalog.resolveCanonicalKey(itemTr.name) ?? CanonicalPackingCatalog.normalize(itemTr.name);
+      final keyEn = CanonicalPackingCatalog.resolveCanonicalKey(itemEn.name) ?? CanonicalPackingCatalog.normalize(itemEn.name);
+
+      expect(keyTr, 'passport');
+      expect(keyEn, 'passport');
+      expect(keyTr, keyEn);
+    });
+
+    test('Deleted items are filtered out from remote upserts', () {
+      final deletedIds = {'item_del_1', 'item_del_2'};
+      final remoteItems = [
+        PackingItem(
+          id: 'item_del_1',
+          name: 'Pasaport',
+          category: 'Belgeler',
+          quantity: 1,
+          isPacked: false,
+          createdAt: now,
+          updatedAt: now,
+        ),
+        PackingItem(
+          id: 'item_keep_3',
+          name: 'Güneş Kremi',
+          category: 'Bakım',
+          quantity: 1,
+          isPacked: false,
+          createdAt: now,
+          updatedAt: now,
+        ),
+      ];
+
+      final filteredRemote = remoteItems.where((i) => !deletedIds.contains(i.id)).toList();
+      expect(filteredRemote.length, 1);
+      expect(filteredRemote.first.id, 'item_keep_3');
+    });
+  });
+
+  group('7. Hikaye Kartı 10 Yeni Tema, 3 Yeni Şablon ve Sıfır Boşluk Tasarımı Testleri', () {
+    test('StoryCardTheme has 16 palettes and StoryCardLayout has 7 distinct layouts', () {
+      expect(StoryCardTheme.values.length, 16);
+      expect(StoryCardLayout.values.length, 7);
+
+      // Verify 3 new layouts
+      expect(StoryCardLayout.values.contains(StoryCardLayout.journey), isTrue);
+      expect(StoryCardLayout.values.contains(StoryCardLayout.polaroid), isTrue);
+      expect(StoryCardLayout.values.contains(StoryCardLayout.infographic), isTrue);
+
+      // Verify 10 new themes
+      expect(StoryCardTheme.values.contains(StoryCardTheme.cyberpunk), isTrue);
+      expect(StoryCardTheme.values.contains(StoryCardTheme.volcano), isTrue);
+      expect(StoryCardTheme.values.contains(StoryCardTheme.nordicForest), isTrue);
+      expect(StoryCardTheme.values.contains(StoryCardTheme.goldenHour), isTrue);
+      expect(StoryCardTheme.values.contains(StoryCardTheme.galaxy), isTrue);
+      expect(StoryCardTheme.values.contains(StoryCardTheme.monochromeDark), isTrue);
+      expect(StoryCardTheme.values.contains(StoryCardTheme.cherryBlossom), isTrue);
+      expect(StoryCardTheme.values.contains(StoryCardTheme.vintageSepia), isTrue);
+      expect(StoryCardTheme.values.contains(StoryCardTheme.matcha), isTrue);
+      expect(StoryCardTheme.values.contains(StoryCardTheme.pastelDream), isTrue);
+    });
+
+    test('StoryCardLayout localized names work across tr, en, de', () {
+      expect(StoryCardLayout.journey.getLocalizedName(null, locale: 'tr'), 'Yolculuk');
+      expect(StoryCardLayout.journey.getLocalizedName(null, locale: 'en'), 'Journey');
+      expect(StoryCardLayout.journey.getLocalizedName(null, locale: 'de'), 'Reise');
+
+      expect(StoryCardLayout.polaroid.getLocalizedName(null, locale: 'tr'), 'Kartpostal');
+      expect(StoryCardLayout.polaroid.getLocalizedName(null, locale: 'en'), 'Postcard');
+      expect(StoryCardLayout.polaroid.getLocalizedName(null, locale: 'de'), 'Postkarte');
+
+      expect(StoryCardLayout.infographic.getLocalizedName(null, locale: 'tr'), 'İnfografik');
+      expect(StoryCardLayout.infographic.getLocalizedName(null, locale: 'en'), 'Infographic');
+      expect(StoryCardLayout.infographic.getLocalizedName(null, locale: 'de'), 'Infografik');
+    });
+
+    testWidgets('TravelMapStoryCard renders all 7 layouts with 0 countries gracefully without void or overflow', (tester) async {
+      tester.view.physicalSize = const Size(360, 640);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.resetPhysicalSize());
+
+      for (final layout in StoryCardLayout.values) {
+        debugPrint('Testing layout: $layout');
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('tr'),
+            home: Scaffold(
+              body: Center(
+                child: TravelMapStoryCard(
+                  countries: const [],
+                  totalVisited: 0,
+                  totalLived: 0,
+                  totalWishlist: 0,
+                  worldPercentage: 0.0,
+                  continentsCount: 0,
+                  theme: StoryCardTheme.cyberpunk,
+                  layout: layout,
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      }
+    });
+
+    testWidgets('TravelMapStoryCard renders with low country count (1-3 countries) and wishlist targets', (tester) async {
+      tester.view.physicalSize = const Size(360, 640);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.resetPhysicalSize());
+
+      final sampleCountries = [
+        WorldCountriesData.allCountries.firstWhere((c) => c.code == 'TR').copyWith(status: CountryStatus.lived),
+        WorldCountriesData.allCountries.firstWhere((c) => c.code == 'FR').copyWith(status: CountryStatus.visited),
+        WorldCountriesData.allCountries.firstWhere((c) => c.code == 'JP').copyWith(status: CountryStatus.wishlist),
+      ];
+
+      for (final layout in [StoryCardLayout.journey, StoryCardLayout.polaroid, StoryCardLayout.infographic]) {
+        await tester.pumpWidget(
+          MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('tr'),
+            home: Scaffold(
+              body: Center(
+                child: TravelMapStoryCard(
+                  countries: sampleCountries,
+                  totalVisited: 1,
+                  totalLived: 1,
+                  totalWishlist: 1,
+                  worldPercentage: 1.0,
+                  continentsCount: 2,
+                  theme: StoryCardTheme.goldenHour,
+                  layout: layout,
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      }
     });
   });
 }

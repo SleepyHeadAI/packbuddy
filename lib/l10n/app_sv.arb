@@ -655,5 +655,17 @@
   "phraseHospital": "Var ligger sjukhuset?",
   "phraseEnglish": "Talar du engelska?",
   "budgetAlert85": "Närmar sig budgetgränsen (85%)",
-  "budgetAlert100": "Budgetgränsen överskriden!"
+  "budgetAlert100": "Budgetgränsen överskriden!",
+  "storyLayoutJourney": "Resa",
+  "storyLayoutPolaroid": "Vykort",
+  "storyLayoutInfographic": "Infografik",
+  "addCustomLocation": "Lägg till anpassad plats",
+  "customLocation": "Anpassad plats",
+  "customLocationHint": "t.ex. Vår by, lantställe, campingplats...",
+  "customLocationDescription": "Lägg till en by, landsbygd, camping eller plats utanför kartan.",
+  "addAsCustomLocation": "Lägg till som anpassad plats",
+  "customLocationTooltip": "Lägg till anpassad plats (t.ex. Vår by)",
+  "notACountryOrCityPrompt": "\"{query}\" hittades inte i katalog över länder eller städer. Vill du lägga till den som anpassad plats?",
+  "cityLabel": "Stad",
+  "countryLabel": "Land"
 }

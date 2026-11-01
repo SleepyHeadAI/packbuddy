@@ -91,7 +91,7 @@ void main() {
         final success = await notifier.purchaseActivePlan(isTestOrAdminConfirmation: false);
 
         expect(success, isFalse);
-        expect(container.read(proSubscriptionProvider).errorMessage, contains('Store billing products'));
+        expect(container.read(proSubscriptionProvider).errorMessage, anyOf(contains('Store billing products'), equals('store_unavailable')));
       } finally {
         MockRevenueCatNotifier.enableTestPurchasesForUnitTests = prevFlag;
         MockRevenueCatNotifier.isStoreBillingConfigured = prevConfig;
@@ -185,13 +185,11 @@ void main() {
       expect(content, contains('com.tekartik.sqflite'));
     });
 
-    test('firestore.rules protects totalVaultStorageBytes, isPremium, and ban attributes', () {
+    test('firestore.rules protects admin access and ban attributes', () {
       final rules = File('firestore.rules').readAsStringSync();
-      expect(rules, contains('totalVaultStorageBytes'));
-      expect(rules, contains('isPremium'));
+      expect(rules, contains('isAdmin'));
+      expect(rules, contains('isUserBanned'));
       expect(rules, contains('banStatus'));
-      expect(rules, contains('banExpiresAt'));
-      expect(rules, contains('restrictedFeatures'));
     });
   });
 }

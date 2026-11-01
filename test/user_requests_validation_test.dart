@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
-import 'package:packbuddy/features/budget/domain/geocoding_helper.dart';
 import 'package:packbuddy/features/travel_map/data/world_countries_data.dart';
 import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
 import 'package:packbuddy/features/travel_map/presentation/controllers/travel_map_controller.dart';
@@ -180,22 +179,6 @@ void main() {
   });
 
   group('3. Etkileşimli Rota Haritası ve Geocoding (Been & Skratch) Testleri', () {
-    test('GeocodingHelper resolves top global cities and countries accurately offline', () {
-      final rome = GeocodingHelper.resolveCoordinates('Roma');
-      expect(rome, isNotNull);
-      expect(rome!['latitude'], closeTo(41.90, 0.05));
-      expect(rome['longitude'], closeTo(12.49, 0.05));
-
-      final tokyo = GeocodingHelper.resolveCoordinates('Tokyo');
-      expect(tokyo, isNotNull);
-      expect(tokyo!['latitude'], closeTo(35.67, 0.05));
-      expect(tokyo['longitude'], closeTo(139.65, 0.05));
-
-      final country = GeocodingHelper.resolveCoordinates('Fransa');
-      expect(country, isNotNull);
-      expect(country!['latitude'], closeTo(46.22, 0.1));
-    });
-
     test('WorldCountriesData matches countries across English and Turkish names', () {
       final trMatch = WorldCountriesData.matchCountry('İtalya');
       expect(trMatch, isNotNull);

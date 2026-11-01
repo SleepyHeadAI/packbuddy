@@ -152,8 +152,9 @@ void main() {
       await tester.pump();
     });
 
-    test('StoryCardTheme includes exactly 6 themes: 3 Dark and 3 Light', () {
-      expect(StoryCardTheme.values.length, 6);
+    test('StoryCardTheme includes 16 themes and StoryCardLayout includes 7 layouts', () {
+      expect(StoryCardTheme.values.length, 16);
+      expect(StoryCardLayout.values.length, 7);
 
       final darkThemes = StoryCardTheme.values.where((t) {
         final palette = StoryCardPalette.forTheme(t);
@@ -165,11 +166,40 @@ void main() {
         return palette.isLight;
       }).toList();
 
-      expect(darkThemes.length, 3);
-      expect(lightThemes.length, 3);
+      expect(darkThemes.length, 9);
+      expect(lightThemes.length, 7);
 
-      expect(darkThemes, containsAll([StoryCardTheme.midnight, StoryCardTheme.sunset, StoryCardTheme.emerald]));
-      expect(lightThemes, containsAll([StoryCardTheme.minimalLight, StoryCardTheme.sandLight, StoryCardTheme.oceanLight]));
+      expect(darkThemes, containsAll([
+        StoryCardTheme.midnight,
+        StoryCardTheme.sunset,
+        StoryCardTheme.emerald,
+        StoryCardTheme.cyberpunk,
+        StoryCardTheme.volcano,
+        StoryCardTheme.nordicForest,
+        StoryCardTheme.goldenHour,
+        StoryCardTheme.galaxy,
+        StoryCardTheme.monochromeDark,
+      ]));
+      expect(lightThemes, containsAll([
+        StoryCardTheme.minimalLight,
+        StoryCardTheme.sandLight,
+        StoryCardTheme.oceanLight,
+        StoryCardTheme.cherryBlossom,
+        StoryCardTheme.vintageSepia,
+        StoryCardTheme.matcha,
+        StoryCardTheme.pastelDream,
+      ]));
+
+      // Verify the 3 new layouts
+      expect(StoryCardLayout.values, containsAll([
+        StoryCardLayout.classic,
+        StoryCardLayout.passport,
+        StoryCardLayout.minimal,
+        StoryCardLayout.showcase,
+        StoryCardLayout.journey,
+        StoryCardLayout.polaroid,
+        StoryCardLayout.infographic,
+      ]));
     });
 
     testWidgets('CountryFlag widget renders authentic NorthernCyprusFlag for NC code and emoji text for others', (tester) async {

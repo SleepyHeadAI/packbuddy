@@ -1966,6 +1966,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get storyLayoutClassic => 'クラシック';
 
   @override
+  String get storyLayoutJourney => '旅路';
+
+  @override
+  String get storyLayoutPolaroid => 'ポストカード';
+
+  @override
+  String get storyLayoutInfographic => 'インフォグラフィック';
+
+  @override
   String get storeUnavailableMessage => '現在ストアに接続できません。通信環境を確認して再度お試しください。';
 
   @override
@@ -2018,4 +2027,33 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get budgetAlert100 => '予算上限を超過しました！';
+
+  @override
+  String get addCustomLocation => 'カスタム場所を追加';
+
+  @override
+  String get customLocation => 'カスタム場所';
+
+  @override
+  String get customLocationHint => '例: 私の故郷、田舎の家、キャンプ場...';
+
+  @override
+  String get customLocationDescription => '村や田舎、キャンプ場など地図にないスポットを追加。';
+
+  @override
+  String get addAsCustomLocation => 'カスタム場所として追加';
+
+  @override
+  String get customLocationTooltip => 'カスタム場所を追加（例: 私の故郷）';
+
+  @override
+  String notACountryOrCityPrompt(Object query) {
+    return '「$query」は国や都市のカタログに見つかりませんでした。カスタム場所として追加しますか？';
+  }
+
+  @override
+  String get cityLabel => '都市';
+
+  @override
+  String get countryLabel => '国';
 }

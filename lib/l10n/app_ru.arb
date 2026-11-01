@@ -655,5 +655,17 @@
   "phraseHospital": "Где находится больница?",
   "phraseEnglish": "Вы говорите по-английски?",
   "budgetAlert85": "Приближение к лимиту (85%)",
-  "budgetAlert100": "Лимит бюджета превышен!"
+  "budgetAlert100": "Лимит бюджета превышен!",
+  "storyLayoutJourney": "Путешествие",
+  "storyLayoutPolaroid": "Открытка",
+  "storyLayoutInfographic": "Инфографика",
+  "addCustomLocation": "Добавить свое место",
+  "customLocation": "Свое место",
+  "customLocationHint": "напр.: Родная деревня, дача, кемпинг...",
+  "customLocationDescription": "Добавьте деревню, дачу, кемпинг или особое место вне карты.",
+  "addAsCustomLocation": "Добавить как особое место",
+  "customLocationTooltip": "Добавить свое место (напр.: Родная деревня)",
+  "notACountryOrCityPrompt": "Место «{query}» не найдено в списке стран и городов. Добавить его как особое место?",
+  "cityLabel": "Город",
+  "countryLabel": "Страна"
 }

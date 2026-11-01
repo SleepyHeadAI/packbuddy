@@ -9,7 +9,7 @@ import '../domain/travel_country.dart';
 import 'world_countries_data.dart';
 
 /// Service managing persistence, statistics, and bidirectional Cloud Firestore backup
-/// for the Been & Skratch World Travel Map.
+/// for the PackBuddy World Travel Map.
 class TravelMapService {
   static const String _keyCountries = 'packbuddy_travel_map_countries_v1';
   static const List<String> _fallbackKeys = [

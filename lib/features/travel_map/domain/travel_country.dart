@@ -1,6 +1,6 @@
 import 'package:packbuddy/features/budget/domain/country_localization.dart';
 
-/// Status of a country in the user's travel journey (Been & Skratch style)
+/// Status of a country in the user's travel journey
 enum CountryStatus {
   none,
   visited,

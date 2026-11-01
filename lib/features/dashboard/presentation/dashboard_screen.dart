@@ -388,7 +388,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             tooltip: l10n.settings,
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                _createSmoothRoute(const SettingsScreen()),
               );
             },
           ),
@@ -413,18 +413,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(6),
+                        padding: const EdgeInsets.all(5),
                         decoration: BoxDecoration(
                           color: theme.colorScheme.primary.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
                           Icons.flight_takeoff_rounded,
-                          size: 17,
+                          size: 16,
                           color: theme.colorScheme.primary,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 6),
                       Flexible(
                         child: Text(
                           l10n.trips,
@@ -437,9 +437,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                         ),
                       ),
                       if (tripCount > 0) ...[
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 4),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.primary.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(10),
@@ -448,7 +448,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                             '$tripCount',
                             style: TextStyle(
                               color: theme.colorScheme.primary,
-                              fontSize: 11,
+                              fontSize: 10,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -457,34 +457,41 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     ],
                   ),
                 ),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    visualDensity: VisualDensity.compact,
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      _createSmoothRoute(const TripsScreen()),
-                    );
-                  },
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        l10n.viewAll,
-                        style: TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
+                const SizedBox(width: 4),
+                Flexible(
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      visualDensity: VisualDensity.compact,
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        _createSmoothRoute(const TripsScreen()),
+                      );
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            l10n.viewAll,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 3),
+                        Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 11,
                           color: theme.colorScheme.primary,
                         ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        size: 11,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -600,6 +607,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       icon: Icons.flight_takeoff_rounded,
                       accentColor: theme.colorScheme.primary,
                       gradientStart: theme.colorScheme.primary.withValues(alpha: 0.12),
+                      heroTagBadge: 'trips-hero-badge',
+                      heroTagTitle: 'trips-hero-title',
                       onTap: () {
                         Navigator.of(context).push(
                           _createSmoothRoute(const TripsScreen()),
@@ -618,6 +627,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       icon: Icons.shield_outlined,
                       accentColor: theme.colorScheme.tertiary,
                       gradientStart: theme.colorScheme.tertiary.withValues(alpha: 0.12),
+                      heroTagBadge: 'vault-hero-badge',
+                      heroTagTitle: 'vault-hero-title',
                       onTap: () {
                         Navigator.of(context).push(
                           _createSmoothRoute(const VaultScreen()),
@@ -761,7 +772,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             ),
             const SizedBox(height: 18),
 
-            // World Travel Map Showcase Banner (Been & Skratch style)
+            // World Travel Map Showcase Banner
             AppCard(
               padding: const EdgeInsets.all(16),
               onTap: () {
@@ -771,29 +782,32 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               },
               child: Row(
                 children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF10B981), Color(0xFF0D9488)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(14),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF10B981).withValues(alpha: 0.35),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
+                  Hero(
+                    tag: 'travel-map-hero-badge',
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF10B981), Color(0xFF0D9488)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                      ],
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.public_rounded,
-                        color: Colors.white,
-                        size: 26,
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF10B981).withValues(alpha: 0.35),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.public_rounded,
+                          color: Colors.white,
+                          size: 26,
+                        ),
                       ),
                     ),
                   ),
@@ -802,35 +816,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                l10n.worldTravelMapTitle,
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                        Hero(
+                          tag: 'travel-map-hero-title',
+                          child: Material(
+                            type: MaterialType.transparency,
+                            child: Text(
+                              l10n.worldTravelMapTitle,
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w800,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(width: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF10B981).withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: const Text(
-                                'Been & Skratch',
-                                style: TextStyle(
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF10B981),
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                         const SizedBox(height: 3),
                         Text(
@@ -879,7 +877,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               badgeText: tripCount > 0 ? '$tripCount' : null,
               onTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const TripsScreen()),
+                  _createSmoothRoute(const TripsScreen()),
                 );
               },
             ),
@@ -916,6 +914,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               iconContainerColor: const Color(0xFF6366F1).withValues(alpha: 0.15),
               title: l10n.compareTrips,
               subtitle: l10n.comparisonSummary,
+              heroTagBadge: 'compare-trips-hero-badge',
+              heroTagTitle: 'compare-trips-hero-title',
               onTap: () {
                 Navigator.of(context).push(
                   _createSmoothRoute(const TripComparisonScreen()),
@@ -935,7 +935,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               badgeText: checklistState.totalCount > 0 ? '${checklistState.packedCount}/${checklistState.totalCount}' : null,
               onTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const ChecklistScreen()),
+                  _createSmoothRoute(const ChecklistScreen()),
                 );
               },
             ),
@@ -950,7 +950,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               badgeText: docCount > 0 ? '$docCount' : null,
               onTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const VaultScreen()),
+                  _createSmoothRoute(const VaultScreen()),
                 );
               },
             ),
@@ -962,9 +962,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               iconContainerColor: theme.colorScheme.secondaryContainer,
               title: l10n.settings,
               subtitle: l10n.settingsDescription,
+              heroTagBadge: 'settings-hero-badge',
+              heroTagTitle: 'settings-hero-title',
               onTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                  _createSmoothRoute(const SettingsScreen()),
                 );
               },
             ),
@@ -1530,6 +1532,8 @@ class _BentoStatCard extends StatelessWidget {
   final Color accentColor;
   final Color gradientStart;
   final VoidCallback onTap;
+  final String? heroTagBadge;
+  final String? heroTagTitle;
 
   const _BentoStatCard({
     required this.title,
@@ -1539,11 +1543,25 @@ class _BentoStatCard extends StatelessWidget {
     required this.accentColor,
     required this.gradientStart,
     required this.onTap,
+    this.heroTagBadge,
+    this.heroTagTitle,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    final iconWidget = Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: gradientStart,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Center(
+        child: Icon(icon, color: accentColor, size: 20),
+      ),
+    );
 
     return AppCard(
       onTap: onTap,
@@ -1554,17 +1572,9 @@ class _BentoStatCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: gradientStart,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Icon(icon, color: accentColor, size: 20),
-                ),
-              ),
+              heroTagBadge != null
+                  ? Hero(tag: heroTagBadge!, child: iconWidget)
+                  : iconWidget,
               const SizedBox(width: 8),
               Flexible(
                 child: FittedBox(
@@ -1582,14 +1592,29 @@ class _BentoStatCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          Text(
-            title,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
+          heroTagTitle != null
+              ? Hero(
+                  tag: heroTagTitle!,
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: Text(
+                      title,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                )
+              : Text(
+                  title,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
           const SizedBox(height: 2),
           Text(
             description,
@@ -1617,6 +1642,8 @@ class _HubFeatureCard extends StatelessWidget {
   final String subtitle;
   final String? badgeText;
   final VoidCallback onTap;
+  final String? heroTagBadge;
+  final String? heroTagTitle;
 
   const _HubFeatureCard({
     required this.icon,
@@ -1626,28 +1653,34 @@ class _HubFeatureCard extends StatelessWidget {
     required this.subtitle,
     this.badgeText,
     required this.onTap,
+    this.heroTagBadge,
+    this.heroTagTitle,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    final iconWidget = Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: iconContainerColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Center(
+        child: Icon(icon, color: iconColor, size: 20),
+      ),
+    );
+
     return AppCard(
       onTap: onTap,
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       child: Row(
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: iconContainerColor,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Center(
-              child: Icon(icon, color: iconColor, size: 20),
-            ),
-          ),
+          heroTagBadge != null
+              ? Hero(tag: heroTagBadge!, child: iconWidget)
+              : iconWidget,
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -1659,12 +1692,25 @@ class _HubFeatureCard extends StatelessWidget {
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         alignment: Alignment.centerLeft,
-                        child: Text(
-                          title,
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                        child: heroTagTitle != null
+                            ? Hero(
+                                tag: heroTagTitle!,
+                                child: Material(
+                                  type: MaterialType.transparency,
+                                  child: Text(
+                                    title,
+                                    style: theme.textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Text(
+                                title,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                       ),
                     ),
                     if (badgeText != null) ...[

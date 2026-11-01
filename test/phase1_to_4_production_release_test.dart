@@ -162,54 +162,55 @@ void main() {
     });
 
     testWidgets('Normal regular user cannot bypass billing; shows store billing required dialog and isPro remains false', (tester) async {
-      final regularUser = FakeUser(uid: 'regular_user_1', email: 'regular@example.com');
-      final container = ProviderContainer(
-        overrides: [
-          authControllerProvider.overrideWith(
-            (ref) => FakeAuthController(
-              AuthState(
-                user: regularUser,
-                isInitialized: true,
+      final prevFlag = MockRevenueCatNotifier.enableTestPurchasesForUnitTests;
+      final prevConfig = MockRevenueCatNotifier.isStoreBillingConfigured;
+      MockRevenueCatNotifier.enableTestPurchasesForUnitTests = false;
+      MockRevenueCatNotifier.isStoreBillingConfigured = false;
+      try {
+        final regularUser = FakeUser(uid: 'regular_user_1', email: 'regular@example.com');
+        final container = ProviderContainer(
+          overrides: [
+            authControllerProvider.overrideWith(
+              (ref) => FakeAuthController(
+                AuthState(
+                  user: regularUser,
+                  isInitialized: true,
+                ),
               ),
             ),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp(
+              theme: AppTheme.lightTheme,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: const Locale('en'),
+              home: const Scaffold(body: PaywallSheet()),
+            ),
           ),
-        ],
-      );
-      addTearDown(container.dispose);
+        );
+        await tester.pumpAndSettle();
 
-      await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
-          child: MaterialApp(
-            theme: AppTheme.lightTheme,
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            locale: const Locale('en'),
-            home: const Scaffold(body: PaywallSheet()),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        // Ensure user is not Pro initially
+        expect(container.read(proSubscriptionProvider).isPro, isFalse);
 
-      // Ensure user is not Pro initially
-      expect(container.read(proSubscriptionProvider).isPro, isFalse);
+        // Attempt purchase with real store flow
+        final notifier = container.read(proSubscriptionProvider.notifier);
+        final success = await notifier.purchaseActivePlan();
 
-      // Tap Subscribe Now
-      final subscribeBtn = find.text('Continue with Pro');
-      expect(subscribeBtn, findsOneWidget);
-      await tester.tap(subscribeBtn);
-      await tester.pumpAndSettle();
-
-      // Inactive coming soon notice dialog is displayed
-      expect(find.text('PackBuddy Pro Coming Soon'), findsOneWidget);
-      expect(find.textContaining('currently not active'), findsOneWidget);
-
-      // Dismiss dialog
-      await tester.tap(find.text('OK'));
-      await tester.pumpAndSettle();
-
-      // Crucial: isPro MUST remain false!
-      expect(container.read(proSubscriptionProvider).isPro, isFalse);
+        // Crucial: isPro MUST remain false and store_unavailable is reported!
+        expect(success, isFalse);
+        expect(container.read(proSubscriptionProvider).isPro, isFalse);
+        expect(container.read(proSubscriptionProvider).errorMessage, 'store_unavailable');
+      } finally {
+        MockRevenueCatNotifier.enableTestPurchasesForUnitTests = prevFlag;
+        MockRevenueCatNotifier.isStoreBillingConfigured = prevConfig;
+      }
     });
 
     testWidgets('Super Admin shows Admin / Sandbox Test Purchase Confirmation dialog and activates Pro on confirmation', (tester) async {
@@ -276,7 +277,7 @@ void main() {
         final success = await notifier.purchaseActivePlan(isTestOrAdminConfirmation: false);
 
         expect(success, isFalse);
-        expect(container.read(proSubscriptionProvider).errorMessage, contains('Store billing products'));
+        expect(container.read(proSubscriptionProvider).errorMessage, anyOf(contains('store_unavailable'), contains('Store billing products')));
       } finally {
         MockRevenueCatNotifier.enableTestPurchasesForUnitTests = prevFlag;
       }

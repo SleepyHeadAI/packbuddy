@@ -655,5 +655,17 @@
   "phraseHospital": "Waar is het ziekenhuis?",
   "phraseEnglish": "Spreekt u Engels?",
   "budgetAlert85": "Limiet bijna bereikt (85%)",
-  "budgetAlert100": "Budgetlimiet overschreden!"
+  "budgetAlert100": "Budgetlimiet overschreden!",
+  "storyLayoutJourney": "Reis",
+  "storyLayoutPolaroid": "Ansichtkaart",
+  "storyLayoutInfographic": "Infographic",
+  "addCustomLocation": "Aangepaste locatie toevoegen",
+  "customLocation": "Aangepaste locatie",
+  "customLocationHint": "bijv. Ons dorp, buitenhuis, kampeerterrein...",
+  "customLocationDescription": "Voeg een dorp, platteland, camping of speciale plek toe.",
+  "addAsCustomLocation": "Toevoegen als aangepaste locatie",
+  "customLocationTooltip": "Aangepaste locatie toevoegen (bijv. Ons dorp)",
+  "notACountryOrCityPrompt": "\"{query}\" is niet gevonden in de landen- of stedenlijst. Wilt u deze toevoegen als aangepaste locatie?",
+  "cityLabel": "Stad",
+  "countryLabel": "Land"
 }

@@ -2043,6 +2043,15 @@ class AppLocalizationsNl extends AppLocalizations {
   String get storyLayoutClassic => 'Klassiek';
 
   @override
+  String get storyLayoutJourney => 'Reis';
+
+  @override
+  String get storyLayoutPolaroid => 'Ansichtkaart';
+
+  @override
+  String get storyLayoutInfographic => 'Infographic';
+
+  @override
   String get storeUnavailableMessage =>
       'Winkelverbinding is momenteel niet beschikbaar. Probeer het later opnieuw.';
 
@@ -2096,4 +2105,36 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get budgetAlert100 => 'Budgetlimiet overschreden!';
+
+  @override
+  String get addCustomLocation => 'Aangepaste locatie toevoegen';
+
+  @override
+  String get customLocation => 'Aangepaste locatie';
+
+  @override
+  String get customLocationHint =>
+      'bijv. Ons dorp, buitenhuis, kampeerterrein...';
+
+  @override
+  String get customLocationDescription =>
+      'Voeg een dorp, platteland, camping of speciale plek toe.';
+
+  @override
+  String get addAsCustomLocation => 'Toevoegen als aangepaste locatie';
+
+  @override
+  String get customLocationTooltip =>
+      'Aangepaste locatie toevoegen (bijv. Ons dorp)';
+
+  @override
+  String notACountryOrCityPrompt(Object query) {
+    return '\"$query\" is niet gevonden in de landen- of stedenlijst. Wilt u deze toevoegen als aangepaste locatie?';
+  }
+
+  @override
+  String get cityLabel => 'Stad';
+
+  @override
+  String get countryLabel => 'Land';
 }

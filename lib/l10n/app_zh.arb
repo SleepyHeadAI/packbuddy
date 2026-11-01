@@ -655,5 +655,17 @@
   "phraseHospital": "请问医院在哪里？",
   "phraseEnglish": "你会说英语吗？",
   "budgetAlert85": "接近预算上限 (85%)",
-  "budgetAlert100": "预算已超支！"
+  "budgetAlert100": "预算已超支！",
+  "storyLayoutJourney": "旅程",
+  "storyLayoutPolaroid": "明信片",
+  "storyLayoutInfographic": "信息图表",
+  "addCustomLocation": "添加自定义地点",
+  "customLocation": "自定义地点",
+  "customLocationHint": "例如：我们的乡村、老家农庄、露营地...",
+  "customLocationDescription": "添加乡村、农庄、露营地或地图之外的特殊地点。",
+  "addAsCustomLocation": "作为自定义地点添加",
+  "customLocationTooltip": "添加自定义地点（例如：老家村庄）",
+  "notACountryOrCityPrompt": "在国家和城市列表中未找到“{query}”。是否要将其添加为自定义地点？",
+  "cityLabel": "城市",
+  "countryLabel": "国家"
 }

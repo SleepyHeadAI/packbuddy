@@ -44,7 +44,43 @@ class SettingsScreen extends ConsumerWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(l10n.settings),
+          titleSpacing: 8,
+          title: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Hero(
+                  tag: 'settings-hero-badge',
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.secondaryContainer,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.tune_rounded,
+                      color: theme.colorScheme.secondary,
+                      size: 18,
+                    ),
+                  ),
+                ),
+                Hero(
+                  tag: 'settings-hero-title',
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: Text(
+                      l10n.settings,
+                      style: theme.appBarTheme.titleTextStyle ??
+                          theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_rounded),
             tooltip: MaterialLocalizations.of(context).backButtonTooltip,

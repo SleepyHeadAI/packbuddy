@@ -655,5 +655,17 @@
   "phraseHospital": "أين أقرب مستشفى؟",
   "phraseEnglish": "هل تتحدث الإنجليزية؟",
   "budgetAlert85": "الاقتراب من الحد (85%)",
-  "budgetAlert100": "تم تجاوز ميزانية الرحلة!"
+  "budgetAlert100": "تم تجاوز ميزانية الرحلة!",
+  "storyLayoutJourney": "رحلة",
+  "storyLayoutPolaroid": "بطاقة بريدية",
+  "storyLayoutInfographic": "إنفوجرافيك",
+  "addCustomLocation": "إضافة موقع مخصص",
+  "customLocation": "موقع مخصص",
+  "customLocationHint": "مثال: قريتي، كوخ ريفي، موقع تخييم...",
+  "customLocationDescription": "أضف قرية، ريفاً، موقع تخييم أو مكاناً خارج الخريطة.",
+  "addAsCustomLocation": "إضافة كموقع مخصص",
+  "customLocationTooltip": "إضافة موقع مخصص (مثال: قريتي)",
+  "notACountryOrCityPrompt": "لم يتم العثور على \"{query}\" في دليل البلدان أو المدن. هل ترغب في إضافته كموقع مخصص؟",
+  "cityLabel": "مدينة",
+  "countryLabel": "بلد"
 }

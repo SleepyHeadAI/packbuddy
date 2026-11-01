@@ -7,15 +7,19 @@ import 'package:packbuddy/l10n/app_localizations.dart';
 
 /// Available story layout templates
 enum StoryCardLayout {
-  classic,   // 🌟 Klasik (Balanced Map + Stats + Flag Strip)
-  passport,  // 🛂 Pasaport (Official Travel Passport & Visa Stamps Edition)
-  minimal,   // 🧊 Minimal (Editorial Typography & Clean Outline)
-  showcase,  // 🖼️ Vitrin (Immersive Large Map & Glassmorphism HUD)
+  classic,     // 🌟 Klasik (Balanced Map + Stats + Flag Strip)
+  passport,    // 🛂 Pasaport (Official Travel Passport & Visa Stamps Edition)
+  minimal,     // 🧊 Minimal (Editorial Typography & Clean Outline)
+  showcase,    // 🖼️ Vitrin (Immersive Large Map & Glassmorphism HUD)
+  journey,     // ✈️ Yolculuk (Milestones & Route Waypoints)
+  polaroid,    // 📸 Kartpostal (Postcard & Travel Scrapbook)
+  infographic, // 📊 İnfografik (Continental Progress & Explorer Radar)
 }
 
 extension StoryCardLayoutX on StoryCardLayout {
   String getLocalizedName(AppLocalizations? l10n, {String? locale}) {
     final isTr = locale == 'tr';
+    final isDe = locale == 'de';
     switch (this) {
       case StoryCardLayout.classic:
         return l10n?.storyLayoutClassic ?? (isTr ? 'Klasik' : 'Classic');
@@ -25,6 +29,12 @@ extension StoryCardLayoutX on StoryCardLayout {
         return l10n?.storyLayoutMinimal ?? (isTr ? 'Minimal' : 'Minimal');
       case StoryCardLayout.showcase:
         return l10n?.storyLayoutShowcase ?? (isTr ? 'Vitrin' : 'Showcase');
+      case StoryCardLayout.journey:
+        return l10n?.storyLayoutJourney ?? (isTr ? 'Yolculuk' : (isDe ? 'Reise' : 'Journey'));
+      case StoryCardLayout.polaroid:
+        return l10n?.storyLayoutPolaroid ?? (isTr ? 'Kartpostal' : (isDe ? 'Postkarte' : 'Postcard'));
+      case StoryCardLayout.infographic:
+        return l10n?.storyLayoutInfographic ?? (isTr ? 'İnfografik' : (isDe ? 'Infografik' : 'Infographic'));
     }
   }
 
@@ -38,21 +48,37 @@ extension StoryCardLayoutX on StoryCardLayout {
         return '🧊';
       case StoryCardLayout.showcase:
         return '🖼️';
+      case StoryCardLayout.journey:
+        return '✈️';
+      case StoryCardLayout.polaroid:
+        return '📸';
+      case StoryCardLayout.infographic:
+        return '📊';
     }
   }
 }
 
-/// Available elevated design styles and color palettes for social media stories (3 Dark, 3 Light)
+/// Available elevated design styles and color palettes for social media stories (16 Palettes: 8 Dark, 8 Light)
 enum StoryCardTheme {
-  // 3 Dark Themes
-  midnight,    // 🌌 Gece Kaşifi (Midnight Obsidian & Neon Glow)
-  sunset,      // 🌅 Gün Batımı (Twilight Velvet Violet & Sunset Flame)
-  emerald,     // 🌲 Aurora (Nordic Emerald & Warm Gold)
+  // 8 Dark Themes
+  midnight,      // 🌌 Gece Kaşifi (Midnight Obsidian & Neon Glow)
+  sunset,        // 🌅 Gün Batımı (Twilight Velvet Violet & Sunset Flame)
+  emerald,       // 🌲 Aurora (Nordic Emerald & Warm Gold)
+  cyberpunk,     // ⚡ Siber (Deep Cyber Navy & Neon Cyan)
+  volcano,       // 🌋 Lav (Obsidian Basalt & Molten Orange)
+  nordicForest,  // 🏔️ Fiyort (Deep Spruce Slate & Ice Blue)
+  goldenHour,    // ✨ Altın Çağ (Imperial Dark Gold & Radiant Amber)
+  galaxy,        // 🌌 Galaksi (Deep Cosmic Purple & Starfire Violet)
+  monochromeDark,// ⬛ Karbon (Graphite Black & Platinum)
 
-  // 3 Light Themes
-  minimalLight,// ❄️ İskandinav (Pure Porcelain White & Slate)
-  sandLight,   // 🏖️ Sahra (Warm Sahara Linen & Terracotta Gold)
-  oceanLight,  // 🌊 Akdeniz (Mediterranean Azure & Coastal Sky)
+  // 7 Light Themes (Total 16 themes: 9 dark, 7 light)
+  minimalLight,  // ❄️ İskandinav (Pure Porcelain White & Slate)
+  sandLight,     // 🏖️ Sahra (Warm Sahara Linen & Terracotta Gold)
+  oceanLight,    // 🌊 Akdeniz (Mediterranean Azure & Coastal Sky)
+  cherryBlossom, // 🌸 Sakura (Blush Paper & Cherry Rose)
+  vintageSepia,  // 📜 Parşömen (Antique Parchment & Vintage Walnut)
+  matcha,        // 🍵 Matcha (Zen Light Green & Forest Moss)
+  pastelDream,   // 🦄 Pastel Rüya (Dreamy Lilac Lavender & Soft Coral)
 }
 
 /// Color and styling definition for a StoryCardTheme
@@ -337,6 +363,396 @@ class StoryCardPalette {
           isLight: true,
           previewColors: const [Color(0xFFE0F2FE), Color(0xFF0284C7), Color(0xFFF43F5E)],
         );
+
+      case StoryCardTheme.cyberpunk:
+        return StoryCardPalette(
+          label: isTr ? 'Siber' : (locale == 'de' ? 'Cyber' : 'Cyberpunk'),
+          emoji: '⚡',
+          backgroundGradient: const LinearGradient(
+            colors: [Color(0xFF0A071E), Color(0xFF140D36), Color(0xFF060312)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          mapBackground: const Color(0xFF0D0A26),
+          unvisitedLandColor: const Color(0xFF22164F),
+          mapBorderColor: const Color(0xFF191140),
+          livedColor: const Color(0xFFFACC15), // Cyber Yellow
+          visitedColor: const Color(0xFF06B6D4), // Neon Cyan
+          wishlistColor: const Color(0xFFF43F5E), // Rose Coral
+          textColor: Colors.white,
+          subtextColor: const Color(0xFF94A3B8),
+          cardBorder: const Color(0xFF06B6D4).withValues(alpha: 0.35),
+          tileBackground: const Color(0xFF06B6D4).withValues(alpha: 0.08),
+          tileBorder: const Color(0xFF06B6D4).withValues(alpha: 0.20),
+          heroGradient: LinearGradient(
+            colors: [
+              const Color(0xFF06B6D4).withValues(alpha: 0.25),
+              const Color(0xFF8B5CF6).withValues(alpha: 0.18),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          heroBorder: const Color(0xFF06B6D4).withValues(alpha: 0.5),
+          logoGradient: const LinearGradient(
+            colors: [Color(0xFF06B6D4), Color(0xFF8B5CF6)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          accentColor: const Color(0xFF06B6D4),
+          isLight: false,
+          previewColors: const [Color(0xFF140D36), Color(0xFF06B6D4), Color(0xFFFACC15)],
+        );
+
+      case StoryCardTheme.volcano:
+        return StoryCardPalette(
+          label: isTr ? 'Lav' : (locale == 'de' ? 'Vulkan' : 'Volcano'),
+          emoji: '🌋',
+          backgroundGradient: const LinearGradient(
+            colors: [Color(0xFF140D0E), Color(0xFF221113), Color(0xFF0C0708)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          mapBackground: const Color(0xFF180E10),
+          unvisitedLandColor: const Color(0xFF331D21),
+          mapBorderColor: const Color(0xFF1F1013),
+          livedColor: const Color(0xFFF59E0B),
+          visitedColor: const Color(0xFFFF3D00), // Molten Orange
+          wishlistColor: const Color(0xFFD50000), // Crimson
+          textColor: Colors.white,
+          subtextColor: const Color(0xFFFFCCBC).withValues(alpha: 0.75),
+          cardBorder: const Color(0xFFFF3D00).withValues(alpha: 0.35),
+          tileBackground: const Color(0xFFFF3D00).withValues(alpha: 0.08),
+          tileBorder: const Color(0xFFFF3D00).withValues(alpha: 0.18),
+          heroGradient: LinearGradient(
+            colors: [
+              const Color(0xFFFF3D00).withValues(alpha: 0.30),
+              const Color(0xFFFF9100).withValues(alpha: 0.18),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          heroBorder: const Color(0xFFFF3D00).withValues(alpha: 0.5),
+          logoGradient: const LinearGradient(
+            colors: [Color(0xFFDD2C00), Color(0xFFFF3D00)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          accentColor: const Color(0xFFFF3D00),
+          isLight: false,
+          previewColors: const [Color(0xFF221113), Color(0xFFFF3D00), Color(0xFFF59E0B)],
+        );
+
+      case StoryCardTheme.nordicForest:
+        return StoryCardPalette(
+          label: isTr ? 'Fiyort' : (locale == 'de' ? 'Fjord' : 'Fjord'),
+          emoji: '🏔️',
+          backgroundGradient: const LinearGradient(
+            colors: [Color(0xFF09141B), Color(0xFF0F232F), Color(0xFF060D12)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          mapBackground: const Color(0xFF0B1921),
+          unvisitedLandColor: const Color(0xFF1A3342),
+          mapBorderColor: const Color(0xFF102532),
+          livedColor: const Color(0xFF2DD4BF),
+          visitedColor: const Color(0xFF38BDF8), // Ice Blue
+          wishlistColor: const Color(0xFFF472B6),
+          textColor: Colors.white,
+          subtextColor: const Color(0xFFBAE6FD).withValues(alpha: 0.78),
+          cardBorder: const Color(0xFF38BDF8).withValues(alpha: 0.3),
+          tileBackground: const Color(0xFF38BDF8).withValues(alpha: 0.08),
+          tileBorder: const Color(0xFF38BDF8).withValues(alpha: 0.18),
+          heroGradient: LinearGradient(
+            colors: [
+              const Color(0xFF38BDF8).withValues(alpha: 0.25),
+              const Color(0xFF2DD4BF).withValues(alpha: 0.15),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          heroBorder: const Color(0xFF38BDF8).withValues(alpha: 0.45),
+          logoGradient: const LinearGradient(
+            colors: [Color(0xFF0284C7), Color(0xFF38BDF8)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          accentColor: const Color(0xFF38BDF8),
+          isLight: false,
+          previewColors: const [Color(0xFF0F232F), Color(0xFF38BDF8), Color(0xFF2DD4BF)],
+        );
+
+      case StoryCardTheme.goldenHour:
+        return StoryCardPalette(
+          label: isTr ? 'Altın Çağ' : (locale == 'de' ? 'Goldene Stunde' : 'Golden Hour'),
+          emoji: '✨',
+          backgroundGradient: const LinearGradient(
+            colors: [Color(0xFF151006), Color(0xFF241A0A), Color(0xFF0D0A03)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          mapBackground: const Color(0xFF1A1307),
+          unvisitedLandColor: const Color(0xFF382910),
+          mapBorderColor: const Color(0xFF211707),
+          livedColor: const Color(0xFF10B981),
+          visitedColor: const Color(0xFFF59E0B), // Radiant Amber
+          wishlistColor: const Color(0xFFEF4444),
+          textColor: Colors.white,
+          subtextColor: const Color(0xFFFEF3C7).withValues(alpha: 0.8),
+          cardBorder: const Color(0xFFF59E0B).withValues(alpha: 0.4),
+          tileBackground: const Color(0xFFF59E0B).withValues(alpha: 0.08),
+          tileBorder: const Color(0xFFF59E0B).withValues(alpha: 0.2),
+          heroGradient: LinearGradient(
+            colors: [
+              const Color(0xFFF59E0B).withValues(alpha: 0.3),
+              const Color(0xFFD97706).withValues(alpha: 0.15),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          heroBorder: const Color(0xFFF59E0B).withValues(alpha: 0.5),
+          logoGradient: const LinearGradient(
+            colors: [Color(0xFFB45309), Color(0xFFF59E0B)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          accentColor: const Color(0xFFF59E0B),
+          isLight: false,
+          previewColors: const [Color(0xFF241A0A), Color(0xFFF59E0B), Color(0xFFFDE68A)],
+        );
+
+      case StoryCardTheme.galaxy:
+        return StoryCardPalette(
+          label: isTr ? 'Galaksi' : (locale == 'de' ? 'Galaxie' : 'Galaxy'),
+          emoji: '🌌',
+          backgroundGradient: const LinearGradient(
+            colors: [Color(0xFF0F0721), Color(0xFF1D0B38), Color(0xFF070311)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          mapBackground: const Color(0xFF13092A),
+          unvisitedLandColor: const Color(0xFF291452),
+          mapBorderColor: const Color(0xFF1B0C39),
+          livedColor: const Color(0xFF06B6D4),
+          visitedColor: const Color(0xFFA855F7), // Nebula Purple
+          wishlistColor: const Color(0xFFEC4899), // Star Pink
+          textColor: Colors.white,
+          subtextColor: const Color(0xFFE9D5FF).withValues(alpha: 0.75),
+          cardBorder: const Color(0xFFA855F7).withValues(alpha: 0.35),
+          tileBackground: const Color(0xFFA855F7).withValues(alpha: 0.09),
+          tileBorder: const Color(0xFFA855F7).withValues(alpha: 0.22),
+          heroGradient: LinearGradient(
+            colors: [
+              const Color(0xFFA855F7).withValues(alpha: 0.28),
+              const Color(0xFFEC4899).withValues(alpha: 0.16),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          heroBorder: const Color(0xFFA855F7).withValues(alpha: 0.5),
+          logoGradient: const LinearGradient(
+            colors: [Color(0xFF7E22CE), Color(0xFFA855F7)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          accentColor: const Color(0xFFA855F7),
+          isLight: false,
+          previewColors: const [Color(0xFF1D0B38), Color(0xFFA855F7), Color(0xFFEC4899)],
+        );
+
+      case StoryCardTheme.monochromeDark:
+        return StoryCardPalette(
+          label: isTr ? 'Karbon' : (locale == 'de' ? 'Karbon' : 'Carbon'),
+          emoji: '⬛',
+          backgroundGradient: const LinearGradient(
+            colors: [Color(0xFF0C0D0E), Color(0xFF181A1D), Color(0xFF08090A)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          mapBackground: const Color(0xFF101214),
+          unvisitedLandColor: const Color(0xFF23272D),
+          mapBorderColor: const Color(0xFF1B1E23),
+          livedColor: const Color(0xFF10B981),
+          visitedColor: const Color(0xFFE2E8F0), // Platinum White
+          wishlistColor: const Color(0xFFF59E0B),
+          textColor: Colors.white,
+          subtextColor: const Color(0xFF94A3B8),
+          cardBorder: const Color(0xFF475569),
+          tileBackground: Colors.white.withValues(alpha: 0.06),
+          tileBorder: Colors.white.withValues(alpha: 0.12),
+          heroGradient: LinearGradient(
+            colors: [
+              Colors.white.withValues(alpha: 0.12),
+              Colors.white.withValues(alpha: 0.04),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          heroBorder: Colors.white.withValues(alpha: 0.35),
+          logoGradient: const LinearGradient(
+            colors: [Color(0xFF475569), Color(0xFF94A3B8)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          accentColor: const Color(0xFFE2E8F0),
+          isLight: false,
+          previewColors: const [Color(0xFF181A1D), Color(0xFFE2E8F0), Color(0xFF10B981)],
+        );
+
+      case StoryCardTheme.cherryBlossom:
+        return StoryCardPalette(
+          label: isTr ? 'Sakura' : (locale == 'de' ? 'Sakura' : 'Sakura'),
+          emoji: '🌸',
+          backgroundGradient: const LinearGradient(
+            colors: [Color(0xFFFFF7F9), Color(0xFFFFEFF3), Color(0xFFFFF0F5)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          mapBackground: const Color(0xFFFFF5F7),
+          unvisitedLandColor: const Color(0xFFFFDDE6),
+          mapBorderColor: const Color(0xFFFFCCD9),
+          livedColor: const Color(0xFF059669),
+          visitedColor: const Color(0xFFE11D48), // Rose Coral
+          wishlistColor: const Color(0xFF9333EA),
+          textColor: const Color(0xFF4C0519),
+          subtextColor: const Color(0xFF9F1239),
+          cardBorder: const Color(0xFFFDA4AF),
+          tileBackground: Colors.white.withValues(alpha: 0.95),
+          tileBorder: const Color(0xFFFECDD3),
+          heroGradient: LinearGradient(
+            colors: [
+              const Color(0xFFE11D48).withValues(alpha: 0.12),
+              const Color(0xFFFB7185).withValues(alpha: 0.08),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          heroBorder: const Color(0xFFFB7185).withValues(alpha: 0.45),
+          logoGradient: const LinearGradient(
+            colors: [Color(0xFFBE123C), Color(0xFFE11D48)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          accentColor: const Color(0xFFE11D48),
+          isLight: true,
+          previewColors: const [Color(0xFFFFEFF3), Color(0xFFE11D48), Color(0xFFFDA4AF)],
+        );
+
+      case StoryCardTheme.vintageSepia:
+        return StoryCardPalette(
+          label: isTr ? 'Parşömen' : (locale == 'de' ? 'Pergament' : 'Parchment'),
+          emoji: '📜',
+          backgroundGradient: const LinearGradient(
+            colors: [Color(0xFFF9F5EB), Color(0xFFF2ECE0), Color(0xFFEBE3D3)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          mapBackground: const Color(0xFFF4EFE6),
+          unvisitedLandColor: const Color(0xFFDCCFBC),
+          mapBorderColor: const Color(0xFFC7B69F),
+          livedColor: const Color(0xFF15803D),
+          visitedColor: const Color(0xFF854D0E), // Aged Amber Walnut
+          wishlistColor: const Color(0xFFB91C1C),
+          textColor: const Color(0xFF422006),
+          subtextColor: const Color(0xFF713F12),
+          cardBorder: const Color(0xFFD4B996),
+          tileBackground: Colors.white.withValues(alpha: 0.85),
+          tileBorder: const Color(0xFFDCCFBC),
+          heroGradient: LinearGradient(
+            colors: [
+              const Color(0xFF854D0E).withValues(alpha: 0.14),
+              const Color(0xFFA16207).withValues(alpha: 0.08),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          heroBorder: const Color(0xFF854D0E).withValues(alpha: 0.4),
+          logoGradient: const LinearGradient(
+            colors: [Color(0xFF713F12), Color(0xFF854D0E)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          accentColor: const Color(0xFF854D0E),
+          isLight: true,
+          previewColors: const [Color(0xFFF2ECE0), Color(0xFF854D0E), Color(0xFFB91C1C)],
+        );
+
+      case StoryCardTheme.matcha:
+        return StoryCardPalette(
+          label: isTr ? 'Matcha' : (locale == 'de' ? 'Matcha' : 'Matcha'),
+          emoji: '🍵',
+          backgroundGradient: const LinearGradient(
+            colors: [Color(0xFFF4F7F2), Color(0xFFEBF2E7), Color(0xFFE0ECDA)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          mapBackground: const Color(0xFFEFF5EB),
+          unvisitedLandColor: const Color(0xFFCFDFC6),
+          mapBorderColor: const Color(0xFFB6CEAA),
+          livedColor: const Color(0xFF0284C7),
+          visitedColor: const Color(0xFF4D7C0F), // Rich Leaf Green
+          wishlistColor: const Color(0xFFDC2626),
+          textColor: const Color(0xFF14532D),
+          subtextColor: const Color(0xFF166534),
+          cardBorder: const Color(0xFFA3E635).withValues(alpha: 0.5),
+          tileBackground: Colors.white.withValues(alpha: 0.90),
+          tileBorder: const Color(0xFFD9F99D),
+          heroGradient: LinearGradient(
+            colors: [
+              const Color(0xFF4D7C0F).withValues(alpha: 0.15),
+              const Color(0xFF65A30D).withValues(alpha: 0.08),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          heroBorder: const Color(0xFF4D7C0F).withValues(alpha: 0.4),
+          logoGradient: const LinearGradient(
+            colors: [Color(0xFF3F6212), Color(0xFF4D7C0F)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          accentColor: const Color(0xFF4D7C0F),
+          isLight: true,
+          previewColors: const [Color(0xFFEBF2E7), Color(0xFF4D7C0F), Color(0xFF0284C7)],
+        );
+
+      case StoryCardTheme.pastelDream:
+        return StoryCardPalette(
+          label: isTr ? 'Pastel Rüya' : (locale == 'de' ? 'Pastelltraum' : 'Pastel Dream'),
+          emoji: '🦄',
+          backgroundGradient: const LinearGradient(
+            colors: [Color(0xFFFBF8FF), Color(0xFFF3EDFF), Color(0xFFEBE1FF)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          mapBackground: const Color(0xFFF8F4FF),
+          unvisitedLandColor: const Color(0xFFDED2F9),
+          mapBorderColor: const Color(0xFFC7B5F0),
+          livedColor: const Color(0xFF0D9488),
+          visitedColor: const Color(0xFF8B5CF6), // Pastel Violet
+          wishlistColor: const Color(0xFFF43F5E), // Coral
+          textColor: const Color(0xFF4C1D95),
+          subtextColor: const Color(0xFF6D28D9),
+          cardBorder: const Color(0xFFC4B5FD),
+          tileBackground: Colors.white.withValues(alpha: 0.92),
+          tileBorder: const Color(0xFFDDD6FE),
+          heroGradient: LinearGradient(
+            colors: [
+              const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+              const Color(0xFF6366F1).withValues(alpha: 0.08),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          heroBorder: const Color(0xFF8B5CF6).withValues(alpha: 0.35),
+          logoGradient: const LinearGradient(
+            colors: [Color(0xFF6D28D9), Color(0xFF8B5CF6)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          accentColor: const Color(0xFF8B5CF6),
+          isLight: true,
+          previewColors: const [Color(0xFFEDE9FE), Color(0xFF8B5CF6), Color(0xFFF43F5E)],
+        );
     }
   }
 }
@@ -435,6 +851,12 @@ class TravelMapStoryCard extends StatelessWidget {
         return _buildMinimalLayout(l10n, palette, colorMap, visitedCountries);
       case StoryCardLayout.showcase:
         return _buildShowcaseLayout(l10n, palette, colorMap, visitedCountries);
+      case StoryCardLayout.journey:
+        return _buildJourneyLayout(l10n, palette, colorMap, visitedCountries);
+      case StoryCardLayout.polaroid:
+        return _buildPolaroidLayout(l10n, palette, colorMap, visitedCountries);
+      case StoryCardLayout.infographic:
+        return _buildInfographicLayout(l10n, palette, colorMap, visitedCountries);
     }
   }
 
@@ -499,29 +921,35 @@ class TravelMapStoryCard extends StatelessWidget {
                 ),
               ],
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: palette.isLight
-                    ? Colors.black.withValues(alpha: 0.05)
-                    : Colors.white.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: palette.cardBorder),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.public_rounded, size: 12, color: palette.accentColor),
-                  const SizedBox(width: 5),
-                  Text(
-                    l10n.storyCardTagline,
-                    style: TextStyle(
-                      color: palette.textColor,
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w700,
+            const SizedBox(width: 8),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                decoration: BoxDecoration(
+                  color: palette.isLight
+                      ? Colors.black.withValues(alpha: 0.05)
+                      : Colors.white.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: palette.cardBorder),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.public_rounded, size: 12, color: palette.accentColor),
+                    const SizedBox(width: 5),
+                    Expanded(
+                      child: Text(
+                        l10n.storyCardTagline,
+                        style: TextStyle(
+                          color: palette.textColor,
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
@@ -533,13 +961,13 @@ class TravelMapStoryCard extends StatelessWidget {
         const SizedBox(height: 8),
 
         // Legend Row
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 10,
+          runSpacing: 4,
           children: [
             _buildLegendPill(palette.livedColor, l10n.mapLegendLived, palette.subtextColor),
-            const SizedBox(width: 12),
             _buildLegendPill(palette.visitedColor, l10n.mapLegendBeen, palette.subtextColor),
-            const SizedBox(width: 12),
             _buildLegendPill(palette.wishlistColor, l10n.mapLegendWant, palette.subtextColor),
           ],
         ),
@@ -551,11 +979,12 @@ class TravelMapStoryCard extends StatelessWidget {
 
         // 4 Key Metric Tiles
         _buildFourStatTiles(l10n, palette),
-        const Spacer(),
+        const SizedBox(height: 10),
 
-        // Dynamic All-Visited Flags Showcase
-        if (visitedCountries.isNotEmpty)
-          _buildFlagsGrid(visitedCountries, palette, l10n),
+        // Dynamic Flags or Rich Explorer Milestones (No Empty Void)
+        Expanded(
+          child: _buildBottomExplorerSection(visitedCountries, palette, l10n),
+        ),
       ],
     );
   }
@@ -693,34 +1122,12 @@ class TravelMapStoryCard extends StatelessWidget {
             ),
           ],
         ),
-        const Spacer(),
+        const SizedBox(height: 10),
 
-        // Visa Flag Stamp Collection
-        if (visitedCountries.isNotEmpty) ...[
-          Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.military_tech_rounded, size: 14, color: palette.accentColor),
-                const SizedBox(width: 6),
-                Text(
-                  l10n.passportEntryVisas.toUpperCase(),
-                  style: TextStyle(
-                    color: palette.subtextColor,
-                    fontSize: 9.5,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (visitedCountries.length <= 4)
-            _buildPassportVisaStamps(visitedCountries, palette, l10n)
-          else
-            _buildFlagsGrid(visitedCountries, palette, l10n),
-        ],
+        // Visa Flag Stamp Collection or Passport Clearance Notice
+        Expanded(
+          child: _buildPassportLowerSection(visitedCountries, palette, l10n),
+        ),
       ],
     );
   }
@@ -802,21 +1209,21 @@ class TravelMapStoryCard extends StatelessWidget {
             border: Border.all(color: palette.tileBorder),
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildMiniTextStat(l10n.mapLegendLived, '$totalLived', palette.livedColor),
-              Container(width: 1, height: 22, color: palette.tileBorder),
-              _buildMiniTextStat(l10n.mapLegendBeen, '$totalVisited', palette.visitedColor),
-              Container(width: 1, height: 22, color: palette.tileBorder),
-              _buildMiniTextStat(l10n.mapLegendWant, '$totalWishlist', palette.wishlistColor),
+              Expanded(child: _buildMiniTextStat(l10n.mapLegendLived, '$totalLived', palette.livedColor)),
+              Container(width: 1, height: 20, color: palette.tileBorder),
+              Expanded(child: _buildMiniTextStat(l10n.mapLegendBeen, '$totalVisited', palette.visitedColor)),
+              Container(width: 1, height: 20, color: palette.tileBorder),
+              Expanded(child: _buildMiniTextStat(l10n.mapLegendWant, '$totalWishlist', palette.wishlistColor)),
             ],
           ),
         ),
-        const Spacer(),
+        const SizedBox(height: 10),
 
-        // Flag strip
-        if (visitedCountries.isNotEmpty)
-          _buildFlagsGrid(visitedCountries, palette, l10n),
+        // Flag strip or Horizon Explorer Banner (No Empty Void)
+        Expanded(
+          child: _buildBottomExplorerSection(visitedCountries, palette, l10n),
+        ),
       ],
     );
   }
@@ -835,20 +1242,27 @@ class TravelMapStoryCard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                Icon(Icons.flight_takeoff_rounded, color: palette.accentColor, size: 18),
-                const SizedBox(width: 6),
-                Text(
-                  'PackBuddy',
-                  style: TextStyle(
-                    color: palette.textColor,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w900,
+            Expanded(
+              child: Row(
+                children: [
+                  Icon(Icons.flight_takeoff_rounded, color: palette.accentColor, size: 18),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      'PackBuddy',
+                      style: TextStyle(
+                        color: palette.textColor,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w900,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
+            const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
               decoration: BoxDecoration(
@@ -900,20 +1314,1191 @@ class TravelMapStoryCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    _buildShowcaseStatTile(l10n.mapLegendBeen, '$totalVisited', Icons.flight_takeoff_rounded, palette.visitedColor, palette),
-                    _buildShowcaseStatTile(l10n.mapLegendLived, '$totalLived', Icons.home_rounded, palette.livedColor, palette),
-                    _buildShowcaseStatTile(l10n.continentsUnit, '$continentsCount', Icons.public_rounded, palette.accentColor, palette),
+                    Flexible(child: _buildShowcaseStatTile(l10n.mapLegendBeen, '$totalVisited', Icons.flight_takeoff_rounded, palette.visitedColor, palette)),
+                    Flexible(child: _buildShowcaseStatTile(l10n.mapLegendLived, '$totalLived', Icons.home_rounded, palette.livedColor, palette)),
+                    Flexible(child: _buildShowcaseStatTile(l10n.continentsUnit, '$continentsCount', Icons.public_rounded, palette.accentColor, palette)),
                   ],
                 ),
-                // Flags Grid inside HUD
-                if (visitedCountries.isNotEmpty)
-                  _buildFlagsGrid(visitedCountries, palette, l10n),
+                // Flags Grid inside HUD or Explorer Status
+                _buildBottomExplorerSection(visitedCountries, palette, l10n),
               ],
             ),
           ),
         ),
       ],
     );
+  }
+
+  // 5. JOURNEY LAYOUT (Milestones, Expedition Log & Route Waypoints)
+  Widget _buildJourneyLayout(
+    AppLocalizations l10n,
+    StoryCardPalette palette,
+    Map<String, Color> colorMap,
+    List<TravelCountry> visitedCountries,
+  ) {
+    final wishlistCountries = countries.where((c) => c.isWishlist).toList();
+    final rank = totalVisited == 0
+        ? 'ROOKIE NOMAD'
+        : (totalVisited < 5
+            ? 'TRAILBLAZER'
+            : (totalVisited < 15 ? 'GLOBETROTTER' : 'WORLD MASTER'));
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Top Expedition Banner
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: palette.accentColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: palette.accentColor.withValues(alpha: 0.4)),
+                    ),
+                    child: Icon(Icons.explore_rounded, color: palette.accentColor, size: 16),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'PACKBUDDY',
+                          style: TextStyle(
+                            color: palette.textColor,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.5,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          'EXPEDITION LOG • $rank',
+                          style: TextStyle(
+                            color: palette.accentColor,
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.0,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+              decoration: BoxDecoration(
+                color: palette.tileBackground,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: palette.tileBorder),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.flight_takeoff_rounded, size: 12, color: palette.visitedColor),
+                  const SizedBox(width: 4),
+                  Text(
+                    '$totalVisited / 197',
+                    style: TextStyle(
+                      color: palette.textColor,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+
+        // Journey Map Canvas
+        _buildMapBox(palette, colorMap, height: 175),
+        const SizedBox(height: 10),
+
+        // Expedition Progress Bar & Metrics
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          decoration: BoxDecoration(
+            gradient: palette.heroGradient,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: palette.heroBorder),
+          ),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.route_rounded, size: 14, color: palette.accentColor),
+                      const SizedBox(width: 6),
+                      Text(
+                        '%${worldPercentage.toStringAsFixed(1)} ${l10n.ofTheWorld.toUpperCase()}',
+                        style: TextStyle(
+                          color: palette.textColor,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    '$continentsCount ${l10n.continentsUnit}',
+                    style: TextStyle(
+                      color: palette.accentColor,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: (worldPercentage / 100).clamp(0.02, 1.0),
+                  minHeight: 5,
+                  backgroundColor: palette.isLight ? Colors.black12 : Colors.white12,
+                  valueColor: AlwaysStoppedAnimation<Color>(palette.accentColor),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+
+        // Waypoints Timeline / Destination Section
+        Expanded(
+          child: _buildJourneyWaypoints(visitedCountries, wishlistCountries, palette, l10n),
+        ),
+      ],
+    );
+  }
+
+  // 6. POLAROID LAYOUT (Vintage Scrapbook & Keepsake Edition)
+  Widget _buildPolaroidLayout(
+    AppLocalizations l10n,
+    StoryCardPalette palette,
+    Map<String, Color> colorMap,
+    List<TravelCountry> visitedCountries,
+  ) {
+    final wishlistCountries = countries.where((c) => c.isWishlist).toList();
+    final polaroidBg = palette.isLight
+        ? const Color(0xFFFAF8F5)
+        : const Color(0xFF1B2028);
+    final polaroidBorder = palette.isLight
+        ? const Color(0xFFE5DECE)
+        : const Color(0xFF2E3846);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Top Vintage Header
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  Icon(Icons.camera_alt_outlined, size: 16, color: palette.accentColor),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      'PackBuddy Scrapbook',
+                      style: TextStyle(
+                        color: palette.textColor,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.3,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: palette.accentColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: palette.accentColor.withValues(alpha: 0.3)),
+              ),
+              child: Text(
+                '★ EDITION 2026 ★',
+                style: TextStyle(
+                  color: palette.accentColor,
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+
+        // The Polaroid Frame Card
+        Container(
+          padding: const EdgeInsets.fromLTRB(10, 10, 10, 14),
+          decoration: BoxDecoration(
+            color: polaroidBg,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: polaroidBorder, width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: palette.isLight ? 0.08 : 0.35),
+                blurRadius: 18,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              // Photo Canvas with subtle tape sticker
+              Stack(
+                alignment: Alignment.topCenter,
+                children: [
+                  _buildMapBox(palette, colorMap, height: 190),
+                  // Washi tape sticker
+                  Positioned(
+                    top: -4,
+                    child: Container(
+                      width: 48,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: Colors.amber.withValues(alpha: 0.55),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              // Polaroid Handwritten-style footer caption
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '🌍 Our World Odyssey',
+                          style: TextStyle(
+                            color: palette.isLight ? const Color(0xFF1E293B) : Colors.white,
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.2,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '%${worldPercentage.toStringAsFixed(1)} explored • $totalVisited destinations',
+                          style: TextStyle(
+                            color: palette.isLight ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: palette.accentColor, width: 1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      'PASSPORTED',
+                      style: TextStyle(
+                        color: palette.accentColor,
+                        fontSize: 8,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+
+        // Scrapbook Memorabilia / Sticker Badges
+        Expanded(
+          child: _buildPolaroidStickers(visitedCountries, wishlistCountries, palette, l10n),
+        ),
+      ],
+    );
+  }
+
+  // 7. INFOGRAPHIC LAYOUT (Continental Analytics & Tech Radar)
+  Widget _buildInfographicLayout(
+    AppLocalizations l10n,
+    StoryCardPalette palette,
+    Map<String, Color> colorMap,
+    List<TravelCountry> visitedCountries,
+  ) {
+    // Calculate continents distribution
+    final europeCount = visitedCountries.where((c) => c.continents.contains('Europe')).length;
+    final asiaCount = visitedCountries.where((c) => c.continents.contains('Asia')).length;
+    final americasCount = visitedCountries.where((c) => c.continents.contains('Americas')).length;
+    final africaCount = visitedCountries.where((c) => c.continents.contains('Africa')).length;
+    final oceaniaCount = visitedCountries.where((c) => c.continents.contains('Oceania')).length;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Top HUD Header
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: palette.accentColor,
+                      boxShadow: [
+                        BoxShadow(
+                          color: palette.accentColor.withValues(alpha: 0.6),
+                          blurRadius: 6,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      'ATLAS TELEMETRY',
+                      style: TextStyle(
+                        color: palette.textColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.2,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: palette.accentColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: palette.accentColor.withValues(alpha: 0.4)),
+              ),
+              child: Text(
+                'LIVE • 197 NODES',
+                style: TextStyle(
+                  color: palette.accentColor,
+                  fontSize: 9,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.0,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+
+        // Top Split: Big Radial-Style Stat + 4 Mini Gauges
+        Row(
+          children: [
+            // Left Metric: World Coverage Dial
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: palette.tileBackground,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: palette.accentColor.withValues(alpha: 0.4)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'GLOBAL',
+                    style: TextStyle(
+                      color: palette.accentColor,
+                      fontSize: 8.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '%${worldPercentage.toStringAsFixed(1)}',
+                    style: TextStyle(
+                      color: palette.textColor,
+                      fontSize: 26,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  Text(
+                    l10n.ofTheWorld.toUpperCase(),
+                    style: TextStyle(
+                      color: palette.subtextColor,
+                      fontSize: 8,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            // Right Metric: 2x2 Data Grid
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: palette.tileBackground,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: palette.tileBorder),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(child: _buildInfographicMiniCell('CONTINENTS', '$continentsCount/7', palette.accentColor)),
+                        Expanded(child: _buildInfographicMiniCell('VISITED', '$totalVisited', palette.visitedColor)),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Expanded(child: _buildInfographicMiniCell('LIVED', '$totalLived', palette.livedColor)),
+                        Expanded(child: _buildInfographicMiniCell('TARGETS', '$totalWishlist', palette.wishlistColor)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+
+        // Map Canvas with Crosshair Frame
+        _buildMapBox(palette, colorMap, height: 170),
+        const SizedBox(height: 10),
+
+        // Continental Coverage Spectrum Matrix
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            color: palette.tileBackground,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: palette.tileBorder),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: Text(
+                      'CONTINENTAL BREAKDOWN',
+                      style: TextStyle(
+                        color: palette.accentColor,
+                        fontSize: 8.5,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.8,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '$continentsCount / 7 REACHED',
+                    style: TextStyle(
+                      color: palette.subtextColor,
+                      fontSize: 8.5,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildContinentBadge('🇪🇺 EU', europeCount, palette),
+                  _buildContinentBadge('🌏 AS', asiaCount, palette),
+                  _buildContinentBadge('🌎 AM', americasCount, palette),
+                  _buildContinentBadge('🌍 AF', africaCount, palette),
+                  _buildContinentBadge('🌊 OC', oceaniaCount, palette),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+
+        // Bottom Flags or Empty-State Explorer Section inside HUD
+        Expanded(
+          child: _buildBottomExplorerSection(visitedCountries, palette, l10n),
+        ),
+      ],
+    );
+  }
+
+  // --- REUSABLE SUB-WIDGETS & ADAPTIVE ZERO-GAP SECTIONS ---
+
+  Widget _buildJourneyWaypoints(
+    List<TravelCountry> visited,
+    List<TravelCountry> wishlist,
+    StoryCardPalette palette,
+    AppLocalizations l10n,
+  ) {
+    if (visited.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: palette.tileBackground,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: palette.tileBorder),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.flight_takeoff_rounded, size: 24, color: palette.accentColor),
+            const SizedBox(height: 6),
+            Text(
+              'EXPEDITION READY FOR LAUNCH',
+              style: TextStyle(
+                color: palette.accentColor,
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.0,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              wishlist.isNotEmpty
+                  ? 'Wishlist targets saved: ${wishlist.take(3).map((c) => c.getLocalizedName(l10n.localeName)).join(" • ")}'
+                  : 'Start mapping countries to chart your travel timeline',
+              style: TextStyle(
+                color: palette.subtextColor,
+                fontSize: 10.5,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (visited.length <= 4) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: palette.tileBackground,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: palette.tileBorder),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: visited.map((c) {
+            final isHome = c.isLived;
+            final nodeColor = isHome ? palette.livedColor : palette.visitedColor;
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              margin: const EdgeInsets.symmetric(vertical: 2),
+              decoration: BoxDecoration(
+                color: palette.isLight
+                    ? Colors.black.withValues(alpha: 0.03)
+                    : Colors.white.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: nodeColor.withValues(alpha: 0.35)),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    isHome ? Icons.home_rounded : Icons.location_on_rounded,
+                    size: 14,
+                    color: nodeColor,
+                  ),
+                  const SizedBox(width: 8),
+                  CountryFlag(code: c.code, fallbackEmoji: c.flag, size: 16),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      c.getLocalizedName(l10n.localeName),
+                      style: TextStyle(
+                        color: palette.textColor,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Text(
+                    c.continent,
+                    style: TextStyle(
+                      color: palette.subtextColor,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: nodeColor.withValues(alpha: 0.18),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      isHome ? 'BASE' : 'VISITED',
+                      style: TextStyle(
+                        color: nodeColor,
+                        fontSize: 7.5,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+      );
+    }
+
+    return _buildFlagsGrid(visited, palette, l10n);
+  }
+
+  Widget _buildPolaroidStickers(
+    List<TravelCountry> visited,
+    List<TravelCountry> wishlist,
+    StoryCardPalette palette,
+    AppLocalizations l10n,
+  ) {
+    if (visited.isEmpty) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: palette.tileBackground,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: palette.tileBorder),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.photo_library_outlined, size: 20, color: palette.accentColor),
+            const SizedBox(height: 4),
+            Text(
+              'MEMORIES IN THE MAKING',
+              style: TextStyle(
+                color: palette.accentColor,
+                fontSize: 9.5,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.0,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              'Your scrapbook is ready to collect global stamps',
+              style: TextStyle(
+                color: palette.subtextColor,
+                fontSize: 10.5,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (visited.length <= 4) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        decoration: BoxDecoration(
+          color: palette.tileBackground,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: palette.tileBorder),
+        ),
+        child: Wrap(
+          spacing: 8,
+          runSpacing: 6,
+          alignment: WrapAlignment.center,
+          children: visited.map((c) {
+            final isHome = c.isLived;
+            final stickerColor = isHome ? palette.livedColor : palette.accentColor;
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: palette.isLight ? Colors.white : const Color(0xFF242A35),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: stickerColor.withValues(alpha: 0.5)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CountryFlag(code: c.code, fallbackEmoji: c.flag, size: 16),
+                  const SizedBox(width: 6),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 80),
+                    child: Text(
+                      c.getLocalizedName(l10n.localeName),
+                      style: TextStyle(
+                        color: palette.textColor,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w800,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '★',
+                    style: TextStyle(color: stickerColor, fontSize: 9),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+      );
+    }
+
+    return _buildFlagsGrid(visited, palette, l10n);
+  }
+
+  Widget _buildInfographicMiniCell(String label, String value, Color color) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            color: color,
+            fontSize: 13,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.grey,
+            fontSize: 7.5,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.5,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContinentBadge(String label, int count, StoryCardPalette palette) {
+    final active = count > 0;
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+        decoration: BoxDecoration(
+          color: active
+              ? palette.accentColor.withValues(alpha: 0.18)
+              : (palette.isLight ? Colors.black.withValues(alpha: 0.04) : Colors.white.withValues(alpha: 0.04)),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: active
+                ? palette.accentColor.withValues(alpha: 0.5)
+                : Colors.transparent,
+          ),
+        ),
+        child: Column(
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: active ? palette.textColor : palette.subtextColor,
+                fontSize: 8.5,
+                fontWeight: FontWeight.w700,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 1),
+            Text(
+              '$count',
+              style: TextStyle(
+                color: active ? palette.accentColor : palette.subtextColor,
+                fontSize: 9.5,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPassportLowerSection(
+    List<TravelCountry> visitedCountries,
+    StoryCardPalette palette,
+    AppLocalizations l10n,
+  ) {
+    if (visitedCountries.isEmpty) {
+      final wishlistCountries = countries.where((c) => c.isWishlist).take(3).toList();
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: palette.tileBackground,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: palette.accentColor.withValues(alpha: 0.35)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.verified_outlined, size: 16, color: palette.accentColor),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    '★ VISA CLEARANCE PENDING ★',
+                    style: TextStyle(
+                      color: palette.accentColor,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.8,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            if (wishlistCountries.isNotEmpty) ...[
+              Text(
+                'TARGET DESTINATIONS / HEDEF ROTALAR',
+                style: TextStyle(
+                  color: palette.subtextColor,
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Wrap(
+                spacing: 8,
+                runSpacing: 6,
+                alignment: WrapAlignment.center,
+                children: wishlistCountries.map((c) => Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: palette.accentColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: palette.accentColor.withValues(alpha: 0.3)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CountryFlag(code: c.code, fallbackEmoji: c.flag, size: 14),
+                      const SizedBox(width: 5),
+                      Text(
+                        c.getLocalizedName(l10n.localeName),
+                        style: TextStyle(
+                          color: palette.textColor,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                )).toList(),
+              ),
+            ] else
+              Text(
+                'Ready for takeoff • Mark your first visited country',
+                style: TextStyle(
+                  color: palette.subtextColor,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+              ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.military_tech_rounded, size: 14, color: palette.accentColor),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  l10n.passportEntryVisas.toUpperCase(),
+                  style: TextStyle(
+                    color: palette.subtextColor,
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.2,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: visitedCountries.length <= 4
+              ? _buildPassportVisaStamps(visitedCountries, palette, l10n)
+              : _buildFlagsGrid(visitedCountries, palette, l10n),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBottomExplorerSection(
+    List<TravelCountry> visitedCountries,
+    StoryCardPalette palette,
+    AppLocalizations l10n,
+  ) {
+    if (visitedCountries.isEmpty) {
+      final wishlistCountries = countries.where((c) => c.isWishlist).take(4).toList();
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: palette.tileBackground,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: palette.tileBorder),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.explore_rounded, color: palette.accentColor, size: 16),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    wishlistCountries.isNotEmpty
+                        ? 'NEXT ON THE RADAR'
+                        : 'HORIZON AWAITS',
+                    style: TextStyle(
+                      color: palette.accentColor,
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.0,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (wishlistCountries.isNotEmpty)
+              Wrap(
+                spacing: 8,
+                runSpacing: 6,
+                alignment: WrapAlignment.center,
+                children: wishlistCountries.map((c) => Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: palette.wishlistColor.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: palette.wishlistColor.withValues(alpha: 0.35)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CountryFlag(code: c.code, fallbackEmoji: c.flag, size: 16),
+                      const SizedBox(width: 6),
+                      Text(
+                        c.getLocalizedName(l10n.localeName),
+                        style: TextStyle(
+                          color: palette.textColor,
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(Icons.bookmark_added_rounded, size: 12, color: palette.wishlistColor),
+                    ],
+                  ),
+                )).toList(),
+              )
+            else
+              Text(
+                'Her büyük seyahat tek bir adımla başlar • Yeni ülkeler keşfetmeye başla',
+                style: TextStyle(
+                  color: palette.subtextColor,
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+          ],
+        ),
+      );
+    }
+
+    if (visitedCountries.length <= 4) {
+      final wishlistCountries = countries.where((c) => c.isWishlist).take(2).toList();
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: palette.tileBackground,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: palette.tileBorder),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              alignment: WrapAlignment.center,
+              children: visitedCountries.map((c) {
+                final isLived = c.isLived;
+                final statusColor = isLived ? palette.livedColor : palette.visitedColor;
+                final statusText = isLived ? 'Lived' : 'Visited';
+
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: palette.isLight
+                        ? Colors.black.withValues(alpha: 0.04)
+                        : Colors.white.withValues(alpha: 0.07),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: statusColor.withValues(alpha: 0.45)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CountryFlag(code: c.code, fallbackEmoji: c.flag, size: 18),
+                      const SizedBox(width: 6),
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 90),
+                        child: Text(
+                          c.getLocalizedName(l10n.localeName),
+                          style: TextStyle(
+                            color: palette.textColor,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: statusColor.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          statusText,
+                          style: TextStyle(
+                            color: statusColor,
+                            fontSize: 8,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+            if (wishlistCountries.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.near_me_rounded, size: 11, color: palette.wishlistColor),
+                  const SizedBox(width: 4),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 230),
+                    child: Text(
+                      'Next: ${wishlistCountries.map((c) => c.getLocalizedName(l10n.localeName)).join(', ')}',
+                      style: TextStyle(
+                        color: palette.subtextColor,
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      );
+    }
+
+    return _buildFlagsGrid(visitedCountries, palette, l10n);
   }
 
   // --- REUSABLE SUB-WIDGETS ---
@@ -1143,32 +2728,35 @@ class TravelMapStoryCard extends StatelessWidget {
 
   Widget _buildMiniTextStat(String title, String value, Color color) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 7,
-          height: 7,
+          width: 6,
+          height: 6,
           decoration: BoxDecoration(shape: BoxShape.circle, color: color),
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 4),
         Text(
           value,
           style: TextStyle(
             color: color,
             fontWeight: FontWeight.w900,
-            fontSize: 13,
+            fontSize: 12,
           ),
         ),
-        const SizedBox(width: 4),
-        Text(
-          title,
-          style: const TextStyle(
-            color: Colors.grey,
-            fontWeight: FontWeight.w600,
-            fontSize: 10.5,
+        const SizedBox(width: 3),
+        Flexible(
+          child: Text(
+            title,
+            style: const TextStyle(
+              color: Colors.grey,
+              fontWeight: FontWeight.w600,
+              fontSize: 9.5,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
@@ -1186,29 +2774,33 @@ class TravelMapStoryCard extends StatelessWidget {
       children: [
         Icon(icon, size: 15, color: color),
         const SizedBox(width: 5),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              value,
-              style: TextStyle(
-                color: palette.textColor,
-                fontWeight: FontWeight.w900,
-                fontSize: 14,
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                value,
+                style: TextStyle(
+                  color: palette.textColor,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 14,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            Text(
-              label,
-              style: TextStyle(
-                color: palette.subtextColor,
-                fontWeight: FontWeight.w600,
-                fontSize: 9.5,
+              Text(
+                label,
+                style: TextStyle(
+                  color: palette.subtextColor,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 9.5,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );

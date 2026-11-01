@@ -171,44 +171,50 @@ class _VaultThumbnailWidgetState extends State<VaultThumbnailWidget> {
             ],
           ),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFDC2626).withValues(alpha: 0.18),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: const Color(0xFFDC2626).withValues(alpha: 0.4),
-                  width: 1.5,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        child: Center(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFDC2626).withValues(alpha: 0.18),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFFDC2626).withValues(alpha: 0.4),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.picture_as_pdf_rounded,
+                    size: 28,
+                    color: Color(0xFFDC2626),
+                  ),
                 ),
-              ),
-              child: const Icon(
-                Icons.picture_as_pdf_rounded,
-                size: 32,
-                color: Color(0xFFDC2626),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-              decoration: BoxDecoration(
-                color: const Color(0xFFDC2626).withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: const Text(
-                'PDF BELGESİ',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFFDC2626),
-                  letterSpacing: 0.6,
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFDC2626).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Text(
+                    'PDF BELGESİ',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFFDC2626),
+                      letterSpacing: 0.6,
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       );
     }

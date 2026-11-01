@@ -2379,6 +2379,18 @@
   "@storyLayoutClassic": {
     "description": "storyLayoutClassic label"
   },
+  "storyLayoutJourney": "Journey",
+  "@storyLayoutJourney": {
+    "description": "storyLayoutJourney label"
+  },
+  "storyLayoutPolaroid": "Postcard",
+  "@storyLayoutPolaroid": {
+    "description": "storyLayoutPolaroid label"
+  },
+  "storyLayoutInfographic": "Infographic",
+  "@storyLayoutInfographic": {
+    "description": "storyLayoutInfographic label"
+  },
   "storeUnavailableMessage": "Store connection is currently unavailable. Please check your internet connection and try again.",
   "emergencyGuideTitle": "Emergency & Local Guide (SOS)",
   "emergencyPolice": "Police",
@@ -2396,5 +2408,14 @@
   "phraseHospital": "Where is the hospital?",
   "phraseEnglish": "Do you speak English?",
   "budgetAlert85": "Approaching limit (85%)",
-  "budgetAlert100": "Budget limit exceeded!"
+  "budgetAlert100": "Budget limit exceeded!",
+  "addCustomLocation": "Add Custom Location",
+  "customLocation": "Custom Location",
+  "customLocationHint": "e.g. My Village, Country House, Camp Site...",
+  "customLocationDescription": "Add a village, countryside, camp site, or off-map spot.",
+  "addAsCustomLocation": "Add as custom location",
+  "customLocationTooltip": "Add custom location (e.g. My Village)",
+  "notACountryOrCityPrompt": "\"{query}\" was not found in the verified country or city catalog. Would you like to add it as a custom location?",
+  "cityLabel": "City",
+  "countryLabel": "Country"
 }

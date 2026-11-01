@@ -2035,6 +2035,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get storyLayoutClassic => 'Classic';
 
   @override
+  String get storyLayoutJourney => 'Journey';
+
+  @override
+  String get storyLayoutPolaroid => 'Postcard';
+
+  @override
+  String get storyLayoutInfographic => 'Infographic';
+
+  @override
   String get storeUnavailableMessage =>
       'Store connection is currently unavailable. Please check your internet connection and try again.';
 
@@ -2088,4 +2097,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get budgetAlert100 => 'Budget limit exceeded!';
+
+  @override
+  String get addCustomLocation => 'Add Custom Location';
+
+  @override
+  String get customLocation => 'Custom Location';
+
+  @override
+  String get customLocationHint =>
+      'e.g. My Village, Country House, Camp Site...';
+
+  @override
+  String get customLocationDescription =>
+      'Add a village, countryside, camp site, or off-map spot.';
+
+  @override
+  String get addAsCustomLocation => 'Add as custom location';
+
+  @override
+  String get customLocationTooltip => 'Add custom location (e.g. My Village)';
+
+  @override
+  String notACountryOrCityPrompt(Object query) {
+    return '\"$query\" was not found in the verified country or city catalog. Would you like to add it as a custom location?';
+  }
+
+  @override
+  String get cityLabel => 'City';
+
+  @override
+  String get countryLabel => 'Country';
 }

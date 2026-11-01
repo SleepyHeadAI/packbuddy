@@ -655,5 +655,17 @@
   "phraseHospital": "โรงพยาบาลอยู่ที่ไหน?",
   "phraseEnglish": "คุณพูดภาษาอังกฤษได้ไหม?",
   "budgetAlert85": "ใกล้ถึงขีดจำกัดแล้ว (85%)",
-  "budgetAlert100": "เกินงบประมาณที่ตั้งไว้!"
+  "budgetAlert100": "เกินงบประมาณที่ตั้งไว้!",
+  "storyLayoutJourney": "การเดินทาง",
+  "storyLayoutPolaroid": "โปสการ์ด",
+  "storyLayoutInfographic": "อินโฟกราฟิก",
+  "addCustomLocation": "เพิ่มสถานที่กำหนดเอง",
+  "customLocation": "สถานที่กำหนดเอง",
+  "customLocationHint": "เช่น หมู่บ้านของเรา, บ้านพักตากอากาศ, จุดกางเต็นท์...",
+  "customLocationDescription": "เพิ่มหมู่บ้าน ชนบท จุดตั้งแคมป์ หรือสถานที่ที่ไม่อยู่ในแผนที่",
+  "addAsCustomLocation": "เพิ่มเป็นสถานที่กำหนดเอง",
+  "customLocationTooltip": "เพิ่มสถานที่กำหนดเอง (เช่น หมู่บ้านของเรา)",
+  "notACountryOrCityPrompt": "ไม่พบ \"{query}\" ในรายชื่อประเทศหรือเมือง คุณต้องการเพิ่มเป็นสถานที่กำหนดเองหรือไม่?",
+  "cityLabel": "เมือง",
+  "countryLabel": "ประเทศ"
 }

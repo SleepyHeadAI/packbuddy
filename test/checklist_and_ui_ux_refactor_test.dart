@@ -345,7 +345,7 @@ void main() {
       await tester.pump();
 
       // Verify aligned top bar elements
-      expect(find.byIcon(Icons.person_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
       expect(find.byIcon(Icons.notifications_none_rounded), findsOneWidget);
 
       // Verify luggage bento card renders

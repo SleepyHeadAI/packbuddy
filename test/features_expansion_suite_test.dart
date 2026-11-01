@@ -8,7 +8,6 @@ import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/services/share_service.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/features/auth/auth_screen.dart';
-import 'package:packbuddy/features/auth/auth_service.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/domain/trip_waypoint.dart';
@@ -16,14 +15,11 @@ import 'package:packbuddy/features/budget/presentation/controllers/trip_controll
 import 'package:packbuddy/features/budget/presentation/screens/widgets/budget_analytics_card.dart';
 import 'package:packbuddy/features/budget/presentation/screens/trip_comparison_screen.dart';
 import 'package:packbuddy/features/budget/presentation/widgets/currency_converter_card.dart';
-import 'package:packbuddy/features/budget/presentation/widgets/trip_map_preview.dart';
 import 'package:packbuddy/features/checklist/domain/packing_item.dart';
 import 'package:packbuddy/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:packbuddy/features/settings/presentation/screens/widgets/home_widget_preview_card.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'package:firebase_auth/firebase_auth.dart';
 
 class MockTripNotifier extends StateNotifier<TripState> implements TripController {
   MockTripNotifier(List<Trip> trips) : super(TripState(trips: trips));
@@ -64,16 +60,6 @@ class MockTripNotifier extends StateNotifier<TripState> implements TripControlle
 
   @override
   Future<bool> removeCollaborator(String tripId, String collaboratorEmail) async => true;
-}
-
-class MockAuthServiceWithApple extends Fake implements AuthService {
-  bool appleSignInCalled = false;
-
-  @override
-  Future<UserCredential?> signInWithApple() async {
-    appleSignInCalled = true;
-    return null;
-  }
 }
 
 void main() {
@@ -382,16 +368,6 @@ void main() {
       expect(decoded.length, 2);
       expect(decoded[0].name, 'Shinjuku');
       expect(decoded[1].name, 'Shibuya');
-    });
-
-    test('RouteMapPainter paints pins and dashed routes without throws', () {
-      final painter = RouteMapPainter(
-        waypointCount: 3,
-        primaryColor: Colors.teal,
-        secondaryColor: Colors.orange,
-        isDark: false,
-      );
-      expect(painter.shouldRepaint(painter), isFalse);
     });
   });
 

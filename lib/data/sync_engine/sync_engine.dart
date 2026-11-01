@@ -230,7 +230,15 @@ class SyncEngine extends StateNotifier<SyncState> {
       if (!snap.exists || snap.data() == null) return;
       try {
         final updatedTrip = Trip.fromJson(snap.data()!);
-        await _dbHelper.insertTrip(updatedTrip);
+        if (updatedTrip.isDeleted) {
+          await _dbHelper.hardDeleteTrip(tripId);
+        } else {
+          final localDeleted = await _dbHelper.getDeletedTrips();
+          final isLocallyDeleted = localDeleted.any((d) => d.id == updatedTrip.id && !updatedTrip.updatedAt.isAfter(d.updatedAt));
+          if (!isLocallyDeleted) {
+            await _dbHelper.insertTrip(updatedTrip);
+          }
+        }
         final currentUid = _authInstance?.currentUser?.uid ?? FirebaseAuth.instance.currentUser?.uid;
         if (currentUid != null) {
           ref?.read(tripControllerProvider.notifier).loadTrips(userId: currentUid);
@@ -253,11 +261,19 @@ class SyncEngine extends StateNotifier<SyncState> {
           final data = docChange.doc.data();
           if (data == null) continue;
           if (docChange.type == DocumentChangeType.removed) {
-            await _dbHelper.deleteChecklistItem(docChange.doc.id);
+            await _dbHelper.hardDeleteChecklistItem(docChange.doc.id);
             changed = true;
           } else {
             final item = PackingItem.fromJson(data);
-            await _dbHelper.insertChecklistItem(item);
+            if (item.isDeleted) {
+              await _dbHelper.hardDeleteChecklistItem(docChange.doc.id);
+            } else {
+              final localDeleted = await _dbHelper.getDeletedChecklistItems();
+              final isLocallyDeleted = localDeleted.any((d) => d.id == item.id && !item.updatedAt.isAfter(d.updatedAt));
+              if (!isLocallyDeleted) {
+                await _dbHelper.insertChecklistItem(item);
+              }
+            }
             changed = true;
           }
         } catch (e) {
@@ -285,11 +301,19 @@ class SyncEngine extends StateNotifier<SyncState> {
           final data = docChange.doc.data();
           if (data == null) continue;
           if (docChange.type == DocumentChangeType.removed) {
-            await _dbHelper.deleteExpense(docChange.doc.id);
+            await _dbHelper.hardDeleteExpense(docChange.doc.id);
             changed = true;
           } else {
             final exp = Expense.fromJson(data);
-            await _dbHelper.insertExpense(exp);
+            if (exp.isDeleted) {
+              await _dbHelper.hardDeleteExpense(docChange.doc.id);
+            } else {
+              final localDeleted = await _dbHelper.getDeletedExpenses();
+              final isLocallyDeleted = localDeleted.any((d) => d.id == exp.id && !exp.updatedAt.isAfter(d.updatedAt));
+              if (!isLocallyDeleted) {
+                await _dbHelper.insertExpense(exp);
+              }
+            }
             changed = true;
           }
         } catch (e) {
@@ -637,6 +661,12 @@ class SyncEngine extends StateNotifier<SyncState> {
 
       // 1.4 Soft-deleted Checklist Items strictly filtered by user_id
       final deletedItems = await _dbHelper.getDeletedChecklistItems(userId: uid);
+      final deletedCanonicalMap = <String, PackingItem>{};
+      for (final di in deletedItems) {
+        final dKey = CanonicalPackingCatalog.resolveCanonicalKey(di.name) ?? CanonicalPackingCatalog.normalize(di.name);
+        deletedCanonicalMap['${di.tripId ?? ""}:::$dKey'] = di;
+      }
+
       if (deletedItems.isNotEmpty) {
         final itemDocs = await Future.wait(
           deletedItems.map((item) async {
@@ -668,6 +698,13 @@ class SyncEngine extends StateNotifier<SyncState> {
           itemIdsToHardDelete.add(item.id);
           processedItems++;
         }
+      }
+
+      // Commit pending deletions immediately to Firestore before Step 2 reconciliation
+      if (batchOpCount > 0) {
+        await batch.commit();
+        batch = firestore.batch();
+        batchOpCount = 0;
       }
 
       // ===================================================================
@@ -725,7 +762,11 @@ class SyncEngine extends StateNotifier<SyncState> {
           data['id'] = (data['id'] != null && data['id'].toString().isNotEmpty) ? data['id'] : doc.id;
           data['user_id'] = data['user_id'] ?? data['userId'] ?? uid;
           data['userId'] = data['userId'] ?? data['user_id'] ?? uid;
-          remoteTripsMap[doc.id] = Trip.fromJson(data);
+          final trip = Trip.fromJson(data);
+          if (trip.isDeleted || tripIdsToHardDelete.contains(trip.id)) {
+            continue;
+          }
+          remoteTripsMap[doc.id] = trip;
         } catch (e) {
           debugPrint('[SyncEngine] Trip parsing notice: $e');
         }
@@ -743,7 +784,11 @@ class SyncEngine extends StateNotifier<SyncState> {
             data['id'] = (data['id'] != null && data['id'].toString().isNotEmpty) ? data['id'] : doc.id;
             data['user_id'] = data['user_id'] ?? data['userId'] ?? uid;
             data['userId'] = data['userId'] ?? data['user_id'] ?? uid;
-            remoteTripsMap[doc.id] = Trip.fromJson(data);
+            final trip = Trip.fromJson(data);
+            if (trip.isDeleted || tripIdsToHardDelete.contains(trip.id)) {
+              continue;
+            }
+            remoteTripsMap[doc.id] = trip;
           } catch (_) {}
         }
       } catch (_) {}
@@ -781,6 +826,7 @@ class SyncEngine extends StateNotifier<SyncState> {
       }
 
       for (final entry in remoteTripsMap.entries) {
+        if (tripIdsToHardDelete.contains(entry.key)) continue;
         if (!localTripsMap.containsKey(entry.key)) {
           tripsToUpsertLocal.add(entry.value);
           processedItems++;
@@ -796,7 +842,11 @@ class SyncEngine extends StateNotifier<SyncState> {
           data['id'] = (data['id'] != null && data['id'].toString().isNotEmpty) ? data['id'] : doc.id;
           data['user_id'] = data['user_id'] ?? data['userId'] ?? uid;
           data['userId'] = data['userId'] ?? data['user_id'] ?? uid;
-          remoteExpensesMap[doc.id] = Expense.fromJson(data);
+          final exp = Expense.fromJson(data);
+          if (exp.isDeleted || expenseIdsToHardDelete.contains(exp.id)) {
+            continue;
+          }
+          remoteExpensesMap[doc.id] = exp;
         } catch (e) {
           debugPrint('[SyncEngine] Expense parsing notice: $e');
         }
@@ -834,6 +884,7 @@ class SyncEngine extends StateNotifier<SyncState> {
       }
 
       for (final entry in remoteExpensesMap.entries) {
+        if (expenseIdsToHardDelete.contains(entry.key)) continue;
         if (!localExpensesMap.containsKey(entry.key)) {
           expensesToUpsertLocal.add(entry.value);
           processedItems++;
@@ -849,7 +900,11 @@ class SyncEngine extends StateNotifier<SyncState> {
           data['id'] = (data['id'] != null && data['id'].toString().isNotEmpty) ? data['id'] : doc.id;
           data['user_id'] = data['user_id'] ?? data['userId'] ?? uid;
           data['userId'] = data['userId'] ?? data['user_id'] ?? uid;
-          remoteDocsMap[doc.id] = Document.fromJson(data);
+          final d = Document.fromJson(data);
+          if (d.isDeleted || docIdsToHardDelete.contains(d.id)) {
+            continue;
+          }
+          remoteDocsMap[doc.id] = d;
         } catch (e) {
           debugPrint('[SyncEngine] Document parsing notice: $e');
         }
@@ -938,6 +993,7 @@ class SyncEngine extends StateNotifier<SyncState> {
       }
 
       for (final entry in remoteDocsMap.entries) {
+        if (docIdsToHardDelete.contains(entry.key)) continue;
         if (!localDocsMap.containsKey(entry.key)) {
           docsToUpsertLocal.add(entry.value);
           processedItems++;
@@ -954,7 +1010,11 @@ class SyncEngine extends StateNotifier<SyncState> {
           data['id'] = (data['id'] != null && data['id'].toString().isNotEmpty) ? data['id'] : doc.id;
           data['user_id'] = data['user_id'] ?? data['userId'] ?? uid;
           data['userId'] = data['userId'] ?? data['user_id'] ?? uid;
-          remoteItemsMap[doc.id] = PackingItem.fromJson(data);
+          final item = PackingItem.fromJson(data);
+          if (item.isDeleted || itemIdsToHardDelete.contains(item.id)) {
+            continue;
+          }
+          remoteItemsMap[doc.id] = item;
         } catch (e) {
           debugPrint('[SyncEngine] PackingItem parsing notice: $e');
         }
@@ -975,6 +1035,17 @@ class SyncEngine extends StateNotifier<SyncState> {
       for (final rItem in remoteItemsMap.values) {
         final rKey = CanonicalPackingCatalog.resolveCanonicalKey(rItem.name) ?? CanonicalPackingCatalog.normalize(rItem.name);
         final groupKey = '${rItem.tripId ?? ""}:::$rKey';
+
+        // Check if this item was deleted locally
+        final deletedMatch = deletedCanonicalMap[groupKey];
+        if (deletedMatch != null && !rItem.updatedAt.isAfter(deletedMatch.updatedAt)) {
+          // User deleted this canonical item locally and remote is not newer!
+          // Purge duplicate remote doc from Firestore and skip upsert
+          batch.delete(firestore.collection('checklist_items').doc(rItem.id));
+          await queueBatchOp();
+          continue;
+        }
+
         remoteGroups.putIfAbsent(groupKey, () => []).add(rItem);
       }
 
@@ -1027,10 +1098,19 @@ class SyncEngine extends StateNotifier<SyncState> {
       }
 
       for (final entry in sanitizedRemoteMap.entries) {
+        if (itemIdsToHardDelete.contains(entry.key)) continue;
         if (!localItemsMap.containsKey(entry.key)) {
           final rItem = entry.value;
           final rKey = CanonicalPackingCatalog.resolveCanonicalKey(rItem.name) ?? CanonicalPackingCatalog.normalize(rItem.name);
           final groupKey = '${rItem.tripId ?? ""}:::$rKey';
+
+          final deletedMatch = deletedCanonicalMap[groupKey];
+          if (deletedMatch != null && !rItem.updatedAt.isAfter(deletedMatch.updatedAt)) {
+            batch.delete(firestore.collection('checklist_items').doc(rItem.id));
+            await queueBatchOp();
+            continue;
+          }
+
           if (localCanonicalMap.containsKey(groupKey)) {
             // Duplicate item with different ID between remote and local!
             // Prefer packed state and delete legacy remote doc from Firestore
@@ -1121,6 +1201,12 @@ class SyncEngine extends StateNotifier<SyncState> {
         resolvedDocsToUpsert.addAll(docsToUpsertLocal);
       }
 
+      // Final sanity filtering: ensure no queued deleted IDs are in upsert lists!
+      tripsToUpsertLocal.removeWhere((t) => tripIdsToHardDelete.contains(t.id));
+      expensesToUpsertLocal.removeWhere((e) => expenseIdsToHardDelete.contains(e.id));
+      resolvedDocsToUpsert.removeWhere((d) => docIdsToHardDelete.contains(d.id));
+      itemsToUpsertLocal.removeWhere((i) => itemIdsToHardDelete.contains(i.id));
+
       // SQLite Transactions: Atomic update on local SQLite to avoid UI freezing
       final db = await _dbHelper.database;
       await db.transaction((txn) async {
@@ -1128,29 +1214,29 @@ class SyncEngine extends StateNotifier<SyncState> {
         for (final id in tripIdsToHardDelete) {
           await txn.delete(
             AppConstants.tableTrips,
-            where: 'id = ? AND user_id = ?',
-            whereArgs: [id, uid],
+            where: 'id = ?',
+            whereArgs: [id],
           );
         }
         for (final id in expenseIdsToHardDelete) {
           await txn.delete(
             AppConstants.tableExpenses,
-            where: 'id = ? AND user_id = ?',
-            whereArgs: [id, uid],
+            where: 'id = ?',
+            whereArgs: [id],
           );
         }
         for (final id in docIdsToHardDelete) {
           await txn.delete(
             AppConstants.tableDocuments,
-            where: 'id = ? AND user_id = ?',
-            whereArgs: [id, uid],
+            where: 'id = ?',
+            whereArgs: [id],
           );
         }
         for (final id in itemIdsToHardDelete) {
           await txn.delete(
             AppConstants.tableChecklistItems,
-            where: 'id = ? AND user_id = ?',
-            whereArgs: [id, uid],
+            where: 'id = ?',
+            whereArgs: [id],
           );
         }
 

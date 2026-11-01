@@ -1,4 +1,5 @@
 import '../../core/services/telemetry_service.dart';
+import '../../core/services/preferences_service.dart';
 import '../vault/domain/document.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -151,7 +152,9 @@ class AdminUserModel {
       createdAt: parseDate(data['createdAt']),
       lastLoginAt: parseDate(data['lastLoginAt']),
       lastActiveAt: parseDate(data['lastActiveAt']),
-      isPremium: data['isPremium'] as bool? ?? false,
+      isPremium: (data['isPremium'] == true) ||
+          (data['is_premium'] == true) ||
+          PreferencesService.instance.isProUser(uid: id),
       totalVaultStorageBytes: (data['totalVaultStorageBytes'] as num?)?.toInt() ?? 0,
       banStatus: data['banStatus'] as String? ?? 'none',
       banExpiresAt: data['banExpiresAt'] as String?,
@@ -328,7 +331,10 @@ class FirebaseAdminService implements AdminService {
         if (data['emailVerified'] == true) {
           verifiedUsers++;
         }
-        if (data['isPremium'] == true) {
+        final isPro = (data['isPremium'] == true) ||
+            (data['is_premium'] == true) ||
+            PreferencesService.instance.isProUser(uid: doc.id);
+        if (isPro) {
           proUsers++;
         }
         final storage = (data['totalVaultStorageBytes'] as num?)?.toInt() ?? 0;
@@ -399,8 +405,10 @@ class FirebaseAdminService implements AdminService {
     try {
       await firestore.collection('users').doc(uid).set({
         'isPremium': isPremium,
+        'is_premium': isPremium,
         'updatedAt': DateTime.now().toIso8601String(),
       }, SetOptions(merge: true));
+      await PreferencesService.instance.setProUser(isPremium, uid: uid);
     } catch (e) {
       debugPrint('[AdminService] toggleUserProStatus error: $e');
       rethrow;
@@ -422,6 +430,7 @@ class FirebaseAdminService implements AdminService {
     try {
       final updates = <String, dynamic>{
         'isPremium': isPremium,
+        'is_premium': isPremium,
         'banStatus': banStatus,
         'banExpiresAt': banExpiresAt,
         'banReason': banReason,
@@ -432,6 +441,7 @@ class FirebaseAdminService implements AdminService {
           .collection('users')
           .doc(uid)
           .set(updates, SetOptions(merge: true));
+      await PreferencesService.instance.setProUser(isPremium, uid: uid);
     } catch (e) {
       debugPrint('[AdminService] updateUserModeration error: $e');
       rethrow;

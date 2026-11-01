@@ -4,12 +4,27 @@ import 'package:packbuddy/features/budget/domain/country.dart';
 import 'package:packbuddy/features/travel_map/presentation/widgets/country_flag.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
+/// Result representing user selection from CountryPickerSheet (country or city)
+class CountryPickerResult {
+  final Country country;
+  final String? selectedCity;
+
+  const CountryPickerResult({required this.country, this.selectedCity});
+
+  String getLocalizedLabel(String locale) {
+    if (selectedCity != null && selectedCity!.isNotEmpty) {
+      return '${country.flag} $selectedCity, ${country.getLocalizedName(locale)}';
+    }
+    return '${country.flag} ${country.getLocalizedName(locale)}';
+  }
+}
+
 /// Searchable modal bottom sheet to select travel destinations & countries
 class CountryPickerSheet extends StatefulWidget {
   const CountryPickerSheet({super.key});
 
-  static Future<Country?> show(BuildContext context) {
-    return showModalBottomSheet<Country>(
+  static Future<CountryPickerResult?> show(BuildContext context) {
+    return showModalBottomSheet<CountryPickerResult>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -167,7 +182,7 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
                       backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                       side: BorderSide(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4)),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                      onPressed: () => Navigator.of(context).pop(country),
+                      onPressed: () => Navigator.of(context).pop(CountryPickerResult(country: country)),
                     ),
                   );
                 }).toList(),
@@ -246,12 +261,37 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         subtitle: country.popularDestinations.isNotEmpty
-                            ? Text(
-                                country.popularDestinations.take(3).join(', '),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 4),
+                                child: Wrap(
+                                  spacing: 6,
+                                  runSpacing: 4,
+                                  children: country.popularDestinations.take(4).map((city) {
+                                    return InkWell(
+                                      onTap: () => Navigator.of(context).pop(
+                                        CountryPickerResult(country: country, selectedCity: city),
+                                      ),
+                                      borderRadius: BorderRadius.circular(6),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            const Icon(Icons.location_city_rounded, size: 10),
+                                            const SizedBox(width: 3),
+                                            Text(
+                                              city,
+                                              style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
                                 ),
                               )
                             : null,
@@ -270,7 +310,7 @@ class _CountryPickerSheetState extends State<CountryPickerSheet> {
                             ),
                           ),
                         ),
-                        onTap: () => Navigator.of(context).pop(country),
+                        onTap: () => Navigator.of(context).pop(CountryPickerResult(country: country)),
                       );
                     },
                   ),

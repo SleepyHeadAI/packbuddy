@@ -2045,6 +2045,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get storyLayoutClassic => 'Классика';
 
   @override
+  String get storyLayoutJourney => 'Путешествие';
+
+  @override
+  String get storyLayoutPolaroid => 'Открытка';
+
+  @override
+  String get storyLayoutInfographic => 'Инфографика';
+
+  @override
   String get storeUnavailableMessage =>
       'Подключение к магазину временно недоступно. Пожалуйста, повторите попытку позже.';
 
@@ -2098,4 +2107,35 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get budgetAlert100 => 'Лимит бюджета превышен!';
+
+  @override
+  String get addCustomLocation => 'Добавить свое место';
+
+  @override
+  String get customLocation => 'Свое место';
+
+  @override
+  String get customLocationHint => 'напр.: Родная деревня, дача, кемпинг...';
+
+  @override
+  String get customLocationDescription =>
+      'Добавьте деревню, дачу, кемпинг или особое место вне карты.';
+
+  @override
+  String get addAsCustomLocation => 'Добавить как особое место';
+
+  @override
+  String get customLocationTooltip =>
+      'Добавить свое место (напр.: Родная деревня)';
+
+  @override
+  String notACountryOrCityPrompt(Object query) {
+    return 'Место «$query» не найдено в списке стран и городов. Добавить его как особое место?';
+  }
+
+  @override
+  String get cityLabel => 'Город';
+
+  @override
+  String get countryLabel => 'Страна';
 }

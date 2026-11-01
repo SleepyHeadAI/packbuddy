@@ -132,19 +132,6 @@ class MockAuthService implements AuthService {
   }
 
   @override
-  Future<UserCredential?> signInWithApple() async {
-    final user = FakeUser(
-      uid: 'uid-apple-789',
-      email: 'traveler@privaterelay.appleid.com',
-      displayName: 'Apple Traveler',
-      emailVerified: true,
-      providerData: [FakeUserInfo(providerId: 'apple.com')],
-    );
-    emitUser(user);
-    return FakeUserCredential(user: user);
-  }
-
-  @override
   Future<void> signOut() async {
     emitUser(null);
   }

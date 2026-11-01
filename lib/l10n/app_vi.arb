@@ -655,5 +655,17 @@
   "phraseHospital": "Bệnh viện ở đâu?",
   "phraseEnglish": "Bạn có nói tiếng Anh không?",
   "budgetAlert85": "Gần đạt hạn mức (85%)",
-  "budgetAlert100": "Vượt quá ngân sách!"
+  "budgetAlert100": "Vượt quá ngân sách!",
+  "storyLayoutJourney": "Hành trình",
+  "storyLayoutPolaroid": "Bưu thiếp",
+  "storyLayoutInfographic": "Đồ họa thông tin",
+  "addCustomLocation": "Thêm địa điểm tùy chỉnh",
+  "customLocation": "Địa điểm tùy chỉnh",
+  "customLocationHint": "vd: Làng quê, nhà vườn, điểm cắm trại...",
+  "customLocationDescription": "Thêm làng quê, vùng nông thôn, điểm cắm trại hoặc nơi ngoài bản đồ.",
+  "addAsCustomLocation": "Thêm dưới dạng địa điểm tùy chỉnh",
+  "customLocationTooltip": "Thêm địa điểm tùy chỉnh (vd: Làng quê)",
+  "notACountryOrCityPrompt": "Không tìm thấy \"{query}\" trong danh mục quốc gia hoặc thành phố. Bạn có muốn thêm dưới dạng địa điểm tùy chỉnh?",
+  "cityLabel": "Thành phố",
+  "countryLabel": "Quốc gia"
 }

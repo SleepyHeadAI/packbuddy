@@ -13,7 +13,6 @@ import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/domain/trip_waypoint.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
-import 'package:packbuddy/features/budget/presentation/widgets/trip_map_preview.dart';
 import 'package:packbuddy/features/budget/presentation/screens/trip_detail_screen.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/expense_controller.dart';
@@ -114,6 +113,15 @@ void main() {
         expect(l10n.waypoints, isNotEmpty);
         expect(l10n.addWaypoint, isNotEmpty);
         expect(l10n.noWaypoints, isNotEmpty);
+        expect(l10n.customLocationHint, isNotEmpty);
+        expect(l10n.addCustomLocation, isNotEmpty);
+        expect(l10n.customLocationDescription, isNotEmpty);
+        expect(l10n.addAsCustomLocation, isNotEmpty);
+        expect(l10n.storyLayoutJourney, isNotEmpty);
+        expect(l10n.storyLayoutPolaroid, isNotEmpty);
+        expect(l10n.storyLayoutInfographic, isNotEmpty);
+        expect(l10n.cityLabel, isNotEmpty);
+        expect(l10n.countryLabel, isNotEmpty);
       }
     });
 
@@ -278,52 +286,6 @@ void main() {
   });
 
   group('4. UI Overflow Stress Tests on Compact Screen (320px width)', () {
-    testWidgets('TripMapPreviewCard renders zero overflow with long destination in all 20 locales', (tester) async {
-      tester.view.physicalSize = const Size(320, 568);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(() => tester.view.resetPhysicalSize());
-
-      final now = DateTime.now();
-      final longDestinationTrip = Trip(
-        id: 'trip_long_dest',
-        title: 'Romantic Road Tour',
-        destination: 'Rothenburg ob der Tauber, Baden-Württemberg, Germany',
-        startDate: now,
-        endDate: now.add(const Duration(days: 7)),
-        createdAt: now,
-        updatedAt: now,
-        waypoints: const [
-          TripWaypoint(id: 'wp1', tripId: 'trip_long_dest', name: 'Plönlein Square', latitude: 49.3745, longitude: 10.1788),
-          TripWaypoint(id: 'wp2', tripId: 'trip_long_dest', name: 'St. Jakob Church', latitude: 49.3770, longitude: 10.1780),
-        ],
-      );
-
-      for (final loc in supportedLocales) {
-        await tester.pumpWidget(
-          MaterialApp(
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            locale: loc,
-            home: Scaffold(
-              body: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: TripMapPreviewCard(
-                    trip: longDestinationTrip,
-                    waypoints: longDestinationTrip.waypoints,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-        await tester.pumpAndSettle();
-
-        // Must have zero Flutter errors and zero RenderFlex overflows
-        expect(tester.takeException(), isNull, reason: 'Overflow in TripMapPreviewCard with locale: ${loc.languageCode}');
-      }
-    });
-
     testWidgets('AuthScreen password rules row renders zero overflow on 320px width', (tester) async {
       tester.view.physicalSize = const Size(320, 568);
       tester.view.devicePixelRatio = 1.0;

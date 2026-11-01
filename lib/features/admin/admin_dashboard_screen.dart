@@ -1210,6 +1210,7 @@ class _UserModerationBottomSheetState
                               onPressed: () async {
                                 await ref.read(adminServiceProvider).cancelAccountDeletionAsAdmin(widget.user.uid);
                                 if (context.mounted) {
+                                  ScaffoldMessenger.of(context).clearSnackBars();
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(l10n.adminDeletionCancelled),
@@ -1794,6 +1795,7 @@ class _UserModerationBottomSheetState
               );
               _reloadDocuments();
               if (mounted) {
+                messenger.clearSnackBars();
                 messenger.showSnackBar(
                   SnackBar(
                     content: Text(l10n.adminDocumentDeleted),
@@ -1832,6 +1834,7 @@ class _UserModerationBottomSheetState
               Navigator.of(ctx).pop();
               await ref.read(adminServiceProvider).purgeUserDataAsAdmin(widget.user.uid);
               if (mounted) {
+                messenger.clearSnackBars();
                 messenger.showSnackBar(
                   SnackBar(
                     content: Text(l10n.adminDataPurged),

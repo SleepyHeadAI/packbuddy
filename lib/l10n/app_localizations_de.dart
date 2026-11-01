@@ -2051,6 +2051,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get storyLayoutClassic => 'Klassisch';
 
   @override
+  String get storyLayoutJourney => 'Reise';
+
+  @override
+  String get storyLayoutPolaroid => 'Postkarte';
+
+  @override
+  String get storyLayoutInfographic => 'Infografik';
+
+  @override
   String get storeUnavailableMessage =>
       'Store-Verbindung ist derzeit nicht verfügbar. Bitte versuchen Sie es später erneut.';
 
@@ -2104,4 +2113,36 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get budgetAlert100 => 'Budgetlimit überschritten!';
+
+  @override
+  String get addCustomLocation => 'Benutzerdefinierten Ort hinzufügen';
+
+  @override
+  String get customLocation => 'Benutzerdefinierter Ort';
+
+  @override
+  String get customLocationHint =>
+      'z.B. Unser Dorf, Opas Bauernhof, Campingplatz...';
+
+  @override
+  String get customLocationDescription =>
+      'Fügen Sie ein Dorf, einen Bauernhof, einen Campingplatz oder einen individuellen Ort hinzu.';
+
+  @override
+  String get addAsCustomLocation => 'Als benutzerdefinierten Ort hinzufügen';
+
+  @override
+  String get customLocationTooltip =>
+      'Benutzerdefinierten Ort hinzufügen (z.B. Unser Dorf)';
+
+  @override
+  String notACountryOrCityPrompt(Object query) {
+    return '\"$query\" wurde nicht im Länder- oder Städtekatalog gefunden. Als benutzerdefinierten Ort hinzufügen?';
+  }
+
+  @override
+  String get cityLabel => 'Stadt';
+
+  @override
+  String get countryLabel => 'Land';
 }

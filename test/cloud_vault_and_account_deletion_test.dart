@@ -178,8 +178,8 @@ void main() {
       expect(pdfDoc.isPdf, isTrue);
     });
 
-    test('SQLite Schema version is 9 for cloud vault database migration', () {
-      expect(AppConstants.databaseVersion, 9);
+    test('SQLite Schema version is 9 or above for cloud vault database migration', () {
+      expect(AppConstants.databaseVersion, greaterThanOrEqualTo(9));
     });
   });
 

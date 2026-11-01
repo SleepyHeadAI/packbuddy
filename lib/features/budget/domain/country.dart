@@ -1602,4 +1602,150 @@ class Country {
       return null;
     }
   }
+
+  /// Searches for real countries and cities matching the query with prefix-first priority.
+  static List<LocationSearchResult> searchLocations(
+    String query, {
+    String languageCode = 'en',
+    int limit = 8,
+  }) {
+    final q = query.trim().toLowerCase();
+    if (q.length < 2) return const [];
+
+    final prefixCountries = <LocationSearchResult>[];
+    final containsCountries = <LocationSearchResult>[];
+    final prefixCities = <LocationSearchResult>[];
+    final containsCities = <LocationSearchResult>[];
+
+    for (final c in allCountries) {
+      final locName = c.getLocalizedName(languageCode);
+      final locLower = locName.toLowerCase();
+      final engLower = c.name.toLowerCase();
+      final trLower = c.localName.toLowerCase();
+      final codeLower = c.code.toLowerCase();
+
+      final isCountryPrefix = locLower.startsWith(q) ||
+          engLower.startsWith(q) ||
+          trLower.startsWith(q) ||
+          codeLower == q;
+      final isCountryContains = !isCountryPrefix &&
+          (locLower.contains(q) || engLower.contains(q) || trLower.contains(q));
+
+      if (isCountryPrefix) {
+        prefixCountries.add(LocationSearchResult(
+          title: locName,
+          subtitle: '${c.code} • ${c.defaultCurrency}',
+          formattedStop: '${c.flag} $locName',
+          country: c,
+          isCity: false,
+        ));
+      } else if (isCountryContains) {
+        containsCountries.add(LocationSearchResult(
+          title: locName,
+          subtitle: '${c.code} • ${c.defaultCurrency}',
+          formattedStop: '${c.flag} $locName',
+          country: c,
+          isCity: false,
+        ));
+      }
+
+      for (final city in c.popularDestinations) {
+        final cityLower = city.toLowerCase();
+        final isCityPrefix = cityLower.startsWith(q);
+        final isCityContains = !isCityPrefix && cityLower.contains(q);
+
+        if (isCityPrefix) {
+          prefixCities.add(LocationSearchResult(
+            title: city,
+            subtitle: '$locName (${c.code})',
+            formattedStop: '${c.flag} $city, $locName',
+            country: c,
+            isCity: true,
+            cityName: city,
+          ));
+        } else if (isCityContains) {
+          containsCities.add(LocationSearchResult(
+            title: city,
+            subtitle: '$locName (${c.code})',
+            formattedStop: '${c.flag} $city, $locName',
+            country: c,
+            isCity: true,
+            cityName: city,
+          ));
+        }
+      }
+    }
+
+    // Prefix matches come first, followed by contains matches
+    return [
+      ...prefixCities,
+      ...prefixCountries,
+      ...containsCities,
+      ...containsCountries,
+    ].take(limit).toList();
+  }
+
+  /// Exact match lookup for a location string (returns formatted country or city if found)
+  static LocationSearchResult? findLocationExact(
+    String input, {
+    String languageCode = 'en',
+  }) {
+    final q = input.trim().toLowerCase();
+    if (q.isEmpty) return null;
+
+    // 1. Exact match on country name, localName, or code
+    for (final c in allCountries) {
+      final locName = c.getLocalizedName(languageCode);
+      if (locName.toLowerCase() == q ||
+          c.name.toLowerCase() == q ||
+          c.localName.toLowerCase() == q ||
+          c.code.toLowerCase() == q) {
+        return LocationSearchResult(
+          title: locName,
+          subtitle: '${c.code} • ${c.defaultCurrency}',
+          formattedStop: '${c.flag} $locName',
+          country: c,
+          isCity: false,
+        );
+      }
+    }
+
+    // 2. Exact match on popular city
+    for (final c in allCountries) {
+      final locName = c.getLocalizedName(languageCode);
+      for (final city in c.popularDestinations) {
+        if (city.toLowerCase() == q) {
+          return LocationSearchResult(
+            title: city,
+            subtitle: '$locName (${c.code})',
+            formattedStop: '${c.flag} $city, $locName',
+            country: c,
+            isCity: true,
+            cityName: city,
+          );
+        }
+      }
+    }
+
+    return null;
+  }
+}
+
+/// Search result representing either a real Country or a City within a Country
+class LocationSearchResult {
+  final String title;
+  final String subtitle;
+  final String formattedStop;
+  final Country country;
+  final bool isCity;
+  final String? cityName;
+
+  const LocationSearchResult({
+    required this.title,
+    required this.subtitle,
+    required this.formattedStop,
+    required this.country,
+    required this.isCity,
+    this.cityName,
+  });
 }

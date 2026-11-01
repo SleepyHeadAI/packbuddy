@@ -655,5 +655,17 @@
   "phraseHospital": "病院はどこですか？",
   "phraseEnglish": "英語を話せますか？",
   "budgetAlert85": "予算上限に接近中 (85%)",
-  "budgetAlert100": "予算上限を超過しました！"
+  "budgetAlert100": "予算上限を超過しました！",
+  "storyLayoutJourney": "旅路",
+  "storyLayoutPolaroid": "ポストカード",
+  "storyLayoutInfographic": "インフォグラフィック",
+  "addCustomLocation": "カスタム場所を追加",
+  "customLocation": "カスタム場所",
+  "customLocationHint": "例: 私の故郷、田舎の家、キャンプ場...",
+  "customLocationDescription": "村や田舎、キャンプ場など地図にないスポットを追加。",
+  "addAsCustomLocation": "カスタム場所として追加",
+  "customLocationTooltip": "カスタム場所を追加（例: 私の故郷）",
+  "notACountryOrCityPrompt": "「{query}」は国や都市のカタログに見つかりませんでした。カスタム場所として追加しますか？",
+  "cityLabel": "都市",
+  "countryLabel": "国"
 }

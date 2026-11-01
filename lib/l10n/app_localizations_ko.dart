@@ -1966,6 +1966,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get storyLayoutClassic => '클래식';
 
   @override
+  String get storyLayoutJourney => '여정';
+
+  @override
+  String get storyLayoutPolaroid => '엽서';
+
+  @override
+  String get storyLayoutInfographic => '인포그래픽';
+
+  @override
   String get storeUnavailableMessage =>
       '현재 스토어에 연결할 수 없습니다. 네트워크 확인 후 다시 시도해 주세요.';
 
@@ -2019,4 +2028,33 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get budgetAlert100 => '예산 한도를 초과했습니다!';
+
+  @override
+  String get addCustomLocation => '맞춤 위치 추가';
+
+  @override
+  String get customLocation => '맞춤 위치';
+
+  @override
+  String get customLocationHint => '예: 우리 마을, 시골집, 캠핑장...';
+
+  @override
+  String get customLocationDescription => '마을, 시골, 캠핑장 등 지도에 없는 장소를 추가하세요.';
+
+  @override
+  String get addAsCustomLocation => '맞춤 위치로 추가';
+
+  @override
+  String get customLocationTooltip => '맞춤 위치 추가 (예: 우리 마을)';
+
+  @override
+  String notACountryOrCityPrompt(Object query) {
+    return '\"$query\"이(가) 등록된 국가 또는 도시 목록에 없습니다. 맞춤 위치로 추가하시겠습니까?';
+  }
+
+  @override
+  String get cityLabel => '도시';
+
+  @override
+  String get countryLabel => '국가';
 }

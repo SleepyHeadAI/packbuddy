@@ -3962,6 +3962,24 @@ abstract class AppLocalizations {
   /// **'Classic'**
   String get storyLayoutClassic;
 
+  /// storyLayoutJourney label
+  ///
+  /// In en, this message translates to:
+  /// **'Journey'**
+  String get storyLayoutJourney;
+
+  /// storyLayoutPolaroid label
+  ///
+  /// In en, this message translates to:
+  /// **'Postcard'**
+  String get storyLayoutPolaroid;
+
+  /// storyLayoutInfographic label
+  ///
+  /// In en, this message translates to:
+  /// **'Infographic'**
+  String get storyLayoutInfographic;
+
   /// No description provided for @storeUnavailableMessage.
   ///
   /// In en, this message translates to:
@@ -4069,6 +4087,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Budget limit exceeded!'**
   String get budgetAlert100;
+
+  /// No description provided for @addCustomLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Custom Location'**
+  String get addCustomLocation;
+
+  /// No description provided for @customLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Location'**
+  String get customLocation;
+
+  /// No description provided for @customLocationHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. My Village, Country House, Camp Site...'**
+  String get customLocationHint;
+
+  /// No description provided for @customLocationDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a village, countryside, camp site, or off-map spot.'**
+  String get customLocationDescription;
+
+  /// No description provided for @addAsCustomLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Add as custom location'**
+  String get addAsCustomLocation;
+
+  /// No description provided for @customLocationTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Add custom location (e.g. My Village)'**
+  String get customLocationTooltip;
+
+  /// No description provided for @notACountryOrCityPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{query}\" was not found in the verified country or city catalog. Would you like to add it as a custom location?'**
+  String notACountryOrCityPrompt(Object query);
+
+  /// No description provided for @cityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get cityLabel;
+
+  /// No description provided for @countryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get countryLabel;
 }
 
 class _AppLocalizationsDelegate

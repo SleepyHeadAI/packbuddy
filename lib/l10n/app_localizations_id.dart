@@ -2044,6 +2044,15 @@ class AppLocalizationsId extends AppLocalizations {
   String get storyLayoutClassic => 'Klasik';
 
   @override
+  String get storyLayoutJourney => 'Perjalanan';
+
+  @override
+  String get storyLayoutPolaroid => 'Kartu Pos';
+
+  @override
+  String get storyLayoutInfographic => 'Infografis';
+
+  @override
   String get storeUnavailableMessage =>
       'Koneksi ke toko sedang tidak tersedia. Silakan periksa jaringan dan coba lagi.';
 
@@ -2097,4 +2106,34 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get budgetAlert100 => 'Batas anggaran terlampaui!';
+
+  @override
+  String get addCustomLocation => 'Tambah Lokasi Kustom';
+
+  @override
+  String get customLocation => 'Lokasi Kustom';
+
+  @override
+  String get customLocationHint => 'mis. Desaku, Rumah Kebun, Tempat Kemah...';
+
+  @override
+  String get customLocationDescription =>
+      'Tambahkan desa, pedesaan, perkemahan, atau titik di luar peta.';
+
+  @override
+  String get addAsCustomLocation => 'Tambah sebagai lokasi kustom';
+
+  @override
+  String get customLocationTooltip => 'Tambah lokasi kustom (mis. Desaku)';
+
+  @override
+  String notACountryOrCityPrompt(Object query) {
+    return '\"$query\" tidak ditemukan dalam daftar negara atau kota terverifikasi. Ingin menambahkannya sebagai lokasi kustom?';
+  }
+
+  @override
+  String get cityLabel => 'Kota';
+
+  @override
+  String get countryLabel => 'Negara';
 }

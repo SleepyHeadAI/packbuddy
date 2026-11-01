@@ -655,5 +655,17 @@
   "phraseHospital": "Di mana rumah sakit?",
   "phraseEnglish": "Bisa bicara bahasa Inggris?",
   "budgetAlert85": "Mendekati batas (85%)",
-  "budgetAlert100": "Batas anggaran terlampaui!"
+  "budgetAlert100": "Batas anggaran terlampaui!",
+  "storyLayoutJourney": "Perjalanan",
+  "storyLayoutPolaroid": "Kartu Pos",
+  "storyLayoutInfographic": "Infografis",
+  "addCustomLocation": "Tambah Lokasi Kustom",
+  "customLocation": "Lokasi Kustom",
+  "customLocationHint": "mis. Desaku, Rumah Kebun, Tempat Kemah...",
+  "customLocationDescription": "Tambahkan desa, pedesaan, perkemahan, atau titik di luar peta.",
+  "addAsCustomLocation": "Tambah sebagai lokasi kustom",
+  "customLocationTooltip": "Tambah lokasi kustom (mis. Desaku)",
+  "notACountryOrCityPrompt": "\"{query}\" tidak ditemukan dalam daftar negara atau kota terverifikasi. Ingin menambahkannya sebagai lokasi kustom?",
+  "cityLabel": "Kota",
+  "countryLabel": "Negara"
 }

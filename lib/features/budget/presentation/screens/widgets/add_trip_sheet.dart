@@ -11,6 +11,8 @@ import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
 import 'country_picker_sheet.dart';
 
+const _customPinColor = Color(0xFFE05A47);
+
 /// Modal bottom sheet to create or edit a trip with country picker, multi-stop itinerary, transport modes, and notes
 class AddTripSheet extends ConsumerStatefulWidget {
   final Trip? tripToEdit;
@@ -65,7 +67,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
 
   // Multi-destination list of stops / cities / countries
   final List<String> _itineraryStops = [];
-  List<Country> _countrySuggestions = [];
+  List<LocationSearchResult> _locationSuggestions = [];
 
   @override
   void initState() {
@@ -112,50 +114,198 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
   }
 
   void _onStopInputChanged() {
-    final query = _stopInputController.text.trim().toLowerCase();
+    final query = _stopInputController.text.trim();
     if (query.length < 2) {
-      if (_countrySuggestions.isNotEmpty) {
-        setState(() => _countrySuggestions = []);
+      if (_locationSuggestions.isNotEmpty) {
+        setState(() => _locationSuggestions = []);
       }
       return;
     }
 
     final langCode = Localizations.localeOf(context).languageCode;
-    final prefixMatches = <Country>[];
-    final containsMatches = <Country>[];
-
-    for (final c in Country.allCountries) {
-      final locName = c.getLocalizedName(langCode).toLowerCase();
-      final engName = c.name.toLowerCase();
-      final localName = c.localName.toLowerCase();
-
-      if (locName.startsWith(query) || engName.startsWith(query) || localName.startsWith(query)) {
-        prefixMatches.add(c);
-      } else if (locName.contains(query) || engName.contains(query) || localName.contains(query)) {
-        containsMatches.add(c);
-      }
-    }
-
-    final combined = [...prefixMatches, ...containsMatches].take(5).toList();
+    final results = Country.searchLocations(query, languageCode: langCode, limit: 6);
     setState(() {
-      _countrySuggestions = combined;
+      _locationSuggestions = results;
     });
   }
 
-  void _selectCountrySuggestion(Country country) {
-    final langCode = Localizations.localeOf(context).languageCode;
-    final label = '${country.flag} ${country.getLocalizedName(langCode)}';
+  void _selectLocationSuggestion(LocationSearchResult suggestion) {
     setState(() {
-      if (!_itineraryStops.contains(label)) {
-        _itineraryStops.add(label);
+      if (!_itineraryStops.contains(suggestion.formattedStop)) {
+        _itineraryStops.add(suggestion.formattedStop);
       }
-      _selectedCountry = country;
-      if (CurrencyFormatter.supportedCurrencies.contains(country.defaultCurrency)) {
-        _selectedCurrency = country.defaultCurrency;
+      _selectedCountry = suggestion.country;
+      if (CurrencyFormatter.supportedCurrencies.contains(suggestion.country.defaultCurrency)) {
+        _selectedCurrency = suggestion.country.defaultCurrency;
       }
       _stopInputController.clear();
-      _countrySuggestions = [];
+      _locationSuggestions = [];
     });
+  }
+
+  void _addCustomLocation(String customName) {
+    final clean = customName.trim();
+    if (clean.isEmpty) return;
+    final formatted = clean.startsWith('📍') ? clean : '📍 $clean';
+    setState(() {
+      if (!_itineraryStops.contains(formatted)) {
+        _itineraryStops.add(formatted);
+      }
+      _stopInputController.clear();
+      _locationSuggestions = [];
+    });
+  }
+
+  Future<void> _showCustomLocationDialog({String prefill = ''}) async {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final customController = TextEditingController(text: prefill);
+    final formKey = GlobalKey<FormState>();
+
+    final customPlace = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: _customPinColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.pin_drop_rounded, color: _customPinColor, size: 22),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                l10n.addCustomLocation,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        content: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.customLocationDescription,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 14),
+              TextFormField(
+                controller: customController,
+                autofocus: true,
+                textCapitalization: TextCapitalization.words,
+                decoration: InputDecoration(
+                  labelText: l10n.customLocation,
+                  hintText: l10n.customLocationHint,
+                  prefixIcon: const Icon(Icons.edit_location_alt_outlined, size: 20),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                  isDense: true,
+                ),
+                validator: (val) {
+                  if (val == null || val.trim().isEmpty) {
+                    return l10n.customLocation;
+                  }
+                  return null;
+                },
+                onFieldSubmitted: (val) {
+                  if (formKey.currentState?.validate() ?? false) {
+                    Navigator.of(ctx).pop(val.trim());
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: _customPinColor,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            onPressed: () {
+              if (formKey.currentState?.validate() ?? false) {
+                Navigator.of(ctx).pop(customController.text.trim());
+              }
+            },
+            child: Text(l10n.add),
+          ),
+        ],
+      ),
+    );
+
+    if (customPlace != null && customPlace.isNotEmpty) {
+      _addCustomLocation(customPlace);
+    }
+  }
+
+  Future<void> _showUnrecognizedLocationDialog(String text) async {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    final shouldAddAsCustom = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: _customPinColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.help_outline_rounded, color: _customPinColor, size: 22),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                l10n.addCustomLocation,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          l10n.notACountryOrCityPrompt(text),
+          style: theme.textTheme.bodyMedium,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton.icon(
+            style: FilledButton.styleFrom(
+              backgroundColor: _customPinColor,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            icon: const Icon(Icons.pin_drop_rounded, size: 16),
+            label: Text(l10n.addAsCustomLocation),
+            onPressed: () => Navigator.of(ctx).pop(true),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldAddAsCustom == true) {
+      _addCustomLocation(text);
+    }
   }
 
   Future<void> _pickDateRange() async {
@@ -184,17 +334,17 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
   }
 
   Future<void> _openCountryPicker() async {
-    final country = await CountryPickerSheet.show(context);
-    if (country != null) {
+    final result = await CountryPickerSheet.show(context);
+    if (result != null) {
       setState(() {
-        _selectedCountry = country;
+        _selectedCountry = result.country;
         final langCode = Localizations.localeOf(context).languageCode;
-        final countryLabel = '${country.flag} ${country.getLocalizedName(langCode)}';
-        if (!_itineraryStops.contains(countryLabel)) {
-          _itineraryStops.add(countryLabel);
+        final label = result.getLocalizedLabel(langCode);
+        if (!_itineraryStops.contains(label)) {
+          _itineraryStops.add(label);
         }
-        if (CurrencyFormatter.supportedCurrencies.contains(country.defaultCurrency)) {
-          _selectedCurrency = country.defaultCurrency;
+        if (CurrencyFormatter.supportedCurrencies.contains(result.country.defaultCurrency)) {
+          _selectedCurrency = result.country.defaultCurrency;
         }
       });
     }
@@ -202,14 +352,26 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
 
   void _addStopFromInput() {
     final text = _stopInputController.text.trim();
-    if (text.isNotEmpty) {
-      setState(() {
-        if (!_itineraryStops.contains(text)) {
-          _itineraryStops.add(text);
-        }
-        _stopInputController.clear();
-      });
+    if (text.isEmpty) return;
+
+    final langCode = Localizations.localeOf(context).languageCode;
+    // 1. Check if user typed an exact real country or city
+    final exact = Country.findLocationExact(text, languageCode: langCode);
+    if (exact != null) {
+      _selectLocationSuggestion(exact);
+      return;
     }
+
+    // 2. If suggestions are open and first item is a matching city or country
+    if (_locationSuggestions.isNotEmpty &&
+        _locationSuggestions.first.title.toLowerCase() == text.toLowerCase()) {
+      _selectLocationSuggestion(_locationSuggestions.first);
+      return;
+    }
+
+    // 3. User entered an unrecognized location (e.g. "Bizim Köy", "Dedemin Evi")
+    // Prompt whether to add as custom location
+    _showUnrecognizedLocationDialog(text);
   }
 
   void _removeStop(int index) {
@@ -221,10 +383,15 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
   void _submit() {
     final l10n = AppLocalizations.of(context)!;
     final textStop = _stopInputController.text.trim();
-    if (textStop.isNotEmpty && !_itineraryStops.contains(textStop)) {
-      _itineraryStops.add(textStop);
+    if (textStop.isNotEmpty) {
+      final langCode = Localizations.localeOf(context).languageCode;
+      final exact = Country.findLocationExact(textStop, languageCode: langCode);
+      if (exact != null && !_itineraryStops.contains(exact.formattedStop)) {
+        _itineraryStops.add(exact.formattedStop);
+        _selectedCountry = exact.country;
+      }
       _stopInputController.clear();
-      _countrySuggestions = [];
+      _locationSuggestions = [];
     }
 
     if (_itineraryStops.isEmpty) {
@@ -375,20 +542,39 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  TextButton.icon(
-                    onPressed: _openCountryPicker,
-                    icon: const Icon(Icons.travel_explore_rounded, size: 16),
-                    label: Text(l10n.addCountry, style: const TextStyle(fontSize: 12)),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  // Optional Custom Location Quick Button
+                  IconButton(
+                    icon: const Icon(Icons.pin_drop_outlined, size: 18),
+                    tooltip: l10n.customLocationTooltip,
+                    style: IconButton.styleFrom(
+                      padding: const EdgeInsets.all(6),
                       visualDensity: VisualDensity.compact,
+                      backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                    ),
+                    onPressed: () => _showCustomLocationDialog(prefill: _stopInputController.text.trim()),
+                  ),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: TextButton.icon(
+                      onPressed: _openCountryPicker,
+                      icon: const Icon(Icons.travel_explore_rounded, size: 16),
+                      label: Text(
+                        l10n.addCountry,
+                        style: const TextStyle(fontSize: 12),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                        visualDensity: VisualDensity.compact,
+                      ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
 
-              // Destination Quick Stop Input Field
+              // Destination Quick Stop Input Field (with Optional Custom Pin Action)
               Row(
                 children: [
                   Expanded(
@@ -397,7 +583,26 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                       textCapitalization: TextCapitalization.words,
                       decoration: InputDecoration(
                         hintText: l10n.cityOrStopHint,
-                        prefixIcon: const Icon(Icons.add_location_alt_outlined, size: 20),
+                        prefixIcon: const Icon(Icons.travel_explore_rounded, size: 20),
+                        suffixIcon: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (_stopInputController.text.isNotEmpty)
+                              IconButton(
+                                icon: const Icon(Icons.clear_rounded, size: 18),
+                                onPressed: () {
+                                  _stopInputController.clear();
+                                  setState(() => _locationSuggestions = []);
+                                },
+                              ),
+                            IconButton(
+                              icon: const Icon(Icons.pin_drop_rounded, size: 20),
+                              tooltip: l10n.customLocationTooltip,
+                              color: _customPinColor,
+                              onPressed: () => _showCustomLocationDialog(prefill: _stopInputController.text.trim()),
+                            ),
+                          ],
+                        ),
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                       ),
@@ -422,8 +627,8 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                 ],
               ),
 
-              // Dynamic Country Autocomplete Suggestions
-              if (_countrySuggestions.isNotEmpty) ...[
+              // Dynamic Real Country & City Suggestions (Plus Custom Location Pin Action)
+              if (_stopInputController.text.trim().length >= 2) ...[
                 const SizedBox(height: 6),
                 Container(
                   decoration: BoxDecoration(
@@ -442,36 +647,117 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                     borderRadius: BorderRadius.circular(14),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
-                      children: _countrySuggestions.map((c) {
-                        final langCode = Localizations.localeOf(context).languageCode;
-                        final cName = c.getLocalizedName(langCode);
-                        return InkWell(
-                          onTap: () => _selectCountrySuggestion(c),
-                          child: Padding(
+                      children: [
+                        ..._locationSuggestions.map((item) {
+                          return InkWell(
+                            onTap: () => _selectLocationSuggestion(item),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                              child: Row(
+                                children: [
+                                  Text(item.country.flag, style: const TextStyle(fontSize: 20)),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item.title,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 13.5,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          item.subtitle,
+                                          style: theme.textTheme.bodySmall?.copyWith(
+                                            color: theme.colorScheme.onSurfaceVariant,
+                                            fontSize: 11,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: (item.isCity ? theme.colorScheme.tertiaryContainer : theme.colorScheme.primaryContainer)
+                                          .withValues(alpha: 0.6),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
+                                      item.isCity ? l10n.cityLabel : l10n.countryLabel,
+                                      style: TextStyle(
+                                        fontSize: 9.5,
+                                        fontWeight: FontWeight.bold,
+                                        color: item.isCity ? theme.colorScheme.onTertiaryContainer : theme.colorScheme.onPrimaryContainer,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Icon(
+                                    Icons.north_west_rounded,
+                                    size: 16,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }),
+                        // Option to add the entered text as a custom location directly
+                        InkWell(
+                          onTap: () => _addCustomLocation(_stopInputController.text.trim()),
+                          child: Container(
+                            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                             child: Row(
                               children: [
-                                Text(c.flag, style: const TextStyle(fontSize: 20)),
+                                Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: _customPinColor.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Icon(Icons.pin_drop_rounded, size: 16, color: _customPinColor),
+                                ),
                                 const SizedBox(width: 10),
                                 Expanded(
-                                  child: Text(
-                                    '$cName (${c.code})',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 13.5,
-                                    ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${l10n.addAsCustomLocation}: "${_stopInputController.text.trim()}"',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12.5,
+                                          color: _customPinColor,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        l10n.customLocationDescription,
+                                        style: theme.textTheme.bodySmall?.copyWith(
+                                          color: theme.colorScheme.onSurfaceVariant,
+                                          fontSize: 10.5,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                Icon(
-                                  Icons.north_west_rounded,
-                                  size: 16,
-                                  color: theme.colorScheme.primary,
-                                ),
+                                const Icon(Icons.add_rounded, size: 18, color: _customPinColor),
                               ],
                             ),
                           ),
-                        );
-                      }).toList(),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -510,18 +796,21 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                         children: _itineraryStops.asMap().entries.map((entry) {
                           final idx = entry.key;
                           final stop = entry.value;
+                          final isCustom = stop.startsWith('📍');
                           return Chip(
                             avatar: CircleAvatar(
                               radius: 10,
-                              backgroundColor: theme.colorScheme.primary,
-                              child: Text(
-                                '${idx + 1}',
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
+                              backgroundColor: isCustom ? _customPinColor : theme.colorScheme.primary,
+                              child: isCustom
+                                  ? const Icon(Icons.pin_drop_rounded, size: 10, color: Colors.white)
+                                  : Text(
+                                      '${idx + 1}',
+                                      style: const TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                             ),
                             label: Text(
                               stop,

@@ -1960,6 +1960,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get storyLayoutClassic => '经典';
 
   @override
+  String get storyLayoutJourney => '旅程';
+
+  @override
+  String get storyLayoutPolaroid => '明信片';
+
+  @override
+  String get storyLayoutInfographic => '信息图表';
+
+  @override
   String get storeUnavailableMessage => '目前无法连接到应用商店。请检查网络连接后重试。';
 
   @override
@@ -2012,4 +2021,33 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get budgetAlert100 => '预算已超支！';
+
+  @override
+  String get addCustomLocation => '添加自定义地点';
+
+  @override
+  String get customLocation => '自定义地点';
+
+  @override
+  String get customLocationHint => '例如：我们的乡村、老家农庄、露营地...';
+
+  @override
+  String get customLocationDescription => '添加乡村、农庄、露营地或地图之外的特殊地点。';
+
+  @override
+  String get addAsCustomLocation => '作为自定义地点添加';
+
+  @override
+  String get customLocationTooltip => '添加自定义地点（例如：老家村庄）';
+
+  @override
+  String notACountryOrCityPrompt(Object query) {
+    return '在国家和城市列表中未找到“$query”。是否要将其添加为自定义地点？';
+  }
+
+  @override
+  String get cityLabel => '城市';
+
+  @override
+  String get countryLabel => '国家';
 }

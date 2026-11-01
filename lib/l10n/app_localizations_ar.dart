@@ -2023,6 +2023,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get storyLayoutClassic => 'كلاسيكي';
 
   @override
+  String get storyLayoutJourney => 'رحلة';
+
+  @override
+  String get storyLayoutPolaroid => 'بطاقة بريدية';
+
+  @override
+  String get storyLayoutInfographic => 'إنفوجرافيك';
+
+  @override
   String get storeUnavailableMessage =>
       'الاتصال بالمتجر غير متاح حالياً. يرجى التحقق من اتصالك والمحاولة لاحقاً.';
 
@@ -2076,4 +2085,34 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get budgetAlert100 => 'تم تجاوز ميزانية الرحلة!';
+
+  @override
+  String get addCustomLocation => 'إضافة موقع مخصص';
+
+  @override
+  String get customLocation => 'موقع مخصص';
+
+  @override
+  String get customLocationHint => 'مثال: قريتي، كوخ ريفي، موقع تخييم...';
+
+  @override
+  String get customLocationDescription =>
+      'أضف قرية، ريفاً، موقع تخييم أو مكاناً خارج الخريطة.';
+
+  @override
+  String get addAsCustomLocation => 'إضافة كموقع مخصص';
+
+  @override
+  String get customLocationTooltip => 'إضافة موقع مخصص (مثال: قريتي)';
+
+  @override
+  String notACountryOrCityPrompt(Object query) {
+    return 'لم يتم العثور على \"$query\" في دليل البلدان أو المدن. هل ترغب في إضافته كموقع مخصص؟';
+  }
+
+  @override
+  String get cityLabel => 'مدينة';
+
+  @override
+  String get countryLabel => 'بلد';
 }

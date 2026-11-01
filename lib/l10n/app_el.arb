@@ -655,5 +655,17 @@
   "phraseHospital": "Πού είναι το νοσοκομείο;",
   "phraseEnglish": "Μιλάτε αγγλικά;",
   "budgetAlert85": "Προσέγγιση ορίου (85%)",
-  "budgetAlert100": "Υπέρβαση προϋπολογισμού!"
+  "budgetAlert100": "Υπέρβαση προϋπολογισμού!",
+  "storyLayoutJourney": "Ταξίδι",
+  "storyLayoutPolaroid": "Καρτ ποστάλ",
+  "storyLayoutInfographic": "Infographic",
+  "addCustomLocation": "Προσθήκη προσαρμοσμένης τοποθεσίας",
+  "customLocation": "Προσαρμοσμένη τοποθεσία",
+  "customLocationHint": "π.χ. Το χωριό μου, εξοχικό, χώρος κατασκήνωσης...",
+  "customLocationDescription": "Προσθέστε χωριό, εξοχή, κάμπινγκ ή άλλο σημείο εκτός χάρτη.",
+  "addAsCustomLocation": "Προσθήκη ως προσαρμοσμένη τοποθεσία",
+  "customLocationTooltip": "Προσθήκη προσαρμοσμένης τοποθεσίας (π.χ. Το χωριό μου)",
+  "notACountryOrCityPrompt": "Το \"{query}\" δεν βρέθηκε στον κατάλογο χωρών ή πόλεων. Θέλετε να το προσθέσετε ως προσαρμοσμένη τοποθεσία;",
+  "cityLabel": "Πόλη",
+  "countryLabel": "Χώρα"
 }

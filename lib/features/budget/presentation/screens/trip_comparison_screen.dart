@@ -68,11 +68,43 @@ class _TripComparisonScreenState extends ConsumerState<TripComparisonScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          l10n?.compareTrips ?? 'Compare Trips',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.2,
+        titleSpacing: 8,
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Hero(
+                tag: 'compare-trips-hero-badge',
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  margin: const EdgeInsets.only(right: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6366F1).withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.compare_arrows_rounded,
+                    color: Color(0xFF6366F1),
+                    size: 18,
+                  ),
+                ),
+              ),
+              Hero(
+                tag: 'compare-trips-hero-title',
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: Text(
+                    l10n?.compareTrips ?? 'Compare Trips',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         centerTitle: false,

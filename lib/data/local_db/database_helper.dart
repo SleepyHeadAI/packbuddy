@@ -454,6 +454,11 @@ class DatabaseHelper {
     final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
     final now = DateTime.now().millisecondsSinceEpoch;
 
+    final condition = effectiveUserId.isNotEmpty
+        ? 'trip_id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL) AND is_deleted = 0'
+        : 'trip_id = ? AND is_deleted = 0';
+    final args = effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id];
+
     // 1. Soft-delete associated expenses
     await db.update(
       AppConstants.tableExpenses,
@@ -461,8 +466,8 @@ class DatabaseHelper {
         'is_deleted': 1,
         'updated_at': now,
       },
-      where: 'trip_id = ? AND user_id = ? AND is_deleted = 0',
-      whereArgs: [id, effectiveUserId],
+      where: condition,
+      whereArgs: args,
     );
 
     // 2. Soft-delete associated checklist items
@@ -472,8 +477,8 @@ class DatabaseHelper {
         'is_deleted': 1,
         'updated_at': now,
       },
-      where: 'trip_id = ? AND user_id = ? AND is_deleted = 0',
-      whereArgs: [id, effectiveUserId],
+      where: condition,
+      whereArgs: args,
     );
 
     // 3. Soft-delete the trip itself
@@ -483,8 +488,10 @@ class DatabaseHelper {
         'is_deleted': 1,
         'updated_at': now,
       },
-      where: 'id = ? AND user_id = ?',
-      whereArgs: [id, effectiveUserId],
+      where: effectiveUserId.isNotEmpty
+          ? 'id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          : 'id = ?',
+      whereArgs: effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id],
     );
   }
 
@@ -494,14 +501,19 @@ class DatabaseHelper {
     final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
     final now = DateTime.now().millisecondsSinceEpoch;
 
+    final condition = effectiveUserId.isNotEmpty
+        ? 'trip_id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+        : 'trip_id = ?';
+    final args = effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id];
+
     await db.update(
       AppConstants.tableExpenses,
       {
         'is_deleted': 0,
         'updated_at': now,
       },
-      where: 'trip_id = ? AND user_id = ?',
-      whereArgs: [id, effectiveUserId],
+      where: condition,
+      whereArgs: args,
     );
 
     await db.update(
@@ -510,8 +522,8 @@ class DatabaseHelper {
         'is_deleted': 0,
         'updated_at': now,
       },
-      where: 'trip_id = ? AND user_id = ?',
-      whereArgs: [id, effectiveUserId],
+      where: condition,
+      whereArgs: args,
     );
 
     return await db.update(
@@ -520,19 +532,20 @@ class DatabaseHelper {
         'is_deleted': 0,
         'updated_at': now,
       },
-      where: 'id = ? AND user_id = ?',
-      whereArgs: [id, effectiveUserId],
+      where: effectiveUserId.isNotEmpty
+          ? 'id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          : 'id = ?',
+      whereArgs: effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id],
     );
   }
 
   /// Hard Delete: Permanently removes trip from SQLite (executed after cloud deletion)
   Future<int> hardDeleteTrip(String id, {String? userId}) async {
     final db = await database;
-    final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
     return await db.delete(
       AppConstants.tableTrips,
-      where: 'id = ? AND user_id = ?',
-      whereArgs: [id, effectiveUserId],
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
 
@@ -542,8 +555,10 @@ class DatabaseHelper {
     final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
     final result = await db.query(
       AppConstants.tableTrips,
-      where: 'is_deleted = 1 AND user_id = ?',
-      whereArgs: [effectiveUserId],
+      where: effectiveUserId.isNotEmpty
+          ? 'is_deleted = 1 AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          : 'is_deleted = 1',
+      whereArgs: effectiveUserId.isNotEmpty ? [effectiveUserId] : null,
     );
     return result.map((map) => Trip.fromMap(map)).toList();
   }
@@ -654,8 +669,10 @@ class DatabaseHelper {
         'is_deleted': 1,
         'updated_at': DateTime.now().millisecondsSinceEpoch,
       },
-      where: 'id = ? AND user_id = ?',
-      whereArgs: [id, effectiveUserId],
+      where: effectiveUserId.isNotEmpty
+          ? 'id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          : 'id = ?',
+      whereArgs: effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id],
     );
   }
 
@@ -669,19 +686,20 @@ class DatabaseHelper {
         'is_deleted': 0,
         'updated_at': DateTime.now().millisecondsSinceEpoch,
       },
-      where: 'id = ? AND user_id = ?',
-      whereArgs: [id, effectiveUserId],
+      where: effectiveUserId.isNotEmpty
+          ? 'id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          : 'id = ?',
+      whereArgs: effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id],
     );
   }
 
   /// Hard Delete: Permanently removes expense from SQLite (executed after cloud deletion)
   Future<int> hardDeleteExpense(String id, {String? userId}) async {
     final db = await database;
-    final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
     return await db.delete(
       AppConstants.tableExpenses,
-      where: 'id = ? AND user_id = ?',
-      whereArgs: [id, effectiveUserId],
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
 
@@ -691,8 +709,10 @@ class DatabaseHelper {
     final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
     final result = await db.query(
       AppConstants.tableExpenses,
-      where: 'is_deleted = 1 AND user_id = ?',
-      whereArgs: [effectiveUserId],
+      where: effectiveUserId.isNotEmpty
+          ? 'is_deleted = 1 AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          : 'is_deleted = 1',
+      whereArgs: effectiveUserId.isNotEmpty ? [effectiveUserId] : null,
     );
     return result.map((map) => Expense.fromMap(map)).toList();
   }
@@ -813,19 +833,37 @@ class DatabaseHelper {
         'is_deleted': 1,
         'updated_at': DateTime.now().millisecondsSinceEpoch,
       },
-      where: 'id = ? AND user_id = ?',
-      whereArgs: [id, effectiveUserId],
+      where: effectiveUserId.isNotEmpty
+          ? 'id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          : 'id = ?',
+      whereArgs: effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id],
+    );
+  }
+
+  /// Restores a soft-deleted document
+  Future<int> restoreDocument(String id, {String? userId}) async {
+    final db = await database;
+    final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
+    return await db.update(
+      AppConstants.tableDocuments,
+      {
+        'is_deleted': 0,
+        'updated_at': DateTime.now().millisecondsSinceEpoch,
+      },
+      where: effectiveUserId.isNotEmpty
+          ? 'id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          : 'id = ?',
+      whereArgs: effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id],
     );
   }
 
   /// Hard Delete: Permanently removes document from SQLite (executed after cloud deletion)
   Future<int> hardDeleteDocument(String id, {String? userId}) async {
     final db = await database;
-    final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
     return await db.delete(
       AppConstants.tableDocuments,
-      where: 'id = ? AND user_id = ?',
-      whereArgs: [id, effectiveUserId],
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
 
@@ -835,8 +873,10 @@ class DatabaseHelper {
     final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
     final result = await db.query(
       AppConstants.tableDocuments,
-      where: 'is_deleted = 1 AND user_id = ?',
-      whereArgs: [effectiveUserId],
+      where: effectiveUserId.isNotEmpty
+          ? 'is_deleted = 1 AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          : 'is_deleted = 1',
+      whereArgs: effectiveUserId.isNotEmpty ? [effectiveUserId] : null,
     );
     return result.map((map) => Document.fromMap(map)).toList();
   }
@@ -919,8 +959,10 @@ class DatabaseHelper {
         'is_deleted': 1,
         'updated_at': DateTime.now().millisecondsSinceEpoch,
       },
-      where: 'id = ? AND user_id = ?',
-      whereArgs: [id, effectiveUserId],
+      where: effectiveUserId.isNotEmpty
+          ? 'id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          : 'id = ?',
+      whereArgs: effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id],
     );
   }
 
@@ -934,19 +976,20 @@ class DatabaseHelper {
         'is_deleted': 0,
         'updated_at': DateTime.now().millisecondsSinceEpoch,
       },
-      where: 'id = ? AND user_id = ?',
-      whereArgs: [id, effectiveUserId],
+      where: effectiveUserId.isNotEmpty
+          ? 'id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          : 'id = ?',
+      whereArgs: effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id],
     );
   }
 
   /// Hard deletes a checklist item strictly filtered by userId
   Future<int> hardDeleteChecklistItem(String id, {String? userId}) async {
     final db = await database;
-    final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
     return await db.delete(
       AppConstants.tableChecklistItems,
-      where: 'id = ? AND user_id = ?',
-      whereArgs: [id, effectiveUserId],
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
 
@@ -956,8 +999,10 @@ class DatabaseHelper {
     final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
     final maps = await db.query(
       AppConstants.tableChecklistItems,
-      where: 'id = ? AND user_id = ?',
-      whereArgs: [id, effectiveUserId],
+      where: effectiveUserId.isNotEmpty
+          ? 'id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          : 'id = ?',
+      whereArgs: effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id],
     );
     if (maps.isNotEmpty) {
       return PackingItem.fromMap(maps.first);
@@ -971,8 +1016,10 @@ class DatabaseHelper {
     final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
     final result = await db.query(
       AppConstants.tableChecklistItems,
-      where: 'is_deleted = 1 AND user_id = ?',
-      whereArgs: [effectiveUserId],
+      where: effectiveUserId.isNotEmpty
+          ? 'is_deleted = 1 AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          : 'is_deleted = 1',
+      whereArgs: effectiveUserId.isNotEmpty ? [effectiveUserId] : null,
     );
     return result.map((map) => PackingItem.fromMap(map)).toList();
   }

@@ -2065,6 +2065,15 @@ class AppLocalizationsEl extends AppLocalizations {
   String get storyLayoutClassic => 'Κλασικό';
 
   @override
+  String get storyLayoutJourney => 'Ταξίδι';
+
+  @override
+  String get storyLayoutPolaroid => 'Καρτ ποστάλ';
+
+  @override
+  String get storyLayoutInfographic => 'Infographic';
+
+  @override
   String get storeUnavailableMessage =>
       'Η σύνδεση με το κατάστημα δεν είναι διαθέσιμη. Παρακαλούμε δοκιμάστε αργότερα.';
 
@@ -2119,4 +2128,36 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get budgetAlert100 => 'Υπέρβαση προϋπολογισμού!';
+
+  @override
+  String get addCustomLocation => 'Προσθήκη προσαρμοσμένης τοποθεσίας';
+
+  @override
+  String get customLocation => 'Προσαρμοσμένη τοποθεσία';
+
+  @override
+  String get customLocationHint =>
+      'π.χ. Το χωριό μου, εξοχικό, χώρος κατασκήνωσης...';
+
+  @override
+  String get customLocationDescription =>
+      'Προσθέστε χωριό, εξοχή, κάμπινγκ ή άλλο σημείο εκτός χάρτη.';
+
+  @override
+  String get addAsCustomLocation => 'Προσθήκη ως προσαρμοσμένη τοποθεσία';
+
+  @override
+  String get customLocationTooltip =>
+      'Προσθήκη προσαρμοσμένης τοποθεσίας (π.χ. Το χωριό μου)';
+
+  @override
+  String notACountryOrCityPrompt(Object query) {
+    return 'Το \"$query\" δεν βρέθηκε στον κατάλογο χωρών ή πόλεων. Θέλετε να το προσθέσετε ως προσαρμοσμένη τοποθεσία;';
+  }
+
+  @override
+  String get cityLabel => 'Πόλη';
+
+  @override
+  String get countryLabel => 'Χώρα';
 }

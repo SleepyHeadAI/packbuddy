@@ -483,6 +483,7 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
                       padding: const EdgeInsets.only(right: 8),
                       child: FilterChip(
                         selected: isSelected,
+                        showCheckmark: false,
                         avatar: Icon(
                           cat['icon'] as IconData,
                           size: 16,
@@ -490,18 +491,19 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
                         ),
                         label: Text(cat['label'] as String),
                         selectedColor: color,
-                        checkmarkColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                         labelStyle: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
                           color: isSelected ? Colors.white : theme.colorScheme.onSurface,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                           side: BorderSide(
                             color: isSelected
-                                ? Colors.transparent
-                                : theme.colorScheme.outlineVariant,
+                                ? color
+                                : theme.colorScheme.outlineVariant.withValues(alpha: 0.6),
+                            width: isSelected ? 1.5 : 1.0,
                           ),
                         ),
                         onSelected: (selected) {
@@ -553,6 +555,7 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: ChoiceChip(
+                        showCheckmark: false,
                         avatar: Icon(
                           pm['icon'] as IconData,
                           size: 16,
@@ -561,10 +564,20 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
                         label: Text(_getPaymentLabel(pm['key'] as String, l10n)),
                         selected: isSelected,
                         selectedColor: theme.colorScheme.primary,
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          side: BorderSide(
+                            color: isSelected
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.outlineVariant.withValues(alpha: 0.6),
+                            width: isSelected ? 1.5 : 1.0,
+                          ),
+                        ),
                         labelStyle: TextStyle(
                           color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
                           fontWeight: FontWeight.w600,
-                          fontSize: 12,
+                          fontSize: 12.5,
                         ),
                         onSelected: (val) {
                           if (val) {

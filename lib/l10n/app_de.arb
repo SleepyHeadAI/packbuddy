@@ -638,6 +638,9 @@
   "passportWorldCitizen": "Weltbürger",
   "storyLayoutPassport": "Reisepass",
   "storyLayoutClassic": "Klassisch",
+  "storyLayoutJourney": "Reise",
+  "storyLayoutPolaroid": "Postkarte",
+  "storyLayoutInfographic": "Infografik",
   "storeUnavailableMessage": "Store-Verbindung ist derzeit nicht verfügbar. Bitte versuchen Sie es später erneut.",
   "emergencyGuideTitle": "Notfall & Lokaler Leitfaden (SOS)",
   "emergencyPolice": "Polizei",
@@ -655,5 +658,14 @@
   "phraseHospital": "Wo ist das Krankenhaus?",
   "phraseEnglish": "Sprechen Sie Englisch?",
   "budgetAlert85": "Limit fast erreicht (85%)",
-  "budgetAlert100": "Budgetlimit überschritten!"
+  "budgetAlert100": "Budgetlimit überschritten!",
+  "addCustomLocation": "Benutzerdefinierten Ort hinzufügen",
+  "customLocation": "Benutzerdefinierter Ort",
+  "customLocationHint": "z.B. Unser Dorf, Opas Bauernhof, Campingplatz...",
+  "customLocationDescription": "Fügen Sie ein Dorf, einen Bauernhof, einen Campingplatz oder einen individuellen Ort hinzu.",
+  "addAsCustomLocation": "Als benutzerdefinierten Ort hinzufügen",
+  "customLocationTooltip": "Benutzerdefinierten Ort hinzufügen (z.B. Unser Dorf)",
+  "notACountryOrCityPrompt": "\"{query}\" wurde nicht im Länder- oder Städtekatalog gefunden. Als benutzerdefinierten Ort hinzufügen?",
+  "cityLabel": "Stadt",
+  "countryLabel": "Land"
 }

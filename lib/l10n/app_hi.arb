@@ -655,5 +655,17 @@
   "phraseHospital": "अस्पताल कहाँ है?",
   "phraseEnglish": "क्या आप अंग्रेज़ी बोलते हैं?",
   "budgetAlert85": "बजट सीमा निकट (85%)",
-  "budgetAlert100": "बजट सीमा पार हो गई!"
+  "budgetAlert100": "बजट सीमा पार हो गई!",
+  "storyLayoutJourney": "यात्रा",
+  "storyLayoutPolaroid": "पोस्टकार्ड",
+  "storyLayoutInfographic": "इन्फोग्राफिक",
+  "addCustomLocation": "कस्टम स्थान जोड़ें",
+  "customLocation": "कस्टम स्थान",
+  "customLocationHint": "उदा. मेरा गाँव, फार्महाउस, कैंप साइट...",
+  "customLocationDescription": "गाँव, देहात, कैंप साइट या मानचित्र से बाहर का स्थान जोड़ें।",
+  "addAsCustomLocation": "कस्टम स्थान के रूप में जोड़ें",
+  "customLocationTooltip": "कस्टम स्थान जोड़ें (उदा. मेरा गाँव)",
+  "notACountryOrCityPrompt": "\"{query}\" सत्यापित देश या शहर सूची में नहीं मिला। क्या आप इसे कस्टम स्थान के रूप में जोड़ना चाहते हैं?",
+  "cityLabel": "शहर",
+  "countryLabel": "देश"
 }

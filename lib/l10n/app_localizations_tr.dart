@@ -2048,6 +2048,15 @@ class AppLocalizationsTr extends AppLocalizations {
   String get storyLayoutClassic => 'Klasik';
 
   @override
+  String get storyLayoutJourney => 'Yolculuk';
+
+  @override
+  String get storyLayoutPolaroid => 'Kartpostal';
+
+  @override
+  String get storyLayoutInfographic => 'İnfografik';
+
+  @override
   String get storeUnavailableMessage =>
       'Mağaza bağlantısı şu anda kurulamadı. Lütfen internet bağlantınızı kontrol edip tekrar deneyiniz.';
 
@@ -2101,4 +2110,35 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get budgetAlert100 => 'Bütçe limiti aşıldı!';
+
+  @override
+  String get addCustomLocation => 'Özel Konum Ekle';
+
+  @override
+  String get customLocation => 'Özel Konum';
+
+  @override
+  String get customLocationHint =>
+      'örn: Bizim Köy, Dedemin Çiftliği, Kamp Alanı...';
+
+  @override
+  String get customLocationDescription =>
+      'Köy, yayla, çiftlik, kamp alanı gibi haritada yer almayan özel bir yer ekleyin.';
+
+  @override
+  String get addAsCustomLocation => 'Özel konum olarak ekle';
+
+  @override
+  String get customLocationTooltip => 'Özel konum ekle (örn: Bizim Köy)';
+
+  @override
+  String notACountryOrCityPrompt(Object query) {
+    return '\"$query\" ülke veya şehir listesinde bulunamadı. Özel konum olarak eklemek ister misiniz?';
+  }
+
+  @override
+  String get cityLabel => 'Şehir';
+
+  @override
+  String get countryLabel => 'Ülke';
 }

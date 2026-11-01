@@ -655,5 +655,17 @@
   "phraseHospital": "¿Dónde está el hospital?",
   "phraseEnglish": "¿Habla inglés?",
   "budgetAlert85": "Límite cercano (85%)",
-  "budgetAlert100": "¡Límite de presupuesto superado!"
+  "budgetAlert100": "¡Límite de presupuesto superado!",
+  "storyLayoutJourney": "Viaje",
+  "storyLayoutPolaroid": "Postal",
+  "storyLayoutInfographic": "Infografía",
+  "addCustomLocation": "Añadir ubicación personalizada",
+  "customLocation": "Ubicación personalizada",
+  "customLocationHint": "ej. Mi pueblo, casa de campo, zona de acampada...",
+  "customLocationDescription": "Añade un pueblo, campo, camping o lugar fuera del mapa.",
+  "addAsCustomLocation": "Añadir como ubicación personalizada",
+  "customLocationTooltip": "Añadir ubicación personalizada (ej. Mi pueblo)",
+  "notACountryOrCityPrompt": "No se encontró \"{query}\" en el catálogo de países o ciudades. ¿Deseas añadirlo como ubicación personalizada?",
+  "cityLabel": "Ciudad",
+  "countryLabel": "País"
 }

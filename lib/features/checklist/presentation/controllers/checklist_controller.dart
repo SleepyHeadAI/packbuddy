@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../data/local_db/database_helper.dart';
 import '../../../../data/sync_engine/sync_engine.dart';
 import '../../../../core/services/telemetry_service.dart';
+import '../../../../core/services/preferences_service.dart';
 import '../../domain/packing_item.dart';
 import '../../domain/packing_templates.dart';
 import '../../domain/airline_baggage_guide.dart';
@@ -310,12 +311,17 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
       var items = await _db.getChecklistItems(tripId: tripId, userId: userId);
       if (!mounted) return;
       if (items.isEmpty && tripId == null) {
-        // Seed default items for a rich first-run experience with deterministic IDs
-        for (final item in _buildSeedItems(userId)) {
-          await _db.insertChecklistItem(item, userId: userId);
+        final alreadySeeded = PreferencesService.instance.hasSeededChecklist(uid: userId);
+        final deletedItems = await _db.getDeletedChecklistItems(userId: userId);
+        if (!alreadySeeded && deletedItems.isEmpty) {
+          // Seed default items for a rich first-run experience with deterministic IDs ONLY ONCE
+          for (final item in _buildSeedItems(userId)) {
+            await _db.insertChecklistItem(item, userId: userId);
+          }
+          await PreferencesService.instance.setSeededChecklist(true, uid: userId);
+          if (!mounted) return;
+          items = await _db.getChecklistItems(userId: userId);
         }
-        if (!mounted) return;
-        items = await _db.getChecklistItems(userId: userId);
       }
       if (!mounted) return;
       state = state.copyWith(items: items, isLoading: false);

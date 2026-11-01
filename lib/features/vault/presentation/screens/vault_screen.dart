@@ -317,7 +317,43 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(l10n.vault),
+          titleSpacing: 8,
+          title: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Hero(
+                  tag: 'vault-hero-badge',
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.tertiary.withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.shield_outlined,
+                      color: theme.colorScheme.tertiary,
+                      size: 18,
+                    ),
+                  ),
+                ),
+                Hero(
+                  tag: 'vault-hero-title',
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: Text(
+                      l10n.vault,
+                      style: theme.appBarTheme.titleTextStyle ??
+                          theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_rounded),
             tooltip: MaterialLocalizations.of(context).backButtonTooltip,
@@ -451,6 +487,8 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                       ),
                                       Text(
                                         l10n.savedDocument,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: theme.textTheme.bodySmall?.copyWith(
                                           color: theme.colorScheme.onSurfaceVariant,
                                           fontWeight: FontWeight.w600,
@@ -460,6 +498,8 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                   ),
                                   Text(
                                     l10n.offlineAndEncrypted,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: 10,
                                       color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
@@ -591,6 +631,8 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                         passportDoc != null
                                             ? dateFormat.format(passportDoc.createdAt)
                                             : l10n.saveYourPassport,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 11,
                                           color: passportDoc != null
@@ -958,47 +1000,44 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                 if (vaultState.documents.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(32),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.secondaryContainer.withValues(alpha: 0.5),
-                                shape: BoxShape.circle,
+                    child: SingleChildScrollView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(32),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(24),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.secondaryContainer.withValues(alpha: 0.5),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.shield_outlined,
+                                  size: 44,
+                                  color: theme.colorScheme.secondary,
+                                ),
                               ),
-                              child: Icon(
-                                Icons.shield_outlined,
-                                size: 44,
-                                color: theme.colorScheme.secondary,
+                              const SizedBox(height: 20),
+                              Text(
+                                l10n.noDocumentsYet,
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.4,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 20),
-                            Text(
-                              l10n.noDocumentsYet,
-                              style: theme.textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: -0.4,
+                              const SizedBox(height: 8),
+                              Text(
+                                l10n.noDocumentsSubtitle,
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              l10n.noDocumentsSubtitle,
-                              textAlign: TextAlign.center,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            FilledButton.icon(
-                              onPressed: () => AddDocumentSheet.show(context),
-                              icon: const Icon(Icons.add_rounded, size: 18),
-                              label: Text(l10n.addDocument),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -1006,23 +1045,26 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                 else if (filteredDocuments.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.filter_list_off_rounded,
-                            size: 40,
-                            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            l10n.noDocumentsForFilter,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
+                    child: SingleChildScrollView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.filter_list_off_rounded,
+                              size: 40,
+                              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 12),
+                            Text(
+                              l10n.noDocumentsForFilter,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   )

@@ -14,7 +14,7 @@ import 'package:packbuddy/features/travel_map/presentation/widgets/travel_map_st
 import 'package:packbuddy/features/travel_map/presentation/widgets/country_flag.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
-/// Full-screen Been & Skratch style interactive world travel map and country tracker
+/// Full-screen interactive world travel map and country tracker
 class TravelMapScreen extends ConsumerStatefulWidget {
   const TravelMapScreen({super.key});
 
@@ -864,12 +864,41 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        titleSpacing: 8,
         title: FittedBox(
           fit: BoxFit.scaleDown,
           alignment: Alignment.centerLeft,
-          child: Text(
-            l10n.worldTravelMapTitle,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Hero(
+                tag: 'travel-map-hero-badge',
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  margin: const EdgeInsets.only(right: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.public_rounded,
+                    color: Color(0xFF10B981),
+                    size: 18,
+                  ),
+                ),
+              ),
+              Hero(
+                tag: 'travel-map-hero-title',
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: Text(
+                    l10n.worldTravelMapTitle,
+                    style: theme.appBarTheme.titleTextStyle ??
+                        theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         actions: [

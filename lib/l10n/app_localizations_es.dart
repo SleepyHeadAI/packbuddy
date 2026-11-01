@@ -2059,6 +2059,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get storyLayoutClassic => 'Clásico';
 
   @override
+  String get storyLayoutJourney => 'Viaje';
+
+  @override
+  String get storyLayoutPolaroid => 'Postal';
+
+  @override
+  String get storyLayoutInfographic => 'Infografía';
+
+  @override
   String get storeUnavailableMessage =>
       'La conexión con la tienda no está disponible actualmente. Por favor, inténtelo de nuevo más tarde.';
 
@@ -2112,4 +2121,36 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get budgetAlert100 => '¡Límite de presupuesto superado!';
+
+  @override
+  String get addCustomLocation => 'Añadir ubicación personalizada';
+
+  @override
+  String get customLocation => 'Ubicación personalizada';
+
+  @override
+  String get customLocationHint =>
+      'ej. Mi pueblo, casa de campo, zona de acampada...';
+
+  @override
+  String get customLocationDescription =>
+      'Añade un pueblo, campo, camping o lugar fuera del mapa.';
+
+  @override
+  String get addAsCustomLocation => 'Añadir como ubicación personalizada';
+
+  @override
+  String get customLocationTooltip =>
+      'Añadir ubicación personalizada (ej. Mi pueblo)';
+
+  @override
+  String notACountryOrCityPrompt(Object query) {
+    return 'No se encontró \"$query\" en el catálogo de países o ciudades. ¿Deseas añadirlo como ubicación personalizada?';
+  }
+
+  @override
+  String get cityLabel => 'Ciudad';
+
+  @override
+  String get countryLabel => 'País';
 }

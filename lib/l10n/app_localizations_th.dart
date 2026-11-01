@@ -2030,6 +2030,15 @@ class AppLocalizationsTh extends AppLocalizations {
   String get storyLayoutClassic => 'คลาสสิก';
 
   @override
+  String get storyLayoutJourney => 'การเดินทาง';
+
+  @override
+  String get storyLayoutPolaroid => 'โปสการ์ด';
+
+  @override
+  String get storyLayoutInfographic => 'อินโฟกราฟิก';
+
+  @override
   String get storeUnavailableMessage =>
       'ไม่สามารถเชื่อมต่อร้านค้าได้ในขณะนี้ โปรดลองใหม่อีกครั้ง';
 
@@ -2083,4 +2092,36 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get budgetAlert100 => 'เกินงบประมาณที่ตั้งไว้!';
+
+  @override
+  String get addCustomLocation => 'เพิ่มสถานที่กำหนดเอง';
+
+  @override
+  String get customLocation => 'สถานที่กำหนดเอง';
+
+  @override
+  String get customLocationHint =>
+      'เช่น หมู่บ้านของเรา, บ้านพักตากอากาศ, จุดกางเต็นท์...';
+
+  @override
+  String get customLocationDescription =>
+      'เพิ่มหมู่บ้าน ชนบท จุดตั้งแคมป์ หรือสถานที่ที่ไม่อยู่ในแผนที่';
+
+  @override
+  String get addAsCustomLocation => 'เพิ่มเป็นสถานที่กำหนดเอง';
+
+  @override
+  String get customLocationTooltip =>
+      'เพิ่มสถานที่กำหนดเอง (เช่น หมู่บ้านของเรา)';
+
+  @override
+  String notACountryOrCityPrompt(Object query) {
+    return 'ไม่พบ \"$query\" ในรายชื่อประเทศหรือเมือง คุณต้องการเพิ่มเป็นสถานที่กำหนดเองหรือไม่?';
+  }
+
+  @override
+  String get cityLabel => 'เมือง';
+
+  @override
+  String get countryLabel => 'ประเทศ';
 }

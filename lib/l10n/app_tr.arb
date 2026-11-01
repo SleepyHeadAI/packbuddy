@@ -638,6 +638,9 @@
   "passportWorldCitizen": "Dünya Vatandaşı",
   "storyLayoutPassport": "Pasaport",
   "storyLayoutClassic": "Klasik",
+  "storyLayoutJourney": "Yolculuk",
+  "storyLayoutPolaroid": "Kartpostal",
+  "storyLayoutInfographic": "İnfografik",
   "storeUnavailableMessage": "Mağaza bağlantısı şu anda kurulamadı. Lütfen internet bağlantınızı kontrol edip tekrar deneyiniz.",
   "emergencyGuideTitle": "Acil Durum & Yerel Rehber (SOS)",
   "emergencyPolice": "Polis",
@@ -655,5 +658,14 @@
   "phraseHospital": "Hastane nerede?",
   "phraseEnglish": "İngilizce biliyor musunuz?",
   "budgetAlert85": "Bütçe sınırına yaklaşıldı (%85)",
-  "budgetAlert100": "Bütçe limiti aşıldı!"
+  "budgetAlert100": "Bütçe limiti aşıldı!",
+  "addCustomLocation": "Özel Konum Ekle",
+  "customLocation": "Özel Konum",
+  "customLocationHint": "örn: Bizim Köy, Dedemin Çiftliği, Kamp Alanı...",
+  "customLocationDescription": "Köy, yayla, çiftlik, kamp alanı gibi haritada yer almayan özel bir yer ekleyin.",
+  "addAsCustomLocation": "Özel konum olarak ekle",
+  "customLocationTooltip": "Özel konum ekle (örn: Bizim Köy)",
+  "notACountryOrCityPrompt": "\"{query}\" ülke veya şehir listesinde bulunamadı. Özel konum olarak eklemek ister misiniz?",
+  "cityLabel": "Şehir",
+  "countryLabel": "Ülke"
 }

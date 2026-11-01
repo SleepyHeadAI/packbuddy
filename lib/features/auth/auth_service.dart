@@ -5,7 +5,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../core/services/preferences_service.dart';
 import '../../core/services/currency_service.dart';
 import '../../data/local_db/database_helper.dart';
@@ -33,9 +32,6 @@ abstract class AuthService {
 
   /// Authenticate using Google OAuth
   Future<UserCredential?> signInWithGoogle();
-
-  /// Authenticate using Apple Sign-In (Feature F-15)
-  Future<UserCredential?> signInWithApple();
 
   /// Sign out current user from all providers
   Future<void> signOut();
@@ -213,48 +209,6 @@ class FirebaseAuthService implements AuthService {
       debugPrint('[FirebaseAuthService] Google Sign-In exception: $e\n$stackTrace');
       throw FirebaseAuthException(
         code: 'google-sign-in-failed',
-        message: e.toString(),
-      );
-    }
-  }
-
-  @override
-  Future<UserCredential?> signInWithApple() async {
-    if (!kIsWeb && defaultTargetPlatform != TargetPlatform.iOS && defaultTargetPlatform != TargetPlatform.macOS) {
-      throw FirebaseAuthException(
-        code: 'apple-sign-in-unsupported',
-        message: 'Sign in with Apple is only supported on iOS and macOS devices.',
-      );
-    }
-    try {
-      final appleCredential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-      );
-
-      final OAuthProvider oAuthProvider = OAuthProvider('apple.com');
-      final AuthCredential credential = oAuthProvider.credential(
-        idToken: appleCredential.identityToken,
-        accessToken: appleCredential.authorizationCode,
-      );
-
-      final userCredential = await _firebaseAuth.signInWithCredential(credential);
-      if (userCredential.user != null) {
-        unawaited(syncUserProfile(userCredential.user!));
-      }
-      return userCredential;
-    } on SignInWithAppleAuthorizationException catch (e) {
-      if (e.code == AuthorizationErrorCode.canceled) {
-        return null;
-      }
-      debugPrint('[FirebaseAuthService] Apple Sign-In authorization error: $e');
-      rethrow;
-    } catch (e, stackTrace) {
-      debugPrint('[FirebaseAuthService] Apple Sign-In exception: $e\n$stackTrace');
-      throw FirebaseAuthException(
-        code: 'apple-sign-in-failed',
         message: e.toString(),
       );
     }

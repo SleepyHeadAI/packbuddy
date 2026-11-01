@@ -655,5 +655,17 @@
   "phraseHospital": "병원이 어디에 있나요?",
   "phraseEnglish": "영어 하실 수 있나요?",
   "budgetAlert85": "예산 한도 접근 (85%)",
-  "budgetAlert100": "예산 한도를 초과했습니다!"
+  "budgetAlert100": "예산 한도를 초과했습니다!",
+  "storyLayoutJourney": "여정",
+  "storyLayoutPolaroid": "엽서",
+  "storyLayoutInfographic": "인포그래픽",
+  "addCustomLocation": "맞춤 위치 추가",
+  "customLocation": "맞춤 위치",
+  "customLocationHint": "예: 우리 마을, 시골집, 캠핑장...",
+  "customLocationDescription": "마을, 시골, 캠핑장 등 지도에 없는 장소를 추가하세요.",
+  "addAsCustomLocation": "맞춤 위치로 추가",
+  "customLocationTooltip": "맞춤 위치 추가 (예: 우리 마을)",
+  "notACountryOrCityPrompt": "\"{query}\"이(가) 등록된 국가 또는 도시 목록에 없습니다. 맞춤 위치로 추가하시겠습니까?",
+  "cityLabel": "도시",
+  "countryLabel": "국가"
 }

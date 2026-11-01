@@ -2037,6 +2037,15 @@ class AppLocalizationsSv extends AppLocalizations {
   String get storyLayoutClassic => 'Klassisk';
 
   @override
+  String get storyLayoutJourney => 'Resa';
+
+  @override
+  String get storyLayoutPolaroid => 'Vykort';
+
+  @override
+  String get storyLayoutInfographic => 'Infografik';
+
+  @override
   String get storeUnavailableMessage =>
       'Butiksanslutningen är för närvarande inte tillgänglig. Försök igen senare.';
 
@@ -2090,4 +2099,34 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get budgetAlert100 => 'Budgetgränsen överskriden!';
+
+  @override
+  String get addCustomLocation => 'Lägg till anpassad plats';
+
+  @override
+  String get customLocation => 'Anpassad plats';
+
+  @override
+  String get customLocationHint => 't.ex. Vår by, lantställe, campingplats...';
+
+  @override
+  String get customLocationDescription =>
+      'Lägg till en by, landsbygd, camping eller plats utanför kartan.';
+
+  @override
+  String get addAsCustomLocation => 'Lägg till som anpassad plats';
+
+  @override
+  String get customLocationTooltip => 'Lägg till anpassad plats (t.ex. Vår by)';
+
+  @override
+  String notACountryOrCityPrompt(Object query) {
+    return '\"$query\" hittades inte i katalog över länder eller städer. Vill du lägga till den som anpassad plats?';
+  }
+
+  @override
+  String get cityLabel => 'Stad';
+
+  @override
+  String get countryLabel => 'Land';
 }

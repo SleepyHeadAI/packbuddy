@@ -76,10 +76,6 @@ void main() {
       expect(find.byIcon(Icons.remove_rounded), findsOneWidget);
       expect(find.byIcon(Icons.restart_alt_rounded), findsOneWidget);
 
-      // Verify tabs exist (Countries and Cities)
-      expect(find.text('Ülkeler'), findsOneWidget);
-      expect(find.text('Şehirler'), findsOneWidget);
-
       // Tap zoom in
       await tester.tap(find.byIcon(Icons.add_rounded));
       await tester.pumpAndSettle();
@@ -92,11 +88,7 @@ void main() {
       await tester.tap(find.byIcon(Icons.remove_rounded));
       await tester.pumpAndSettle();
 
-      // Switch to Cities tab
-      await tester.tap(find.text('Şehirler'));
-      await tester.pumpAndSettle();
-
-      // Verify cities tab renders city pins without exception
+      // Verify no exceptions thrown during interaction
       expect(tester.takeException(), isNull);
     });
   });

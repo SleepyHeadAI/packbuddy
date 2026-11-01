@@ -423,4 +423,15 @@ class PreferencesService {
   List<String> getNotificationHistory() => _prefs?.getStringList(keyNotificationHistoryList) ?? [];
   Future<void> saveNotificationHistory(List<String> items) async => _prefs?.setStringList(keyNotificationHistoryList, items);
   Future<void> clearNotificationHistory() async => _prefs?.remove(keyNotificationHistoryList);
+
+  // --- Checklist First-Time Seeding Tracking ---
+  bool hasSeededChecklist({String? uid}) {
+    final key = uid != null && uid.isNotEmpty ? 'has_seeded_checklist_$uid' : 'has_seeded_checklist';
+    return _prefs?.getBool(key) ?? false;
+  }
+
+  Future<void> setSeededChecklist(bool value, {String? uid}) async {
+    final key = uid != null && uid.isNotEmpty ? 'has_seeded_checklist_$uid' : 'has_seeded_checklist';
+    await _prefs?.setBool(key, value);
+  }
 }

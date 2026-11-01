@@ -655,5 +655,17 @@
   "phraseHospital": "Gdzie jest szpital?",
   "phraseEnglish": "Czy mówi Pan/Pani po angielsku?",
   "budgetAlert85": "Zbliżanie się do limitu (85%)",
-  "budgetAlert100": "Przekroczono limit budżetu!"
+  "budgetAlert100": "Przekroczono limit budżetu!",
+  "storyLayoutJourney": "Podróż",
+  "storyLayoutPolaroid": "Pocztówka",
+  "storyLayoutInfographic": "Infografika",
+  "addCustomLocation": "Dodaj własną lokalizację",
+  "customLocation": "Własna lokalizacja",
+  "customLocationHint": "np. Moja wieś, domek letniskowy, pole namiotowe...",
+  "customLocationDescription": "Dodaj wieś, kemping lub inne niestandardowe miejsce.",
+  "addAsCustomLocation": "Dodaj jako własną lokalizację",
+  "customLocationTooltip": "Dodaj własną lokalizację (np. Moja wieś)",
+  "notACountryOrCityPrompt": "Nie znaleziono \"{query}\" w katalogu państw ani miast. Czy chcesz dodać to jako własną lokalizację?",
+  "cityLabel": "Miasto",
+  "countryLabel": "Kraj"
 }

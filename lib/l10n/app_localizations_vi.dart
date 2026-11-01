@@ -2041,6 +2041,15 @@ class AppLocalizationsVi extends AppLocalizations {
   String get storyLayoutClassic => 'Cổ điển';
 
   @override
+  String get storyLayoutJourney => 'Hành trình';
+
+  @override
+  String get storyLayoutPolaroid => 'Bưu thiếp';
+
+  @override
+  String get storyLayoutInfographic => 'Đồ họa thông tin';
+
+  @override
   String get storeUnavailableMessage =>
       'Kết nối cửa hàng hiện không khả dụng. Vui lòng thử lại sau.';
 
@@ -2094,4 +2103,34 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get budgetAlert100 => 'Vượt quá ngân sách!';
+
+  @override
+  String get addCustomLocation => 'Thêm địa điểm tùy chỉnh';
+
+  @override
+  String get customLocation => 'Địa điểm tùy chỉnh';
+
+  @override
+  String get customLocationHint => 'vd: Làng quê, nhà vườn, điểm cắm trại...';
+
+  @override
+  String get customLocationDescription =>
+      'Thêm làng quê, vùng nông thôn, điểm cắm trại hoặc nơi ngoài bản đồ.';
+
+  @override
+  String get addAsCustomLocation => 'Thêm dưới dạng địa điểm tùy chỉnh';
+
+  @override
+  String get customLocationTooltip => 'Thêm địa điểm tùy chỉnh (vd: Làng quê)';
+
+  @override
+  String notACountryOrCityPrompt(Object query) {
+    return 'Không tìm thấy \"$query\" trong danh mục quốc gia hoặc thành phố. Bạn có muốn thêm dưới dạng địa điểm tùy chỉnh?';
+  }
+
+  @override
+  String get cityLabel => 'Thành phố';
+
+  @override
+  String get countryLabel => 'Quốc gia';
 }

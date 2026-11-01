@@ -288,34 +288,6 @@ class AuthController extends StateNotifier<AuthState> {
     }
   }
 
-  /// Interactive Apple Sign In (Feature F-15)
-  Future<bool> signInWithApple() async {
-    state = state.copyWith(isLoading: true, clearError: true);
-    try {
-      final credential = await _authService.signInWithApple();
-      if (credential == null) {
-        // User dismissed Apple ID authorization
-        state = state.copyWith(isLoading: false);
-        return false;
-      }
-      if (credential.user != null) {
-        await _syncProfileAndNotify(credential.user!);
-      }
-      state = state.copyWith(
-        user: credential.user,
-        isLoading: false,
-        clearError: true,
-      );
-      return true;
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: _formatAuthError(e),
-      );
-      return false;
-    }
-  }
-
   /// Reload current user from Firebase to check if email was verified
   Future<bool> reloadUser() async {
     try {
