@@ -16,6 +16,7 @@ class PreferencesService {
   static const String keyWidgetShowCountdown = 'packbuddy_widget_show_countdown';
   static const String keyWidgetShowPacking = 'packbuddy_widget_show_packing';
   static const String keyWidgetShowBudget = 'packbuddy_widget_show_budget';
+  static const String keyTravelMapIs3D = 'packbuddy_travel_map_is_3d';
 
   // Per-User Scoped Keys
   static const String keyDefaultCurrency = 'packbuddy_default_currency';
@@ -434,4 +435,8 @@ class PreferencesService {
     final key = uid != null && uid.isNotEmpty ? 'has_seeded_checklist_$uid' : 'has_seeded_checklist';
     await _prefs?.setBool(key, value);
   }
+
+  // --- Travel Map Mode (2D flat vs 3D Globe) ---
+  bool getTravelMapIs3D() => _prefs?.getBool(keyTravelMapIs3D) ?? false;
+  Future<void> setTravelMapIs3D(bool is3D) async => _prefs?.setBool(keyTravelMapIs3D, is3D);
 }

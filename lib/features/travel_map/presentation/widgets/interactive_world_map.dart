@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:countries_world_map/countries_world_map.dart';
 import 'package:countries_world_map/data/maps/world_map.dart';
+import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/features/travel_map/data/world_countries_data.dart';
 import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
 import 'package:packbuddy/features/travel_map/presentation/widgets/country_flag.dart';
@@ -13,12 +14,16 @@ class InteractiveWorldMap extends StatefulWidget {
   final List<TravelCountry> countries;
   final ValueChanged<TravelCountry> onCountryTap;
   final ValueChanged<bool>? onMapInteracting;
+  final bool? is3DMode;
+  final ValueChanged<bool>? onToggle3DMode;
 
   const InteractiveWorldMap({
     super.key,
     required this.countries,
     required this.onCountryTap,
     this.onMapInteracting,
+    this.is3DMode,
+    this.onToggle3DMode,
   });
 
   @override
@@ -27,8 +32,32 @@ class InteractiveWorldMap extends StatefulWidget {
 
 class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
   final TransformationController _transformController = TransformationController();
-  bool _is3DMode = false; // Toggle between 2D flat projection and 3D globe
+  late bool _is3DMode; // Toggle between 2D flat projection and 3D globe
   bool _isInteracting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _is3DMode = widget.is3DMode ?? PreferencesService.instance.getTravelMapIs3D();
+  }
+
+  @override
+  void didUpdateWidget(covariant InteractiveWorldMap oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.is3DMode != null && widget.is3DMode != _is3DMode) {
+      _is3DMode = widget.is3DMode!;
+    }
+  }
+
+  void _set3DMode(bool value) {
+    if (_is3DMode != value) {
+      setState(() {
+        _is3DMode = value;
+      });
+      PreferencesService.instance.setTravelMapIs3D(value);
+      widget.onToggle3DMode?.call(value);
+    }
+  }
 
   void _setInteracting(bool val) {
     if (_isInteracting != val) {
@@ -442,7 +471,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         GestureDetector(
-                          onTap: () => setState(() => _is3DMode = false),
+                          onTap: () => _set3DMode(false),
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -464,7 +493,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                         ),
                         const SizedBox(width: 3),
                         GestureDetector(
-                          onTap: () => setState(() => _is3DMode = true),
+                          onTap: () => _set3DMode(true),
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),

@@ -306,11 +306,12 @@ class TravelMapService {
     return getCountries(uid: effectiveUid);
   }
 
-  /// Automatically matches completed trips to countries and marks them as visited if not already set
-  Future<List<TravelCountry>> syncFromTrips(List<Trip> trips, {String? uid}) async {
+  /// Automatically matches completed trips to countries and marks them as visited if not already set.
+  /// Returns updated countries if modifications were made, or null if no changes occurred.
+  Future<List<TravelCountry>?> syncFromTrips(List<Trip> trips, {String? uid}) async {
     final now = DateTime.now();
     final completedTrips = trips.where((t) => !t.isDeleted && t.endDate.isBefore(now)).toList();
-    if (completedTrips.isEmpty) return getCountries(uid: uid);
+    if (completedTrips.isEmpty) return null;
 
     final effectiveUid = _resolveUid(uid);
     final prefs = await SharedPreferences.getInstance();
@@ -333,23 +334,24 @@ class TravelMapService {
       }
     }
 
-    if (modified) {
-      final encoded = jsonEncode(savedMap);
-      await prefs.setString(_keyCountries, encoded);
-      await prefs.setString('packbuddy_travel_map_countries', encoded);
-      if (effectiveUid != null) {
-        await prefs.setString(_scopedKey(effectiveUid), encoded);
-      }
+    if (!modified) return null;
 
-      if (effectiveUid != null && _isFirebaseReady) {
-        try {
-          await FirebaseFirestore.instance.collection('users').doc(effectiveUid).set({
-            'travelMapCountries': savedMap,
-            'travelMapUpdatedAt': DateTime.now().toIso8601String(),
-          }, SetOptions(merge: true));
-        } catch (_) {}
-      }
+    final encoded = jsonEncode(savedMap);
+    await prefs.setString(_keyCountries, encoded);
+    await prefs.setString('packbuddy_travel_map_countries', encoded);
+    if (effectiveUid != null) {
+      await prefs.setString(_scopedKey(effectiveUid), encoded);
     }
+
+    if (effectiveUid != null && _isFirebaseReady) {
+      try {
+        await FirebaseFirestore.instance.collection('users').doc(effectiveUid).set({
+          'travelMapCountries': savedMap,
+          'travelMapUpdatedAt': DateTime.now().toIso8601String(),
+        }, SetOptions(merge: true));
+      } catch (_) {}
+    }
+
     return getCountries(uid: effectiveUid);
   }
 }

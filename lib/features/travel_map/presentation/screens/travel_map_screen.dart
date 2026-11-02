@@ -1106,6 +1106,10 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: InteractiveWorldMap(
                         countries: mapState.countries,
+                        is3DMode: mapState.is3DMode,
+                        onToggle3DMode: (val) {
+                          ref.read(travelMapControllerProvider.notifier).set3DMode(val);
+                        },
                         onCountryTap: _showCountryDetailSheet,
                         onMapInteracting: (val) {
                           setState(() {

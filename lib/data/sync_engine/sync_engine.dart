@@ -502,7 +502,6 @@ class SyncEngine extends StateNotifier<SyncState> {
       // World Travel Map Two-Way Cloud Sync
       try {
         await TravelMapService.instance.syncWithCloud(uid: uid);
-        ref?.read(travelMapControllerProvider.notifier).loadCountries(userId: uid);
       } catch (e) {
         debugPrint('[SyncEngine] Travel map sync in performSync notice: $e');
       }
@@ -712,7 +711,8 @@ class SyncEngine extends StateNotifier<SyncState> {
       // Multi-tenant & Delta Sync with WriteBatch & SQLite Transactions
       // ===================================================================
 
-      // Helper to fetch documents from Firestore supporting both snake_case (user_id) and camelCase (userId)
+      // Helper to fetch documents from Firestore supporting both snake_case (user_id) and camelCase (userId).
+      // Uses single-field equality filters to avoid requiring Firestore composite indexes (FAILED_PRECONDITION).
       Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchDualDocs(
         String collectionName,
       ) async {
@@ -720,13 +720,10 @@ class SyncEngine extends StateNotifier<SyncState> {
 
         // Query 1: user_id == uid (primary snake_case column)
         try {
-          Query<Map<String, dynamic>> q1 = firestore
+          final snap1 = await firestore
               .collection(collectionName)
-              .where('user_id', isEqualTo: uid);
-          if (lastSyncedAt > 0) {
-            q1 = q1.where('updated_at', isGreaterThan: lastSyncedAt);
-          }
-          final snap1 = await q1.get();
+              .where('user_id', isEqualTo: uid)
+              .get();
           for (final doc in snap1.docs) {
             results[doc.id] = doc;
           }
@@ -736,13 +733,10 @@ class SyncEngine extends StateNotifier<SyncState> {
 
         // Query 2: userId == uid (legacy / cross-platform camelCase compatibility)
         try {
-          Query<Map<String, dynamic>> q2 = firestore
+          final snap2 = await firestore
               .collection(collectionName)
-              .where('userId', isEqualTo: uid);
-          if (lastSyncedAt > 0) {
-            q2 = q2.where('updated_at', isGreaterThan: lastSyncedAt);
-          }
-          final snap2 = await q2.get();
+              .where('userId', isEqualTo: uid)
+              .get();
           for (final doc in snap2.docs) {
             results[doc.id] = doc;
           }

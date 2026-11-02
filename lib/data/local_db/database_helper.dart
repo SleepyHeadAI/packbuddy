@@ -455,7 +455,7 @@ class DatabaseHelper {
     final now = DateTime.now().millisecondsSinceEpoch;
 
     final condition = effectiveUserId.isNotEmpty
-        ? 'trip_id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL) AND is_deleted = 0'
+        ? "trip_id = ? AND (user_id = ? OR user_id = '' OR user_id IS NULL) AND is_deleted = 0"
         : 'trip_id = ? AND is_deleted = 0';
     final args = effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id];
 
@@ -489,7 +489,7 @@ class DatabaseHelper {
         'updated_at': now,
       },
       where: effectiveUserId.isNotEmpty
-          ? 'id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          ? "id = ? AND (user_id = ? OR user_id = '' OR user_id IS NULL)"
           : 'id = ?',
       whereArgs: effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id],
     );
@@ -502,7 +502,7 @@ class DatabaseHelper {
     final now = DateTime.now().millisecondsSinceEpoch;
 
     final condition = effectiveUserId.isNotEmpty
-        ? 'trip_id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+        ? "trip_id = ? AND (user_id = ? OR user_id = '' OR user_id IS NULL)"
         : 'trip_id = ?';
     final args = effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id];
 
@@ -533,7 +533,7 @@ class DatabaseHelper {
         'updated_at': now,
       },
       where: effectiveUserId.isNotEmpty
-          ? 'id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          ? "id = ? AND (user_id = ? OR user_id = '' OR user_id IS NULL)"
           : 'id = ?',
       whereArgs: effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id],
     );
@@ -556,7 +556,7 @@ class DatabaseHelper {
     final result = await db.query(
       AppConstants.tableTrips,
       where: effectiveUserId.isNotEmpty
-          ? 'is_deleted = 1 AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          ? "is_deleted = 1 AND (user_id = ? OR user_id = '' OR user_id IS NULL)"
           : 'is_deleted = 1',
       whereArgs: effectiveUserId.isNotEmpty ? [effectiveUserId] : null,
     );
@@ -670,7 +670,7 @@ class DatabaseHelper {
         'updated_at': DateTime.now().millisecondsSinceEpoch,
       },
       where: effectiveUserId.isNotEmpty
-          ? 'id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          ? "id = ? AND (user_id = ? OR user_id = '' OR user_id IS NULL)"
           : 'id = ?',
       whereArgs: effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id],
     );
@@ -687,7 +687,7 @@ class DatabaseHelper {
         'updated_at': DateTime.now().millisecondsSinceEpoch,
       },
       where: effectiveUserId.isNotEmpty
-          ? 'id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          ? "id = ? AND (user_id = ? OR user_id = '' OR user_id IS NULL)"
           : 'id = ?',
       whereArgs: effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id],
     );
@@ -710,7 +710,7 @@ class DatabaseHelper {
     final result = await db.query(
       AppConstants.tableExpenses,
       where: effectiveUserId.isNotEmpty
-          ? 'is_deleted = 1 AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          ? "is_deleted = 1 AND (user_id = ? OR user_id = '' OR user_id IS NULL)"
           : 'is_deleted = 1',
       whereArgs: effectiveUserId.isNotEmpty ? [effectiveUserId] : null,
     );
@@ -834,7 +834,7 @@ class DatabaseHelper {
         'updated_at': DateTime.now().millisecondsSinceEpoch,
       },
       where: effectiveUserId.isNotEmpty
-          ? 'id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          ? "id = ? AND (user_id = ? OR user_id = '' OR user_id IS NULL)"
           : 'id = ?',
       whereArgs: effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id],
     );
@@ -851,7 +851,7 @@ class DatabaseHelper {
         'updated_at': DateTime.now().millisecondsSinceEpoch,
       },
       where: effectiveUserId.isNotEmpty
-          ? 'id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          ? "id = ? AND (user_id = ? OR user_id = '' OR user_id IS NULL)"
           : 'id = ?',
       whereArgs: effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id],
     );
@@ -874,7 +874,7 @@ class DatabaseHelper {
     final result = await db.query(
       AppConstants.tableDocuments,
       where: effectiveUserId.isNotEmpty
-          ? 'is_deleted = 1 AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          ? "is_deleted = 1 AND (user_id = ? OR user_id = '' OR user_id IS NULL)"
           : 'is_deleted = 1',
       whereArgs: effectiveUserId.isNotEmpty ? [effectiveUserId] : null,
     );
@@ -960,7 +960,7 @@ class DatabaseHelper {
         'updated_at': DateTime.now().millisecondsSinceEpoch,
       },
       where: effectiveUserId.isNotEmpty
-          ? 'id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          ? "id = ? AND (user_id = ? OR user_id = '' OR user_id IS NULL)"
           : 'id = ?',
       whereArgs: effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id],
     );
@@ -977,7 +977,7 @@ class DatabaseHelper {
         'updated_at': DateTime.now().millisecondsSinceEpoch,
       },
       where: effectiveUserId.isNotEmpty
-          ? 'id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          ? "id = ? AND (user_id = ? OR user_id = '' OR user_id IS NULL)"
           : 'id = ?',
       whereArgs: effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id],
     );
@@ -1000,7 +1000,7 @@ class DatabaseHelper {
     final maps = await db.query(
       AppConstants.tableChecklistItems,
       where: effectiveUserId.isNotEmpty
-          ? 'id = ? AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          ? "id = ? AND (user_id = ? OR user_id = '' OR user_id IS NULL)"
           : 'id = ?',
       whereArgs: effectiveUserId.isNotEmpty ? [id, effectiveUserId] : [id],
     );
@@ -1017,7 +1017,7 @@ class DatabaseHelper {
     final result = await db.query(
       AppConstants.tableChecklistItems,
       where: effectiveUserId.isNotEmpty
-          ? 'is_deleted = 1 AND (user_id = ? OR user_id = "" OR user_id IS NULL)'
+          ? "is_deleted = 1 AND (user_id = ? OR user_id = '' OR user_id IS NULL)"
           : 'is_deleted = 1',
       whereArgs: effectiveUserId.isNotEmpty ? [effectiveUserId] : null,
     );

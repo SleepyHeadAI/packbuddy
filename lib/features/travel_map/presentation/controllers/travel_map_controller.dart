@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
@@ -26,12 +27,14 @@ class TravelMapState {
   final List<TravelCountry> countries;
   final String filter; // 'all', 'visited', 'wishlist', 'Europe', 'Asia', 'Americas', 'Africa', 'Oceania'
   final String searchQuery;
+  final bool is3DMode;
 
   const TravelMapState({
     this.isLoading = false,
     this.countries = const [],
     this.filter = 'all',
     this.searchQuery = '',
+    this.is3DMode = false,
   });
 
   int get totalVisited => countries.where((c) => c.isVisited || c.isLived).length;
@@ -120,12 +123,14 @@ class TravelMapState {
     List<TravelCountry>? countries,
     String? filter,
     String? searchQuery,
+    bool? is3DMode,
   }) {
     return TravelMapState(
       isLoading: isLoading ?? this.isLoading,
       countries: countries ?? this.countries,
       filter: filter ?? this.filter,
       searchQuery: searchQuery ?? this.searchQuery,
+      is3DMode: is3DMode ?? this.is3DMode,
     );
   }
 }
@@ -136,21 +141,33 @@ class TravelMapController extends StateNotifier<TravelMapState> {
 
   TravelMapController([TravelMapService? service, this._ref])
       : _service = service ?? TravelMapService.instance,
-        super(const TravelMapState(isLoading: true)) {
+        super(TravelMapState(
+          isLoading: true,
+          is3DMode: PreferencesService.instance.getTravelMapIs3D(),
+        )) {
     loadCountries();
   }
 
   String? get _currentUserId => _ref?.read(authUserProvider)?.uid;
 
   void resetState() {
-    state = const TravelMapState(
+    state = TravelMapState(
       countries: WorldCountriesData.allCountries,
       isLoading: false,
+      is3DMode: PreferencesService.instance.getTravelMapIs3D(),
     );
   }
 
-  Future<void> loadCountries({String? userId}) async {
-    state = state.copyWith(isLoading: true);
+  void set3DMode(bool is3D) {
+    PreferencesService.instance.setTravelMapIs3D(is3D);
+    state = state.copyWith(is3DMode: is3D);
+  }
+
+  Future<void> loadCountries({String? userId, bool showLoading = false}) async {
+    // Only display full loading screen if countries haven't been loaded yet or explicitly requested
+    if (showLoading || state.countries.isEmpty) {
+      state = state.copyWith(isLoading: true);
+    }
     final effectiveUid = userId ?? _currentUserId;
     final countries = await _service.getCountries(uid: effectiveUid);
     state = state.copyWith(isLoading: false, countries: countries);
@@ -159,7 +176,7 @@ class TravelMapController extends StateNotifier<TravelMapState> {
     if (_ref != null) {
       final trips = _ref.read(tripControllerProvider).trips;
       if (trips.isNotEmpty) {
-        syncWithTrips(trips, userId: effectiveUid);
+        await syncWithTrips(trips, userId: effectiveUid);
       }
     }
   }
@@ -201,7 +218,9 @@ class TravelMapController extends StateNotifier<TravelMapState> {
   Future<void> syncWithTrips(List<Trip> trips, {String? userId}) async {
     final effectiveUid = userId ?? _currentUserId;
     final updated = await _service.syncFromTrips(trips, uid: effectiveUid);
-    state = state.copyWith(countries: updated);
+    if (updated != null) {
+      state = state.copyWith(countries: updated);
+    }
   }
 
   void setFilter(String filter) {

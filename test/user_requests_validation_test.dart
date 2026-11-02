@@ -223,6 +223,25 @@ void main() {
       expect(notifier.state.worldPercentage, greaterThan(0.0));
     });
 
+    test('PreferencesService and TravelMapController persist and retain 3D Globe mode without resetting', () async {
+      SharedPreferences.setMockInitialValues({});
+      await PreferencesService.init();
+
+      expect(PreferencesService.instance.getTravelMapIs3D(), isFalse);
+
+      final controller = TravelMapController();
+      expect(controller.state.is3DMode, isFalse);
+
+      controller.set3DMode(true);
+      expect(controller.state.is3DMode, isTrue);
+      expect(PreferencesService.instance.getTravelMapIs3D(), isTrue);
+
+      // Verify loadCountries does not reset 3D mode or set isLoading=true when countries already exist
+      await controller.loadCountries();
+      expect(controller.state.is3DMode, isTrue);
+      expect(controller.state.isLoading, isFalse);
+    });
+
     testWidgets('InteractiveWorldMap widget renders pin canvas and handles zoom safely', (tester) async {
       final sampleCountries = [
         const TravelCountry(
@@ -249,6 +268,7 @@ void main() {
         ),
       ];
 
+      await PreferencesService.instance.setTravelMapIs3D(false);
       TravelCountry? tappedCountry;
 
       await tester.pumpWidget(
@@ -280,6 +300,40 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(tappedCountry, isNull);
+    });
+
+    testWidgets('InteractiveWorldMap toggles between 2D and 3D Globe and persists selection', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      await PreferencesService.init();
+
+      bool toggledMode = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          theme: AppTheme.darkTheme,
+          home: Scaffold(
+            body: InteractiveWorldMap(
+              countries: const [],
+              onCountryTap: (_) {},
+              onToggle3DMode: (val) => toggledMode = val,
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final globeButton = find.textContaining('3D Globe');
+      expect(globeButton, findsOneWidget);
+
+      await tester.tap(globeButton);
+      await tester.pumpAndSettle();
+
+      expect(toggledMode, isTrue);
+      expect(PreferencesService.instance.getTravelMapIs3D(), isTrue);
     });
 
     testWidgets('TravelMapScreen renders search bar, continent chips and discovery progress bar', (tester) async {
