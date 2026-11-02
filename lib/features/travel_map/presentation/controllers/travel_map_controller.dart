@@ -181,6 +181,24 @@ class TravelMapController extends StateNotifier<TravelMapState> {
     }
   }
 
+  /// Forces an authoritative Cloud Firestore synchronization and refetches live country data
+  Future<void> refreshFromCloud({String? userId}) async {
+    state = state.copyWith(isLoading: true);
+    final effectiveUid = userId ?? _currentUserId;
+    if (effectiveUid != null) {
+      await _service.syncWithCloud(uid: effectiveUid);
+    }
+    final countries = await _service.getCountries(uid: effectiveUid, forceRemote: true);
+    state = state.copyWith(isLoading: false, countries: countries);
+
+    if (_ref != null) {
+      final trips = _ref.read(tripControllerProvider).trips;
+      if (trips.isNotEmpty) {
+        await syncWithTrips(trips, userId: effectiveUid);
+      }
+    }
+  }
+
   Future<void> setCountryStatus({
     required String code,
     required CountryStatus status,

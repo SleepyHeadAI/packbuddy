@@ -903,6 +903,11 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.sync_rounded, size: 22),
+            tooltip: l10n.syncNow,
+            onPressed: () => ref.read(travelMapControllerProvider.notifier).refreshFromCloud(),
+          ),
+          IconButton(
             icon: const Icon(Icons.ios_share_rounded, size: 22),
             tooltip: l10n.shareStory,
             onPressed: () => _openStoryShareModal(
@@ -935,12 +940,15 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
       ),
       body: mapState.isLoading
           ? const Center(child: CircularProgressIndicator())
-          : CustomScrollView(
-              scrollCacheExtent: const ScrollCacheExtent.pixels(800.0),
-              physics: _isMapInteracting
-                  ? const NeverScrollableScrollPhysics()
-                  : const BouncingScrollPhysics(),
-              slivers: [
+          : RefreshIndicator(
+              onRefresh: () => ref.read(travelMapControllerProvider.notifier).refreshFromCloud(),
+              color: const Color(0xFFEA580C),
+              child: CustomScrollView(
+                scrollCacheExtent: const ScrollCacheExtent.pixels(800.0),
+                physics: _isMapInteracting
+                    ? const NeverScrollableScrollPhysics()
+                    : const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                slivers: [
                 // 1. Overview Progress Bar (Gezilen | Hedef | Dünya Bar)
                 SliverToBoxAdapter(
                   child: Padding(
@@ -1383,6 +1391,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                 ),
               ],
             ),
+          ),
     );
   }
 

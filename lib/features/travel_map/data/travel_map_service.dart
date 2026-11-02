@@ -97,7 +97,7 @@ class TravelMapService {
 
   /// Loads all countries with user's persisted status.
   /// If local storage is empty and user is logged in, automatically queries Firestore for cloud backup.
-  Future<List<TravelCountry>> getCountries({String? uid}) async {
+  Future<List<TravelCountry>> getCountries({String? uid, bool forceRemote = false}) async {
     final prefs = await SharedPreferences.getInstance();
     var savedMap = await _loadSavedMap(prefs, uid: uid);
 
@@ -109,7 +109,7 @@ class TravelMapService {
         final doc = await FirebaseFirestore.instance
             .collection('users')
             .doc(effectiveUid)
-            .get();
+            .get(forceRemote ? const GetOptions(source: Source.server) : null);
         if (doc.exists && doc.data() != null) {
           final data = doc.data()!;
           if (data.containsKey('travelMapCountries')) {
@@ -121,6 +121,24 @@ class TravelMapService {
           }
         }
       } catch (e) {
+        if (forceRemote) {
+          try {
+            final doc = await FirebaseFirestore.instance
+                .collection('users')
+                .doc(effectiveUid)
+                .get();
+            if (doc.exists && doc.data() != null) {
+              final data = doc.data()!;
+              if (data.containsKey('travelMapCountries')) {
+                final remote = data['travelMapCountries'];
+                if (remote is Map && remote.isNotEmpty) {
+                  await restoreFromCloud(Map<String, dynamic>.from(remote), uid: effectiveUid);
+                  savedMap = await _loadSavedMap(prefs, uid: effectiveUid);
+                }
+              }
+            }
+          } catch (_) {}
+        }
         debugPrint('[TravelMapService] Cloud fallback notice: $e');
       }
     }
