@@ -56,6 +56,9 @@ abstract class AuthService {
   /// Updates lastActiveAt timestamp for current user in Firestore
   Future<void> updateLastActive(String uid);
 
+  /// Records active session duration (in seconds) for a user in Firestore
+  Future<void> recordSessionDuration(String uid, int seconds);
+
   /// Send password reset link to user's email address
   Future<void> sendPasswordResetEmail({required String email});
 }
@@ -531,6 +534,8 @@ class FirebaseAuthService implements AuthService {
         'createdAt': effectiveCreatedAt,
         'lastLoginAt': now,
         'lastActiveAt': now,
+        'lastInactivityWarningAt': null,
+        'inactivityWarningCount': 0,
         'isPremium': effectiveIsPremium,
         'countryCode': countryCode,
         'countryName': countryName,
@@ -575,6 +580,24 @@ class FirebaseAuthService implements AuthService {
       final firestore = _firestore ?? FirebaseFirestore.instance;
       await firestore.collection('users').doc(uid).set({
         'lastActiveAt': DateTime.now().toIso8601String(),
+        'lastInactivityWarningAt': null,
+        'inactivityWarningCount': 0,
+      }, SetOptions(merge: true));
+    } catch (_) {}
+  }
+
+  @override
+  Future<void> recordSessionDuration(String uid, int seconds) async {
+    try {
+      if (!_isFirebaseReady && _firestore == null) return;
+      final firestore = _firestore ?? FirebaseFirestore.instance;
+      await firestore.collection('users').doc(uid).set({
+        'totalSessionSeconds': FieldValue.increment(seconds),
+        'sessionCount': FieldValue.increment(1),
+        'lastSessionSeconds': seconds,
+        'lastActiveAt': DateTime.now().toIso8601String(),
+        'lastInactivityWarningAt': null,
+        'inactivityWarningCount': 0,
       }, SetOptions(merge: true));
     } catch (_) {}
   }

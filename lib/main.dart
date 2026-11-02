@@ -66,21 +66,39 @@ class PackBuddyApp extends ConsumerStatefulWidget {
 
 class _PackBuddyAppState extends ConsumerState<PackBuddyApp>
     with WidgetsBindingObserver {
+  DateTime? _sessionStartTime;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _sessionStartTime = DateTime.now();
   }
 
   @override
   void dispose() {
+    _recordActiveSession();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  void _recordActiveSession() {
+    if (_sessionStartTime != null) {
+      final elapsed = DateTime.now().difference(_sessionStartTime!).inSeconds;
+      _sessionStartTime = null;
+      if (elapsed >= 2) {
+        final user = ref.read(authUserProvider);
+        if (user != null) {
+          ref.read(authServiceProvider).recordSessionDuration(user.uid, elapsed).catchError((_) {});
+        }
+      }
+    }
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      _sessionStartTime = DateTime.now();
       final user = ref.read(authUserProvider);
       final isVerified = ref.read(isEmailVerifiedProvider);
       final isPassword = ref.read(authControllerProvider).isPasswordProvider;
@@ -90,6 +108,10 @@ class _PackBuddyAppState extends ConsumerState<PackBuddyApp>
           ref.read(syncEngineProvider.notifier).performSync().catchError((_) {});
         }
       }
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      _recordActiveSession();
     }
   }
 

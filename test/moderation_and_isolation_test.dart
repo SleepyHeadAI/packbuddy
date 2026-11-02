@@ -120,6 +120,9 @@ class MockAdminServiceForTest implements AdminService {
   Future<List<AdminUserModel>> fetchUsers() async => List.from(users);
 
   @override
+  Future<AdminDetailedAnalytics> fetchDetailedAnalytics() async => const AdminDetailedAnalytics();
+
+  @override
   Future<void> toggleUserProStatus(String uid, bool isPremium) async {}
 
   @override
@@ -152,6 +155,12 @@ class MockAdminServiceForTest implements AdminService {
 
   @override
   Future<void> purgeUserDataAsAdmin(String uid) async {}
+
+  @override
+  Future<void> sendInactivityWarningEmail(String uid) async {}
+
+  @override
+  Future<InactivityScanResult> processInactivityPolicies() async => const InactivityScanResult();
 }
 
 void main() {

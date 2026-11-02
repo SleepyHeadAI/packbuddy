@@ -162,10 +162,22 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
 
             // Platform Metrics Grid (Clutter-free, no redundant Verified card)
             _buildMetricsGrid(context, adminState.metrics, isDark),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
             // Geographic & Activity Analytics Section
             _buildGeoAnalyticsSection(context, adminState, isDark, l10n),
+            const SizedBox(height: 20),
+
+            // Live Engagement & Session Analytics
+            _buildEngagementAnalyticsSection(context, adminState.detailedAnalytics, isDark),
+            const SizedBox(height: 20),
+
+            // World Travel Demand & Destination Intelligence Hub (Wishlist, Visited, Lived, Continents)
+            _buildCountryDemandHub(context, adminState, isDark),
+            const SizedBox(height: 20),
+
+            // Transport Modes & Travel Financial Preferences
+            _buildTravelPreferencesSection(context, adminState.detailedAnalytics, isDark),
             const SizedBox(height: 28),
 
             // User Management Section Header
@@ -192,12 +204,51 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                     ],
                   ),
                 ),
-                if (adminState.isLoading || adminState.isActionLoading)
+                // Action Button to run Inactivity Scan
+                BouncyPressable(
+                  onTap: adminState.isActionLoading
+                      ? null
+                      : () => _showInactivityScanConfirmationDialog(context),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.errorPastel.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppColors.errorPastel.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.auto_delete_rounded,
+                          size: 15,
+                          color: AppColors.errorPastel,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          Localizations.localeOf(context).languageCode == 'tr'
+                              ? 'İnaktiflik Taraması'
+                              : 'Inactivity Scan',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.errorPastel,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                if (adminState.isLoading || adminState.isActionLoading) ...[
+                  const SizedBox(width: 8),
                   const SizedBox(
-                    width: 20,
-                    height: 20,
+                    width: 18,
+                    height: 18,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   ),
+                ],
               ],
             ),
             const SizedBox(height: 12),
@@ -345,6 +396,905 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               : const Color(0xFFE0F2FE),
         ),
       ],
+    );
+  }
+
+  /// Interactive Live Engagement & Session Analytics
+  Widget _buildEngagementAnalyticsSection(
+    BuildContext context,
+    AdminDetailedAnalytics analytics,
+    bool isDark,
+  ) {
+    final theme = Theme.of(context);
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+
+    final avgSessionStr = analytics.formattedAverageSessionDuration;
+    final totalDurationStr = analytics.formattedTotalPlatformDuration;
+    final avgTripDaysStr = analytics.formattedAverageTripDuration;
+    final avgExpenseStr = analytics.formattedAverageExpense;
+
+    return AppCard(
+      borderRadius: 22,
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6366F1).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.insights_rounded,
+                  size: 20,
+                  color: Color(0xFF6366F1),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isTr ? 'Kullanım & Oturum İstatistikleri' : 'Usage & Session Analytics',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    Text(
+                      isTr
+                          ? 'Aktif oturum süreleri ve seyahat finans ortalamaları'
+                          : 'Real-time session duration & travel finance',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // 2x2 Grid of Live Engagement Metrics
+          Row(
+            children: [
+              Expanded(
+                child: _buildMiniStatCard(
+                  context: context,
+                  title: isTr ? 'Ortalama Süre' : 'Avg Session',
+                  value: avgSessionStr,
+                  subtitle: isTr ? 'Oturum başına' : 'Per session',
+                  icon: Icons.timer_rounded,
+                  iconColor: const Color(0xFFD97706),
+                  bgColor: isDark ? const Color(0xFF2E2312) : const Color(0xFFFEF3C7),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildMiniStatCard(
+                  context: context,
+                  title: isTr ? 'Toplam Süre' : 'Total App Time',
+                  value: totalDurationStr,
+                  subtitle: isTr ? 'Platform geneli' : 'Platform logged',
+                  icon: Icons.hourglass_top_rounded,
+                  iconColor: const Color(0xFF3B82F6),
+                  bgColor: isDark ? const Color(0xFF132338) : const Color(0xFFEFF6FF),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: _buildMiniStatCard(
+                  context: context,
+                  title: isTr ? 'Ortalama Gezi' : 'Avg Trip Length',
+                  value: avgTripDaysStr,
+                  subtitle: isTr ? 'Planlanan süre' : 'Planned duration',
+                  icon: Icons.date_range_rounded,
+                  iconColor: const Color(0xFF10B981),
+                  bgColor: isDark ? const Color(0xFF132E27) : const Color(0xFFECFDF5),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildMiniStatCard(
+                  context: context,
+                  title: isTr ? 'Gezi Başı Bütçe' : 'Avg Expense / Trip',
+                  value: avgExpenseStr,
+                  subtitle: isTr ? 'Ortalama harcama' : 'Per trip spend',
+                  icon: Icons.account_balance_wallet_rounded,
+                  iconColor: const Color(0xFF8B5CF6),
+                  bgColor: isDark ? const Color(0xFF241B36) : const Color(0xFFF5F3FF),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          const Divider(height: 1),
+          const SizedBox(height: 14),
+
+          // Platform Conversion & Verification Rates
+          Text(
+            isTr ? 'Platform Sağlık Oranları' : 'Platform Health Ratios',
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+          ),
+          const SizedBox(height: 10),
+          _buildHealthProgressBar(
+            label: isTr ? 'Pro Üye Dönüşüm Oranı' : 'Pro Conversion Rate',
+            value: analytics.proConversionRate,
+            displayValue: '%${(analytics.proConversionRate * 100).toStringAsFixed(1)}',
+            barColor: const Color(0xFFD97706),
+          ),
+          const SizedBox(height: 10),
+          _buildHealthProgressBar(
+            label: isTr ? 'Doğrulanmış Hesap Oranı' : 'Verified Accounts Rate',
+            value: analytics.emailVerificationRate,
+            displayValue: '%${(analytics.emailVerificationRate * 100).toStringAsFixed(1)}',
+            barColor: const Color(0xFF10B981),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMiniStatCard({
+    required BuildContext context,
+    required String title,
+    required String value,
+    required String subtitle,
+    required IconData icon,
+    required Color iconColor,
+    required Color bgColor,
+  }) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 16, color: iconColor),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: iconColor,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.3,
+              ),
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            subtitle,
+            style: TextStyle(
+              fontSize: 10,
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHealthProgressBar({
+    required String label,
+    required double value,
+    required String displayValue,
+    required Color barColor,
+  }) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w500,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              displayValue,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: barColor,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: LinearProgressIndicator(
+            value: value.clamp(0.0, 1.0),
+            minHeight: 6,
+            backgroundColor: theme.colorScheme.surfaceContainerHighest,
+            valueColor: AlwaysStoppedAnimation<Color>(barColor),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// World Travel Demand & Destination Intelligence Hub (Wishlist, Visited, Lived, Continents)
+  Widget _buildCountryDemandHub(
+    BuildContext context,
+    AdminState state,
+    bool isDark,
+  ) {
+    final theme = Theme.of(context);
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    final activeTab = state.selectedCountryAnalyticsTab;
+    final analytics = state.detailedAnalytics;
+
+    List<CountryTravelMetric> countryList;
+    Color themeColor;
+    String title;
+    String subtitle;
+    String emptyMessage;
+
+    switch (activeTab) {
+      case 'visited':
+        countryList = analytics.topVisitedCountries;
+        themeColor = const Color(0xFF3B82F6);
+        title = isTr ? 'En Çok Ziyaret Edilen Ülkeler' : 'Most Visited Countries';
+        subtitle = isTr
+            ? 'Gezginlerin seyahat edip tamamladığı ülkeler'
+            : 'Destinations visited and logged by travelers';
+        emptyMessage = isTr
+            ? 'Kullanıcılar gezi tamamladıkça veya haritada işaretledikçe burada listelenir.'
+            : 'Will appear as users visit countries.';
+        break;
+      case 'lived':
+        countryList = analytics.topLivedCountries;
+        themeColor = const Color(0xFF10B981);
+        title = isTr ? 'Kullanıcıların En Çok Yaşadığı Ülkeler' : 'Where Users Live (Home Country)';
+        subtitle = isTr
+            ? 'Kayıtlı kullanıcıların ikamet ve yaşadığı yerler'
+            : 'Primary residence and origin of users';
+        emptyMessage = isTr
+            ? 'Kullanıcıların profil ülkeleri burada listelenir.'
+            : 'User residences will appear here.';
+        break;
+      case 'continents':
+        countryList = const [];
+        themeColor = const Color(0xFF8B5CF6);
+        title = isTr ? 'Kıtalara Göre Seyahat Dağılımı' : 'Travel Distribution by Continent';
+        subtitle = isTr
+            ? 'Kıtalar bazında toplam seyahat payları'
+            : 'Regional breakdown across the 5 continents';
+        emptyMessage = isTr
+            ? 'Kıta seyahat verileri toplanıyor.'
+            : 'Continent data is being aggregated.';
+        break;
+      case 'wishlist':
+      default:
+        countryList = analytics.topWishlistCountries;
+        themeColor = const Color(0xFFD97706);
+        title = isTr ? 'En Çok Gitmek İstenen Ülkeler' : 'Most Wishlisted Countries';
+        subtitle = isTr
+            ? 'Gezginlerin hayal listesine eklediği popüler rotalar'
+            : 'Bucket list destinations travelers dream of visiting';
+        emptyMessage = isTr
+            ? 'Kullanıcılar haritada gitmek istedikleri ülkeleri ekledikçe burada listelenir.'
+            : 'Will appear as users add wishlist countries.';
+        break;
+    }
+
+    return AppCard(
+      borderRadius: 22,
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: themeColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.travel_explore_rounded,
+                  size: 20,
+                  color: themeColor,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Interactive Segmented Tab Selector
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildCountryHubTab(
+                  context: context,
+                  label: isTr ? '🌟 Gitmek İstenen' : '🌟 Wishlist',
+                  tabKey: 'wishlist',
+                  current: activeTab,
+                  activeColor: const Color(0xFFD97706),
+                ),
+                const SizedBox(width: 8),
+                _buildCountryHubTab(
+                  context: context,
+                  label: isTr ? '✈️ En Çok Gidilen' : '✈️ Visited',
+                  tabKey: 'visited',
+                  current: activeTab,
+                  activeColor: const Color(0xFF3B82F6),
+                ),
+                const SizedBox(width: 8),
+                _buildCountryHubTab(
+                  context: context,
+                  label: isTr ? '🏠 Yaşanılan Ülke' : '🏠 Residence',
+                  tabKey: 'lived',
+                  current: activeTab,
+                  activeColor: const Color(0xFF10B981),
+                ),
+                const SizedBox(width: 8),
+                _buildCountryHubTab(
+                  context: context,
+                  label: isTr ? '🌍 Kıtalar' : '🌍 Continents',
+                  tabKey: 'continents',
+                  current: activeTab,
+                  activeColor: const Color(0xFF8B5CF6),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Divider(height: 1),
+          const SizedBox(height: 14),
+
+          // Content of Active Tab
+          if (activeTab == 'continents')
+            _buildContinentList(context, analytics.continentShares)
+          else if (countryList.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.radar_rounded,
+                      size: 36,
+                      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      emptyMessage,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else
+            Column(
+              children: countryList.asMap().entries.map((entry) {
+                final index = entry.key;
+                final item = entry.value;
+                return _buildCountryRankRow(
+                  context: context,
+                  rank: index + 1,
+                  item: item,
+                  color: themeColor,
+                );
+              }).toList(),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCountryHubTab({
+    required BuildContext context,
+    required String label,
+    required String tabKey,
+    required String current,
+    required Color activeColor,
+  }) {
+    final isSelected = tabKey == current;
+    final theme = Theme.of(context);
+
+    return BouncyPressable(
+      onTap: () {
+        ref.read(adminControllerProvider.notifier).setCountryAnalyticsTab(tabKey);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? activeColor
+              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSelected
+                ? Colors.transparent
+                : theme.colorScheme.outline.withValues(alpha: 0.2),
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            color: isSelected ? Colors.white : theme.colorScheme.onSurface,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCountryRankRow({
+    required BuildContext context,
+    required int rank,
+    required CountryTravelMetric item,
+    required Color color,
+  }) {
+    final theme = Theme.of(context);
+    final percentStr = (item.percentage * 100).toStringAsFixed(1);
+
+    Color rankBg;
+    Color rankText;
+    if (rank == 1) {
+      rankBg = const Color(0xFFFEF3C7);
+      rankText = const Color(0xFFD97706);
+    } else if (rank == 2) {
+      rankBg = const Color(0xFFF1F5F9);
+      rankText = const Color(0xFF64748B);
+    } else if (rank == 3) {
+      rankBg = const Color(0xFFFFEDD5);
+      rankText = const Color(0xFFC2410C);
+    } else {
+      rankBg = theme.colorScheme.surfaceContainerHighest;
+      rankText = theme.colorScheme.onSurfaceVariant;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 22,
+                height: 22,
+                decoration: BoxDecoration(
+                  color: rankBg,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Center(
+                  child: Text(
+                    '$rank',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: rankText,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(item.flag, style: const TextStyle(fontSize: 16)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        item.countryName,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        item.countryCode,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '${item.count} (%$percentStr)',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: item.percentage.clamp(0.0, 1.0),
+              minHeight: 6,
+              backgroundColor: theme.colorScheme.surfaceContainerHighest,
+              valueColor: AlwaysStoppedAnimation<Color>(color),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContinentList(
+    BuildContext context,
+    List<ContinentShareMetric> continentShares,
+  ) {
+    final theme = Theme.of(context);
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+
+    if (continentShares.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Center(
+          child: Text(
+            isTr ? 'Kıta seyahat verileri toplanıyor.' : 'Continent data is being aggregated.',
+            style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+          ),
+        ),
+      );
+    }
+
+    final Map<String, String> continentTr = {
+      'Europe': 'Avrupa',
+      'Asia': 'Asya',
+      'Americas': 'Amerika',
+      'Africa': 'Afrika',
+      'Oceania': 'Okyanusya',
+    };
+
+    return Column(
+      children: continentShares.map((c) {
+        final percentStr = (c.percentage * 100).toStringAsFixed(1);
+        final localizedName = isTr ? (continentTr[c.continentName] ?? c.continentName) : c.continentName;
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(c.icon, style: const TextStyle(fontSize: 16)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      localizedName,
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                  Text(
+                    '${c.count} (%$percentStr)',
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 5),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: c.percentage.clamp(0.0, 1.0),
+                  minHeight: 6,
+                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF8B5CF6)),
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  /// Transport & Currency Analytics Section
+  Widget _buildTravelPreferencesSection(
+    BuildContext context,
+    AdminDetailedAnalytics analytics,
+    bool isDark,
+  ) {
+    final theme = Theme.of(context);
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+
+    return AppCard(
+      borderRadius: 22,
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0EA5E9).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.commute_rounded,
+                  size: 20,
+                  color: Color(0xFF0EA5E9),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isTr ? 'Ulaşım & Para Birimi Tercihleri' : 'Transport & Currency Intelligence',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    Text(
+                      isTr ? 'Gezginlerin seyahat tarzı ve tercihleri' : 'Travel modes and primary currencies',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Transport Mode Preferences
+          Text(
+            isTr ? 'Popüler Ulaşım Modları' : 'Transport Modes',
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+          ),
+          const SizedBox(height: 10),
+          if (analytics.transportPreferences.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text(
+                isTr
+                    ? 'Gezilere ulaşım türü eklendikçe burada listelenir.'
+                    : 'Will appear as trips specify transport.',
+                style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+              ),
+            )
+          else
+            Column(
+              children: analytics.transportPreferences.map((t) {
+                final percent = (t.percentage * 100).toStringAsFixed(1);
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      Text(t.icon, style: const TextStyle(fontSize: 16)),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 90,
+                        child: Text(
+                          t.label,
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: t.percentage.clamp(0.0, 1.0),
+                            minHeight: 6,
+                            backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF0EA5E9)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${t.count} (%$percent)',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+
+          const SizedBox(height: 16),
+          const Divider(height: 1),
+          const SizedBox(height: 14),
+
+          // Top Currencies & Vault Categories
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Currencies Column
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isTr ? 'Para Birimleri' : 'Currencies',
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                    ),
+                    const SizedBox(height: 8),
+                    if (analytics.currencyShares.isEmpty)
+                      Text(
+                        isTr ? 'Veri toplanıyor' : 'Aggregating',
+                        style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                      )
+                    else
+                      ...analytics.currencyShares.take(4).map((c) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  c.currencyCode,
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF10B981),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                '${c.count} (%${(c.percentage * 100).toStringAsFixed(0)})',
+                                style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Vault Categories Column
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isTr ? 'Kasa Belge Türleri' : 'Vault Categories',
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                    ),
+                    const SizedBox(height: 8),
+                    if (analytics.vaultCategories.isEmpty)
+                      Text(
+                        isTr ? 'Belge yüklenmedi' : 'No docs yet',
+                        style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                      )
+                    else
+                      ...analytics.vaultCategories.take(4).map((v) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.description_outlined, size: 13, color: Color(0xFF8B5CF6)),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  v.label,
+                                  style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Text(
+                                '${v.count}',
+                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -602,11 +1552,16 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
     AdminState state,
     AppLocalizations l10n,
   ) {
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
     final allCount = state.allUsers.length;
     final proCount = state.allUsers.where((u) => u.isPremium).length;
     final bannedCount = state.allUsers.where((u) => u.isCurrentlyBanned).length;
     final restrictedCount =
         state.allUsers.where((u) => u.restrictedFeatures.isNotEmpty).length;
+    final inactive5thCount =
+        state.allUsers.where((u) => u.is5thMonthWarningPeriod).length;
+    final inactive6thCount =
+        state.allUsers.where((u) => u.is6thMonthPurgeReady).length;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -636,6 +1591,20 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             filter: UserFilterChip.restricted,
             current: state.userFilter,
             badgeColor: const Color(0xFF8B5CF6),
+          ),
+          const SizedBox(width: 8),
+          _buildDirectoryFilterChip(
+            label: isTr ? '5. Ay Uyarı ($inactive5thCount)' : '5th Mo Warning ($inactive5thCount)',
+            filter: UserFilterChip.inactive5thMonth,
+            current: state.userFilter,
+            badgeColor: const Color(0xFFD97706),
+          ),
+          const SizedBox(width: 8),
+          _buildDirectoryFilterChip(
+            label: isTr ? '6+ Ay Silinecek ($inactive6thCount)' : '6+ Mo Purge ($inactive6thCount)',
+            filter: UserFilterChip.inactive6thMonth,
+            current: state.userFilter,
+            badgeColor: AppColors.errorPastel,
           ),
         ],
       ),
@@ -805,6 +1774,43 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.history_rounded,
+                            size: 13,
+                            color: user.is6thMonthPurgeReady
+                                ? AppColors.errorPastel
+                                : (user.is5thMonthWarningPeriod
+                                    ? const Color(0xFFD97706)
+                                    : (user.inactiveDays <= 7
+                                        ? const Color(0xFF10B981)
+                                        : theme.colorScheme.onSurfaceVariant)),
+                          ),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              Localizations.localeOf(context).languageCode == 'tr'
+                                  ? 'Son Aktif: ${AppDateFormatter.formatRelativeTime(user.effectiveLastActiveAt, locale: 'tr')} ($lastActiveStr)'
+                                  : 'Last Active: ${AppDateFormatter.formatRelativeTime(user.effectiveLastActiveAt, locale: 'en')} ($lastActiveStr)',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: (user.is6thMonthPurgeReady || user.is5thMonthWarningPeriod)
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                                color: user.is6thMonthPurgeReady
+                                    ? AppColors.errorPastel
+                                    : (user.is5thMonthWarningPeriod
+                                        ? const Color(0xFFD97706)
+                                        : theme.colorScheme.onSurfaceVariant),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -927,6 +1933,42 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                     maxWidth: 240,
                   ),
 
+                // 6+ Months Inactivity (Purge Ready) Badge
+                if (user.is6thMonthPurgeReady)
+                  StatusBadge(
+                    label: Localizations.localeOf(context).languageCode == 'tr'
+                        ? '6+ Ay İnaktif (${user.inactiveDays} gün)'
+                        : '6+ Mo Inactive (${user.inactiveDays}d)',
+                    icon: Icons.auto_delete_rounded,
+                    backgroundColor: AppColors.errorPastel.withValues(alpha: 0.15),
+                    textColor: AppColors.errorPastel,
+                    maxWidth: 200,
+                  ),
+
+                // 5th Month Inactivity (Warning Period) Badge
+                if (user.is5thMonthWarningPeriod)
+                  StatusBadge(
+                    label: Localizations.localeOf(context).languageCode == 'tr'
+                        ? '5. Ay Uyarı (${user.inactiveDays} gün)'
+                        : '5th Mo Warning (${user.inactiveDays}d)',
+                    icon: Icons.mark_email_unread_rounded,
+                    backgroundColor: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                    textColor: const Color(0xFFD97706),
+                    maxWidth: 200,
+                  ),
+
+                // Inactivity Warnings Count Badge
+                if (user.inactivityWarningCount > 0)
+                  StatusBadge(
+                    label: Localizations.localeOf(context).languageCode == 'tr'
+                        ? '${user.inactivityWarningCount} Uyarı Gönderildi'
+                        : '${user.inactivityWarningCount} Warnings Sent',
+                    icon: Icons.outgoing_mail,
+                    backgroundColor: const Color(0xFF6366F1).withValues(alpha: 0.15),
+                    textColor: const Color(0xFF6366F1),
+                    maxWidth: 160,
+                  ),
+
                 // Last Active Date
                 Row(
                   mainAxisSize: MainAxisSize.min,
@@ -1000,6 +2042,135 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => _UserModerationBottomSheet(user: user),
+    );
+  }
+
+  void _showInactivityScanConfirmationDialog(BuildContext context) {
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.errorPastel.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.schedule_send_rounded,
+                color: AppColors.errorPastel,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                isTr ? 'İnaktif Hesap İlkesi Taraması' : 'Inactivity Policy Scan',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              isTr
+                  ? 'Bu işlem tüm kullanıcıları tarayarak şu kuralları uygular:'
+                  : 'This process scans all users and applies these policies:',
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF59E0B).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.mark_email_unread_rounded, size: 18, color: Color(0xFFD97706)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      isTr
+                          ? '5. Ay Uyarıları (150-179 gün):\nSon 7 gün içinde uyarı almamış inaktif kullanıcılara haftalık "Hesabınız 30 gün içinde silinecektir" e-postası gönderilir.'
+                          : '5th Month Warnings (150-179 days):\nWeekly warning emails sent to users without a warning in the last 7 days.',
+                      style: const TextStyle(fontSize: 12, height: 1.3),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.errorPastel.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.errorPastel.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.delete_forever_rounded, size: 18, color: AppColors.errorPastel),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      isTr
+                          ? '6+ Ay Otomatik Silme (180+ gün):\nHesabına 6 aydır girmeyen kullanıcıların hesapları ve tüm verileri kalıcı olarak silinir.'
+                          : '6+ Month Auto-Purge (180+ days):\nAccounts inactive for 6+ months and all cloud data will be permanently wiped.',
+                      style: const TextStyle(fontSize: 12, height: 1.3),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(AppLocalizations.of(context)!.cancel),
+          ),
+          FilledButton.icon(
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.errorPastel,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              final messenger = ScaffoldMessenger.of(context);
+              final result = await ref.read(adminControllerProvider.notifier).runInactivityScan();
+              if (result != null && mounted) {
+                messenger.clearSnackBars();
+                messenger.showSnackBar(
+                  SnackBar(
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    backgroundColor: AppColors.primaryLight,
+                    duration: const Duration(seconds: 4),
+                    content: Text(
+                      isTr
+                          ? 'Tarama Tamamlandı: ${result.totalScanned} taranan, ${result.warningsSent} uyarı e-postası, ${result.accountsPurged} silinen hesap.'
+                          : 'Scan Complete: ${result.totalScanned} scanned, ${result.warningsSent} warnings sent, ${result.accountsPurged} accounts purged.',
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                  ),
+                );
+              }
+            },
+            icon: const Icon(Icons.play_arrow_rounded, size: 18),
+            label: Text(isTr ? 'Taramayı Başlat' : 'Start Scan'),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1242,6 +2413,10 @@ class _UserModerationBottomSheetState
                 ),
                 const SizedBox(height: 16),
               ],
+
+              // Inactivity & Auto-Deletion Status (6 Months / 5th Month Policy)
+              _buildInactivityStatusCard(context),
+              const SizedBox(height: 16),
 
               // SECTION 1: Pro Membership Toggle
               AppCard(
@@ -1808,6 +2983,194 @@ class _UserModerationBottomSheetState
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildInactivityStatusCard(BuildContext context) {
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    final user = ref.watch(adminControllerProvider).allUsers.firstWhere(
+      (u) => u.uid == widget.user.uid,
+      orElse: () => widget.user,
+    );
+    final inactiveDays = user.inactiveDays;
+    final is5thMonth = user.is5thMonthWarningPeriod;
+    final is6thMonth = user.is6thMonthPurgeReady;
+
+    Color statusColor;
+    String statusTitle;
+    IconData statusIcon;
+
+    if (is6thMonth) {
+      statusColor = AppColors.errorPastel;
+      statusTitle = isTr ? '6+ Ay İnaktif (Hesap Silinmeye Hazır)' : '6+ Months Inactive (Purge Ready)';
+      statusIcon = Icons.delete_forever_rounded;
+    } else if (is5thMonth) {
+      statusColor = const Color(0xFFD97706);
+      statusTitle = isTr ? '5. Ay Uyarı Döneminde (Haftalık E-posta)' : '5th Month Warning Period (Weekly Email)';
+      statusIcon = Icons.mark_email_unread_rounded;
+    } else {
+      statusColor = const Color(0xFF10B981);
+      statusTitle = isTr ? 'Normal / Aktif Kullanıcı' : 'Active Account';
+      statusIcon = Icons.check_circle_outline_rounded;
+    }
+
+    final lastWarningStr = user.lastInactivityWarningAt != null
+        ? AppDateFormatter.formatDateTime(user.lastInactivityWarningAt!)
+        : (isTr ? 'Henüz gönderilmedi' : 'None sent yet');
+
+    return AppCard(
+      borderRadius: 18,
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(statusIcon, color: statusColor, size: 20),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isTr ? 'İnaktiflik ve Otomatik Silme' : 'Inactivity & Auto-Purge Policy',
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                    ),
+                    Text(
+                      statusTitle,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: statusColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Divider(height: 1),
+          const SizedBox(height: 10),
+          _buildInfoRow(
+            icon: Icons.history_rounded,
+            label: isTr ? 'Son Aktiflik:' : 'Last Active:',
+            value: '${AppDateFormatter.formatRelativeTime(user.effectiveLastActiveAt, locale: isTr ? 'tr' : 'en')} ($inactiveDays gün)',
+          ),
+          const SizedBox(height: 6),
+          _buildInfoRow(
+            icon: Icons.calendar_today_rounded,
+            label: isTr ? 'Tam Tarih:' : 'Exact Date:',
+            value: AppDateFormatter.formatDateTime(user.effectiveLastActiveAt),
+          ),
+          const SizedBox(height: 6),
+          _buildInfoRow(
+            icon: Icons.mail_outline_rounded,
+            label: isTr ? '5. Ay Uyarıları:' : '5th Mo Warnings:',
+            value: isTr
+                ? '${user.inactivityWarningCount} adet gönderildi (Son: $lastWarningStr)'
+                : '${user.inactivityWarningCount} sent (Last: $lastWarningStr)',
+          ),
+          if (is5thMonth) ...[
+            const SizedBox(height: 6),
+            _buildInfoRow(
+              icon: Icons.timer_outlined,
+              label: isTr ? 'Kalıcı Silinmeye:' : 'Until Permanent Purge:',
+              value: isTr ? '${180 - inactiveDays} gün kaldı' : '${180 - inactiveDays} days remaining',
+            ),
+          ],
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              // Manual warning email button
+              Expanded(
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                  ),
+                  onPressed: () async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    final success = await ref
+                        .read(adminControllerProvider.notifier)
+                        .sendInactivityWarning(user.uid);
+                    if (mounted) {
+                      messenger.clearSnackBars();
+                      messenger.showSnackBar(
+                        SnackBar(
+                          backgroundColor: success ? AppColors.successPastel : AppColors.errorPastel,
+                          content: Text(
+                            success
+                                ? (isTr ? 'Uyarı e-postası başarıyla kuyruğa eklendi.' : 'Warning email queued successfully.')
+                                : (isTr ? 'Uyarı e-postası gönderilemedi.' : 'Failed to send warning email.'),
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  icon: const Icon(Icons.send_rounded, size: 14),
+                  label: Text(
+                    isTr ? 'Uyarı Gönder' : 'Send Warning',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+              ),
+              if (is6thMonth) ...[
+                const SizedBox(width: 8),
+                Expanded(
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.errorPastel,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                    ),
+                    onPressed: () => _confirmPurgeUser(context, AppLocalizations.of(context)!),
+                    icon: const Icon(Icons.delete_forever_rounded, size: 14),
+                    label: Text(
+                      isTr ? 'Şimdi Sil' : 'Purge Now',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    final theme = Theme.of(context);
+    return Row(
+      children: [
+        Icon(icon, size: 14, color: theme.colorScheme.onSurfaceVariant),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+        ),
+        const SizedBox(width: 4),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+            textAlign: TextAlign.end,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 

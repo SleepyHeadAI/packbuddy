@@ -17,6 +17,8 @@ enum UserFilterChip {
   pro,
   banned,
   restricted,
+  inactive5thMonth,
+  inactive6thMonth,
 }
 
 /// Country aggregated analytics item
@@ -54,6 +56,8 @@ class AdminState {
   final bool isActionLoading;
   final AdminPlatformMetrics metrics;
   final List<AdminUserModel> allUsers;
+  final AdminDetailedAnalytics detailedAnalytics;
+  final String selectedCountryAnalyticsTab; // 'wishlist', 'visited', 'lived', 'continents'
   final String searchQuery;
   final UserFilterChip userFilter;
   final AnalyticsPeriod analyticsPeriod;
@@ -65,6 +69,8 @@ class AdminState {
     this.isActionLoading = false,
     this.metrics = const AdminPlatformMetrics(),
     this.allUsers = const [],
+    this.detailedAnalytics = const AdminDetailedAnalytics(),
+    this.selectedCountryAnalyticsTab = 'wishlist',
     this.searchQuery = '',
     this.userFilter = UserFilterChip.all,
     this.analyticsPeriod = AnalyticsPeriod.daily,
@@ -155,6 +161,12 @@ class AdminState {
       case UserFilterChip.restricted:
         users = users.where((u) => u.restrictedFeatures.isNotEmpty).toList();
         break;
+      case UserFilterChip.inactive5thMonth:
+        users = users.where((u) => u.is5thMonthWarningPeriod).toList();
+        break;
+      case UserFilterChip.inactive6thMonth:
+        users = users.where((u) => u.is6thMonthPurgeReady).toList();
+        break;
     }
 
     if (searchQuery.trim().isEmpty) return users;
@@ -173,6 +185,8 @@ class AdminState {
     bool? isActionLoading,
     AdminPlatformMetrics? metrics,
     List<AdminUserModel>? allUsers,
+    AdminDetailedAnalytics? detailedAnalytics,
+    String? selectedCountryAnalyticsTab,
     String? searchQuery,
     UserFilterChip? userFilter,
     AnalyticsPeriod? analyticsPeriod,
@@ -185,6 +199,8 @@ class AdminState {
       isActionLoading: isActionLoading ?? this.isActionLoading,
       metrics: metrics ?? this.metrics,
       allUsers: allUsers ?? this.allUsers,
+      detailedAnalytics: detailedAnalytics ?? this.detailedAnalytics,
+      selectedCountryAnalyticsTab: selectedCountryAnalyticsTab ?? this.selectedCountryAnalyticsTab,
       searchQuery: searchQuery ?? this.searchQuery,
       userFilter: userFilter ?? this.userFilter,
       analyticsPeriod: analyticsPeriod ?? this.analyticsPeriod,
@@ -202,22 +218,25 @@ class AdminController extends StateNotifier<AdminState> {
     refreshData();
   }
 
-  /// Reloads both platform metrics and user profiles from Cloud Firestore
+  /// Reloads platform metrics, user profiles, and detailed travel analytics from Cloud Firestore
   Future<void> refreshData() async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final results = await Future.wait([
         _adminService.fetchMetrics(),
         _adminService.fetchUsers(),
+        _adminService.fetchDetailedAnalytics(),
       ]);
 
       final metrics = results[0] as AdminPlatformMetrics;
       final users = results[1] as List<AdminUserModel>;
+      final analytics = results[2] as AdminDetailedAnalytics;
 
       state = state.copyWith(
         isLoading: false,
         metrics: metrics,
         allUsers: users,
+        detailedAnalytics: analytics,
         lastRefreshedAt: DateTime.now(),
       );
     } catch (e) {
@@ -226,6 +245,11 @@ class AdminController extends StateNotifier<AdminState> {
         errorMessage: e.toString(),
       );
     }
+  }
+
+  /// Changes the active tab in the Country Travel Demand Hub ('wishlist', 'visited', 'lived', 'continents')
+  void setCountryAnalyticsTab(String tab) {
+    state = state.copyWith(selectedCountryAnalyticsTab: tab);
   }
 
   /// Alias for refreshData
@@ -339,6 +363,102 @@ class AdminController extends StateNotifier<AdminState> {
         errorMessage: e.toString(),
       );
       return false;
+    }
+  }
+
+  /// Sends a manual or scheduled inactivity warning email to a user in their 5th inactive month
+  Future<bool> sendInactivityWarning(String uid) async {
+    state = state.copyWith(isActionLoading: true, clearError: true);
+    try {
+      await _adminService.sendInactivityWarningEmail(uid);
+      final updatedUsers = state.allUsers.map((u) {
+        if (u.uid == uid) {
+          return u.copyWith(
+            lastInactivityWarningAt: DateTime.now(),
+            inactivityWarningCount: u.inactivityWarningCount + 1,
+          );
+        }
+        return u;
+      }).toList();
+
+      state = state.copyWith(
+        isActionLoading: false,
+        allUsers: updatedUsers,
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isActionLoading: false,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
+  }
+
+  /// Cancels pending account deletion requested by user
+  Future<bool> cancelAccountDeletion(String uid) async {
+    state = state.copyWith(isActionLoading: true, clearError: true);
+    try {
+      await _adminService.cancelAccountDeletionAsAdmin(uid);
+      final updatedUsers = state.allUsers.map((u) {
+        if (u.uid == uid) {
+          return u.copyWith(
+            deletionStatus: 'none',
+            scheduledPermanentDeletionAt: null,
+            deletionRequestedAt: null,
+          );
+        }
+        return u;
+      }).toList();
+
+      state = state.copyWith(
+        isActionLoading: false,
+        allUsers: updatedUsers,
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isActionLoading: false,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
+  }
+
+  /// Completely purges a user's account and all linked cloud data
+  Future<bool> purgeUser(String uid) async {
+    state = state.copyWith(isActionLoading: true, clearError: true);
+    try {
+      await _adminService.purgeUserDataAsAdmin(uid);
+      final updatedUsers = state.allUsers.where((u) => u.uid != uid).toList();
+      state = state.copyWith(
+        isActionLoading: false,
+        allUsers: updatedUsers,
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isActionLoading: false,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
+  }
+
+  /// Executes global 6-month inactivity auto-purge & 5th-month weekly email scan
+  Future<InactivityScanResult?> runInactivityScan() async {
+    state = state.copyWith(isActionLoading: true, clearError: true);
+    try {
+      final result = await _adminService.processInactivityPolicies();
+      await refreshData();
+      state = state.copyWith(isActionLoading: false);
+      return result;
+    } catch (e) {
+      state = state.copyWith(
+        isActionLoading: false,
+        errorMessage: e.toString(),
+      );
+      return null;
     }
   }
 

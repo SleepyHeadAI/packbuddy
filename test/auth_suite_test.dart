@@ -168,6 +168,9 @@ class MockAuthService implements AuthService {
   Future<void> updateLastActive(String uid) async {}
 
   @override
+  Future<void> recordSessionDuration(String uid, int seconds) async {}
+
+  @override
   void Function(String uid)? onAccountRestoredFromDeletion;
 
   @override

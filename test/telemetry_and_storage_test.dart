@@ -74,7 +74,22 @@ class FakeAdminController extends StateNotifier<AdminState>
   }
 
   @override
+  void setCountryAnalyticsTab(String tab) {}
+
+  @override
   void clearError() {}
+
+  @override
+  Future<bool> cancelAccountDeletion(String uid) async => true;
+
+  @override
+  Future<bool> purgeUser(String uid) async => true;
+
+  @override
+  Future<bool> sendInactivityWarning(String uid) async => true;
+
+  @override
+  Future<InactivityScanResult?> runInactivityScan() async => const InactivityScanResult();
 }
 
 void main() {

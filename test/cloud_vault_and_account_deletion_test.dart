@@ -69,6 +69,9 @@ class MockCloudAdminService implements AdminService {
   Future<List<AdminUserModel>> fetchUsers() async => List.from(users);
 
   @override
+  Future<AdminDetailedAnalytics> fetchDetailedAnalytics() async => const AdminDetailedAnalytics();
+
+  @override
   Future<void> toggleUserProStatus(String uid, bool isPremium) async {}
 
   @override
@@ -114,6 +117,12 @@ class MockCloudAdminService implements AdminService {
     users.removeWhere((u) => u.uid == uid);
     userDocuments.remove(uid);
   }
+
+  @override
+  Future<void> sendInactivityWarningEmail(String uid) async {}
+
+  @override
+  Future<InactivityScanResult> processInactivityPolicies() async => const InactivityScanResult();
 }
 
 void main() {
@@ -255,7 +264,7 @@ void main() {
     }
 
     testWidgets('Renders pending deletion badge with remaining days on user card', (tester) async {
-      tester.view.physicalSize = const Size(1000, 2000);
+      tester.view.physicalSize = const Size(1000, 3200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
 
@@ -284,7 +293,7 @@ void main() {
     });
 
     testWidgets('Opens moderation sheet and inspects uploaded image & PDF vault documents', (tester) async {
-      tester.view.physicalSize = const Size(1000, 2000);
+      tester.view.physicalSize = const Size(1000, 3200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
 
@@ -335,6 +344,11 @@ void main() {
 
       final moderateBtn = find.byIcon(Icons.tune_rounded);
       expect(moderateBtn, findsOneWidget);
+      await tester.scrollUntilVisible(
+        moderateBtn,
+        200.0,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.tap(moderateBtn);
       await tester.pumpAndSettle();
 

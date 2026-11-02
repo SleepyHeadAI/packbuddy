@@ -52,4 +52,33 @@ class AppDateFormatter {
       return '$d.$m.$y $hr:$min';
     }
   }
+
+  /// Safely formats a datetime relative to now (e.g. '2 saat önce', '5 gün önce', '5 ay önce (152 gün)')
+  static String formatRelativeTime(DateTime dateTime, {String? locale}) {
+    if (dateTime.millisecondsSinceEpoch == 0) {
+      return locale == 'tr' ? 'Bilinmiyor' : 'Unknown';
+    }
+    final now = DateTime.now();
+    final diff = now.difference(dateTime);
+    final isTr = locale == 'tr' || (locale == null && Intl.defaultLocale?.startsWith('tr') == true);
+
+    if (diff.isNegative || diff.inMinutes < 1) {
+      return isTr ? 'Az önce' : 'Just now';
+    }
+    if (diff.inMinutes < 60) {
+      return isTr ? '${diff.inMinutes} dk. önce' : '${diff.inMinutes}m ago';
+    }
+    if (diff.inHours < 24) {
+      return isTr ? '${diff.inHours} saat önce' : '${diff.inHours}h ago';
+    }
+    if (diff.inDays < 30) {
+      return isTr ? '${diff.inDays} gün önce' : '${diff.inDays}d ago';
+    }
+    if (diff.inDays < 365) {
+      final months = diff.inDays ~/ 30;
+      return isTr ? '$months ay önce (${diff.inDays} gün)' : '$months mo ago (${diff.inDays}d)';
+    }
+    final years = diff.inDays ~/ 365;
+    return isTr ? '$years yıl önce' : '$years yr ago';
+  }
 }
