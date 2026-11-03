@@ -15,6 +15,7 @@ import 'features/auth/auth_controller.dart';
 import 'features/auth/auth_screen.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
 import 'core/services/telemetry_service.dart';
+import 'core/services/notification_service.dart';
 import 'features/auth/presentation/screens/email_verification_screen.dart';
 import 'features/auth/presentation/screens/banned_screen.dart';
 import 'features/admin/user_moderation_provider.dart';
@@ -74,6 +75,15 @@ class _PackBuddyAppState extends ConsumerState<PackBuddyApp>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _sessionStartTime = DateTime.now();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        final notifService = ref.read(notificationServiceProvider);
+        notifService.initialize();
+        notifService.requestPermissions();
+      } catch (e) {
+        debugPrint('[PackBuddyApp] notification service warmup notice: $e');
+      }
+    });
   }
 
   @override

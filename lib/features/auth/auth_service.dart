@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../core/services/preferences_service.dart';
 import '../../core/services/currency_service.dart';
+import '../../core/services/live_location_service.dart';
 import '../../data/local_db/database_helper.dart';
 import '../admin/admin_service.dart';
 import '../travel_map/data/travel_map_service.dart';
@@ -552,6 +553,20 @@ class FirebaseAuthService implements AuthService {
               ? remoteCreatedAt
               : createdAt;
 
+      LiveLocationResult liveLoc;
+      try {
+        liveLoc = await LiveLocationService.instance.detectLiveLocation();
+      } catch (_) {
+        liveLoc = LiveLocationResult(
+          countryCode: countryCode.isNotEmpty ? countryCode : 'US',
+          countryName: countryName.isNotEmpty ? countryName : 'United States',
+          source: 'system_locale',
+        );
+      }
+
+      final activeTheme = PreferencesService.instance.getThemeMode().name;
+      final activeLocale = PreferencesService.instance.getLocale()?.languageCode ?? 'tr';
+
       final updateFields = <String, dynamic>{
         'uid': user.uid,
         'email': email,
@@ -567,6 +582,12 @@ class FirebaseAuthService implements AuthService {
         'countryCode': countryCode,
         'countryName': countryName,
         'currencyCode': currencyCode,
+        'liveCountryCode': liveLoc.countryCode,
+        'liveCountryName': liveLoc.countryName,
+        'liveCity': liveLoc.city,
+        'liveLocationUpdatedAt': now,
+        'appThemeMode': activeTheme,
+        'appLanguage': activeLocale,
         'banStatus': banStatus,
         'banExpiresAt': banExpiresAt,
         'banReason': banReason,

@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/services/app_widget_service.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
@@ -271,5 +273,17 @@ final travelMapServiceProvider = Provider<TravelMapService>((ref) {
 final travelMapControllerProvider =
     StateNotifierProvider<TravelMapController, TravelMapState>((ref) {
   final service = ref.watch(travelMapServiceProvider);
-  return TravelMapController(service, ref);
+  final controller = TravelMapController(service, ref);
+
+  if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+    ref.listen<User?>(authUserProvider, (prev, next) {
+      if (next != null) {
+        controller.loadCountries(userId: next.uid);
+      } else {
+        controller.resetState();
+      }
+    });
+  }
+
+  return controller;
 });

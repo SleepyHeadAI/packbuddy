@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
+import 'package:packbuddy/core/services/email_dispatch_service.dart';
+import 'package:packbuddy/core/services/notification_service.dart';
 import 'package:packbuddy/features/admin/admin_service.dart';
 import 'package:packbuddy/features/admin/admin_controller.dart';
 import 'package:packbuddy/features/admin/admin_dashboard_screen.dart';
@@ -253,6 +255,44 @@ void main() {
       expect(history.length, 1);
       expect(history.first.contains('Sistem Bildirimi'), isTrue);
       expect(history.first.contains('admin_warning'), isTrue);
+    });
+
+    test('EmailDispatchService formats plain text and HTML warning email bodies with user details', () {
+      final emailService = EmailDispatchService.instance;
+      final text = emailService.formatWarningEmailText(
+        displayName: 'Ahmet',
+        title: 'Önemli Uyarı',
+        message: 'Lütfen seyahat listenizi kontrol ediniz.',
+      );
+      expect(text.contains('Merhaba Ahmet'), isTrue);
+      expect(text.contains('Önemli Uyarı'), isTrue);
+      expect(text.contains('Lütfen seyahat listenizi kontrol ediniz.'), isTrue);
+      expect(text.contains('PackBuddy Yönetim Ekibi'), isTrue);
+
+      final html = emailService.formatWarningEmailHtml(
+        displayName: 'Ahmet',
+        title: 'Önemli Uyarı',
+        message: 'Lütfen seyahat listenizi kontrol ediniz.',
+      );
+      expect(html.contains('<strong>Ahmet</strong>'), isTrue);
+      expect(html.contains('Önemli Uyarı'), isTrue);
+      expect(html.contains('#ea580c'), isTrue);
+    });
+
+    test('EmailDispatchService returns false when toEmail is empty', () async {
+      final emailService = EmailDispatchService.instance;
+      final result = await emailService.launchEmailDraft(
+        toEmail: '   ',
+        subject: 'Title',
+        body: 'Body',
+      );
+      expect(result, isFalse);
+    });
+
+    test('LocalNotificationService exposes urgent alerts channel configurations', () {
+      expect(LocalNotificationService.urgentAlertChannelId, 'packbuddy_urgent_alerts');
+      expect(LocalNotificationService.urgentAlertChannelName, 'System & Admin Alerts');
+      expect(LocalNotificationService.channelId, 'packbuddy_trip_reminders');
     });
 
     testWidgets('AdminDashboardScreen renders both World Map and Trip sections separately',

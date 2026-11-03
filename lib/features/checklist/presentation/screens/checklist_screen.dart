@@ -69,8 +69,9 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
     final deletedText = '$localizedName ${l10n.deleted}';
     final undoLabel = l10n.undo;
 
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.showSnackBar(
       SnackBar(
         content: Row(
           children: [
@@ -93,9 +94,10 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
           },
         ),
         behavior: SnackBarBehavior.floating,
+        dismissDirection: DismissDirection.horizontal,
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 20),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        duration: const Duration(seconds: 4),
+        duration: const Duration(milliseconds: 2500),
       ),
     );
   }

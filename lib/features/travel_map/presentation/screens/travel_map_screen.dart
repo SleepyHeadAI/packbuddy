@@ -903,11 +903,6 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.sync_rounded, size: 22),
-            tooltip: l10n.syncNow,
-            onPressed: () => ref.read(travelMapControllerProvider.notifier).refreshFromCloud(),
-          ),
-          IconButton(
             icon: const Icon(Icons.ios_share_rounded, size: 22),
             tooltip: l10n.shareStory,
             onPressed: () => _openStoryShareModal(

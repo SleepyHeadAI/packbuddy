@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:packbuddy/core/services/notification_service.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
@@ -76,7 +78,7 @@ class _NotificationsCenterSheetState extends ConsumerState<NotificationsCenterSh
     _loadHistory();
   }
 
-  void _loadHistory() {
+  Future<void> _loadHistory() async {
     try {
       final rawList = PreferencesService.instance.getNotificationHistory();
       final loaded = rawList.map((str) {
@@ -87,7 +89,54 @@ class _NotificationsCenterSheetState extends ConsumerState<NotificationsCenterSh
         }
       }).whereType<InAppNotificationRecord>().toList();
       loaded.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-      setState(() => _history = loaded);
+      if (mounted) {
+        setState(() => _history = loaded);
+      }
+
+      // Fetch remote Firestore cloud notifications (e.g. across fresh app installs)
+      final currentUid = FirebaseAuth.instance.currentUser?.uid;
+      if (currentUid != null) {
+        try {
+          final snap = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(currentUid)
+              .collection('notifications')
+              .orderBy('timestamp', descending: true)
+              .limit(40)
+              .get();
+
+          final existingIds = loaded.map((e) => e.id).toSet();
+          bool hasNew = false;
+          for (final doc in snap.docs) {
+            final data = doc.data();
+            final id = doc.id;
+            if (!existingIds.contains(id)) {
+              final title = data['title'] as String? ?? 'PackBuddy Bildirimi';
+              final message = data['message'] as String? ?? '';
+              final ts = (data['timestamp'] as num?)?.toInt() ?? 0;
+              final type = data['type'] as String? ?? 'admin_warning';
+              final cloudRecord = InAppNotificationRecord(
+                id: id,
+                title: title,
+                body: message,
+                timestamp: ts > 0 ? DateTime.fromMillisecondsSinceEpoch(ts) : DateTime.now(),
+                type: type == 'reminder' ? 'reminder' : (type == 'test' ? 'test' : 'admin_warning'),
+              );
+              loaded.add(cloudRecord);
+              existingIds.add(id);
+              hasNew = true;
+            }
+          }
+          if (hasNew && mounted) {
+            loaded.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+            setState(() => _history = loaded);
+            final rawListToSave = loaded.map((r) => jsonEncode(r.toJson())).toList();
+            await PreferencesService.instance.saveNotificationHistory(rawListToSave);
+          }
+        } catch (e) {
+          debugPrint('[_NotificationsCenterSheetState] fetch remote notifications notice: $e');
+        }
+      }
     } catch (_) {}
   }
 

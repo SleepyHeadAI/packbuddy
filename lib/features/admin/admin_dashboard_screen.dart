@@ -3,10 +3,12 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:pdfx/pdfx.dart';
 import '../../core/services/security_service.dart';
+import '../../core/services/email_dispatch_service.dart';
 import '../../core/utils/date_formatter.dart';
 import '../../core/theme/app_colors.dart';
 import '../../l10n/app_localizations.dart';
@@ -185,6 +187,10 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
 
             // 2. Trip Data Analytics (Destinations, Dates, Budgets, Transport, Currencies)
             _buildTripAnalyticsCard(context, adminState.detailedAnalytics, isDark),
+            const SizedBox(height: 20),
+
+            // 3. User Preferences Analytics (Theme & Language Distribution)
+            _buildThemeAndLanguageSection(context, adminState.detailedAnalytics, isDark),
             const SizedBox(height: 28),
 
             // User Management Section Header
@@ -1486,6 +1492,191 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
     );
   }
 
+  /// App Theme & Language Preferences Distribution Section
+  Widget _buildThemeAndLanguageSection(
+    BuildContext context,
+    AdminDetailedAnalytics analytics,
+    bool isDark,
+  ) {
+    final theme = Theme.of(context);
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+
+    return AppCard(
+      borderRadius: 22,
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6366F1).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.palette_outlined,
+                  size: 20,
+                  color: Color(0xFF6366F1),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isTr ? 'Kullanıcı Tercihleri (Tema ve Dil)' : 'User Preferences (Theme & Language)',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.1,
+                      ),
+                    ),
+                    Text(
+                      isTr
+                          ? 'Kullanıcıların tema modları ve uygulama dili dağılımı'
+                          : 'Distribution of theme modes and interface languages',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Theme Modes Breakdown
+          Text(
+            isTr ? 'Uygulama Teması Dağılımı' : 'App Theme Distribution',
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+          ),
+          const SizedBox(height: 8),
+          if (analytics.themeShares.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Text(
+                isTr ? 'Tema verisi toplanıyor...' : 'Aggregating theme data...',
+                style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+              ),
+            )
+          else
+            Column(
+              children: analytics.themeShares.map((m) {
+                final pct = (m.percentage * 100).toStringAsFixed(1);
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      Text(m.icon, style: const TextStyle(fontSize: 15)),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 150,
+                        child: Text(
+                          m.label,
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: m.percentage.clamp(0.0, 1.0),
+                            minHeight: 6,
+                            backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF6366F1)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${m.count} (%$pct)',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+
+          const SizedBox(height: 14),
+          const Divider(height: 1),
+          const SizedBox(height: 14),
+
+          // Language Preferences Breakdown
+          Text(
+            isTr ? 'Uygulama Dili Dağılımı' : 'Language Distribution',
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+          ),
+          const SizedBox(height: 8),
+          if (analytics.languageShares.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Text(
+                isTr ? 'Dil verisi toplanıyor...' : 'Aggregating language data...',
+                style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+              ),
+            )
+          else
+            Column(
+              children: analytics.languageShares.map((m) {
+                final pct = (m.percentage * 100).toStringAsFixed(1);
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      Text(m.icon, style: const TextStyle(fontSize: 15)),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 150,
+                        child: Text(
+                          m.label,
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: m.percentage.clamp(0.0, 1.0),
+                            minHeight: 6,
+                            backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF10B981)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${m.count} (%$pct)',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+        ],
+      ),
+    );
+  }
+
   /// Interactive Period Geo-Analytics & Activity Section
   Widget _buildGeoAnalyticsSection(
     BuildContext context,
@@ -2656,6 +2847,10 @@ class _UserModerationBottomSheetState
               _buildInactivityStatusCard(context),
               const SizedBox(height: 16),
 
+              // Comprehensive User Analytics & Metrics Hub
+              _buildUserAnalyticsHub(context, widget.user),
+              const SizedBox(height: 16),
+
               // SECTION 1: Pro Membership Toggle
               AppCard(
                 borderRadius: 18,
@@ -3268,6 +3463,313 @@ class _UserModerationBottomSheetState
           ),
         ],
       ),
+    );
+  }
+
+  /// Displays comprehensive analytics and metrics hub for this specific user
+  Widget _buildUserAnalyticsHub(BuildContext context, AdminUserModel baseUser) {
+    final theme = Theme.of(context);
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    final user = ref.watch(adminControllerProvider).allUsers.firstWhere(
+      (u) => u.uid == baseUser.uid,
+      orElse: () => baseUser,
+    );
+    final liveFlag = countryCodeToFlagEmoji(user.effectiveLiveCountryCode);
+
+    String themeLabel;
+    String themeIcon;
+    switch (user.appThemeMode.toLowerCase()) {
+      case 'dark':
+        themeLabel = isTr ? 'Koyu Tema' : 'Dark Theme';
+        themeIcon = '🌙';
+        break;
+      case 'light':
+        themeLabel = isTr ? 'Açık Tema' : 'Light Theme';
+        themeIcon = '☀️';
+        break;
+      default:
+        themeLabel = isTr ? 'Sistem' : 'System';
+        themeIcon = '⚙️';
+        break;
+    }
+
+    String langLabel;
+    String langFlag;
+    switch (user.appLanguage.toLowerCase()) {
+      case 'tr':
+        langLabel = 'Türkçe';
+        langFlag = '🇹🇷';
+        break;
+      case 'en':
+        langLabel = 'English';
+        langFlag = '🇬🇧';
+        break;
+      case 'de':
+        langLabel = 'Deutsch';
+        langFlag = '🇩🇪';
+        break;
+      case 'fr':
+        langLabel = 'Français';
+        langFlag = '🇫🇷';
+        break;
+      case 'es':
+        langLabel = 'Español';
+        langFlag = '🇪🇸';
+        break;
+      default:
+        langLabel = user.appLanguage.toUpperCase();
+        langFlag = '🌐';
+        break;
+    }
+
+    return AppCard(
+      borderRadius: 18,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0EA5E9).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.analytics_rounded,
+                  color: Color(0xFF0EA5E9),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isTr ? 'Kullanıcı İstatistik & Analitik Özeti' : 'User Analytics & Metrics',
+                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                    ),
+                    Text(
+                      isTr
+                          ? 'Canlı konum, oturum ve seyahat verileri'
+                          : 'Live location, sessions, and travel metrics',
+                      style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // 1. Canlı Konum ve Tercihler
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isTr ? 'Canlı Konum' : 'Live Location',
+                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Text(liveFlag, style: const TextStyle(fontSize: 15)),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              user.liveCity.isNotEmpty
+                                  ? '${user.effectiveLiveCountryName} (${user.liveCity})'
+                                  : user.effectiveLiveCountryName,
+                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isTr ? 'Tercihler' : 'Preferences',
+                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '$themeIcon $themeLabel • $langFlag $langLabel',
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          // 2. Oturum & Kullanım Metrikleri
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isTr ? 'Toplam Oturum' : 'Total Sessions',
+                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${user.sessionCount} ${isTr ? "oturum" : "sessions"}',
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+                      ),
+                      Text(
+                        formatDurationSeconds(user.totalSessionSeconds.toDouble()),
+                        style: TextStyle(fontSize: 11, color: theme.colorScheme.primary, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isTr ? 'Ortalama Süre' : 'Avg Duration',
+                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        formatDurationSeconds(user.sessionCount > 0 ? (user.totalSessionSeconds / user.sessionCount) : 0.0),
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+                      ),
+                      Text(
+                        '${isTr ? "Son:" : "Last:"} ${formatDurationSeconds(user.lastSessionSeconds.toDouble())}',
+                        style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          // 3. Dünya Haritası İstatistikleri
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF97316).withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFF97316).withValues(alpha: 0.2)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Text('🌍', style: TextStyle(fontSize: 14)),
+                        const SizedBox(width: 6),
+                        Text(
+                          isTr ? 'Dünya Haritası Keşfi' : 'World Map Exploration',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      '%${user.worldExploredPercentage.toStringAsFixed(1)}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFFF97316),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: (user.worldExploredPercentage / 100).clamp(0.0, 1.0),
+                    minHeight: 6,
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFF97316)),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildUserStatBadge(isTr ? 'Gezilen' : 'Visited', '${user.visitedWorldMapCount}', const Color(0xFF10B981)),
+                    _buildUserStatBadge(isTr ? 'Hedef' : 'Wishlist', '${user.wishlistWorldMapCount}', const Color(0xFF3B82F6)),
+                    _buildUserStatBadge(isTr ? 'Yaşanan' : 'Lived', '${user.livedWorldMapCount}', const Color(0xFF8B5CF6)),
+                    _buildUserStatBadge(isTr ? 'Kasa' : 'Vault', formatStorageBytes(user.totalVaultStorageBytes), const Color(0xFF6B7280)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUserStatBadge(String label, String value, Color color) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: color),
+        ),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 10, color: Colors.grey),
+        ),
+      ],
     );
   }
 
@@ -3921,8 +4423,64 @@ class _SendWarningBottomSheetState extends ConsumerState<_SendWarningBottomSheet
                 ),
               ],
             ),
+            action: _sendEmail && widget.user.email.isNotEmpty
+                ? SnackBarAction(
+                    label: isTr ? 'E-postayı Aç' : 'Open Email',
+                    textColor: Colors.white,
+                    onPressed: () {
+                      EmailDispatchService.instance.launchEmailDraft(
+                        toEmail: widget.user.email,
+                        subject: '⚠️ PackBuddy Bildirimi: $title',
+                        body: EmailDispatchService.instance.formatWarningEmailText(
+                          displayName: widget.user.displayName,
+                          title: title,
+                          message: message,
+                        ),
+                      );
+                    },
+                  )
+                : null,
           ),
         );
+
+        // If target user is the currently logged in admin user, surface an immediate In-App Dialog
+        final currentAuthUid = FirebaseAuth.instance.currentUser?.uid;
+        if (currentAuthUid == widget.user.uid) {
+          showDialog(
+            context: context,
+            builder: (dCtx) => AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              icon: const Icon(Icons.warning_amber_rounded, color: Color(0xFFEA580C), size: 48),
+              title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+              content: SingleChildScrollView(
+                child: Text(message, style: const TextStyle(fontSize: 14, height: 1.4)),
+              ),
+              actions: [
+                if (_sendEmail && widget.user.email.isNotEmpty)
+                  TextButton.icon(
+                    icon: const Icon(Icons.email_outlined, size: 16),
+                    label: Text(isTr ? 'Posta Uygulamasında Aç' : 'Open in Mail App'),
+                    onPressed: () {
+                      Navigator.of(dCtx).pop();
+                      EmailDispatchService.instance.launchEmailDraft(
+                        toEmail: widget.user.email,
+                        subject: '⚠️ PackBuddy Bildirimi: $title',
+                        body: EmailDispatchService.instance.formatWarningEmailText(
+                          displayName: widget.user.displayName,
+                          title: title,
+                          message: message,
+                        ),
+                      );
+                    },
+                  ),
+                FilledButton(
+                  onPressed: () => Navigator.of(dCtx).pop(),
+                  child: Text(isTr ? 'Anladım' : 'Got it'),
+                ),
+              ],
+            ),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -4135,6 +4693,36 @@ class _SendWarningBottomSheetState extends ConsumerState<_SendWarningBottomSheet
                           ? (val) => setState(() => _sendEmail = val)
                           : null,
                     ),
+                    if (widget.user.email.isNotEmpty) ...[
+                      const Divider(height: 1),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: TextButton.icon(
+                          style: TextButton.styleFrom(
+                            alignment: Alignment.centerLeft,
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                          ),
+                          icon: const Icon(Icons.outgoing_mail, size: 18, color: Color(0xFFD97706)),
+                          label: Text(
+                            isTr ? 'Posta Uygulamasında Taslağı Aç (Gmail vb.)' : 'Open Draft in Mail App',
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFFD97706)),
+                          ),
+                          onPressed: () {
+                            final title = _titleController.text.trim();
+                            final message = _messageController.text.trim();
+                            EmailDispatchService.instance.launchEmailDraft(
+                              toEmail: widget.user.email,
+                              subject: '⚠️ PackBuddy Bildirimi: ${title.isNotEmpty ? title : "Önemli Uyarı"}',
+                              body: EmailDispatchService.instance.formatWarningEmailText(
+                                displayName: widget.user.displayName,
+                                title: title,
+                                message: message,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

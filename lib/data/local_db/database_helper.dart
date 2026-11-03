@@ -163,6 +163,20 @@ class DatabaseHelper {
         last_synced_at INTEGER NOT NULL
       )
     ''');
+
+    // 6. Travel Map Table (Multi-tenant with user_id)
+    await db.execute('''
+      CREATE TABLE ${AppConstants.tableTravelMap} (
+        code TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        status TEXT NOT NULL,
+        visited_date INTEGER,
+        notes TEXT,
+        updated_at INTEGER NOT NULL,
+        is_deleted INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (user_id, code)
+      )
+    ''');
   }
 
   Future<void> _onUpgradeDB(Database db, int oldVersion, int newVersion) async {
@@ -265,6 +279,24 @@ class DatabaseHelper {
         await db.execute('ALTER TABLE ${AppConstants.tableChecklistItems} ADD COLUMN packed_by TEXT');
       } catch (_) {}
     }
+
+    // Version 11: Add travel_map table for offline-first and persistent marked countries across app reinstall
+    if (oldVersion < 11) {
+      try {
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS ${AppConstants.tableTravelMap} (
+            code TEXT NOT NULL,
+            user_id TEXT NOT NULL,
+            status TEXT NOT NULL,
+            visited_date INTEGER,
+            notes TEXT,
+            updated_at INTEGER NOT NULL,
+            is_deleted INTEGER NOT NULL DEFAULT 0,
+            PRIMARY KEY (user_id, code)
+          )
+        ''');
+      } catch (_) {}
+    }
   }
 
   /// Completely wipes all local SQLite tables (useful for sign-outs)
@@ -283,6 +315,7 @@ class DatabaseHelper {
       await txn.delete(AppConstants.tableChecklistItems);
       await txn.delete(AppConstants.tableDocuments);
       await txn.delete(AppConstants.tableTrips);
+      await txn.delete(AppConstants.tableTravelMap);
       await txn.delete(AppConstants.tableSyncMetadata);
     });
 
@@ -372,6 +405,12 @@ class DatabaseHelper {
         );
         await txn.update(
           AppConstants.tableDocuments,
+          {'user_id': uid},
+          where: 'user_id = ? OR user_id IS NULL',
+          whereArgs: [''],
+        );
+        await txn.update(
+          AppConstants.tableTravelMap,
           {'user_id': uid},
           where: 'user_id = ? OR user_id IS NULL',
           whereArgs: [''],
@@ -1092,6 +1131,83 @@ class DatabaseHelper {
       }
     }
     return deletedCount;
+  }
+
+  // ==========================================
+  // TRAVEL MAP CRUD OPERATIONS (OFFLINE-FIRST)
+  // ==========================================
+
+  /// Inserts or updates a marked country in local SQLite
+  Future<int> insertOrUpdateTravelMapCountry({
+    required String code,
+    required String status,
+    String? userId,
+    DateTime? visitedDate,
+    String? notes,
+    DateTime? updatedAt,
+  }) async {
+    final db = await database;
+    final effectiveUid = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
+    final now = updatedAt ?? DateTime.now();
+    final row = <String, dynamic>{
+      'code': code.toUpperCase().trim(),
+      'user_id': effectiveUid,
+      'status': status,
+      'visited_date': visitedDate?.millisecondsSinceEpoch,
+      'notes': notes,
+      'updated_at': now.millisecondsSinceEpoch,
+      'is_deleted': 0,
+    };
+
+    return await db.insert(
+      AppConstants.tableTravelMap,
+      row,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  /// Deletes a marked country for a user from local SQLite
+  Future<int> deleteTravelMapCountry(String code, {String? userId}) async {
+    final db = await database;
+    final effectiveUid = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
+    return await db.delete(
+      AppConstants.tableTravelMap,
+      where: 'user_id = ? AND code = ?',
+      whereArgs: [effectiveUid, code.toUpperCase().trim()],
+    );
+  }
+
+  /// Soft deletes a marked country for synchronization
+  Future<int> softDeleteTravelMapCountry(String code, {String? userId}) async {
+    final db = await database;
+    final effectiveUid = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
+    return await db.update(
+      AppConstants.tableTravelMap,
+      {
+        'is_deleted': 1,
+        'updated_at': DateTime.now().millisecondsSinceEpoch,
+      },
+      where: 'user_id = ? AND code = ?',
+      whereArgs: [effectiveUid, code.toUpperCase().trim()],
+    );
+  }
+
+  /// Retrieves all marked countries for a user from local SQLite
+  Future<List<Map<String, dynamic>>> getTravelMapCountries({String? userId, bool includeDeleted = false}) async {
+    final db = await database;
+    final effectiveUid = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
+    if (includeDeleted) {
+      return await db.query(
+        AppConstants.tableTravelMap,
+        where: 'user_id = ? OR user_id = ""',
+        whereArgs: [effectiveUid],
+      );
+    }
+    return await db.query(
+      AppConstants.tableTravelMap,
+      where: '(user_id = ? OR user_id = "") AND is_deleted = 0',
+      whereArgs: [effectiveUid],
+    );
   }
 
   Future<void> close() async {

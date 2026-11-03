@@ -1,10 +1,13 @@
 import '../../core/services/telemetry_service.dart';
 import '../../core/services/preferences_service.dart';
+import '../../core/services/email_dispatch_service.dart';
+import '../../core/services/notification_service.dart';
 import '../vault/domain/document.dart';
 import '../travel_map/data/world_countries_data.dart';
 import '../travel_map/domain/travel_country.dart';
 import '../budget/domain/country_localization.dart';
 import 'dart:async';
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -152,6 +155,23 @@ class VaultCategoryShareMetric {
   });
 }
 
+/// Preference share metric (Theme, Language, etc.)
+class PreferenceShareMetric {
+  final String key;
+  final String label;
+  final String icon;
+  final int count;
+  final double percentage; // 0.0 to 1.0
+
+  const PreferenceShareMetric({
+    required this.key,
+    required this.label,
+    required this.icon,
+    required this.count,
+    required this.percentage,
+  });
+}
+
 /// Comprehensive Platform Analytics & Travel Intelligence
 class AdminDetailedAnalytics {
   final List<CountryTravelMetric> topWishlistCountries;
@@ -165,6 +185,8 @@ class AdminDetailedAnalytics {
   final List<TransportPreferenceMetric> transportPreferences;
   final List<CurrencyShareMetric> currencyShares;
   final List<VaultCategoryShareMetric> vaultCategories;
+  final List<PreferenceShareMetric> themeShares;
+  final List<PreferenceShareMetric> languageShares;
   final int totalPlatformSessionSeconds;
   final int totalPlatformSessions;
   final double averageSessionDurationSeconds;
@@ -185,6 +207,8 @@ class AdminDetailedAnalytics {
     this.transportPreferences = const [],
     this.currencyShares = const [],
     this.vaultCategories = const [],
+    this.themeShares = const [],
+    this.languageShares = const [],
     this.totalPlatformSessionSeconds = 0,
     this.totalPlatformSessions = 0,
     this.averageSessionDurationSeconds = 0.0,
@@ -227,6 +251,11 @@ class AdminUserModel {
   final String countryCode;
   final String countryName;
   final String currencyCode;
+  final String liveCountryCode;
+  final String liveCountryName;
+  final String liveCity;
+  final String appThemeMode; // 'light' | 'dark' | 'system'
+  final String appLanguage; // 'tr' | 'en' | 'de' ...
   final String deletionStatus; // 'none' | 'pending_deletion'
   final String? deletionRequestedAt;
   final String? scheduledPermanentDeletionAt;
@@ -256,6 +285,11 @@ class AdminUserModel {
     this.countryCode = 'US',
     this.countryName = 'United States',
     this.currencyCode = 'USD',
+    this.liveCountryCode = '',
+    this.liveCountryName = '',
+    this.liveCity = '',
+    this.appThemeMode = 'light',
+    this.appLanguage = 'tr',
     this.deletionStatus = 'none',
     this.deletionRequestedAt,
     this.scheduledPermanentDeletionAt,
@@ -341,6 +375,11 @@ class AdminUserModel {
       countryCode: data['countryCode'] as String? ?? 'US',
       countryName: data['countryName'] as String? ?? 'United States',
       currencyCode: data['currencyCode'] as String? ?? 'USD',
+      liveCountryCode: (data['liveCountryCode'] as String? ?? data['countryCode'] as String? ?? 'US').toUpperCase().trim(),
+      liveCountryName: (data['liveCountryName'] as String? ?? data['countryName'] as String? ?? 'United States').trim(),
+      liveCity: (data['liveCity'] as String? ?? '').trim(),
+      appThemeMode: (data['appThemeMode'] as String? ?? 'light').toLowerCase().trim(),
+      appLanguage: (data['appLanguage'] as String? ?? 'tr').toLowerCase().trim(),
       deletionStatus: data['deletionStatus'] as String? ?? 'none',
       deletionRequestedAt: data['deletionRequestedAt'] as String?,
       scheduledPermanentDeletionAt: data['scheduledPermanentDeletionAt'] as String?,
@@ -357,6 +396,35 @@ class AdminUserModel {
 
   double get averageSessionMinutes =>
       sessionCount > 0 ? (totalSessionSeconds / sessionCount / 60) : 0.0;
+
+  String get effectiveLiveCountryCode =>
+      liveCountryCode.isNotEmpty ? liveCountryCode : (countryCode.isNotEmpty ? countryCode : 'US');
+
+  String get effectiveLiveCountryName =>
+      liveCountryName.isNotEmpty ? liveCountryName : (countryName.isNotEmpty ? countryName : 'United States');
+
+  int get visitedWorldMapCount => travelMapCountries.values.where((v) {
+        if (v is! Map) return false;
+        final status = (v['status'] ?? '').toString().toLowerCase();
+        return status == 'visited' || status == 'lived';
+      }).length;
+
+  int get wishlistWorldMapCount => travelMapCountries.values.where((v) {
+        if (v is! Map) return false;
+        final status = (v['status'] ?? '').toString().toLowerCase();
+        return status == 'wishlist';
+      }).length;
+
+  int get livedWorldMapCount => travelMapCountries.values.where((v) {
+        if (v is! Map) return false;
+        final status = (v['status'] ?? '').toString().toLowerCase();
+        return status == 'lived';
+      }).length;
+
+  double get worldExploredPercentage =>
+      WorldCountriesData.allCountries.isNotEmpty
+          ? (visitedWorldMapCount / WorldCountriesData.allCountries.length * 100)
+          : 0.0;
 
   AdminUserModel copyWith({
     String? uid,
@@ -377,6 +445,11 @@ class AdminUserModel {
     String? countryCode,
     String? countryName,
     String? currencyCode,
+    String? liveCountryCode,
+    String? liveCountryName,
+    String? liveCity,
+    String? appThemeMode,
+    String? appLanguage,
     String? deletionStatus,
     String? deletionRequestedAt,
     String? scheduledPermanentDeletionAt,
@@ -408,6 +481,11 @@ class AdminUserModel {
       countryCode: countryCode ?? this.countryCode,
       countryName: countryName ?? this.countryName,
       currencyCode: currencyCode ?? this.currencyCode,
+      liveCountryCode: liveCountryCode ?? this.liveCountryCode,
+      liveCountryName: liveCountryName ?? this.liveCountryName,
+      liveCity: liveCity ?? this.liveCity,
+      appThemeMode: appThemeMode ?? this.appThemeMode,
+      appLanguage: appLanguage ?? this.appLanguage,
       deletionStatus: deletionStatus ?? this.deletionStatus,
       deletionRequestedAt: deletionRequestedAt ?? this.deletionRequestedAt,
       scheduledPermanentDeletionAt: scheduledPermanentDeletionAt ?? this.scheduledPermanentDeletionAt,
@@ -507,6 +585,12 @@ class FirebaseAdminService implements AdminService {
   FirebaseFirestore? get _effectiveFirestore {
     if (firestore != null) return firestore;
     if (_isFirebaseReady) return FirebaseFirestore.instance;
+    return null;
+  }
+
+  FirebaseAuth? get _effectiveAuth {
+    if (auth != null) return auth;
+    if (_isFirebaseReady) return FirebaseAuth.instance;
     return null;
   }
 
@@ -641,6 +725,8 @@ class FirebaseAdminService implements AdminService {
       final Map<String, int> currencyCounts = {};
       final Map<String, int> transportCounts = {};
       final Map<String, int> vaultCategoryCounts = {};
+      final Map<String, int> themeCounts = {};
+      final Map<String, int> languageCounts = {};
 
       int totalPlatformSessionSeconds = 0;
       int totalPlatformSessions = 0;
@@ -716,6 +802,13 @@ class FirebaseAdminService implements AdminService {
             PreferencesService.instance.isProUser(uid: doc.id)) {
           proUsers++;
         }
+
+        // 5. Theme & Language Preferences tracking
+        final theme = (data['appThemeMode'] as String? ?? 'light').toLowerCase().trim();
+        themeCounts[theme] = (themeCounts[theme] ?? 0) + 1;
+
+        final lang = (data['appLanguage'] as String? ?? 'tr').toLowerCase().trim();
+        languageCounts[lang] = (languageCounts[lang] ?? 0) + 1;
       }
 
       // 5. Query Trips (Strictly Trip Data Analytics: Destinations, Dates, Transport, Currencies)
@@ -822,6 +915,92 @@ class FirebaseAdminService implements AdminService {
       final currencyShares = _buildCurrencyMetrics(currencyCounts);
       final vaultCategories = _buildVaultCategoryMetrics(vaultCategoryCounts);
 
+      final themeShares = _buildPreferenceMetrics(
+        themeCounts,
+        totalUsers,
+        labelResolver: (k) {
+          switch (k) {
+            case 'dark':
+              return 'Koyu Tema (Dark)';
+            case 'light':
+              return 'Açık Tema (Light)';
+            case 'system':
+              return 'Sistem Varsayılanı (System)';
+            default:
+              return k.toUpperCase();
+          }
+        },
+        iconResolver: (k) {
+          switch (k) {
+            case 'dark':
+              return '🌙';
+            case 'light':
+              return '☀️';
+            case 'system':
+              return '⚙️';
+            default:
+              return '🎨';
+          }
+        },
+      );
+
+      final languageShares = _buildPreferenceMetrics(
+        languageCounts,
+        totalUsers,
+        labelResolver: (k) {
+          switch (k) {
+            case 'tr':
+              return 'Türkçe (TR)';
+            case 'en':
+              return 'English (EN)';
+            case 'de':
+              return 'Deutsch (DE)';
+            case 'fr':
+              return 'Français (FR)';
+            case 'es':
+              return 'Español (ES)';
+            case 'it':
+              return 'Italiano (IT)';
+            case 'ja':
+              return '日本語 (JA)';
+            case 'zh':
+              return '中文 (ZH)';
+            case 'ru':
+              return 'Русский (RU)';
+            case 'ar':
+              return 'العربية (AR)';
+            default:
+              return k.toUpperCase();
+          }
+        },
+        iconResolver: (k) {
+          switch (k) {
+            case 'tr':
+              return '🇹🇷';
+            case 'en':
+              return '🇬🇧';
+            case 'de':
+              return '🇩🇪';
+            case 'fr':
+              return '🇫🇷';
+            case 'es':
+              return '🇪🇸';
+            case 'it':
+              return '🇮🇹';
+            case 'ja':
+              return '🇯🇵';
+            case 'zh':
+              return '🇨🇳';
+            case 'ru':
+              return '🇷🇺';
+            case 'ar':
+              return '🇸🇦';
+            default:
+              return '🌐';
+          }
+        },
+      );
+
       return AdminDetailedAnalytics(
         topWishlistCountries: topWishlist,
         topVisitedCountries: topVisited,
@@ -834,6 +1013,8 @@ class FirebaseAdminService implements AdminService {
         transportPreferences: transportPrefs,
         currencyShares: currencyShares,
         vaultCategories: vaultCategories,
+        themeShares: themeShares,
+        languageShares: languageShares,
         totalPlatformSessionSeconds: totalPlatformSessionSeconds,
         totalPlatformSessions: totalPlatformSessions,
         averageSessionDurationSeconds: avgSessionSeconds,
@@ -997,6 +1178,28 @@ class FirebaseAdminService implements AdminService {
       return VaultCategoryShareMetric(
         category: cat,
         label: label,
+        count: e.value,
+        percentage: total > 0 ? (e.value / total) : 0.0,
+      );
+    }).toList();
+  }
+
+  List<PreferenceShareMetric> _buildPreferenceMetrics(
+    Map<String, int> counts,
+    int totalUsers, {
+    required String Function(String) labelResolver,
+    required String Function(String) iconResolver,
+  }) {
+    if (counts.isEmpty) return const [];
+    final total = counts.values.fold<int>(0, (acc, c) => acc + c);
+    final sorted = counts.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+
+    return sorted.map((e) {
+      final key = e.key;
+      return PreferenceShareMetric(
+        key: key,
+        label: labelResolver(key),
+        icon: iconResolver(key),
         count: e.value,
         percentage: total > 0 ? (e.value / total) : 0.0,
       );
@@ -1277,73 +1480,109 @@ class FirebaseAdminService implements AdminService {
 
     try {
       final userDoc = await firestore.collection('users').doc(uid).get();
-      if (!userDoc.exists || userDoc.data() == null) return false;
-
-      final data = userDoc.data()!;
-      final email = data['email'] as String? ?? '';
-      final displayName = data['displayName'] as String? ?? '';
+      final data = userDoc.exists && userDoc.data() != null ? userDoc.data()! : <String, dynamic>{};
+      
+      final currentUid = _effectiveAuth?.currentUser?.uid;
+      final email = (data['email'] as String?)?.isNotEmpty == true
+          ? (data['email'] as String)
+          : (currentUid == uid ? _effectiveAuth?.currentUser?.email ?? '' : '');
+      final displayName = (data['displayName'] as String?)?.isNotEmpty == true
+          ? (data['displayName'] as String)
+          : (currentUid == uid ? _effectiveAuth?.currentUser?.displayName ?? '' : '');
       final nowTimestamp = DateTime.now().millisecondsSinceEpoch;
       final nowIso = DateTime.now().toIso8601String();
 
       // 1. In-App Notification (users/{uid}/notifications subcollection and latestAdminWarning field)
       if (sendInAppNotification) {
-        final notifRef = await firestore.collection('users').doc(uid).collection('notifications').add({
-          'title': title,
-          'message': message,
-          'type': warningType,
-          'timestamp': nowTimestamp,
-          'createdAt': FieldValue.serverTimestamp(),
-          'read': false,
-        });
-
-        await firestore.collection('users').doc(uid).set({
-          'latestAdminWarning': {
-            'id': notifRef.id,
+        DocumentReference<Map<String, dynamic>>? notifRef;
+        try {
+          notifRef = await firestore.collection('users').doc(uid).collection('notifications').add({
             'title': title,
             'message': message,
             'type': warningType,
             'timestamp': nowTimestamp,
-            'createdAt': nowIso,
-          },
+            'createdAt': FieldValue.serverTimestamp(),
+            'read': false,
+          });
+        } catch (subErr) {
+          debugPrint('[AdminService] Error saving to notifications subcollection: $subErr');
+        }
+
+        final warningPayload = {
+          'id': notifRef?.id ?? '$nowTimestamp',
+          'title': title,
+          'message': message,
+          'type': warningType,
+          'timestamp': nowTimestamp,
+          'createdAt': nowIso,
+        };
+
+        await firestore.collection('users').doc(uid).set({
+          'latestAdminWarning': warningPayload,
           'updatedAt': nowIso,
         }, SetOptions(merge: true));
+
+        // If warning is addressed to the active local user on this device, immediately trigger local notification & history!
+        if (currentUid == uid) {
+          final recordJson = jsonEncode({
+            'id': notifRef?.id ?? '$nowTimestamp',
+            'title': title,
+            'body': message,
+            'timestamp': nowTimestamp,
+            'type': 'admin_warning',
+          });
+          await PreferencesService.instance.addNotificationHistoryItem(recordJson);
+          await PreferencesService.instance.setLastSeenAdminWarningAt(nowTimestamp, uid: uid);
+          try {
+            await LocalNotificationService().showInstantNotification(
+              id: (nowTimestamp % 1000000000).abs(),
+              title: title,
+              body: message,
+              payload: 'admin_warning:${notifRef?.id ?? nowTimestamp}',
+            );
+          } catch (e) {
+            debugPrint('[AdminService] Local notification dispatch error: $e');
+          }
+        }
       }
 
       // 2. Email Delivery (mail collection)
       if (sendEmail && email.isNotEmpty) {
         final emailSubject = '⚠️ PackBuddy Bildirimi: $title';
-        final emailHtml = '''
-          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
-            <h2 style="color: #ea580c; margin-top: 0;">PackBuddy Yönetici Uyarısı</h2>
-            <p>Merhaba <strong>${displayName.isNotEmpty ? displayName : "Gezgin"}</strong>,</p>
-            <div style="background-color: #fff7ed; border-left: 4px solid #ea580c; padding: 14px; margin: 18px 0; border-radius: 8px;">
-              <p style="margin: 0; color: #9a3412; font-weight: bold; font-size: 15px;">
-                $title
-              </p>
-              <p style="margin: 8px 0 0 0; color: #334155; font-size: 14px; line-height: 1.5; white-space: pre-line;">
-                $message
-              </p>
-            </div>
-            <p style="color: #64748b; font-size: 13px;">
-              Sorularınız veya destek için lütfen uygulamamız üzerinden bizimle iletişime geçin.
-            </p>
-            <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
-            <p style="font-size: 12px; color: #94a3b8; margin-bottom: 0;">Bu bildirim PackBuddy yönetim paneli tarafından iletilmiştir.</p>
-          </div>
-        ''';
+        final emailText = EmailDispatchService.instance.formatWarningEmailText(
+          displayName: displayName,
+          title: title,
+          message: message,
+        );
+        final emailHtml = EmailDispatchService.instance.formatWarningEmailHtml(
+          displayName: displayName,
+          title: title,
+          message: message,
+        );
 
-        await firestore.collection('mail').add({
-          'to': [email],
-          'message': {
-            'subject': emailSubject,
-            'text': '$title\n\n$message',
-            'html': emailHtml,
-          },
-          'type': 'admin_custom_warning',
-          'warningType': warningType,
-          'targetUid': uid,
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+        try {
+          await firestore.collection('mail').add({
+            'to': [email],
+            'message': {
+              'subject': emailSubject,
+              'text': emailText,
+              'html': emailHtml,
+            },
+            'type': 'admin_custom_warning',
+            'warningType': warningType,
+            'targetUid': uid,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+        } catch (mailErr) {
+          debugPrint('[AdminService] Error queueing to mail collection: $mailErr');
+        }
+
+        try {
+          await firestore.collection('users').doc(uid).set({
+            'lastWarningEmailQueuedAt': nowIso,
+            'lastWarningEmailSubject': emailSubject,
+          }, SetOptions(merge: true));
+        } catch (_) {}
       }
 
       // If warningType is inactivity, also update inactivity metrics

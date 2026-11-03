@@ -54,11 +54,16 @@ class LocalNotificationService implements INotificationService {
   })  : _plugin = plugin ?? FlutterLocalNotificationsPlugin(),
         _prefs = preferencesService ?? PreferencesService.instance;
 
-  /// Android notification channel identifier
+  /// Android notification channel identifiers
   static const String channelId = 'packbuddy_trip_reminders';
   static const String channelName = 'Trip Packing Reminders';
   static const String channelDescription =
       'Smart notifications and packing reminders before trip departure';
+
+  static const String urgentAlertChannelId = 'packbuddy_urgent_alerts';
+  static const String urgentAlertChannelName = 'System & Admin Alerts';
+  static const String urgentAlertChannelDescription =
+      'Important account, security, and administrative alerts';
 
   /// Generates a deterministic, positive 31-bit integer notification ID
   /// from the trip UUID and the reminder offset in hours.
@@ -91,9 +96,9 @@ class LocalNotificationService implements INotificationService {
       // 2. Platform initialization settings
       const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
       const darwinSettings = DarwinInitializationSettings(
-        requestAlertPermission: false,
-        requestBadgePermission: false,
-        requestSoundPermission: false,
+        requestAlertPermission: true,
+        requestBadgePermission: true,
+        requestSoundPermission: true,
       );
 
       const initSettings = InitializationSettings(
@@ -108,7 +113,39 @@ class LocalNotificationService implements INotificationService {
         },
       );
 
+      // 3. Pre-create high-priority notification channels on Android
+      final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      if (androidPlugin != null) {
+        const urgentChannel = AndroidNotificationChannel(
+          urgentAlertChannelId,
+          urgentAlertChannelName,
+          description: urgentAlertChannelDescription,
+          importance: Importance.max,
+          playSound: true,
+          enableVibration: true,
+          enableLights: true,
+        );
+        const reminderChannel = AndroidNotificationChannel(
+          channelId,
+          channelName,
+          description: channelDescription,
+          importance: Importance.high,
+          playSound: true,
+          enableVibration: true,
+        );
+        try {
+          await androidPlugin.createNotificationChannel(urgentChannel);
+          await androidPlugin.createNotificationChannel(reminderChannel);
+        } catch (e) {
+          debugPrint('[LocalNotificationService] Error creating notification channels: $e');
+        }
+      }
+
       _isInitialized = true;
+
+      // 4. Gracefully request runtime permissions for Android 13+ and iOS
+      await requestPermissions();
     } catch (e) {
       debugPrint('[LocalNotificationService] Initialization error (continuing gracefully): $e');
     }
@@ -229,11 +266,17 @@ class LocalNotificationService implements INotificationService {
       await initialize();
     }
     const androidDetails = AndroidNotificationDetails(
-      'packbuddy_urgent_alerts',
-      'System & Admin Alerts',
-      channelDescription: 'Important account, security, and administrative alerts',
+      urgentAlertChannelId,
+      urgentAlertChannelName,
+      channelDescription: urgentAlertChannelDescription,
       importance: Importance.max,
-      priority: Priority.high,
+      priority: Priority.max,
+      fullScreenIntent: false,
+      playSound: true,
+      enableVibration: true,
+      enableLights: true,
+      visibility: NotificationVisibility.public,
+      ticker: 'PackBuddy Bildirimi',
       icon: '@mipmap/ic_launcher',
     );
     const darwinDetails = DarwinNotificationDetails(

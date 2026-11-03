@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../data/local_db/database_helper.dart';
 import '../../budget/domain/trip.dart';
 import '../domain/travel_country.dart';
 import 'world_countries_data.dart';
@@ -80,10 +82,32 @@ class TravelMapService {
     // 2. Read global primary key
     mergeRaw(prefs.getString(_keyCountries));
 
-    // 3. Read user-scoped key (authoritative for logged-in user)
+    // 3. Read user-scoped key (authoritative for logged-in user in SharedPreferences)
     final scoped = _scopedKey(uid);
     if (scoped != _keyCountries) {
       mergeRaw(prefs.getString(scoped));
+    }
+
+    // 4. Read SQLite table (persists even if SharedPreferences gets cleared)
+    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+      try {
+        final effective = _resolveUid(uid);
+        final dbRows = await DatabaseHelper.instance.getTravelMapCountries(userId: effective);
+        for (final row in dbRows) {
+          final code = (row['code'] as String?)?.toUpperCase().trim();
+          if (code != null && code.isNotEmpty) {
+            final status = row['status'] as String? ?? 'none';
+            if (status != 'none') {
+              normalizedMap[code] = {
+                'code': code,
+                'status': status,
+                'visitedDate': row['visited_date'] ?? DateTime.now().millisecondsSinceEpoch,
+                'notes': row['notes'],
+              };
+            }
+          }
+        }
+      } catch (_) {}
     }
 
     return normalizedMap;
@@ -106,6 +130,7 @@ class TravelMapService {
     // Self-healing cloud fallback: If user is logged in, restore and merge any remote countries from Firestore
     if (effectiveUid != null && _isFirebaseReady) {
       try {
+        // Query users/{uid}
         final doc = await FirebaseFirestore.instance
             .collection('users')
             .doc(effectiveUid)
@@ -120,25 +145,33 @@ class TravelMapService {
             }
           }
         }
-      } catch (e) {
-        if (forceRemote) {
-          try {
-            final doc = await FirebaseFirestore.instance
-                .collection('users')
-                .doc(effectiveUid)
-                .get();
-            if (doc.exists && doc.data() != null) {
-              final data = doc.data()!;
-              if (data.containsKey('travelMapCountries')) {
-                final remote = data['travelMapCountries'];
-                if (remote is Map && remote.isNotEmpty) {
-                  await restoreFromCloud(Map<String, dynamic>.from(remote), uid: effectiveUid);
-                  savedMap = await _loadSavedMap(prefs, uid: effectiveUid);
-                }
-              }
+
+        // Query dedicated travel_map collection (multi-device cloud persistent store)
+        final travelMapSnap = await FirebaseFirestore.instance
+            .collection('travel_map')
+            .where('user_id', isEqualTo: effectiveUid)
+            .get(forceRemote ? const GetOptions(source: Source.server) : null);
+        if (travelMapSnap.docs.isNotEmpty) {
+          final Map<String, dynamic> colCountries = {};
+          for (final d in travelMapSnap.docs) {
+            final data = d.data();
+            final code = (data['code'] as String?)?.toUpperCase().trim();
+            final isDeleted = data['is_deleted'] == 1 || data['is_deleted'] == true;
+            if (code != null && code.isNotEmpty && !isDeleted) {
+              colCountries[code] = {
+                'code': code,
+                'status': data['status'] ?? 'visited',
+                'visitedDate': data['visited_date'] ?? data['visitedDate'] ?? DateTime.now().millisecondsSinceEpoch,
+                'notes': data['notes'],
+              };
             }
-          } catch (_) {}
+          }
+          if (colCountries.isNotEmpty) {
+            await restoreFromCloud(colCountries, uid: effectiveUid);
+            savedMap = await _loadSavedMap(prefs, uid: effectiveUid);
+          }
         }
+      } catch (e) {
         debugPrint('[TravelMapService] Cloud fallback notice: $e');
       }
     }
@@ -169,71 +202,94 @@ class TravelMapService {
     final prefs = await SharedPreferences.getInstance();
     final savedMap = await _loadSavedMap(prefs, uid: effectiveUid);
     final keyUpper = code.toUpperCase().trim();
+    final effectiveDate = visitedDate ?? DateTime.now();
 
     if (status == CountryStatus.none) {
       savedMap.remove(keyUpper);
       savedMap.remove(code.toLowerCase().trim());
+      // 1. Remove from SQLite
+      if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+        try {
+          await DatabaseHelper.instance.deleteTravelMapCountry(keyUpper, userId: effectiveUid);
+        } catch (_) {}
+      }
     } else {
-      savedMap[keyUpper] = {
+      final countryData = {
         'code': keyUpper,
         'status': status.name,
-        'visitedDate': (visitedDate ?? DateTime.now()).millisecondsSinceEpoch,
+        'visitedDate': effectiveDate.millisecondsSinceEpoch,
         'notes': notes,
       };
+      savedMap[keyUpper] = countryData;
+      // 1. Persist to SQLite
+      if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+        try {
+          await DatabaseHelper.instance.insertOrUpdateTravelMapCountry(
+            code: keyUpper,
+            status: status.name,
+            userId: effectiveUid,
+            visitedDate: effectiveDate,
+            notes: notes,
+          );
+        } catch (_) {}
+      }
     }
 
     final encoded = jsonEncode(savedMap);
-    // 1. Persist to local storage
+    // 2. Persist to SharedPreferences
     await prefs.setString(_keyCountries, encoded);
     await prefs.setString('packbuddy_travel_map_countries', encoded);
     if (effectiveUid != null) {
       await prefs.setString(_scopedKey(effectiveUid), encoded);
     }
 
-    // 2. Immediately backup to Firestore under users/{uid}
+    // 3. Immediately backup to Firestore (both dedicated collection and users/{uid})
     if (effectiveUid != null && _isFirebaseReady) {
-      try {
-        if (status == CountryStatus.none) {
-          // Explicitly delete country keys from Firestore map so they don't resurrect
+      final docId = '${effectiveUid}_$keyUpper';
+      if (status == CountryStatus.none) {
+        try {
+          await FirebaseFirestore.instance.collection('travel_map').doc(docId).delete();
+        } catch (_) {}
+        try {
           await FirebaseFirestore.instance.collection('users').doc(effectiveUid).update({
             'travelMapCountries.$keyUpper': FieldValue.delete(),
             'travelMapCountries.${keyUpper.toLowerCase()}': FieldValue.delete(),
             'travelMapUpdatedAt': DateTime.now().toIso8601String(),
           });
-        } else {
-          // Dot notation update preserves all other countries in Firestore
+        } catch (_) {}
+      } else {
+        try {
+          await FirebaseFirestore.instance.collection('travel_map').doc(docId).set({
+            'id': docId,
+            'user_id': effectiveUid,
+            'code': keyUpper,
+            'status': status.name,
+            'visited_date': effectiveDate.millisecondsSinceEpoch,
+            'notes': notes,
+            'updated_at': DateTime.now().millisecondsSinceEpoch,
+            'is_deleted': 0,
+          }, SetOptions(merge: true));
+        } catch (_) {}
+        try {
           await FirebaseFirestore.instance.collection('users').doc(effectiveUid).update({
             'travelMapCountries.$keyUpper': savedMap[keyUpper],
             'travelMapUpdatedAt': DateTime.now().toIso8601String(),
           });
+        } catch (e) {
+          try {
+            await FirebaseFirestore.instance.collection('users').doc(effectiveUid).set({
+              'travelMapCountries': {keyUpper: savedMap[keyUpper]},
+              'travelMapUpdatedAt': DateTime.now().toIso8601String(),
+            }, SetOptions(merge: true));
+          } catch (_) {}
         }
-      } catch (e) {
-        // Fallback: merge with full remote map safely without overwriting
-        try {
-          final doc = await FirebaseFirestore.instance.collection('users').doc(effectiveUid).get();
-          final remoteData = doc.data();
-          final remoteCountries = (remoteData != null && remoteData['travelMapCountries'] is Map)
-              ? Map<String, dynamic>.from(remoteData['travelMapCountries'] as Map)
-              : <String, dynamic>{};
-          if (status == CountryStatus.none) {
-            remoteCountries.remove(keyUpper);
-            remoteCountries.remove(code.toLowerCase().trim());
-          } else {
-            remoteCountries[keyUpper] = savedMap[keyUpper];
-          }
-          await FirebaseFirestore.instance.collection('users').doc(effectiveUid).set({
-            'travelMapCountries': remoteCountries,
-            'travelMapUpdatedAt': DateTime.now().toIso8601String(),
-          }, SetOptions(merge: true));
-        } catch (_) {}
-        debugPrint('[TravelMapService] Firestore backup handled: $e');
       }
     }
 
     return getCountries(uid: effectiveUid);
   }
 
-  /// Restores travel map countries from Cloud Firestore into local SharedPreferences
+  /// Restores travel map countries from Cloud Firestore into local SQLite & SharedPreferences
   Future<void> restoreFromCloud(
     Map<String, dynamic> remoteCountries, {
     String? uid,
@@ -246,7 +302,6 @@ class TravelMapService {
       final keyUpper = entry.key.toUpperCase().trim();
       if (entry.value is Map) {
         final valMap = Map<String, dynamic>.from(entry.value as Map);
-        // If country already exists locally, keep the most recently updated one
         if (savedMap.containsKey(keyUpper)) {
           final localDate = savedMap[keyUpper]?['visitedDate'] as int? ?? 0;
           final remoteDate = valMap['visitedDate'] as int? ?? 0;
@@ -255,6 +310,25 @@ class TravelMapService {
           }
         } else {
           savedMap[keyUpper] = valMap;
+        }
+
+        // Persist to local SQLite
+        if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+          try {
+            final statusStr = valMap['status']?.toString() ?? 'visited';
+            final vDateNum = valMap['visitedDate'] ?? valMap['visited_date'];
+            final vDate = vDateNum is int
+                ? DateTime.fromMillisecondsSinceEpoch(vDateNum)
+                : null;
+            final notesStr = valMap['notes']?.toString();
+            await DatabaseHelper.instance.insertOrUpdateTravelMapCountry(
+              code: keyUpper,
+              status: statusStr,
+              userId: effectiveUid,
+              visitedDate: vDate,
+              notes: notesStr,
+            );
+          } catch (_) {}
         }
       }
     }
@@ -289,6 +363,25 @@ class TravelMapService {
         }
       }
 
+      // Also query travel_map collection
+      final colSnap = await FirebaseFirestore.instance
+          .collection('travel_map')
+          .where('user_id', isEqualTo: effectiveUid)
+          .get();
+      for (final cd in colSnap.docs) {
+        final data = cd.data();
+        final code = (data['code'] as String?)?.toUpperCase().trim();
+        final isDeleted = data['is_deleted'] == 1 || data['is_deleted'] == true;
+        if (code != null && code.isNotEmpty && !isDeleted) {
+          remoteMap[code] = {
+            'code': code,
+            'status': data['status'] ?? 'visited',
+            'visitedDate': data['visited_date'] ?? data['visitedDate'] ?? DateTime.now().millisecondsSinceEpoch,
+            'notes': data['notes'],
+          };
+        }
+      }
+
       // Two-Way Merge: Union of local and remote countries
       final mergedMap = Map<String, Map<String, dynamic>>.from(localMap);
       bool remoteNeedsUpdate = false;
@@ -319,6 +412,28 @@ class TravelMapService {
         }
       }
 
+      // Save merged to SQLite
+      if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+        for (final entry in mergedMap.entries) {
+          try {
+            final val = entry.value;
+            final statusStr = val['status']?.toString() ?? 'visited';
+            final vDateNum = val['visitedDate'] ?? val['visited_date'];
+            final vDate = vDateNum is int
+                ? DateTime.fromMillisecondsSinceEpoch(vDateNum)
+                : null;
+            final notesStr = val['notes']?.toString();
+            await DatabaseHelper.instance.insertOrUpdateTravelMapCountry(
+              code: entry.key,
+              status: statusStr,
+              userId: effectiveUid,
+              visitedDate: vDate,
+              notes: notesStr,
+            );
+          } catch (_) {}
+        }
+      }
+
       // Save merged to local SharedPreferences
       final encoded = jsonEncode(mergedMap);
       await prefs.setString(_keyCountries, encoded);
@@ -331,6 +446,22 @@ class TravelMapService {
           'travelMapCountries': mergedMap,
           'travelMapUpdatedAt': DateTime.now().toIso8601String(),
         }, SetOptions(merge: true));
+
+        // Sync individual docs in travel_map collection
+        for (final entry in mergedMap.entries) {
+          final docId = '${effectiveUid}_${entry.key}';
+          final val = entry.value;
+          await FirebaseFirestore.instance.collection('travel_map').doc(docId).set({
+            'id': docId,
+            'user_id': effectiveUid,
+            'code': entry.key,
+            'status': val['status'] ?? 'visited',
+            'visited_date': val['visitedDate'] ?? DateTime.now().millisecondsSinceEpoch,
+            'notes': val['notes'],
+            'updated_at': DateTime.now().millisecondsSinceEpoch,
+            'is_deleted': 0,
+          }, SetOptions(merge: true));
+        }
       }
     } catch (e) {
       debugPrint('[TravelMapService] syncWithCloud notice: $e');

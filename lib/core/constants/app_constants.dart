@@ -6,7 +6,7 @@ class AppConstants {
 
   // Database Constants
   static const String databaseName = 'packbuddy.db';
-  static const int databaseVersion = 10;
+  static const int databaseVersion = 11;
 
   // SQLite Table Names
   static const String tableTrips = 'trips';
@@ -14,6 +14,7 @@ class AppConstants {
   static const String tableDocuments = 'documents';
   static const String tableChecklistItems = 'checklist_items';
   static const String tableSyncMetadata = 'sync_metadata';
+  static const String tableTravelMap = 'travel_map';
 
 
   // Default Values

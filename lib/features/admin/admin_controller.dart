@@ -114,9 +114,7 @@ class AdminState {
     final Map<String, List<AdminUserModel>> grouped = {};
 
     for (final user in active) {
-      final code = user.countryCode.toUpperCase().trim().isEmpty
-          ? 'US'
-          : user.countryCode.toUpperCase().trim();
+      final code = user.effectiveLiveCountryCode.toUpperCase().trim();
       grouped.putIfAbsent(code, () => []).add(user);
     }
 
@@ -125,9 +123,11 @@ class AdminState {
       final usersInCountry = entry.value;
       final count = usersInCountry.length;
       final countryName = usersInCountry
-          .firstWhere((u) => u.countryName.isNotEmpty,
-              orElse: () => usersInCountry.first)
-          .countryName;
+          .firstWhere(
+            (u) => u.effectiveLiveCountryName.isNotEmpty,
+            orElse: () => usersInCountry.first,
+          )
+          .effectiveLiveCountryName;
       final primaryCurrency = usersInCountry
           .firstWhere((u) => u.currencyCode.isNotEmpty,
               orElse: () => usersInCountry.first)

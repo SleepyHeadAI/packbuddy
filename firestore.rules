@@ -25,6 +25,18 @@ service cloud.firestore {
       allow create: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
       allow update: if (isAuthenticated() && request.auth.uid == userId && !isUserBanned(userId)) || isAdmin();
       allow delete: if isAdmin();
+
+      // In-app notifications subcollection: allows user to read/clear their alerts & admin to dispatch
+      match /notifications/{notifId} {
+        allow read, update, delete: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
+        allow create: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
+      }
+    }
+
+    // Mail queue collection for Firebase Trigger Email extension
+    match /mail/{docId} {
+      allow create: if isAuthenticated() || isAdmin();
+      allow read, update, delete: if isAdmin();
     }
 
     // Trips collection: supports collaborative shared travel lists (Feature F-1)
@@ -58,6 +70,13 @@ service cloud.firestore {
       allow create: if (isAuthenticated() && !isUserBanned(request.auth.uid)) || isAdmin();
       allow read: if isAuthenticated() || isAdmin();
       allow update, delete: if (isAuthenticated() && !isUserBanned(request.auth.uid)) || isAdmin();
+    }
+
+    // World Travel Map marked countries collection: multi-device synchronization & backup
+    match /travel_map/{docId} {
+      allow create: if (isAuthenticated() && request.resource.data.user_id == request.auth.uid && !isUserBanned(request.auth.uid)) || isAdmin();
+      allow read: if (isAuthenticated() && resource.data.user_id == request.auth.uid) || isAdmin();
+      allow update, delete: if (isAuthenticated() && resource.data.user_id == request.auth.uid && !isUserBanned(request.auth.uid)) || isAdmin();
     }
 
     // Fallback rule for any other collection: admin only
