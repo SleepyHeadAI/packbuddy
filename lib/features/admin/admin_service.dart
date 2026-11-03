@@ -1517,10 +1517,17 @@ class FirebaseAdminService implements AdminService {
           'createdAt': nowIso,
         };
 
-        await firestore.collection('users').doc(uid).set({
+        final Map<String, dynamic> userUpdate = {
           'latestAdminWarning': warningPayload,
           'updatedAt': nowIso,
-        }, SetOptions(merge: true));
+        };
+
+        // If warning is addressed to the active admin user on this device, mark it seen in cloud immediately
+        if (currentUid == uid) {
+          userUpdate['lastSeenAdminWarningAt'] = nowTimestamp;
+        }
+
+        await firestore.collection('users').doc(uid).set(userUpdate, SetOptions(merge: true));
 
         // If warning is addressed to the active local user on this device, immediately trigger local notification & history!
         if (currentUid == uid) {

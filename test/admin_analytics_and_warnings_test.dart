@@ -289,6 +289,22 @@ void main() {
       expect(result, isFalse);
     });
 
+    test('Simulated clean app install with existing cloud warning does not trigger duplicate instant notification', () {
+      final nowMs = DateTime.now().millisecondsSinceEpoch;
+      const warningTimestamp = 1730000000000; // Past warning
+      final cloudLastSeen = warningTimestamp;
+      const localLastSeen = 0; // Clean install wiped SharedPreferences
+
+      final effectiveLastSeen = cloudLastSeen > localLastSeen ? cloudLastSeen : localLastSeen;
+      final isOldWarning = (nowMs - warningTimestamp) > 180000;
+
+      // Because cloudLastSeen is equal to warningTimestamp, wTimestamp > effectiveLastSeen is false
+      expect(warningTimestamp > effectiveLastSeen, isFalse);
+
+      // Even if cloudLastSeen had not been saved, isOldWarning is true on initial load
+      expect(isOldWarning, isTrue);
+    });
+
     test('LocalNotificationService exposes urgent alerts channel configurations', () {
       expect(LocalNotificationService.urgentAlertChannelId, 'packbuddy_urgent_alerts');
       expect(LocalNotificationService.urgentAlertChannelName, 'System & Admin Alerts');

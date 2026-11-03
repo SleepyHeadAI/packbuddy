@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:packbuddy/core/l10n/l10n.dart';
+import 'package:packbuddy/core/l10n/locale_provider.dart';
+import 'package:packbuddy/core/l10n/language_selector_sheet.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
@@ -21,7 +25,7 @@ class OnboardingPageData {
 }
 
 /// Interactive First-Time Walkthrough & App Tour (Feature F-13)
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends ConsumerStatefulWidget {
   final bool isReplay;
   final VoidCallback? onCompleted;
 
@@ -32,10 +36,10 @@ class OnboardingScreen extends StatefulWidget {
   });
 
   @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
+  ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
@@ -139,7 +143,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
+    final activeLocale = ref.watch(localeProvider);
 
     final isLastPage = _currentPage == _pages.length - 1;
 
@@ -148,7 +154,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Top Bar with Skip Button
+            // Top Bar with App Branding, Language Selector Pill and Skip Button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
@@ -182,15 +188,71 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                     ],
                   ),
-                  TextButton(
-                    onPressed: _completeOnboarding,
-                    child: Text(
-                      l10n?.skip ?? 'Skip',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: theme.colorScheme.onSurfaceVariant,
+
+                  // Top Right Action Cluster: Language Switcher Pill + Skip Button
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Language Selector Pill
+                      InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () => showLanguageSelectorSheet(context, ref, activeLocale),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? theme.colorScheme.surfaceContainerHighest
+                                : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: theme.colorScheme.outline.withValues(alpha: 0.5),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                L10n.getLanguageFlag(activeLocale.languageCode),
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                activeLocale.languageCode.toUpperCase(),
+                                style: TextStyle(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.4,
+                                  color: theme.colorScheme.onSurface,
+                                ),
+                              ),
+                              const SizedBox(width: 3),
+                              Icon(
+                                Icons.keyboard_arrow_down_rounded,
+                                size: 16,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 6),
+                      TextButton(
+                        onPressed: _completeOnboarding,
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          visualDensity: VisualDensity.compact,
+                        ),
+                        child: Text(
+                          l10n?.skip ?? 'Skip',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

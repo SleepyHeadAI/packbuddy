@@ -185,5 +185,40 @@ void main() {
       expect(PreferencesService.instance.isOnboardingCompleted(), isTrue);
       expect(find.byType(AuthScreen), findsOneWidget);
     });
+
+    testWidgets('OnboardingScreen displays language selector pill in top-right and allows switching languages dynamically', (tester) async {
+      await PreferencesService.instance.setOnboardingCompleted(false);
+      await PreferencesService.instance.setLocale(const Locale('tr'));
+
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: PackBuddyApp(),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(OnboardingScreen), findsOneWidget);
+      // Verify language pill is present with TR code
+      expect(find.text('TR'), findsOneWidget);
+      expect(find.text('Zahmetsiz Seyahat Planlaması'), findsOneWidget);
+
+      // Tap language selector pill
+      await tester.tap(find.text('TR'));
+      await tester.pumpAndSettle();
+
+      // Modal bottom sheet with languages should open
+      expect(find.text('English'), findsOneWidget);
+      expect(find.text('Deutsch'), findsOneWidget);
+
+      // Select English
+      await tester.tap(find.text('English'));
+      await tester.pumpAndSettle();
+
+      // Onboarding screen should now be in English!
+      expect(find.text('EN'), findsOneWidget);
+      expect(find.text('Plan Trips Effortlessly'), findsOneWidget);
+      expect(find.text('Skip'), findsOneWidget);
+      expect(find.text('Next'), findsOneWidget);
+    });
   });
 }

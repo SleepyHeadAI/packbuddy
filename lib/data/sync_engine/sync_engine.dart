@@ -170,12 +170,16 @@ class SyncEngine extends StateNotifier<SyncState> {
     if (!isFirebaseReady && _firestoreInstance == null) return;
     final firestore = _firestoreInstance ?? FirebaseFirestore.instance;
 
+    bool isInitialSnapshot = true;
+
     _userDocSubscription = firestore
         .collection('users')
         .doc(uid)
         .snapshots()
         .listen(
       (snapshot) {
+        final isFirst = isInitialSnapshot;
+        isInitialSnapshot = false;
         if (snapshot.exists && snapshot.data() != null) {
           final data = snapshot.data()!;
           final bool hasProKey = data.containsKey('isPremium') ||
@@ -213,9 +217,21 @@ class SyncEngine extends StateNotifier<SyncState> {
               final wTitle = warningMap['title']?.toString() ?? 'PackBuddy Bildirimi';
               final wBody = warningMap['message']?.toString() ?? '';
               final wTimestamp = (warningMap['timestamp'] as num?)?.toInt() ?? 0;
-              final lastSeen = PreferencesService.instance.getLastSeenAdminWarningAt(uid: uid);
-              if (wTimestamp > lastSeen) {
+              final cloudLastSeen = (data['lastSeenAdminWarningAt'] as num?)?.toInt() ?? 0;
+              final localLastSeen = PreferencesService.instance.getLastSeenAdminWarningAt(uid: uid);
+              final effectiveLastSeen = cloudLastSeen > localLastSeen ? cloudLastSeen : localLastSeen;
+
+              final nowMs = DateTime.now().millisecondsSinceEpoch;
+              final isOldWarning = (nowMs - wTimestamp) > 180000; // > 3 minutes old
+
+              if (wTimestamp > effectiveLastSeen) {
                 PreferencesService.instance.setLastSeenAdminWarningAt(wTimestamp, uid: uid);
+                try {
+                  firestore.collection('users').doc(uid).set({
+                    'lastSeenAdminWarningAt': wTimestamp,
+                  }, SetOptions(merge: true));
+                } catch (_) {}
+
                 final recordJson = jsonEncode({
                   'id': wId.isNotEmpty ? wId : '${DateTime.now().millisecondsSinceEpoch}',
                   'title': wTitle,
@@ -224,15 +240,20 @@ class SyncEngine extends StateNotifier<SyncState> {
                   'type': 'admin_warning',
                 });
                 PreferencesService.instance.addNotificationHistoryItem(recordJson);
-                try {
-                  final notifService = ref?.read(notificationServiceProvider);
-                  notifService?.showInstantNotification(
-                    id: (wTimestamp % 1000000000).abs(),
-                    title: wTitle,
-                    body: wBody,
-                    payload: 'admin_warning:$wId',
-                  );
-                } catch (_) {}
+
+                // Do not pop instant heads-up alert if this is an old historical warning on first app load / reinstall
+                final shouldAlert = !isOldWarning && !isFirst;
+                if (shouldAlert) {
+                  try {
+                    final notifService = ref?.read(notificationServiceProvider);
+                    notifService?.showInstantNotification(
+                      id: (wTimestamp % 1000000000).abs(),
+                      title: wTitle,
+                      body: wBody,
+                      payload: 'admin_warning:$wId',
+                    );
+                  } catch (_) {}
+                }
               }
             }
           }

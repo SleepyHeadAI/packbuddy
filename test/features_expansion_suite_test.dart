@@ -526,12 +526,14 @@ void main() {
 
     testWidgets('OnboardingScreen navigates 4 tour slides and reaches Get Started', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          locale: const Locale('en'),
-          home: const OnboardingScreen(isReplay: true),
+        ProviderScope(
+          child: MaterialApp(
+            theme: AppTheme.lightTheme,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('en'),
+            home: const OnboardingScreen(isReplay: true),
+          ),
         ),
       );
       await tester.pumpAndSettle();
