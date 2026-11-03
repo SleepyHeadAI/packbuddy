@@ -20,6 +20,7 @@ class HomeWidgetPreviewCard extends ConsumerStatefulWidget {
 
 class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
   int _selectedSize = 1; // 0: Small, 1: Medium, 2: Large
+  late String _widgetMode; // 'auto', 'trip', 'world_map'
   late bool _showCountdown;
   late bool _showPacking;
   late bool _showBudget;
@@ -29,6 +30,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
   void initState() {
     super.initState();
     final prefs = PreferencesService.instance;
+    _widgetMode = prefs.getWidgetMode();
     _showCountdown = prefs.isWidgetShowCountdown();
     _showPacking = prefs.isWidgetShowPacking();
     _showBudget = prefs.isWidgetShowBudget();
@@ -42,6 +44,13 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
         _widgetData = data;
       });
     }
+  }
+
+  Future<void> _updateWidgetMode(String mode) async {
+    setState(() => _widgetMode = mode);
+    await PreferencesService.instance.setWidgetMode(mode);
+    await AppWidgetService.syncCurrentState(widgetMode: mode);
+    await _loadPayload();
   }
 
   Future<void> _pinWidgetToHomeScreen() async {
@@ -63,6 +72,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
         upcomingTrip: nextTrip,
         items: checklistState.items,
         expenses: expenses,
+        widgetMode: _widgetMode,
       );
 
       final isSupported = await HomeWidget.isRequestPinWidgetSupported() ?? false;
@@ -150,6 +160,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
     final l10n = AppLocalizations.of(context);
 
     return Container(
@@ -192,7 +203,9 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                       ),
                     ),
                     Text(
-                      l10n?.widgetPreview ?? 'Glanceable packing & countdown',
+                      isTr
+                          ? 'Aktif seyahat ve dünya haritası anlık istatistikleri'
+                          : (l10n?.widgetPreview ?? 'Glanceable packing & countdown'),
                       style: TextStyle(
                         fontSize: 11.5,
                         color: theme.colorScheme.onSurfaceVariant,
@@ -204,6 +217,33 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
             ],
           ),
           const SizedBox(height: 16),
+
+          // Widget Mode Selector Tabs
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildModeChoiceChip(
+                  key: 'auto',
+                  label: isTr ? '🌟 Otomatik (Akıllı)' : '🌟 Auto (Smart)',
+                  theme: theme,
+                ),
+                const SizedBox(width: 8),
+                _buildModeChoiceChip(
+                  key: 'trip',
+                  label: isTr ? '✈️ Aktif Seyahat' : '✈️ Active Trip',
+                  theme: theme,
+                ),
+                const SizedBox(width: 8),
+                _buildModeChoiceChip(
+                  key: 'world_map',
+                  label: isTr ? '🌍 Dünya Haritası' : '🌍 World Map',
+                  theme: theme,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
 
           // Size Selector Tabs (Small, Medium, Large)
           Center(
@@ -286,6 +326,27 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
     );
   }
 
+  Widget _buildModeChoiceChip({
+    required String key,
+    required String label,
+    required ThemeData theme,
+  }) {
+    final isSelected = _widgetMode == key;
+    return ChoiceChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (_) => _updateWidgetMode(key),
+      selectedColor: theme.colorScheme.primaryContainer,
+      labelStyle: TextStyle(
+        fontSize: 11.5,
+        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+        color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface,
+      ),
+      visualDensity: VisualDensity.compact,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    );
+  }
+
   Widget _buildSwitchRow({
     required String title,
     required bool value,
@@ -325,6 +386,14 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
       _ => 130.0,
     };
 
+    final bool showWorldMap = switch (_widgetMode) {
+      'world_map' => true,
+      'trip' => false,
+      _ => !(_widgetData?.hasUpcomingTrip ?? false) &&
+          ((_widgetData?.visitedCountriesCount ?? 0) > 0 ||
+              (_widgetData?.wishlistCountriesCount ?? 0) > 0),
+    };
+
     final String tripTitle = _widgetData?.tripTitle ?? l10n?.appName ?? 'PackBuddy';
     final String destination = _widgetData?.destination ?? l10n?.destination ?? 'Plan your next trip';
     final String daysText = _widgetData != null && _widgetData!.daysUntil > 0
@@ -335,6 +404,12 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
     final int packingPercent = _widgetData?.packingPercent ?? 0;
     final double packingProgress = totalItems > 0 ? (packedItems / totalItems).clamp(0.0, 1.0) : 0.0;
     final String budgetSpent = _widgetData?.budgetSpent ?? '';
+
+    final int visitedCount = _widgetData?.visitedCountriesCount ?? 0;
+    final String rawPct = (_widgetData?.worldPercentage ?? '0.0').replaceAll('%', '').trim();
+    final double worldPercent = double.tryParse(rawPct) ?? 0.0;
+    final int wishlistCount = _widgetData?.wishlistCountriesCount ?? 0;
+    final int continentsCount = _widgetData?.continentsCount ?? 0;
 
     return FittedBox(
       fit: BoxFit.scaleDown,
@@ -357,128 +432,249 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Widget Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.flight_takeoff_rounded, size: 14, color: theme.colorScheme.primary),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          'PackBuddy',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
-                            color: theme.colorScheme.primary,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (_showCountdown)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      daysText,
-                      style: TextStyle(
-                        fontSize: 9.5,
-                        fontWeight: FontWeight.w800,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-
-            // Destination / Title
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  tripTitle,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  destination,
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-
-            // Packing Progress
-            if (_showPacking) ...[
-              Column(
+        child: showWorldMap
+            ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // Widget Header
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Flexible(
-                        child: Text(
-                          '${l10n?.shareChecklist ?? "Packing"}: $packedItems/$totalItems',
-                          style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.public_rounded, size: 14, color: theme.colorScheme.primary),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                'PackBuddy • Dünya',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  color: theme.colorScheme.primary,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      Text('$packingPercent%', style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700)),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          '%${worldPercent.toStringAsFixed(1)}',
+                          style: TextStyle(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w800,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 3),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(2),
-                    child: LinearProgressIndicator(
-                      value: packingProgress,
-                      minHeight: 4,
-                      backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.successPastel),
-                    ),
+
+                  // Map Counts
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        visitedCount > 0 ? '$visitedCount Ülke Gezildi' : 'Dünya Haritası',
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        continentsCount > 0
+                            ? '$continentsCount Kıta Keşfedildi'
+                            : 'Ülkeleri haritadan işaretle',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+
+                  // World exploration progress
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Flexible(
+                            child: Text(
+                              'Keşif Oranı',
+                              style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text('%${worldPercent.toStringAsFixed(1)}',
+                              style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700)),
+                        ],
+                      ),
+                      const SizedBox(height: 3),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(2),
+                        child: LinearProgressIndicator(
+                          value: (worldPercent / 100.0).clamp(0.0, 1.0),
+                          minHeight: 4,
+                          backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                          valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // Bottom detail row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '✈️ $visitedCount Gezildi',
+                        style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                      Text(
+                        '🌟 $wishlistCount Hedef',
+                        style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                    ],
                   ),
                 ],
-              ),
-            ],
-
-            // Budget Summary (Medium / Large)
-            if (_showBudget && _selectedSize != 0) ...[
-              Row(
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Flexible(
-                    child: Text(
-                      budgetSpent.isNotEmpty ? '${l10n?.spent ?? "Spent"}: $budgetSpent' : (l10n?.budget ?? 'Budget'),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurfaceVariant),
-                    ),
+                  // Widget Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.flight_takeoff_rounded, size: 14, color: theme.colorScheme.primary),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                'PackBuddy',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  color: theme.colorScheme.primary,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (_showCountdown)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            daysText,
+                            style: TextStyle(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w800,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
+
+                  // Destination / Title
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        tripTitle,
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        destination,
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+
+                  // Packing Progress
+                  if (_showPacking) ...[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                '${l10n?.shareChecklist ?? "Packing"}: $packedItems/$totalItems',
+                                style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Text('$packingPercent%', style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700)),
+                          ],
+                        ),
+                        const SizedBox(height: 3),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(2),
+                          child: LinearProgressIndicator(
+                            value: packingProgress,
+                            minHeight: 4,
+                            backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                            valueColor: AlwaysStoppedAnimation<Color>(AppColors.successPastel),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+
+                  // Budget Summary (Medium / Large)
+                  if (_showBudget && _selectedSize != 0) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            budgetSpent.isNotEmpty ? '${l10n?.spent ?? "Spent"}: $budgetSpent' : (l10n?.budget ?? 'Budget'),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurfaceVariant),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
-            ],
-          ],
-        ),
       ),
     );
   }

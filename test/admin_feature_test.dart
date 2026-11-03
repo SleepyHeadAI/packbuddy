@@ -263,6 +263,28 @@ class MockAdminService implements AdminService {
     }
   }
 
+  final List<Map<String, dynamic>> sentWarnings = [];
+
+  @override
+  Future<bool> sendUserWarning({
+    required String uid,
+    required String title,
+    required String message,
+    required String warningType,
+    bool sendInAppNotification = true,
+    bool sendEmail = true,
+  }) async {
+    sentWarnings.add({
+      'uid': uid,
+      'title': title,
+      'message': message,
+      'warningType': warningType,
+      'sendInApp': sendInAppNotification,
+      'sendEmail': sendEmail,
+    });
+    return true;
+  }
+
   @override
   Future<InactivityScanResult> processInactivityPolicies() async {
     processPoliciesCalled = true;
@@ -790,8 +812,8 @@ void main() {
       expect(find.textContaining('Session Analytics'), findsOneWidget);
       expect(find.text('8 dk 33 sn'), findsOneWidget); // Avg session duration
       expect(find.text('4.3 sa'), findsOneWidget); // Total platform duration
-      expect(find.text('5.5 gün'), findsOneWidget); // Avg trip length
-      expect(find.text('\$320'), findsOneWidget); // Avg expense
+      expect(find.text('5.5 gün'), findsWidgets); // Avg trip length
+      expect(find.text('\$320'), findsWidgets); // Avg expense
 
       // Country Demand Hub tabs
       expect(find.text('🌟 Wishlist'), findsOneWidget);

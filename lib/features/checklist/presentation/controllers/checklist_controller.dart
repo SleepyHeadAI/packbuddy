@@ -1,6 +1,9 @@
+import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../data/local_db/database_helper.dart';
 import '../../../../data/sync_engine/sync_engine.dart';
+import '../../../../core/services/app_widget_service.dart';
 import '../../../../core/services/telemetry_service.dart';
 import '../../../../core/services/preferences_service.dart';
 import '../../domain/packing_item.dart';
@@ -165,10 +168,24 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
     }
   }
 
+  Timer? _syncDebounceTimer;
+
   void _triggerSync() {
-    try {
-      _ref?.read(syncEngineProvider.notifier).performSync();
-    } catch (_) {}
+    _syncDebounceTimer?.cancel();
+    _syncDebounceTimer = Timer(const Duration(milliseconds: 1500), () {
+      try {
+        _ref?.read(syncEngineProvider.notifier).performSync();
+      } catch (_) {}
+      try {
+        AppWidgetService.syncCurrentState();
+      } catch (_) {}
+    });
+  }
+
+  @override
+  void dispose() {
+    _syncDebounceTimer?.cancel();
+    super.dispose();
   }
 
   /// Seed initial representative travel items with deterministic IDs
@@ -312,19 +329,28 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
       if (!mounted) return;
       if (items.isEmpty && tripId == null) {
         final alreadySeeded = PreferencesService.instance.hasSeededChecklist(uid: userId);
+        final alreadyCleared = PreferencesService.instance.hasClearedChecklist(uid: userId);
         final deletedItems = await _db.getDeletedChecklistItems(userId: userId);
-        if (!alreadySeeded && deletedItems.isEmpty) {
+        if (!alreadySeeded && !alreadyCleared && deletedItems.isEmpty) {
           // Seed default items for a rich first-run experience with deterministic IDs ONLY ONCE
           for (final item in _buildSeedItems(userId)) {
             await _db.insertChecklistItem(item, userId: userId);
           }
           await PreferencesService.instance.setSeededChecklist(true, uid: userId);
+          if (userId != null && userId.isNotEmpty) {
+            try {
+              unawaited(FirebaseFirestore.instance.collection('users').doc(userId).set({
+                'hasSeededChecklist': true,
+              }, SetOptions(merge: true)));
+            } catch (_) {}
+          }
           if (!mounted) return;
           items = await _db.getChecklistItems(userId: userId);
         }
       }
       if (!mounted) return;
       state = state.copyWith(items: items, isLoading: false);
+      AppWidgetService.syncCurrentState();
     } catch (e) {
       if (!mounted) return;
       state = state.copyWith(
@@ -447,6 +473,19 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
 
     try {
       await _db.deleteChecklistItem(id);
+      if (newItems.isEmpty && state.activeTripId == null) {
+        final uid = _ref?.read(authUserProvider)?.uid;
+        PreferencesService.instance.setClearedChecklist(true, uid: uid);
+        PreferencesService.instance.setSeededChecklist(true, uid: uid);
+        if (uid != null && uid.isNotEmpty) {
+          try {
+            unawaited(FirebaseFirestore.instance.collection('users').doc(uid).set({
+              'hasClearedChecklist': true,
+              'hasSeededChecklist': true,
+            }, SetOptions(merge: true)));
+          } catch (_) {}
+        }
+      }
       _triggerSync();
       return deleted;
     } catch (e) {
@@ -464,6 +503,15 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
 
     try {
       await _db.restoreChecklistItem(item.id);
+      final uid = _ref?.read(authUserProvider)?.uid;
+      PreferencesService.instance.setClearedChecklist(false, uid: uid);
+      if (uid != null && uid.isNotEmpty) {
+        try {
+          unawaited(FirebaseFirestore.instance.collection('users').doc(uid).set({
+            'hasClearedChecklist': false,
+          }, SetOptions(merge: true)));
+        } catch (_) {}
+      }
       _triggerSync();
     } catch (e) {
       state = state.copyWith(errorMessage: 'Geri alma başarısız: $e');
@@ -481,6 +529,16 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
 
     try {
       await _db.insertChecklistItem(itemToSave);
+      PreferencesService.instance.setClearedChecklist(false, uid: currentUid);
+      PreferencesService.instance.setSeededChecklist(true, uid: currentUid);
+      if (currentUid.isNotEmpty) {
+        try {
+          unawaited(FirebaseFirestore.instance.collection('users').doc(currentUid).set({
+            'hasClearedChecklist': false,
+            'hasSeededChecklist': true,
+          }, SetOptions(merge: true)));
+        } catch (_) {}
+      }
       _triggerSync();
       TelemetryService.instance.logChecklistAction(
         action: 'add',

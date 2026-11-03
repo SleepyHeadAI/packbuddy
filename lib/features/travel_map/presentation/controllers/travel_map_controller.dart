@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:packbuddy/core/services/app_widget_service.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
@@ -169,7 +170,15 @@ class TravelMapController extends StateNotifier<TravelMapState> {
       state = state.copyWith(isLoading: true);
     }
     final effectiveUid = userId ?? _currentUserId;
-    final countries = await _service.getCountries(uid: effectiveUid);
+    var countries = await _service.getCountries(uid: effectiveUid);
+
+    // If logged in and all countries are unvisited/empty locally (e.g. fresh install), sync from Firestore
+    if (effectiveUid != null && countries.every((c) => c.status == CountryStatus.none)) {
+      try {
+        countries = await _service.syncWithCloud(uid: effectiveUid);
+      } catch (_) {}
+    }
+
     state = state.copyWith(isLoading: false, countries: countries);
 
     // Sync completed trips if available
@@ -179,6 +188,7 @@ class TravelMapController extends StateNotifier<TravelMapState> {
         await syncWithTrips(trips, userId: effectiveUid);
       }
     }
+    AppWidgetService.syncCurrentState(countries: state.countries);
   }
 
   /// Forces an authoritative Cloud Firestore synchronization and refetches live country data
@@ -197,6 +207,7 @@ class TravelMapController extends StateNotifier<TravelMapState> {
         await syncWithTrips(trips, userId: effectiveUid);
       }
     }
+    AppWidgetService.syncCurrentState(countries: state.countries);
   }
 
   Future<void> setCountryStatus({
@@ -221,6 +232,7 @@ class TravelMapController extends StateNotifier<TravelMapState> {
       return c;
     }).toList();
     state = state.copyWith(countries: optimisticList);
+    AppWidgetService.syncCurrentState(countries: optimisticList);
 
     // 2. Persist to storage in background and confirm
     final updated = await _service.setStatus(
@@ -231,6 +243,7 @@ class TravelMapController extends StateNotifier<TravelMapState> {
       uid: effectiveUid,
     );
     state = state.copyWith(countries: updated);
+    AppWidgetService.syncCurrentState(countries: updated);
   }
 
   Future<void> syncWithTrips(List<Trip> trips, {String? userId}) async {
@@ -238,6 +251,7 @@ class TravelMapController extends StateNotifier<TravelMapState> {
     final updated = await _service.syncFromTrips(trips, uid: effectiveUid);
     if (updated != null) {
       state = state.copyWith(countries: updated);
+      AppWidgetService.syncCurrentState(countries: updated);
     }
   }
 

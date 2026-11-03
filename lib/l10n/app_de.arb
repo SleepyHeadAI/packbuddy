@@ -562,7 +562,7 @@
   "visitedCountryStatus": "Sie haben dieses Land besucht",
   "worldTravelMapTitle": "Meine Weltreisekarte",
   "worldTravelMapSubtitle": "Bereiste & Wunschländer einfärben",
-  "worldTravelMapStats": "{visited} Bereist • {wishlist} Wunsch • %{percentage} Entdeckt",
+  "worldTravelMapStats": "{visited} Bereist • {wishlist} Wunsch • {percentage}% Entdeckt",
   "mapLegendBeen": "Bereist",
   "mapLegendWant": "Wunsch",
   "mapLegendUnvisited": "Nicht bereist",

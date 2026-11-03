@@ -562,7 +562,7 @@
   "visitedCountryStatus": "您已到访过该国家",
   "worldTravelMapTitle": "我的世界旅行地图",
   "worldTravelMapSubtitle": "点亮去过的和想去的国家",
-  "worldTravelMapStats": "{visited} 已到访 • {wishlist} 想去 • %{percentage} 已探索",
+  "worldTravelMapStats": "{visited} 已到访 • {wishlist} 想去 • {percentage}% 已探索",
   "mapLegendBeen": "去过",
   "mapLegendWant": "想去",
   "mapLegendUnvisited": "未去过",

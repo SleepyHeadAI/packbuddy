@@ -21,7 +21,7 @@ void main() {
 
     test('ThemeMode persistence works correctly', () async {
       final prefs = PreferencesService.instance;
-      expect(prefs.getThemeMode(), ThemeMode.system);
+      expect(prefs.getThemeMode(), ThemeMode.light);
 
       await prefs.setThemeMode(ThemeMode.dark);
       expect(prefs.getThemeMode(), ThemeMode.dark);

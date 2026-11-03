@@ -1724,7 +1724,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String worldTravelMapStats(int visited, int wishlist, String percentage) {
-    return '$visited 訪問済み • $wishlist 行きたい • %$percentage 探索済み';
+    return '$visited 訪問済み • $wishlist 行きたい • $percentage% 探索済み';
   }
 
   @override

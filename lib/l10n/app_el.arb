@@ -562,7 +562,7 @@
   "visitedCountryStatus": "Έχετε επισκεφθεί αυτή τη χώρα",
   "worldTravelMapTitle": "Ο παγκόσμιος ταξιδιωτικός μου χάρτης",
   "worldTravelMapSubtitle": "Χρωματίστε τις χώρες που επισκεφθήκατε και επιθυμείτε",
-  "worldTravelMapStats": "{visited} Επισκεφθείσες • {wishlist} Επιθυμητές • %{percentage} Εξερευνήθηκαν",
+  "worldTravelMapStats": "{visited} Επισκεφθείσες • {wishlist} Επιθυμητές • {percentage}% Εξερευνήθηκαν",
   "mapLegendBeen": "Επισκέφθηκα",
   "mapLegendWant": "Επιθυμητό",
   "mapLegendUnvisited": "Μη επισκεφθέν",

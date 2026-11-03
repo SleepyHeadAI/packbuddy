@@ -19,6 +19,7 @@ import 'features/auth/presentation/screens/email_verification_screen.dart';
 import 'features/auth/presentation/screens/banned_screen.dart';
 import 'features/admin/user_moderation_provider.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
+import 'features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'data/sync_engine/sync_engine.dart';
 
 void main() async {
@@ -137,8 +138,26 @@ class _PackBuddyAppState extends ConsumerState<PackBuddyApp>
   }
 }
 
+/// Notifier managing onboarding tour completion state
+class OnboardingCompletedNotifier extends StateNotifier<bool> {
+  OnboardingCompletedNotifier()
+      : super(PreferencesService.instance.isOnboardingCompleted());
+
+  Future<void> complete() async {
+    await PreferencesService.instance.setOnboardingCompleted(true);
+    state = true;
+  }
+}
+
+/// Provider exposing whether user has completed or skipped the first-time onboarding tour
+final onboardingCompletedProvider =
+    StateNotifierProvider<OnboardingCompletedNotifier, bool>((ref) {
+  return OnboardingCompletedNotifier();
+});
+
 /// Authentication Wall Gate (Zorunlu Giriş & E-posta Doğrulama Duvarı)
-/// - If user is null: strictly [AuthScreen]
+/// - If first install & unauthenticated: [OnboardingScreen] interactive tour
+/// - If unauthenticated: strictly [AuthScreen]
 /// - If user is banned: strictly [BannedScreen]
 /// - If user != null BUT emailVerified == false (password provider): strictly [EmailVerificationScreen]
 /// - If user != null AND emailVerified == true: [DashboardScreen]
@@ -149,6 +168,7 @@ class AuthWallGate extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authUserProvider);
     final moderation = ref.watch(userModerationProvider);
+    final onboardingCompleted = ref.watch(onboardingCompletedProvider);
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 350),
@@ -160,17 +180,32 @@ class AuthWallGate extends ConsumerWidget {
           child: child,
         );
       },
-      child: _buildGatedScreen(user, moderation),
+      child: _buildGatedScreen(user, moderation, onboardingCompleted, ref),
     );
   }
 
-  Widget _buildGatedScreen(User? user, UserModerationState moderation) {
-    // 1. Unauthenticated -> strictly AuthScreen
+  Widget _buildGatedScreen(
+    User? user,
+    UserModerationState moderation,
+    bool onboardingCompleted,
+    WidgetRef ref,
+  ) {
+    // 1. First-time app open: show interactive onboarding walkthrough before login
+    if (!onboardingCompleted && user == null) {
+      return OnboardingScreen(
+        key: const ValueKey('first_time_onboarding_tour'),
+        onCompleted: () {
+          ref.read(onboardingCompletedProvider.notifier).complete();
+        },
+      );
+    }
+
+    // 2. Unauthenticated -> strictly AuthScreen
     if (user == null) {
       return const AuthScreen(key: ValueKey('unauthenticated_auth_wall'));
     }
 
-    // 2. Real-Time Ban Enforcement -> strictly BannedScreen
+    // 3. Real-Time Ban Enforcement -> strictly BannedScreen
     if (moderation.isCurrentlyBanned) {
       return BannedScreen(
         key: const ValueKey('banned_lock_screen'),
@@ -178,18 +213,18 @@ class AuthWallGate extends ConsumerWidget {
       );
     }
 
-    // 3. Check provider (password vs social OAuth like Google)
+    // 4. Check provider (password vs social OAuth like Google)
     final isPasswordProvider = user.providerData.isEmpty ||
         user.providerData.any((p) => p.providerId == 'password');
 
-    // 4. Unverified email for password accounts -> strictly EmailVerificationScreen
+    // 5. Unverified email for password accounts -> strictly EmailVerificationScreen
     if (!user.emailVerified && isPasswordProvider) {
       return const EmailVerificationScreen(
         key: ValueKey('email_verification_wall'),
       );
     }
 
-    // 5. Fully authenticated and verified -> DashboardScreen
+    // 6. Fully authenticated and verified -> DashboardScreen
     return const DashboardScreen(
       key: ValueKey('authenticated_dashboard'),
     );

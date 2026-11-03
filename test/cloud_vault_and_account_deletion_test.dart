@@ -122,6 +122,16 @@ class MockCloudAdminService implements AdminService {
   Future<void> sendInactivityWarningEmail(String uid) async {}
 
   @override
+  Future<bool> sendUserWarning({
+    required String uid,
+    required String title,
+    required String message,
+    required String warningType,
+    bool sendInAppNotification = true,
+    bool sendEmail = true,
+  }) async => true;
+
+  @override
   Future<InactivityScanResult> processInactivityPolicies() async => const InactivityScanResult();
 }
 

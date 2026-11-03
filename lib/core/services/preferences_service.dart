@@ -16,6 +16,7 @@ class PreferencesService {
   static const String keyWidgetShowCountdown = 'packbuddy_widget_show_countdown';
   static const String keyWidgetShowPacking = 'packbuddy_widget_show_packing';
   static const String keyWidgetShowBudget = 'packbuddy_widget_show_budget';
+  static const String keyWidgetMode = 'packbuddy_widget_mode';
   static const String keyTravelMapIs3D = 'packbuddy_travel_map_is_3d';
 
   // Per-User Scoped Keys
@@ -71,8 +72,10 @@ class PreferencesService {
       case 'dark':
         return ThemeMode.dark;
       case 'system':
-      default:
         return ThemeMode.system;
+      default:
+        // PackBuddy starts in Light Mode by default on fresh install
+        return ThemeMode.light;
     }
   }
 
@@ -415,6 +418,9 @@ class PreferencesService {
   bool isWidgetShowBudget() => _prefs?.getBool(keyWidgetShowBudget) ?? true;
   Future<void> setWidgetShowBudget(bool show) async => _prefs?.setBool(keyWidgetShowBudget, show);
 
+  String getWidgetMode() => _prefs?.getString(keyWidgetMode) ?? 'auto';
+  Future<void> setWidgetMode(String mode) async => _prefs?.setString(keyWidgetMode, mode);
+
   // --- Notifications Center Unread Tracking & History ---
   static const String keyLastReadNotificationsAt = 'notifications_last_read_timestamp';
   int getLastReadNotificationsAt() => _prefs?.getInt(keyLastReadNotificationsAt) ?? 0;
@@ -425,6 +431,23 @@ class PreferencesService {
   Future<void> saveNotificationHistory(List<String> items) async => _prefs?.setStringList(keyNotificationHistoryList, items);
   Future<void> clearNotificationHistory() async => _prefs?.remove(keyNotificationHistoryList);
 
+  Future<void> addNotificationHistoryItem(String jsonItem) async {
+    final list = List<String>.from(getNotificationHistory());
+    list.insert(0, jsonItem);
+    if (list.length > 60) list.removeLast();
+    await saveNotificationHistory(list);
+  }
+
+  static const String keyLastSeenAdminWarningAt = 'last_seen_admin_warning_timestamp';
+  int getLastSeenAdminWarningAt({String? uid}) {
+    final key = uid != null && uid.isNotEmpty ? '${keyLastSeenAdminWarningAt}_$uid' : keyLastSeenAdminWarningAt;
+    return _prefs?.getInt(key) ?? 0;
+  }
+  Future<void> setLastSeenAdminWarningAt(int timestamp, {String? uid}) async {
+    final key = uid != null && uid.isNotEmpty ? '${keyLastSeenAdminWarningAt}_$uid' : keyLastSeenAdminWarningAt;
+    await _prefs?.setInt(key, timestamp);
+  }
+
   // --- Checklist First-Time Seeding Tracking ---
   bool hasSeededChecklist({String? uid}) {
     final key = uid != null && uid.isNotEmpty ? 'has_seeded_checklist_$uid' : 'has_seeded_checklist';
@@ -433,6 +456,16 @@ class PreferencesService {
 
   Future<void> setSeededChecklist(bool value, {String? uid}) async {
     final key = uid != null && uid.isNotEmpty ? 'has_seeded_checklist_$uid' : 'has_seeded_checklist';
+    await _prefs?.setBool(key, value);
+  }
+
+  bool hasClearedChecklist({String? uid}) {
+    final key = uid != null && uid.isNotEmpty ? 'has_cleared_checklist_$uid' : 'has_cleared_checklist';
+    return _prefs?.getBool(key) ?? false;
+  }
+
+  Future<void> setClearedChecklist(bool value, {String? uid}) async {
+    final key = uid != null && uid.isNotEmpty ? 'has_cleared_checklist_$uid' : 'has_cleared_checklist';
     await _prefs?.setBool(key, value);
   }
 

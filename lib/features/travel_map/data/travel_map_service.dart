@@ -201,20 +201,32 @@ class TravelMapService {
             'travelMapUpdatedAt': DateTime.now().toIso8601String(),
           });
         } else {
-          await FirebaseFirestore.instance.collection('users').doc(effectiveUid).set({
-            'travelMapCountries': savedMap,
+          // Dot notation update preserves all other countries in Firestore
+          await FirebaseFirestore.instance.collection('users').doc(effectiveUid).update({
+            'travelMapCountries.$keyUpper': savedMap[keyUpper],
             'travelMapUpdatedAt': DateTime.now().toIso8601String(),
-          }, SetOptions(merge: true));
+          });
         }
       } catch (e) {
-        // Fallback: replace entire map directly
+        // Fallback: merge with full remote map safely without overwriting
         try {
+          final doc = await FirebaseFirestore.instance.collection('users').doc(effectiveUid).get();
+          final remoteData = doc.data();
+          final remoteCountries = (remoteData != null && remoteData['travelMapCountries'] is Map)
+              ? Map<String, dynamic>.from(remoteData['travelMapCountries'] as Map)
+              : <String, dynamic>{};
+          if (status == CountryStatus.none) {
+            remoteCountries.remove(keyUpper);
+            remoteCountries.remove(code.toLowerCase().trim());
+          } else {
+            remoteCountries[keyUpper] = savedMap[keyUpper];
+          }
           await FirebaseFirestore.instance.collection('users').doc(effectiveUid).set({
-            'travelMapCountries': savedMap,
+            'travelMapCountries': remoteCountries,
             'travelMapUpdatedAt': DateTime.now().toIso8601String(),
           }, SetOptions(merge: true));
         } catch (_) {}
-        debugPrint('[TravelMapService] Error backing up travel map to Firestore: $e');
+        debugPrint('[TravelMapService] Firestore backup handled: $e');
       }
     }
 
@@ -300,8 +312,11 @@ class TravelMapService {
       }
 
       // Check if local has entries that remote doesn't
-      if (localMap.length > remoteMap.length) {
-        remoteNeedsUpdate = true;
+      for (final localKey in localMap.keys) {
+        if (!remoteMap.containsKey(localKey)) {
+          remoteNeedsUpdate = true;
+          break;
+        }
       }
 
       // Save merged to local SharedPreferences
@@ -310,8 +325,8 @@ class TravelMapService {
       await prefs.setString('packbuddy_travel_map_countries', encoded);
       await prefs.setString(_scopedKey(effectiveUid), encoded);
 
-      // Push merged to Firestore if remote needs update
-      if (remoteNeedsUpdate || remoteMap.isEmpty) {
+      // Push merged to Firestore ONLY if local has newer/added data, or if remote was empty and local has data
+      if (remoteNeedsUpdate || (remoteMap.isEmpty && mergedMap.isNotEmpty)) {
         await userDocRef.set({
           'travelMapCountries': mergedMap,
           'travelMapUpdatedAt': DateTime.now().toIso8601String(),
@@ -336,17 +351,20 @@ class TravelMapService {
     final savedMap = await _loadSavedMap(prefs, uid: effectiveUid);
 
     bool modified = false;
+    final Map<String, dynamic> newTripCountries = {};
     for (final trip in completedTrips) {
       final match = WorldCountriesData.matchCountry(trip.destination);
       if (match != null) {
         final keyUpper = match.code.toUpperCase().trim();
         if (!savedMap.containsKey(keyUpper)) {
-          savedMap[keyUpper] = {
+          final countryData = {
             'code': keyUpper,
             'status': CountryStatus.visited.name,
             'visitedDate': trip.endDate.millisecondsSinceEpoch,
             'notes': trip.title,
           };
+          savedMap[keyUpper] = countryData;
+          newTripCountries[keyUpper] = countryData;
           modified = true;
         }
       }
@@ -363,11 +381,28 @@ class TravelMapService {
 
     if (effectiveUid != null && _isFirebaseReady) {
       try {
-        await FirebaseFirestore.instance.collection('users').doc(effectiveUid).set({
-          'travelMapCountries': savedMap,
+        final Map<String, dynamic> updateFields = {
           'travelMapUpdatedAt': DateTime.now().toIso8601String(),
-        }, SetOptions(merge: true));
-      } catch (_) {}
+        };
+        for (final entry in newTripCountries.entries) {
+          updateFields['travelMapCountries.${entry.key}'] = entry.value;
+        }
+        await FirebaseFirestore.instance.collection('users').doc(effectiveUid).update(updateFields);
+      } catch (_) {
+        // Fallback: merge with remote map safely without overwriting
+        try {
+          final doc = await FirebaseFirestore.instance.collection('users').doc(effectiveUid).get();
+          final remoteData = doc.data();
+          final remoteCountries = (remoteData != null && remoteData['travelMapCountries'] is Map)
+              ? Map<String, dynamic>.from(remoteData['travelMapCountries'] as Map)
+              : <String, dynamic>{};
+          remoteCountries.addAll(savedMap);
+          await FirebaseFirestore.instance.collection('users').doc(effectiveUid).set({
+            'travelMapCountries': remoteCountries,
+            'travelMapUpdatedAt': DateTime.now().toIso8601String(),
+          }, SetOptions(merge: true));
+        } catch (_) {}
+      }
     }
 
     return getCountries(uid: effectiveUid);

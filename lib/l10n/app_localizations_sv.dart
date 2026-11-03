@@ -1793,7 +1793,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String worldTravelMapStats(int visited, int wishlist, String percentage) {
-    return '$visited Besökta • $wishlist Önskade • %$percentage Utforskade';
+    return '$visited Besökta • $wishlist Önskade • $percentage% Utforskade';
   }
 
   @override

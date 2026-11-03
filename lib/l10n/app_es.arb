@@ -562,7 +562,7 @@
   "visitedCountryStatus": "Has visitado este país",
   "worldTravelMapTitle": "Mi mapa de viajes mundial",
   "worldTravelMapSubtitle": "Colorea países visitados y deseados",
-  "worldTravelMapStats": "{visited} Visitados • {wishlist} Deseados • %{percentage} Explorado",
+  "worldTravelMapStats": "{visited} Visitados • {wishlist} Deseados • {percentage}% Explorado",
   "mapLegendBeen": "Visitado",
   "mapLegendWant": "Deseado",
   "mapLegendUnvisited": "No visitado",

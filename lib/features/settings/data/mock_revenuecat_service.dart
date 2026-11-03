@@ -136,6 +136,27 @@ class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
     if (!enableTestPurchasesForUnitTests && isStoreBillingConfigured) {
       _initBilling();
     }
+    _checkRemoteEntitlementOnStartup();
+  }
+
+  void _checkRemoteEntitlementOnStartup() {
+    final uid = _auth?.currentUser?.uid;
+    if (uid == null) return;
+    final firestore = _firestore;
+    if (firestore == null) return;
+
+    firestore.collection('users').doc(uid).get().then((doc) {
+      if (doc.exists && doc.data() != null) {
+        final data = doc.data()!;
+        final isRemotePro = (data['isPremium'] == true) ||
+            (data['is_premium'] == true) ||
+            (data['isPro'] == true) ||
+            (data['pro'] == true);
+        if (isRemotePro && !state.isPro) {
+          updateProStatus(true, uid: uid);
+        }
+      }
+    }).catchError((_) {});
   }
 
   Future<void> _initBilling() async {
@@ -278,6 +299,9 @@ class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
         try {
           await FirebaseFirestore.instance.collection('users').doc(currentUid).set({
             'isPremium': true,
+            'is_premium': true,
+            'isPro': true,
+            'pro': true,
             'proPurchasedAt': DateTime.now().toIso8601String(),
           }, SetOptions(merge: true));
         } catch (e) {
@@ -373,6 +397,9 @@ class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
         try {
           await FirebaseFirestore.instance.collection('users').doc(currentUid).set({
             'isPremium': true,
+            'is_premium': true,
+            'isPro': true,
+            'pro': true,
             'proPurchasedAt': DateTime.now().toIso8601String(),
           }, SetOptions(merge: true));
         } catch (e) {
@@ -397,7 +424,14 @@ class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
     if (currentUid != null && _firestore != null) {
       try {
         final userDoc = await _firestore!.collection('users').doc(currentUid).get();
-        if (userDoc.exists && (userDoc.data()?['isPremium'] == true)) {
+        final data = userDoc.data();
+        final hasPro = userDoc.exists &&
+            data != null &&
+            ((data['isPremium'] == true) ||
+                (data['is_premium'] == true) ||
+                (data['isPro'] == true) ||
+                (data['pro'] == true));
+        if (hasPro) {
           await _prefs.setProUser(true, uid: currentUid);
           state = state.copyWith(isPro: true, isLoading: false, errorMessage: null);
           TelemetryService.instance.logProStatusChanged(isPro: true, source: 'firestore_restore');

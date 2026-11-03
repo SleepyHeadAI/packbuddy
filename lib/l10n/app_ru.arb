@@ -562,7 +562,7 @@
   "visitedCountryStatus": "Вы посетили эту страну",
   "worldTravelMapTitle": "Моя карта путешествий по миру",
   "worldTravelMapSubtitle": "Отмечайте посещенные страны и список желаний",
-  "worldTravelMapStats": "{visited} Посещено • {wishlist} В планах • %{percentage} Исследовано",
+  "worldTravelMapStats": "{visited} Посещено • {wishlist} В планах • {percentage}% Исследовано",
   "mapLegendBeen": "Посещено",
   "mapLegendWant": "В планах",
   "mapLegendUnvisited": "Не посещено",

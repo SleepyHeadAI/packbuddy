@@ -62,7 +62,7 @@ void main() {
       addTearDown(container.dispose);
 
       final notifier = container.read(themeModeProvider.notifier);
-      expect(container.read(themeModeProvider), ThemeMode.system);
+      expect(container.read(themeModeProvider), ThemeMode.light);
 
       notifier.setThemeMode(ThemeMode.dark);
       expect(container.read(themeModeProvider), ThemeMode.dark);

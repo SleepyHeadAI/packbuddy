@@ -1786,7 +1786,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String worldTravelMapStats(int visited, int wishlist, String percentage) {
-    return '$visited घूमे गए • $wishlist इच्छा सूची • %$percentage खोजे गए';
+    return '$visited घूमे गए • $wishlist इच्छा सूची • $percentage% खोजे गए';
   }
 
   @override

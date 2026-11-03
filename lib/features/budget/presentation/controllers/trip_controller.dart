@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../core/services/notification_service.dart';
+import '../../../../core/services/app_widget_service.dart';
 import '../../../../core/services/preferences_service.dart';
 import '../../../../core/services/telemetry_service.dart';
 import '../../../../data/local_db/database_helper.dart';
@@ -88,6 +89,8 @@ class TripController extends StateNotifier<TripState> {
           } catch (_) {}
         }
       }
+
+      AppWidgetService.syncCurrentState();
     } catch (e) {
       if (!mounted) return;
       state = state.copyWith(
@@ -160,6 +163,8 @@ class TripController extends StateNotifier<TripState> {
         _ref.read(syncEngineProvider.notifier).performSync();
       } catch (_) {}
 
+      AppWidgetService.syncCurrentState();
+
       return newTrip;
     } catch (e) {
       state = state.copyWith(errorMessage: e.toString());
@@ -201,6 +206,8 @@ class TripController extends StateNotifier<TripState> {
         _ref.read(syncEngineProvider.notifier).performSync();
       } catch (_) {}
 
+      AppWidgetService.syncCurrentState();
+
       return tripToSave;
     } catch (e) {
       state = state.copyWith(errorMessage: e.toString());
@@ -227,6 +234,8 @@ class TripController extends StateNotifier<TripState> {
       try {
         _ref.read(syncEngineProvider.notifier).performSync();
       } catch (_) {}
+
+      AppWidgetService.syncCurrentState();
 
       return true;
     } catch (e) {

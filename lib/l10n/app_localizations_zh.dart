@@ -1720,7 +1720,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String worldTravelMapStats(int visited, int wishlist, String percentage) {
-    return '$visited 已到访 • $wishlist 想去 • %$percentage 已探索';
+    return '$visited 已到访 • $wishlist 想去 • $percentage% 已探索';
   }
 
   @override

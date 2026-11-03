@@ -562,7 +562,7 @@
   "visitedCountryStatus": "Du har besökt detta land",
   "worldTravelMapTitle": "Min världskarta över resor",
   "worldTravelMapSubtitle": "Färglägg besökta länder och önskeländer",
-  "worldTravelMapStats": "{visited} Besökta • {wishlist} Önskade • %{percentage} Utforskade",
+  "worldTravelMapStats": "{visited} Besökta • {wishlist} Önskade • {percentage}% Utforskade",
   "mapLegendBeen": "Besökt",
   "mapLegendWant": "Önskelista",
   "mapLegendUnvisited": "Icke besökt",

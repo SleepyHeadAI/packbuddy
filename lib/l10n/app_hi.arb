@@ -562,7 +562,7 @@
   "visitedCountryStatus": "आप इस देश की यात्रा कर चुके हैं",
   "worldTravelMapTitle": "मेरा विश्व यात्रा मानचित्र",
   "worldTravelMapSubtitle": "देखे गए और पसंदीदा देशों को रंगीन करें",
-  "worldTravelMapStats": "{visited} घूमे गए • {wishlist} इच्छा सूची • %{percentage} खोजे गए",
+  "worldTravelMapStats": "{visited} घूमे गए • {wishlist} इच्छा सूची • {percentage}% खोजे गए",
   "mapLegendBeen": "घूमा हुआ",
   "mapLegendWant": "इच्छा",
   "mapLegendUnvisited": "नहीं घूमा",

@@ -562,7 +562,7 @@
   "visitedCountryStatus": "Je hebt dit land bezocht",
   "worldTravelMapTitle": "Mijn wereldreiskaart",
   "worldTravelMapSubtitle": "Kleur bezochte en gewenste landen in",
-  "worldTravelMapStats": "{visited} Bezocht • {wishlist} Wensenlijst • %{percentage} Ontdekt",
+  "worldTravelMapStats": "{visited} Bezocht • {wishlist} Wensenlijst • {percentage}% Ontdekt",
   "mapLegendBeen": "Bezocht",
   "mapLegendWant": "Wensenlijst",
   "mapLegendUnvisited": "Niet bezocht",

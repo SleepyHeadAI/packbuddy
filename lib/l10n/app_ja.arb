@@ -562,7 +562,7 @@
   "visitedCountryStatus": "この国を訪れました",
   "worldTravelMapTitle": "世界旅行マップ",
   "worldTravelMapSubtitle": "訪れた国と行きたい国を色分け",
-  "worldTravelMapStats": "{visited} 訪問済み • {wishlist} 行きたい • %{percentage} 探索済み",
+  "worldTravelMapStats": "{visited} 訪問済み • {wishlist} 行きたい • {percentage}% 探索済み",
   "mapLegendBeen": "訪問済み",
   "mapLegendWant": "行きたい",
   "mapLegendUnvisited": "未訪問",

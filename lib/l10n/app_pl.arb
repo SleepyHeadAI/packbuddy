@@ -562,7 +562,7 @@
   "visitedCountryStatus": "Odwiedziłeś ten kraj",
   "worldTravelMapTitle": "Moja mapa podróży po świecie",
   "worldTravelMapSubtitle": "Pokoloruj odwiedzone i wymarzone kraje",
-  "worldTravelMapStats": "{visited} Odwiedzone • {wishlist} Wymarzone • %{percentage} Odkryte",
+  "worldTravelMapStats": "{visited} Odwiedzone • {wishlist} Wymarzone • {percentage}% Odkryte",
   "mapLegendBeen": "Odwiedzone",
   "mapLegendWant": "Wymarzone",
   "mapLegendUnvisited": "Nieodwiedzone",

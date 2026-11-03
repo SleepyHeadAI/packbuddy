@@ -616,17 +616,28 @@ class _NotificationsCenterSheetState extends ConsumerState<NotificationsCenterSh
       itemBuilder: (context, index) {
         final item = _history[index];
         final isTest = item.type == 'test';
+        final isAdminWarning = item.type == 'admin_warning';
+
+        final iconColor = isAdminWarning
+            ? const Color(0xFFEA580C)
+            : (isTest ? const Color(0xFF10B981) : theme.colorScheme.primary);
+        final iconBgColor = iconColor.withValues(alpha: 0.15);
+        final borderColor = isAdminWarning
+            ? const Color(0xFFEA580C).withValues(alpha: 0.35)
+            : theme.colorScheme.outlineVariant.withValues(alpha: 0.3);
 
         return Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: isDark
-                ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
-                : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.25),
+                ? (isAdminWarning
+                    ? const Color(0xFF2A1B12).withValues(alpha: 0.5)
+                    : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3))
+                : (isAdminWarning
+                    ? const Color(0xFFFFF7ED)
+                    : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.25)),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-            ),
+            border: Border.all(color: borderColor),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -634,15 +645,15 @@ class _NotificationsCenterSheetState extends ConsumerState<NotificationsCenterSh
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: isTest
-                      ? const Color(0xFF10B981).withValues(alpha: 0.15)
-                      : theme.colorScheme.primary.withValues(alpha: 0.15),
+                  color: iconBgColor,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  isTest ? Icons.verified_rounded : Icons.notifications_rounded,
+                  isAdminWarning
+                      ? Icons.warning_amber_rounded
+                      : (isTest ? Icons.verified_rounded : Icons.notifications_rounded),
                   size: 16,
-                  color: isTest ? const Color(0xFF10B981) : theme.colorScheme.primary,
+                  color: iconColor,
                 ),
               ),
               const SizedBox(width: 12),
@@ -654,11 +665,39 @@ class _NotificationsCenterSheetState extends ConsumerState<NotificationsCenterSh
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: Text(
-                            item.title,
-                            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          child: Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  item.title,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 13,
+                                    color: isAdminWarning ? const Color(0xFFC2410C) : null,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              if (isAdminWarning) ...[
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFEA580C).withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    Localizations.localeOf(context).languageCode == 'tr' ? 'Yönetici' : 'Admin',
+                                    style: const TextStyle(
+                                      fontSize: 9.5,
+                                      fontWeight: FontWeight.w800,
+                                      color: Color(0xFFEA580C),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ),
                         Text(

@@ -31,6 +31,14 @@ abstract class INotificationService {
 
   /// Reschedules packing reminders for all active upcoming trips.
   Future<void> syncAllTripReminders(List<Trip> trips);
+
+  /// Displays an immediate high-priority alert notification banner
+  Future<void> showInstantNotification({
+    required int id,
+    required String title,
+    required String body,
+    String? payload,
+  });
 }
 
 /// Production implementation of [INotificationService] powered by
@@ -210,6 +218,46 @@ class LocalNotificationService implements INotificationService {
     }
   }
 
+  @override
+  Future<void> showInstantNotification({
+    required int id,
+    required String title,
+    required String body,
+    String? payload,
+  }) async {
+    if (!_isInitialized) {
+      await initialize();
+    }
+    const androidDetails = AndroidNotificationDetails(
+      'packbuddy_urgent_alerts',
+      'System & Admin Alerts',
+      channelDescription: 'Important account, security, and administrative alerts',
+      importance: Importance.max,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+    );
+    const darwinDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: darwinDetails,
+    );
+    try {
+      await _plugin.show(
+        id: id,
+        title: title,
+        body: body,
+        notificationDetails: details,
+        payload: payload,
+      );
+    } catch (e) {
+      debugPrint('[LocalNotificationService] showInstantNotification error: $e');
+    }
+  }
+
   Future<void> _scheduleSingleReminder({
     required int id,
     required DateTime scheduledDate,
@@ -342,6 +390,14 @@ class FakeNotificationService implements INotificationService {
       }
     }
   }
+
+  @override
+  Future<void> showInstantNotification({
+    required int id,
+    required String title,
+    required String body,
+    String? payload,
+  }) async {}
 }
 
 /// Global Riverpod Provider for [INotificationService]

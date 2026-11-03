@@ -2036,7 +2036,7 @@
   "@worldTravelMapSubtitle": {
     "description": "Subtitle explaining map colorization"
   },
-  "worldTravelMapStats": "{visited} Visited • {wishlist} Wishlist • %{percentage} Explored",
+  "worldTravelMapStats": "{visited} Visited • {wishlist} Wishlist • {percentage}% Explored",
   "@worldTravelMapStats": {
     "description": "Formatted summary stats on travel map showcase",
     "placeholders": {

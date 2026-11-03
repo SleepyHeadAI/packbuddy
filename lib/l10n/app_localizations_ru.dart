@@ -1801,7 +1801,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String worldTravelMapStats(int visited, int wishlist, String percentage) {
-    return '$visited Посещено • $wishlist В планах • %$percentage Исследовано';
+    return '$visited Посещено • $wishlist В планах • $percentage% Исследовано';
   }
 
   @override

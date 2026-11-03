@@ -1799,7 +1799,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String worldTravelMapStats(int visited, int wishlist, String percentage) {
-    return '$visited Bezocht • $wishlist Wensenlijst • %$percentage Ontdekt';
+    return '$visited Bezocht • $wishlist Wensenlijst • $percentage% Ontdekt';
   }
 
   @override

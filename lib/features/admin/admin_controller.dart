@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/services/telemetry_service.dart';
+import '../auth/auth_controller.dart';
+import '../settings/data/mock_revenuecat_service.dart';
 import 'admin_service.dart';
 
 /// Analytics period for geo and user activity calculations
@@ -213,8 +215,9 @@ class AdminState {
 /// StateNotifier controlling platform metric aggregation and user status mutations
 class AdminController extends StateNotifier<AdminState> {
   final AdminService _adminService;
+  final Ref? _ref;
 
-  AdminController(this._adminService) : super(const AdminState()) {
+  AdminController(this._adminService, [this._ref]) : super(const AdminState()) {
     refreshData();
   }
 
@@ -292,6 +295,12 @@ class AdminController extends StateNotifier<AdminState> {
       final proCount = updatedUsers.where((u) => u.isPremium).length;
       final updatedMetrics = state.metrics.copyWith(proUsers: proCount);
 
+      // Synchronize active session if current logged-in user's pro was modified
+      final currentUid = _ref?.read(authUserProvider)?.uid;
+      if (currentUid == uid && _ref != null) {
+        _ref.read(proSubscriptionProvider.notifier).updateProStatus(isPremium, uid: uid);
+      }
+
       state = state.copyWith(
         isActionLoading: false,
         allUsers: updatedUsers,
@@ -350,6 +359,12 @@ class AdminController extends StateNotifier<AdminState> {
 
       final proCount = updatedUsers.where((u) => u.isPremium).length;
       final updatedMetrics = state.metrics.copyWith(proUsers: proCount);
+
+      // Synchronize active session if current logged-in user's pro was modified
+      final currentUid = _ref?.read(authUserProvider)?.uid;
+      if (currentUid == uid && _ref != null) {
+        _ref.read(proSubscriptionProvider.notifier).updateProStatus(isPremium, uid: uid);
+      }
 
       state = state.copyWith(
         isActionLoading: false,
@@ -462,6 +477,39 @@ class AdminController extends StateNotifier<AdminState> {
     }
   }
 
+  /// Sends an interactive admin warning to a user (in-app notification + email)
+  Future<bool> sendUserWarning({
+    required String uid,
+    required String title,
+    required String message,
+    required String warningType,
+    bool sendInAppNotification = true,
+    bool sendEmail = true,
+  }) async {
+    state = state.copyWith(isActionLoading: true, clearError: true);
+    try {
+      final success = await _adminService.sendUserWarning(
+        uid: uid,
+        title: title,
+        message: message,
+        warningType: warningType,
+        sendInAppNotification: sendInAppNotification,
+        sendEmail: sendEmail,
+      );
+      if (success) {
+        await loadUsers();
+      }
+      state = state.copyWith(isActionLoading: false);
+      return success;
+    } catch (e) {
+      state = state.copyWith(
+        isActionLoading: false,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
+  }
+
   /// Clears active error notification
   void clearError() {
     if (state.errorMessage != null) {
@@ -474,5 +522,5 @@ class AdminController extends StateNotifier<AdminState> {
 final adminControllerProvider =
     StateNotifierProvider<AdminController, AdminState>((ref) {
   final service = ref.watch(adminServiceProvider);
-  return AdminController(service);
+  return AdminController(service, ref);
 });

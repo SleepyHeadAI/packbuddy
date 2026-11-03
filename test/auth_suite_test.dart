@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/features/auth/auth_service.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/auth/auth_screen.dart';
@@ -182,6 +184,12 @@ class MockAuthService implements AuthService {
 }
 
 void main() {
+  setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences.setMockInitialValues({});
+    await PreferencesService.init();
+  });
+
   group('1. AuthController Unit Tests & Verification State', () {
     late MockAuthService mockAuthService;
 
@@ -588,6 +596,7 @@ void main() {
   group('4. Auth Wall Gate Verification Routing Tests', () {
     testWidgets('Unauthenticated user is strictly routed to AuthScreen', (tester) async {
       final mockAuth = MockAuthService(initialUser: null);
+      await PreferencesService.instance.setOnboardingCompleted(true);
 
       await tester.pumpWidget(
         ProviderScope(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:countries_world_map/countries_world_map.dart';
 import 'package:countries_world_map/data/maps/world_map.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
+import 'package:packbuddy/features/budget/domain/country_localization.dart';
 import 'package:packbuddy/features/travel_map/data/world_countries_data.dart';
 import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
 import 'package:packbuddy/features/travel_map/presentation/widgets/country_flag.dart';
@@ -306,7 +307,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                     style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
                   ),
                   Text(
-                    '${country.continent} • ${country.capital}',
+                    '${ContinentLocalization.getContinentName(country.continent, currentLocale)} • ${country.capital}',
                     style: TextStyle(
                       fontSize: 11.5,
                       color: theme.colorScheme.onSurfaceVariant,

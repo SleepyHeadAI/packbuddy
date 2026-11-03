@@ -89,6 +89,16 @@ class FakeAdminController extends StateNotifier<AdminState>
   Future<bool> sendInactivityWarning(String uid) async => true;
 
   @override
+  Future<bool> sendUserWarning({
+    required String uid,
+    required String title,
+    required String message,
+    required String warningType,
+    bool sendInAppNotification = true,
+    bool sendEmail = true,
+  }) async => true;
+
+  @override
   Future<InactivityScanResult?> runInactivityScan() async => const InactivityScanResult();
 }
 

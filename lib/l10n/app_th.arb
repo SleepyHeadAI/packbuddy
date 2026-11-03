@@ -562,7 +562,7 @@
   "visitedCountryStatus": "คุณได้ไปเยือนประเทศนี้แล้ว",
   "worldTravelMapTitle": "แผนที่การเดินทางทั่วโลกของฉัน",
   "worldTravelMapSubtitle": "ระบายสีประเทศที่เคยไปและประเทศในฝัน",
-  "worldTravelMapStats": "{visited} เคยไป • {wishlist} อยากไป • %{percentage} สำรวจแล้ว",
+  "worldTravelMapStats": "{visited} เคยไป • {wishlist} อยากไป • {percentage}% สำรวจแล้ว",
   "mapLegendBeen": "เคยไป",
   "mapLegendWant": "อยากไป",
   "mapLegendUnvisited": "ยังไม่เคยไป",

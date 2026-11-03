@@ -562,7 +562,7 @@
   "visitedCountryStatus": "لقد زرت هذا البلد",
   "worldTravelMapTitle": "خريطة رحلاتي حول العالم",
   "worldTravelMapSubtitle": "لوّن البلدان التي زرتها وترغب في زيارتها",
-  "worldTravelMapStats": "{visited} تمت زيارتها • {wishlist} في القائمة • %{percentage} تم استكشافها",
+  "worldTravelMapStats": "{visited} تمت زيارتها • {wishlist} في القائمة • {percentage}% تم استكشافها",
   "mapLegendBeen": "تمت زيارتها",
   "mapLegendWant": "في القائمة",
   "mapLegendUnvisited": "لم تتم زيارتها",

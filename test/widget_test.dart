@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/auth/auth_screen.dart';
 import 'package:packbuddy/features/auth/presentation/screens/email_verification_screen.dart';
@@ -31,6 +33,12 @@ class _FakeUser extends Fake implements User {
 }
 
 void main() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    await PreferencesService.init();
+    await PreferencesService.instance.setOnboardingCompleted(true);
+  });
+
   testWidgets('PackBuddy smoke test - unauthenticated user strictly lands on Auth Wall', (WidgetTester tester) async {
     await tester.pumpWidget(
       const ProviderScope(

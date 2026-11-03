@@ -1724,7 +1724,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String worldTravelMapStats(int visited, int wishlist, String percentage) {
-    return '$visited 방문함 • $wishlist 위시리스트 • %$percentage 탐험함';
+    return '$visited 방문함 • $wishlist 위시리스트 • $percentage% 탐험함';
   }
 
   @override

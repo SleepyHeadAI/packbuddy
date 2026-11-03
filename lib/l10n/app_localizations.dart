@@ -3509,7 +3509,7 @@ abstract class AppLocalizations {
   /// Formatted summary stats on travel map showcase
   ///
   /// In en, this message translates to:
-  /// **'{visited} Visited • {wishlist} Wishlist • %{percentage} Explored'**
+  /// **'{visited} Visited • {wishlist} Wishlist • {percentage}% Explored'**
   String worldTravelMapStats(int visited, int wishlist, String percentage);
 
   /// Legend label for visited countries

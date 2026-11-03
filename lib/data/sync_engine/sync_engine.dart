@@ -20,6 +20,7 @@ import '../../features/checklist/domain/canonical_packing_catalog.dart';
 import '../../core/services/currency_service.dart';
 import '../../core/services/preferences_service.dart';
 import '../../core/services/security_service.dart';
+import '../../core/services/notification_service.dart';
 import '../../features/auth/auth_controller.dart';
 import '../../features/settings/data/mock_revenuecat_service.dart';
 import '../../features/vault/presentation/controllers/vault_controller.dart';
@@ -177,8 +178,15 @@ class SyncEngine extends StateNotifier<SyncState> {
       (snapshot) {
         if (snapshot.exists && snapshot.data() != null) {
           final data = snapshot.data()!;
-          if (data.containsKey('isPremium')) {
-            final isPro = data['isPremium'] == true;
+          final bool hasProKey = data.containsKey('isPremium') ||
+              data.containsKey('is_premium') ||
+              data.containsKey('isPro') ||
+              data.containsKey('pro');
+          if (hasProKey) {
+            final isPro = (data['isPremium'] == true) ||
+                (data['is_premium'] == true) ||
+                (data['isPro'] == true) ||
+                (data['pro'] == true);
             PreferencesService.instance.setProUser(isPro, uid: uid);
             onProStatusSynced?.call(isPro);
             final r = ref;
@@ -197,6 +205,36 @@ class SyncEngine extends StateNotifier<SyncState> {
             PreferencesService.instance.setBanStatus((data['banStatus'] as String?) ?? 'none', uid: uid);
             PreferencesService.instance.setBanExpiresAt(data['banExpiresAt'] as String?, uid: uid);
             PreferencesService.instance.setBanReason(data['banReason'] as String?, uid: uid);
+          }
+          if (data.containsKey('latestAdminWarning')) {
+            final warningMap = data['latestAdminWarning'];
+            if (warningMap is Map) {
+              final wId = warningMap['id']?.toString() ?? '';
+              final wTitle = warningMap['title']?.toString() ?? 'PackBuddy Bildirimi';
+              final wBody = warningMap['message']?.toString() ?? '';
+              final wTimestamp = (warningMap['timestamp'] as num?)?.toInt() ?? 0;
+              final lastSeen = PreferencesService.instance.getLastSeenAdminWarningAt(uid: uid);
+              if (wTimestamp > lastSeen) {
+                PreferencesService.instance.setLastSeenAdminWarningAt(wTimestamp, uid: uid);
+                final recordJson = jsonEncode({
+                  'id': wId.isNotEmpty ? wId : '${DateTime.now().millisecondsSinceEpoch}',
+                  'title': wTitle,
+                  'body': wBody,
+                  'timestamp': wTimestamp > 0 ? wTimestamp : DateTime.now().millisecondsSinceEpoch,
+                  'type': 'admin_warning',
+                });
+                PreferencesService.instance.addNotificationHistoryItem(recordJson);
+                try {
+                  final notifService = ref?.read(notificationServiceProvider);
+                  notifService?.showInstantNotification(
+                    id: (wTimestamp % 1000000000).abs(),
+                    title: wTitle,
+                    body: wBody,
+                    payload: 'admin_warning:$wId',
+                  );
+                } catch (_) {}
+              }
+            }
           }
         }
       },
@@ -475,8 +513,15 @@ class SyncEngine extends StateNotifier<SyncState> {
         bool effectiveIsPro = localIsPro;
         if (userDoc.exists && userDoc.data() != null) {
           final userData = userDoc.data()!;
-          if (userData.containsKey('isPremium')) {
-            final remoteIsPro = userData['isPremium'] == true;
+          final bool hasRemotePro = userData.containsKey('isPremium') ||
+              userData.containsKey('is_premium') ||
+              userData.containsKey('isPro') ||
+              userData.containsKey('pro');
+          if (hasRemotePro) {
+            final remoteIsPro = (userData['isPremium'] == true) ||
+                (userData['is_premium'] == true) ||
+                (userData['isPro'] == true) ||
+                (userData['pro'] == true);
             effectiveIsPro = remoteIsPro || localIsPro;
           }
           if (userData.containsKey('vaultPin')) {
@@ -1311,13 +1356,19 @@ class SyncEngine extends StateNotifier<SyncState> {
         }
       }
 
-      // Refresh active domain UI controllers from newly synced local SQLite
+      // Refresh active domain UI controllers when remote mutations occurred
       final r = ref;
       if (r != null) {
         try {
-          r.read(tripControllerProvider.notifier).loadTrips(userId: uid);
-          r.read(checklistControllerProvider.notifier).loadItems(userId: uid);
-          r.read(vaultControllerProvider.notifier).loadDocuments(userId: uid);
+          if (tripsToUpsertLocal.isNotEmpty || tripIdsToHardDelete.isNotEmpty) {
+            r.read(tripControllerProvider.notifier).loadTrips(userId: uid);
+          }
+          if (itemsToUpsertLocal.isNotEmpty || itemIdsToHardDelete.isNotEmpty) {
+            r.read(checklistControllerProvider.notifier).loadItems(userId: uid);
+          }
+          if (docsToUpsertLocal.isNotEmpty || docIdsToHardDelete.isNotEmpty) {
+            r.read(vaultControllerProvider.notifier).loadDocuments(userId: uid);
+          }
           r.read(travelMapControllerProvider.notifier).loadCountries(userId: uid);
         } catch (_) {}
       }

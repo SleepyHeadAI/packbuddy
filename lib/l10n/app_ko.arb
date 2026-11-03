@@ -562,7 +562,7 @@
   "visitedCountryStatus": "이 국가를 방문했습니다",
   "worldTravelMapTitle": "세계 여행 지도",
   "worldTravelMapSubtitle": "방문한 국가와 위시리스트 국가 색칠하기",
-  "worldTravelMapStats": "{visited} 방문함 • {wishlist} 위시리스트 • %{percentage} 탐험함",
+  "worldTravelMapStats": "{visited} 방문함 • {wishlist} 위시리스트 • {percentage}% 탐험함",
   "mapLegendBeen": "방문함",
   "mapLegendWant": "위시리스트",
   "mapLegendUnvisited": "미방문",

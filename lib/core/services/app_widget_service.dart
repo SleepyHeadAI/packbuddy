@@ -1,10 +1,14 @@
 import 'dart:convert';
 import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../data/local_db/database_helper.dart';
 import '../../features/budget/domain/trip.dart';
 import '../../features/budget/domain/expense.dart';
 import '../../features/checklist/domain/packing_item.dart';
+import '../../features/travel_map/data/travel_map_service.dart';
+import '../../features/travel_map/domain/travel_country.dart';
 import '../utils/currency_formatter.dart';
+import 'preferences_service.dart';
 
 /// App Widget Payload model for iOS WidgetKit / Android AppWidgets (Feature F-9)
 class AppWidgetData {
@@ -16,6 +20,12 @@ class AppWidgetData {
   final int packingPercent;
   final String? budgetSpent;
   final String? budgetTotal;
+  final int visitedCountriesCount;
+  final String worldPercentage;
+  final int wishlistCountriesCount;
+  final int continentsCount;
+  final String widgetMode; // 'auto', 'trip', 'world_map'
+  final bool hasUpcomingTrip;
   final DateTime updatedAt;
 
   const AppWidgetData({
@@ -27,6 +37,12 @@ class AppWidgetData {
     this.packingPercent = 0,
     this.budgetSpent,
     this.budgetTotal,
+    this.visitedCountriesCount = 0,
+    this.worldPercentage = '%0.0',
+    this.wishlistCountriesCount = 0,
+    this.continentsCount = 0,
+    this.widgetMode = 'auto',
+    this.hasUpcomingTrip = false,
     required this.updatedAt,
   });
 
@@ -39,6 +55,12 @@ class AppWidgetData {
         'packingPercent': packingPercent,
         'budgetSpent': budgetSpent,
         'budgetTotal': budgetTotal,
+        'visitedCountriesCount': visitedCountriesCount,
+        'worldPercentage': worldPercentage,
+        'wishlistCountriesCount': wishlistCountriesCount,
+        'continentsCount': continentsCount,
+        'widgetMode': widgetMode,
+        'hasUpcomingTrip': hasUpcomingTrip,
         'updatedAt': updatedAt.millisecondsSinceEpoch,
       };
 
@@ -51,6 +73,12 @@ class AppWidgetData {
         packingPercent: (json['packingPercent'] as num?)?.toInt() ?? 0,
         budgetSpent: json['budgetSpent'] as String?,
         budgetTotal: json['budgetTotal'] as String?,
+        visitedCountriesCount: (json['visitedCountriesCount'] as num?)?.toInt() ?? 0,
+        worldPercentage: json['worldPercentage'] as String? ?? '%0.0',
+        wishlistCountriesCount: (json['wishlistCountriesCount'] as num?)?.toInt() ?? 0,
+        continentsCount: (json['continentsCount'] as num?)?.toInt() ?? 0,
+        widgetMode: json['widgetMode'] as String? ?? 'auto',
+        hasUpcomingTrip: json['hasUpcomingTrip'] as bool? ?? false,
         updatedAt: json['updatedAt'] != null
             ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int)
             : DateTime.now(),
@@ -63,80 +91,166 @@ class AppWidgetService {
 
   static const String keyWidgetPayload = 'packbuddy_widget_payload_data';
 
-  /// Serializes and stores latest upcoming trip and checklist metrics for home widgets
+  /// Serializes and stores latest upcoming trip, checklist, and travel map metrics
   static Future<void> updateWidgetPayload({
     Trip? upcomingTrip,
-    List<PackingItem> items = const [],
-    List<Expense> expenses = const [],
+    List<PackingItem>? items,
+    List<Expense>? expenses,
+    List<TravelCountry>? countries,
+    String? widgetMode,
   }) async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      final mode = widgetMode ?? PreferencesService.instance.getWidgetMode();
 
-      if (upcomingTrip == null) {
-        await prefs.remove(keyWidgetPayload);
+      // 1. Resolve World Map Metrics
+      List<TravelCountry> mapCountries = countries ?? const [];
+      if (mapCountries.isEmpty) {
         try {
-          await HomeWidget.saveWidgetData<String>('trip_title', 'PackBuddy');
-          await HomeWidget.saveWidgetData<String>('trip_destination', '');
-          await HomeWidget.saveWidgetData<int>('trip_days', 0);
-          await HomeWidget.saveWidgetData<String>('trip_packing', '0/0');
-          await HomeWidget.saveWidgetData<String>('trip_budget', '');
-          await HomeWidget.updateWidget(
-            name: 'PackBuddyWidgetProvider',
-            androidName: 'PackBuddyWidgetProvider',
-            iOSName: 'PackBuddyWidget',
-          );
+          mapCountries = await TravelMapService.instance.getCountries();
         } catch (_) {}
-        return;
       }
 
-      final now = DateTime.now();
-      final today = DateTime(now.year, now.month, now.day);
-      final tripStart = DateTime(
-        upcomingTrip.startDate.year,
-        upcomingTrip.startDate.month,
-        upcomingTrip.startDate.day,
-      );
-      final daysUntil = tripStart.difference(today).inDays;
+      final visitedCountries = mapCountries.where((c) => c.isVisited || c.isLived).toList();
+      final visitedCount = visitedCountries.length;
+      final wishlistCount = mapCountries.where((c) => c.isWishlist).length;
+      final continentsCount = visitedCountries.map((c) => c.continent).where((c) => c.isNotEmpty).toSet().length;
+      final totalCountries = mapCountries.isNotEmpty ? mapCountries.length : 229;
+      final worldPct = (visitedCount / totalCountries) * 100;
+      final worldPercentStr = '%${worldPct.toStringAsFixed(1)}';
 
-      final tripItems = items.where((i) => i.tripId == upcomingTrip.id && !i.isDeleted).toList();
-      final totalItems = tripItems.length;
-      final packedItems = tripItems.where((i) => i.isPacked).length;
-      final packingPercent = totalItems > 0 ? ((packedItems / totalItems) * 100).toInt() : 0;
+      // 2. Resolve Trip Metrics
+      final hasUpcomingTrip = upcomingTrip != null;
+      int daysUntil = 0;
+      int totalItems = 0;
+      int packedItems = 0;
+      int packingPercent = 0;
+      String? budgetSpentStr;
+      String? budgetTotalStr;
 
-      final totalSpent = expenses.where((e) => e.tripId == upcomingTrip.id && !e.isDeleted).fold<double>(
-            0.0,
-            (sum, e) => sum + e.amount,
-          );
+      if (upcomingTrip != null) {
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final tripStart = DateTime(
+          upcomingTrip.startDate.year,
+          upcomingTrip.startDate.month,
+          upcomingTrip.startDate.day,
+        );
+        daysUntil = tripStart.difference(today).inDays;
+        if (daysUntil < 0) daysUntil = 0;
+
+        final tripItems = (items ?? const [])
+            .where((i) => (i.tripId == upcomingTrip.id || i.tripId == null) && !i.isDeleted)
+            .toList();
+        totalItems = tripItems.length;
+        packedItems = tripItems.where((i) => i.isPacked).length;
+        packingPercent = totalItems > 0 ? ((packedItems / totalItems) * 100).toInt() : 0;
+
+        final totalSpent = (expenses ?? const [])
+            .where((e) => e.tripId == upcomingTrip.id && !e.isDeleted)
+            .fold<double>(0.0, (sum, e) => sum + e.amount);
+
+        budgetSpentStr = CurrencyFormatter.format(totalSpent, currency: upcomingTrip.defaultCurrency);
+        if (upcomingTrip.budgetLimit != null) {
+          budgetTotalStr = CurrencyFormatter.format(upcomingTrip.budgetLimit!, currency: upcomingTrip.defaultCurrency);
+        }
+      }
 
       final payload = AppWidgetData(
-        tripTitle: upcomingTrip.title.isNotEmpty ? upcomingTrip.title : upcomingTrip.destination,
-        destination: upcomingTrip.destination,
-        daysUntil: daysUntil > 0 ? daysUntil : 0,
+        tripTitle: upcomingTrip != null
+            ? (upcomingTrip.title.isNotEmpty ? upcomingTrip.title : upcomingTrip.destination)
+            : 'PackBuddy',
+        destination: upcomingTrip?.destination ?? '',
+        daysUntil: daysUntil,
         totalItems: totalItems,
         packedItems: packedItems,
         packingPercent: packingPercent,
-        budgetSpent: CurrencyFormatter.format(totalSpent, currency: upcomingTrip.defaultCurrency),
-        budgetTotal: upcomingTrip.budgetLimit != null
-            ? CurrencyFormatter.format(upcomingTrip.budgetLimit!, currency: upcomingTrip.defaultCurrency)
-            : null,
+        budgetSpent: budgetSpentStr,
+        budgetTotal: budgetTotalStr,
+        visitedCountriesCount: visitedCount,
+        worldPercentage: worldPercentStr,
+        wishlistCountriesCount: wishlistCount,
+        continentsCount: continentsCount,
+        widgetMode: mode,
+        hasUpcomingTrip: hasUpcomingTrip,
         updatedAt: DateTime.now(),
       );
 
       await prefs.setString(keyWidgetPayload, jsonEncode(payload.toJson()));
 
-      // Synchronize with Native Home Screen Widget (Android AppWidget & iOS WidgetKit)
+      // 3. Synchronize with Native Home Screen Widget (Android AppWidget & iOS WidgetKit)
       try {
-        await HomeWidget.saveWidgetData<String>('trip_title', payload.tripTitle ?? '');
+        await HomeWidget.saveWidgetData<String>('widget_mode', mode);
+        await HomeWidget.saveWidgetData<bool>('has_upcoming_trip', hasUpcomingTrip);
+
+        // Trip Fields
+        await HomeWidget.saveWidgetData<String>('trip_title', payload.tripTitle ?? 'PackBuddy');
         await HomeWidget.saveWidgetData<String>('trip_destination', payload.destination ?? '');
         await HomeWidget.saveWidgetData<int>('trip_days', payload.daysUntil);
         await HomeWidget.saveWidgetData<String>('trip_packing', '${payload.packedItems}/${payload.totalItems}');
         await HomeWidget.saveWidgetData<String>('trip_budget', payload.budgetSpent ?? '');
+
+        // World Map Fields
+        await HomeWidget.saveWidgetData<int>('map_visited_count', visitedCount);
+        await HomeWidget.saveWidgetData<String>('map_world_percent', worldPercentStr);
+        await HomeWidget.saveWidgetData<int>('map_wishlist_count', wishlistCount);
+        await HomeWidget.saveWidgetData<int>('map_continents_count', continentsCount);
+
         await HomeWidget.updateWidget(
           name: 'PackBuddyWidgetProvider',
           androidName: 'PackBuddyWidgetProvider',
+          qualifiedAndroidName: 'com.sleepyhead.packbuddy.PackBuddyWidgetProvider',
           iOSName: 'PackBuddyWidget',
         );
       } catch (_) {}
+    } catch (_) {}
+  }
+
+  /// Self-contained automatic widget refresh from database and local preferences
+  static Future<void> syncCurrentState({
+    Trip? upcomingTrip,
+    List<PackingItem>? items,
+    List<Expense>? expenses,
+    List<TravelCountry>? countries,
+    String? widgetMode,
+  }) async {
+    try {
+      Trip? nextTrip = upcomingTrip;
+      if (nextTrip == null) {
+        final now = DateTime.now();
+        final trips = await DatabaseHelper.instance.getTrips(includeDeleted: false);
+        final futureTrips = trips
+            .where((t) => !t.isDeleted && t.startDate.isAfter(now.subtract(const Duration(days: 1))))
+            .toList()
+          ..sort((a, b) => a.startDate.compareTo(b.startDate));
+        if (futureTrips.isNotEmpty) {
+          nextTrip = futureTrips.first;
+        }
+      }
+
+      List<PackingItem>? resolvedItems = items;
+      if (resolvedItems == null && nextTrip != null) {
+        resolvedItems = await DatabaseHelper.instance.getChecklistItems(
+          tripId: nextTrip.id,
+          includeDeleted: false,
+        );
+      }
+
+      List<Expense>? resolvedExpenses = expenses;
+      if (resolvedExpenses == null && nextTrip != null) {
+        resolvedExpenses = await DatabaseHelper.instance.getExpenses(
+          tripId: nextTrip.id,
+          includeDeleted: false,
+        );
+      }
+
+      await updateWidgetPayload(
+        upcomingTrip: nextTrip,
+        items: resolvedItems,
+        expenses: resolvedExpenses,
+        countries: countries,
+        widgetMode: widgetMode,
+      );
     } catch (_) {}
   }
 

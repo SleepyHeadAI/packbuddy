@@ -562,7 +562,7 @@
   "visitedCountryStatus": "Anda telah mengunjungi negara ini",
   "worldTravelMapTitle": "Peta Perjalanan Dunia Saya",
   "worldTravelMapSubtitle": "Warnai negara yang telah dikunjungi & diimpikan",
-  "worldTravelMapStats": "{visited} Dikunjungi • {wishlist} Impian • %{percentage} Dijelajahi",
+  "worldTravelMapStats": "{visited} Dikunjungi • {wishlist} Impian • {percentage}% Dijelajahi",
   "mapLegendBeen": "Dikunjungi",
   "mapLegendWant": "Impian",
   "mapLegendUnvisited": "Belum dikunjungi",

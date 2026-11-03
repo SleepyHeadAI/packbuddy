@@ -562,7 +562,7 @@
   "visitedCountryStatus": "Bạn đã đến thăm quốc gia này",
   "worldTravelMapTitle": "Bản đồ du lịch thế giới của tôi",
   "worldTravelMapSubtitle": "Tô màu các quốc gia đã đến và muốn đến",
-  "worldTravelMapStats": "{visited} Đã đến • {wishlist} Muốn đến • %{percentage} Đã khám phá",
+  "worldTravelMapStats": "{visited} Đã đến • {wishlist} Muốn đến • {percentage}% Đã khám phá",
   "mapLegendBeen": "Đã đi",
   "mapLegendWant": "Muốn đi",
   "mapLegendUnvisited": "Chưa đi",

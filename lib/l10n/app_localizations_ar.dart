@@ -1779,7 +1779,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String worldTravelMapStats(int visited, int wishlist, String percentage) {
-    return '$visited تمت زيارتها • $wishlist في القائمة • %$percentage تم استكشافها';
+    return '$visited تمت زيارتها • $wishlist في القائمة • $percentage% تم استكشافها';
   }
 
   @override

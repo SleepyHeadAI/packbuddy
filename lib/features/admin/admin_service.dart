@@ -158,6 +158,10 @@ class AdminDetailedAnalytics {
   final List<CountryTravelMetric> topVisitedCountries;
   final List<CountryTravelMetric> topLivedCountries;
   final List<ContinentShareMetric> continentShares;
+  final List<CountryTravelMetric> topTripDestinations;
+  final int upcomingTripsCount;
+  final int completedTripsCount;
+  final int totalWorldMapMarks;
   final List<TransportPreferenceMetric> transportPreferences;
   final List<CurrencyShareMetric> currencyShares;
   final List<VaultCategoryShareMetric> vaultCategories;
@@ -174,6 +178,10 @@ class AdminDetailedAnalytics {
     this.topVisitedCountries = const [],
     this.topLivedCountries = const [],
     this.continentShares = const [],
+    this.topTripDestinations = const [],
+    this.upcomingTripsCount = 0,
+    this.completedTripsCount = 0,
+    this.totalWorldMapMarks = 0,
     this.transportPreferences = const [],
     this.currencyShares = const [],
     this.vaultCategories = const [],
@@ -466,6 +474,14 @@ abstract class AdminService {
   Future<void> cancelAccountDeletionAsAdmin(String uid);
   Future<void> purgeUserDataAsAdmin(String uid);
   Future<void> sendInactivityWarningEmail(String uid);
+  Future<bool> sendUserWarning({
+    required String uid,
+    required String title,
+    required String message,
+    required String warningType,
+    bool sendInAppNotification = true,
+    bool sendEmail = true,
+  });
   Future<InactivityScanResult> processInactivityPolicies();
   bool isCurrentUserAdmin();
 }
@@ -621,6 +637,7 @@ class FirebaseAdminService implements AdminService {
       final Map<String, int> visitedCounts = {};
       final Map<String, int> livedCounts = {};
       final Map<String, int> continentCounts = {};
+      final Map<String, int> tripDestinationCounts = {};
       final Map<String, int> currencyCounts = {};
       final Map<String, int> transportCounts = {};
       final Map<String, int> vaultCategoryCounts = {};
@@ -629,6 +646,7 @@ class FirebaseAdminService implements AdminService {
       int totalPlatformSessions = 0;
       int verifiedUsers = 0;
       int proUsers = 0;
+      int totalWorldMapMarks = 0;
 
       for (final doc in usersSnap.docs) {
         final data = doc.data();
@@ -639,7 +657,7 @@ class FirebaseAdminService implements AdminService {
           livedCounts[homeCountry] = (livedCounts[homeCountry] ?? 0) + 1;
         }
 
-        // 2. User Travel Map Countries (Wishlist, Visited, Lived)
+        // 2. User Travel Map Countries (Wishlist, Visited, Lived) - Strictly World Map Data
         final travelCountries = data['travelMapCountries'];
         if (travelCountries is Map) {
           travelCountries.forEach((rawKey, val) {
@@ -655,11 +673,14 @@ class FirebaseAdminService implements AdminService {
             if (status.contains('wish') || status == 'hedef' || status == 'istek') {
               wishlistCounts[code] = (wishlistCounts[code] ?? 0) + 1;
               _incrementContinent(continentCounts, code);
+              totalWorldMapMarks++;
             } else if (status.contains('visited') || status == 'gezilen' || status == 'gezi') {
               visitedCounts[code] = (visitedCounts[code] ?? 0) + 1;
               _incrementContinent(continentCounts, code);
+              totalWorldMapMarks++;
             } else if (status.contains('lived') || status == 'yasayan') {
               livedCounts[code] = (livedCounts[code] ?? 0) + 1;
+              totalWorldMapMarks++;
             }
           });
         }
@@ -697,11 +718,15 @@ class FirebaseAdminService implements AdminService {
         }
       }
 
-      // 5. Query Trips (for Destinations, Transport Modes, Trip Duration, Currencies)
+      // 5. Query Trips (Strictly Trip Data Analytics: Destinations, Dates, Transport, Currencies)
       double totalTripDays = 0;
       int tripCountWithDates = 0;
+      int upcomingTripsCount = 0;
+      int completedTripsCount = 0;
+      int totalTripsSnapCount = 0;
       try {
         final tripsSnap = await firestore.collection('trips').get();
+        totalTripsSnapCount = tripsSnap.docs.length;
         final now = DateTime.now();
         for (final doc in tripsSnap.docs) {
           final tData = doc.data();
@@ -724,12 +749,15 @@ class FirebaseAdminService implements AdminService {
           if (tData['endDate'] is String) end = DateTime.tryParse(tData['endDate']);
 
           if (destCode.length == 2) {
-            if (start != null && start.isAfter(now)) {
-              wishlistCounts[destCode] = (wishlistCounts[destCode] ?? 0) + 1;
+            tripDestinationCounts[destCode] = (tripDestinationCounts[destCode] ?? 0) + 1;
+          }
+
+          if (start != null) {
+            if (start.isAfter(now)) {
+              upcomingTripsCount++;
             } else {
-              visitedCounts[destCode] = (visitedCounts[destCode] ?? 0) + 1;
+              completedTripsCount++;
             }
-            _incrementContinent(continentCounts, destCode);
           }
 
           if (start != null && end != null) {
@@ -786,6 +814,10 @@ class FirebaseAdminService implements AdminService {
       final topVisited = _buildCountryMetrics(visitedCounts, totalUsers);
       final topLived = _buildCountryMetrics(livedCounts, totalUsers);
       final continentShares = _buildContinentMetrics(continentCounts);
+      final topTripDestinations = _buildCountryMetrics(
+        tripDestinationCounts,
+        totalTripsSnapCount > 0 ? totalTripsSnapCount : 1,
+      );
       final transportPrefs = _buildTransportMetrics(transportCounts);
       final currencyShares = _buildCurrencyMetrics(currencyCounts);
       final vaultCategories = _buildVaultCategoryMetrics(vaultCategoryCounts);
@@ -795,6 +827,10 @@ class FirebaseAdminService implements AdminService {
         topVisitedCountries: topVisited,
         topLivedCountries: topLived,
         continentShares: continentShares,
+        topTripDestinations: topTripDestinations,
+        upcomingTripsCount: upcomingTripsCount,
+        completedTripsCount: completedTripsCount,
+        totalWorldMapMarks: totalWorldMapMarks,
         transportPreferences: transportPrefs,
         currencyShares: currencyShares,
         vaultCategories: vaultCategories,
@@ -987,6 +1023,8 @@ class FirebaseAdminService implements AdminService {
       await firestore.collection('users').doc(uid).set({
         'isPremium': isPremium,
         'is_premium': isPremium,
+        'isPro': isPremium,
+        'pro': isPremium,
         'updatedAt': DateTime.now().toIso8601String(),
       }, SetOptions(merge: true));
       await PreferencesService.instance.setProUser(isPremium, uid: uid);
@@ -1012,6 +1050,8 @@ class FirebaseAdminService implements AdminService {
       final updates = <String, dynamic>{
         'isPremium': isPremium,
         'is_premium': isPremium,
+        'isPro': isPremium,
+        'pro': isPremium,
         'banStatus': banStatus,
         'banExpiresAt': banExpiresAt,
         'banReason': banReason,
@@ -1221,6 +1261,110 @@ class FirebaseAdminService implements AdminService {
       action: 'send_inactivity_warning_email',
       targetUid: uid,
     );
+  }
+
+  @override
+  Future<bool> sendUserWarning({
+    required String uid,
+    required String title,
+    required String message,
+    required String warningType,
+    bool sendInAppNotification = true,
+    bool sendEmail = true,
+  }) async {
+    final firestore = _effectiveFirestore;
+    if (firestore == null) return false;
+
+    try {
+      final userDoc = await firestore.collection('users').doc(uid).get();
+      if (!userDoc.exists || userDoc.data() == null) return false;
+
+      final data = userDoc.data()!;
+      final email = data['email'] as String? ?? '';
+      final displayName = data['displayName'] as String? ?? '';
+      final nowTimestamp = DateTime.now().millisecondsSinceEpoch;
+      final nowIso = DateTime.now().toIso8601String();
+
+      // 1. In-App Notification (users/{uid}/notifications subcollection and latestAdminWarning field)
+      if (sendInAppNotification) {
+        final notifRef = await firestore.collection('users').doc(uid).collection('notifications').add({
+          'title': title,
+          'message': message,
+          'type': warningType,
+          'timestamp': nowTimestamp,
+          'createdAt': FieldValue.serverTimestamp(),
+          'read': false,
+        });
+
+        await firestore.collection('users').doc(uid).set({
+          'latestAdminWarning': {
+            'id': notifRef.id,
+            'title': title,
+            'message': message,
+            'type': warningType,
+            'timestamp': nowTimestamp,
+            'createdAt': nowIso,
+          },
+          'updatedAt': nowIso,
+        }, SetOptions(merge: true));
+      }
+
+      // 2. Email Delivery (mail collection)
+      if (sendEmail && email.isNotEmpty) {
+        final emailSubject = '⚠️ PackBuddy Bildirimi: $title';
+        final emailHtml = '''
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
+            <h2 style="color: #ea580c; margin-top: 0;">PackBuddy Yönetici Uyarısı</h2>
+            <p>Merhaba <strong>${displayName.isNotEmpty ? displayName : "Gezgin"}</strong>,</p>
+            <div style="background-color: #fff7ed; border-left: 4px solid #ea580c; padding: 14px; margin: 18px 0; border-radius: 8px;">
+              <p style="margin: 0; color: #9a3412; font-weight: bold; font-size: 15px;">
+                $title
+              </p>
+              <p style="margin: 8px 0 0 0; color: #334155; font-size: 14px; line-height: 1.5; white-space: pre-line;">
+                $message
+              </p>
+            </div>
+            <p style="color: #64748b; font-size: 13px;">
+              Sorularınız veya destek için lütfen uygulamamız üzerinden bizimle iletişime geçin.
+            </p>
+            <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
+            <p style="font-size: 12px; color: #94a3b8; margin-bottom: 0;">Bu bildirim PackBuddy yönetim paneli tarafından iletilmiştir.</p>
+          </div>
+        ''';
+
+        await firestore.collection('mail').add({
+          'to': [email],
+          'message': {
+            'subject': emailSubject,
+            'text': '$title\n\n$message',
+            'html': emailHtml,
+          },
+          'type': 'admin_custom_warning',
+          'warningType': warningType,
+          'targetUid': uid,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      }
+
+      // If warningType is inactivity, also update inactivity metrics
+      if (warningType == 'inactivity') {
+        await firestore.collection('users').doc(uid).set({
+          'inactivityWarningCount': FieldValue.increment(1),
+          'lastInactivityWarningAt': FieldValue.serverTimestamp(),
+          'updatedAt': nowIso,
+        }, SetOptions(merge: true));
+      }
+
+      TelemetryService.instance.logAdminAction(
+        action: 'send_user_warning',
+        targetUid: uid,
+      );
+
+      return true;
+    } catch (e) {
+      debugPrint('[AdminService] sendUserWarning error: $e');
+      return false;
+    }
   }
 
   @override

@@ -8,6 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../../core/services/preferences_service.dart';
 import '../../core/services/currency_service.dart';
 import '../../data/local_db/database_helper.dart';
+import '../admin/admin_service.dart';
 import '../travel_map/data/travel_map_service.dart';
 
 /// Contract defining authentication operations for PackBuddy
@@ -348,22 +349,39 @@ class FirebaseAuthService implements AuthService {
       final remoteData = existingDoc?.data();
 
       // PRO ENTITLEMENT PERSISTENCE & CONTAGION PREVENTION:
-      // If remote user document exists and specifies isPremium, it is the authoritative source of truth.
+      // If remote user document exists and specifies Pro (checking isPremium, is_premium, isPro, pro), it is the authoritative source of truth.
+      // Super admin accounts automatically retain Pro entitlement.
       // If it's a new registration or converting guest, inherit local device pro status.
-      final bool remoteHasIsPremium = remoteExists && remoteData != null && remoteData.containsKey('isPremium');
-      final bool remoteIsPremium = remoteHasIsPremium && (remoteData['isPremium'] == true);
+      final bool remoteHasIsPremium = remoteExists &&
+          remoteData != null &&
+          (remoteData.containsKey('isPremium') ||
+              remoteData.containsKey('is_premium') ||
+              remoteData.containsKey('isPro') ||
+              remoteData.containsKey('pro'));
+      final bool remoteIsPremium = remoteHasIsPremium &&
+          ((remoteData['isPremium'] == true) ||
+              (remoteData['is_premium'] == true) ||
+              (remoteData['isPro'] == true) ||
+              (remoteData['pro'] == true));
       final bool localScopedPro = PreferencesService.instance.isProUser(uid: user.uid);
       final bool localDevicePro = PreferencesService.instance.isProUser();
+      final bool isSuperAdmin = user.email?.trim().toLowerCase() == kAdminEmail;
 
-      final bool effectiveIsPremium = remoteIsPremium || localScopedPro || (!remoteHasIsPremium && localDevicePro);
+      final bool effectiveIsPremium = isSuperAdmin ||
+          remoteIsPremium ||
+          localScopedPro ||
+          (!remoteHasIsPremium && localDevicePro);
 
       await PreferencesService.instance.setProUser(effectiveIsPremium, uid: user.uid);
 
-      // If user has local Pro but remote was not marked Pro, persist to Firestore
+      // If user has effective Pro but remote was not marked Pro, persist to Firestore
       if (effectiveIsPremium && !remoteIsPremium) {
         try {
           await userDocRef.set({
             'isPremium': true,
+            'is_premium': true,
+            'isPro': true,
+            'pro': true,
             'proSyncedAt': DateTime.now().toIso8601String(),
           }, SetOptions(merge: true));
         } catch (e) {
@@ -509,6 +527,16 @@ class FirebaseAuthService implements AuthService {
         }
       }
 
+      // CHECKLIST SEEDING & CLEARING CLOUD SYNCHRONIZATION:
+      final remoteHasSeededChecklist = remoteData?['hasSeededChecklist'] as bool?;
+      final remoteHasClearedChecklist = remoteData?['hasClearedChecklist'] as bool?;
+      if (remoteHasSeededChecklist != null) {
+        await PreferencesService.instance.setSeededChecklist(remoteHasSeededChecklist, uid: user.uid);
+      }
+      if (remoteHasClearedChecklist != null) {
+        await PreferencesService.instance.setClearedChecklist(remoteHasClearedChecklist, uid: user.uid);
+      }
+
       // WORLD TRAVEL MAP PERSISTENCE & RESTORE:
       // Perform bidirectional cloud sync and merge between local storage and Firestore users/{uid}
       try {
@@ -524,7 +552,7 @@ class FirebaseAuthService implements AuthService {
               ? remoteCreatedAt
               : createdAt;
 
-      await userDocRef.set({
+      final updateFields = <String, dynamic>{
         'uid': user.uid,
         'email': email,
         'displayName': displayName,
@@ -536,7 +564,6 @@ class FirebaseAuthService implements AuthService {
         'lastActiveAt': now,
         'lastInactivityWarningAt': null,
         'inactivityWarningCount': 0,
-        'isPremium': effectiveIsPremium,
         'countryCode': countryCode,
         'countryName': countryName,
         'currencyCode': currencyCode,
@@ -544,7 +571,18 @@ class FirebaseAuthService implements AuthService {
         'banExpiresAt': banExpiresAt,
         'banReason': banReason,
         'restrictedFeatures': restrictedFeatures,
-      }, SetOptions(merge: true));
+      };
+
+      // Only update Pro fields if we successfully verified the remote document (existing or new), or if effective is true.
+      // This prevents transient fetch failures on reinstall from wiping out remote Pro entitlement.
+      if (existingDoc != null || effectiveIsPremium) {
+        updateFields['isPremium'] = effectiveIsPremium;
+        updateFields['is_premium'] = effectiveIsPremium;
+        updateFields['isPro'] = effectiveIsPremium;
+        updateFields['pro'] = effectiveIsPremium;
+      }
+
+      await userDocRef.set(updateFields, SetOptions(merge: true));
 
       return effectiveIsPremium;
     } catch (e) {

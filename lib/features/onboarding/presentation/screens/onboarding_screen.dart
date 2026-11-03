@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
-import 'package:packbuddy/features/auth/auth_screen.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 class OnboardingPageData {
@@ -24,8 +23,13 @@ class OnboardingPageData {
 /// Interactive First-Time Walkthrough & App Tour (Feature F-13)
 class OnboardingScreen extends StatefulWidget {
   final bool isReplay;
+  final VoidCallback? onCompleted;
 
-  const OnboardingScreen({super.key, this.isReplay = false});
+  const OnboardingScreen({
+    super.key,
+    this.isReplay = false,
+    this.onCompleted,
+  });
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -78,12 +82,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     await PreferencesService.instance.setOnboardingCompleted(true);
     if (!mounted) return;
 
+    widget.onCompleted?.call();
+
     if (widget.isReplay) {
-      Navigator.of(context).pop();
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
     } else {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const AuthScreen()),
-      );
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
     }
   }
 
