@@ -30,6 +30,14 @@
 -keep class com.dexterous.flutterlocalnotifications.** { *; }
 -dontwarn com.dexterous.flutterlocalnotifications.**
 
+# Keep HomeWidget & Android AppWidget Provider
+-keep class com.sleepyhead.packbuddy.PackBuddyWidgetProvider { *; }
+-keep class es.antonborri.home_widget.** { *; }
+-dontwarn es.antonborri.home_widget.**
+-keepclassmembers class com.sleepyhead.packbuddy.R$* {
+    public static final int *;
+}
+
 # General anti-tamper obfuscation settings
 -repackageclasses
 -allowaccessmodification

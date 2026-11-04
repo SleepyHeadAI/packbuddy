@@ -346,6 +346,56 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
                   ),
                 ],
               ),
+              const SizedBox(height: 14),
+
+              // Tag & Compartment Selectors
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      initialValue: _tag,
+                      menuMaxHeight: 280,
+                      borderRadius: BorderRadius.circular(16),
+                      decoration: InputDecoration(
+                        labelText: '${l10n.navBaggage} / Tag',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      ),
+                      items: _tags.map((t) {
+                        return DropdownMenuItem(
+                          value: t,
+                          child: Text(t, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val != null) setState(() => _tag = val);
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      initialValue: _compartment,
+                      menuMaxHeight: 280,
+                      borderRadius: BorderRadius.circular(16),
+                      decoration: InputDecoration(
+                        labelText: l10n.compartment,
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      ),
+                      items: _compartments.map((comp) {
+                        return DropdownMenuItem(
+                          value: comp,
+                          child: Text(comp, style: const TextStyle(fontSize: 12)),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val != null) setState(() => _compartment = val);
+                      },
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 20),
 
               // Action Buttons

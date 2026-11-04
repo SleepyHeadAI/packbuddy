@@ -12,6 +12,7 @@ import 'package:packbuddy/features/travel_map/presentation/controllers/travel_ma
 import 'package:packbuddy/features/travel_map/presentation/widgets/interactive_world_map.dart';
 import 'package:packbuddy/features/travel_map/presentation/widgets/travel_map_story_card.dart';
 import 'package:packbuddy/features/travel_map/presentation/widgets/country_flag.dart';
+import 'package:packbuddy/core/services/app_widget_localization.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 /// Full-screen interactive world travel map and country tracker
@@ -110,9 +111,11 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final lang = Localizations.localeOf(context).languageCode;
     final storyKey = GlobalKey();
     StoryCardLayout selectedLayout = StoryCardLayout.classic;
     StoryCardTheme selectedTheme = StoryCardTheme.midnight;
+    int selectedThemeCategory = selectedTheme.isLight ? 1 : 0;
 
     showModalBottomSheet(
       context: context,
@@ -265,16 +268,108 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                       ),
                     ),
 
-                    // 2. Theme / Palette Selector Bar (6 Options)
+                    // 2. Theme Category Tabs: [ 🌙 Dark (9) ]  [ ☀️ Light (7) ]
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 6, 16, 4),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(12),
+                              onTap: () {
+                                setModalState(() {
+                                  selectedThemeCategory = 0;
+                                  if (selectedTheme.isLight) {
+                                    selectedTheme = StoryCardTheme.values.firstWhere((t) => t.isDark);
+                                  }
+                                });
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                padding: const EdgeInsets.symmetric(vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: selectedThemeCategory == 0
+                                      ? (isDark ? Colors.white.withValues(alpha: 0.16) : const Color(0xFF0F172A))
+                                      : (isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.04)),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: selectedThemeCategory == 0
+                                        ? const Color(0xFFEA580C)
+                                        : (isDark ? Colors.white12 : Colors.black12),
+                                    width: selectedThemeCategory == 0 ? 1.5 : 1.0,
+                                  ),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  '🌙 ${AppWidgetLocalization.getDarkThemesCategory(lang)} (9)',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: selectedThemeCategory == 0 ? FontWeight.w800 : FontWeight.w600,
+                                    color: selectedThemeCategory == 0
+                                        ? Colors.white
+                                        : (isDark ? Colors.white70 : Colors.black87),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(12),
+                              onTap: () {
+                                setModalState(() {
+                                  selectedThemeCategory = 1;
+                                  if (selectedTheme.isDark) {
+                                    selectedTheme = StoryCardTheme.values.firstWhere((t) => t.isLight);
+                                  }
+                                });
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                padding: const EdgeInsets.symmetric(vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: selectedThemeCategory == 1
+                                      ? const Color(0xFFEA580C)
+                                      : (isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.04)),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: selectedThemeCategory == 1
+                                        ? const Color(0xFFEA580C)
+                                        : (isDark ? Colors.white12 : Colors.black12),
+                                    width: selectedThemeCategory == 1 ? 1.5 : 1.0,
+                                  ),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  '☀️ ${AppWidgetLocalization.getLightThemesCategory(lang)} (7)',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: selectedThemeCategory == 1 ? FontWeight.w800 : FontWeight.w600,
+                                    color: selectedThemeCategory == 1
+                                        ? Colors.white
+                                        : (isDark ? Colors.white70 : Colors.black87),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // 3. Theme / Palette Selector Bar (Filtered by category)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
-                          children: StoryCardTheme.values.map((t) {
+                          children: StoryCardTheme.values
+                              .where((t) => selectedThemeCategory == 0 ? t.isDark : t.isLight)
+                              .map((t) {
                             final palette = StoryCardPalette.forTheme(
                               t,
-                              locale: Localizations.localeOf(context).languageCode,
+                              locale: lang,
                               l10n: l10n,
                             );
                             final isSelected = t == selectedTheme;
@@ -285,6 +380,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                 onTap: () {
                                   setModalState(() {
                                     selectedTheme = t;
+                                    selectedThemeCategory = t.isLight ? 1 : 0;
                                   });
                                 },
                                 child: AnimatedContainer(
@@ -1371,18 +1467,23 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
 
 
                 // 7. Country List Items
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 40),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        final country = mapState.filteredCountries[index];
-                        return _buildCountryTile(country, l10n, currentLang, theme, isDark);
-                      },
-                      childCount: mapState.filteredCountries.length,
-                      addRepaintBoundaries: true,
-                    ),
-                  ),
+                Builder(
+                  builder: (context) {
+                    final displayCountries = mapState.getFilteredCountries(currentLang);
+                    return SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 40),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final country = displayCountries[index];
+                            return _buildCountryTile(country, l10n, currentLang, theme, isDark);
+                          },
+                          childCount: displayCountries.length,
+                          addRepaintBoundaries: true,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),

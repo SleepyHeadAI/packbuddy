@@ -83,12 +83,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     await ref.read(authControllerProvider.notifier).signInWithGoogle();
   }
 
-  void _handleForgotPassword(BuildContext context) {
+  Future<void> _handleForgotPassword(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
     final emailCtrl = TextEditingController(text: _emailController.text);
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
+    try {
+      await showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
         title: Text(l10n.authResetPasswordTitle),
         content: Column(
@@ -166,6 +167,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         ],
       ),
     );
+    } finally {
+      emailCtrl.dispose();
+    }
   }
 
   String _getLocalizedAuthError(String code, AppLocalizations l10n) {

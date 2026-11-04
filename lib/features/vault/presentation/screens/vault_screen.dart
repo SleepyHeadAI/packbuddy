@@ -79,6 +79,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
   }
 
   @override
+  void deactivate() {
+    ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
+    super.deactivate();
+  }
+
+  @override
   void dispose() {
     SecurityService.instance.disableSecureScreen();
     super.dispose();
@@ -227,6 +233,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 20),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         duration: const Duration(seconds: 4),
+        persist: false,
       ),
     );
   }

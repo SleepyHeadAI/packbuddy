@@ -1,16 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:countries_world_map/countries_world_map.dart';
+import 'package:countries_world_map/data/maps/world_map.dart';
 import 'package:packbuddy/data/local_db/database_helper.dart';
+import 'package:packbuddy/core/l10n/locale_provider.dart';
+import 'package:packbuddy/core/services/app_widget_localization.dart';
 import 'package:packbuddy/core/services/app_widget_service.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
+import 'package:packbuddy/features/travel_map/data/travel_map_service.dart';
+import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
+import 'package:packbuddy/core/services/widget_map_renderer.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 /// In-App Home Screen Widget Preview & Customization Card (Feature F-9)
+/// Provides complete 20-language localization and differentiated Small / Medium / Large widgets,
+/// featuring a miniature painted vector World Map in Medium and Large sizes.
 class HomeWidgetPreviewCard extends ConsumerStatefulWidget {
   const HomeWidgetPreviewCard({super.key});
 
@@ -19,18 +28,47 @@ class HomeWidgetPreviewCard extends ConsumerStatefulWidget {
 }
 
 class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
+  static const List<String> darkWidgetThemes = [
+    'midnight',
+    'sunset',
+    'emerald',
+    'cyberpunk',
+    'volcano',
+    'nordicForest',
+    'goldenHour',
+    'galaxy',
+    'monochromeDark',
+  ];
+
+  static const List<String> lightWidgetThemes = [
+    'minimalLight',
+    'sandLight',
+    'oceanLight',
+    'cherryBlossom',
+    'vintageSepia',
+    'matcha',
+    'pastelDream',
+  ];
+
   int _selectedSize = 1; // 0: Small, 1: Medium, 2: Large
   late String _widgetMode; // 'auto', 'trip', 'world_map'
+  late String _widgetTheme;
+  int _selectedThemeCategory = 0; // 0: Dark (9), 1: Light (7)
   late bool _showCountdown;
   late bool _showPacking;
   late bool _showBudget;
   AppWidgetData? _widgetData;
+  List<TravelCountry> _countries = const [];
 
   @override
   void initState() {
     super.initState();
     final prefs = PreferencesService.instance;
     _widgetMode = prefs.getWidgetMode();
+    _widgetTheme = prefs.getWidgetTheme();
+    if (_widgetTheme == 'light') _widgetTheme = 'minimalLight';
+    if (_widgetTheme == 'ocean') _widgetTheme = 'oceanLight';
+    _selectedThemeCategory = lightWidgetThemes.contains(_widgetTheme) ? 1 : 0;
     _showCountdown = prefs.isWidgetShowCountdown();
     _showPacking = prefs.isWidgetShowPacking();
     _showBudget = prefs.isWidgetShowBudget();
@@ -39,9 +77,14 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
 
   Future<void> _loadPayload() async {
     final data = await AppWidgetService.getWidgetPayload();
+    List<TravelCountry> countries = const [];
+    try {
+      countries = await TravelMapService.instance.getCountries();
+    } catch (_) {}
     if (mounted) {
       setState(() {
         _widgetData = data;
+        _countries = countries;
       });
     }
   }
@@ -49,7 +92,14 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
   Future<void> _updateWidgetMode(String mode) async {
     setState(() => _widgetMode = mode);
     await PreferencesService.instance.setWidgetMode(mode);
-    await AppWidgetService.syncCurrentState(widgetMode: mode);
+    await AppWidgetService.syncCurrentState(widgetMode: mode, widgetTheme: _widgetTheme);
+    await _loadPayload();
+  }
+
+  Future<void> _updateWidgetTheme(String themeKey) async {
+    setState(() => _widgetTheme = themeKey);
+    await PreferencesService.instance.setWidgetTheme(themeKey);
+    await AppWidgetService.syncCurrentState(widgetMode: _widgetMode, widgetTheme: themeKey);
     await _loadPayload();
   }
 
@@ -72,15 +122,23 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
         upcomingTrip: nextTrip,
         items: checklistState.items,
         expenses: expenses,
+        countries: _countries,
         widgetMode: _widgetMode,
+        widgetTheme: _widgetTheme,
       );
+
+      await HomeWidget.saveWidgetData<int>('user_selected_size', _selectedSize);
 
       final isSupported = await HomeWidget.isRequestPinWidgetSupported() ?? false;
       if (isSupported) {
+        final providerName = _selectedSize == 2
+            ? 'PackBuddyLargeWidgetProvider'
+            : (_selectedSize == 1 ? 'PackBuddyMediumWidgetProvider' : 'PackBuddyWidgetProvider');
+
         await HomeWidget.requestPinWidget(
-          name: 'PackBuddyWidgetProvider',
-          androidName: 'PackBuddyWidgetProvider',
-          qualifiedAndroidName: 'com.sleepyhead.packbuddy.PackBuddyWidgetProvider',
+          name: providerName,
+          androidName: providerName,
+          qualifiedAndroidName: 'com.sleepyhead.packbuddy.$providerName',
         );
         if (mounted) {
           final l10n = AppLocalizations.of(context);
@@ -92,7 +150,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      l10n?.pinWidgetSuccess ?? 'Widget ana ekrana eklendi.',
+                      l10n?.pinWidgetSuccess ?? 'Widget added to home screen.',
                     ),
                   ),
                 ],
@@ -160,7 +218,8 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    final activeLocale = ref.watch(localeProvider);
+    final lang = Localizations.maybeLocaleOf(context)?.languageCode ?? activeLocale.languageCode;
     final l10n = AppLocalizations.of(context);
 
     return Container(
@@ -203,9 +262,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                       ),
                     ),
                     Text(
-                      isTr
-                          ? 'Aktif seyahat ve dünya haritası anlık istatistikleri'
-                          : (l10n?.widgetPreview ?? 'Glanceable packing & countdown'),
+                      AppWidgetLocalization.getHeaderSubtitle(lang),
                       style: TextStyle(
                         fontSize: 11.5,
                         color: theme.colorScheme.onSurfaceVariant,
@@ -225,19 +282,19 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
               children: [
                 _buildModeChoiceChip(
                   key: 'auto',
-                  label: isTr ? '🌟 Otomatik (Akıllı)' : '🌟 Auto (Smart)',
+                  label: AppWidgetLocalization.getAutoModeLabel(lang),
                   theme: theme,
                 ),
                 const SizedBox(width: 8),
                 _buildModeChoiceChip(
                   key: 'trip',
-                  label: isTr ? '✈️ Aktif Seyahat' : '✈️ Active Trip',
+                  label: AppWidgetLocalization.getTripModeLabel(lang),
                   theme: theme,
                 ),
                 const SizedBox(width: 8),
                 _buildModeChoiceChip(
                   key: 'world_map',
-                  label: isTr ? '🌍 Dünya Haritası' : '🌍 World Map',
+                  label: AppWidgetLocalization.getWorldMapModeLabel(lang),
                   theme: theme,
                 ),
               ],
@@ -279,11 +336,138 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
               ),
             ),
           ),
+          const SizedBox(height: 12),
+
+          // Theme & Style Selector
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppWidgetLocalization.getThemeSectionTitle(lang),
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // Category Switch: [ 🌙 Dark (9) ]  [ ☀️ Light (7) ]
+              Row(
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: () {
+                        setState(() {
+                          _selectedThemeCategory = 0;
+                          if (lightWidgetThemes.contains(_widgetTheme)) {
+                            _updateWidgetTheme(darkWidgetThemes.first);
+                          }
+                        });
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.symmetric(vertical: 6.5),
+                        decoration: BoxDecoration(
+                          color: _selectedThemeCategory == 0
+                              ? theme.colorScheme.primaryContainer
+                              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: _selectedThemeCategory == 0
+                                ? theme.colorScheme.primary
+                                : Colors.transparent,
+                            width: 1.2,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          '🌙 ${AppWidgetLocalization.getDarkThemesCategory(lang)} (${darkWidgetThemes.length})',
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: _selectedThemeCategory == 0 ? FontWeight.w800 : FontWeight.w600,
+                            color: _selectedThemeCategory == 0
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: () {
+                        setState(() {
+                          _selectedThemeCategory = 1;
+                          if (darkWidgetThemes.contains(_widgetTheme)) {
+                            _updateWidgetTheme(lightWidgetThemes.first);
+                          }
+                        });
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.symmetric(vertical: 6.5),
+                        decoration: BoxDecoration(
+                          color: _selectedThemeCategory == 1
+                              ? theme.colorScheme.primaryContainer
+                              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: _selectedThemeCategory == 1
+                                ? theme.colorScheme.primary
+                                : Colors.transparent,
+                            width: 1.2,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          '☀️ ${AppWidgetLocalization.getLightThemesCategory(lang)} (${lightWidgetThemes.length})',
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: _selectedThemeCategory == 1 ? FontWeight.w800 : FontWeight.w600,
+                            color: _selectedThemeCategory == 1
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+
+              // Theme Chips Row
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: (_selectedThemeCategory == 0 ? darkWidgetThemes : lightWidgetThemes)
+                      .map((key) {
+                    final config = WidgetThemeConfig.fromKey(key);
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: _buildThemeChip(
+                        key,
+                        config.cardBgColor,
+                        config.accentColor,
+                        config.emoji,
+                        lang,
+                        theme,
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 16),
 
           // Widget Preview Canvas (Simulating iOS/Android widget)
           Center(
-            child: _buildWidgetPreview(theme, isDark, l10n),
+            child: _buildWidgetPreview(theme, isDark, l10n, lang),
           ),
           const SizedBox(height: 16),
 
@@ -347,6 +531,72 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
     );
   }
 
+  Widget _buildThemeChip(
+    String key,
+    Color swatchColor,
+    Color accentColor,
+    String emoji,
+    String lang,
+    ThemeData theme,
+  ) {
+    final isSelected = _widgetTheme == key;
+    final label = AppWidgetLocalization.getThemeName(lang, key);
+    return InkWell(
+      onTap: () => _updateWidgetTheme(key),
+      borderRadius: BorderRadius.circular(10),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? theme.colorScheme.primary.withValues(alpha: 0.15)
+              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected ? theme.colorScheme.primary : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 13,
+              height: 13,
+              decoration: BoxDecoration(
+                color: swatchColor,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? theme.colorScheme.primary : Colors.grey.withValues(alpha: 0.5),
+                  width: 1.2,
+                ),
+              ),
+              child: Center(
+                child: Container(
+                  width: 5,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: accentColor,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              '$emoji $label',
+              style: TextStyle(
+                fontSize: 11.5,
+                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildSwitchRow({
     required String title,
     required bool value,
@@ -372,18 +622,19 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
     );
   }
 
-  Widget _buildWidgetPreview(ThemeData theme, bool isDark, AppLocalizations? l10n) {
+  /// Master preview router: switches dimensions and layout based on Small (0), Medium (1), and Large (2)
+  Widget _buildWidgetPreview(ThemeData theme, bool isDark, AppLocalizations? l10n, String lang) {
     final double width = switch (_selectedSize) {
-      0 => 148.0,
-      1 => 280.0,
-      2 => 280.0,
-      _ => 280.0,
+      0 => 156.0,
+      1 => 310.0,
+      2 => 310.0,
+      _ => 310.0,
     };
     final double height = switch (_selectedSize) {
-      0 => 148.0,
-      1 => 130.0,
-      2 => 210.0,
-      _ => 130.0,
+      0 => 156.0,
+      1 => 140.0,
+      2 => 300.0,
+      _ => 140.0,
     };
 
     final bool showWorldMap = switch (_widgetMode) {
@@ -394,22 +645,51 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
               (_widgetData?.wishlistCountriesCount ?? 0) > 0),
     };
 
-    final String tripTitle = _widgetData?.tripTitle ?? l10n?.appName ?? 'PackBuddy';
-    final String destination = _widgetData?.destination ?? l10n?.destination ?? 'Plan your next trip';
-    final String daysText = _widgetData != null && _widgetData!.daysUntil > 0
-        ? '${_widgetData!.daysUntil}d'
-        : (_widgetData != null ? '0d' : '-');
-    final int totalItems = _widgetData?.totalItems ?? 0;
-    final int packedItems = _widgetData?.packedItems ?? 0;
-    final int packingPercent = _widgetData?.packingPercent ?? 0;
-    final double packingProgress = totalItems > 0 ? (packedItems / totalItems).clamp(0.0, 1.0) : 0.0;
-    final String budgetSpent = _widgetData?.budgetSpent ?? '';
+    final themeConfig = WidgetThemeConfig.fromKey(_widgetTheme);
 
-    final int visitedCount = _widgetData?.visitedCountriesCount ?? 0;
+    // Build the country color map for our miniature vector World Map
+    final colorMap = <String, Color>{};
+    for (final country in _countries) {
+      final code = country.code.toLowerCase().trim();
+      if (country.isLived) {
+        colorMap[code] = themeConfig.livedColor;
+      } else if (country.isVisited) {
+        colorMap[code] = themeConfig.visitedColor;
+      } else if (country.isWishlist) {
+        colorMap[code] = themeConfig.wishlistColor;
+      }
+    }
+    // Also map Northern Cyprus color onto Cyprus polygon if set
+    final nc = _countries.where((c) => c.code == 'NC').firstOrNull;
+    if (nc != null && (colorMap['cy'] == null || nc.isLived || nc.isVisited)) {
+      if (nc.isLived) {
+        colorMap['cy'] = themeConfig.livedColor;
+      } else if (nc.isVisited) {
+        colorMap['cy'] = themeConfig.visitedColor;
+      } else if (nc.isWishlist && colorMap['cy'] == null) {
+        colorMap['cy'] = themeConfig.wishlistColor;
+      }
+    }
+
+    final int livedCount = _countries.where((c) => c.isLived).length;
+    final int visitedCount = _countries.isNotEmpty
+        ? _countries.where((c) => c.isVisited || c.isLived).length
+        : (_widgetData?.visitedCountriesCount ?? 0);
+    final int wishlistCount = _countries.isNotEmpty
+        ? _countries.where((c) => c.isWishlist).length
+        : (_widgetData?.wishlistCountriesCount ?? 0);
+    final int continentsCount = _countries.isNotEmpty
+        ? _countries
+            .where((c) => c.isVisited || c.isLived)
+            .map((c) => c.continent)
+            .where((c) => c.isNotEmpty)
+            .toSet()
+            .length
+        : (_widgetData?.continentsCount ?? 0);
+
     final String rawPct = (_widgetData?.worldPercentage ?? '0.0').replaceAll('%', '').trim();
-    final double worldPercent = double.tryParse(rawPct) ?? 0.0;
-    final int wishlistCount = _widgetData?.wishlistCountriesCount ?? 0;
-    final int continentsCount = _widgetData?.continentsCount ?? 0;
+    final double worldPercent = double.tryParse(rawPct) ??
+        (visitedCount > 0 ? (visitedCount / 229.0 * 100.0) : 0.0);
 
     return FittedBox(
       fit: BoxFit.scaleDown,
@@ -418,264 +698,1099 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
         height: height,
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+          color: themeConfig.cardBgColor,
           borderRadius: BorderRadius.circular(22),
           border: Border.all(
-            color: theme.colorScheme.primary.withValues(alpha: 0.3),
+            color: themeConfig.cardBorderColor,
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
-              blurRadius: 12,
+              color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.12),
+              blurRadius: 14,
               offset: const Offset(0, 4),
             ),
           ],
         ),
         child: showWorldMap
-            ? Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Widget Header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.public_rounded, size: 14, color: theme.colorScheme.primary),
-                            const SizedBox(width: 4),
-                            Flexible(
-                              child: Text(
-                                'PackBuddy • Dünya',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w800,
-                                  color: theme.colorScheme.primary,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          '%${worldPercent.toStringAsFixed(1)}',
-                          style: TextStyle(
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w800,
-                            color: theme.colorScheme.primary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  // Map Counts
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        visitedCount > 0 ? '$visitedCount Ülke Gezildi' : 'Dünya Haritası',
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        continentsCount > 0
-                            ? '$continentsCount Kıta Keşfedildi'
-                            : 'Ülkeleri haritadan işaretle',
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-
-                  // World exploration progress
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Flexible(
-                            child: Text(
-                              'Keşif Oranı',
-                              style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text('%${worldPercent.toStringAsFixed(1)}',
-                              style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700)),
-                        ],
-                      ),
-                      const SizedBox(height: 3),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(2),
-                        child: LinearProgressIndicator(
-                          value: (worldPercent / 100.0).clamp(0.0, 1.0),
-                          minHeight: 4,
-                          backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-                          valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  // Bottom detail row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '✈️ $visitedCount Gezildi',
-                        style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurfaceVariant),
-                      ),
-                      Text(
-                        '🌟 $wishlistCount Hedef',
-                        style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurfaceVariant),
-                      ),
-                    ],
-                  ),
-                ],
+            ? _buildWorldMapContent(
+                theme: theme,
+                isDark: isDark,
+                lang: lang,
+                themeConfig: themeConfig,
+                visitedCount: visitedCount,
+                livedCount: livedCount,
+                wishlistCount: wishlistCount,
+                continentsCount: continentsCount,
+                worldPercent: worldPercent,
+                colorMap: colorMap,
               )
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            : _buildTripContent(
+                theme: theme,
+                isDark: isDark,
+                lang: lang,
+                l10n: l10n,
+              ),
+      ),
+    );
+  }
+
+  // ==========================================
+  // WORLD MAP WIDGET PREVIEWS (Small / Medium / Large)
+  // ==========================================
+
+  Widget _buildWorldMapContent({
+    required ThemeData theme,
+    required bool isDark,
+    required String lang,
+    required WidgetThemeConfig themeConfig,
+    required int visitedCount,
+    required int livedCount,
+    required int wishlistCount,
+    required int continentsCount,
+    required double worldPercent,
+    required Map<String, Color> colorMap,
+  }) {
+    switch (_selectedSize) {
+      case 0:
+        return _buildSmallWorldMap(
+          theme: theme,
+          isDark: isDark,
+          lang: lang,
+          themeConfig: themeConfig,
+          visitedCount: visitedCount,
+          wishlistCount: wishlistCount,
+          continentsCount: continentsCount,
+          worldPercent: worldPercent,
+        );
+      case 1:
+        return _buildMediumWorldMap(
+          theme: theme,
+          isDark: isDark,
+          lang: lang,
+          themeConfig: themeConfig,
+          visitedCount: visitedCount,
+          wishlistCount: wishlistCount,
+          continentsCount: continentsCount,
+          worldPercent: worldPercent,
+          colorMap: colorMap,
+        );
+      case 2:
+      default:
+        return _buildLargeWorldMap(
+          theme: theme,
+          isDark: isDark,
+          lang: lang,
+          themeConfig: themeConfig,
+          visitedCount: visitedCount,
+          livedCount: livedCount,
+          wishlistCount: wishlistCount,
+          continentsCount: continentsCount,
+          worldPercent: worldPercent,
+          colorMap: colorMap,
+        );
+    }
+  }
+
+  /// Small World Map Widget (156x156): Compact glanceable stats with big bold number
+  Widget _buildSmallWorldMap({
+    required ThemeData theme,
+    required bool isDark,
+    required String lang,
+    required WidgetThemeConfig themeConfig,
+    required int visitedCount,
+    required int wishlistCount,
+    required int continentsCount,
+    required double worldPercent,
+  }) {
+    final visitedTitle = AppWidgetLocalization.getVisitedTitle(lang, visitedCount);
+    final continentsSub = AppWidgetLocalization.getContinentsSubtitle(lang, continentsCount);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // Header
+        Row(
+          children: [
+            Icon(Icons.public_rounded, size: 13, color: themeConfig.accentColor),
+            const SizedBox(width: 3),
+            Expanded(
+              child: Text(
+                'PackBuddy',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w800,
+                  color: themeConfig.accentColor,
+                ),
+              ),
+            ),
+            const SizedBox(width: 4),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 4.5, vertical: 1.5),
+              decoration: BoxDecoration(
+                color: themeConfig.badgeBgColor,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                '%${worldPercent.toStringAsFixed(1)}',
+                style: const TextStyle(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        // Big Prominent Stat
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '$visitedCount',
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.w900,
+                color: themeConfig.accentColor,
+                height: 1.0,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              visitedTitle,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: themeConfig.titleTextColor,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            Text(
+              continentsSub,
+              style: TextStyle(
+                fontSize: 9.5,
+                color: themeConfig.subtitleTextColor,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+
+        // Bottom progress & stats
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(2),
+              child: LinearProgressIndicator(
+                value: (worldPercent / 100.0).clamp(0.0, 1.0),
+                minHeight: 3.5,
+                backgroundColor: themeConfig.unvisitedLandColor.withValues(alpha: 0.3),
+                valueColor: AlwaysStoppedAnimation<Color>(themeConfig.accentColor),
+              ),
+            ),
+            const SizedBox(height: 5),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '✈️ $visitedCount',
+                  style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
+                ),
+                Text(
+                  '🌟 $wishlistCount',
+                  style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// Medium World Map Widget (310x140): Horizontal 2-column layout with miniature vector map thumbnail
+  Widget _buildMediumWorldMap({
+    required ThemeData theme,
+    required bool isDark,
+    required String lang,
+    required WidgetThemeConfig themeConfig,
+    required int visitedCount,
+    required int wishlistCount,
+    required int continentsCount,
+    required double worldPercent,
+    required Map<String, Color> colorMap,
+  }) {
+    final worldHeader = AppWidgetLocalization.getWorldHeader(lang);
+    final visitedTitle = AppWidgetLocalization.getVisitedTitle(lang, visitedCount);
+    final explorationRateLabel = AppWidgetLocalization.getExplorationRateLabel(lang);
+    final visitedStatLabel = AppWidgetLocalization.getVisitedStatLabel(lang, visitedCount);
+    final wishlistStatLabel = AppWidgetLocalization.getWishlistStatLabel(lang, wishlistCount);
+    final continentsStatLabel = AppWidgetLocalization.getContinentsStatLabel(lang, continentsCount);
+
+    final unvisitedLandColor = themeConfig.unvisitedLandColor;
+    final countryBorderColor = themeConfig.countryBorderColor;
+    final oceanColor = themeConfig.oceanColor;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Left Column: Stats & Progress
+        Expanded(
+          flex: 3,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Header
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Widget Header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.flight_takeoff_rounded, size: 14, color: theme.colorScheme.primary),
-                            const SizedBox(width: 4),
-                            Flexible(
-                              child: Text(
-                                'PackBuddy',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w800,
-                                  color: theme.colorScheme.primary,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (_showCountdown)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            daysText,
-                            style: TextStyle(
-                              fontSize: 9.5,
-                              fontWeight: FontWeight.w800,
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-
-                  // Destination / Title
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        tripTitle,
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        destination,
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-
-                  // Packing Progress
-                  if (_showPacking) ...[
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  Expanded(
+                    child: Row(
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Flexible(
-                              child: Text(
-                                '${l10n?.shareChecklist ?? "Packing"}: $packedItems/$totalItems',
-                                style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                        Icon(Icons.public_rounded, size: 14, color: themeConfig.accentColor),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            worldHeader,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: themeConfig.accentColor,
                             ),
-                            const SizedBox(width: 4),
-                            Text('$packingPercent%', style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700)),
-                          ],
-                        ),
-                        const SizedBox(height: 3),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(2),
-                          child: LinearProgressIndicator(
-                            value: packingProgress,
-                            minHeight: 4,
-                            backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-                            valueColor: AlwaysStoppedAnimation<Color>(AppColors.successPastel),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
                     ),
-                  ],
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: themeConfig.badgeBgColor,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      '%${worldPercent.toStringAsFixed(1)}',
+                      style: const TextStyle(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
 
-                  // Budget Summary (Medium / Large)
-                  if (_showBudget && _selectedSize != 0) ...[
+              // Title
+              Text(
+                visitedTitle,
+                style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w900, color: themeConfig.titleTextColor),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+
+              // Progress bar
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    explorationRateLabel,
+                    style: TextStyle(fontSize: 9, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2.5),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(2),
+                    child: LinearProgressIndicator(
+                      value: (worldPercent / 100.0).clamp(0.0, 1.0),
+                      minHeight: 3.5,
+                      backgroundColor: themeConfig.unvisitedLandColor.withValues(alpha: 0.3),
+                      valueColor: AlwaysStoppedAnimation<Color>(themeConfig.accentColor),
+                    ),
+                  ),
+                ],
+              ),
+
+              // Bottom row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: Text(
+                      visitedStatLabel,
+                      style: TextStyle(fontSize: 9.5, color: themeConfig.subtitleTextColor),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      wishlistStatLabel,
+                      style: TextStyle(fontSize: 9.5, color: themeConfig.subtitleTextColor),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(width: 10),
+
+        // Right Column: Miniature Painted World Map Card
+        SizedBox(
+          width: 110,
+          child: Container(
+            decoration: BoxDecoration(
+              color: oceanColor,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: themeConfig.mapBorderColor,
+                width: 1.0,
+              ),
+            ),
+            padding: const EdgeInsets.all(4),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Center(
+                      child: AspectRatio(
+                        aspectRatio: 2000 / 857,
+                        child: SimpleMap(
+                          instructions: SMapWorld.instructions,
+                          defaultColor: unvisitedLandColor,
+                          colors: colorMap,
+                          countryBorder: CountryBorder(
+                            color: countryBorderColor,
+                            width: 0.35,
+                          ),
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
+                  decoration: BoxDecoration(
+                    color: themeConfig.statBgColor,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    continentsStatLabel,
+                    style: TextStyle(
+                      fontSize: 8.5,
+                      fontWeight: FontWeight.w700,
+                      color: themeConfig.accentColor,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Large World Map Widget (310x300): Hero miniature painted world map with legend
+  Widget _buildLargeWorldMap({
+    required ThemeData theme,
+    required bool isDark,
+    required String lang,
+    required WidgetThemeConfig themeConfig,
+    required int visitedCount,
+    required int livedCount,
+    required int wishlistCount,
+    required int continentsCount,
+    required double worldPercent,
+    required Map<String, Color> colorMap,
+  }) {
+    final worldHeader = AppWidgetLocalization.getWorldHeader(lang);
+    final continentsStatLabel = AppWidgetLocalization.getContinentsStatLabel(lang, continentsCount);
+
+    final legendLived = AppWidgetLocalization.getLegendLived(lang);
+    final legendVisited = AppWidgetLocalization.getLegendVisited(lang);
+    final legendWishlist = AppWidgetLocalization.getLegendWishlist(lang);
+
+    final unvisitedLandColor = themeConfig.unvisitedLandColor;
+    final countryBorderColor = themeConfig.countryBorderColor;
+    final oceanColor = themeConfig.oceanColor;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Top Header
+        Row(
+          children: [
+            Icon(Icons.public_rounded, size: 16, color: themeConfig.accentColor),
+            const SizedBox(width: 5),
+            Expanded(
+              child: Text(
+                worldHeader,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: themeConfig.accentColor,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+              decoration: BoxDecoration(
+                color: themeConfig.badgeBgColor,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '%${worldPercent.toStringAsFixed(1)}',
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+
+        // Hero Miniature Vector World Map Showcase
+        Expanded(
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: oceanColor,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: themeConfig.mapBorderColor,
+                width: 1.2,
+              ),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Center(
+                  child: AspectRatio(
+                    aspectRatio: 2000 / 857,
+                    child: SimpleMap(
+                      instructions: SMapWorld.instructions,
+                      defaultColor: unvisitedLandColor,
+                      colors: colorMap,
+                      countryBorder: CountryBorder(
+                        color: countryBorderColor,
+                        width: 0.45,
+                      ),
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+                // Floating interactive map legend banner
+                Positioned(
+                  bottom: 4,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: themeConfig.legendBgColor,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: themeConfig.legendBorderColor,
+                          width: 0.8,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.15),
+                            blurRadius: 4,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildLegendIndicator(themeConfig.livedColor, '$legendLived ($livedCount)', themeConfig.legendTextColor),
+                          const SizedBox(width: 8),
+                          _buildLegendIndicator(themeConfig.visitedColor, '$legendVisited ($visitedCount)', themeConfig.legendTextColor),
+                          const SizedBox(width: 8),
+                          _buildLegendIndicator(themeConfig.wishlistColor, '$legendWishlist ($wishlistCount)', themeConfig.legendTextColor),
+                          if (continentsCount > 0) ...[
+                            const SizedBox(width: 8),
+                            Text(
+                              continentsStatLabel,
+                              style: TextStyle(
+                                fontSize: 8.5,
+                                fontWeight: FontWeight.w700,
+                                color: themeConfig.legendTextColor,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLegendIndicator(Color color, String text, Color textColor) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 7,
+          height: 7,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 3.5),
+        Text(
+          text,
+          style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w700, color: textColor),
+        ),
+      ],
+    );
+  }
+
+
+
+  // ==========================================
+  // TRIP WIDGET PREVIEWS (Small / Medium / Large)
+  // ==========================================
+
+  Widget _buildTripContent({
+    required ThemeData theme,
+    required bool isDark,
+    required String lang,
+    required AppLocalizations? l10n,
+  }) {
+    switch (_selectedSize) {
+      case 0:
+        return _buildSmallTrip(theme: theme, isDark: isDark, lang: lang, l10n: l10n);
+      case 1:
+        return _buildMediumTrip(theme: theme, isDark: isDark, lang: lang, l10n: l10n);
+      case 2:
+      default:
+        return _buildLargeTrip(theme: theme, isDark: isDark, lang: lang, l10n: l10n);
+    }
+  }
+
+  Widget _buildSmallTrip({
+    required ThemeData theme,
+    required bool isDark,
+    required String lang,
+    required AppLocalizations? l10n,
+  }) {
+    final defaultDestination = AppWidgetLocalization.getDefaultDestination(lang);
+    final tripTitle = _widgetData?.tripTitle ?? (l10n?.appName ?? 'PackBuddy');
+    final destination = _widgetData?.destination ?? defaultDestination;
+    final int days = _widgetData?.daysUntil ?? 0;
+    final String daysText = AppWidgetLocalization.formatDaysUntil(lang, days);
+    final int totalItems = _widgetData?.totalItems ?? 0;
+    final int packedItems = _widgetData?.packedItems ?? 0;
+    final double packingProgress = totalItems > 0 ? (packedItems / totalItems).clamp(0.0, 1.0) : 0.0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // Header
+        Row(
+          children: [
+            Icon(Icons.flight_takeoff_rounded, size: 13, color: theme.colorScheme.primary),
+            const SizedBox(width: 3),
+            Expanded(
+              child: Text(
+                'PackBuddy',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w800,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+            ),
+            if (_showCountdown) ...[
+              const SizedBox(width: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4.5, vertical: 1.5),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  '$days${AppWidgetLocalization.getDaysSuffix(lang)}',
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+
+        // Destination / Title
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              tripTitle,
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            Text(
+              destination,
+              style: TextStyle(
+                fontSize: 9.5,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+
+        // Packing
+        if (_showPacking)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      '${AppWidgetLocalization.getPackingLabel(lang)}: $packedItems/$totalItems',
+                      style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w600),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 2),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(2),
+                child: LinearProgressIndicator(
+                  value: packingProgress,
+                  minHeight: 3.5,
+                  backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.successPastel),
+                ),
+              ),
+            ],
+          )
+        else
+          Text(
+            daysText,
+            style: TextStyle(fontSize: 9.5, color: theme.colorScheme.onSurfaceVariant),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildMediumTrip({
+    required ThemeData theme,
+    required bool isDark,
+    required String lang,
+    required AppLocalizations? l10n,
+  }) {
+    final tripHeader = AppWidgetLocalization.getTripHeader(lang);
+    final defaultDestination = AppWidgetLocalization.getDefaultDestination(lang);
+    final tripTitle = _widgetData?.tripTitle ?? (l10n?.appName ?? 'PackBuddy');
+    final destination = _widgetData?.destination ?? defaultDestination;
+    final int days = _widgetData?.daysUntil ?? 0;
+    final String daysText = AppWidgetLocalization.formatDaysUntil(lang, days);
+    final int totalItems = _widgetData?.totalItems ?? 0;
+    final int packedItems = _widgetData?.packedItems ?? 0;
+    final int packingPercent = _widgetData?.packingPercent ?? 0;
+    final double packingProgress = totalItems > 0 ? (packedItems / totalItems).clamp(0.0, 1.0) : 0.0;
+    final String budgetSpent = _widgetData?.budgetSpent ?? '';
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Left Column
+        Expanded(
+          flex: 3,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Header
+              Row(
+                children: [
+                  Icon(Icons.flight_takeoff_rounded, size: 14, color: theme.colorScheme.primary),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      tripHeader,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        color: theme.colorScheme.primary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+
+              // Title & destination
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    tripTitle,
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    destination,
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+
+              // Countdown badge
+              if (_showCountdown)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    daysText,
+                    style: TextStyle(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w800,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+
+        const SizedBox(width: 10),
+
+        // Right Column: Packing & Budget Progress
+        Expanded(
+          flex: 2,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (_showPacking) ...[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Flexible(
                           child: Text(
-                            budgetSpent.isNotEmpty ? '${l10n?.spent ?? "Spent"}: $budgetSpent' : (l10n?.budget ?? 'Budget'),
+                            AppWidgetLocalization.getPackingLabel(lang),
+                            style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurfaceVariant),
                           ),
+                        ),
+                        Text(
+                          '$packingPercent%',
+                          style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800),
                         ),
                       ],
                     ),
+                    const SizedBox(height: 2),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(2),
+                      child: LinearProgressIndicator(
+                        value: packingProgress,
+                        minHeight: 4,
+                        backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.successPastel),
+                      ),
+                    ),
+                    Text(
+                      '$packedItems/$totalItems',
+                      style: TextStyle(fontSize: 9, color: theme.colorScheme.onSurfaceVariant),
+                    ),
                   ],
-                ],
-              ),
-      ),
+                ),
+              ],
+              if (_showBudget) ...[
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppWidgetLocalization.getSpentLabel(lang),
+                        style: TextStyle(fontSize: 8.5, color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                      Text(
+                        budgetSpent.isNotEmpty ? budgetSpent : AppWidgetLocalization.getBudgetLabel(lang),
+                        style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
+
+  Widget _buildLargeTrip({
+    required ThemeData theme,
+    required bool isDark,
+    required String lang,
+    required AppLocalizations? l10n,
+  }) {
+    final tripHeader = AppWidgetLocalization.getTripHeader(lang);
+    final defaultDestination = AppWidgetLocalization.getDefaultDestination(lang);
+    final tripTitle = _widgetData?.tripTitle ?? (l10n?.appName ?? 'PackBuddy');
+    final destination = _widgetData?.destination ?? defaultDestination;
+    final int days = _widgetData?.daysUntil ?? 0;
+    final String daysText = AppWidgetLocalization.formatDaysUntil(lang, days);
+    final int totalItems = _widgetData?.totalItems ?? 0;
+    final int packedItems = _widgetData?.packedItems ?? 0;
+    final int packingPercent = _widgetData?.packingPercent ?? 0;
+    final double packingProgress = totalItems > 0 ? (packedItems / totalItems).clamp(0.0, 1.0) : 0.0;
+    final String budgetSpent = _widgetData?.budgetSpent ?? '';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Top Header
+        Row(
+            children: [
+              Icon(Icons.flight_takeoff_rounded, size: 16, color: theme.colorScheme.primary),
+              const SizedBox(width: 5),
+              Expanded(
+                child: Text(
+                  tripHeader,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w800,
+                    color: theme.colorScheme.primary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (_showCountdown) ...[
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      daysText.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        color: theme.colorScheme.primary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 8),
+
+          // Destination Showcase Card
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF0F172A) : Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: theme.colorScheme.primary.withValues(alpha: 0.2),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  tripTitle,
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    Icon(Icons.location_on_rounded, size: 12, color: theme.colorScheme.primary),
+                    const SizedBox(width: 3),
+                    Expanded(
+                      child: Text(
+                        destination,
+                        style: TextStyle(fontSize: 10.5, color: theme.colorScheme.onSurfaceVariant),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 6),
+
+          // Packing Checklist Progress Card
+          if (_showPacking) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF0F172A) : Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          '${AppWidgetLocalization.getPackingLabel(lang)}: $packedItems/$totalItems',
+                          style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        '$packingPercent%',
+                        style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(3),
+                    child: LinearProgressIndicator(
+                      value: packingProgress,
+                      minHeight: 4.5,
+                      backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.successPastel),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 6),
+          ],
+
+          // Budget Card
+          if (_showBudget) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF0F172A) : Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: Text(
+                      AppWidgetLocalization.getSpentLabel(lang),
+                      style: TextStyle(fontSize: 10.5, color: theme.colorScheme.onSurfaceVariant),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    budgetSpent.isNotEmpty ? budgetSpent : '-',
+                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: Color(0xFF10B981)),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 6),
+          ],
+
+          // Bottom status footer
+          Center(
+            child: Text(
+              AppWidgetLocalization.getCountdownActive(lang),
+              style: TextStyle(
+                fontSize: 9.5,
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
 }

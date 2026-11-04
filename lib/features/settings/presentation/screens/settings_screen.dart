@@ -471,7 +471,7 @@ class SettingsScreen extends ConsumerWidget {
           // 7. Home Screen Widget Preview & Customization (Feature F-9)
           _SectionHeader(title: l10n.widgetSettings),
           const SizedBox(height: 8),
-          const HomeWidgetPreviewCard(),
+          HomeWidgetPreviewCard(key: ValueKey(currentLocale.languageCode)),
           const SizedBox(height: 24),
 
           // 8. Interactive App Tour (Feature F-13)

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
@@ -48,6 +49,9 @@ class TelemetryService {
 
   /// Initializes PostHog SDK programmatically with EU Cloud, Session Replay & PII text masking
   Future<void> init() async {
+    if (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) {
+      return;
+    }
     if (posthogApiKey.isEmpty) {
       debugPrint('[TelemetryService] POSTHOG_API_KEY is not configured. Running in secure offline mode.');
       return;

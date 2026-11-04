@@ -6,6 +6,7 @@ import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
+import 'package:packbuddy/features/budget/presentation/controllers/expense_controller.dart';
 import 'package:packbuddy/data/local_db/database_helper.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/checklist/domain/packing_item.dart';
@@ -65,6 +66,13 @@ class _TripComparisonScreenState extends ConsumerState<TripComparisonScreen> {
             : (allTrips.isNotEmpty ? {allTrips[0].id} : <String>{}));
 
     final selectedTrips = allTrips.where((t) => effectiveSelectedIds.contains(t.id)).toList();
+
+    // Reactively collect expenses for all selected trips via Riverpod
+    final reactiveExpenses = <Expense>[];
+    for (final trip in selectedTrips) {
+      reactiveExpenses.addAll(ref.watch(expenseControllerProvider(trip.id)).expenses);
+    }
+    final effectiveExpenses = reactiveExpenses.isNotEmpty ? reactiveExpenses : _expenses;
 
     return Scaffold(
       appBar: AppBar(
@@ -199,7 +207,7 @@ class _TripComparisonScreenState extends ConsumerState<TripComparisonScreen> {
                     if (selectedTrips.length >= 2) ...[
                       _buildSummaryHighlights(
                         selectedTrips: selectedTrips,
-                        expenses: _expenses,
+                        expenses: effectiveExpenses,
                         items: checklistState.items,
                         activeCurrency: activeCurrency,
                         theme: theme,
@@ -219,7 +227,7 @@ class _TripComparisonScreenState extends ConsumerState<TripComparisonScreen> {
                           padding: const EdgeInsets.only(bottom: 14),
                           child: _buildTripComparisonCard(
                             trip: trip,
-                            expenses: _expenses.where((e) => e.tripId == trip.id).toList(),
+                            expenses: effectiveExpenses.where((e) => e.tripId == trip.id).toList(),
                             items: checklistState.items.where((i) => i.tripId == trip.id).toList(),
                             activeCurrency: activeCurrency,
                             theme: theme,

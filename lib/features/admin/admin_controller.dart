@@ -23,6 +23,19 @@ enum UserFilterChip {
   inactive6thMonth,
 }
 
+/// City aggregated analytics item within a country
+class CityAnalyticsItem {
+  final String cityName;
+  final int activeUserCount;
+  final double percentage; // 0.0 to 1.0 (relative to the country's active users)
+
+  const CityAnalyticsItem({
+    required this.cityName,
+    required this.activeUserCount,
+    required this.percentage,
+  });
+}
+
 /// Country aggregated analytics item
 class CountryAnalyticsItem {
   final String countryCode;
@@ -30,6 +43,8 @@ class CountryAnalyticsItem {
   final String primaryCurrency;
   final int activeUserCount;
   final double percentage; // 0.0 to 1.0
+  final String topCity;
+  final List<CityAnalyticsItem> cities;
 
   const CountryAnalyticsItem({
     required this.countryCode,
@@ -37,6 +52,8 @@ class CountryAnalyticsItem {
     required this.primaryCurrency,
     required this.activeUserCount,
     required this.percentage,
+    this.topCity = '',
+    this.cities = const [],
   });
 }
 
@@ -132,6 +149,47 @@ class AdminState {
           .firstWhere((u) => u.currencyCode.isNotEmpty,
               orElse: () => usersInCountry.first)
           .currencyCode;
+      final topCity = usersInCountry
+          .map((u) => u.liveCity.trim())
+          .firstWhere((c) => c.isNotEmpty, orElse: () => '');
+
+      // Group cities within this country
+      final Map<String, int> cityCounts = {};
+      final Map<String, String> cityDisplayNames = {};
+
+      for (final u in usersInCountry) {
+        final rawCity = u.liveCity.trim();
+        if (rawCity.isEmpty) {
+          cityCounts[''] = (cityCounts[''] ?? 0) + 1;
+        } else {
+          final normalizedKey = rawCity.toLowerCase();
+          cityCounts[normalizedKey] = (cityCounts[normalizedKey] ?? 0) + 1;
+          if (!cityDisplayNames.containsKey(normalizedKey)) {
+            final formatted = rawCity[0].toUpperCase() + (rawCity.length > 1 ? rawCity.substring(1) : '');
+            cityDisplayNames[normalizedKey] = formatted;
+          }
+        }
+      }
+
+      final cityItems = cityCounts.entries.map((cEntry) {
+        final key = cEntry.key;
+        final cCount = cEntry.value;
+        final displayName = key.isEmpty ? '' : (cityDisplayNames[key] ?? key);
+        final cPct = count > 0 ? (cCount / count) : 0.0;
+        return CityAnalyticsItem(
+          cityName: displayName,
+          activeUserCount: cCount,
+          percentage: cPct,
+        );
+      }).toList();
+
+      cityItems.sort((a, b) {
+        if (a.cityName.isEmpty && b.cityName.isNotEmpty) return 1;
+        if (a.cityName.isNotEmpty && b.cityName.isEmpty) return -1;
+        final cmp = b.activeUserCount.compareTo(a.activeUserCount);
+        if (cmp != 0) return cmp;
+        return a.cityName.compareTo(b.cityName);
+      });
 
       return CountryAnalyticsItem(
         countryCode: code,
@@ -139,6 +197,8 @@ class AdminState {
         primaryCurrency: primaryCurrency.isEmpty ? 'USD' : primaryCurrency,
         activeUserCount: count,
         percentage: totalActive > 0 ? (count / totalActive) : 0.0,
+        topCity: topCity,
+        cities: cityItems,
       );
     }).toList();
 

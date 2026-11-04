@@ -54,6 +54,12 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
   }
 
   @override
+  void deactivate() {
+    ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
+    super.deactivate();
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     _searchFocusNode.dispose();
@@ -98,6 +104,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 20),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         duration: const Duration(milliseconds: 2500),
+        persist: false,
       ),
     );
   }

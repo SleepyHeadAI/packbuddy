@@ -17,6 +17,7 @@ class PreferencesService {
   static const String keyWidgetShowPacking = 'packbuddy_widget_show_packing';
   static const String keyWidgetShowBudget = 'packbuddy_widget_show_budget';
   static const String keyWidgetMode = 'packbuddy_widget_mode';
+  static const String keyWidgetTheme = 'packbuddy_widget_theme';
   static const String keyTravelMapIs3D = 'packbuddy_travel_map_is_3d';
 
   // Per-User Scoped Keys
@@ -24,6 +25,10 @@ class PreferencesService {
   static const String keyUserSelectedCurrency = 'packbuddy_user_selected_currency';
   static const String keyCountryCode = 'packbuddy_detected_country_code';
   static const String keyCountryName = 'packbuddy_detected_country_name';
+  static const String keyLiveCity = 'packbuddy_detected_city';
+  static const String keyTotalSessionSeconds = 'packbuddy_total_session_seconds';
+  static const String keySessionCount = 'packbuddy_session_count';
+  static const String keyLastSessionSeconds = 'packbuddy_last_session_seconds';
   static const String keyRestrictedFeatures = 'packbuddy_restricted_features';
   static const String keyBanStatus = 'packbuddy_ban_status';
   static const String keyBanExpiresAt = 'packbuddy_ban_expires_at';
@@ -421,6 +426,9 @@ class PreferencesService {
   String getWidgetMode() => _prefs?.getString(keyWidgetMode) ?? 'auto';
   Future<void> setWidgetMode(String mode) async => _prefs?.setString(keyWidgetMode, mode);
 
+  String getWidgetTheme() => _prefs?.getString(keyWidgetTheme) ?? 'midnight';
+  Future<void> setWidgetTheme(String theme) async => _prefs?.setString(keyWidgetTheme, theme);
+
   // --- Notifications Center Unread Tracking & History ---
   static const String keyLastReadNotificationsAt = 'notifications_last_read_timestamp';
   int getLastReadNotificationsAt() => _prefs?.getInt(keyLastReadNotificationsAt) ?? 0;
@@ -472,4 +480,58 @@ class PreferencesService {
   // --- Travel Map Mode (2D flat vs 3D Globe) ---
   bool getTravelMapIs3D() => _prefs?.getBool(keyTravelMapIs3D) ?? false;
   Future<void> setTravelMapIs3D(bool is3D) async => _prefs?.setBool(keyTravelMapIs3D, is3D);
+
+  // --- Live City & Session Tracking (Local Persistence) ---
+  String? getLiveCity({String? uid}) {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    if (effectiveUid != null) {
+      return _prefs?.getString('${keyLiveCity}_$effectiveUid');
+    }
+    return _prefs?.getString(keyLiveCity);
+  }
+
+  Future<void> setLiveCity(String city, {String? uid}) async {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    if (effectiveUid != null) {
+      await _prefs?.setString('${keyLiveCity}_$effectiveUid', city);
+    } else {
+      await _prefs?.setString(keyLiveCity, city);
+    }
+  }
+
+  int getTotalSessionSeconds({String? uid}) {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    if (effectiveUid != null) {
+      return _prefs?.getInt('${keyTotalSessionSeconds}_$effectiveUid') ?? 0;
+    }
+    return _prefs?.getInt(keyTotalSessionSeconds) ?? 0;
+  }
+
+  int getSessionCount({String? uid}) {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    if (effectiveUid != null) {
+      return _prefs?.getInt('${keySessionCount}_$effectiveUid') ?? 0;
+    }
+    return _prefs?.getInt(keySessionCount) ?? 0;
+  }
+
+  int getLastSessionSeconds({String? uid}) {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    if (effectiveUid != null) {
+      return _prefs?.getInt('${keyLastSessionSeconds}_$effectiveUid') ?? 0;
+    }
+    return _prefs?.getInt(keyLastSessionSeconds) ?? 0;
+  }
+
+  Future<void> recordSession(int seconds, {String? uid}) async {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    final curTotal = getTotalSessionSeconds(uid: effectiveUid);
+    final curCount = getSessionCount(uid: effectiveUid);
+    final totalKey = effectiveUid != null ? '${keyTotalSessionSeconds}_$effectiveUid' : keyTotalSessionSeconds;
+    final countKey = effectiveUid != null ? '${keySessionCount}_$effectiveUid' : keySessionCount;
+    final lastKey = effectiveUid != null ? '${keyLastSessionSeconds}_$effectiveUid' : keyLastSessionSeconds;
+    await _prefs?.setInt(totalKey, curTotal + seconds);
+    await _prefs?.setInt(countKey, curCount + 1);
+    await _prefs?.setInt(lastKey, seconds);
+  }
 }

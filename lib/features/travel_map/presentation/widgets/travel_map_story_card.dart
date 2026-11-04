@@ -81,6 +81,11 @@ enum StoryCardTheme {
   pastelDream,   // 🦄 Pastel Rüya (Dreamy Lilac Lavender & Soft Coral)
 }
 
+extension StoryCardThemeX on StoryCardTheme {
+  bool get isLight => index >= 9;
+  bool get isDark => index < 9;
+}
+
 /// Color and styling definition for a StoryCardTheme
 class StoryCardPalette {
   final String label;
@@ -870,58 +875,12 @@ class TravelMapStoryCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Top Bar
+        // Top Bar: Clean clearance on the top-left for social media avatar & username
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(7),
-                  decoration: BoxDecoration(
-                    gradient: palette.logoGradient,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: palette.accentColor.withValues(alpha: 0.4),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.flight_takeoff_rounded,
-                    color: Colors.white,
-                    size: 15,
-                  ),
-                ),
-                const SizedBox(width: 9),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'PackBuddy',
-                      style: TextStyle(
-                        color: palette.textColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                    Text(
-                      'WORLD TRAVELER',
-                      style: TextStyle(
-                        color: palette.accentColor,
-                        fontSize: 8.5,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(width: 8),
+            // Left safe clearance for Instagram story profile & handle
+            const SizedBox(width: 50),
             Expanded(
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
@@ -951,6 +910,56 @@ class TravelMapStoryCard extends StatelessWidget {
                   ],
                 ),
               ),
+            ),
+            const SizedBox(width: 8),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    gradient: palette.logoGradient,
+                    borderRadius: BorderRadius.circular(9),
+                    boxShadow: [
+                      BoxShadow(
+                        color: palette.accentColor.withValues(alpha: 0.4),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.flight_takeoff_rounded,
+                    color: Colors.white,
+                    size: 14,
+                  ),
+                ),
+                const SizedBox(width: 7),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'PackBuddy',
+                      style: TextStyle(
+                        color: palette.textColor,
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    Text(
+                      'WORLD TRAVELER',
+                      style: TextStyle(
+                        color: palette.accentColor,
+                        fontSize: 7.5,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
@@ -2187,7 +2196,7 @@ class TravelMapStoryCard extends StatelessWidget {
     AppLocalizations l10n,
   ) {
     if (visitedCountries.isEmpty) {
-      final wishlistCountries = countries.where((c) => c.isWishlist).take(3).toList();
+      final wishlistCountries = countries.where((c) => c.isWishlist).take(6).toList();
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -2315,7 +2324,7 @@ class TravelMapStoryCard extends StatelessWidget {
     AppLocalizations l10n,
   ) {
     if (visitedCountries.isEmpty) {
-      final wishlistCountries = countries.where((c) => c.isWishlist).take(4).toList();
+      final wishlistCountries = countries.where((c) => c.isWishlist).take(8).toList();
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -2400,7 +2409,7 @@ class TravelMapStoryCard extends StatelessWidget {
     }
 
     if (visitedCountries.length <= 4) {
-      final wishlistCountries = countries.where((c) => c.isWishlist).take(2).toList();
+      final wishlistCountries = countries.where((c) => c.isWishlist).toList();
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -2471,26 +2480,28 @@ class TravelMapStoryCard extends StatelessWidget {
             ),
             if (wishlistCountries.isNotEmpty) ...[
               const SizedBox(height: 6),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.near_me_rounded, size: 11, color: palette.wishlistColor),
-                  const SizedBox(width: 4),
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 230),
-                    child: Text(
-                      'Next: ${wishlistCountries.map((c) => c.getLocalizedName(l10n.localeName)).join(', ')}',
-                      style: TextStyle(
-                        color: palette.subtextColor,
-                        fontSize: 9.5,
-                        fontWeight: FontWeight.w600,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.near_me_rounded, size: 11, color: palette.wishlistColor),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        '${l10n.mapLegendWant}: ${wishlistCountries.map((c) => c.getLocalizedName(l10n.localeName)).join(', ')}',
+                        style: TextStyle(
+                          color: palette.subtextColor,
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 2,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ],

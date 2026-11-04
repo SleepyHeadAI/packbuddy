@@ -209,5 +209,70 @@ void main() {
       final deItem = breakdown.firstWhere((b) => b.countryCode == 'DE');
       expect(deItem.activeUserCount, equals(1));
     });
+
+    test('AdminState countryBreakdown groups by liveCountryCode and breaks down cities with proportional percentages', () {
+      final now = DateTime.now();
+      final users = [
+        AdminUserModel(
+          uid: 'u1',
+          email: 'u1@test.com',
+          countryCode: 'TR',
+          liveCountryCode: 'TR',
+          liveCity: 'Istanbul',
+          lastActiveAt: now.subtract(const Duration(minutes: 1)),
+        ),
+        AdminUserModel(
+          uid: 'u2',
+          email: 'u2@test.com',
+          countryCode: 'TR',
+          liveCountryCode: 'TR',
+          liveCity: 'Istanbul',
+          lastActiveAt: now.subtract(const Duration(minutes: 2)),
+        ),
+        AdminUserModel(
+          uid: 'u3',
+          email: 'u3@test.com',
+          countryCode: 'TR',
+          liveCountryCode: 'TR',
+          liveCity: 'Ankara',
+          lastActiveAt: now.subtract(const Duration(minutes: 3)),
+        ),
+        AdminUserModel(
+          uid: 'u4',
+          email: 'u4@test.com',
+          countryCode: 'TR',
+          liveCountryCode: 'TR',
+          liveCity: 'Izmir',
+          lastActiveAt: now.subtract(const Duration(minutes: 4)),
+        ),
+      ];
+
+      final state = AdminState(
+        allUsers: users,
+        analyticsPeriod: AnalyticsPeriod.live,
+      );
+
+      final breakdown = state.countryBreakdown;
+      expect(breakdown.length, equals(1));
+
+      final tr = breakdown.first;
+      expect(tr.activeUserCount, equals(4));
+      expect(tr.cities.length, equals(3));
+
+      // Istanbul: 2/4 = 50%
+      final istanbul = tr.cities.firstWhere((c) => c.cityName == 'Istanbul');
+      expect(istanbul.activeUserCount, equals(2));
+      expect(istanbul.percentage, closeTo(0.5, 0.001));
+
+      // Ankara: 1/4 = 25%
+      final ankara = tr.cities.firstWhere((c) => c.cityName == 'Ankara');
+      expect(ankara.activeUserCount, equals(1));
+      expect(ankara.percentage, closeTo(0.25, 0.001));
+
+      // Izmir: 1/4 = 25%
+      final izmir = tr.cities.firstWhere((c) => c.cityName == 'Izmir');
+      expect(izmir.activeUserCount, equals(1));
+      expect(izmir.percentage, closeTo(0.25, 0.001));
+    });
   });
 }

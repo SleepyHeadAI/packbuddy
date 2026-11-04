@@ -1,7 +1,10 @@
 import '../../core/services/telemetry_service.dart';
 import '../../core/services/preferences_service.dart';
+import '../../core/services/live_location_service.dart';
 import '../../core/services/email_dispatch_service.dart';
 import '../../core/services/notification_service.dart';
+import '../../data/local_db/database_helper.dart';
+import '../budget/domain/country.dart';
 import '../vault/domain/document.dart';
 import '../travel_map/data/world_countries_data.dart';
 import '../travel_map/domain/travel_country.dart';
@@ -354,41 +357,43 @@ class AdminUserModel {
     return AdminUserModel(
       uid: id,
       email: data['email'] as String? ?? '',
-      displayName: data['displayName'] as String? ?? '',
-      photoUrl: data['photoUrl'] as String? ?? '',
+      displayName: (data['displayName'] ?? data['display_name']) as String? ?? '',
+      photoUrl: (data['photoUrl'] ?? data['photo_url']) as String? ?? '',
       provider: data['provider'] as String? ?? 'password',
-      emailVerified: data['emailVerified'] as bool? ?? false,
-      createdAt: parseDate(data['createdAt']),
-      lastLoginAt: parseDate(data['lastLoginAt']),
-      lastActiveAt: parseDate(data['lastActiveAt']),
+      emailVerified: (data['emailVerified'] ?? data['email_verified']) as bool? ?? false,
+      createdAt: parseDate(data['createdAt'] ?? data['created_at']),
+      lastLoginAt: parseDate(data['lastLoginAt'] ?? data['last_login_at']),
+      lastActiveAt: parseDate(data['lastActiveAt'] ?? data['last_active_at']),
       isPremium: (data['isPremium'] == true) ||
           (data['is_premium'] == true) ||
+          (data['isPro'] == true) ||
+          (data['pro'] == true) ||
           PreferencesService.instance.isProUser(uid: id),
-      totalVaultStorageBytes: (data['totalVaultStorageBytes'] as num?)?.toInt() ?? 0,
-      banStatus: data['banStatus'] as String? ?? 'none',
-      banExpiresAt: data['banExpiresAt'] as String?,
-      banReason: data['banReason'] as String?,
-      restrictedFeatures: (data['restrictedFeatures'] as List<dynamic>?)
+      totalVaultStorageBytes: ((data['totalVaultStorageBytes'] ?? data['total_vault_storage_bytes']) as num?)?.toInt() ?? 0,
+      banStatus: (data['banStatus'] ?? data['ban_status']) as String? ?? 'none',
+      banExpiresAt: (data['banExpiresAt'] ?? data['ban_expires_at']) as String?,
+      banReason: (data['banReason'] ?? data['ban_reason']) as String?,
+      restrictedFeatures: ((data['restrictedFeatures'] ?? data['restricted_features']) as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           const [],
-      countryCode: data['countryCode'] as String? ?? 'US',
-      countryName: data['countryName'] as String? ?? 'United States',
-      currencyCode: data['currencyCode'] as String? ?? 'USD',
-      liveCountryCode: (data['liveCountryCode'] as String? ?? data['countryCode'] as String? ?? 'US').toUpperCase().trim(),
-      liveCountryName: (data['liveCountryName'] as String? ?? data['countryName'] as String? ?? 'United States').trim(),
-      liveCity: (data['liveCity'] as String? ?? '').trim(),
-      appThemeMode: (data['appThemeMode'] as String? ?? 'light').toLowerCase().trim(),
-      appLanguage: (data['appLanguage'] as String? ?? 'tr').toLowerCase().trim(),
-      deletionStatus: data['deletionStatus'] as String? ?? 'none',
-      deletionRequestedAt: data['deletionRequestedAt'] as String?,
-      scheduledPermanentDeletionAt: data['scheduledPermanentDeletionAt'] as String?,
-      lastInactivityWarningAt: parseDate(data['lastInactivityWarningAt']),
-      inactivityWarningCount: (data['inactivityWarningCount'] as num?)?.toInt() ?? 0,
-      totalSessionSeconds: (data['totalSessionSeconds'] as num?)?.toInt() ?? 0,
-      sessionCount: (data['sessionCount'] as num?)?.toInt() ?? 0,
-      lastSessionSeconds: (data['lastSessionSeconds'] as num?)?.toInt() ?? 0,
-      travelMapCountries: (data['travelMapCountries'] as Map<dynamic, dynamic>?)?.map(
+      countryCode: (data['countryCode'] ?? data['country_code']) as String? ?? 'US',
+      countryName: (data['countryName'] ?? data['country_name']) as String? ?? 'United States',
+      currencyCode: (data['currencyCode'] ?? data['currency_code']) as String? ?? 'USD',
+      liveCountryCode: ((data['liveCountryCode'] ?? data['live_country_code'] ?? data['countryCode'] ?? data['country_code']) as String? ?? 'US').toUpperCase().trim(),
+      liveCountryName: ((data['liveCountryName'] ?? data['live_country_name'] ?? data['countryName'] ?? data['country_name']) as String? ?? 'United States').trim(),
+      liveCity: ((data['liveCity'] ?? data['live_city']) as String? ?? '').trim(),
+      appThemeMode: ((data['appThemeMode'] ?? data['app_theme_mode'] ?? data['themeMode'] ?? data['theme_mode']) as String? ?? 'light').toLowerCase().trim(),
+      appLanguage: ((data['appLanguage'] ?? data['app_language'] ?? data['languageCode'] ?? data['language_code']) as String? ?? 'tr').toLowerCase().trim(),
+      deletionStatus: (data['deletionStatus'] ?? data['deletion_status']) as String? ?? 'none',
+      deletionRequestedAt: (data['deletionRequestedAt'] ?? data['deletion_requested_at']) as String?,
+      scheduledPermanentDeletionAt: (data['scheduledPermanentDeletionAt'] ?? data['scheduled_permanent_deletion_at']) as String?,
+      lastInactivityWarningAt: parseDate(data['lastInactivityWarningAt'] ?? data['last_inactivity_warning_at']),
+      inactivityWarningCount: ((data['inactivityWarningCount'] ?? data['inactivity_warning_count']) as num?)?.toInt() ?? 0,
+      totalSessionSeconds: ((data['totalSessionSeconds'] ?? data['total_session_seconds']) as num?)?.toInt() ?? 0,
+      sessionCount: ((data['sessionCount'] ?? data['session_count']) as num?)?.toInt() ?? 0,
+      lastSessionSeconds: ((data['lastSessionSeconds'] ?? data['last_session_seconds']) as num?)?.toInt() ?? 0,
+      travelMapCountries: ((data['travelMapCountries'] ?? data['travel_map_countries']) as Map<dynamic, dynamic>?)?.map(
             (k, v) => MapEntry(k.toString().toUpperCase(), v),
           ) ?? const {},
     );
@@ -404,21 +409,39 @@ class AdminUserModel {
       liveCountryName.isNotEmpty ? liveCountryName : (countryName.isNotEmpty ? countryName : 'United States');
 
   int get visitedWorldMapCount => travelMapCountries.values.where((v) {
-        if (v is! Map) return false;
-        final status = (v['status'] ?? '').toString().toLowerCase();
-        return status == 'visited' || status == 'lived';
+        String status = '';
+        if (v is Map) {
+          status = (v['status'] ?? '').toString().toLowerCase().trim();
+        } else if (v is String) {
+          status = v.toLowerCase().trim();
+        }
+        return status.contains('visited') ||
+            status.contains('lived') ||
+            status == 'gezilen' ||
+            status == 'gezi' ||
+            status == 'yasayan';
       }).length;
 
   int get wishlistWorldMapCount => travelMapCountries.values.where((v) {
-        if (v is! Map) return false;
-        final status = (v['status'] ?? '').toString().toLowerCase();
-        return status == 'wishlist';
+        String status = '';
+        if (v is Map) {
+          status = (v['status'] ?? '').toString().toLowerCase().trim();
+        } else if (v is String) {
+          status = v.toLowerCase().trim();
+        }
+        return status.contains('wish') ||
+            status == 'hedef' ||
+            status == 'istek';
       }).length;
 
   int get livedWorldMapCount => travelMapCountries.values.where((v) {
-        if (v is! Map) return false;
-        final status = (v['status'] ?? '').toString().toLowerCase();
-        return status == 'lived';
+        String status = '';
+        if (v is Map) {
+          status = (v['status'] ?? '').toString().toLowerCase().trim();
+        } else if (v is String) {
+          status = v.toLowerCase().trim();
+        }
+        return status.contains('lived') || status == 'yasayan';
       }).length;
 
   double get worldExploredPercentage =>
@@ -622,11 +645,141 @@ class FirebaseAdminService implements AdminService {
     }
   }
 
+  Future<AdminPlatformMetrics> _fetchLocalMetrics() async {
+    try {
+      final db = DatabaseHelper.instance;
+      final trips = await db.getTrips();
+      final expenses = await db.getExpenses();
+      final docs = await db.getDocuments();
+      final items = await db.getChecklistItems();
+      final storageBytes = await db.getTotalVaultStorageBytes();
+
+      final currentAuth = _effectiveAuth?.currentUser;
+      final isPro = PreferencesService.instance.isProUser(uid: currentAuth?.uid);
+      final isVerified = currentAuth?.emailVerified ?? false;
+      final hasUser = currentAuth != null;
+
+      return AdminPlatformMetrics(
+        totalUsers: hasUser ? 1 : 0,
+        verifiedUsers: (hasUser && isVerified) ? 1 : 0,
+        proUsers: (hasUser && isPro) ? 1 : 0,
+        totalTrips: trips.length,
+        totalExpenses: expenses.length,
+        totalDocuments: docs.length,
+        totalChecklistItems: items.length,
+        totalStorageBytes: storageBytes,
+      );
+    } catch (e) {
+      debugPrint('[AdminService] _fetchLocalMetrics error: $e');
+      return const AdminPlatformMetrics();
+    }
+  }
+
+  Future<List<AdminUserModel>> _fetchLocalUserList() async {
+    try {
+      final currentAuth = _effectiveAuth?.currentUser;
+      final uid = currentAuth?.uid ?? 'admin_local';
+      final email = currentAuth?.email ?? kAdminEmail;
+      final prefs = PreferencesService.instance;
+      final db = DatabaseHelper.instance;
+
+      final isPro = prefs.isProUser(uid: uid);
+      final storageBytes = await db.getTotalVaultStorageBytes(userId: uid);
+      final travelRows = await db.getTravelMapCountries(userId: uid);
+      final Map<String, dynamic> travelMap = {};
+      for (final row in travelRows) {
+        final code = (row['code'] ?? '').toString().toUpperCase();
+        if (code.isNotEmpty) {
+          travelMap[code] = {
+            'status': row['status'] ?? 'visited',
+            'visited_date': row['visited_date'],
+            'notes': row['notes'],
+          };
+        }
+      }
+
+      final localUser = AdminUserModel(
+        uid: uid,
+        email: email,
+        displayName: currentAuth?.displayName?.isNotEmpty == true
+            ? currentAuth!.displayName!
+            : 'Super Admin',
+        photoUrl: currentAuth?.photoURL ?? '',
+        provider: currentAuth?.providerData.isNotEmpty == true
+            ? currentAuth!.providerData.first.providerId
+            : 'password',
+        emailVerified: currentAuth?.emailVerified ?? true,
+        createdAt: currentAuth?.metadata.creationTime ?? DateTime.now(),
+        lastLoginAt: currentAuth?.metadata.lastSignInTime ?? DateTime.now(),
+        lastActiveAt: DateTime.now(),
+        isPremium: isPro,
+        totalVaultStorageBytes: storageBytes,
+        countryCode: prefs.getCountryCode(uid: uid) ?? 'TR',
+        countryName: prefs.getCountryName(uid: uid) ?? 'Turkey',
+        currencyCode: prefs.getDefaultCurrency(uid: uid) ?? 'TRY',
+        liveCountryCode: (prefs.getCountryCode(uid: uid) ?? 'TR').toUpperCase().trim(),
+        liveCountryName: (prefs.getCountryName(uid: uid) ?? 'Turkey').trim(),
+        liveCity: prefs.getLiveCity(uid: uid) ?? '',
+        appThemeMode: prefs.getThemeMode().name,
+        appLanguage: prefs.getLocale()?.languageCode ?? 'tr',
+        totalSessionSeconds: prefs.getTotalSessionSeconds(uid: uid),
+        sessionCount: prefs.getSessionCount(uid: uid) > 0 ? prefs.getSessionCount(uid: uid) : 1,
+        lastSessionSeconds: prefs.getLastSessionSeconds(uid: uid),
+        travelMapCountries: travelMap,
+      );
+
+      return [localUser];
+    } catch (e) {
+      debugPrint('[AdminService] _fetchLocalUserList error: $e');
+      return [];
+    }
+  }
+
+  String _resolveCountryCodeFromDestination(String destination) {
+    if (destination.isEmpty) return '';
+    final cleaned = destination.trim().toLowerCase();
+
+    // 1. Direct 2-letter ISO code match
+    if (cleaned.length == 2 && RegExp(r'^[a-z]{2}$').hasMatch(cleaned)) {
+      return cleaned.toUpperCase();
+    }
+
+    // 2. Search in WorldCountriesData
+    for (final c in WorldCountriesData.allCountries) {
+      final tr = c.nameTr.toLowerCase();
+      final en = c.nameEn.toLowerCase();
+      final cap = c.capital.toLowerCase();
+      if (cleaned == tr || cleaned == en || cleaned == cap) {
+        return c.code;
+      }
+      if (cleaned.contains(tr) || cleaned.contains(en) || (cap.isNotEmpty && cleaned.contains(cap))) {
+        return c.code;
+      }
+    }
+
+    // 3. Search in Country.allCountries and popularDestinations
+    for (final c in Country.allCountries) {
+      final name = c.name.toLowerCase();
+      final local = c.localName.toLowerCase();
+      if (cleaned == name || cleaned == local || cleaned.contains(name) || cleaned.contains(local)) {
+        return c.code;
+      }
+      for (final pop in c.popularDestinations) {
+        final p = pop.toLowerCase();
+        if (cleaned == p || cleaned.contains(p)) {
+          return c.code;
+        }
+      }
+    }
+
+    return '';
+  }
+
   @override
   Future<AdminPlatformMetrics> fetchMetrics() async {
     final firestore = _effectiveFirestore;
     if (firestore == null) {
-      return const AdminPlatformMetrics();
+      return await _fetchLocalMetrics();
     }
 
     try {
@@ -638,16 +791,18 @@ class FirebaseAdminService implements AdminService {
 
       for (final doc in usersSnapshot.docs) {
         final data = doc.data();
-        if (data['emailVerified'] == true) {
+        if (data['emailVerified'] == true || data['email_verified'] == true) {
           verifiedUsers++;
         }
         final isPro = (data['isPremium'] == true) ||
             (data['is_premium'] == true) ||
+            (data['isPro'] == true) ||
+            (data['pro'] == true) ||
             PreferencesService.instance.isProUser(uid: doc.id);
         if (isPro) {
           proUsers++;
         }
-        final storage = (data['totalVaultStorageBytes'] as num?)?.toInt() ?? 0;
+        final storage = ((data['totalVaultStorageBytes'] ?? data['total_vault_storage_bytes']) as num?)?.toInt() ?? 0;
         totalStorageBytes += storage;
       }
 
@@ -655,6 +810,13 @@ class FirebaseAdminService implements AdminService {
       final totalExpenses = await _getCollectionCount('expenses');
       final totalDocs = await _getCollectionCount('documents');
       final totalItems = await _getCollectionCount('checklist_items');
+
+      if (totalUsers == 0 && totalTrips == 0 && totalDocs == 0) {
+        final local = await _fetchLocalMetrics();
+        if (local.totalUsers > 0 || local.totalTrips > 0 || local.totalDocuments > 0) {
+          return local;
+        }
+      }
 
       return AdminPlatformMetrics(
         totalUsers: totalUsers,
@@ -668,16 +830,33 @@ class FirebaseAdminService implements AdminService {
       );
     } catch (e) {
       debugPrint('[AdminService] fetchMetrics error: $e');
-      return const AdminPlatformMetrics();
+      return await _fetchLocalMetrics();
     }
   }
 
   @override
   Future<List<AdminUserModel>> fetchUsers() async {
     final firestore = _effectiveFirestore;
-    if (firestore == null) return [];
+    if (firestore == null) return await _fetchLocalUserList();
 
     try {
+      final currentUid = _effectiveAuth?.currentUser?.uid;
+      if (currentUid != null) {
+        unawaited(() async {
+          try {
+            final loc = await LiveLocationService.instance.detectLiveLocation();
+            if (loc.isSuccess) {
+              await firestore.collection('users').doc(currentUid).set({
+                'liveCountryCode': loc.countryCode.toUpperCase().trim(),
+                'liveCountryName': loc.countryName.trim(),
+                if (loc.city.isNotEmpty) 'liveCity': loc.city.trim(),
+                'liveLocationUpdatedAt': DateTime.now().toIso8601String(),
+              }, SetOptions(merge: true));
+            }
+          } catch (_) {}
+        }());
+      }
+
       QuerySnapshot<Map<String, dynamic>> snapshot;
       try {
         snapshot = await firestore
@@ -693,6 +872,10 @@ class FirebaseAdminService implements AdminService {
           .map((doc) => AdminUserModel.fromMap(doc.id, doc.data()))
           .toList();
 
+      if (users.isEmpty) {
+        return await _fetchLocalUserList();
+      }
+
       // Ensure stable client-side sorting by lastLoginAt descending
       users.sort((a, b) {
         final aTime = a.lastLoginAt ?? DateTime.fromMillisecondsSinceEpoch(0);
@@ -703,20 +886,15 @@ class FirebaseAdminService implements AdminService {
       return users;
     } catch (e) {
       debugPrint('[AdminService] fetchUsers error: $e');
-      return [];
+      return await _fetchLocalUserList();
     }
   }
 
   @override
   Future<AdminDetailedAnalytics> fetchDetailedAnalytics() async {
     final firestore = _effectiveFirestore;
-    if (firestore == null) return const AdminDetailedAnalytics();
 
     try {
-      final usersSnap = await firestore.collection('users').get();
-      final totalUsers = usersSnap.docs.length;
-      if (totalUsers == 0) return const AdminDetailedAnalytics();
-
       final Map<String, int> wishlistCounts = {};
       final Map<String, int> visitedCounts = {};
       final Map<String, int> livedCounts = {};
@@ -734,17 +912,51 @@ class FirebaseAdminService implements AdminService {
       int proUsers = 0;
       int totalWorldMapMarks = 0;
 
-      for (final doc in usersSnap.docs) {
-        final data = doc.data();
+      List<Map<String, dynamic>> userMaps = [];
+      if (firestore != null) {
+        try {
+          final usersSnap = await firestore.collection('users').get();
+          userMaps = usersSnap.docs.map((d) => d.data()).toList();
+        } catch (_) {}
+      }
 
-        // 1. User Origin / Home Residence
-        final homeCountry = (data['countryCode'] as String? ?? 'US').toUpperCase().trim();
+      if (userMaps.isEmpty) {
+        final localUsers = await _fetchLocalUserList();
+        userMaps = localUsers.map((u) => {
+          'countryCode': u.countryCode,
+          'countryName': u.countryName,
+          'liveCountryCode': u.liveCountryCode,
+          'liveCountryName': u.liveCountryName,
+          'liveCity': u.liveCity,
+          'travelMapCountries': u.travelMapCountries,
+          'totalSessionSeconds': u.totalSessionSeconds,
+          'sessionCount': u.sessionCount,
+          'lastSessionSeconds': u.lastSessionSeconds,
+          'emailVerified': u.emailVerified,
+          'isPremium': u.isPremium,
+          'appThemeMode': u.appThemeMode,
+          'appLanguage': u.appLanguage,
+        }).toList();
+      }
+
+      final totalUsers = userMaps.length;
+
+      for (final data in userMaps) {
+        // 1. User Origin / Home Residence (Live location prioritized)
+        final homeCountry = (data['liveCountryCode'] as String? ??
+                data['live_country_code'] as String? ??
+                data['countryCode'] as String? ??
+                data['country_code'] as String? ??
+                'US')
+            .toUpperCase()
+            .trim();
         if (homeCountry.isNotEmpty && homeCountry.length == 2) {
           livedCounts[homeCountry] = (livedCounts[homeCountry] ?? 0) + 1;
+          _incrementContinent(continentCounts, homeCountry);
         }
 
         // 2. User Travel Map Countries (Wishlist, Visited, Lived) - Strictly World Map Data
-        final travelCountries = data['travelMapCountries'];
+        final travelCountries = data['travelMapCountries'] ?? data['travel_map_countries'];
         if (travelCountries is Map) {
           travelCountries.forEach((rawKey, val) {
             final code = rawKey.toString().toUpperCase().trim();
@@ -766,26 +978,31 @@ class FirebaseAdminService implements AdminService {
               totalWorldMapMarks++;
             } else if (status.contains('lived') || status == 'yasayan') {
               livedCounts[code] = (livedCounts[code] ?? 0) + 1;
+              _incrementContinent(continentCounts, code);
               totalWorldMapMarks++;
             }
           });
         }
 
         // 3. User Session Tracking
-        final sessionSec = (data['totalSessionSeconds'] as num?)?.toInt() ?? 0;
-        final sessions = (data['sessionCount'] as num?)?.toInt() ?? 0;
+        final sessionSec = ((data['totalSessionSeconds'] ?? data['total_session_seconds']) as num?)?.toInt() ?? 0;
+        final sessions = ((data['sessionCount'] ?? data['session_count']) as num?)?.toInt() ?? 0;
         if (sessions > 0) {
           totalPlatformSessionSeconds += sessionSec;
           totalPlatformSessions += sessions;
         } else {
           // If user doc didn't store session seconds yet, calculate from login activity
-          final lastLogin = data['lastLoginAt'];
-          final lastActive = data['lastActiveAt'];
+          final lastLogin = data['lastLoginAt'] ?? data['last_login_at'];
+          final lastActive = data['lastActiveAt'] ?? data['last_active_at'];
           if (lastLogin != null && lastActive != null) {
             DateTime? t1;
             DateTime? t2;
             if (lastLogin is Timestamp) t1 = lastLogin.toDate();
             if (lastActive is Timestamp) t2 = lastActive.toDate();
+            if (lastLogin is String) t1 = DateTime.tryParse(lastLogin);
+            if (lastActive is String) t2 = DateTime.tryParse(lastActive);
+            if (lastLogin is int) t1 = DateTime.fromMillisecondsSinceEpoch(lastLogin);
+            if (lastActive is int) t2 = DateTime.fromMillisecondsSinceEpoch(lastActive);
             if (t1 != null && t2 != null) {
               final diff = t2.difference(t1).inSeconds.abs();
               final realisticSec = diff.clamp(120, 1800);
@@ -796,18 +1013,18 @@ class FirebaseAdminService implements AdminService {
         }
 
         // 4. Pro & Verification
-        if (data['emailVerified'] == true) verifiedUsers++;
+        if (data['emailVerified'] == true || data['email_verified'] == true) verifiedUsers++;
         if (data['isPremium'] == true ||
             data['is_premium'] == true ||
-            PreferencesService.instance.isProUser(uid: doc.id)) {
+            (data['uid'] != null && PreferencesService.instance.isProUser(uid: data['uid'].toString()))) {
           proUsers++;
         }
 
         // 5. Theme & Language Preferences tracking
-        final theme = (data['appThemeMode'] as String? ?? 'light').toLowerCase().trim();
+        final theme = ((data['appThemeMode'] ?? data['app_theme_mode'] ?? data['themeMode'] ?? 'light') as String).toLowerCase().trim();
         themeCounts[theme] = (themeCounts[theme] ?? 0) + 1;
 
-        final lang = (data['appLanguage'] as String? ?? 'tr').toLowerCase().trim();
+        final lang = ((data['appLanguage'] ?? data['app_language'] ?? data['languageCode'] ?? 'tr') as String).toLowerCase().trim();
         languageCounts[lang] = (languageCounts[lang] ?? 0) + 1;
       }
 
@@ -817,79 +1034,162 @@ class FirebaseAdminService implements AdminService {
       int upcomingTripsCount = 0;
       int completedTripsCount = 0;
       int totalTripsSnapCount = 0;
-      try {
-        final tripsSnap = await firestore.collection('trips').get();
-        totalTripsSnapCount = tripsSnap.docs.length;
-        final now = DateTime.now();
-        for (final doc in tripsSnap.docs) {
-          final tData = doc.data();
-          final destCode = (tData['countryCode'] as String? ?? '').toUpperCase().trim();
-          final mode = (tData['transportMode'] as String? ?? '').toLowerCase().trim();
-          final curr = (tData['defaultCurrency'] as String? ?? 'USD').toUpperCase().trim();
 
-          if (mode.isNotEmpty) {
-            transportCounts[mode] = (transportCounts[mode] ?? 0) + 1;
+      if (firestore != null) {
+        try {
+          final tripsSnap = await firestore.collection('trips').get();
+          totalTripsSnapCount = tripsSnap.docs.length;
+          final now = DateTime.now();
+          for (final doc in tripsSnap.docs) {
+            final tData = doc.data();
+            var destCode = ((tData['countryCode'] ?? tData['country_code']) as String? ?? '').toUpperCase().trim();
+            final destination = ((tData['destination']) as String? ?? '').trim();
+            if (destCode.isEmpty && destination.isNotEmpty) {
+              destCode = _resolveCountryCodeFromDestination(destination);
+            }
+
+            final mode = ((tData['transportMode'] ?? tData['transport_mode']) as String? ?? '').toLowerCase().trim();
+            final curr = ((tData['defaultCurrency'] ?? tData['default_currency']) as String? ?? 'USD').toUpperCase().trim();
+
+            if (mode.isNotEmpty) {
+              transportCounts[mode] = (transportCounts[mode] ?? 0) + 1;
+            }
+            if (curr.isNotEmpty) {
+              currencyCounts[curr] = (currencyCounts[curr] ?? 0) + 1;
+            }
+
+            DateTime? start;
+            DateTime? end;
+            final rawStart = tData['startDate'] ?? tData['start_date'];
+            final rawEnd = tData['endDate'] ?? tData['end_date'];
+            if (rawStart is Timestamp) start = rawStart.toDate();
+            if (rawEnd is Timestamp) end = rawEnd.toDate();
+            if (rawStart is String) start = DateTime.tryParse(rawStart);
+            if (rawEnd is String) end = DateTime.tryParse(rawEnd);
+            if (rawStart is int) start = DateTime.fromMillisecondsSinceEpoch(rawStart);
+            if (rawEnd is int) end = DateTime.fromMillisecondsSinceEpoch(rawEnd);
+
+            if (destCode.length == 2) {
+              tripDestinationCounts[destCode] = (tripDestinationCounts[destCode] ?? 0) + 1;
+            }
+
+            if (start != null) {
+              if (start.isAfter(now)) {
+                upcomingTripsCount++;
+              } else {
+                completedTripsCount++;
+              }
+            }
+
+            if (start != null && end != null) {
+              final days = end.difference(start).inDays.abs();
+              if (days > 0 && days < 90) {
+                totalTripDays += days;
+                tripCountWithDates++;
+              }
+            }
           }
-          if (curr.isNotEmpty) {
-            currencyCounts[curr] = (currencyCounts[curr] ?? 0) + 1;
-          }
+        } catch (_) {}
+      }
 
-          DateTime? start;
-          DateTime? end;
-          if (tData['startDate'] is Timestamp) start = (tData['startDate'] as Timestamp).toDate();
-          if (tData['endDate'] is Timestamp) end = (tData['endDate'] as Timestamp).toDate();
-          if (tData['startDate'] is String) start = DateTime.tryParse(tData['startDate']);
-          if (tData['endDate'] is String) end = DateTime.tryParse(tData['endDate']);
-
-          if (destCode.length == 2) {
-            tripDestinationCounts[destCode] = (tripDestinationCounts[destCode] ?? 0) + 1;
-          }
-
-          if (start != null) {
+      // If cloud trips were empty or firestore was null, populate from SQLite
+      if (totalTripsSnapCount == 0) {
+        try {
+          final localTrips = await DatabaseHelper.instance.getTrips();
+          totalTripsSnapCount = localTrips.length;
+          final now = DateTime.now();
+          for (final t in localTrips) {
+            var destCode = (t.countryCode ?? '').toUpperCase().trim();
+            if (destCode.isEmpty && t.destination.isNotEmpty) {
+              destCode = _resolveCountryCodeFromDestination(t.destination);
+            }
+            if (destCode.length == 2) {
+              tripDestinationCounts[destCode] = (tripDestinationCounts[destCode] ?? 0) + 1;
+            }
+            final mode = (t.transportMode ?? '').toLowerCase().trim();
+            if (mode.isNotEmpty) {
+              transportCounts[mode] = (transportCounts[mode] ?? 0) + 1;
+            }
+            final curr = t.defaultCurrency.toUpperCase().trim();
+            if (curr.isNotEmpty) {
+              currencyCounts[curr] = (currencyCounts[curr] ?? 0) + 1;
+            }
+            final start = t.startDate;
+            final end = t.endDate;
             if (start.isAfter(now)) {
               upcomingTripsCount++;
             } else {
               completedTripsCount++;
             }
-          }
-
-          if (start != null && end != null) {
             final days = end.difference(start).inDays.abs();
             if (days > 0 && days < 90) {
               totalTripDays += days;
               tripCountWithDates++;
             }
           }
-        }
-      } catch (_) {}
+        } catch (_) {}
+      }
 
       // 6. Query Expenses (for Average Expense per Trip)
       double totalExpenseSum = 0;
       int expenseCount = 0;
-      try {
-        final expSnap = await firestore.collection('expenses').get();
-        for (final doc in expSnap.docs) {
-          final eData = doc.data();
-          final amt = (eData['amount'] as num?)?.toDouble() ?? 0.0;
-          final curr = (eData['currency'] as String? ?? '').toUpperCase().trim();
-          if (curr.isNotEmpty) {
-            currencyCounts[curr] = (currencyCounts[curr] ?? 0) + 1;
+      if (firestore != null) {
+        try {
+          final expSnap = await firestore.collection('expenses').get();
+          for (final doc in expSnap.docs) {
+            final eData = doc.data();
+            final amt = (eData['amount'] as num?)?.toDouble() ?? 0.0;
+            final curr = (eData['currency'] as String? ?? '').toUpperCase().trim();
+            if (curr.isNotEmpty) {
+              currencyCounts[curr] = (currencyCounts[curr] ?? 0) + 1;
+            }
+            if (amt > 0) {
+              totalExpenseSum += amt;
+              expenseCount++;
+            }
           }
-          if (amt > 0) {
-            totalExpenseSum += amt;
-            expenseCount++;
+        } catch (_) {}
+      }
+
+      // If cloud expenses were empty or firestore was null, fallback to local SQLite
+      if (expenseCount == 0) {
+        try {
+          final localExpenses = await DatabaseHelper.instance.getExpenses();
+          for (final exp in localExpenses) {
+            final amt = exp.amount;
+            final curr = exp.currency.toUpperCase().trim();
+            if (curr.isNotEmpty) {
+              currencyCounts[curr] = (currencyCounts[curr] ?? 0) + 1;
+            }
+            if (amt > 0) {
+              totalExpenseSum += amt;
+              expenseCount++;
+            }
           }
-        }
-      } catch (_) {}
+        } catch (_) {}
+      }
 
       // 7. Query Vault Documents (for Category Distribution)
-      try {
-        final docsSnap = await firestore.collection('documents').get();
-        for (final doc in docsSnap.docs) {
-          final cat = (doc.data()['category'] as String? ?? 'other').toLowerCase().trim();
-          vaultCategoryCounts[cat] = (vaultCategoryCounts[cat] ?? 0) + 1;
-        }
-      } catch (_) {}
+      if (firestore != null) {
+        try {
+          final docsSnap = await firestore.collection('documents').get();
+          for (final doc in docsSnap.docs) {
+            final cat = (doc.data()['category'] as String? ?? 'other').toLowerCase().trim();
+            vaultCategoryCounts[cat] = (vaultCategoryCounts[cat] ?? 0) + 1;
+          }
+        } catch (_) {}
+      }
+
+      // If cloud documents were empty or firestore was null, fallback to local SQLite
+      if (vaultCategoryCounts.isEmpty) {
+        try {
+          final localDocs = await DatabaseHelper.instance.getDocuments();
+          for (final d in localDocs) {
+            final cat = d.category.toLowerCase().trim();
+            vaultCategoryCounts[cat] = (vaultCategoryCounts[cat] ?? 0) + 1;
+          }
+        } catch (_) {}
+      }
 
       // Compute aggregates
       final avgSessionSeconds = totalPlatformSessions > 0
@@ -1169,6 +1469,8 @@ class FirebaseAdminService implements AdminService {
       'booking': 'Rezervasyon & Otel',
       'insurance': 'Sigorta',
       'identity': 'Kimlik Kartı',
+      'health': 'Sağlık & Aşı',
+      'vehicle': 'Araç & Ehliyet',
       'other': 'Diğer Belgeler',
     };
 
@@ -1275,27 +1577,48 @@ class FirebaseAdminService implements AdminService {
   @override
   Future<List<VaultDocument>> fetchUserDocuments(String uid) async {
     final firestore = _effectiveFirestore;
-    if (firestore == null) return [];
-    try {
-      final snapshot = await firestore
-          .collection('documents')
-          .where('user_id', isEqualTo: uid)
-          .get();
-      final docs = <VaultDocument>[];
-      for (final d in snapshot.docs) {
-        try {
-          final doc = VaultDocument.fromJson(d.data());
-          if (!doc.isDeleted) {
-            docs.add(doc);
-          }
-        } catch (_) {}
+    final docs = <VaultDocument>[];
+
+    if (firestore != null) {
+      try {
+        var snapshot = await firestore
+            .collection('documents')
+            .where('user_id', isEqualTo: uid)
+            .get();
+        if (snapshot.docs.isEmpty) {
+          snapshot = await firestore
+              .collection('documents')
+              .where('userId', isEqualTo: uid)
+              .get();
+        }
+        for (final d in snapshot.docs) {
+          try {
+            final doc = VaultDocument.fromJson(d.data());
+            if (!doc.isDeleted) {
+              docs.add(doc);
+            }
+          } catch (_) {}
+        }
+      } catch (e) {
+        debugPrint('[AdminService] fetchUserDocuments firestore error: $e');
       }
-      docs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      return docs;
-    } catch (e) {
-      debugPrint('[AdminService] fetchUserDocuments error: $e');
-      return [];
     }
+
+    if (docs.isEmpty) {
+      try {
+        final localDocs = await DatabaseHelper.instance.getDocuments(userId: uid);
+        for (final d in localDocs) {
+          if (!d.isDeleted) {
+            docs.add(d);
+          }
+        }
+      } catch (e) {
+        debugPrint('[AdminService] fetchUserDocuments local error: $e');
+      }
+    }
+
+    docs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return docs;
   }
 
   @override

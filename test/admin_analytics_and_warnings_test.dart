@@ -359,5 +359,67 @@ void main() {
       expect(find.text('Uçak'), findsOneWidget); // Transport mode
       expect(find.text('EUR'), findsOneWidget); // Currency
     });
+
+    test('AdminUserModel correctly parses snake_case fields and Turkish map statuses', () {
+      final user = AdminUserModel.fromMap('u-snake-1', {
+        'email': 'nomad@packbuddy.com',
+        'display_name': 'Nomad User',
+        'total_session_seconds': 3600,
+        'session_count': 6,
+        'last_session_seconds': 600,
+        'travel_map_countries': {
+          'tr': 'yasayan',
+          'de': 'gezilen',
+          'fr': {'status': 'visited'},
+          'jp': 'istek',
+          'us': {'status': 'wishlist'},
+          'it': 'hedef',
+        },
+      });
+
+      expect(user.displayName, 'Nomad User');
+      expect(user.totalSessionSeconds, 3600);
+      expect(user.sessionCount, 6);
+      expect(user.lastSessionSeconds, 600);
+      expect(user.averageSessionMinutes, 10.0);
+
+      // Visited includes visited & lived ('yasayan', 'gezilen', 'visited') -> 3
+      expect(user.visitedWorldMapCount, 3);
+      // Lived includes 'yasayan' -> 1
+      expect(user.livedWorldMapCount, 1);
+      // Wishlist includes 'istek', 'wishlist', 'hedef' -> 3
+      expect(user.wishlistWorldMapCount, 3);
+    });
+
+    testWidgets('AdminDashboardScreen renders platform metrics card grid correctly', (tester) async {
+      final mockService = MockAdminServiceForAnalytics(users: []);
+      final controller = AdminController(mockService);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            adminServiceProvider.overrideWithValue(mockService),
+            adminControllerProvider.overrideWith((ref) => controller),
+            isAdminProvider.overrideWithValue(true),
+          ],
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('tr'),
+            home: Scaffold(
+              body: AdminDashboardScreen(),
+            ),
+          ),
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // Metric titles
+      expect(find.text('Toplam Kullanıcı'), findsOneWidget);
+      expect(find.text('Pro Üyeler'), findsOneWidget);
+      expect(find.text('Toplam Seyahat'), findsOneWidget);
+      expect(find.text('Kasa Belgeleri'), findsOneWidget);
+      expect(find.text('Kasa Depolama'), findsOneWidget);
+    });
   });
 }

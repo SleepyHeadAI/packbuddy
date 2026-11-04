@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../services/app_widget_service.dart';
 import '../services/preferences_service.dart';
 import '../services/telemetry_service.dart';
 
@@ -18,6 +19,7 @@ class LocaleNotifier extends StateNotifier<Locale> {
     if (state != locale) {
       state = locale;
       _prefs.setLocale(locale);
+      AppWidgetService.syncCurrentState();
       TelemetryService.instance.logPreferenceChanged(
         setting: 'locale',
         value: locale.languageCode,

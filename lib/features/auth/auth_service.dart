@@ -390,6 +390,21 @@ class FirebaseAuthService implements AuthService {
         }
       }
 
+      // CHECKLIST SEEDING & CLEARING CLOUD SYNCHRONIZATION:
+      final remoteHasSeededChecklist = remoteData?['hasSeededChecklist'] as bool?;
+      final remoteHasClearedChecklist = remoteData?['hasClearedChecklist'] as bool?;
+      if (remoteHasSeededChecklist != null) {
+        await PreferencesService.instance.setSeededChecklist(remoteHasSeededChecklist, uid: user.uid);
+      }
+      if (remoteHasClearedChecklist != null) {
+        await PreferencesService.instance.setClearedChecklist(remoteHasClearedChecklist, uid: user.uid);
+      }
+      if (remoteHasClearedChecklist == true) {
+        try {
+          await DatabaseHelper.instance.deleteDefaultSeedItems(user.uid);
+        } catch (_) {}
+      }
+
       // ADOPT GUEST DATA:
       // Automatically migrate offline/guest trips, expenses, and documents to the logged-in user
       try {
@@ -528,16 +543,6 @@ class FirebaseAuthService implements AuthService {
         }
       }
 
-      // CHECKLIST SEEDING & CLEARING CLOUD SYNCHRONIZATION:
-      final remoteHasSeededChecklist = remoteData?['hasSeededChecklist'] as bool?;
-      final remoteHasClearedChecklist = remoteData?['hasClearedChecklist'] as bool?;
-      if (remoteHasSeededChecklist != null) {
-        await PreferencesService.instance.setSeededChecklist(remoteHasSeededChecklist, uid: user.uid);
-      }
-      if (remoteHasClearedChecklist != null) {
-        await PreferencesService.instance.setClearedChecklist(remoteHasClearedChecklist, uid: user.uid);
-      }
-
       // WORLD TRAVEL MAP PERSISTENCE & RESTORE:
       // Perform bidirectional cloud sync and merge between local storage and Firestore users/{uid}
       try {
@@ -637,27 +642,54 @@ class FirebaseAuthService implements AuthService {
     try {
       if (!_isFirebaseReady && _firestore == null) return;
       final firestore = _firestore ?? FirebaseFirestore.instance;
-      await firestore.collection('users').doc(uid).set({
-        'lastActiveAt': DateTime.now().toIso8601String(),
+      final now = DateTime.now().toIso8601String();
+      final updateData = <String, dynamic>{
+        'lastActiveAt': now,
         'lastInactivityWarningAt': null,
         'inactivityWarningCount': 0,
-      }, SetOptions(merge: true));
+      };
+
+      try {
+        final liveLoc = await LiveLocationService.instance.detectLiveLocation();
+        if (liveLoc.countryCode.isNotEmpty) {
+          updateData['liveCountryCode'] = liveLoc.countryCode;
+          updateData['liveCountryName'] = liveLoc.countryName;
+          updateData['liveCity'] = liveLoc.city;
+          updateData['liveLocationUpdatedAt'] = now;
+        }
+      } catch (_) {}
+
+      await firestore.collection('users').doc(uid).set(updateData, SetOptions(merge: true));
     } catch (_) {}
   }
 
   @override
   Future<void> recordSessionDuration(String uid, int seconds) async {
     try {
+      await PreferencesService.instance.recordSession(seconds, uid: uid);
       if (!_isFirebaseReady && _firestore == null) return;
       final firestore = _firestore ?? FirebaseFirestore.instance;
-      await firestore.collection('users').doc(uid).set({
+      final now = DateTime.now().toIso8601String();
+      final updateData = <String, dynamic>{
         'totalSessionSeconds': FieldValue.increment(seconds),
         'sessionCount': FieldValue.increment(1),
         'lastSessionSeconds': seconds,
-        'lastActiveAt': DateTime.now().toIso8601String(),
+        'lastActiveAt': now,
         'lastInactivityWarningAt': null,
         'inactivityWarningCount': 0,
-      }, SetOptions(merge: true));
+      };
+
+      try {
+        final liveLoc = await LiveLocationService.instance.detectLiveLocation();
+        if (liveLoc.countryCode.isNotEmpty) {
+          updateData['liveCountryCode'] = liveLoc.countryCode;
+          updateData['liveCountryName'] = liveLoc.countryName;
+          updateData['liveCity'] = liveLoc.city;
+          updateData['liveLocationUpdatedAt'] = now;
+        }
+      } catch (_) {}
+
+      await firestore.collection('users').doc(uid).set(updateData, SetOptions(merge: true));
     } catch (_) {}
   }
 }

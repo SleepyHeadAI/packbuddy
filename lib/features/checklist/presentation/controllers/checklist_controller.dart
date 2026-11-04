@@ -11,6 +11,7 @@ import '../../domain/packing_templates.dart';
 import '../../domain/airline_baggage_guide.dart';
 import '../../domain/canonical_packing_catalog.dart';
 import '../../../auth/auth_controller.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// State of the Checklist & Luggage system
 class ChecklistState {
@@ -34,60 +35,72 @@ class ChecklistState {
     this.selectedAirline,
   });
 
-  /// Normalizes and resolves a category string into a language-independent canonical token
+  static final Map<String, String> _canonicalTokens = _buildCanonicalTokens();
+
+  static Map<String, String> _buildCanonicalTokens() {
+    final map = <String, String>{
+      '': 'all',
+      'all': 'all',
+      'tümü': 'all',
+      'tumu': 'all',
+      'alle': 'all',
+      'todos': 'all',
+      'tous': 'all',
+      'все': 'all',
+      'clothing': 'clothing',
+      'kıyafet': 'clothing',
+      'kiyafet': 'clothing',
+      'kleidung': 'clothing',
+      'ropa': 'clothing',
+      'vetements': 'clothing',
+      'vêtements': 'clothing',
+      'одежда': 'clothing',
+      'electronics': 'electronics',
+      'elektronik': 'electronics',
+      'electronica': 'electronics',
+      'électronique': 'electronics',
+      'электроника': 'electronics',
+      'toiletries': 'toiletries',
+      'kişisel bakım': 'toiletries',
+      'kisisel bakim': 'toiletries',
+      'personal care': 'toiletries',
+      'körperpflege': 'toiletries',
+      'higiene': 'toiletries',
+      'toilette': 'toilette',
+      'туалетные принадлежности': 'toiletries',
+      'documents': 'documents',
+      'belgeler': 'documents',
+      'dokumente': 'documents',
+      'documentos': 'documents',
+      'документы': 'documents',
+      'accessories': 'accessories',
+      'aksesuar': 'accessories',
+      'zubehör': 'accessories',
+      'zubehor': 'accessories',
+      'accesorios': 'accessories',
+      'accessoires': 'accessories',
+      'аксессуары': 'accessories',
+    };
+
+    // Dynamically register localized tokens across all 20 supported languages
+    for (final locale in AppLocalizations.supportedLocales) {
+      try {
+        final l10n = lookupAppLocalizations(locale);
+        map[l10n.allCategories.trim().toLowerCase()] = 'all';
+        map[l10n.categoryClothing.trim().toLowerCase()] = 'clothing';
+        map[l10n.categoryElectronics.trim().toLowerCase()] = 'electronics';
+        map[l10n.categoryToiletries.trim().toLowerCase()] = 'toiletries';
+        map[l10n.categoryDocuments.trim().toLowerCase()] = 'documents';
+        map[l10n.categoryAccessories.trim().toLowerCase()] = 'accessories';
+      } catch (_) {}
+    }
+    return map;
+  }
+
+  /// Normalizes and resolves a category string into a language-independent canonical token across all 20 languages
   static String normalizeCategoryToken(String category) {
     final lower = category.trim().toLowerCase();
-    if (lower.isEmpty ||
-        lower == 'tümü' ||
-        lower == 'all' ||
-        lower == 'alle' ||
-        lower == 'todos' ||
-        lower == 'tous' ||
-        lower == 'все') {
-      return 'all';
-    }
-    if (lower == 'kıyafet' ||
-        lower == 'clothing' ||
-        lower == 'kleidung' ||
-        lower == 'ropa' ||
-        lower == 'vetements' ||
-        lower == 'vêtements' ||
-        lower == 'одежда') {
-      return 'clothing';
-    }
-    if (lower == 'elektronik' ||
-        lower == 'electronics' ||
-        lower == 'electronica' ||
-        lower == 'électronique' ||
-        lower == 'электроника') {
-      return 'electronics';
-    }
-    if (lower == 'kişisel bakım' ||
-        lower == 'toiletries' ||
-        lower == 'personal care' ||
-        lower == 'körperpflege' ||
-        lower == 'higiene' ||
-        lower == 'toilette' ||
-        lower == 'туалетные принадлежности') {
-      return 'toiletries';
-    }
-    if (lower == 'belgeler' ||
-        lower == 'documents' ||
-        lower == 'dokumente' ||
-        lower == 'documentos' ||
-        lower == 'документы') {
-      return 'documents';
-    }
-    if (lower == 'aksesuar' ||
-        lower == 'accessories' ||
-        lower == 'zubehör' ||
-        lower == 'zubehor' ||
-        lower == 'accesorios' ||
-        lower == 'accessoires' ||
-        lower == 'аксессуары') {
-      return 'accessories';
-    }
-    return lower;
+    return _canonicalTokens[lower] ?? lower;
   }
 
   /// Items filtered by active search query and category filter
@@ -164,7 +177,8 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
       : _db = db ?? DatabaseHelper.instance,
         super(initialState ?? const ChecklistState()) {
     if (initialState == null) {
-      loadItems();
+      final initialUid = _ref?.read(authUserProvider)?.uid;
+      loadItems(userId: initialUid);
     }
   }
 
@@ -323,29 +337,64 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
     if (!mounted) return;
     state = state.copyWith(isLoading: true, activeTripId: tripId);
     try {
+      final effectiveUid = (userId != null && userId.isNotEmpty)
+          ? userId
+          : _ref?.read(authUserProvider)?.uid;
+
       // Deduplicate existing checklist items in SQLite for clean state
-      await _db.deduplicateChecklistItems(userId: userId, tripId: tripId);
-      var items = await _db.getChecklistItems(tripId: tripId, userId: userId);
+      await _db.deduplicateChecklistItems(userId: effectiveUid, tripId: tripId);
+      var items = await _db.getChecklistItems(tripId: tripId, userId: effectiveUid);
       if (!mounted) return;
-      if (items.isEmpty && tripId == null) {
-        final alreadySeeded = PreferencesService.instance.hasSeededChecklist(uid: userId);
-        final alreadyCleared = PreferencesService.instance.hasClearedChecklist(uid: userId);
-        final deletedItems = await _db.getDeletedChecklistItems(userId: userId);
+
+      // If user intentionally cleared checklist, purge any rogue default items
+      if (effectiveUid != null && effectiveUid.isNotEmpty) {
+        final isCleared = PreferencesService.instance.hasClearedChecklist(uid: effectiveUid);
+        if (isCleared && items.any((i) => i.id.startsWith('default_'))) {
+          await _db.deleteDefaultSeedItems(effectiveUid);
+          items = await _db.getChecklistItems(tripId: tripId, userId: effectiveUid);
+        }
+      }
+
+      // Only seed default items if:
+      // 1. We are viewing the general checklist (tripId == null)
+      // 2. We have an authenticated user (never auto-seed into guest storage before login)
+      // 3. User hasn't already seeded or cleared the checklist
+      if (items.isEmpty && tripId == null && effectiveUid != null && effectiveUid.isNotEmpty) {
+        var alreadySeeded = PreferencesService.instance.hasSeededChecklist(uid: effectiveUid);
+        var alreadyCleared = PreferencesService.instance.hasClearedChecklist(uid: effectiveUid);
+
+        // If local prefs have no record (e.g. fresh install / reinstall), verify with Firestore first!
+        if (!alreadySeeded && !alreadyCleared) {
+          try {
+            final userDoc = await FirebaseFirestore.instance.collection('users').doc(effectiveUid).get();
+            if (userDoc.exists && userDoc.data() != null) {
+              final data = userDoc.data()!;
+              if (data['hasClearedChecklist'] == true) {
+                alreadyCleared = true;
+                await PreferencesService.instance.setClearedChecklist(true, uid: effectiveUid);
+              }
+              if (data['hasSeededChecklist'] == true) {
+                alreadySeeded = true;
+                await PreferencesService.instance.setSeededChecklist(true, uid: effectiveUid);
+              }
+            }
+          } catch (_) {}
+        }
+
+        final deletedItems = await _db.getDeletedChecklistItems(userId: effectiveUid);
         if (!alreadySeeded && !alreadyCleared && deletedItems.isEmpty) {
           // Seed default items for a rich first-run experience with deterministic IDs ONLY ONCE
-          for (final item in _buildSeedItems(userId)) {
-            await _db.insertChecklistItem(item, userId: userId);
+          for (final item in _buildSeedItems(effectiveUid)) {
+            await _db.insertChecklistItem(item, userId: effectiveUid);
           }
-          await PreferencesService.instance.setSeededChecklist(true, uid: userId);
-          if (userId != null && userId.isNotEmpty) {
-            try {
-              unawaited(FirebaseFirestore.instance.collection('users').doc(userId).set({
-                'hasSeededChecklist': true,
-              }, SetOptions(merge: true)));
-            } catch (_) {}
-          }
+          await PreferencesService.instance.setSeededChecklist(true, uid: effectiveUid);
+          try {
+            unawaited(FirebaseFirestore.instance.collection('users').doc(effectiveUid).set({
+              'hasSeededChecklist': true,
+            }, SetOptions(merge: true)));
+          } catch (_) {}
           if (!mounted) return;
-          items = await _db.getChecklistItems(userId: userId);
+          items = await _db.getChecklistItems(userId: effectiveUid);
         }
       }
       if (!mounted) return;

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import '../../features/budget/domain/country.dart';
 import 'currency_service.dart';
+import 'preferences_service.dart';
 
 /// Represents live geographic location detected from network / IP or system locale
 class LiveLocationResult {
@@ -18,6 +19,8 @@ class LiveLocationResult {
     this.city = '',
     this.source = 'system_locale',
   });
+
+  bool get isSuccess => countryCode.isNotEmpty;
 
   @override
   String toString() =>
@@ -48,20 +51,20 @@ class LiveLocationService {
       return _cachedLocation!;
     }
 
-    // 1. Try IP Geolocation with strict 3-second timeout
+    // 1. Try secure HTTPS IP Geolocation with strict 3-second timeout
     try {
       final client = HttpClient();
       client.connectionTimeout = const Duration(seconds: 3);
 
-      final uri = Uri.parse('http://ip-api.com/json/?fields=status,country,countryCode,city');
+      final uri = Uri.parse('https://ipwho.is/');
       final request = await client.getUrl(uri).timeout(const Duration(seconds: 3));
       final response = await request.close().timeout(const Duration(seconds: 3));
 
       if (response.statusCode == 200) {
         final body = await response.transform(utf8.decoder).join();
         final data = jsonDecode(body);
-        if (data is Map && data['status'] == 'success') {
-          final code = (data['countryCode'] as String? ?? '').toUpperCase().trim();
+        if (data is Map && data['success'] == true) {
+          final code = (data['country_code'] as String? ?? '').toUpperCase().trim();
           final name = data['country'] as String? ?? '';
           final city = data['city'] as String? ?? '';
 
@@ -73,6 +76,7 @@ class LiveLocationService {
               source: 'live_ip',
             );
             _cachedLocation = result;
+            _persistDetectedLocation(result);
             client.close();
             return result;
           }
@@ -80,10 +84,42 @@ class LiveLocationService {
       }
       client.close();
     } catch (e) {
-      debugPrint('[LiveLocationService] IP geolocation note: $e');
+      debugPrint('[LiveLocationService] HTTPS IP geolocation note: $e');
     }
 
-    // 2. Second fallback endpoint: api.country.is
+    // 2. Second fallback endpoint: ip-api.com (returns country, code, city)
+    try {
+      final client = HttpClient();
+      client.connectionTimeout = const Duration(seconds: 2);
+      final uri = Uri.parse('http://ip-api.com/json/?fields=status,country,countryCode,city');
+      final request = await client.getUrl(uri).timeout(const Duration(seconds: 2));
+      final response = await request.close().timeout(const Duration(seconds: 2));
+
+      if (response.statusCode == 200) {
+        final body = await response.transform(utf8.decoder).join();
+        final data = jsonDecode(body);
+        if (data is Map && data['status'] == 'success') {
+          final code = (data['countryCode'] as String? ?? '').toUpperCase().trim();
+          final name = (data['country'] as String? ?? '').trim();
+          final city = (data['city'] as String? ?? '').trim();
+          if (code.isNotEmpty) {
+            final result = LiveLocationResult(
+              countryCode: code,
+              countryName: name.isNotEmpty ? name : (Country.findByCode(code)?.name ?? code),
+              city: city,
+              source: 'live_ip',
+            );
+            _cachedLocation = result;
+            _persistDetectedLocation(result);
+            client.close();
+            return result;
+          }
+        }
+      }
+      client.close();
+    } catch (_) {}
+
+    // 3. Third fallback endpoint: api.country.is
     try {
       final client = HttpClient();
       client.connectionTimeout = const Duration(seconds: 2);
@@ -105,6 +141,7 @@ class LiveLocationService {
               source: 'live_ip',
             );
             _cachedLocation = result;
+            _persistDetectedLocation(result);
             client.close();
             return result;
           }
@@ -113,7 +150,7 @@ class LiveLocationService {
       client.close();
     } catch (_) {}
 
-    // 3. Fallback to device system locale via CountryDetector
+    // 4. Fallback to device system locale via CountryDetector
     final fallback = CountryDetector.detectCountry();
     final result = LiveLocationResult(
       countryCode: fallback.code,
@@ -123,6 +160,18 @@ class LiveLocationService {
     );
     _cachedLocation = result;
     return result;
+  }
+
+  void _persistDetectedLocation(LiveLocationResult result) {
+    try {
+      if (result.source == 'live_ip') {
+        PreferencesService.instance.setCountryCode(result.countryCode);
+        PreferencesService.instance.setCountryName(result.countryName);
+        if (result.city.isNotEmpty) {
+          PreferencesService.instance.setLiveCity(result.city);
+        }
+      }
+    } catch (_) {}
   }
 }
 

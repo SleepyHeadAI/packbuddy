@@ -94,14 +94,17 @@ class _PackBuddyAppState extends ConsumerState<PackBuddyApp>
   }
 
   void _recordActiveSession() {
+    if (!mounted) return;
     if (_sessionStartTime != null) {
       final elapsed = DateTime.now().difference(_sessionStartTime!).inSeconds;
       _sessionStartTime = null;
       if (elapsed >= 2) {
-        final user = ref.read(authUserProvider);
-        if (user != null) {
-          ref.read(authServiceProvider).recordSessionDuration(user.uid, elapsed).catchError((_) {});
-        }
+        try {
+          final user = ref.read(authUserProvider);
+          if (user != null) {
+            ref.read(authServiceProvider).recordSessionDuration(user.uid, elapsed).catchError((_) {});
+          }
+        } catch (_) {}
       }
     }
   }

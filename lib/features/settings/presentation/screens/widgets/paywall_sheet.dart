@@ -411,6 +411,69 @@ class PaywallSheet extends ConsumerWidget {
                       ),
               ),
             ),
+            const SizedBox(height: 12),
+
+            // Restore Purchases Action (Required by Apple App Store & Google Play Store)
+            TextButton(
+              onPressed: proState.isLoading
+                  ? null
+                  : () async {
+                      final success = await ref
+                          .read(proSubscriptionProvider.notifier)
+                          .restorePurchases();
+                      if (!context.mounted) return;
+                      final langCode = Localizations.localeOf(context).languageCode;
+                      if (success) {
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Row(
+                              children: [
+                                const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                                const SizedBox(width: 12),
+                                Expanded(child: Text(_resolveRestoreSuccessMessage(langCode))),
+                              ],
+                            ),
+                            backgroundColor: AppColors.successPastel,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(_resolveNoPurchasesFoundMessage(langCode)),
+                            backgroundColor: theme.colorScheme.onSurfaceVariant,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                        );
+                      }
+                    },
+              child: Text(
+                _resolveRestorePurchasesLabel(Localizations.localeOf(context).languageCode),
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+
+            // Legal & Terms Disclaimer
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                l10n.authTermsNotice,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.75),
+                  height: 1.35,
+                ),
+              ),
+            ),
           ],
         ],
       ),
@@ -418,6 +481,81 @@ class PaywallSheet extends ConsumerWidget {
   ),
 );
 }
+
+  static String _resolveRestorePurchasesLabel(String langCode) {
+    switch (langCode) {
+      case 'tr':
+        return 'Satın Alımları Geri Yükle';
+      case 'es':
+        return 'Restaurar compras';
+      case 'fr':
+        return 'Restaurer les achats';
+      case 'de':
+        return 'Käufe wiederherstellen';
+      case 'it':
+        return 'Ripristina acquisti';
+      case 'pt':
+        return 'Restaurar compras';
+      case 'ru':
+        return 'Восстановить покупки';
+      case 'zh':
+        return '恢复购买';
+      case 'ja':
+        return '購入を復元';
+      case 'ko':
+        return '구매 복원';
+      case 'ar':
+        return 'استعادة المشتريات';
+      case 'nl':
+        return 'Aankopen herstellen';
+      case 'sv':
+        return 'Återställ köp';
+      case 'pl':
+        return 'Przywróć zakupy';
+      case 'hi':
+        return 'खरीदारी पुनर्स्थापित करें';
+      case 'id':
+        return 'Pulihkan Pembelian';
+      case 'th':
+        return 'กู้คืนการซื้อ';
+      case 'vi':
+        return 'Khôi phục giao dịch mua';
+      case 'el':
+        return 'Επαναφορά αγορών';
+      default:
+        return 'Restore Purchases';
+    }
+  }
+
+  static String _resolveRestoreSuccessMessage(String langCode) {
+    switch (langCode) {
+      case 'tr':
+        return 'Satın alımlarınız başarıyla geri yüklendi!';
+      case 'es':
+        return '¡Tus compras han sido restauradas con éxito!';
+      case 'fr':
+        return 'Vos achats ont été restaurés avec succès !';
+      case 'de':
+        return 'Ihre Käufe wurden erfolgreich wiederhergestellt!';
+      default:
+        return 'Your purchases were restored successfully!';
+    }
+  }
+
+  static String _resolveNoPurchasesFoundMessage(String langCode) {
+    switch (langCode) {
+      case 'tr':
+        return 'Geri yüklenecek aktif bir abonelik bulunamadı.';
+      case 'es':
+        return 'No se encontraron compras activas para restaurar.';
+      case 'fr':
+        return 'Aucun achat actif trouvé à restaurer.';
+      case 'de':
+        return 'Keine aktiven Käufe zur Wiederherstellung gefunden.';
+      default:
+        return 'No active subscription found to restore.';
+    }
+  }
 }
 
 class _ProFeatureRow extends StatelessWidget {

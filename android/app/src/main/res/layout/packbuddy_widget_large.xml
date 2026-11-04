@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <!-- Top Header: App Name & Exploration / Days Badge -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/widget_app_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="PackBuddy • World Map"
+            android:textColor="#3B82F6"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_days"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/widget_badge_bg"
+            android:paddingStart="8dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="3dp"
+            android:text="%12.3"
+            android:textColor="#FFFFFF"
+            android:textSize="10.5sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Title & Subtitle -->
+    <LinearLayout
+        android:id="@+id/widget_title_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/widget_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="28 Countries Visited"
+            android:textColor="#FFFFFF"
+            android:textSize="14.5sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_destination"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text=""
+            android:visibility="gone"
+            android:textColor="#94A3B8"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <!-- Center Hero: Painted World Map Image -->
+    <FrameLayout
+        android:id="@+id/widget_map_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/widget_map_bg"
+        android:padding="0dp">
+
+        <ImageView
+            android:id="@+id/widget_map_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="World Map"
+            android:scaleType="fitCenter" />
+    </FrameLayout>
+
+    <!-- Bottom Stat Badges -->
+    <LinearLayout
+        android:id="@+id/widget_bottom_stats"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/widget_packing"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/widget_stat_bg"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingStart="4dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="4dp"
+            android:paddingBottom="3dp"
+            android:text="✈️ 28 Visited"
+            android:textColor="#38BDF8"
+            android:textSize="10.5sp"
+            android:textStyle="bold" />
+
+        <FrameLayout
+            android:layout_width="6dp"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/widget_budget"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/widget_stat_bg"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingStart="4dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="4dp"
+            android:paddingBottom="3dp"
+            android:text="🌟 0 Wishlist"
+            android:textColor="#FBBF24"
+            android:textSize="10.5sp"
+            android:textStyle="bold" />
+
+        <FrameLayout
+            android:layout_width="6dp"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/widget_stat3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/widget_stat_bg"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingStart="4dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="4dp"
+            android:paddingBottom="3dp"
+            android:text="🌍 2 Continents"
+            android:textColor="#34D399"
+            android:textSize="10.5sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</LinearLayout>
+

@@ -1132,6 +1132,11 @@ class SyncEngine extends StateNotifier<SyncState> {
       for (final localItem in localItems) {
         final remoteItem = sanitizedRemoteMap[localItem.id];
         if (remoteItem == null) {
+          final isCleared = PreferencesService.instance.hasClearedChecklist(uid: uid);
+          if (isCleared && localItem.id.startsWith('default_')) {
+            itemIdsToHardDelete.add(localItem.id);
+            continue;
+          }
           if (lastSyncedAt == 0 || localItem.updatedAt.millisecondsSinceEpoch > lastSyncedAt) {
             batch.set(
               firestore.collection('checklist_items').doc(localItem.id),

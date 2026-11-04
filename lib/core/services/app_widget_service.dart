@@ -8,7 +8,9 @@ import '../../features/checklist/domain/packing_item.dart';
 import '../../features/travel_map/data/travel_map_service.dart';
 import '../../features/travel_map/domain/travel_country.dart';
 import '../utils/currency_formatter.dart';
+import 'app_widget_localization.dart';
 import 'preferences_service.dart';
+import 'widget_map_renderer.dart';
 
 /// App Widget Payload model for iOS WidgetKit / Android AppWidgets (Feature F-9)
 class AppWidgetData {
@@ -98,6 +100,7 @@ class AppWidgetService {
     List<Expense>? expenses,
     List<TravelCountry>? countries,
     String? widgetMode,
+    String? widgetTheme,
   }) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -196,12 +199,86 @@ class AppWidgetService {
         await HomeWidget.saveWidgetData<int>('map_wishlist_count', wishlistCount);
         await HomeWidget.saveWidgetData<int>('map_continents_count', continentsCount);
 
-        await HomeWidget.updateWidget(
-          name: 'PackBuddyWidgetProvider',
-          androidName: 'PackBuddyWidgetProvider',
-          qualifiedAndroidName: 'com.sleepyhead.packbuddy.PackBuddyWidgetProvider',
-          iOSName: 'PackBuddyWidget',
-        );
+        // Pre-formatted localized texts for native Android AppWidget
+        final lang = PreferencesService.instance.getLocale()?.languageCode ?? 'en';
+        final theme = widgetTheme ?? PreferencesService.instance.getWidgetTheme();
+        await HomeWidget.saveWidgetData<String>('widget_theme', theme);
+
+        final showWorldMap = mode == 'world_map' ||
+            (mode == 'auto' && !hasUpcomingTrip && (visitedCount > 0 || wishlistCount > 0));
+
+        if (showWorldMap) {
+          final customAppName = AppWidgetLocalization.getWorldHeader(lang);
+          final customTitle = AppWidgetLocalization.getVisitedTitle(lang, visitedCount);
+          const customSubtitle = '';
+          final customStat1 = AppWidgetLocalization.getVisitedStatLabel(lang, visitedCount);
+          final customStat2 = AppWidgetLocalization.getWishlistStatLabel(lang, wishlistCount);
+          final customStat3 = AppWidgetLocalization.getContinentsStatLabel(lang, continentsCount);
+
+          await HomeWidget.saveWidgetData<String>('custom_app_name', customAppName);
+          await HomeWidget.saveWidgetData<String>('custom_days', worldPercentStr);
+          await HomeWidget.saveWidgetData<String>('custom_title', customTitle);
+          await HomeWidget.saveWidgetData<String>('custom_subtitle', customSubtitle);
+          await HomeWidget.saveWidgetData<String>('custom_stat1', customStat1);
+          await HomeWidget.saveWidgetData<String>('custom_stat2', customStat2);
+          await HomeWidget.saveWidgetData<String>('custom_stat3', customStat3);
+
+          // Render high-resolution vector world map image for medium and large home screen widgets
+          await WidgetMapRenderer.renderAndSaveMapImages(mapCountries, theme: theme, continentsCount: continentsCount);
+        } else if (hasUpcomingTrip && (payload.tripTitle?.isNotEmpty ?? false)) {
+          final customAppName = AppWidgetLocalization.getTripHeader(lang);
+          final customDays = daysUntil > 0
+              ? '$daysUntil${AppWidgetLocalization.getDaysSuffix(lang)}'
+              : (daysUntil == 0
+                  ? AppWidgetLocalization.formatDaysUntil(lang, 0)
+                  : AppWidgetLocalization.formatDaysUntil(lang, -1));
+          final customTitle = payload.tripTitle ?? 'PackBuddy';
+          final customSubtitle = (payload.destination?.isNotEmpty ?? false)
+              ? payload.destination!
+              : AppWidgetLocalization.getCountdownActive(lang);
+          final customStat1 = '🎒 ${payload.packedItems}/${payload.totalItems} ${AppWidgetLocalization.getPackingLabel(lang).toLowerCase()}';
+          final customStat2 = payload.budgetSpent ?? '';
+          final customStat3 = payload.budgetTotal != null ? '${AppWidgetLocalization.getBudgetLabel(lang)}: ${payload.budgetTotal}' : '';
+
+          await HomeWidget.saveWidgetData<String>('custom_app_name', customAppName);
+          await HomeWidget.saveWidgetData<String>('custom_days', customDays);
+          await HomeWidget.saveWidgetData<String>('custom_title', customTitle);
+          await HomeWidget.saveWidgetData<String>('custom_subtitle', customSubtitle);
+          await HomeWidget.saveWidgetData<String>('custom_stat1', customStat1);
+          await HomeWidget.saveWidgetData<String>('custom_stat2', customStat2);
+          await HomeWidget.saveWidgetData<String>('custom_stat3', customStat3);
+        } else {
+          final customAppName = 'PackBuddy';
+          final customDays = '✈️';
+          final customTitle = AppWidgetLocalization.getTripHeader(lang);
+          final customSubtitle = AppWidgetLocalization.getDefaultDestination(lang);
+          final customStat1 = '🎒 ${AppWidgetLocalization.getPackingLabel(lang)}';
+          final customStat2 = AppWidgetLocalization.getWorldMapModeLabel(lang);
+          final customStat3 = AppWidgetLocalization.getWorldHeader(lang);
+
+          await HomeWidget.saveWidgetData<String>('custom_app_name', customAppName);
+          await HomeWidget.saveWidgetData<String>('custom_days', customDays);
+          await HomeWidget.saveWidgetData<String>('custom_title', customTitle);
+          await HomeWidget.saveWidgetData<String>('custom_subtitle', customSubtitle);
+          await HomeWidget.saveWidgetData<String>('custom_stat1', customStat1);
+          await HomeWidget.saveWidgetData<String>('custom_stat2', customStat2);
+          await HomeWidget.saveWidgetData<String>('custom_stat3', customStat3);
+        }
+
+        for (final provider in const [
+          'PackBuddyWidgetProvider',
+          'PackBuddyMediumWidgetProvider',
+          'PackBuddyLargeWidgetProvider',
+        ]) {
+          try {
+            await HomeWidget.updateWidget(
+              name: provider,
+              androidName: provider,
+              qualifiedAndroidName: 'com.sleepyhead.packbuddy.$provider',
+              iOSName: 'PackBuddyWidget',
+            );
+          } catch (_) {}
+        }
       } catch (_) {}
     } catch (_) {}
   }
@@ -213,6 +290,7 @@ class AppWidgetService {
     List<Expense>? expenses,
     List<TravelCountry>? countries,
     String? widgetMode,
+    String? widgetTheme,
   }) async {
     try {
       Trip? nextTrip = upcomingTrip;
@@ -250,6 +328,7 @@ class AppWidgetService {
         expenses: resolvedExpenses,
         countries: countries,
         widgetMode: widgetMode,
+        widgetTheme: widgetTheme,
       );
     } catch (_) {}
   }

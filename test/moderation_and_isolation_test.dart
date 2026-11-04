@@ -395,6 +395,7 @@ void main() {
         countryCode: 'TR',
         countryName: 'Turkey',
         currencyCode: 'TRY',
+        liveCity: 'Bursa',
         isPremium: true,
         lastActiveAt: DateTime.now().subtract(const Duration(minutes: 5)),
       ),
@@ -405,6 +406,7 @@ void main() {
         countryCode: 'TR',
         countryName: 'Turkey',
         currencyCode: 'TRY',
+        liveCity: 'Istanbul',
         isPremium: false,
         lastActiveAt: DateTime.now().subtract(const Duration(hours: 1)),
       ),
@@ -575,8 +577,19 @@ void main() {
       expect(find.text('Live (15m)'), findsOneWidget);
       expect(find.text('Daily (24h)'), findsOneWidget);
 
-      // Verify Country Breakdown appears
-      expect(find.textContaining('Turkey (TR)'), findsWidgets);
+      // Scroll down to Geo-Analytics country list
+      await tester.drag(find.byType(ListView), const Offset(0, -400));
+      await tester.pumpAndSettle();
+
+      // Verify Country Breakdown appears and tap Turkey to expand city breakdown
+      final turkeyFinder = find.byKey(const ValueKey('geo_country_TR'));
+      expect(turkeyFinder, findsOneWidget);
+
+      await tester.tap(turkeyFinder);
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('CITY BREAKDOWN'), findsOneWidget);
+      expect(find.text('Bursa'), findsOneWidget);
     });
   });
 }

@@ -397,6 +397,12 @@ class DatabaseHelper {
           where: 'user_id = ? OR user_id IS NULL',
           whereArgs: [''],
         );
+        // Purge dummy default seed items created under guest mode so they never contaminate user's account
+        await txn.delete(
+          AppConstants.tableChecklistItems,
+          where: "(user_id = ? OR user_id IS NULL) AND id LIKE 'default_%'",
+          whereArgs: [''],
+        );
         await txn.update(
           AppConstants.tableChecklistItems,
           {'user_id': uid},
@@ -1029,6 +1035,19 @@ class DatabaseHelper {
       AppConstants.tableChecklistItems,
       where: 'id = ?',
       whereArgs: [id],
+    );
+  }
+
+  /// Hard deletes any default seeded demo items for the given user ID or guest
+  Future<int> deleteDefaultSeedItems(String? userId) async {
+    final db = await database;
+    final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
+    return await db.delete(
+      AppConstants.tableChecklistItems,
+      where: effectiveUserId.isNotEmpty
+          ? "id LIKE 'default_%' AND (user_id = ? OR user_id = '' OR user_id IS NULL)"
+          : "id LIKE 'default_%'",
+      whereArgs: effectiveUserId.isNotEmpty ? [effectiveUserId] : null,
     );
   }
 

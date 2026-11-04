@@ -99,6 +99,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     }
   }
 
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
   void _nextPage() {
     if (_currentPage < _pages.length - 1) {
       _pageController.nextPage(

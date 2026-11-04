@@ -75,12 +75,16 @@ class TravelMapState {
     return map;
   }
 
-  List<TravelCountry> get filteredCountries {
+  List<TravelCountry> get filteredCountries => getFilteredCountries('tr');
+
+  List<TravelCountry> getFilteredCountries([String langCode = 'tr']) {
     final list = countries.where((c) {
       if (searchQuery.isNotEmpty) {
         final q = searchQuery.toLowerCase().trim();
+        final localizedName = c.getLocalizedName(langCode).toLowerCase();
         final match = c.nameTr.toLowerCase().contains(q) ||
             c.nameEn.toLowerCase().contains(q) ||
+            localizedName.contains(q) ||
             c.capital.toLowerCase().contains(q) ||
             c.code.toLowerCase().contains(q);
         if (!match) return false;
@@ -115,7 +119,10 @@ class TravelMapState {
 
       final pComp = priority(a).compareTo(priority(b));
       if (pComp != 0) return pComp;
-      return a.nameTr.compareTo(b.nameTr);
+
+      final nameA = a.getLocalizedName(langCode);
+      final nameB = b.getLocalizedName(langCode);
+      return nameA.toLowerCase().compareTo(nameB.toLowerCase());
     });
 
     return list;

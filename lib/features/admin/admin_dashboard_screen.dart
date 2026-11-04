@@ -31,6 +31,12 @@ class AdminDashboardScreen extends ConsumerStatefulWidget {
 
 class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final Set<String> _expandedCountries = {};
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -1711,11 +1717,26 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(
-                  l10n.adminGeoAnalytics,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.adminGeoAnalytics,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 1),
+                    Text(
+                      l10n.localeName.startsWith('tr')
+                          ? 'Anlık Canlı Konum ve Şehir Dağılımı (Detay için dokunun)'
+                          : 'Real-Time Live Location & City Breakdown (Tap to expand)',
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Container(
@@ -1820,69 +1841,220 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               children: breakdown.map((item) {
                 final flag = countryCodeToFlagEmoji(item.countryCode);
                 final percentStr = (item.percentage * 100).toStringAsFixed(1);
+                final isTr = l10n.localeName.startsWith('tr');
+                final localizedCountry = CountryLocalization.getCountryName(item.countryCode, l10n.localeName) ?? item.countryName;
+                final isExpanded = _expandedCountries.contains(item.countryCode);
 
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+                  child: InkWell(
+                    key: ValueKey('geo_country_${item.countryCode}'),
+                    onTap: () {
+                      setState(() {
+                        if (isExpanded) {
+                          _expandedCountries.remove(item.countryCode);
+                        } else {
+                          _expandedCountries.add(item.countryCode);
+                        }
+                      });
+                    },
+                    borderRadius: BorderRadius.circular(10),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            flag,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              '${item.countryName} (${item.countryCode})',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 13,
+                          Row(
+                            children: [
+                              Text(
+                                flag,
+                                style: const TextStyle(fontSize: 16),
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  '$localizedCountry (${item.countryCode})',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 13,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  '${item.activeUserCount} ($percentStr%)',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 2),
+                              AnimatedRotation(
+                                turns: isExpanded ? 0.5 : 0.0,
+                                duration: const Duration(milliseconds: 200),
+                                child: Icon(
+                                  Icons.keyboard_arrow_down_rounded,
+                                  size: 18,
+                                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                                ),
+                              ),
+                            ],
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.surfaceContainerHighest,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              item.primaryCurrency,
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                color: theme.colorScheme.primary,
+                          const SizedBox(height: 6),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: LinearProgressIndicator(
+                              value: item.percentage.clamp(0.0, 1.0),
+                              minHeight: 6,
+                              backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                theme.colorScheme.primary,
                               ),
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '${item.activeUserCount} ($percentStr%)',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: theme.colorScheme.onSurfaceVariant,
+                          if (isExpanded) ...[
+                            const SizedBox(height: 10),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.35),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          isTr
+                                              ? '${localizedCountry.toUpperCase()} ŞEHİR DAĞILIMI'
+                                              : '${item.countryCode} CITY BREAKDOWN',
+                                          style: TextStyle(
+                                            fontSize: 9.5,
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: 0.5,
+                                            color: theme.colorScheme.onSurfaceVariant,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        isTr
+                                            ? '($localizedCountry içi oran)'
+                                            : '(share of country)',
+                                        style: TextStyle(
+                                          fontSize: 9,
+                                          fontStyle: FontStyle.italic,
+                                          color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  if (item.cities.isEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 4),
+                                      child: Text(
+                                        isTr ? 'Şehir verisi henüz kaydedilmedi' : 'No city data yet',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontStyle: FontStyle.italic,
+                                          color: theme.colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    )
+                                  else
+                                    ...item.cities.map((city) {
+                                      final cityPercentStr = (city.percentage * 100).toStringAsFixed(1);
+                                      final cityNameDisplay = city.cityName.isNotEmpty
+                                          ? city.cityName
+                                          : (isTr ? 'Diğer / Bilinmeyen Şehir' : 'Other / Unknown City');
+
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 4),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Expanded(
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    children: [
+                                                      Icon(
+                                                        Icons.location_on_rounded,
+                                                        size: 11,
+                                                        color: theme.colorScheme.primary,
+                                                      ),
+                                                      const SizedBox(width: 4),
+                                                      Flexible(
+                                                        child: Text(
+                                                          cityNameDisplay,
+                                                          style: TextStyle(
+                                                            fontSize: 11.5,
+                                                            fontWeight: FontWeight.w600,
+                                                            color: theme.colorScheme.onSurface,
+                                                          ),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow.ellipsis,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  '${city.activeUserCount} (%$cityPercentStr)',
+                                                  style: TextStyle(
+                                                    fontSize: 11,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: theme.colorScheme.primary,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 3),
+                                            ClipRRect(
+                                              borderRadius: BorderRadius.circular(3),
+                                              child: LinearProgressIndicator(
+                                                value: city.percentage.clamp(0.0, 1.0),
+                                                minHeight: 4,
+                                                backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                                                valueColor: AlwaysStoppedAnimation<Color>(
+                                                  theme.colorScheme.primary.withValues(alpha: 0.75),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }),
+                                ],
+                              ),
                             ),
-                          ),
+                          ],
                         ],
                       ),
-                      const SizedBox(height: 6),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: item.percentage.clamp(0.0, 1.0),
-                          minHeight: 6,
-                          backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            theme.colorScheme.primary,
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 );
               }).toList(),
@@ -4440,6 +4612,7 @@ class _SendWarningBottomSheetState extends ConsumerState<_SendWarningBottomSheet
                     },
                   )
                 : null,
+            persist: false,
           ),
         );
 
