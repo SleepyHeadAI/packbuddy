@@ -123,52 +123,90 @@ class AppWidgetService {
 
   /// Global navigator key allowing widget deep links to navigate without context dependency
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  static Uri? _pendingUri;
+  static bool _isHandlingUri = false;
 
   /// Handles deep links originating from Android Home Screen widgets
   static Future<void> handleWidgetUri(Uri uri, [WidgetRef? ref]) async {
     debugPrint('[AppWidgetService] Received widget deep link: $uri');
-    final context = navigatorKey.currentContext;
-    if (context == null) return;
+    _pendingUri = uri;
+    await _processPendingUri();
+  }
 
-    final host = uri.host.isNotEmpty ? uri.host : uri.path.replaceAll('/', '');
+  static Future<void> _processPendingUri() async {
+    if (_isHandlingUri || _pendingUri == null) return;
+    _isHandlingUri = true;
+    try {
+      final uri = _pendingUri!;
 
-    if (host == 'add_expense' || uri.toString().contains('add_expense')) {
-      final trips = await DatabaseHelper.instance.getTrips(includeDeleted: false);
-      final activeTrips = trips.where((t) => !t.isDeleted).toList()
-        ..sort((a, b) => a.startDate.compareTo(b.startDate));
-      if (activeTrips.isNotEmpty) {
-        final trip = activeTrips.first;
-        if (context.mounted) {
-          AddExpenseSheet.show(
-            context,
-            tripId: trip.id,
-            defaultCurrency: trip.defaultCurrency,
+      // Wait for navigatorKey.currentContext to become available and stable (up to 3 seconds)
+      for (int i = 0; i < 30; i++) {
+        if (navigatorKey.currentContext != null) break;
+        await Future.delayed(const Duration(milliseconds: 100));
+      }
+      var context = navigatorKey.currentContext;
+      if (context == null) {
+        _isHandlingUri = false;
+        return;
+      }
+
+      // Small delay to allow any initial route / auth transition to settle
+      await Future.delayed(const Duration(milliseconds: 300));
+      context = navigatorKey.currentContext;
+      if (context == null || !context.mounted) {
+        _isHandlingUri = false;
+        return;
+      }
+
+      final host = uri.host.isNotEmpty ? uri.host : uri.path.replaceAll('/', '');
+
+      if (host == 'add_expense' || uri.toString().contains('add_expense')) {
+        final trips = await DatabaseHelper.instance.getTrips(includeDeleted: false);
+        final activeTrips = trips.where((t) => !t.isDeleted).toList()
+          ..sort((a, b) => a.startDate.compareTo(b.startDate));
+        final curCtx = navigatorKey.currentContext;
+        if (curCtx != null && curCtx.mounted) {
+          if (activeTrips.isNotEmpty) {
+            final trip = activeTrips.first;
+            AddExpenseSheet.show(
+              curCtx,
+              tripId: trip.id,
+              defaultCurrency: trip.defaultCurrency,
+            );
+          } else {
+            AddTripSheet.show(curCtx);
+          }
+        }
+      } else if (host == 'currency' || uri.toString().contains('currency')) {
+        final curCtx = navigatorKey.currentContext;
+        if (curCtx != null && curCtx.mounted) {
+          CurrencyConverterCard.showAsModal(curCtx);
+        }
+      } else if (host == 'map' || uri.toString().contains('map')) {
+        final curCtx = navigatorKey.currentContext;
+        if (curCtx != null && curCtx.mounted) {
+          Navigator.of(curCtx).push(
+            MaterialPageRoute(builder: (_) => const TravelMapScreen()),
           );
         }
-      } else {
-        if (context.mounted) {
-          AddTripSheet.show(context);
+      } else if (host == 'trip' || uri.toString().contains('trip')) {
+        final trips = await DatabaseHelper.instance.getTrips(includeDeleted: false);
+        final activeTrips = trips.where((t) => !t.isDeleted).toList()
+          ..sort((a, b) => a.startDate.compareTo(b.startDate));
+        final curCtx = navigatorKey.currentContext;
+        if (curCtx != null && curCtx.mounted) {
+          if (activeTrips.isNotEmpty) {
+            Navigator.of(curCtx).push(
+              MaterialPageRoute(builder: (_) => TripDetailScreen(trip: activeTrips.first)),
+            );
+          } else {
+            AddTripSheet.show(curCtx);
+          }
         }
       }
-    } else if (host == 'currency' || uri.toString().contains('currency')) {
-      if (context.mounted) {
-        CurrencyConverterCard.showAsModal(context);
-      }
-    } else if (host == 'map' || uri.toString().contains('map')) {
-      if (context.mounted) {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const TravelMapScreen()),
-        );
-      }
-    } else if (host == 'trip' || uri.toString().contains('trip')) {
-      final trips = await DatabaseHelper.instance.getTrips(includeDeleted: false);
-      final activeTrips = trips.where((t) => !t.isDeleted).toList()
-        ..sort((a, b) => a.startDate.compareTo(b.startDate));
-      if (activeTrips.isNotEmpty && context.mounted) {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => TripDetailScreen(trip: activeTrips.first)),
-        );
-      }
+      _pendingUri = null;
+    } finally {
+      _isHandlingUri = false;
     }
   }
 
@@ -211,6 +249,7 @@ class AppWidgetService {
       String? budgetTotalStr;
       String? remainingBudgetStr;
       String? lastExpenseText;
+      double totalSpent = 0.0;
 
       final userCurrency = upcomingTrip?.defaultCurrency ??
           PreferencesService.instance.getDefaultCurrency() ??
@@ -238,7 +277,7 @@ class AppWidgetService {
             .where((e) => e.tripId == upcomingTrip.id && !e.isDeleted)
             .toList();
 
-        final totalSpent = tripExpenses.fold<double>(0.0, (sum, e) => sum + e.amount);
+        totalSpent = tripExpenses.fold<double>(0.0, (sum, e) => sum + e.amount);
 
         budgetSpentStr = CurrencyFormatter.format(totalSpent, currency: userCurrency);
         if (upcomingTrip.budgetLimit != null) {
@@ -295,6 +334,8 @@ class AppWidgetService {
 
         await HomeWidget.saveWidgetData<String>('widget_mode', mode);
         await HomeWidget.saveWidgetData<String>('widget_theme', theme);
+        await HomeWidget.saveWidgetData<String>('${mode}_theme', theme);
+        await HomeWidget.saveWidgetData<String>('pending_pin_theme', theme);
         await HomeWidget.saveWidgetData<String>('app_language', lang);
         await HomeWidget.saveWidgetData<bool>('has_upcoming_trip', hasUpcomingTrip);
 
@@ -303,7 +344,8 @@ class AppWidgetService {
         await HomeWidget.saveWidgetData<String>('trip_destination', payload.destination ?? '');
         await HomeWidget.saveWidgetData<int>('trip_days', payload.daysUntil);
         await HomeWidget.saveWidgetData<String>('trip_packing', '${payload.packedItems}/${payload.totalItems}');
-        await HomeWidget.saveWidgetData<String>('trip_budget', payload.budgetSpent ?? '');
+        final defaultZeroCurrency = CurrencyFormatter.format(0, currency: userCurrency);
+        await HomeWidget.saveWidgetData<String>('trip_budget', (payload.budgetSpent != null && payload.budgetSpent!.isNotEmpty) ? payload.budgetSpent! : defaultZeroCurrency);
 
         await HomeWidget.saveWidgetData<int>('map_visited_count', visitedCount);
         await HomeWidget.saveWidgetData<String>('map_world_percent', worldPercentStr);
@@ -315,6 +357,11 @@ class AppWidgetService {
         await HomeWidget.saveWidgetData<String>('remaining_budget', remainingBudgetStr ?? '');
         await HomeWidget.saveWidgetData<String>('last_expense_text', lastExpenseText ?? '');
         await HomeWidget.saveWidgetData<String>('user_currency', userCurrency);
+        await HomeWidget.saveWidgetData<String>('currency_rates_json', jsonEncode(CurrencyService.ratesAgainstUsd));
+        await HomeWidget.saveWidgetData<String>('active_trip_id', upcomingTrip?.id ?? '');
+        await HomeWidget.saveWidgetData<String>('active_trip_currency', upcomingTrip?.defaultCurrency ?? userCurrency);
+        await HomeWidget.saveWidgetData<double>('trip_budget_spent_num', totalSpent);
+        await HomeWidget.saveWidgetData<double>('trip_budget_limit_num', upcomingTrip?.budgetLimit ?? 0.0);
 
         // Pre-formatted localized texts for native Android AppWidget based on ALL modes simultaneously
         // 1. World Map
@@ -358,6 +405,10 @@ class AppWidgetService {
         final currencyStat3 = '1 $userCurrency ≈ \$${reverseRate.toStringAsFixed(2)}';
         final currencyTheme = PreferencesService.instance.getWidgetThemeForMode('currency_converter');
 
+        final conv1 = '\$10 ≈ ${(10 * rateUsd).toStringAsFixed(1)} $userCurrency';
+        final conv2 = '\$50 ≈ ${(50 * rateUsd).toStringAsFixed(1)} $userCurrency';
+        final conv3 = '\$100 ≈ ${(100 * rateUsd).toStringAsFixed(0)} $userCurrency';
+
         await HomeWidget.saveWidgetData<String>('currency_converter_app_name', currencyAppName);
         await HomeWidget.saveWidgetData<String>('currency_converter_days', currencyDays);
         await HomeWidget.saveWidgetData<String>('currency_converter_title', currencyTitle);
@@ -366,6 +417,15 @@ class AppWidgetService {
         await HomeWidget.saveWidgetData<String>('currency_converter_stat2', currencyStat2);
         await HomeWidget.saveWidgetData<String>('currency_converter_stat3', currencyStat3);
         await HomeWidget.saveWidgetData<String>('currency_converter_theme', currencyTheme);
+        await HomeWidget.saveWidgetData<String>('currency_converter_conversions_title', AppWidgetLocalization.getQuickConversionsLabel(lang));
+        await HomeWidget.saveWidgetData<String>('currency_converter_live_status', AppWidgetLocalization.getLiveRatesLabel(lang));
+        await HomeWidget.saveWidgetData<String>('currency_converter_sync_status', AppWidgetLocalization.getAutoSyncLabel(lang));
+        await HomeWidget.saveWidgetData<String>('currency_converter_offline_status', AppWidgetLocalization.getOfflineReadyLabel(lang));
+        await HomeWidget.saveWidgetData<String>('currency_conv_1', conv1);
+        await HomeWidget.saveWidgetData<String>('currency_conv_2', conv2);
+        await HomeWidget.saveWidgetData<String>('currency_conv_3', conv3);
+        await HomeWidget.saveWidgetData<String>('currency_usd_label', '1 USD');
+        await HomeWidget.saveWidgetData<String>('currency_eur_label', '1 EUR');
 
         // 3. Quick Expense
         final expenseAppName = AppWidgetLocalization.getExpenseHeader(lang);
@@ -379,6 +439,16 @@ class AppWidgetService {
         final expenseStat3 = lastExpenseText ?? '';
         final expenseTheme = PreferencesService.instance.getWidgetThemeForMode('quick_expense');
 
+        final spentLabel = AppWidgetLocalization.getSpentLabel(lang);
+        final spentBudgetLabel = AppWidgetLocalization.getSpentBudgetLabel(lang);
+        final remainingBudgetTitle = AppWidgetLocalization.getRemainingBudgetTitle(lang);
+        final lastExpenseLabel = AppWidgetLocalization.getLastExpenseLabel(lang);
+        final noLastExpenseText = AppWidgetLocalization.getNoExpensesLoggedLabel(lang);
+        final addExpenseLabel = AppWidgetLocalization.getAddExpenseActionLabel(lang);
+        final quickLogBadge = AppWidgetLocalization.getQuickLogBadge(lang);
+        final showRemaining = PreferencesService.instance.isWidgetShowRemainingBudget();
+        final showLast = PreferencesService.instance.isWidgetShowLastExpense();
+
         await HomeWidget.saveWidgetData<String>('quick_expense_app_name', expenseAppName);
         await HomeWidget.saveWidgetData<String>('quick_expense_days', expenseDays);
         await HomeWidget.saveWidgetData<String>('quick_expense_title', expenseTitle);
@@ -387,6 +457,15 @@ class AppWidgetService {
         await HomeWidget.saveWidgetData<String>('quick_expense_stat2', expenseStat2);
         await HomeWidget.saveWidgetData<String>('quick_expense_stat3', expenseStat3);
         await HomeWidget.saveWidgetData<String>('quick_expense_theme', expenseTheme);
+        await HomeWidget.saveWidgetData<String>('quick_expense_spent_label', spentLabel);
+        await HomeWidget.saveWidgetData<String>('quick_expense_spent_card_label', spentBudgetLabel);
+        await HomeWidget.saveWidgetData<String>('quick_expense_remaining_label', remainingBudgetTitle);
+        await HomeWidget.saveWidgetData<String>('quick_expense_last_label', lastExpenseLabel);
+        await HomeWidget.saveWidgetData<String>('quick_expense_no_last', noLastExpenseText);
+        await HomeWidget.saveWidgetData<String>('quick_expense_add_action', addExpenseLabel);
+        await HomeWidget.saveWidgetData<String>('quick_expense_quick_log', quickLogBadge);
+        await HomeWidget.saveWidgetData<bool>('quick_expense_show_remaining', showRemaining);
+        await HomeWidget.saveWidgetData<bool>('quick_expense_show_last', showLast);
 
         // 4. Trip
         String tripAppName;

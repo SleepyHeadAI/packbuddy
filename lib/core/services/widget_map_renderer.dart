@@ -427,7 +427,7 @@ class WidgetThemeConfig {
           unvisitedLandColor: Color(0xFF1E293B),
           countryBorderColor: Color(0xFF1E293B),
           mapBorderColor: Color(0xFF1F2937),
-          accentColor: Color(0xFFE7B623),
+          accentColor: Color(0xFF3B82F6),
           legendBgColor: Color(0xDD111827),
           legendBorderColor: Color(0x4038BDF8),
           legendTextColor: Colors.white,

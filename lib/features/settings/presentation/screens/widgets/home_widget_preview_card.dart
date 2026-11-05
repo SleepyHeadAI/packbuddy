@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:countries_world_map/countries_world_map.dart';
@@ -116,6 +117,9 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
 
   Future<void> _updateWidgetTheme(String themeKey) async {
     setState(() => _widgetTheme = themeKey);
+    await HomeWidget.saveWidgetData<String>('pending_pin_theme', themeKey);
+    await HomeWidget.saveWidgetData<String>('${_widgetMode}_theme', themeKey);
+    await HomeWidget.saveWidgetData<String>('widget_theme', themeKey);
     await PreferencesService.instance.setWidgetThemeForMode(_widgetMode, themeKey);
     await AppWidgetService.syncCurrentState(widgetMode: _widgetMode, widgetTheme: themeKey);
     await _loadPayload();
@@ -147,6 +151,8 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
 
       await HomeWidget.saveWidgetData<String>('pending_pin_mode', _widgetMode);
       await HomeWidget.saveWidgetData<String>('pending_pin_theme', _widgetTheme);
+      await HomeWidget.saveWidgetData<String>('${_widgetMode}_theme', _widgetTheme);
+      await HomeWidget.saveWidgetData<String>('widget_theme', _widgetTheme);
       await HomeWidget.saveWidgetData<int>('user_selected_size', _selectedSize);
 
       final isSupported = await HomeWidget.isRequestPinWidgetSupported() ?? false;
@@ -176,11 +182,24 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
             break;
         }
 
-        await HomeWidget.requestPinWidget(
-          name: providerName,
-          androidName: providerName,
-          qualifiedAndroidName: 'com.sleepyhead.packbuddy.$providerName',
-        );
+        bool pinnedViaNative = false;
+        try {
+          final res = await const MethodChannel('com.sleepyhead.packbuddy/widget_pin').invokeMethod<bool>('pinWidget', {
+            'mode': _widgetMode,
+            'theme': _widgetTheme,
+            'size': _selectedSize,
+            'provider': providerName,
+          });
+          pinnedViaNative = res == true;
+        } catch (_) {}
+
+        if (!pinnedViaNative) {
+          await HomeWidget.requestPinWidget(
+            name: providerName,
+            androidName: providerName,
+            qualifiedAndroidName: 'com.sleepyhead.packbuddy.$providerName',
+          );
+        }
         if (mounted) {
           final l10n = AppLocalizations.of(context);
           ScaffoldMessenger.of(context).showSnackBar(
@@ -855,6 +874,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
               isDark: isDark,
               lang: lang,
               l10n: l10n,
+              themeConfig: themeConfig,
             ),
         },
       ),
@@ -1418,15 +1438,16 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
     required bool isDark,
     required String lang,
     required AppLocalizations? l10n,
+    required WidgetThemeConfig themeConfig,
   }) {
     switch (_selectedSize) {
       case 0:
-        return _buildSmallTrip(theme: theme, isDark: isDark, lang: lang, l10n: l10n);
+        return _buildSmallTrip(theme: theme, isDark: isDark, lang: lang, l10n: l10n, themeConfig: themeConfig);
       case 1:
-        return _buildMediumTrip(theme: theme, isDark: isDark, lang: lang, l10n: l10n);
+        return _buildMediumTrip(theme: theme, isDark: isDark, lang: lang, l10n: l10n, themeConfig: themeConfig);
       case 2:
       default:
-        return _buildLargeTrip(theme: theme, isDark: isDark, lang: lang, l10n: l10n);
+        return _buildLargeTrip(theme: theme, isDark: isDark, lang: lang, l10n: l10n, themeConfig: themeConfig);
     }
   }
 
@@ -1435,6 +1456,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
     required bool isDark,
     required String lang,
     required AppLocalizations? l10n,
+    required WidgetThemeConfig themeConfig,
   }) {
     final defaultDestination = AppWidgetLocalization.getDefaultDestination(lang);
     final tripTitle = _widgetData?.tripTitle ?? (l10n?.appName ?? 'PackBuddy');
@@ -1452,7 +1474,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
         // Header
         Row(
           children: [
-            Icon(Icons.flight_takeoff_rounded, size: 13, color: theme.colorScheme.primary),
+            Icon(Icons.flight_takeoff_rounded, size: 13, color: themeConfig.accentColor),
             const SizedBox(width: 3),
             Expanded(
               child: Text(
@@ -1462,24 +1484,24 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                 style: TextStyle(
                   fontSize: 9.5,
                   fontWeight: FontWeight.w800,
-                  color: theme.colorScheme.primary,
+                  color: themeConfig.accentColor,
                 ),
               ),
             ),
             if (_showCountdown) ...[
               const SizedBox(width: 4),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4.5, vertical: 1.5),
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                  color: themeConfig.badgeBgColor,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   '$days${AppWidgetLocalization.getDaysSuffix(lang)}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 9,
-                    fontWeight: FontWeight.w800,
-                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -1493,7 +1515,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
           children: [
             Text(
               tripTitle,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: themeConfig.titleTextColor),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -1501,7 +1523,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
               destination,
               style: TextStyle(
                 fontSize: 9.5,
-                color: theme.colorScheme.onSurfaceVariant,
+                color: themeConfig.subtitleTextColor,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -1511,38 +1533,45 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
 
         // Packing
         if (_showPacking)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      '${AppWidgetLocalization.getPackingLabel(lang)}: $packedItems/$totalItems',
-                      style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w600),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            decoration: BoxDecoration(
+              color: themeConfig.statBgColor,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '${AppWidgetLocalization.getPackingLabel(lang)}: $packedItems/$totalItems',
+                        style: TextStyle(fontSize: 9, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 2),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(2),
-                child: LinearProgressIndicator(
-                  value: packingProgress,
-                  minHeight: 3.5,
-                  backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.successPastel),
+                  ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 2),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(2),
+                  child: LinearProgressIndicator(
+                    value: packingProgress,
+                    minHeight: 3.5,
+                    backgroundColor: themeConfig.cardBorderColor.withValues(alpha: 0.3),
+                    valueColor: AlwaysStoppedAnimation<Color>(themeConfig.accentColor),
+                  ),
+                ),
+              ],
+            ),
           )
         else
           Text(
             daysText,
-            style: TextStyle(fontSize: 9.5, color: theme.colorScheme.onSurfaceVariant),
+            style: TextStyle(fontSize: 9.5, color: themeConfig.subtitleTextColor),
           ),
       ],
     );
@@ -1553,6 +1582,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
     required bool isDark,
     required String lang,
     required AppLocalizations? l10n,
+    required WidgetThemeConfig themeConfig,
   }) {
     final tripHeader = AppWidgetLocalization.getTripHeader(lang);
     final defaultDestination = AppWidgetLocalization.getDefaultDestination(lang);
@@ -1579,7 +1609,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
               // Header
               Row(
                 children: [
-                  Icon(Icons.flight_takeoff_rounded, size: 14, color: theme.colorScheme.primary),
+                  Icon(Icons.flight_takeoff_rounded, size: 14, color: themeConfig.accentColor),
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
@@ -1587,7 +1617,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
-                        color: theme.colorScheme.primary,
+                        color: themeConfig.accentColor,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -1602,7 +1632,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                 children: [
                   Text(
                     tripTitle,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: themeConfig.titleTextColor),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -1610,7 +1640,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                     destination,
                     style: TextStyle(
                       fontSize: 10,
-                      color: theme.colorScheme.onSurfaceVariant,
+                      color: themeConfig.subtitleTextColor,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -1621,17 +1651,17 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
               // Countdown badge
               if (_showCountdown)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                    color: themeConfig.badgeBgColor,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     daysText,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 9.5,
                       fontWeight: FontWeight.w800,
-                      color: theme.colorScheme.primary,
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -1649,49 +1679,57 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               if (_showPacking) ...[
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            AppWidgetLocalization.getPackingLabel(lang),
-                            style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: themeConfig.statBgColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              AppWidgetLocalization.getPackingLabel(lang),
+                              style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: themeConfig.subtitleTextColor),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                        ),
-                        Text(
-                          '$packingPercent%',
-                          style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(2),
-                      child: LinearProgressIndicator(
-                        value: packingProgress,
-                        minHeight: 4,
-                        backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.successPastel),
+                          Text(
+                            '$packingPercent%',
+                            style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: themeConfig.titleTextColor),
+                          ),
+                        ],
                       ),
-                    ),
-                    Text(
-                      '$packedItems/$totalItems',
-                      style: TextStyle(fontSize: 9, color: theme.colorScheme.onSurfaceVariant),
-                    ),
-                  ],
+                      const SizedBox(height: 3),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(2),
+                        child: LinearProgressIndicator(
+                          value: packingProgress,
+                          minHeight: 4,
+                          backgroundColor: themeConfig.cardBorderColor.withValues(alpha: 0.3),
+                          valueColor: AlwaysStoppedAnimation<Color>(themeConfig.accentColor),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '$packedItems/$totalItems',
+                        style: TextStyle(fontSize: 9, color: themeConfig.subtitleTextColor),
+                      ),
+                    ],
+                  ),
                 ),
               ],
               if (_showBudget) ...[
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                    color: themeConfig.statBgColor,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
@@ -1699,11 +1737,11 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                     children: [
                       Text(
                         AppWidgetLocalization.getSpentLabel(lang),
-                        style: TextStyle(fontSize: 8.5, color: theme.colorScheme.onSurfaceVariant),
+                        style: TextStyle(fontSize: 8.5, color: themeConfig.subtitleTextColor),
                       ),
                       Text(
                         budgetSpent.isNotEmpty ? budgetSpent : AppWidgetLocalization.getBudgetLabel(lang),
-                        style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800),
+                        style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, color: themeConfig.titleTextColor),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -1723,6 +1761,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
     required bool isDark,
     required String lang,
     required AppLocalizations? l10n,
+    required WidgetThemeConfig themeConfig,
   }) {
     final tripHeader = AppWidgetLocalization.getTripHeader(lang);
     final defaultDestination = AppWidgetLocalization.getDefaultDestination(lang);
@@ -1741,184 +1780,184 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
       children: [
         // Top Header
         Row(
-            children: [
-              Icon(Icons.flight_takeoff_rounded, size: 16, color: theme.colorScheme.primary),
-              const SizedBox(width: 5),
-              Expanded(
-                child: Text(
-                  tripHeader,
-                  style: TextStyle(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w800,
-                    color: theme.colorScheme.primary,
+          children: [
+            Icon(Icons.flight_takeoff_rounded, size: 16, color: themeConfig.accentColor),
+            const SizedBox(width: 5),
+            Expanded(
+              child: Text(
+                tripHeader,
+                style: TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w800,
+                  color: themeConfig.accentColor,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (_showCountdown) ...[
+              const SizedBox(width: 6),
+              Flexible(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: themeConfig.badgeBgColor,
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  child: Text(
+                    daysText.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
-              if (_showCountdown) ...[
-                const SizedBox(width: 6),
-                Flexible(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+            ],
+          ],
+        ),
+        const SizedBox(height: 8),
+
+        // Destination Showcase Card
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            color: themeConfig.statBgColor,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: themeConfig.cardBorderColor.withValues(alpha: 0.3),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                tripTitle,
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: themeConfig.titleTextColor),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Row(
+                children: [
+                  Icon(Icons.location_on_rounded, size: 12, color: themeConfig.accentColor),
+                  const SizedBox(width: 3),
+                  Expanded(
                     child: Text(
-                      daysText.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        color: theme.colorScheme.primary,
-                      ),
+                      destination,
+                      style: TextStyle(fontSize: 10.5, color: themeConfig.subtitleTextColor),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ],
           ),
-          const SizedBox(height: 8),
+        ),
+        const SizedBox(height: 6),
 
-          // Destination Showcase Card
+        // Packing Checklist Progress Card
+        if (_showPacking) ...[
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF0F172A) : Colors.white,
-              borderRadius: BorderRadius.circular(14),
+              color: themeConfig.statBgColor,
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                color: themeConfig.cardBorderColor.withValues(alpha: 0.3),
               ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  tripTitle,
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Icon(Icons.location_on_rounded, size: 12, color: theme.colorScheme.primary),
-                    const SizedBox(width: 3),
-                    Expanded(
+                    Flexible(
                       child: Text(
-                        destination,
-                        style: TextStyle(fontSize: 10.5, color: theme.colorScheme.onSurfaceVariant),
+                        '${AppWidgetLocalization.getPackingLabel(lang)}: $packedItems/$totalItems',
+                        style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: themeConfig.subtitleTextColor),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    const SizedBox(width: 6),
+                    Text(
+                      '$packingPercent%',
+                      style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, color: themeConfig.titleTextColor),
+                    ),
                   ],
+                ),
+                const SizedBox(height: 4),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(3),
+                  child: LinearProgressIndicator(
+                    value: packingProgress,
+                    minHeight: 4.5,
+                    backgroundColor: themeConfig.cardBorderColor.withValues(alpha: 0.3),
+                    valueColor: AlwaysStoppedAnimation<Color>(themeConfig.accentColor),
+                  ),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 6),
+        ],
 
-          // Packing Checklist Progress Card
-          if (_showPacking) ...[
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF0F172A) : Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          '${AppWidgetLocalization.getPackingLabel(lang)}: $packedItems/$totalItems',
-                          style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        '$packingPercent%',
-                        style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(3),
-                    child: LinearProgressIndicator(
-                      value: packingProgress,
-                      minHeight: 4.5,
-                      backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.successPastel),
-                    ),
-                  ),
-                ],
+        // Budget Card
+        if (_showBudget) ...[
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            decoration: BoxDecoration(
+              color: themeConfig.statBgColor,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: themeConfig.cardBorderColor.withValues(alpha: 0.3),
               ),
             ),
-            const SizedBox(height: 6),
-          ],
-
-          // Budget Card
-          if (_showBudget) ...[
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF0F172A) : Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Text(
+                    AppWidgetLocalization.getSpentLabel(lang),
+                    style: TextStyle(fontSize: 10.5, color: themeConfig.subtitleTextColor),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Text(
-                      AppWidgetLocalization.getSpentLabel(lang),
-                      style: TextStyle(fontSize: 10.5, color: theme.colorScheme.onSurfaceVariant),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    budgetSpent.isNotEmpty ? budgetSpent : '-',
-                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: Color(0xFF10B981)),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 6),
-          ],
-
-          // Bottom status footer
-          Center(
-            child: Text(
-              AppWidgetLocalization.getCountdownActive(lang),
-              style: TextStyle(
-                fontSize: 9.5,
-                fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+                const SizedBox(width: 6),
+                Text(
+                  budgetSpent.isNotEmpty ? budgetSpent : '-',
+                  style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: themeConfig.accentColor),
+                ),
+              ],
             ),
           ),
+          const SizedBox(height: 6),
         ],
-      );
-    }
+
+        // Bottom status footer
+        Center(
+          child: Text(
+            AppWidgetLocalization.getCountdownActive(lang),
+            style: TextStyle(
+              fontSize: 9.5,
+              fontWeight: FontWeight.w600,
+              color: themeConfig.subtitleTextColor,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
   // ==========================================
   // CURRENCY CONVERTER WIDGET PREVIEWS
@@ -2140,9 +2179,9 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    '● Canlı Kurlar',
-                    style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
+                  Text(
+                    AppWidgetLocalization.getLiveRatesLabel(lang),
+                    style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
                   ),
                   if (_showReverseRate)
                     Text(
@@ -2293,7 +2332,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Hızlı Çevrimler',
+                AppWidgetLocalization.getQuickConversionsLabel(lang),
                 style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: themeConfig.titleTextColor),
               ),
               const SizedBox(height: 6),
@@ -2317,12 +2356,12 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              '✓ Otomatik Çift Yönlü Senkron',
+              AppWidgetLocalization.getAutoSyncLabel(lang),
               style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
             ),
-            const Text(
-              'Çevrim Çevrimdışı Hazır',
-              style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
+            Text(
+              AppWidgetLocalization.getOfflineReadyLabel(lang),
+              style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
             ),
           ],
         ),
@@ -2420,7 +2459,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Harcanan',
+              AppWidgetLocalization.getSpentLabel(lang),
               style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
             ),
             const SizedBox(height: 1),
@@ -2449,7 +2488,9 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                _showRemainingBudget && remainingBudget != null ? 'Kalan' : '+ Hızlı Harcama',
+                _showRemainingBudget && remainingBudget != null
+                    ? AppWidgetLocalization.getRemainingBudgetTitle(lang)
+                    : AppWidgetLocalization.getAddExpenseActionLabel(lang),
                 style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: themeConfig.accentColor),
               ),
               if (_showRemainingBudget && remainingBudget != null)
@@ -2518,7 +2559,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                   ),
                   if (remainingBudget != null && _showRemainingBudget)
                     Text(
-                      'Kalan Bütçe: $remainingBudget',
+                      '${AppWidgetLocalization.getRemainingBudgetTitle(lang)}: $remainingBudget',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
@@ -2535,7 +2576,9 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                 children: [
                   Expanded(
                     child: Text(
-                      _showLastExpense && lastExpense != null ? 'Son: $lastExpense' : (_widgetData?.tripTitle ?? 'PackBuddy'),
+                      _showLastExpense && lastExpense != null
+                          ? '${AppWidgetLocalization.getLastExpenseLabel(lang)}: $lastExpense'
+                          : (_widgetData?.tripTitle ?? 'PackBuddy'),
                       style: TextStyle(fontSize: 9.5, color: themeConfig.subtitleTextColor),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -2571,10 +2614,10 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                 ),
               ),
               const SizedBox(height: 6),
-              const Text(
-                'Harcama Ekle',
+              Text(
+                AppWidgetLocalization.getAddExpenseActionLabel(lang).replaceAll('+ ', ''),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w900,
                   color: Colors.white,
@@ -2626,9 +2669,9 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                 color: themeConfig.badgeBgColor,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Text(
-                'Hızlı Kayıt',
-                style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: Colors.white),
+              child: Text(
+                AppWidgetLocalization.getQuickLogBadge(lang),
+                style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: Colors.white),
               ),
             ),
           ],
@@ -2647,7 +2690,10 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Harcanan Bütçe', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor)),
+                    Text(
+                      AppWidgetLocalization.getSpentBudgetLabel(lang),
+                      style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
+                    ),
                     const SizedBox(height: 4),
                     Text(budgetSpent, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: themeConfig.titleTextColor), maxLines: 1, overflow: TextOverflow.ellipsis),
                   ],
@@ -2666,7 +2712,10 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Kalan Bütçe', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor)),
+                      Text(
+                        AppWidgetLocalization.getRemainingBudgetTitle(lang),
+                        style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
+                      ),
                       const SizedBox(height: 4),
                       Text(remainingBudget, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: const Color(0xFF10B981)), maxLines: 1, overflow: TextOverflow.ellipsis),
                     ],
@@ -2693,11 +2742,11 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Son Harcama',
+                      AppWidgetLocalization.getLastExpenseLabel(lang),
                       style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
                     ),
                     Text(
-                      lastExpense ?? 'Henüz harcama kaydedilmedi',
+                      lastExpense ?? AppWidgetLocalization.getNoExpensesLoggedLabel(lang),
                       style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: themeConfig.titleTextColor),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -2718,14 +2767,14 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
             borderRadius: BorderRadius.circular(12),
           ),
           alignment: Alignment.center,
-          child: const Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.add_circle_outline_rounded, size: 16, color: Colors.white),
-              SizedBox(width: 6),
+              const Icon(Icons.add_circle_outline_rounded, size: 16, color: Colors.white),
+              const SizedBox(width: 6),
               Text(
-                '+ Harcama Ekle',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.white),
+                AppWidgetLocalization.getAddExpenseActionLabel(lang),
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.white),
               ),
             ],
           ),

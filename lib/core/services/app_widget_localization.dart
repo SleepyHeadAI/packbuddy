@@ -2374,4 +2374,264 @@ class AppWidgetLocalization {
         }
     }
   }
+
+  /// Resolves "Harcanan Bütçe" (Spent Budget) label across 20 languages
+  static String getSpentBudgetLabel(String lang) {
+    switch (lang) {
+      case 'tr': return 'Harcanan Bütçe';
+      case 'es': return 'Presupuesto gastado';
+      case 'fr': return 'Budget dépensé';
+      case 'de': return 'Ausgegebenes Budget';
+      case 'it': return 'Budget speso';
+      case 'pt': return 'Orçamento gasto';
+      case 'ru': return 'Потраченный бюджет';
+      case 'zh': return '已用预算';
+      case 'ja': return '使用済み予算';
+      case 'ko': return '사용된 예산';
+      case 'hi': return 'खर्च किया गया बजट';
+      case 'ar': return 'الميزانية المستهلكة';
+      case 'nl': return 'Besteed budget';
+      case 'el': return 'Δαπανημένος προϋπολογισμός';
+      case 'sv': return 'Förbrukad budget';
+      case 'pl': return 'Wydany budżet';
+      case 'id': return 'Anggaran Terpakai';
+      case 'th': return 'งบประมาณที่ใช้ไป';
+      case 'vi': return 'Ngân sách đã tiêu';
+      default: return 'Spent Budget';
+    }
+  }
+
+  /// Resolves "Kalan Bütçe" (Remaining Budget) label across 20 languages
+  static String getRemainingBudgetTitle(String lang) {
+    switch (lang) {
+      case 'tr': return 'Kalan Bütçe';
+      case 'es': return 'Presupuesto restante';
+      case 'fr': return 'Budget restant';
+      case 'de': return 'Verbleibendes Budget';
+      case 'it': return 'Budget rimanente';
+      case 'pt': return 'Orçamento restante';
+      case 'ru': return 'Оставшийся бюджет';
+      case 'zh': return '剩余预算';
+      case 'ja': return '残りの予算';
+      case 'ko': return '남은 예산';
+      case 'hi': return 'शेष बजट';
+      case 'ar': return 'الميزانية المتبقية';
+      case 'nl': return 'Resterend budget';
+      case 'el': return 'Υπόλοιπο προϋπολογισμού';
+      case 'sv': return 'Kvarvarande budget';
+      case 'pl': return 'Pozostały budżet';
+      case 'id': return 'Sisa Anggaran';
+      case 'th': return 'งบประมาณที่เหลือ';
+      case 'vi': return 'Ngân sách còn lại';
+      default: return 'Remaining Budget';
+    }
+  }
+
+  /// Resolves "Son Harcama" (Last Expense) label across 20 languages
+  static String getLastExpenseLabel(String lang) {
+    switch (lang) {
+      case 'tr': return 'Son Harcama';
+      case 'es': return 'Último gasto';
+      case 'fr': return 'Dernière dépense';
+      case 'de': return 'Letzte Ausgabe';
+      case 'it': return 'Ultima spesa';
+      case 'pt': return 'Último gasto';
+      case 'ru': return 'Последний расход';
+      case 'zh': return '最新支出';
+      case 'ja': return '最近の支出';
+      case 'ko': return '최근 지출';
+      case 'hi': return 'अंतिम खर्च';
+      case 'ar': return 'آخر نفقة';
+      case 'nl': return 'Laatste uitgave';
+      case 'el': return 'Τελευταίο έξοδο';
+      case 'sv': return 'Senaste utgift';
+      case 'pl': return 'Ostatni wydatek';
+      case 'id': return 'Pengeluaran Terakhir';
+      case 'th': return 'ค่าใช้จ่ายล่าสุด';
+      case 'vi': return 'Chi tiêu gần nhất';
+      default: return 'Last Expense';
+    }
+  }
+
+  /// Resolves "Henüz harcama kaydedilmedi" (No expenses logged) label across 20 languages
+  static String getNoExpensesLoggedLabel(String lang) {
+    switch (lang) {
+      case 'tr': return 'Henüz harcama kaydedilmedi';
+      case 'es': return 'Sin gastos registrados aún';
+      case 'fr': return 'Aucune dépense enregistrée';
+      case 'de': return 'Noch keine Ausgaben erfasst';
+      case 'it': return 'Nessuna spesa registrata';
+      case 'pt': return 'Nenhum gasto registrado ainda';
+      case 'ru': return 'Расходы пока не записаны';
+      case 'zh': return '暂无支出记录';
+      case 'ja': return '支出はまだ記録されていません';
+      case 'ko': return '아직 기록된 지출이 없습니다';
+      case 'hi': return 'अभी तक कोई खर्च दर्ज नहीं हुआ';
+      case 'ar': return 'لم يتم تسجيل أي نفقات بعد';
+      case 'nl': return 'Nog geen uitgaven geregistreerd';
+      case 'el': return 'Δεν έχουν καταγραφεί έξοδα ακόμα';
+      case 'sv': return 'Inga utgifter registrerade än';
+      case 'pl': return 'Brak zarejestrowanych wydatków';
+      case 'id': return 'Belum ada pengeluaran dicatat';
+      case 'th': return 'ยังไม่มีการบันทึกค่าใช้จ่าย';
+      case 'vi': return 'Chưa có chi tiêu nào được ghi lại';
+      default: return 'No expenses recorded yet';
+    }
+  }
+
+  /// Resolves "+ Harcama Ekle" (Add Expense) label across 20 languages
+  static String getAddExpenseActionLabel(String lang) {
+    switch (lang) {
+      case 'tr': return '+ Harcama Ekle';
+      case 'es': return '+ Añadir gasto';
+      case 'fr': return '+ Ajouter dépense';
+      case 'de': return '+ Ausgabe erfassen';
+      case 'it': return '+ Aggiungi spesa';
+      case 'pt': return '+ Adicionar gasto';
+      case 'ru': return '+ Добавить расход';
+      case 'zh': return '+ 添加支出';
+      case 'ja': return '+ 支出を追加';
+      case 'ko': return '+ 지출 추가';
+      case 'hi': return '+ खर्च जोड़ें';
+      case 'ar': return '+ إضافة نفقة';
+      case 'nl': return '+ Uitgave toevoegen';
+      case 'el': return '+ Προσθήκη εξόδου';
+      case 'sv': return '+ Lägg till utgift';
+      case 'pl': return '+ Dodaj wydatek';
+      case 'id': return '+ Tambah Pengeluaran';
+      case 'th': return '+ เพิ่มค่าใช้จ่าย';
+      case 'vi': return '+ Thêm chi tiêu';
+      default: return '+ Add Expense';
+    }
+  }
+
+  /// Resolves "Hızlı Kayıt" (Quick Log) badge label across 20 languages
+  static String getQuickLogBadge(String lang) {
+    switch (lang) {
+      case 'tr': return 'Hızlı Kayıt';
+      case 'es': return 'Registro rápido';
+      case 'fr': return 'Saisie rapide';
+      case 'de': return 'Schnellerfassung';
+      case 'it': return 'Registrazione rapida';
+      case 'pt': return 'Registro rápido';
+      case 'ru': return 'Быстрая запись';
+      case 'zh': return '快速记录';
+      case 'ja': return 'クイック記録';
+      case 'ko': return '빠른 기록';
+      case 'hi': return 'त्वरित प्रविष्टि';
+      case 'ar': return 'تسجيل سريع';
+      case 'nl': return 'Snelle invoer';
+      case 'el': return 'Γρήγορη καταγραφή';
+      case 'sv': return 'Snabbregistrering';
+      case 'pl': return 'Szybki wpis';
+      case 'id': return 'Catat Cepat';
+      case 'th': return 'บันทึกด่วน';
+      case 'vi': return 'Ghi nhanh';
+      default: return 'Quick Log';
+    }
+  }
+
+  /// Resolves "Hızlı Çevrimler" (Quick Conversions) label across 20 languages
+  static String getQuickConversionsLabel(String lang) {
+    switch (lang) {
+      case 'tr': return 'Hızlı Çevrimler';
+      case 'es': return 'Conversiones rápidas';
+      case 'fr': return 'Conversions rapides';
+      case 'de': return 'Schnellumrechnungen';
+      case 'it': return 'Conversioni rapide';
+      case 'pt': return 'Conversões rápidas';
+      case 'ru': return 'Быстрая конвертация';
+      case 'zh': return '快捷换算';
+      case 'ja': return 'クイック換算';
+      case 'ko': return '빠른 환산';
+      case 'hi': return 'त्वरित रूपांतरण';
+      case 'ar': return 'تحويلات سريعة';
+      case 'nl': return 'Snelle omrekening';
+      case 'el': return 'Γρήγορες μετατροπές';
+      case 'sv': return 'Snabbkonvertering';
+      case 'pl': return 'Szybkie przeliczniki';
+      case 'id': return 'Konversi Cepat';
+      case 'th': return 'แปลงด่วน';
+      case 'vi': return 'Chuyển đổi nhanh';
+      default: return 'Quick Conversions';
+    }
+  }
+
+  /// Resolves "● Canlı Kurlar" (Live Rates) label across 20 languages
+  static String getLiveRatesLabel(String lang) {
+    switch (lang) {
+      case 'tr': return '● Canlı Kurlar';
+      case 'es': return '● Tasas en vivo';
+      case 'fr': return '● Taux en direct';
+      case 'de': return '● Live-Kurse';
+      case 'it': return '● Tassi in tempo reale';
+      case 'pt': return '● Taxas ao vivo';
+      case 'ru': return '● Текущие курсы';
+      case 'zh': return '● 实时汇率';
+      case 'ja': return '● リアルタイム為替レート';
+      case 'ko': return '● 실시간 환율';
+      case 'hi': return '● लाइव दरें';
+      case 'ar': return '● أسعار مباشرة';
+      case 'nl': return '● Live koersen';
+      case 'el': return '● Ζωντανές ισοτιμίες';
+      case 'sv': return '● Livekurser';
+      case 'pl': return '● Kursy na żywo';
+      case 'id': return '● Kurs Langsung';
+      case 'th': return '● อัตราแลกเปลี่ยนสด';
+      case 'vi': return '● Tỷ giá trực tiếp';
+      default: return '● Live Rates';
+    }
+  }
+
+  /// Resolves "✓ Otomatik Çift Yönlü Senkron" label across 20 languages
+  static String getAutoSyncLabel(String lang) {
+    switch (lang) {
+      case 'tr': return '✓ Otomatik Çift Yönlü Senkron';
+      case 'es': return '✓ Sincronización bidireccional auto';
+      case 'fr': return '✓ Synchro bidirectionnelle auto';
+      case 'de': return '✓ Auto bidirektionale Synchronisation';
+      case 'it': return '✓ Sincronizzazione bidirezionale auto';
+      case 'pt': return '✓ Sincronização bidirecional auto';
+      case 'ru': return '✓ Двусторонняя автосинхронизация';
+      case 'zh': return '✓ 自动双向同步';
+      case 'ja': return '✓ 自動双方向同期';
+      case 'ko': return '✓ 자동 양방향 동기화';
+      case 'hi': return '✓ स्वतः द्विदिशीय समन्वय';
+      case 'ar': return '✓ مزامنة ثنائية الاتجاه تلقائية';
+      case 'nl': return '✓ Auto bidirectionele synchronisatie';
+      case 'el': return '✓ Αυτόματος αμφίδρομος συγχρονισμός';
+      case 'sv': return '✓ Automatisk tvåvägssynk';
+      case 'pl': return '✓ Automatyczna synchronizacja dwukierunkowa';
+      case 'id': return '✓ Sinkronisasi Dua Arah Otomatis';
+      case 'th': return '✓ ซิงค์แบบสองทิศทางอัตโนมัติ';
+      case 'vi': return '✓ Tự động đồng bộ hai chiều';
+      default: return '✓ Auto Bidirectional Sync';
+    }
+  }
+
+  /// Resolves "Çevrim Çevrimdışı Hazır" label across 20 languages
+  static String getOfflineReadyLabel(String lang) {
+    switch (lang) {
+      case 'tr': return 'Çevrim Çevrimdışı Hazır';
+      case 'es': return 'Listo sin conexión';
+      case 'fr': return 'Prêt hors ligne';
+      case 'de': return 'Offline bereit';
+      case 'it': return 'Pronto offline';
+      case 'pt': return 'Pronto offline';
+      case 'ru': return 'Готово офлайн';
+      case 'zh': return '支持离线换算';
+      case 'ja': return 'オフライン対応';
+      case 'ko': return '오프라인 사용 가능';
+      case 'hi': return 'ऑफ़लाइन तैयार';
+      case 'ar': return 'جاهز بدون إنترنت';
+      case 'nl': return 'Offline gereed';
+      case 'el': return 'Έτοιμο εκτός σύνδεσης';
+      case 'sv': return 'Redo offline';
+      case 'pl': return 'Gotowe offline';
+      case 'id': return 'Siap Offline';
+      case 'th': return 'พร้อมใช้งานออฟไลน์';
+      case 'vi': return 'Sẵn sàng ngoại tuyến';
+      default: return 'Offline Ready';
+    }
+  }
 }

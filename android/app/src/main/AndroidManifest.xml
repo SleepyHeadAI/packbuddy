@@ -60,10 +60,18 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.sleepyhead.packbuddy.action.TOGGLE_TRIP_VIEW" />
+                <action android:name="com.sleepyhead.packbuddy.action.TOGGLE_MAP_VIEW" />
+                <action android:name="com.sleepyhead.packbuddy.action.TOGGLE_EXPENSE_VIEW" />
+                <action android:name="com.sleepyhead.packbuddy.action.QUICK_EXPENSE_INCREMENT" />
+                <action android:name="com.sleepyhead.packbuddy.action.CYCLE_CURRENCY" />
+                <action android:name="com.sleepyhead.packbuddy.action.CYCLE_USD_AMOUNT" />
+                <action android:name="com.sleepyhead.packbuddy.action.CYCLE_EUR_AMOUNT" />
+                <action android:name="com.sleepyhead.packbuddy.action.CYCLE_CONVERSIONS" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/packbuddy_widget_info" />
+                android:resource="@xml/packbuddy_trip_small_info" />
         </receiver>
 
         <receiver
@@ -72,10 +80,11 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.sleepyhead.packbuddy.action.TOGGLE_TRIP_VIEW" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/packbuddy_medium_widget_info" />
+                android:resource="@xml/packbuddy_trip_medium_info" />
         </receiver>
 
         <receiver
@@ -84,10 +93,11 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.sleepyhead.packbuddy.action.TOGGLE_TRIP_VIEW" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/packbuddy_large_widget_info" />
+                android:resource="@xml/packbuddy_trip_large_info" />
         </receiver>
 
         <!-- Home Screen App Widget - World Travel Map -->
@@ -97,10 +107,11 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.sleepyhead.packbuddy.action.TOGGLE_MAP_VIEW" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/packbuddy_widget_info" />
+                android:resource="@xml/packbuddy_map_small_info" />
         </receiver>
 
         <receiver
@@ -109,10 +120,11 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.sleepyhead.packbuddy.action.TOGGLE_MAP_VIEW" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/packbuddy_medium_widget_info" />
+                android:resource="@xml/packbuddy_map_medium_info" />
         </receiver>
 
         <receiver
@@ -121,10 +133,11 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.sleepyhead.packbuddy.action.TOGGLE_MAP_VIEW" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/packbuddy_large_widget_info" />
+                android:resource="@xml/packbuddy_map_large_info" />
         </receiver>
 
         <!-- Home Screen App Widget - Quick Expense -->
@@ -134,10 +147,12 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.sleepyhead.packbuddy.action.TOGGLE_EXPENSE_VIEW" />
+                <action android:name="com.sleepyhead.packbuddy.action.QUICK_EXPENSE_INCREMENT" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/packbuddy_widget_info" />
+                android:resource="@xml/packbuddy_expense_small_info" />
         </receiver>
 
         <receiver
@@ -146,10 +161,12 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.sleepyhead.packbuddy.action.TOGGLE_EXPENSE_VIEW" />
+                <action android:name="com.sleepyhead.packbuddy.action.QUICK_EXPENSE_INCREMENT" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/packbuddy_medium_widget_info" />
+                android:resource="@xml/packbuddy_expense_medium_info" />
         </receiver>
 
         <receiver
@@ -158,10 +175,12 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.sleepyhead.packbuddy.action.TOGGLE_EXPENSE_VIEW" />
+                <action android:name="com.sleepyhead.packbuddy.action.QUICK_EXPENSE_INCREMENT" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/packbuddy_large_widget_info" />
+                android:resource="@xml/packbuddy_expense_large_info" />
         </receiver>
 
         <!-- Home Screen App Widget - Currency Converter -->
@@ -171,10 +190,14 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.sleepyhead.packbuddy.action.CYCLE_CURRENCY" />
+                <action android:name="com.sleepyhead.packbuddy.action.CYCLE_USD_AMOUNT" />
+                <action android:name="com.sleepyhead.packbuddy.action.CYCLE_EUR_AMOUNT" />
+                <action android:name="com.sleepyhead.packbuddy.action.CYCLE_CONVERSIONS" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/packbuddy_widget_info" />
+                android:resource="@xml/packbuddy_currency_small_info" />
         </receiver>
 
         <receiver
@@ -183,10 +206,14 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.sleepyhead.packbuddy.action.CYCLE_CURRENCY" />
+                <action android:name="com.sleepyhead.packbuddy.action.CYCLE_USD_AMOUNT" />
+                <action android:name="com.sleepyhead.packbuddy.action.CYCLE_EUR_AMOUNT" />
+                <action android:name="com.sleepyhead.packbuddy.action.CYCLE_CONVERSIONS" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/packbuddy_medium_widget_info" />
+                android:resource="@xml/packbuddy_currency_medium_info" />
         </receiver>
 
         <receiver
@@ -195,10 +222,14 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.sleepyhead.packbuddy.action.CYCLE_CURRENCY" />
+                <action android:name="com.sleepyhead.packbuddy.action.CYCLE_USD_AMOUNT" />
+                <action android:name="com.sleepyhead.packbuddy.action.CYCLE_EUR_AMOUNT" />
+                <action android:name="com.sleepyhead.packbuddy.action.CYCLE_CONVERSIONS" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/packbuddy_large_widget_info" />
+                android:resource="@xml/packbuddy_currency_large_info" />
         </receiver>
         <activity
             android:name=".MainActivity"

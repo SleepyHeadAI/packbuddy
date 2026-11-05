@@ -138,6 +138,7 @@ class ExpenseController extends StateNotifier<ExpenseState> {
         return sum + converted;
       });
 
+      if (!mounted) return newExpense;
       state = state.copyWith(
         expenses: updatedList,
         totalSpent: newTotal,
@@ -160,7 +161,9 @@ class ExpenseController extends StateNotifier<ExpenseState> {
 
       return newExpense;
     } catch (e) {
-      state = state.copyWith(errorMessage: e.toString());
+      if (mounted) {
+        state = state.copyWith(errorMessage: e.toString());
+      }
       return null;
     }
   }
@@ -191,6 +194,7 @@ class ExpenseController extends StateNotifier<ExpenseState> {
         return sum + converted;
       });
 
+      if (!mounted) return expenseToSave;
       state = state.copyWith(
         expenses: updatedList,
         totalSpent: newTotal,
@@ -206,7 +210,9 @@ class ExpenseController extends StateNotifier<ExpenseState> {
 
       return expenseToSave;
     } catch (e) {
-      state = state.copyWith(errorMessage: e.toString());
+      if (mounted) {
+        state = state.copyWith(errorMessage: e.toString());
+      }
       return null;
     }
   }
@@ -265,6 +271,7 @@ class ExpenseController extends StateNotifier<ExpenseState> {
         return sum + converted;
       });
 
+      if (!mounted) return true;
       state = state.copyWith(
         expenses: updatedList,
         totalSpent: newTotal,
@@ -280,15 +287,17 @@ class ExpenseController extends StateNotifier<ExpenseState> {
 
       return true;
     } catch (e) {
-      state = state.copyWith(errorMessage: e.toString());
+      if (mounted) {
+        state = state.copyWith(errorMessage: e.toString());
+      }
       return false;
     }
   }
 }
 
-/// Family provider keyed by tripId with autoDispose to prevent memory leaks
+/// Family provider keyed by tripId
 final expenseControllerProvider =
-    StateNotifierProvider.autoDispose.family<ExpenseController, ExpenseState, String>(
+    StateNotifierProvider.family<ExpenseController, ExpenseState, String>(
   (ref, tripId) {
     return ExpenseController(ref, tripId);
   },

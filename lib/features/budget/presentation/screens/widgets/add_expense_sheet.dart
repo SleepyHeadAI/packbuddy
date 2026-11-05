@@ -7,6 +7,8 @@ import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/expense_controller.dart';
+import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
+import 'package:packbuddy/core/services/app_widget_service.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
 
 /// Modal bottom sheet to add or edit an expense with multi-currency, payment method, dynamic category, and notes
@@ -257,6 +259,8 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
           updatedAt: DateTime.now(),
         );
         await ref.read(expenseControllerProvider(widget.tripId).notifier).updateExpense(updated);
+        ref.read(tripControllerProvider.notifier).loadTrips();
+        AppWidgetService.syncCurrentState().catchError((_) {});
         if (mounted) {
           Navigator.of(context).pop();
         }
@@ -273,6 +277,9 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
             notes: notes,
           );
 
+      ref.read(tripControllerProvider.notifier).loadTrips();
+      AppWidgetService.syncCurrentState().catchError((_) {});
+
       if (mounted) {
         Navigator.of(context).pop();
       }
@@ -281,6 +288,7 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(expenseControllerProvider(widget.tripId));
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
