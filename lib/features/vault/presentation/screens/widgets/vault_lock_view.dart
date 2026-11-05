@@ -175,6 +175,8 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> {
     final l10n = AppLocalizations.of(context)!;
     final vaultState = ref.watch(vaultControllerProvider);
 
+    final isDark = theme.brightness == Brightness.dark;
+
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
@@ -187,23 +189,20 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> {
               height: 88,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [
-                    theme.colorScheme.primary.withValues(alpha: 0.2),
-                    theme.colorScheme.primaryContainer.withValues(alpha: 0.1),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color: isDark ? AppColors.primaryContainerDark : AppColors.primaryContainerLight,
                 border: Border.all(
-                  color: _isError ? AppColors.errorPastel : theme.colorScheme.primary.withValues(alpha: 0.4),
+                  color: _isError
+                      ? AppColors.errorPastel
+                      : (isDark ? AppColors.primaryDark : AppColors.primaryLight),
                   width: 2,
                 ),
               ),
               child: Icon(
                 _isError ? Icons.lock_clock_rounded : Icons.lock_outline_rounded,
                 size: 44,
-                color: _isError ? AppColors.errorPastel : theme.colorScheme.primary,
+                color: _isError
+                    ? AppColors.errorPastel
+                    : (isDark ? AppColors.primaryAmber : AppColors.primaryLight),
               ),
             ),
             const SizedBox(height: 20),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_theme.dart';
 
-/// Refined, modern travel status badge with subtle border and crisp typography
+/// Serene Voyage travel status badge with subtle border and crisp monospace typography
 class StatusBadge extends StatelessWidget {
   final String label;
   final IconData? icon;
@@ -46,7 +47,7 @@ class StatusBadge extends StatelessWidget {
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
+              style: AppTheme.labelFont(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
                 color: textColor,

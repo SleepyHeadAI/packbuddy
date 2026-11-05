@@ -28,6 +28,10 @@ import 'package:packbuddy/features/settings/presentation/screens/settings_screen
 import 'package:packbuddy/features/settings/presentation/screens/widgets/paywall_sheet.dart';
 import 'package:packbuddy/features/settings/data/mock_revenuecat_service.dart';
 import 'package:packbuddy/data/sync_engine/sync_engine.dart';
+import 'package:packbuddy/features/checklist/presentation/screens/widgets/airline_guide_sheet.dart';
+import 'package:packbuddy/features/checklist/presentation/screens/widgets/add_packing_item_sheet.dart';
+import 'package:packbuddy/features/onboarding/presentation/screens/onboarding_screen.dart';
+import 'package:packbuddy/features/auth/presentation/screens/email_verification_screen.dart';
 import 'package:packbuddy/features/admin/admin_service.dart';
 import 'package:packbuddy/features/admin/admin_controller.dart';
 import 'package:packbuddy/features/admin/admin_dashboard_screen.dart';
@@ -584,6 +588,125 @@ void main() {
         }
       }
       expect(err, isNull);
+    });
+    testWidgets(
+        '8d. AirlineGuideSheet renders zero overflows in German, Russian, and Arabic',
+        (tester) async {
+      tester.view.physicalSize = const Size(320, 568);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      for (final lang in ['de', 'ru', 'ar', 'tr']) {
+        await tester.pumpWidget(
+          buildStressApp(
+            screen: const Scaffold(body: AirlineGuideSheet()),
+            locale: Locale(lang),
+          ),
+        );
+        await tester.pump();
+        final err = tester.takeException();
+        if (err != null) {
+          for (final ro in tester.allRenderObjects) {
+            if (ro.toString().contains('OVERFLOWING')) {
+              debugPrint('FOUND OVERFLOW IN AirlineGuideSheet ($lang):\n${ro.toStringDeep()}');
+            }
+          }
+        }
+        expect(err, isNull, reason: 'AirlineGuideSheet overflowed in $lang');
+      }
+    });
+
+    testWidgets(
+        '8e. AddPackingItemSheet renders zero overflows in German, Russian, and Turkish',
+        (tester) async {
+      tester.view.physicalSize = const Size(320, 568);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      for (final lang in ['de', 'ru', 'tr']) {
+        await tester.pumpWidget(
+          buildStressApp(
+            screen: const Scaffold(body: AddPackingItemSheet()),
+            locale: Locale(lang),
+          ),
+        );
+        await tester.pump();
+        final err = tester.takeException();
+        if (err != null) {
+          for (final ro in tester.allRenderObjects) {
+            if (ro.toString().contains('OVERFLOWING')) {
+              debugPrint('FOUND OVERFLOW IN AddPackingItemSheet ($lang):\n${ro.toStringDeep()}');
+            }
+          }
+        }
+        expect(err, isNull, reason: 'AddPackingItemSheet overflowed in $lang');
+      }
+    });
+
+    testWidgets(
+        '8f. OnboardingScreen renders zero overflows on iPhone SE in German and Russian',
+        (tester) async {
+      tester.view.physicalSize = const Size(320, 568);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      for (final lang in ['de', 'ru', 'tr']) {
+        await tester.pumpWidget(
+          buildStressApp(
+            screen: const OnboardingScreen(isReplay: true),
+            locale: Locale(lang),
+          ),
+        );
+        await tester.pump();
+        final err = tester.takeException();
+        if (err != null) {
+          for (final ro in tester.allRenderObjects) {
+            if (ro.toString().contains('OVERFLOWING')) {
+              debugPrint('FOUND OVERFLOW IN OnboardingScreen ($lang):\n${ro.toStringDeep()}');
+            }
+          }
+        }
+        expect(err, isNull, reason: 'OnboardingScreen overflowed in $lang');
+      }
+    });
+
+    testWidgets(
+        '8g. EmailVerificationScreen renders zero overflows on iPhone SE in Russian and Arabic',
+        (tester) async {
+      tester.view.physicalSize = const Size(320, 568);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      for (final lang in ['ru', 'ar', 'de', 'tr']) {
+        await tester.pumpWidget(
+          buildStressApp(
+            screen: const EmailVerificationScreen(),
+            locale: Locale(lang),
+          ),
+        );
+        await tester.pump();
+        final err = tester.takeException();
+        if (err != null) {
+          for (final ro in tester.allRenderObjects) {
+            if (ro.toString().contains('OVERFLOWING')) {
+              debugPrint('FOUND OVERFLOW IN EmailVerificationScreen ($lang):\n${ro.toStringDeep()}');
+            }
+          }
+        }
+        expect(err, isNull, reason: 'EmailVerificationScreen overflowed in $lang');
+      }
     });
   });
 }

@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/features/checklist/domain/packing_item.dart';
+import 'package:packbuddy/features/checklist/domain/packing_tag.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
 
 /// Fast, snappy modal bottom sheet to add or edit a packing item in the checklist
@@ -53,12 +54,7 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
     'Diğer',
   ];
 
-  final List<String> _tags = [
-    'CARRY-ON',
-    'CABIN ONLY',
-    'CHECK-IN',
-    'ESSENTIAL',
-  ];
+  final List<String> _tags = List.from(PackingTagHelper.standardTags);
 
   final List<String> _compartments = [
     'Ana Bölme',
@@ -290,6 +286,7 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
                   Expanded(
                     flex: 3,
                     child: DropdownButtonFormField<String>(
+                      isExpanded: true,
                       initialValue: _category,
                       menuMaxHeight: 280,
                       borderRadius: BorderRadius.circular(16),
@@ -301,7 +298,11 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
                       items: _categories.map((c) {
                         return DropdownMenuItem(
                           value: c,
-                          child: Text(_getCategoryLabel(c, l10n), style: const TextStyle(fontSize: 13)),
+                          child: Text(
+                            _getCategoryLabel(c, l10n),
+                            style: const TextStyle(fontSize: 13),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         );
                       }).toList(),
                       onChanged: (val) {
@@ -312,7 +313,8 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
                   const SizedBox(width: 12),
                   // Quantity
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                    height: 48,
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
                     decoration: BoxDecoration(
                       color: isDark
                           ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6)
@@ -322,13 +324,17 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         IconButton(
                           icon: const Icon(Icons.remove, size: 16),
                           visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                           onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
                         ),
-                        Flexible(
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: Text(
                             '$_quantity ${l10n.pieces}',
                             maxLines: 1,
@@ -339,6 +345,8 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
                         IconButton(
                           icon: Icon(Icons.add, size: 16, color: theme.colorScheme.primary),
                           visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                           onPressed: () => setState(() => _quantity++),
                         ),
                       ],
@@ -349,52 +357,83 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
               const SizedBox(height: 14),
 
               // Tag & Compartment Selectors
-              Row(
-                children: [
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      initialValue: _tag,
-                      menuMaxHeight: 280,
-                      borderRadius: BorderRadius.circular(16),
-                      decoration: InputDecoration(
-                        labelText: '${l10n.navBaggage} / Tag',
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              Builder(
+                builder: (context) {
+                  final langCode = Localizations.localeOf(context).languageCode;
+                  final tagLabel = _getLuggageTypeLabel(langCode);
+
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          isExpanded: true,
+                          initialValue: _tags.contains(_tag) ? _tag : _tags.first,
+                          menuMaxHeight: 280,
+                          borderRadius: BorderRadius.circular(16),
+                          decoration: InputDecoration(
+                            labelText: tagLabel,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          ),
+                          items: _tags.map((t) {
+                            final localized = PackingTagHelper.getLocalizedTag(t, langCode);
+                            final icon = PackingTagHelper.getTagIcon(t);
+                            final tagColor = PackingTagHelper.getTagColor(t, isDark);
+
+                            return DropdownMenuItem(
+                              value: t,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(icon, size: 14, color: tagColor),
+                                  const SizedBox(width: 6),
+                                  Flexible(
+                                    child: Text(
+                                      localized,
+                                      style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            if (val != null) setState(() => _tag = val);
+                          },
+                        ),
                       ),
-                      items: _tags.map((t) {
-                        return DropdownMenuItem(
-                          value: t,
-                          child: Text(t, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                        );
-                      }).toList(),
-                      onChanged: (val) {
-                        if (val != null) setState(() => _tag = val);
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      initialValue: _compartment,
-                      menuMaxHeight: 280,
-                      borderRadius: BorderRadius.circular(16),
-                      decoration: InputDecoration(
-                        labelText: l10n.compartment,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          isExpanded: true,
+                          initialValue: _compartment,
+                          menuMaxHeight: 280,
+                          borderRadius: BorderRadius.circular(16),
+                          decoration: InputDecoration(
+                            labelText: l10n.compartment,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          ),
+                          items: _compartments.map((comp) {
+                            final localizedComp = _getLocalizedCompartment(comp, langCode);
+                            return DropdownMenuItem(
+                              value: comp,
+                              child: Text(
+                                localizedComp,
+                                style: const TextStyle(fontSize: 12),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            if (val != null) setState(() => _compartment = val);
+                          },
+                        ),
                       ),
-                      items: _compartments.map((comp) {
-                        return DropdownMenuItem(
-                          value: comp,
-                          child: Text(comp, style: const TextStyle(fontSize: 12)),
-                        );
-                      }).toList(),
-                      onChanged: (val) {
-                        if (val != null) setState(() => _compartment = val);
-                      },
-                    ),
-                  ),
-                ],
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: 20),
 
@@ -445,4 +484,81 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
     ),
   );
 }
+
+  static String _getLuggageTypeLabel(String langCode) {
+    final lang = langCode.toLowerCase();
+    if (lang == 'tr') return 'Bavul / Bagaj Türü';
+    if (lang == 'de') return 'Gepäckart';
+    if (lang == 'fr') return 'Type de bagage';
+    if (lang == 'es') return 'Tipo de equipaje';
+    if (lang == 'it') return 'Tipo di bagaglio';
+    if (lang == 'ru') return 'Тип багажа';
+    if (lang == 'ar') return 'نوع الأمتعة';
+    if (lang == 'pt') return 'Tipo de bagagem';
+    if (lang == 'nl') return 'Type bagage';
+    return 'Luggage Type';
+  }
+
+  static String _getLocalizedCompartment(String comp, String langCode) {
+    final lang = langCode.toLowerCase();
+    switch (comp) {
+      case 'Ana Bölme':
+        if (lang == 'tr') return 'Ana Bölme';
+        if (lang == 'de') return 'Hauptfach';
+        if (lang == 'fr') return 'Compartiment principal';
+        if (lang == 'es') return 'Compartimento principal';
+        if (lang == 'it') return 'Scomparto principale';
+        if (lang == 'ru') return 'Основное отделение';
+        if (lang == 'ar') return 'المقصورة الرئيسية';
+        if (lang == 'pt') return 'Compartimento principal';
+        if (lang == 'nl') return 'Hoofdvak';
+        return 'Main Compartment';
+      case 'Ön Cep':
+        if (lang == 'tr') return 'Ön Cep';
+        if (lang == 'de') return 'Vordertasche';
+        if (lang == 'fr') return 'Poche avant';
+        if (lang == 'es') return 'Bolsillo delantero';
+        if (lang == 'it') return 'Tasca frontale';
+        if (lang == 'ru') return 'Передний карман';
+        if (lang == 'ar') return 'الجيب الأمامي';
+        if (lang == 'pt') return 'Bolso frontal';
+        if (lang == 'nl') return 'Voorvak';
+        return 'Front Pocket';
+      case 'Sırt Çantası':
+        if (lang == 'tr') return 'Sırt Çantası';
+        if (lang == 'de') return 'Rucksack';
+        if (lang == 'fr') return 'Sac à dos';
+        if (lang == 'es') return 'Mochila';
+        if (lang == 'it') return 'Zaino';
+        if (lang == 'ru') return 'Рюкзак';
+        if (lang == 'ar') return 'حقيبة الظهر';
+        if (lang == 'pt') return 'Mochila';
+        if (lang == 'nl') return 'Rugzak';
+        return 'Backpack';
+      case 'Kozmetik Bölmesi':
+        if (lang == 'tr') return 'Kozmetik Bölmesi';
+        if (lang == 'de') return 'Kulturbeutel';
+        if (lang == 'fr') return 'Trousse de toilette';
+        if (lang == 'es') return 'Neceser';
+        if (lang == 'it') return 'Bustina cosmetici';
+        if (lang == 'ru') return 'Косметичка';
+        if (lang == 'ar') return 'حقيبة مستحضرات التجميل';
+        if (lang == 'pt') return 'Necessaire';
+        if (lang == 'nl') return 'Toilettas';
+        return 'Toiletry Pouch';
+      case 'Yan Göz':
+        if (lang == 'tr') return 'Yan Göz';
+        if (lang == 'de') return 'Seitentasche';
+        if (lang == 'fr') return 'Poche latérale';
+        if (lang == 'es') return 'Bolsillo lateral';
+        if (lang == 'it') return 'Tasca laterale';
+        if (lang == 'ru') return 'Боковой карман';
+        if (lang == 'ar') return 'الجيب الجانبي';
+        if (lang == 'pt') return 'Bolso lateral';
+        if (lang == 'nl') return 'Zijvak';
+        return 'Side Pocket';
+      default:
+        return comp;
+    }
+  }
 }

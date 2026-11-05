@@ -5,6 +5,7 @@ import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
+import 'package:packbuddy/features/budget/domain/city_localization.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
@@ -797,6 +798,10 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                           final idx = entry.key;
                           final stop = entry.value;
                           final isCustom = stop.startsWith('📍');
+                          final localizedDisplayStop = CityLocalization.localizeStop(
+                            stop,
+                            Localizations.localeOf(context).languageCode,
+                          );
                           return Chip(
                             avatar: CircleAvatar(
                               radius: 10,
@@ -813,7 +818,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                                     ),
                             ),
                             label: Text(
-                              stop,
+                              localizedDisplayStop,
                               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                             ),
                             backgroundColor: theme.colorScheme.surface,

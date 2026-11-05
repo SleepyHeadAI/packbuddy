@@ -6,6 +6,7 @@ import '../../../../core/services/telemetry_service.dart';
 import '../../domain/expense.dart';
 import '../../../../core/services/currency_service.dart';
 import '../../../../core/services/preferences_service.dart';
+import '../../../../core/services/app_widget_service.dart';
 import '../../../auth/auth_controller.dart';
 
 /// State representation for expenses belonging to a specific trip
@@ -154,6 +155,9 @@ class ExpenseController extends StateNotifier<ExpenseState> {
         _ref.read(syncEngineProvider.notifier).performSync();
       } catch (_) {}
 
+      // Refresh Home Screen widgets in real time
+      AppWidgetService.syncCurrentState().catchError((_) {});
+
       return newExpense;
     } catch (e) {
       state = state.copyWith(errorMessage: e.toString());
@@ -197,6 +201,9 @@ class ExpenseController extends StateNotifier<ExpenseState> {
         _ref.read(syncEngineProvider.notifier).performSync();
       } catch (_) {}
 
+      // Refresh Home Screen widgets in real time
+      AppWidgetService.syncCurrentState().catchError((_) {});
+
       return expenseToSave;
     } catch (e) {
       state = state.copyWith(errorMessage: e.toString());
@@ -231,6 +238,9 @@ class ExpenseController extends StateNotifier<ExpenseState> {
         _ref.read(syncEngineProvider.notifier).performSync();
       } catch (_) {}
 
+      // Refresh Home Screen widgets in real time
+      AppWidgetService.syncCurrentState().catchError((_) {});
+
       return true;
     } catch (e) {
       state = state.copyWith(errorMessage: e.toString());
@@ -264,6 +274,9 @@ class ExpenseController extends StateNotifier<ExpenseState> {
       try {
         _ref.read(syncEngineProvider.notifier).performSync();
       } catch (_) {}
+
+      // Refresh Home Screen widgets in real time
+      AppWidgetService.syncCurrentState().catchError((_) {});
 
       return true;
     } catch (e) {

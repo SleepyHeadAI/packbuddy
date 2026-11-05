@@ -286,8 +286,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: isDark
-                  ? const [AppColors.primaryDark, Color(0xFF1E3A5F)]
-                  : const [AppColors.primaryLight, AppColors.passportNavy],
+                  ? const [AppColors.primaryDark, Color(0xFFD4A054)]
+                  : const [AppColors.primaryLight, Color(0xFF6E5203)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -395,18 +395,25 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         ]
                       : null,
                 ),
-                child: Text(
-                  l10n.authSignIn,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: _mode == AuthMode.signIn
-                        ? FontWeight.w700
-                        : FontWeight.w600,
-                    color: _mode == AuthMode.signIn
-                        ? (isDark ? AppColors.onSurfaceDark : AppColors.primaryLight)
-                        : (isDark
-                            ? AppColors.onSurfaceVariantDark
-                            : AppColors.onSurfaceVariantLight),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      l10n.authSignIn,
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: _mode == AuthMode.signIn
+                            ? FontWeight.w700
+                            : FontWeight.w600,
+                        color: _mode == AuthMode.signIn
+                            ? (isDark ? AppColors.onSurfaceDark : AppColors.primaryLight)
+                            : (isDark
+                                ? AppColors.onSurfaceVariantDark
+                                : AppColors.onSurfaceVariantLight),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -435,18 +442,25 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         ]
                       : null,
                 ),
-                child: Text(
-                  l10n.authSignUp,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: _mode == AuthMode.signUp
-                        ? FontWeight.w700
-                        : FontWeight.w600,
-                    color: _mode == AuthMode.signUp
-                        ? (isDark ? AppColors.onSurfaceDark : AppColors.primaryLight)
-                        : (isDark
-                            ? AppColors.onSurfaceVariantDark
-                            : AppColors.onSurfaceVariantLight),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      l10n.authSignUp,
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: _mode == AuthMode.signUp
+                            ? FontWeight.w700
+                            : FontWeight.w600,
+                        color: _mode == AuthMode.signUp
+                            ? (isDark ? AppColors.onSurfaceDark : AppColors.primaryLight)
+                            : (isDark
+                                ? AppColors.onSurfaceVariantDark
+                                : AppColors.onSurfaceVariantLight),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -943,8 +957,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDark
-                ? const [AppColors.primaryDark, Color(0xFF5E8BAE)]
-                : const [AppColors.primaryLight, Color(0xFF1F3859)],
+                ? const [AppColors.primaryDark, Color(0xFFD4A054)]
+                : const [AppColors.primaryLight, Color(0xFF6E5203)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),

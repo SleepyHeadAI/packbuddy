@@ -13,7 +13,9 @@ import 'core/services/preferences_service.dart';
 import 'features/auth/auth_service.dart';
 import 'features/auth/auth_controller.dart';
 import 'features/auth/auth_screen.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
+import 'core/services/app_widget_service.dart';
 import 'core/services/telemetry_service.dart';
 import 'core/services/notification_service.dart';
 import 'features/auth/presentation/screens/email_verification_screen.dart';
@@ -83,6 +85,23 @@ class _PackBuddyAppState extends ConsumerState<PackBuddyApp>
       } catch (e) {
         debugPrint('[PackBuddyApp] notification service warmup notice: $e');
       }
+
+      // Check for cold-start launch via home screen widget tap
+      try {
+        HomeWidget.initiallyLaunchedFromHomeWidget().then((Uri? uri) {
+          if (uri != null) {
+            AppWidgetService.handleWidgetUri(uri, ref);
+          }
+        });
+        // Listen for warm clicks from home screen widget while app is alive
+        HomeWidget.widgetClicked.listen((Uri? uri) {
+          if (uri != null) {
+            AppWidgetService.handleWidgetUri(uri, ref);
+          }
+        });
+      } catch (e) {
+        debugPrint('[PackBuddyApp] HomeWidget deep link listener notice: $e');
+      }
     });
   }
 
@@ -135,6 +154,7 @@ class _PackBuddyAppState extends ConsumerState<PackBuddyApp>
     final activeThemeMode = ref.watch(themeModeProvider);
 
     return MaterialApp(
+      navigatorKey: AppWidgetService.navigatorKey,
       title: 'PackBuddy',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,

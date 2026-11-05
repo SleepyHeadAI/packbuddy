@@ -33,6 +33,14 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
   final TextEditingController _customLimitController = TextEditingController();
   String _searchQuery = '';
   List<AirlineBaggageRule> _filteredAirlines = AirlineBaggageRepository.airlines;
+  BaggageAllowanceMode _selectedMode = BaggageAllowanceMode.all;
+
+  @override
+  void initState() {
+    super.initState();
+    final current = ref.read(checklistControllerProvider).baggageAllowanceMode;
+    _selectedMode = current == BaggageAllowanceMode.none ? BaggageAllowanceMode.all : current;
+  }
 
   void _filterAirlines(String query) {
     final q = query.trim().toLowerCase();
@@ -62,6 +70,7 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
+    final langCode = Localizations.localeOf(context).languageCode;
     final checklistState = ref.watch(checklistControllerProvider);
     final selectedAirline = checklistState.selectedAirline;
 
@@ -252,6 +261,74 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
             ),
           ),
 
+          // Allowance Mode Selector: All, Cabin Only, Checked Only, None
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 6, 20, 6),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: Row(
+                children: [
+                  _buildAllowanceChip(
+                    mode: BaggageAllowanceMode.all,
+                    label: _getModeChipLabel(BaggageAllowanceMode.all, langCode),
+                    icon: Icons.all_inclusive_rounded,
+                    isDark: isDark,
+                  ),
+                  const SizedBox(width: 8),
+                  _buildAllowanceChip(
+                    mode: BaggageAllowanceMode.cabinOnly,
+                    label: _getModeChipLabel(BaggageAllowanceMode.cabinOnly, langCode),
+                    icon: Icons.backpack_outlined,
+                    isDark: isDark,
+                  ),
+                  const SizedBox(width: 8),
+                  _buildAllowanceChip(
+                    mode: BaggageAllowanceMode.checkedOnly,
+                    label: _getModeChipLabel(BaggageAllowanceMode.checkedOnly, langCode),
+                    icon: Icons.luggage_rounded,
+                    isDark: isDark,
+                  ),
+                  const SizedBox(width: 8),
+                  ActionChip(
+                    avatar: const Icon(Icons.block_rounded, size: 14, color: AppColors.errorPastel),
+                    label: Text(
+                      _getModeChipLabel(BaggageAllowanceMode.none, langCode),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.errorPastel,
+                      ),
+                    ),
+                    backgroundColor: isDark
+                        ? AppColors.errorPastel.withValues(alpha: 0.12)
+                        : const Color(0xFFFEE2E2),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100),
+                      side: BorderSide(
+                        color: AppColors.errorPastel.withValues(alpha: 0.4),
+                        width: 1,
+                      ),
+                    ),
+                    onPressed: () {
+                      ref.read(checklistControllerProvider.notifier).selectAirline(
+                        null,
+                        mode: BaggageAllowanceMode.none,
+                      );
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(_getLimitRemovedNotice(langCode)),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
           const SizedBox(height: 6),
           const Divider(height: 1),
 
@@ -269,11 +346,22 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
 
                 return InkWell(
                   onTap: () {
-                    ref.read(checklistControllerProvider.notifier).selectAirline(airline);
+                    ref.read(checklistControllerProvider.notifier).selectAirline(
+                      airline,
+                      mode: _selectedMode,
+                    );
                     Navigator.pop(context);
+                    String msg;
+                    if (_selectedMode == BaggageAllowanceMode.cabinOnly) {
+                      msg = l10n.airlineSelectedMessage('${airline.airlineName} • ${l10n.cabinBaggage}', '${airline.cabinLimitKg.toInt()}');
+                    } else if (_selectedMode == BaggageAllowanceMode.checkedOnly) {
+                      msg = l10n.airlineSelectedMessage('${airline.airlineName} • ${l10n.checkedBaggage}', '${airline.checkedLimitKg.toInt()}');
+                    } else {
+                      msg = l10n.airlineSelectedMessage(airline.airlineName, '${airline.checkedLimitKg.toInt()}');
+                    }
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(l10n.airlineSelectedMessage(airline.airlineName, '${airline.checkedLimitKg.toInt()}')),
+                        content: Text(msg),
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
@@ -370,55 +458,82 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
                           children: [
                             // Cabin Limit Box
                             Expanded(
-                              child: Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: isDark
-                                      ? AppColors.surfaceVariantDark
-                                      : AppColors.surfaceVariantLight,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Icon(Icons.backpack_rounded, size: 14, color: theme.colorScheme.primary),
-                                        const SizedBox(width: 6),
-                                        Flexible(
-                                          child: Text(
-                                            l10n.cabinBaggage,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(12),
+                                onTap: () {
+                                  ref.read(checklistControllerProvider.notifier).selectAirline(
+                                    airline,
+                                    mode: BaggageAllowanceMode.cabinOnly,
+                                  );
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        l10n.airlineSelectedMessage('${airline.airlineName} • ${l10n.cabinBaggage}', '${airline.cabinLimitKg.toInt()}'),
+                                      ),
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: (isCurrent && checklistState.baggageAllowanceMode == BaggageAllowanceMode.cabinOnly)
+                                        ? theme.colorScheme.primary.withValues(alpha: 0.15)
+                                        : (isDark
+                                            ? AppColors.surfaceVariantDark
+                                            : AppColors.surfaceVariantLight),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: (isCurrent && checklistState.baggageAllowanceMode == BaggageAllowanceMode.cabinOnly)
+                                          ? theme.colorScheme.primary
+                                          : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
+                                      width: (isCurrent && checklistState.baggageAllowanceMode == BaggageAllowanceMode.cabinOnly) ? 1.5 : 1,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(Icons.backpack_rounded, size: 14, color: theme.colorScheme.primary),
+                                          const SizedBox(width: 6),
+                                          Flexible(
+                                            child: Text(
+                                              l10n.cabinBaggage,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 6),
+                                      FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          '${airline.cabinLimitKg.toStringAsFixed(0)} kg',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w800,
+                                            color: theme.colorScheme.primary,
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 6),
-                                    FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      alignment: Alignment.centerLeft,
-                                      child: Text(
-                                        '${airline.cabinLimitKg.toStringAsFixed(0)} kg',
+                                      ),
+                                      Text(
+                                        airline.cabinDimensions,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w800,
-                                          color: theme.colorScheme.primary,
+                                          fontSize: 10,
+                                          color: theme.colorScheme.onSurfaceVariant,
                                         ),
                                       ),
-                                    ),
-                                    Text(
-                                      airline.cabinDimensions,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: theme.colorScheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -426,55 +541,82 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
 
                             // Checked Limit Box
                             Expanded(
-                              child: Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: isDark
-                                      ? AppColors.surfaceVariantDark
-                                      : AppColors.surfaceVariantLight,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Icon(Icons.luggage_rounded, size: 14, color: theme.colorScheme.secondary),
-                                        const SizedBox(width: 6),
-                                        Flexible(
-                                          child: Text(
-                                            l10n.checkedBaggage,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(12),
+                                onTap: () {
+                                  ref.read(checklistControllerProvider.notifier).selectAirline(
+                                    airline,
+                                    mode: BaggageAllowanceMode.checkedOnly,
+                                  );
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        l10n.airlineSelectedMessage('${airline.airlineName} • ${l10n.checkedBaggage}', '${airline.checkedLimitKg.toInt()}'),
+                                      ),
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: (isCurrent && checklistState.baggageAllowanceMode == BaggageAllowanceMode.checkedOnly)
+                                        ? theme.colorScheme.secondary.withValues(alpha: 0.15)
+                                        : (isDark
+                                            ? AppColors.surfaceVariantDark
+                                            : AppColors.surfaceVariantLight),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: (isCurrent && checklistState.baggageAllowanceMode == BaggageAllowanceMode.checkedOnly)
+                                          ? theme.colorScheme.secondary
+                                          : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
+                                      width: (isCurrent && checklistState.baggageAllowanceMode == BaggageAllowanceMode.checkedOnly) ? 1.5 : 1,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(Icons.luggage_rounded, size: 14, color: theme.colorScheme.secondary),
+                                          const SizedBox(width: 6),
+                                          Flexible(
+                                            child: Text(
+                                              l10n.checkedBaggage,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 6),
+                                      FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          '${airline.checkedLimitKg.toStringAsFixed(0)} kg',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w800,
+                                            color: theme.colorScheme.secondary,
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 6),
-                                    FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      alignment: Alignment.centerLeft,
-                                      child: Text(
-                                        '${airline.checkedLimitKg.toStringAsFixed(0)} kg',
+                                      ),
+                                      Text(
+                                        l10n.standardEconomy,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w800,
-                                          color: theme.colorScheme.secondary,
+                                          fontSize: 10,
+                                          color: theme.colorScheme.onSurfaceVariant,
                                         ),
                                       ),
-                                    ),
-                                    Text(
-                                      l10n.standardEconomy,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        color: theme.colorScheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -504,4 +646,125 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
     ),
   );
 }
+
+  static String _getModeChipLabel(BaggageAllowanceMode mode, String lang) {
+    switch (mode) {
+      case BaggageAllowanceMode.all:
+        if (lang == 'tr') return 'Hepsi (Kabin + Uçak Altı)';
+        if (lang == 'de') return 'Alle (Kabine + Aufgabe)';
+        if (lang == 'fr') return 'Tous (Cabine + Soute)';
+        if (lang == 'es') return 'Todos (Cabina + Bodega)';
+        if (lang == 'it') return 'Tutti (Cabina + Stiva)';
+        if (lang == 'ru') return 'Все (Ручная кладь + Багаж)';
+        if (lang == 'ar') return 'الكل (يدوية + مسجلة)';
+        if (lang == 'pt') return 'Todos (Cabine + Porão)';
+        if (lang == 'nl') return 'Alles (Handbagage + Ruim)';
+        return 'All (Cabin + Checked)';
+      case BaggageAllowanceMode.cabinOnly:
+        if (lang == 'tr') return 'Sadece Kabin';
+        if (lang == 'de') return 'Nur Kabine';
+        if (lang == 'fr') return 'Cabine uniquement';
+        if (lang == 'es') return 'Solo cabina';
+        if (lang == 'it') return 'Solo cabina';
+        if (lang == 'ru') return 'Только ручная кладь';
+        if (lang == 'ar') return 'حقيبة اليد فقط';
+        if (lang == 'pt') return 'Apenas cabine';
+        if (lang == 'nl') return 'Alleen handbagage';
+        return 'Cabin Only';
+      case BaggageAllowanceMode.checkedOnly:
+        if (lang == 'tr') return 'Sadece Uçak Altı';
+        if (lang == 'de') return 'Nur Aufgabegepäck';
+        if (lang == 'fr') return 'Soute uniquement';
+        if (lang == 'es') return 'Solo bodega';
+        if (lang == 'it') return 'Solo stiva';
+        if (lang == 'ru') return 'Только багаж';
+        if (lang == 'ar') return 'الأمتعة المسجلة فقط';
+        if (lang == 'pt') return 'Apenas porão';
+        if (lang == 'nl') return 'Alleen ruimbagage';
+        return 'Checked Only';
+      case BaggageAllowanceMode.none:
+        if (lang == 'tr') return 'Hiçbiri (Limitsiz)';
+        if (lang == 'de') return 'Keine (Unbegrenzt)';
+        if (lang == 'fr') return 'Aucune (Sans limite)';
+        if (lang == 'es') return 'Ninguno (Sin límite)';
+        if (lang == 'it') return 'Nessuno (Illimitato)';
+        if (lang == 'ru') return 'Нет (Без ограничений)';
+        if (lang == 'ar') return 'بدون قيود';
+        if (lang == 'pt') return 'Nenhum (Sem limite)';
+        if (lang == 'nl') return 'Geen (Onbeperkt)';
+        return 'None (No Limit)';
+    }
+  }
+
+  static String _getLimitRemovedNotice(String lang) {
+    if (lang == 'tr') return 'Bagaj limiti kaldırıldı (Limitsiz)';
+    if (lang == 'de') return 'Gepäcklimit entfernt (Unbegrenzt)';
+    if (lang == 'fr') return 'Limite de bagages supprimée (Illimité)';
+    if (lang == 'es') return 'Límite de equipaje eliminado (Sin límite)';
+    if (lang == 'it') return 'Limite bagaglio rimosso (Illimitato)';
+    if (lang == 'ru') return 'Ограничение веса снято (Без ограничений)';
+    if (lang == 'ar') return 'تمت إزالة قيود الأمتعة (غير محدود)';
+    if (lang == 'pt') return 'Limite de bagagem removido (Sem limite)';
+    if (lang == 'nl') return 'Bagagelimiet verwijderd (Onbeperkt)';
+    return 'Baggage limit removed (No limit)';
+  }
+
+  Widget _buildAllowanceChip({
+    required BaggageAllowanceMode mode,
+    required String label,
+    required IconData icon,
+    required bool isDark,
+  }) {
+    final isSelected = _selectedMode == mode;
+    final selectedBg = isDark ? AppColors.primaryAmber : AppColors.primaryLight;
+    final selectedFg = isDark ? const Color(0xFF281C00) : Colors.white;
+    final unselectedBg = isDark ? AppColors.surfaceVariantDark : AppColors.surfaceVariantLight;
+    final unselectedFg = isDark ? AppColors.onSurfaceDark : AppColors.onSurfaceLight;
+    final unselectedIcon = isDark ? AppColors.textMutedDark : AppColors.textMutedLight;
+    final borderColor = isSelected
+        ? (isDark ? AppColors.primaryAmber : AppColors.primaryLight)
+        : (isDark ? AppColors.outlineDark : AppColors.outlineLight);
+
+    return InkWell(
+      onTap: () => setState(() => _selectedMode = mode),
+      borderRadius: BorderRadius.circular(100),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: isSelected ? selectedBg : unselectedBg,
+          borderRadius: BorderRadius.circular(100),
+          border: Border.all(color: borderColor, width: 1),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: (isDark ? AppColors.primaryAmber : AppColors.primaryLight).withValues(alpha: 0.25),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 14,
+              color: isSelected ? selectedFg : unselectedIcon,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                color: isSelected ? selectedFg : unselectedFg,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

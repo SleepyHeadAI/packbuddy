@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/l10n/l10n.dart';
 import 'package:packbuddy/core/l10n/locale_provider.dart';
 import 'package:packbuddy/core/l10n/language_selector_sheet.dart';
@@ -46,7 +47,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final List<OnboardingPageData> _pages = const [
     OnboardingPageData(
       icon: Icons.flight_takeoff_rounded,
-      iconColor: Color(0xFF0284C7),
+      iconColor: AppColors.primaryAmber,
       titleKey: 'onboardingTitle1',
       descKey: 'onboardingDesc1',
       defaultTitle: 'Plan Trips Effortlessly',
@@ -55,7 +56,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     ),
     OnboardingPageData(
       icon: Icons.checklist_rtl_rounded,
-      iconColor: Color(0xFF10B981),
+      iconColor: AppColors.secondaryLight,
       titleKey: 'onboardingTitle2',
       descKey: 'onboardingDesc2',
       defaultTitle: 'Smart Packing Checklists',
@@ -64,7 +65,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     ),
     OnboardingPageData(
       icon: Icons.groups_rounded,
-      iconColor: Color(0xFF8B5CF6),
+      iconColor: AppColors.tertiaryLight,
       titleKey: 'onboardingTitle3',
       descKey: 'onboardingDesc3',
       defaultTitle: 'Collaborate in Real-Time',
@@ -73,7 +74,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     ),
     OnboardingPageData(
       icon: Icons.lock_person_rounded,
-      iconColor: Color(0xFFEC4899),
+      iconColor: AppColors.actionGold,
       titleKey: 'onboardingTitle4',
       descKey: 'onboardingDesc4',
       defaultTitle: 'Offline Travel Vault',
@@ -162,103 +163,106 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           children: [
             // Top Bar with App Branding, Language Selector Pill and Skip Button
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // App branding badge
-                  Row(
-                    children: [
-                      Container(
-                        width: 28,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.luggage_rounded,
-                            size: 16,
-                            color: theme.colorScheme.primary,
-                          ),
-                        ),
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.luggage_rounded,
+                        size: 16,
+                        color: theme.colorScheme.primary,
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'PackBuddy',
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: -0.3,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'PackBuddy',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
 
-                  // Top Right Action Cluster: Language Switcher Pill + Skip Button
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Language Selector Pill
-                      InkWell(
+                  // Language Selector Pill
+                  InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: () => showLanguageSelectorSheet(context, ref, activeLocale),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? theme.colorScheme.surfaceContainerHighest
+                            : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
                         borderRadius: BorderRadius.circular(12),
-                        onTap: () => showLanguageSelectorSheet(context, ref, activeLocale),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? theme.colorScheme.surfaceContainerHighest
-                                : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: theme.colorScheme.outline.withValues(alpha: 0.5),
-                              width: 1,
+                        border: Border.all(
+                          color: theme.colorScheme.outline.withValues(alpha: 0.5),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            L10n.getLanguageFlag(activeLocale.languageCode),
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            activeLocale.languageCode.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.3,
+                              color: theme.colorScheme.onSurface,
                             ),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                L10n.getLanguageFlag(activeLocale.languageCode),
-                                style: const TextStyle(fontSize: 14),
-                              ),
-                              const SizedBox(width: 5),
-                              Text(
-                                activeLocale.languageCode.toUpperCase(),
-                                style: TextStyle(
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.4,
-                                  color: theme.colorScheme.onSurface,
-                                ),
-                              ),
-                              const SizedBox(width: 3),
-                              Icon(
-                                Icons.keyboard_arrow_down_rounded,
-                                size: 16,
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ],
+                          const SizedBox(width: 2),
+                          Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            size: 15,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
-                        ),
+                        ],
                       ),
-                      const SizedBox(width: 6),
-                      TextButton(
-                        onPressed: _completeOnboarding,
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          visualDensity: VisualDensity.compact,
-                        ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 82),
+                    child: TextButton(
+                      onPressed: _completeOnboarding,
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                        visualDensity: VisualDensity.compact,
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
                         child: Text(
                           l10n?.skip ?? 'Skip',
+                          maxLines: 1,
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
-                            fontSize: 13,
+                            fontSize: 12,
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ],
               ),
@@ -275,69 +279,82 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   final title = _resolveTitle(page, l10n);
                   final desc = _resolveDesc(page, l10n);
 
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 28),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Stylized Illustration Frame
-                        Container(
-                          width: 140,
-                          height: 140,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: LinearGradient(
-                              colors: [
-                                page.iconColor.withValues(alpha: 0.22),
-                                page.iconColor.withValues(alpha: 0.05),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            border: Border.all(
-                              color: page.iconColor.withValues(alpha: 0.35),
-                              width: 2,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: page.iconColor.withValues(alpha: 0.20),
-                                blurRadius: 28,
-                                offset: const Offset(0, 10),
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      final iconSize = (constraints.maxHeight < 400) ? 108.0 : 136.0;
+                      final spacing = (constraints.maxHeight < 400) ? 20.0 : 32.0;
+
+                      return SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 8),
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight - 16,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Stylized Illustration Frame
+                              Container(
+                                width: iconSize,
+                                height: iconSize,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      page.iconColor.withValues(alpha: 0.22),
+                                      page.iconColor.withValues(alpha: 0.05),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  border: Border.all(
+                                    color: page.iconColor.withValues(alpha: 0.35),
+                                    width: 2,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: page.iconColor.withValues(alpha: 0.20),
+                                      blurRadius: 28,
+                                      offset: const Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    page.icon,
+                                    size: iconSize * 0.46,
+                                    color: page.iconColor,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: spacing),
+
+                              // Title
+                              Text(
+                                title,
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+
+                              // Subtitle
+                              Text(
+                                desc,
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                  height: 1.45,
+                                ),
                               ),
                             ],
                           ),
-                          child: Center(
-                            child: Icon(
-                              page.icon,
-                              size: 64,
-                              color: page.iconColor,
-                            ),
-                          ),
                         ),
-                        const SizedBox(height: 36),
-
-                        // Title
-                        Text(
-                          title,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-
-                        // Subtitle
-                        Text(
-                          desc,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                            height: 1.45,
-                          ),
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   );
                 },
               ),

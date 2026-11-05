@@ -4,6 +4,7 @@ import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:packbuddy/core/l10n/l10n.dart';
 import 'package:packbuddy/core/l10n/locale_provider.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/core/theme/theme_provider.dart';
 import 'package:packbuddy/data/sync_engine/sync_engine.dart';
 import 'package:packbuddy/core/services/notification_service.dart';
@@ -769,14 +770,19 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.only(left: 4),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.primary,
-            ),
+        style: AppTheme.headlineFont(
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+          letterSpacing: -0.2,
+          color: isDark ? AppColors.onSurfaceDark : AppColors.onSurfaceLight,
+        ),
       ),
     );
   }
@@ -794,105 +800,91 @@ class _ProBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
 
-    return InkWell(
+    return AppCard(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: isPro
-                ? [
-                    AppColors.successPastel.withValues(alpha: 0.2),
-                    theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
-                  ]
-                : [
-                    theme.colorScheme.tertiaryContainer.withValues(alpha: 0.8),
-                    theme.colorScheme.primaryContainer.withValues(alpha: 0.8),
-                  ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+      padding: const EdgeInsets.all(18),
+      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+      border: BorderSide(
+        color: isPro
+            ? AppColors.successPastel.withValues(alpha: 0.35)
+            : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
+        width: 1,
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isPro
+                  ? AppColors.successContainerLight
+                  : AppColors.primaryContainerLight,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              isPro ? Icons.verified_rounded : Icons.auto_awesome_rounded,
+              color: isPro ? AppColors.successPastel : AppColors.primaryLight,
+              size: 26,
+            ),
           ),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.tertiaryLight.withValues(alpha: 0.15),
-              blurRadius: 16,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface.withValues(alpha: 0.9),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                isPro ? Icons.verified_rounded : Icons.auto_awesome_rounded,
-                color: isPro ? AppColors.successPastel : AppColors.tertiaryLight,
-                size: 26,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Flexible(
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
                         child: Text(
                           l10n.proTitle,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             letterSpacing: -0.3,
                           ),
-                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: isPro ? AppColors.successPastel : AppColors.tertiaryLight,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            isPro ? l10n.activeStatus : l10n.proBadge,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    isPro ? l10n.purchaseSuccess : l10n.upgradeToPro,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w500,
                     ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                      decoration: BoxDecoration(
+                        color: isPro ? AppColors.successPastel : AppColors.primaryLight,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        isPro ? l10n.activeStatus : l10n.proBadge,
+                        maxLines: 1,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  isPro ? l10n.purchaseSuccess : l10n.upgradeToPro,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
                   ),
-                ],
-              ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
-            const Icon(Icons.chevron_right_rounded),
-          ],
-        ),
+          ),
+          const Icon(Icons.chevron_right_rounded),
+        ],
       ),
     );
   }
@@ -926,8 +918,8 @@ class _AccountSessionCard extends ConsumerWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: isDark
-                        ? const [AppColors.primaryDark, Color(0xFF1E3A5F)]
-                        : const [AppColors.primaryLight, AppColors.passportNavy],
+                        ? const [AppColors.primaryDark, Color(0xFF3E2D00)]
+                        : const [AppColors.primaryLight, Color(0xFF422E00)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -1192,12 +1184,10 @@ class _AdminDashboardBanner extends StatelessWidget {
     return AppCard(
       borderRadius: 22,
       onTap: onTap,
-      backgroundColor: isDark
-          ? const Color(0xFF1E2638)
-          : const Color(0xFFF1F5FD),
+      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
       border: BorderSide(
-        color: theme.colorScheme.primary.withValues(alpha: 0.35),
-        width: 1.5,
+        color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+        width: 1,
       ),
       padding: const EdgeInsets.all(18),
       child: Row(
@@ -1205,26 +1195,14 @@ class _AdminDashboardBanner extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  theme.colorScheme.primary,
-                  theme.colorScheme.primary.withValues(alpha: 0.8),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: isDark
+                  ? AppColors.primaryContainerDark
+                  : AppColors.primaryContainerLight,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.25),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
             ),
-            child: const Icon(
+            child: Icon(
               Icons.admin_panel_settings_rounded,
-              color: Colors.white,
+              color: isDark ? AppColors.primaryAmber : AppColors.primaryLight,
               size: 26,
             ),
           ),
@@ -1236,15 +1214,18 @@ class _AdminDashboardBanner extends StatelessWidget {
                 Row(
                   children: [
                     Flexible(
-                      child: Text(
-                        l10n.adminDashboard,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 15,
-                          letterSpacing: -0.2,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          l10n.adminDashboard,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 15,
+                            letterSpacing: -0.2,
+                          ),
+                          maxLines: 1,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -1306,6 +1287,7 @@ class _ThemeModeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final isSelected = mode == selectedMode;
 
     return InkWell(
@@ -1316,13 +1298,15 @@ class _ThemeModeCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
         decoration: BoxDecoration(
           color: isSelected
-              ? theme.colorScheme.primaryContainer.withValues(alpha: 0.5)
-              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+              ? (isDark
+                  ? AppColors.primaryContainerDark
+                  : AppColors.primaryContainerLight.withValues(alpha: 0.45))
+              : (isDark ? Colors.white.withValues(alpha: 0.03) : const Color(0xFFF8FAFC)),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: isSelected
-                ? theme.colorScheme.primary
-                : theme.colorScheme.outlineVariant.withValues(alpha: 0.6),
+                ? (isDark ? AppColors.primaryDark : AppColors.primaryLight)
+                : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
             width: isSelected ? 1.5 : 1,
           ),
         ),

@@ -11,6 +11,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/status_badge.dart';
 import '../../budget/domain/country.dart';
+import '../../budget/domain/city_localization.dart';
 import '../../budget/domain/trip.dart';
 import '../../budget/presentation/controllers/trip_controller.dart';
 import '../../budget/presentation/screens/trips_screen.dart';
@@ -554,7 +555,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                                 const SizedBox(width: 5),
                               ],
                               Text(
-                                t.destination.isNotEmpty ? t.destination : t.title,
+                                t.destination.isNotEmpty
+                                    ? CityLocalization.localizeDestination(
+                                        t.destination,
+                                        Localizations.localeOf(context).languageCode,
+                                      )
+                                    : t.title,
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: isCurrent ? FontWeight.w800 : FontWeight.w600,
@@ -653,6 +659,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Hero(
                         tag: 'checklist-hero-badge',
@@ -1010,7 +1017,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             height: 64,
             elevation: 0,
             backgroundColor: Colors.transparent,
-            indicatorColor: theme.colorScheme.primaryContainer,
+            indicatorColor: isDark ? AppColors.primaryDark : const Color(0xFFF0D076),
             selectedIndex: 0,
             labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
             onDestinationSelected: (index) {
@@ -1037,27 +1044,27 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             destinations: [
               NavigationDestination(
                 icon: const Icon(Icons.home_outlined, size: 22),
-                selectedIcon: Icon(Icons.home_rounded, size: 22, color: theme.colorScheme.primary),
+                selectedIcon: const Icon(Icons.home_rounded, size: 22),
                 label: l10n.navHome,
               ),
               NavigationDestination(
                 icon: const Icon(Icons.public_outlined, size: 22),
-                selectedIcon: Icon(Icons.public_rounded, size: 22, color: theme.colorScheme.primary),
+                selectedIcon: const Icon(Icons.public_rounded, size: 22),
                 label: l10n.navMap,
               ),
               NavigationDestination(
                 icon: const Icon(Icons.checklist_rounded, size: 22),
-                selectedIcon: Icon(Icons.checklist_rtl_rounded, size: 22, color: theme.colorScheme.primary),
+                selectedIcon: const Icon(Icons.checklist_rtl_rounded, size: 22),
                 label: l10n.navBaggage,
               ),
               NavigationDestination(
                 icon: const Icon(Icons.folder_shared_outlined, size: 22),
-                selectedIcon: Icon(Icons.folder_shared_rounded, size: 22, color: theme.colorScheme.primary),
+                selectedIcon: const Icon(Icons.folder_shared_rounded, size: 22),
                 label: l10n.navVault,
               ),
               NavigationDestination(
                 icon: const Icon(Icons.tune_outlined, size: 22),
-                selectedIcon: Icon(Icons.tune_rounded, size: 22, color: theme.colorScheme.primary),
+                selectedIcon: const Icon(Icons.tune_rounded, size: 22),
                 label: l10n.navSettings,
               ),
             ],
@@ -1207,28 +1214,15 @@ class _HeroGreetingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return AppCard(
       padding: const EdgeInsets.all(22),
-      gradient: LinearGradient(
-        colors: isDark
-            ? [
-                const Color(0xFF131B2E),
-                const Color(0xFF0F172A),
-              ]
-            : [
-                AppColors.surfaceLight,
-                AppColors.surfaceVariantLight,
-              ],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: Text(
@@ -1301,23 +1295,11 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
     return AppCard(
       onTap: onTap,
       padding: const EdgeInsets.all(18),
-      gradient: LinearGradient(
-        colors: isDark
-            ? [
-                const Color(0xFF1E293B),
-                const Color(0xFF0F172A),
-              ]
-            : [
-                theme.colorScheme.primaryContainer.withValues(alpha: 0.4),
-                AppColors.surfaceLight,
-              ],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Hero(
                 tag: 'trip-transport-icon-${trip.id}',
@@ -1392,9 +1374,11 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
               ),
             ),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Icon(
                         Icons.place_outlined,
@@ -1404,7 +1388,10 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          trip.destination,
+                          CityLocalization.localizeDestination(
+                            trip.destination,
+                            Localizations.localeOf(context).languageCode,
+                          ),
                           style: theme.textTheme.bodySmall?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
@@ -1462,59 +1449,121 @@ class _EmptyTripsPromptCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
 
     return AppCard(
-      padding: const EdgeInsets.all(20),
-      child: Row(
+      onTap: onPlanTrip,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primaryContainer,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.flight_takeoff_rounded,
-              size: 24,
-              color: theme.colorScheme.primary,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.noTripsYet,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.flight_takeoff_rounded,
+                    color: theme.colorScheme.primary,
+                    size: 20,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  l10n.createFirstTrip,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.noTripsYet.toUpperCase(),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: theme.colorScheme.primary,
+                        letterSpacing: 0.8,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      l10n.createFirstTrip,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              FilledButton(
+                onPressed: onPlanTrip,
+                style: FilledButton.styleFrom(
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  minimumSize: const Size(60, 34),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  visualDensity: VisualDensity.compact,
+                ),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    l10n.plan,
+                    maxLines: 1,
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
                   ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: isDark
+                  ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
+                  : theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: theme.colorScheme.outline.withValues(alpha: 0.5),
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.explore_outlined,
+                  size: 14,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    l10n.noTripsSubtitle,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.arrow_forward_rounded,
+                  size: 14,
+                  color: theme.colorScheme.primary,
                 ),
               ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Flexible(
-            child: FilledButton.tonal(
-              onPressed: onPlanTrip,
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                visualDensity: VisualDensity.compact,
-              ),
-              child: Text(
-                l10n.plan,
-                style: const TextStyle(fontWeight: FontWeight.w700),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
             ),
           ),
         ],
@@ -1571,6 +1620,7 @@ class _BentoStatCard extends StatelessWidget {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               heroTagBadge != null
                   ? Hero(tag: heroTagBadge!, child: iconWidget)

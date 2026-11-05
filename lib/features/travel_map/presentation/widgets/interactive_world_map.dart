@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:countries_world_map/countries_world_map.dart';
 import 'package:countries_world_map/data/maps/world_map.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
+import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/features/budget/domain/country_localization.dart';
 import 'package:packbuddy/features/travel_map/data/world_countries_data.dart';
 import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
@@ -274,7 +275,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
       statusColor = const Color(0xFF10B981);
       statusLabel = l10n.mapLegendLived;
     } else if (country.isVisited) {
-      statusColor = const Color(0xFFEA580C);
+      statusColor = AppColors.primaryAmber;
       statusLabel = l10n.mapLegendBeen;
     } else if (country.isWishlist) {
       statusColor = const Color(0xFFEF4444);
@@ -353,7 +354,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
       if (country.isLived) {
         colorMap[code] = const Color(0xFF10B981);
       } else if (country.isVisited) {
-        colorMap[code] = const Color(0xFFEA580C);
+        colorMap[code] = AppColors.primaryAmber;
       } else if (country.isWishlist) {
         colorMap[code] = const Color(0xFFEF4444);
       }
@@ -365,22 +366,22 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
       if (nc.isLived) {
         colorMap['cy'] = const Color(0xFF10B981);
       } else if (nc.isVisited) {
-        colorMap['cy'] = const Color(0xFFEA580C);
+        colorMap['cy'] = AppColors.primaryAmber;
       } else if (nc.isWishlist && colorMap['cy'] == null) {
         colorMap['cy'] = const Color(0xFFEF4444);
       }
     }
 
-    final unvisitedLandColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0);
-    final borderColor = isDark ? const Color(0xFF0F172A) : Colors.white;
-    final oceanColor = isDark ? const Color(0xFF0B0F17) : const Color(0xFFF8FAFC);
+    final unvisitedLandColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFFFFFFF);
+    final borderColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFD6DEE7);
+    final oceanColor = isDark ? const Color(0xFF0B0F17) : const Color(0xFFEEF3F8);
 
     return Container(
       decoration: BoxDecoration(
         color: oceanColor,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
+          color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
           width: 1.5,
         ),
         boxShadow: [
@@ -478,7 +479,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                             decoration: BoxDecoration(
                               color: !_is3DMode
-                                  ? const Color(0xFFEA580C)
+                                  ? AppColors.actionGold
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -641,7 +642,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                                 isDark: isDark,
                               ),
                               _buildLegendDot(
-                                color: const Color(0xFFEA580C),
+                                color: AppColors.primaryAmber,
                                 label: legendVisited,
                                 isDark: isDark,
                               ),

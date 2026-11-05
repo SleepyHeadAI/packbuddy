@@ -13,6 +13,14 @@ import '../../domain/canonical_packing_catalog.dart';
 import '../../../auth/auth_controller.dart';
 import '../../../../l10n/app_localizations.dart';
 
+/// Baggage allowance selection mode: All bags, Cabin only, Checked only, or None
+enum BaggageAllowanceMode {
+  all,
+  cabinOnly,
+  checkedOnly,
+  none,
+}
+
 /// State of the Checklist & Luggage system
 class ChecklistState {
   final List<PackingItem> items;
@@ -23,6 +31,7 @@ class ChecklistState {
   final String? errorMessage;
   final String? activeTripId;
   final AirlineBaggageRule? selectedAirline;
+  final BaggageAllowanceMode baggageAllowanceMode;
 
   const ChecklistState({
     this.items = const [],
@@ -33,6 +42,7 @@ class ChecklistState {
     this.errorMessage,
     this.activeTripId,
     this.selectedAirline,
+    this.baggageAllowanceMode = BaggageAllowanceMode.all,
   });
 
   static final Map<String, String> _canonicalTokens = _buildCanonicalTokens();
@@ -154,6 +164,7 @@ class ChecklistState {
     bool clearSelectedCategory = false,
     AirlineBaggageRule? selectedAirline,
     bool clearSelectedAirline = false,
+    BaggageAllowanceMode? baggageAllowanceMode,
   }) {
     return ChecklistState(
       items: items ?? this.items,
@@ -164,6 +175,7 @@ class ChecklistState {
       errorMessage: errorMessage,
       activeTripId: activeTripId ?? this.activeTripId,
       selectedAirline: clearSelectedAirline ? null : (selectedAirline ?? this.selectedAirline),
+      baggageAllowanceMode: baggageAllowanceMode ?? this.baggageAllowanceMode,
     );
   }
 }
@@ -709,11 +721,32 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
   }
 
   /// Sets or clears selected airline rule for informational guidance
-  void selectAirline(AirlineBaggageRule? airline) {
-    if (airline != null) {
-      state = state.copyWith(selectedAirline: airline);
+  void selectAirline(
+    AirlineBaggageRule? airline, {
+    BaggageAllowanceMode mode = BaggageAllowanceMode.all,
+  }) {
+    if (airline != null && mode != BaggageAllowanceMode.none) {
+      state = state.copyWith(
+        selectedAirline: airline,
+        baggageAllowanceMode: mode,
+      );
     } else {
-      state = state.copyWith(clearSelectedAirline: true);
+      state = state.copyWith(
+        clearSelectedAirline: true,
+        baggageAllowanceMode: BaggageAllowanceMode.none,
+      );
+    }
+  }
+
+  /// Sets baggage allowance mode (All, Cabin only, Checked only, None)
+  void setBaggageAllowanceMode(BaggageAllowanceMode mode) {
+    if (mode == BaggageAllowanceMode.none) {
+      state = state.copyWith(
+        clearSelectedAirline: true,
+        baggageAllowanceMode: BaggageAllowanceMode.none,
+      );
+    } else {
+      state = state.copyWith(baggageAllowanceMode: mode);
     }
   }
 

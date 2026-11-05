@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/features/checklist/domain/packing_item.dart';
+import 'package:packbuddy/features/checklist/domain/packing_tag.dart';
 import 'package:packbuddy/features/checklist/domain/canonical_packing_catalog.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
@@ -265,50 +266,93 @@ class PackingItemTile extends StatelessWidget {
                               decorationThickness: 1.8,
                             ),
                           ),
-                          const SizedBox(height: 5),
+                          const SizedBox(height: 4),
 
-                          // Category Subtitle & Assignee Chip
-                          Row(
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  _getCategoryLabel(item.category, l10n),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w500,
-                                    color: theme.colorScheme.onSurfaceVariant.withValues(
-                                      alpha: item.isPacked ? 0.5 : 0.8,
-                                    ),
-                                    decoration: TextDecoration.none,
-                                  ),
-                                ),
+                          // Category Subtitle
+                          Text(
+                            _getCategoryLabel(item.category, l10n),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w500,
+                              color: theme.colorScheme.onSurfaceVariant.withValues(
+                                alpha: item.isPacked ? 0.5 : 0.8,
                               ),
-                              if (item.assignedTo != null && item.assignedTo!.isNotEmpty) ...[
-                                const SizedBox(width: 6),
-                                Flexible(
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                                    decoration: BoxDecoration(
-                                      color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      '@${item.assignedTo}',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w700,
-                                        color: theme.colorScheme.primary,
+                              decoration: TextDecoration.none,
+                            ),
+                          ),
+
+                          // Mini Luggage Tag Badge & Assignee Chip
+                          if (item.tag.isNotEmpty || (item.assignedTo != null && item.assignedTo!.isNotEmpty)) ...[
+                            const SizedBox(height: 3),
+                            Row(
+                              children: [
+                                if (item.tag.isNotEmpty)
+                                  Flexible(
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                                      decoration: BoxDecoration(
+                                        color: PackingTagHelper.getTagBgColor(item.tag, isDark),
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(
+                                          color: PackingTagHelper.getTagBorderColor(item.tag, isDark),
+                                          width: 0.8,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            PackingTagHelper.getTagIcon(item.tag),
+                                            size: 10,
+                                            color: PackingTagHelper.getTagColor(item.tag, isDark),
+                                          ),
+                                          const SizedBox(width: 3),
+                                          Flexible(
+                                            child: Text(
+                                              PackingTagHelper.getShortTag(
+                                                item.tag,
+                                                Localizations.localeOf(context).languageCode,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 9.5,
+                                                fontWeight: FontWeight.w700,
+                                                color: PackingTagHelper.getTagColor(item.tag, isDark),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
-                                ),
+                                if (item.assignedTo != null && item.assignedTo!.isNotEmpty) ...[
+                                  if (item.tag.isNotEmpty) const SizedBox(width: 4),
+                                  Flexible(
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                                      decoration: BoxDecoration(
+                                        color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        '@${item.assignedTo}',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ],
-                            ],
-                          ),
+                            ),
+                          ],
                         ],
                       ),
                     ),

@@ -1,14 +1,22 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/local_db/database_helper.dart';
 import '../../features/budget/domain/trip.dart';
 import '../../features/budget/domain/expense.dart';
+import '../../features/budget/presentation/screens/trip_detail_screen.dart';
+import '../../features/budget/presentation/screens/widgets/add_expense_sheet.dart';
+import '../../features/budget/presentation/screens/widgets/add_trip_sheet.dart';
+import '../../features/budget/presentation/widgets/currency_converter_card.dart';
 import '../../features/checklist/domain/packing_item.dart';
 import '../../features/travel_map/data/travel_map_service.dart';
 import '../../features/travel_map/domain/travel_country.dart';
+import '../../features/travel_map/presentation/screens/travel_map_screen.dart';
 import '../utils/currency_formatter.dart';
 import 'app_widget_localization.dart';
+import 'currency_service.dart';
 import 'preferences_service.dart';
 import 'widget_map_renderer.dart';
 
@@ -26,8 +34,13 @@ class AppWidgetData {
   final String worldPercentage;
   final int wishlistCountriesCount;
   final int continentsCount;
-  final String widgetMode; // 'auto', 'trip', 'world_map'
+  final String widgetMode; // 'trip', 'world_map', 'currency_converter', 'quick_expense'
   final bool hasUpcomingTrip;
+  final String? currencyRateUSD;
+  final String? currencyRateEUR;
+  final String? remainingBudget;
+  final String? lastExpenseText;
+  final String? userCurrency;
   final DateTime updatedAt;
 
   const AppWidgetData({
@@ -43,8 +56,13 @@ class AppWidgetData {
     this.worldPercentage = '%0.0',
     this.wishlistCountriesCount = 0,
     this.continentsCount = 0,
-    this.widgetMode = 'auto',
+    this.widgetMode = 'trip',
     this.hasUpcomingTrip = false,
+    this.currencyRateUSD,
+    this.currencyRateEUR,
+    this.remainingBudget,
+    this.lastExpenseText,
+    this.userCurrency,
     required this.updatedAt,
   });
 
@@ -63,6 +81,11 @@ class AppWidgetData {
         'continentsCount': continentsCount,
         'widgetMode': widgetMode,
         'hasUpcomingTrip': hasUpcomingTrip,
+        'currencyRateUSD': currencyRateUSD,
+        'currencyRateEUR': currencyRateEUR,
+        'remainingBudget': remainingBudget,
+        'lastExpenseText': lastExpenseText,
+        'userCurrency': userCurrency,
         'updatedAt': updatedAt.millisecondsSinceEpoch,
       };
 
@@ -79,8 +102,13 @@ class AppWidgetData {
         worldPercentage: json['worldPercentage'] as String? ?? '%0.0',
         wishlistCountriesCount: (json['wishlistCountriesCount'] as num?)?.toInt() ?? 0,
         continentsCount: (json['continentsCount'] as num?)?.toInt() ?? 0,
-        widgetMode: json['widgetMode'] as String? ?? 'auto',
+        widgetMode: json['widgetMode'] as String? ?? 'trip',
         hasUpcomingTrip: json['hasUpcomingTrip'] as bool? ?? false,
+        currencyRateUSD: json['currencyRateUSD'] as String?,
+        currencyRateEUR: json['currencyRateEUR'] as String?,
+        remainingBudget: json['remainingBudget'] as String?,
+        lastExpenseText: json['lastExpenseText'] as String?,
+        userCurrency: json['userCurrency'] as String?,
         updatedAt: json['updatedAt'] != null
             ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int)
             : DateTime.now(),
@@ -93,7 +121,58 @@ class AppWidgetService {
 
   static const String keyWidgetPayload = 'packbuddy_widget_payload_data';
 
-  /// Serializes and stores latest upcoming trip, checklist, and travel map metrics
+  /// Global navigator key allowing widget deep links to navigate without context dependency
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  /// Handles deep links originating from Android Home Screen widgets
+  static Future<void> handleWidgetUri(Uri uri, [WidgetRef? ref]) async {
+    debugPrint('[AppWidgetService] Received widget deep link: $uri');
+    final context = navigatorKey.currentContext;
+    if (context == null) return;
+
+    final host = uri.host.isNotEmpty ? uri.host : uri.path.replaceAll('/', '');
+
+    if (host == 'add_expense' || uri.toString().contains('add_expense')) {
+      final trips = await DatabaseHelper.instance.getTrips(includeDeleted: false);
+      final activeTrips = trips.where((t) => !t.isDeleted).toList()
+        ..sort((a, b) => a.startDate.compareTo(b.startDate));
+      if (activeTrips.isNotEmpty) {
+        final trip = activeTrips.first;
+        if (context.mounted) {
+          AddExpenseSheet.show(
+            context,
+            tripId: trip.id,
+            defaultCurrency: trip.defaultCurrency,
+          );
+        }
+      } else {
+        if (context.mounted) {
+          AddTripSheet.show(context);
+        }
+      }
+    } else if (host == 'currency' || uri.toString().contains('currency')) {
+      if (context.mounted) {
+        CurrencyConverterCard.showAsModal(context);
+      }
+    } else if (host == 'map' || uri.toString().contains('map')) {
+      if (context.mounted) {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const TravelMapScreen()),
+        );
+      }
+    } else if (host == 'trip' || uri.toString().contains('trip')) {
+      final trips = await DatabaseHelper.instance.getTrips(includeDeleted: false);
+      final activeTrips = trips.where((t) => !t.isDeleted).toList()
+        ..sort((a, b) => a.startDate.compareTo(b.startDate));
+      if (activeTrips.isNotEmpty && context.mounted) {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => TripDetailScreen(trip: activeTrips.first)),
+        );
+      }
+    }
+  }
+
+  /// Serializes and stores latest upcoming trip, checklist, travel map, and currency metrics
   static Future<void> updateWidgetPayload({
     Trip? upcomingTrip,
     List<PackingItem>? items,
@@ -130,6 +209,12 @@ class AppWidgetService {
       int packingPercent = 0;
       String? budgetSpentStr;
       String? budgetTotalStr;
+      String? remainingBudgetStr;
+      String? lastExpenseText;
+
+      final userCurrency = upcomingTrip?.defaultCurrency ??
+          PreferencesService.instance.getDefaultCurrency() ??
+          'TRY';
 
       if (upcomingTrip != null) {
         final now = DateTime.now();
@@ -149,15 +234,32 @@ class AppWidgetService {
         packedItems = tripItems.where((i) => i.isPacked).length;
         packingPercent = totalItems > 0 ? ((packedItems / totalItems) * 100).toInt() : 0;
 
-        final totalSpent = (expenses ?? const [])
+        final tripExpenses = (expenses ?? const [])
             .where((e) => e.tripId == upcomingTrip.id && !e.isDeleted)
-            .fold<double>(0.0, (sum, e) => sum + e.amount);
+            .toList();
 
-        budgetSpentStr = CurrencyFormatter.format(totalSpent, currency: upcomingTrip.defaultCurrency);
+        final totalSpent = tripExpenses.fold<double>(0.0, (sum, e) => sum + e.amount);
+
+        budgetSpentStr = CurrencyFormatter.format(totalSpent, currency: userCurrency);
         if (upcomingTrip.budgetLimit != null) {
-          budgetTotalStr = CurrencyFormatter.format(upcomingTrip.budgetLimit!, currency: upcomingTrip.defaultCurrency);
+          budgetTotalStr = CurrencyFormatter.format(upcomingTrip.budgetLimit!, currency: userCurrency);
+          final remaining = (upcomingTrip.budgetLimit! - totalSpent).clamp(0.0, double.infinity);
+          remainingBudgetStr = CurrencyFormatter.format(remaining, currency: userCurrency);
+        }
+
+        if (tripExpenses.isNotEmpty) {
+          final sortedExpenses = List<Expense>.from(tripExpenses)
+            ..sort((a, b) => b.date.compareTo(a.date));
+          final last = sortedExpenses.first;
+          lastExpenseText = '${last.title}: ${CurrencyFormatter.format(last.amount, currency: last.currency)}';
         }
       }
+
+      // 3. Resolve Currency Conversion Rates
+      final double rateUsd = CurrencyService.convert(amount: 1.0, fromCurrency: 'USD', toCurrency: userCurrency);
+      final double rateEur = CurrencyService.convert(amount: 1.0, fromCurrency: 'EUR', toCurrency: userCurrency);
+      final String rateUsdStr = CurrencyFormatter.format(rateUsd, currency: userCurrency);
+      final String rateEurStr = CurrencyFormatter.format(rateEur, currency: userCurrency);
 
       final payload = AppWidgetData(
         tripTitle: upcomingTrip != null
@@ -176,100 +278,241 @@ class AppWidgetService {
         continentsCount: continentsCount,
         widgetMode: mode,
         hasUpcomingTrip: hasUpcomingTrip,
+        currencyRateUSD: rateUsdStr,
+        currencyRateEUR: rateEurStr,
+        remainingBudget: remainingBudgetStr,
+        lastExpenseText: lastExpenseText,
+        userCurrency: userCurrency,
         updatedAt: DateTime.now(),
       );
 
       await prefs.setString(keyWidgetPayload, jsonEncode(payload.toJson()));
 
-      // 3. Synchronize with Native Home Screen Widget (Android AppWidget & iOS WidgetKit)
+      // 4. Synchronize with Native Home Screen Widget (Android AppWidget & iOS WidgetKit)
       try {
+        final lang = PreferencesService.instance.getLocale()?.languageCode ?? 'tr';
+        final theme = widgetTheme ?? PreferencesService.instance.getWidgetTheme();
+
         await HomeWidget.saveWidgetData<String>('widget_mode', mode);
+        await HomeWidget.saveWidgetData<String>('widget_theme', theme);
+        await HomeWidget.saveWidgetData<String>('app_language', lang);
         await HomeWidget.saveWidgetData<bool>('has_upcoming_trip', hasUpcomingTrip);
 
-        // Trip Fields
+        // Core fields
         await HomeWidget.saveWidgetData<String>('trip_title', payload.tripTitle ?? 'PackBuddy');
         await HomeWidget.saveWidgetData<String>('trip_destination', payload.destination ?? '');
         await HomeWidget.saveWidgetData<int>('trip_days', payload.daysUntil);
         await HomeWidget.saveWidgetData<String>('trip_packing', '${payload.packedItems}/${payload.totalItems}');
         await HomeWidget.saveWidgetData<String>('trip_budget', payload.budgetSpent ?? '');
 
-        // World Map Fields
         await HomeWidget.saveWidgetData<int>('map_visited_count', visitedCount);
         await HomeWidget.saveWidgetData<String>('map_world_percent', worldPercentStr);
         await HomeWidget.saveWidgetData<int>('map_wishlist_count', wishlistCount);
         await HomeWidget.saveWidgetData<int>('map_continents_count', continentsCount);
 
-        // Pre-formatted localized texts for native Android AppWidget
-        final lang = PreferencesService.instance.getLocale()?.languageCode ?? 'en';
-        final theme = widgetTheme ?? PreferencesService.instance.getWidgetTheme();
-        await HomeWidget.saveWidgetData<String>('widget_theme', theme);
+        await HomeWidget.saveWidgetData<String>('currency_rate_usd', rateUsdStr);
+        await HomeWidget.saveWidgetData<String>('currency_rate_eur', rateEurStr);
+        await HomeWidget.saveWidgetData<String>('remaining_budget', remainingBudgetStr ?? '');
+        await HomeWidget.saveWidgetData<String>('last_expense_text', lastExpenseText ?? '');
+        await HomeWidget.saveWidgetData<String>('user_currency', userCurrency);
 
-        final showWorldMap = mode == 'world_map' ||
-            (mode == 'auto' && !hasUpcomingTrip && (visitedCount > 0 || wishlistCount > 0));
+        // Pre-formatted localized texts for native Android AppWidget based on ALL modes simultaneously
+        // 1. World Map
+        final worldAppName = AppWidgetLocalization.getWorldHeader(lang);
+        final worldDays = worldPercentStr;
+        final worldTitle = AppWidgetLocalization.getVisitedTitle(lang, visitedCount);
+        final worldSubtitle = AppWidgetLocalization.getExplorationRateLabel(lang);
+        final worldStat1 = AppWidgetLocalization.getVisitedStatLabel(lang, visitedCount);
+        final worldStat2 = PreferencesService.instance.isWidgetShowWishlist()
+            ? AppWidgetLocalization.getWishlistStatLabel(lang, wishlistCount)
+            : '';
+        final worldStat3 = PreferencesService.instance.isWidgetShowContinents()
+            ? AppWidgetLocalization.getContinentsStatLabel(lang, continentsCount)
+            : '';
+        final worldTheme = PreferencesService.instance.getWidgetThemeForMode('world_map');
 
-        if (showWorldMap) {
-          final customAppName = AppWidgetLocalization.getWorldHeader(lang);
-          final customTitle = AppWidgetLocalization.getVisitedTitle(lang, visitedCount);
-          const customSubtitle = '';
-          final customStat1 = AppWidgetLocalization.getVisitedStatLabel(lang, visitedCount);
-          final customStat2 = AppWidgetLocalization.getWishlistStatLabel(lang, wishlistCount);
-          final customStat3 = AppWidgetLocalization.getContinentsStatLabel(lang, continentsCount);
+        await HomeWidget.saveWidgetData<String>('world_map_app_name', worldAppName);
+        await HomeWidget.saveWidgetData<String>('world_map_days', worldDays);
+        await HomeWidget.saveWidgetData<String>('world_map_title', worldTitle);
+        await HomeWidget.saveWidgetData<String>('world_map_subtitle', worldSubtitle);
+        await HomeWidget.saveWidgetData<String>('world_map_stat1', worldStat1);
+        await HomeWidget.saveWidgetData<String>('world_map_stat2', worldStat2);
+        await HomeWidget.saveWidgetData<String>('world_map_stat3', worldStat3);
+        await HomeWidget.saveWidgetData<String>('world_map_theme', worldTheme);
 
-          await HomeWidget.saveWidgetData<String>('custom_app_name', customAppName);
-          await HomeWidget.saveWidgetData<String>('custom_days', worldPercentStr);
-          await HomeWidget.saveWidgetData<String>('custom_title', customTitle);
-          await HomeWidget.saveWidgetData<String>('custom_subtitle', customSubtitle);
-          await HomeWidget.saveWidgetData<String>('custom_stat1', customStat1);
-          await HomeWidget.saveWidgetData<String>('custom_stat2', customStat2);
-          await HomeWidget.saveWidgetData<String>('custom_stat3', customStat3);
+        // Render high-resolution vector world map image for any world map widgets
+        await WidgetMapRenderer.renderAndSaveMapImages(
+          mapCountries,
+          theme: worldTheme,
+          continentsCount: continentsCount,
+        );
 
-          // Render high-resolution vector world map image for medium and large home screen widgets
-          await WidgetMapRenderer.renderAndSaveMapImages(mapCountries, theme: theme, continentsCount: continentsCount);
-        } else if (hasUpcomingTrip && (payload.tripTitle?.isNotEmpty ?? false)) {
-          final customAppName = AppWidgetLocalization.getTripHeader(lang);
-          final customDays = daysUntil > 0
+        // 2. Currency Converter
+        final currencyAppName = AppWidgetLocalization.getCurrencyHeader(lang);
+        final currencyDays = userCurrency;
+        final currencyTitle = '1 USD = $rateUsdStr';
+        final currencySubtitle = '1 EUR = $rateEurStr';
+        final currencyStat1 = '💵 $rateUsdStr';
+        final currencyStat2 = '💶 $rateEurStr';
+        final reverseRate = rateUsd > 0 ? (1.0 / rateUsd) : 0.0;
+        final currencyStat3 = '1 $userCurrency ≈ \$${reverseRate.toStringAsFixed(2)}';
+        final currencyTheme = PreferencesService.instance.getWidgetThemeForMode('currency_converter');
+
+        await HomeWidget.saveWidgetData<String>('currency_converter_app_name', currencyAppName);
+        await HomeWidget.saveWidgetData<String>('currency_converter_days', currencyDays);
+        await HomeWidget.saveWidgetData<String>('currency_converter_title', currencyTitle);
+        await HomeWidget.saveWidgetData<String>('currency_converter_subtitle', currencySubtitle);
+        await HomeWidget.saveWidgetData<String>('currency_converter_stat1', currencyStat1);
+        await HomeWidget.saveWidgetData<String>('currency_converter_stat2', currencyStat2);
+        await HomeWidget.saveWidgetData<String>('currency_converter_stat3', currencyStat3);
+        await HomeWidget.saveWidgetData<String>('currency_converter_theme', currencyTheme);
+
+        // 3. Quick Expense
+        final expenseAppName = AppWidgetLocalization.getExpenseHeader(lang);
+        const expenseDays = '+';
+        final expenseTitle = payload.budgetSpent ?? CurrencyFormatter.format(0, currency: userCurrency);
+        final expenseSubtitle = remainingBudgetStr != null
+            ? '${AppWidgetLocalization.getShowRemainingBudgetLabel(lang)}: $remainingBudgetStr'
+            : (upcomingTrip?.title ?? 'PackBuddy');
+        final expenseStat1 = '💳 ${payload.budgetSpent ?? CurrencyFormatter.format(0, currency: userCurrency)}';
+        final expenseStat2 = remainingBudgetStr != null ? '💰 $remainingBudgetStr' : (lang == 'tr' ? '+ Ekle' : '+ Add');
+        final expenseStat3 = lastExpenseText ?? '';
+        final expenseTheme = PreferencesService.instance.getWidgetThemeForMode('quick_expense');
+
+        await HomeWidget.saveWidgetData<String>('quick_expense_app_name', expenseAppName);
+        await HomeWidget.saveWidgetData<String>('quick_expense_days', expenseDays);
+        await HomeWidget.saveWidgetData<String>('quick_expense_title', expenseTitle);
+        await HomeWidget.saveWidgetData<String>('quick_expense_subtitle', expenseSubtitle);
+        await HomeWidget.saveWidgetData<String>('quick_expense_stat1', expenseStat1);
+        await HomeWidget.saveWidgetData<String>('quick_expense_stat2', expenseStat2);
+        await HomeWidget.saveWidgetData<String>('quick_expense_stat3', expenseStat3);
+        await HomeWidget.saveWidgetData<String>('quick_expense_theme', expenseTheme);
+
+        // 4. Trip
+        String tripAppName;
+        String tripDays;
+        String tripTitle;
+        String tripSubtitle;
+        String tripStat1;
+        String tripStat2;
+        String tripStat3;
+
+        if (hasUpcomingTrip && (payload.tripTitle?.isNotEmpty ?? false)) {
+          tripAppName = AppWidgetLocalization.getTripHeader(lang);
+          tripDays = daysUntil > 0
               ? '$daysUntil${AppWidgetLocalization.getDaysSuffix(lang)}'
               : (daysUntil == 0
                   ? AppWidgetLocalization.formatDaysUntil(lang, 0)
                   : AppWidgetLocalization.formatDaysUntil(lang, -1));
-          final customTitle = payload.tripTitle ?? 'PackBuddy';
-          final customSubtitle = (payload.destination?.isNotEmpty ?? false)
+          tripTitle = payload.tripTitle ?? 'PackBuddy';
+          tripSubtitle = (payload.destination?.isNotEmpty ?? false)
               ? payload.destination!
               : AppWidgetLocalization.getCountdownActive(lang);
-          final customStat1 = '🎒 ${payload.packedItems}/${payload.totalItems} ${AppWidgetLocalization.getPackingLabel(lang).toLowerCase()}';
-          final customStat2 = payload.budgetSpent ?? '';
-          final customStat3 = payload.budgetTotal != null ? '${AppWidgetLocalization.getBudgetLabel(lang)}: ${payload.budgetTotal}' : '';
-
-          await HomeWidget.saveWidgetData<String>('custom_app_name', customAppName);
-          await HomeWidget.saveWidgetData<String>('custom_days', customDays);
-          await HomeWidget.saveWidgetData<String>('custom_title', customTitle);
-          await HomeWidget.saveWidgetData<String>('custom_subtitle', customSubtitle);
-          await HomeWidget.saveWidgetData<String>('custom_stat1', customStat1);
-          await HomeWidget.saveWidgetData<String>('custom_stat2', customStat2);
-          await HomeWidget.saveWidgetData<String>('custom_stat3', customStat3);
+          tripStat1 = PreferencesService.instance.isWidgetShowPacking()
+              ? '🎒 ${payload.packedItems}/${payload.totalItems} ${AppWidgetLocalization.getPackingLabel(lang).toLowerCase()}'
+              : '';
+          tripStat2 = PreferencesService.instance.isWidgetShowBudget()
+              ? (payload.budgetSpent ?? '')
+              : '';
+          tripStat3 = payload.budgetTotal != null
+              ? '${AppWidgetLocalization.getBudgetLabel(lang)}: ${payload.budgetTotal}'
+              : '';
         } else {
-          final customAppName = 'PackBuddy';
-          final customDays = '✈️';
-          final customTitle = AppWidgetLocalization.getTripHeader(lang);
-          final customSubtitle = AppWidgetLocalization.getDefaultDestination(lang);
-          final customStat1 = '🎒 ${AppWidgetLocalization.getPackingLabel(lang)}';
-          final customStat2 = AppWidgetLocalization.getWorldMapModeLabel(lang);
-          final customStat3 = AppWidgetLocalization.getWorldHeader(lang);
+          tripAppName = 'PackBuddy';
+          tripDays = '✈️';
+          tripTitle = AppWidgetLocalization.getTripHeader(lang);
+          tripSubtitle = AppWidgetLocalization.getDefaultDestination(lang);
+          tripStat1 = '🎒 ${AppWidgetLocalization.getPackingLabel(lang)}';
+          tripStat2 = AppWidgetLocalization.getWorldMapModeLabel(lang);
+          tripStat3 = AppWidgetLocalization.getWorldHeader(lang);
+        }
+        final tripTheme = PreferencesService.instance.getWidgetThemeForMode('trip');
 
-          await HomeWidget.saveWidgetData<String>('custom_app_name', customAppName);
-          await HomeWidget.saveWidgetData<String>('custom_days', customDays);
-          await HomeWidget.saveWidgetData<String>('custom_title', customTitle);
-          await HomeWidget.saveWidgetData<String>('custom_subtitle', customSubtitle);
-          await HomeWidget.saveWidgetData<String>('custom_stat1', customStat1);
-          await HomeWidget.saveWidgetData<String>('custom_stat2', customStat2);
-          await HomeWidget.saveWidgetData<String>('custom_stat3', customStat3);
+        await HomeWidget.saveWidgetData<String>('trip_app_name', tripAppName);
+        await HomeWidget.saveWidgetData<String>('trip_days', tripDays);
+        await HomeWidget.saveWidgetData<String>('trip_title', tripTitle);
+        await HomeWidget.saveWidgetData<String>('trip_subtitle', tripSubtitle);
+        await HomeWidget.saveWidgetData<String>('trip_stat1', tripStat1);
+        await HomeWidget.saveWidgetData<String>('trip_stat2', tripStat2);
+        await HomeWidget.saveWidgetData<String>('trip_stat3', tripStat3);
+        await HomeWidget.saveWidgetData<String>('trip_theme', tripTheme);
+
+        // Legacy/Active mode fallback keys
+        String customAppName;
+        String customDays;
+        String customTitle;
+        String customSubtitle;
+        String customStat1;
+        String customStat2;
+        String customStat3;
+
+        switch (mode) {
+          case 'world_map':
+            customAppName = worldAppName;
+            customDays = worldDays;
+            customTitle = worldTitle;
+            customSubtitle = worldSubtitle;
+            customStat1 = worldStat1;
+            customStat2 = worldStat2;
+            customStat3 = worldStat3;
+            break;
+
+          case 'currency_converter':
+            customAppName = currencyAppName;
+            customDays = currencyDays;
+            customTitle = currencyTitle;
+            customSubtitle = currencySubtitle;
+            customStat1 = currencyStat1;
+            customStat2 = currencyStat2;
+            customStat3 = currencyStat3;
+            break;
+
+          case 'quick_expense':
+            customAppName = expenseAppName;
+            customDays = expenseDays;
+            customTitle = expenseTitle;
+            customSubtitle = expenseSubtitle;
+            customStat1 = expenseStat1;
+            customStat2 = expenseStat2;
+            customStat3 = expenseStat3;
+            break;
+
+          case 'trip':
+          default:
+            customAppName = tripAppName;
+            customDays = tripDays;
+            customTitle = tripTitle;
+            customSubtitle = tripSubtitle;
+            customStat1 = tripStat1;
+            customStat2 = tripStat2;
+            customStat3 = tripStat3;
+            break;
         }
 
-        for (final provider in const [
+        await HomeWidget.saveWidgetData<String>('custom_app_name', customAppName);
+        await HomeWidget.saveWidgetData<String>('custom_days', customDays);
+        await HomeWidget.saveWidgetData<String>('custom_title', customTitle);
+        await HomeWidget.saveWidgetData<String>('custom_subtitle', customSubtitle);
+        await HomeWidget.saveWidgetData<String>('custom_stat1', customStat1);
+        await HomeWidget.saveWidgetData<String>('custom_stat2', customStat2);
+        await HomeWidget.saveWidgetData<String>('custom_stat3', customStat3);
+
+        const allProviders = [
           'PackBuddyWidgetProvider',
           'PackBuddyMediumWidgetProvider',
           'PackBuddyLargeWidgetProvider',
-        ]) {
+          'PackBuddyMapWidgetProvider',
+          'PackBuddyMapMediumWidgetProvider',
+          'PackBuddyMapLargeWidgetProvider',
+          'PackBuddyExpenseWidgetProvider',
+          'PackBuddyExpenseMediumWidgetProvider',
+          'PackBuddyExpenseLargeWidgetProvider',
+          'PackBuddyCurrencyWidgetProvider',
+          'PackBuddyCurrencyMediumWidgetProvider',
+          'PackBuddyCurrencyLargeWidgetProvider',
+        ];
+
+        for (final provider in allProviders) {
           try {
             await HomeWidget.updateWidget(
               name: provider,
@@ -303,6 +546,8 @@ class AppWidgetService {
           ..sort((a, b) => a.startDate.compareTo(b.startDate));
         if (futureTrips.isNotEmpty) {
           nextTrip = futureTrips.first;
+        } else if (trips.isNotEmpty) {
+          nextTrip = trips.first;
         }
       }
 

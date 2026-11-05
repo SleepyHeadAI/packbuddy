@@ -1,4 +1,5 @@
 import 'country_localization.dart';
+import 'city_localization.dart';
 
 /// Domain entity representing a Country for travel destination routes
 class Country {
@@ -20,12 +21,29 @@ class Country {
 
   /// Returns the country name localized according to languageCode (e.g. 'en', 'tr', 'es', 'de', 'fr', etc.)
   String getLocalizedName(String languageCode) {
-    final lang = languageCode.toLowerCase();
+    final lang = languageCode.toLowerCase().split('_').first.split('-').first;
     if (lang == 'tr') return localName;
     if (lang == 'en') return name;
     final translated = CountryLocalization.getCountryName(code, lang);
     if (translated != null && translated.isNotEmpty) return translated;
     return name;
+  }
+
+  /// Checks whether this country matches a search string across any known language or code
+  bool matchesSearch(String query) {
+    final q = query.trim().toLowerCase();
+    if (q.isEmpty) return false;
+    if (code.toLowerCase() == q ||
+        name.toLowerCase() == q ||
+        localName.toLowerCase() == q) {
+      return true;
+    }
+    for (final lang in ['en', 'tr', 'de', 'fr', 'es', 'it', 'ru']) {
+      if (CountryLocalization.getCountryName(code, lang)?.toLowerCase() == q) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /// Master directory of world travel destinations (UN members + observers + Kosovo & KKTC)
@@ -1603,6 +1621,8 @@ class Country {
     }
   }
 
+  static Country? fromCode(String? code) => findByCode(code);
+
   /// Searches for real countries and cities matching the query with prefix-first priority.
   static List<LocationSearchResult> searchLocations(
     String query, {
@@ -1616,7 +1636,49 @@ class Country {
     final containsCountries = <LocationSearchResult>[];
     final prefixCities = <LocationSearchResult>[];
     final containsCities = <LocationSearchResult>[];
+    final seenCityKeys = <String>{};
 
+    // 1. Search in the 220+ multilingual global cities first
+    final cityMatches = CityLocalization.searchCities(q, limit: limit * 2);
+    for (final city in cityMatches) {
+      final c = Country.findByCode(city.countryCode);
+      final locCity = city.getLocalizedName(languageCode);
+      final locCountry = c?.getLocalizedName(languageCode) ??
+          CountryLocalization.getCountryName(city.countryCode, languageCode) ??
+          city.countryCode;
+      final flag = c?.flag ?? '✈️';
+      final cityKey = '${city.countryCode}_${locCity.toLowerCase()}';
+      if (seenCityKeys.contains(cityKey)) continue;
+      seenCityKeys.add(cityKey);
+
+      final isPrefix = locCity.toLowerCase().startsWith(q) ||
+          city.id.toLowerCase().startsWith(q) ||
+          city.allSearchTerms.any((t) => t.startsWith(q));
+
+      final result = LocationSearchResult(
+        title: locCity,
+        subtitle: '$locCountry (${city.countryCode})',
+        formattedStop: '$flag $locCity, $locCountry',
+        country: c ??
+            Country(
+              code: city.countryCode,
+              name: locCountry,
+              localName: locCountry,
+              flag: flag,
+              defaultCurrency: 'USD',
+            ),
+        isCity: true,
+        cityName: locCity,
+      );
+
+      if (isPrefix) {
+        prefixCities.add(result);
+      } else {
+        containsCities.add(result);
+      }
+    }
+
+    // 2. Search in countries and legacy destinations
     for (final c in allCountries) {
       final locName = c.getLocalizedName(languageCode);
       final locLower = locName.toLowerCase();
@@ -1649,29 +1711,36 @@ class Country {
         ));
       }
 
-      for (final city in c.popularDestinations) {
-        final cityLower = city.toLowerCase();
-        final isCityPrefix = cityLower.startsWith(q);
-        final isCityContains = !isCityPrefix && cityLower.contains(q);
+      // Check legacy popular destinations if not already found in CityLocalization
+      for (final rawCity in c.popularDestinations) {
+        final resolvedCity = CityLocalization.findCityExact(rawCity);
+        final city = resolvedCity != null
+            ? resolvedCity.getLocalizedName(languageCode)
+            : rawCity;
+        final cityKey = '${c.code}_${city.toLowerCase()}';
+        if (seenCityKeys.contains(cityKey)) continue;
 
-        if (isCityPrefix) {
-          prefixCities.add(LocationSearchResult(
+        final cityLower = city.toLowerCase();
+        final rawLower = rawCity.toLowerCase();
+        final isCityPrefix = cityLower.startsWith(q) || rawLower.startsWith(q);
+        final isCityContains = !isCityPrefix &&
+            (cityLower.contains(q) || rawLower.contains(q));
+
+        if (isCityPrefix || isCityContains) {
+          seenCityKeys.add(cityKey);
+          final res = LocationSearchResult(
             title: city,
             subtitle: '$locName (${c.code})',
             formattedStop: '${c.flag} $city, $locName',
             country: c,
             isCity: true,
             cityName: city,
-          ));
-        } else if (isCityContains) {
-          containsCities.add(LocationSearchResult(
-            title: city,
-            subtitle: '$locName (${c.code})',
-            formattedStop: '${c.flag} $city, $locName',
-            country: c,
-            isCity: true,
-            cityName: city,
-          ));
+          );
+          if (isCityPrefix) {
+            prefixCities.add(res);
+          } else {
+            containsCities.add(res);
+          }
         }
       }
     }
@@ -1699,7 +1768,8 @@ class Country {
       if (locName.toLowerCase() == q ||
           c.name.toLowerCase() == q ||
           c.localName.toLowerCase() == q ||
-          c.code.toLowerCase() == q) {
+          c.code.toLowerCase() == q ||
+          c.matchesSearch(q)) {
         return LocationSearchResult(
           title: locName,
           subtitle: '${c.code} • ${c.defaultCurrency}',
@@ -1710,18 +1780,48 @@ class Country {
       }
     }
 
-    // 2. Exact match on popular city
+    // 2. Exact match on 220+ multilingual cities
+    final resolvedCity = CityLocalization.findCityExact(q);
+    if (resolvedCity != null) {
+      final c = Country.findByCode(resolvedCity.countryCode);
+      final locCity = resolvedCity.getLocalizedName(languageCode);
+      final locCountry = c?.getLocalizedName(languageCode) ??
+          CountryLocalization.getCountryName(resolvedCity.countryCode, languageCode) ??
+          resolvedCity.countryCode;
+      final flag = c?.flag ?? '✈️';
+      return LocationSearchResult(
+        title: locCity,
+        subtitle: '$locCountry (${resolvedCity.countryCode})',
+        formattedStop: '$flag $locCity, $locCountry',
+        country: c ??
+            Country(
+              code: resolvedCity.countryCode,
+              name: locCountry,
+              localName: locCountry,
+              flag: flag,
+              defaultCurrency: 'USD',
+            ),
+        isCity: true,
+        cityName: locCity,
+      );
+    }
+
+    // 3. Fallback: match on legacy popular destination strings
     for (final c in allCountries) {
       final locName = c.getLocalizedName(languageCode);
       for (final city in c.popularDestinations) {
         if (city.toLowerCase() == q) {
+          final resolved = CityLocalization.findCityExact(city);
+          final locCity = resolved != null
+              ? resolved.getLocalizedName(languageCode)
+              : city;
           return LocationSearchResult(
-            title: city,
+            title: locCity,
             subtitle: '$locName (${c.code})',
-            formattedStop: '${c.flag} $city, $locName',
+            formattedStop: '${c.flag} $locCity, $locName',
             country: c,
             isCity: true,
-            cityName: city,
+            cityName: locCity,
           );
         }
       }

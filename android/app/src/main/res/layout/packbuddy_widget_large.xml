@@ -59,7 +59,7 @@
             android:maxLines="1"
             android:text="28 Countries Visited"
             android:textColor="#FFFFFF"
-            android:textSize="14.5sp"
+            android:textSize="15sp"
             android:textStyle="bold" />
 
         <TextView
@@ -74,14 +74,14 @@
             android:textSize="11sp" />
     </LinearLayout>
 
-    <!-- Center Hero: Painted World Map Image -->
+    <!-- 1. Center Hero: World Map Image (visible for world_map) -->
     <FrameLayout
         android:id="@+id/widget_map_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_marginTop="6dp"
-        android:background="@drawable/widget_map_bg"
+        android:background="@android:color/transparent"
         android:padding="0dp">
 
         <ImageView
@@ -91,6 +91,50 @@
             android:contentDescription="World Map"
             android:scaleType="fitCenter" />
     </FrameLayout>
+
+    <!-- 2. Center Hero: Quick Expense Cards & Action (visible for quick_expense) -->
+    <LinearLayout
+        android:id="@+id/widget_expense_hero"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="6dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <!-- Prominent Harcama Ekle Action Button -->
+        <LinearLayout
+            android:id="@+id/widget_large_add_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/widget_badge_bg"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
+
+            <TextView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:background="@drawable/widget_stat_bg"
+                android:gravity="center"
+                android:text="+"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_large_add_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Harcama Ekle"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
 
     <!-- Bottom Stat Badges -->
     <LinearLayout
@@ -165,4 +209,3 @@
     </LinearLayout>
 
 </LinearLayout>
-

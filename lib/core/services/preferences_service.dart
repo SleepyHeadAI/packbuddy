@@ -16,6 +16,12 @@ class PreferencesService {
   static const String keyWidgetShowCountdown = 'packbuddy_widget_show_countdown';
   static const String keyWidgetShowPacking = 'packbuddy_widget_show_packing';
   static const String keyWidgetShowBudget = 'packbuddy_widget_show_budget';
+  static const String keyWidgetShowContinents = 'packbuddy_widget_show_continents';
+  static const String keyWidgetShowWishlist = 'packbuddy_widget_show_wishlist';
+  static const String keyWidgetShowLiveRate = 'packbuddy_widget_show_live_rate';
+  static const String keyWidgetShowReverseRate = 'packbuddy_widget_show_reverse_rate';
+  static const String keyWidgetShowRemainingBudget = 'packbuddy_widget_show_remaining_budget';
+  static const String keyWidgetShowLastExpense = 'packbuddy_widget_show_last_expense';
   static const String keyWidgetMode = 'packbuddy_widget_mode';
   static const String keyWidgetTheme = 'packbuddy_widget_theme';
   static const String keyTravelMapIs3D = 'packbuddy_travel_map_is_3d';
@@ -423,11 +429,51 @@ class PreferencesService {
   bool isWidgetShowBudget() => _prefs?.getBool(keyWidgetShowBudget) ?? true;
   Future<void> setWidgetShowBudget(bool show) async => _prefs?.setBool(keyWidgetShowBudget, show);
 
-  String getWidgetMode() => _prefs?.getString(keyWidgetMode) ?? 'auto';
+  bool isWidgetShowContinents() => _prefs?.getBool(keyWidgetShowContinents) ?? true;
+  Future<void> setWidgetShowContinents(bool show) async => _prefs?.setBool(keyWidgetShowContinents, show);
+
+  bool isWidgetShowWishlist() => _prefs?.getBool(keyWidgetShowWishlist) ?? true;
+  Future<void> setWidgetShowWishlist(bool show) async => _prefs?.setBool(keyWidgetShowWishlist, show);
+
+  bool isWidgetShowLiveRate() => _prefs?.getBool(keyWidgetShowLiveRate) ?? true;
+  Future<void> setWidgetShowLiveRate(bool show) async => _prefs?.setBool(keyWidgetShowLiveRate, show);
+
+  bool isWidgetShowReverseRate() => _prefs?.getBool(keyWidgetShowReverseRate) ?? false;
+  Future<void> setWidgetShowReverseRate(bool show) async => _prefs?.setBool(keyWidgetShowReverseRate, show);
+
+  bool isWidgetShowRemainingBudget() => _prefs?.getBool(keyWidgetShowRemainingBudget) ?? true;
+  Future<void> setWidgetShowRemainingBudget(bool show) async => _prefs?.setBool(keyWidgetShowRemainingBudget, show);
+
+  bool isWidgetShowLastExpense() => _prefs?.getBool(keyWidgetShowLastExpense) ?? true;
+  Future<void> setWidgetShowLastExpense(bool show) async => _prefs?.setBool(keyWidgetShowLastExpense, show);
+
+  String getWidgetMode() => _prefs?.getString(keyWidgetMode) ?? 'trip';
   Future<void> setWidgetMode(String mode) async => _prefs?.setString(keyWidgetMode, mode);
 
   String getWidgetTheme() => _prefs?.getString(keyWidgetTheme) ?? 'midnight';
   Future<void> setWidgetTheme(String theme) async => _prefs?.setString(keyWidgetTheme, theme);
+
+  String getWidgetThemeForMode(String mode) {
+    final key = 'packbuddy_widget_theme_$mode';
+    final saved = _prefs?.getString(key);
+    if (saved != null && saved.isNotEmpty) return saved;
+    switch (mode) {
+      case 'world_map':
+        return 'midnight';
+      case 'quick_expense':
+        return 'matcha';
+      case 'currency_converter':
+        return 'oceanLight';
+      case 'trip':
+      default:
+        return getWidgetTheme();
+    }
+  }
+
+  Future<void> setWidgetThemeForMode(String mode, String theme) async {
+    await _prefs?.setString('packbuddy_widget_theme_$mode', theme);
+    await setWidgetTheme(theme);
+  }
 
   // --- Notifications Center Unread Tracking & History ---
   static const String keyLastReadNotificationsAt = 'notifications_last_read_timestamp';

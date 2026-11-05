@@ -252,8 +252,8 @@ class _EmailVerificationScreenState
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: isDark
-                              ? const [AppColors.primaryDark, Color(0xFF5E8BAE)]
-                              : const [AppColors.primaryLight, Color(0xFF1F3859)],
+                              ? const [AppColors.primaryDark, Color(0xFFD4A054)]
+                              : const [AppColors.primaryLight, Color(0xFF6E5203)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -418,8 +418,8 @@ class _EmailVerificationScreenState
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDark
-                ? const [AppColors.primaryDark, Color(0xFF1E3A5F)]
-                : const [AppColors.primaryLight, AppColors.passportNavy],
+                ? const [AppColors.primaryDark, Color(0xFF3E2D00)]
+                : const [AppColors.primaryLight, Color(0xFF6E5203)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),

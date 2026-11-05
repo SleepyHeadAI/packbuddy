@@ -1,5 +1,6 @@
 package com.sleepyhead.packbuddy
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.Display
@@ -20,6 +21,11 @@ class MainActivity : FlutterFragmentActivity() {
     override fun onResume() {
         super.onResume()
         enableHighRefreshRate()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
     }
 
     private fun enableHighRefreshRate() {

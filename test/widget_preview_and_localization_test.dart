@@ -301,6 +301,36 @@ void main() {
         await tester.pumpAndSettle();
       }
     });
+
+    test('PreferencesService isolates widget themes per mode independently', () async {
+      SharedPreferences.setMockInitialValues({});
+      await PreferencesService.init();
+      final prefs = PreferencesService.instance;
+
+      // 1. Initial Defaults per mode
+      expect(prefs.getWidgetThemeForMode('world_map'), 'midnight');
+      expect(prefs.getWidgetThemeForMode('quick_expense'), 'matcha');
+      expect(prefs.getWidgetThemeForMode('currency_converter'), 'oceanLight');
+
+      // 2. Change world_map theme to 'volcano'
+      await prefs.setWidgetThemeForMode('world_map', 'volcano');
+      expect(prefs.getWidgetThemeForMode('world_map'), 'volcano');
+      // quick_expense and currency_converter must remain untouched
+      expect(prefs.getWidgetThemeForMode('quick_expense'), 'matcha');
+      expect(prefs.getWidgetThemeForMode('currency_converter'), 'oceanLight');
+
+      // 3. Change quick_expense theme to 'cyberpunk'
+      await prefs.setWidgetThemeForMode('quick_expense', 'cyberpunk');
+      expect(prefs.getWidgetThemeForMode('world_map'), 'volcano');
+      expect(prefs.getWidgetThemeForMode('quick_expense'), 'cyberpunk');
+      expect(prefs.getWidgetThemeForMode('currency_converter'), 'oceanLight');
+
+      // 4. Change currency_converter theme to 'sunset'
+      await prefs.setWidgetThemeForMode('currency_converter', 'sunset');
+      expect(prefs.getWidgetThemeForMode('world_map'), 'volcano');
+      expect(prefs.getWidgetThemeForMode('quick_expense'), 'cyberpunk');
+      expect(prefs.getWidgetThemeForMode('currency_converter'), 'sunset');
+    });
   });
 }
 

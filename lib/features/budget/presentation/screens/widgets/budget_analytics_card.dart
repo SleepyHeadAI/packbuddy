@@ -79,17 +79,17 @@ class BudgetAnalyticsCard extends StatelessWidget {
   static Color getCategoryColor(String category) {
     final cat = category.toLowerCase();
     if (cat.contains('food') || cat.contains('yemek')) {
-      return const Color(0xFFF97316); // Amber Orange
+      return AppColors.primaryAmber; // Serene Sun Gold
     } else if (cat.contains('transport') || cat.contains('ulaşım')) {
-      return const Color(0xFF06B6D4); // Cyan
+      return AppColors.secondaryLight; // Serene Pine Teal
     } else if (cat.contains('accommodation') || cat.contains('konaklama') || cat.contains('otel')) {
-      return const Color(0xFF6366F1); // Indigo
+      return AppColors.tertiaryLight; // Serene Slate Blue
     } else if (cat.contains('entertainment') || cat.contains('eğlence') || cat.contains('aktivite')) {
-      return const Color(0xFFA855F7); // Purple
+      return AppColors.actionGold; // Serene Deep Ochre
     } else if (cat.contains('shopping') || cat.contains('alışveriş')) {
-      return const Color(0xFFEC4899); // Pink
+      return const Color(0xFF14B8A6); // Serene Radiant Teal
     } else {
-      return const Color(0xFF64748B); // Slate
+      return const Color(0xFF94A3B8); // Serene Soft Slate
     }
   }
 
@@ -212,9 +212,7 @@ class BudgetAnalyticsCard extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: isDark
-              ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
-              : theme.colorScheme.surface,
+          color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
           borderRadius: BorderRadius.circular(22),
           border: Border.all(
             color: isDark ? AppColors.outlineDark : AppColors.outlineLight,

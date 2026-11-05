@@ -8,6 +8,7 @@ import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
 import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
+import 'package:packbuddy/features/budget/domain/city_localization.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/expense_controller.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
@@ -33,13 +34,13 @@ class TripDetailScreen extends ConsumerWidget {
   Color _getCategoryColor(String category) {
     switch (category) {
       case 'Food':
-        return AppColors.tertiaryLight;
+        return AppColors.primaryAmber;
       case 'Transport':
         return AppColors.secondaryLight;
       case 'Accommodation':
-        return AppColors.primaryLight;
+        return AppColors.tertiaryLight;
       case 'Entertainment':
-        return AppColors.warningPastel;
+        return AppColors.actionGold;
       default:
         return AppColors.secondaryDark;
     }
@@ -566,19 +567,14 @@ class TripDetailScreen extends ConsumerWidget {
     ThemeData theme,
     BuildContext context,
   ) {
+    final isDark = theme.brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
-            theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-          ],
-        ),
+        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: theme.colorScheme.primary.withValues(alpha: 0.2),
+          color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+          width: 1,
         ),
       ),
       padding: const EdgeInsets.all(16),
@@ -597,7 +593,10 @@ class TripDetailScreen extends ConsumerWidget {
               ],
               Expanded(
                 child: Text(
-                  currentTrip.destination,
+                  CityLocalization.localizeDestination(
+                    currentTrip.destination,
+                    Localizations.localeOf(context).languageCode,
+                  ),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: theme.colorScheme.onSurface,
@@ -966,7 +965,12 @@ class TripDetailScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 1),
                           Text(
-                            guideSub.isNotEmpty ? guideSub : currentTrip.destination,
+                            guideSub.isNotEmpty
+                                ? guideSub
+                                : CityLocalization.localizeDestination(
+                                    currentTrip.destination,
+                                    Localizations.localeOf(context).languageCode,
+                                  ),
                             style: TextStyle(
                               color: theme.colorScheme.onSurfaceVariant,
                               fontSize: 10.5,

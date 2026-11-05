@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/features/checklist/domain/packing_item.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
@@ -169,7 +170,13 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                       widget.tripTitle != null
                           ? '${widget.tripTitle} - ${l10n.luggageAndChecklist}'
                           : l10n.baggageAndChecklist,
-                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 17),
+                      style: theme.appBarTheme.titleTextStyle ??
+                          AppTheme.headlineFont(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.3,
+                            color: theme.colorScheme.onSurface,
+                          ),
                     ),
                   ),
                 ),
@@ -298,215 +305,299 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: isDark
-                            ? [
-                                theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.8),
-                                theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-                              ]
-                            : [
-                                AppColors.surfaceLight,
-                                theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-                              ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: statusColor.withValues(alpha: isDark ? 0.4 : 0.25),
-                        width: 1.5,
+                        color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+                        width: 1,
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: statusColor.withValues(alpha: 0.08),
-                          blurRadius: 16,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Header Row: Baggage status icon, title, and Dynamic Badge
-                        Row(
+                    child: Builder(
+                      builder: (context) {
+                        final langCode = Localizations.localeOf(context).languageCode;
+                        final isTr = langCode.toLowerCase().startsWith('tr');
+
+                        final cardTitle = widget.tripTitle != null
+                            ? (isTr ? '${widget.tripTitle} Bavulu' : '${widget.tripTitle} Luggage')
+                            : (isTr ? 'Hazırlık Durumu' : 'Packing Status');
+
+                        String airlineTitle;
+                        String airlineSubtitle;
+
+                        if (checklistState.baggageAllowanceMode == BaggageAllowanceMode.none) {
+                          airlineTitle = isTr ? 'Bagaj Limiti: Belirlenmedi' : 'Baggage Limit: None';
+                          airlineSubtitle = isTr ? 'Limitsiz veya sadece kişisel çanta' : 'No limit / personal item only';
+                        } else if (checklistState.selectedAirline != null) {
+                          final air = checklistState.selectedAirline!;
+                          if (checklistState.baggageAllowanceMode == BaggageAllowanceMode.cabinOnly) {
+                            airlineTitle = '${air.airlineName} (Kabin)';
+                            airlineSubtitle = '${air.countryFlag} Sadece Kabin: ${air.cabinLimitKg.toInt()} kg (${air.cabinDimensions})';
+                          } else if (checklistState.baggageAllowanceMode == BaggageAllowanceMode.checkedOnly) {
+                            airlineTitle = '${air.airlineName} (Uçak Altı)';
+                            airlineSubtitle = '${air.countryFlag} Sadece Uçak Altı: ${air.checkedLimitKg.toInt()} kg';
+                          } else {
+                            airlineTitle = air.airlineName;
+                            airlineSubtitle = '${air.countryFlag} Kabin ${air.cabinLimitKg.toInt()} kg • Kargo ${air.checkedLimitKg.toInt()} kg';
+                          }
+                        } else {
+                          if (checklistState.baggageAllowanceMode == BaggageAllowanceMode.cabinOnly) {
+                            airlineTitle = isTr ? 'Standart Kabin Limiti' : 'Standard Cabin Limit';
+                            airlineSubtitle = '✈️ Kabin: 8 kg (55x40x20 cm)';
+                          } else if (checklistState.baggageAllowanceMode == BaggageAllowanceMode.checkedOnly) {
+                            airlineTitle = isTr ? 'Standart Uçak Altı Limiti' : 'Standard Checked Limit';
+                            airlineSubtitle = '✈️ Kargo: 20-23 kg';
+                          } else {
+                            airlineTitle = isTr ? 'Standart Havayolu Limiti' : l10n.airlineBaggageLimits;
+                            airlineSubtitle = l10n.standardBaggageLimitNote;
+                          }
+                        }
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: statusColor.withValues(alpha: 0.15),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(Icons.luggage_rounded, color: statusColor, size: 20),
+                            // Header Row: Baggage status icon, title, and Dynamic Badge
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: statusColor.withValues(alpha: 0.15),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(Icons.luggage_rounded, color: statusColor, size: 20),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        cardTitle,
+                                        style: theme.textTheme.titleSmall?.copyWith(
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: -0.2,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        checklistState.totalCount == 0
+                                            ? l10n.noItemsYet
+                                            : '${checklistState.packedCount}/${checklistState.totalCount} ${l10n.itemsReady} • %${(completionRatio * 100).toInt()}',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: theme.colorScheme.onSurfaceVariant,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                // Status badge
+                                Flexible(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: statusColor.withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: statusColor.withValues(alpha: 0.4), width: 1),
+                                    ),
+                                    child: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        checklistState.totalCount == 0
+                                            ? l10n.listEmpty.toUpperCase()
+                                            : (completionRatio >= 1.0
+                                                ? l10n.completed.toUpperCase()
+                                                : l10n.preparing.toUpperCase()),
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          color: statusColor,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: 0.2,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 10),
-                            Expanded(
+                            const SizedBox(height: 14),
+
+                            // Real-time animated progress bar with visible neutral track
+                            Stack(
+                              children: [
+                                Container(
+                                  height: 10,
+                                  decoration: BoxDecoration(
+                                    color: isDark ? const Color(0xFF232D3B) : const Color(0xFFE2E6EC),
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ),
+                                LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    return AnimatedContainer(
+                                      duration: const Duration(milliseconds: 350),
+                                      curve: Curves.easeOutCubic,
+                                      width: constraints.maxWidth * progressRatio,
+                                      height: 10,
+                                      decoration: BoxDecoration(
+                                        color: statusColor,
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 14),
+
+                            // Full-width Airline Baggage Limits & Quick Actions Banner
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? AppColors.surfaceVariantDark
+                                    : const Color(0xFFF8FAFC),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+                                  width: 1,
+                                ),
+                              ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    l10n.luggagePreparationGuide,
-                                    style: theme.textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: -0.2,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(7),
+                                        decoration: BoxDecoration(
+                                          color: isDark
+                                              ? AppColors.primaryContainerDark
+                                              : AppColors.primaryContainerLight.withValues(alpha: 0.6),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.flight_takeoff_rounded,
+                                          size: 15,
+                                          color: isDark ? AppColors.primaryAmber : AppColors.primaryLight,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              airlineTitle,
+                                              style: theme.textTheme.bodyMedium?.copyWith(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w700,
+                                                letterSpacing: -0.1,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            const SizedBox(height: 1),
+                                            Text(
+                                              airlineSubtitle,
+                                              style: TextStyle(
+                                                fontSize: 10.5,
+                                                fontWeight: FontWeight.w500,
+                                                color: theme.colorScheme.onSurfaceVariant,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Text(
-                                    checklistState.totalCount == 0
-                                        ? l10n.noItemsYet
-                                        : '${checklistState.packedCount}/${checklistState.totalCount} ${l10n.itemsReady} (%${(completionRatio * 100).toInt()})',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: theme.colorScheme.onSurfaceVariant,
-                                      fontWeight: FontWeight.w500,
+                                  const SizedBox(height: 8),
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Wrap(
+                                      alignment: WrapAlignment.end,
+                                      spacing: 8,
+                                      runSpacing: 6,
+                                      children: [
+                                        InkWell(
+                                          onTap: () => AirlineGuideSheet.show(context),
+                                          borderRadius: BorderRadius.circular(8),
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                            decoration: BoxDecoration(
+                                              color: isDark
+                                                  ? AppColors.primaryContainerDark
+                                                  : AppColors.primaryContainerLight.withValues(alpha: 0.45),
+                                              borderRadius: BorderRadius.circular(8),
+                                              border: Border.all(
+                                                color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+                                                width: 0.8,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              _getSetActionLabel(langCode),
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w700,
+                                                color: isDark ? AppColors.primaryAmber : AppColors.primaryLight,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        InkWell(
+                                          onTap: () => SmartTemplatesSheet.show(context, tripId: widget.tripId),
+                                          borderRadius: BorderRadius.circular(8),
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                            decoration: BoxDecoration(
+                                              color: isDark
+                                                  ? AppColors.secondaryContainerDark
+                                                  : AppColors.secondaryContainerLight,
+                                              borderRadius: BorderRadius.circular(8),
+                                              border: Border.all(
+                                                color: AppColors.secondaryLight,
+                                                width: 0.8,
+                                              ),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(
+                                                  Icons.auto_awesome_rounded,
+                                                  size: 11,
+                                                  color: AppColors.secondaryLight,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  _getTemplatesActionLabel(langCode),
+                                                  style: const TextStyle(
+                                                    fontSize: 11,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: AppColors.secondaryLight,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            // Status badge
-                            Flexible(
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: statusColor.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: statusColor.withValues(alpha: 0.4), width: 1),
-                                ),
-                                child: Text(
-                                  checklistState.totalCount == 0
-                                      ? l10n.listEmpty.toUpperCase()
-                                      : (completionRatio >= 1.0
-                                          ? l10n.completed.toUpperCase()
-                                          : l10n.preparing.toUpperCase()),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    color: statusColor,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 0.2,
-                                  ),
-                                ),
-                              ),
-                            ),
                           ],
-                        ),
-                        const SizedBox(height: 14),
-
-                        // Real-time animated progress bar with dynamic threshold colors
-                        Stack(
-                          children: [
-                            Container(
-                              height: 10,
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                            LayoutBuilder(
-                              builder: (context, constraints) {
-                                return AnimatedContainer(
-                                  duration: const Duration(milliseconds: 350),
-                                  curve: Curves.easeOutCubic,
-                                  width: constraints.maxWidth * progressRatio,
-                                  height: 10,
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        statusColor.withValues(alpha: 0.8),
-                                        statusColor,
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(5),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: statusColor.withValues(alpha: 0.4),
-                                        blurRadius: 6,
-                                        offset: const Offset(0, 1),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 14),
-
-                        // Quick Actions: Airline Guide & Smart Templates (Horizontally scrollable for safety)
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          physics: const BouncingScrollPhysics(),
-                          child: Row(
-                            children: [
-                              InkWell(
-                                onTap: () => AirlineGuideSheet.show(context),
-                                borderRadius: BorderRadius.circular(10),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                  decoration: BoxDecoration(
-                                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: theme.colorScheme.primary.withValues(alpha: 0.25),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.flight_takeoff_rounded, size: 13, color: theme.colorScheme.primary),
-                                      const SizedBox(width: 5),
-                                      Text(
-                                        l10n.airlineBaggageLimits,
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w700,
-                                          color: theme.colorScheme.primary,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              InkWell(
-                                onTap: () => SmartTemplatesSheet.show(context, tripId: widget.tripId),
-                                borderRadius: BorderRadius.circular(10),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                  decoration: BoxDecoration(
-                                    color: theme.colorScheme.secondary.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: theme.colorScheme.secondary.withValues(alpha: 0.25),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.auto_awesome_rounded, size: 13, color: theme.colorScheme.secondary),
-                                      const SizedBox(width: 5),
-                                      Text(
-                                        l10n.readyTemplates,
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w700,
-                                          color: theme.colorScheme.secondary,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -522,26 +613,27 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            const Color(0xFF3B82F6).withValues(alpha: 0.12),
-                            const Color(0xFF8B5CF6).withValues(alpha: 0.08),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(12),
+                        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+                        borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: const Color(0xFF3B82F6).withValues(alpha: 0.25),
+                          color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+                          width: 1,
                         ),
                       ),
                       child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const Icon(Icons.tips_and_updates_rounded, color: Color(0xFF3B82F6), size: 16),
+                          Icon(
+                            Icons.tips_and_updates_rounded,
+                            color: isDark ? AppColors.primaryAmber : AppColors.primaryLight,
+                            size: 16,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               l10n.packingTip,
                               style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
-                              maxLines: 1,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -732,5 +824,31 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
         ),
       ),
     );
+  }
+
+  static String _getSetActionLabel(String lang) {
+    if (lang == 'tr') return 'Ayarla';
+    if (lang == 'de') return 'Einstellen';
+    if (lang == 'fr') return 'Régler';
+    if (lang == 'es') return 'Ajustar';
+    if (lang == 'it') return 'Imposta';
+    if (lang == 'ru') return 'Настроить';
+    if (lang == 'ar') return 'ضبط';
+    if (lang == 'pt') return 'Ajustar';
+    if (lang == 'nl') return 'Instellen';
+    return 'Set';
+  }
+
+  static String _getTemplatesActionLabel(String lang) {
+    if (lang == 'tr') return 'Şablon';
+    if (lang == 'de') return 'Vorlagen';
+    if (lang == 'fr') return 'Modèles';
+    if (lang == 'es') return 'Plantillas';
+    if (lang == 'it') return 'Modelli';
+    if (lang == 'ru') return 'Шаблоны';
+    if (lang == 'ar') return 'قوالب';
+    if (lang == 'pt') return 'Modelos';
+    if (lang == 'nl') return 'Sjablonen';
+    return 'Templates';
   }
 }

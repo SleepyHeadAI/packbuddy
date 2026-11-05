@@ -148,7 +148,7 @@ class StoryCardPalette {
           unvisitedLandColor: const Color(0xFF1E293B),
           mapBorderColor: const Color(0xFF0F172A),
           livedColor: const Color(0xFF10B981), // Vivid Emerald
-          visitedColor: const Color(0xFFF97316), // Neon Sunset Orange
+          visitedColor: const Color(0xFFE7B623), // Serene Voyage Sun Gold
           wishlistColor: const Color(0xFFF43F5E), // Rose Coral
           textColor: Colors.white,
           subtextColor: const Color(0xFF94A3B8),
@@ -157,21 +157,21 @@ class StoryCardPalette {
           tileBorder: Colors.white.withValues(alpha: 0.10),
           heroGradient: LinearGradient(
             colors: [
-              const Color(0xFFF97316).withValues(alpha: 0.22),
-              const Color(0xFF0284C7).withValues(alpha: 0.12),
+              const Color(0xFFE7B623).withValues(alpha: 0.22),
+              const Color(0xFF0F766E).withValues(alpha: 0.12),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          heroBorder: const Color(0xFFF97316).withValues(alpha: 0.35),
+          heroBorder: const Color(0xFFE7B623).withValues(alpha: 0.35),
           logoGradient: const LinearGradient(
-            colors: [Color(0xFFEA580C), Color(0xFFF97316)],
+            colors: [Color(0xFFE7B623), Color(0xFF856404)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          accentColor: const Color(0xFFF97316),
+          accentColor: const Color(0xFFE7B623),
           isLight: false,
-          previewColors: const [Color(0xFF080D1A), Color(0xFFF97316), Color(0xFF10B981)],
+          previewColors: const [Color(0xFF080D1A), Color(0xFFE7B623), Color(0xFF10B981)],
         );
 
       case StoryCardTheme.sunset:
@@ -265,7 +265,7 @@ class StoryCardPalette {
           unvisitedLandColor: const Color(0xFFCBD5E1),
           mapBorderColor: const Color(0xFF94A3B8),
           livedColor: const Color(0xFF059669),
-          visitedColor: const Color(0xFFEA580C),
+          visitedColor: const Color(0xFFE7B623),
           wishlistColor: const Color(0xFFE11D48),
           textColor: const Color(0xFF0F172A),
           subtextColor: const Color(0xFF475569),
@@ -274,21 +274,21 @@ class StoryCardPalette {
           tileBorder: const Color(0xFFE2E8F0),
           heroGradient: LinearGradient(
             colors: [
-              const Color(0xFFEA580C).withValues(alpha: 0.12),
+              const Color(0xFFE7B623).withValues(alpha: 0.12),
               const Color(0xFF0284C7).withValues(alpha: 0.08),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          heroBorder: const Color(0xFFEA580C).withValues(alpha: 0.32),
+          heroBorder: const Color(0xFFE7B623).withValues(alpha: 0.32),
           logoGradient: const LinearGradient(
             colors: [Color(0xFF0F172A), Color(0xFF334155)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          accentColor: const Color(0xFFEA580C),
+          accentColor: const Color(0xFFE7B623),
           isLight: true,
-          previewColors: const [Color(0xFFFFFFFF), Color(0xFFEA580C), Color(0xFF0F172A)],
+          previewColors: const [Color(0xFFFFFFFF), Color(0xFFE7B623), Color(0xFF0F172A)],
         );
 
       case StoryCardTheme.sandLight:

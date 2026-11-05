@@ -285,10 +285,10 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
     final theme = Theme.of(context);
 
     final categories = [
-      {'key': 'Food', 'label': l10n.food, 'icon': Icons.restaurant_rounded, 'color': AppColors.tertiaryLight},
+      {'key': 'Food', 'label': l10n.food, 'icon': Icons.restaurant_rounded, 'color': AppColors.primaryAmber},
       {'key': 'Transport', 'label': l10n.transport, 'icon': Icons.directions_subway_rounded, 'color': AppColors.secondaryLight},
-      {'key': 'Accommodation', 'label': l10n.accommodation, 'icon': Icons.hotel_rounded, 'color': AppColors.primaryLight},
-      {'key': 'Entertainment', 'label': l10n.entertainment, 'icon': Icons.attractions_rounded, 'color': AppColors.warningPastel},
+      {'key': 'Accommodation', 'label': l10n.accommodation, 'icon': Icons.hotel_rounded, 'color': AppColors.tertiaryLight},
+      {'key': 'Entertainment', 'label': l10n.entertainment, 'icon': Icons.attractions_rounded, 'color': AppColors.actionGold},
       {'key': 'Other', 'label': l10n.other, 'icon': Icons.more_horiz_rounded, 'color': theme.colorScheme.outline},
     ];
 

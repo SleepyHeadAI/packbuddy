@@ -37,7 +37,7 @@
             android:maxLines="1"
             android:text="28 Countries Visited"
             android:textColor="#FFFFFF"
-            android:textSize="14sp"
+            android:textSize="15sp"
             android:textStyle="bold" />
 
         <TextView
@@ -58,6 +58,7 @@
             android:layout_weight="1" />
 
         <LinearLayout
+            android:id="@+id/widget_bottom_stats"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
@@ -88,8 +89,9 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Right Column: Badge & Map Thumbnail -->
+    <!-- Right Column: Badge & Thumbnails / Action Button -->
     <LinearLayout
+        android:id="@+id/widget_right_column"
         android:layout_width="120dp"
         android:layout_height="match_parent"
         android:layout_marginStart="10dp"
@@ -114,12 +116,13 @@
             android:layout_width="match_parent"
             android:layout_height="4dp" />
 
+        <!-- 1. World Map Image Container (visible for world_map) -->
         <FrameLayout
             android:id="@+id/widget_map_container"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="@drawable/widget_map_bg"
+            android:background="@android:color/transparent"
             android:padding="0dp">
 
             <ImageView
@@ -129,7 +132,78 @@
                 android:contentDescription="World Map"
                 android:scaleType="fitCenter" />
         </FrameLayout>
+
+        <!-- 2. Quick Expense Action Button (visible for quick_expense) -->
+        <LinearLayout
+            android:id="@+id/widget_action_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/widget_stat_bg"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="6dp">
+
+            <TextView
+                android:id="@+id/widget_action_icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/widget_badge_bg"
+                android:gravity="center"
+                android:text="+"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_action_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Harcama Ekle"
+                android:textColor="#FFFFFF"
+                android:textSize="10.5sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- 3. Currency Container (visible for currency_converter) -->
+        <LinearLayout
+            android:id="@+id/widget_currency_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/widget_stat_bg"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="6dp">
+
+            <TextView
+                android:id="@+id/widget_currency_icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/widget_badge_bg"
+                android:gravity="center"
+                android:text="⇄"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_currency_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Döviz"
+                android:textColor="#FFFFFF"
+                android:textSize="10.5sp"
+                android:textStyle="bold" />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>
-

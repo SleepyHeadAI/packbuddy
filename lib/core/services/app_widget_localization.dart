@@ -192,6 +192,281 @@ class AppWidgetLocalization {
     }
   }
 
+  /// Resolves "💱 Currency Converter" mode chip label
+  static String getCurrencyConverterModeLabel(String lang) {
+    switch (lang) {
+      case 'tr':
+        return '💱 Döviz Çevirici';
+      case 'es':
+        return '💱 Conversor de Divisas';
+      case 'fr':
+        return '💱 Convertisseur de Devises';
+      case 'de':
+        return '💱 Währungsrechner';
+      case 'it':
+        return '💱 Convertitore di Valuta';
+      case 'pt':
+        return '💱 Conversor de Moedas';
+      case 'ru':
+        return '💱 Конвертер валют';
+      case 'zh':
+        return '💱 汇率换算器';
+      case 'ja':
+        return '💱 為替レート計算機';
+      case 'ko':
+        return '💱 환율 계산기';
+      case 'hi':
+        return '💱 मुद्रा परिवर्तक';
+      case 'ar':
+        return '💱 محول العملات';
+      case 'nl':
+        return '💱 Valutaconverter';
+      case 'el':
+        return '💱 Μετατροπέας Νομισμάτων';
+      case 'sv':
+        return '💱 Valutaomvandlare';
+      case 'pl':
+        return '💱 Przelicznik Walut';
+      case 'id':
+        return '💱 Konverter Mata Uang';
+      case 'th':
+        return '💱 แปลงสกุลเงิน';
+      case 'vi':
+        return '💱 Chuyển đổi tiền tệ';
+      default:
+        return '💱 Currency Converter';
+    }
+  }
+
+  /// Resolves "💰 Quick Expense" mode chip label
+  static String getQuickExpenseModeLabel(String lang) {
+    switch (lang) {
+      case 'tr':
+        return '💰 Hızlı Harcama';
+      case 'es':
+        return '💰 Gasto Rápido';
+      case 'fr':
+        return '💰 Dépense Rapide';
+      case 'de':
+        return '💰 Schnellausgabe';
+      case 'it':
+        return '💰 Spesa Rapida';
+      case 'pt':
+        return '💰 Despesa Rápida';
+      case 'ru':
+        return '💰 Быстрый расход';
+      case 'zh':
+        return '💰 快捷记账';
+      case 'ja':
+        return '💰 クイック支出';
+      case 'ko':
+        return '💰 빠른 지출 기록';
+      case 'hi':
+        return '💰 त्वरित व्यय';
+      case 'ar':
+        return '💰 تسجيل مصروف';
+      case 'nl':
+        return '💰 Snelle Uitgave';
+      case 'el':
+        return '💰 Γρήγορο Έξοδο';
+      case 'sv':
+        return '💰 Snabbutgift';
+      case 'pl':
+        return '💰 Szybki Wydatek';
+      case 'id':
+        return '💰 Pengeluaran Cepat';
+      case 'th':
+        return '💰 บันทึกค่าใช้จ่ายด่วน';
+      case 'vi':
+        return '💰 Thêm chi tiêu nhanh';
+      default:
+        return '💰 Quick Expense';
+    }
+  }
+
+  /// App name badge header for Currency Converter
+  static String getCurrencyHeader(String lang) {
+    switch (lang) {
+      case 'tr':
+        return 'PackBuddy • Kur';
+      case 'es':
+        return 'PackBuddy • Divisas';
+      case 'fr':
+        return 'PackBuddy • Devises';
+      case 'de':
+        return 'PackBuddy • Kurse';
+      case 'it':
+        return 'PackBuddy • Valute';
+      case 'pt':
+        return 'PackBuddy • Câmbio';
+      case 'ru':
+        return 'PackBuddy • Валюты';
+      case 'zh':
+        return 'PackBuddy • 汇率';
+      case 'ja':
+        return 'PackBuddy • 為替';
+      case 'ko':
+        return 'PackBuddy • 환율';
+      case 'hi':
+        return 'PackBuddy • मुद्रा';
+      case 'ar':
+        return 'PackBuddy • العملات';
+      case 'nl':
+        return 'PackBuddy • Valuta';
+      case 'el':
+        return 'PackBuddy • Συνάλλαγμα';
+      case 'sv':
+        return 'PackBuddy • Valutor';
+      case 'pl':
+        return 'PackBuddy • Waluty';
+      case 'id':
+        return 'PackBuddy • Kurs';
+      case 'th':
+        return 'PackBuddy • อัตราแลกเปลี่ยน';
+      case 'vi':
+        return 'PackBuddy • Tỷ giá';
+      default:
+        return 'PackBuddy • Rates';
+    }
+  }
+
+  /// App name badge header for Quick Expense
+  static String getExpenseHeader(String lang) {
+    switch (lang) {
+      case 'tr':
+        return 'PackBuddy • Bütçe';
+      case 'es':
+        return 'PackBuddy • Presupuesto';
+      case 'fr':
+        return 'PackBuddy • Budget';
+      case 'de':
+        return 'PackBuddy • Budget';
+      case 'it':
+        return 'PackBuddy • Budget';
+      case 'pt':
+        return 'PackBuddy • Orçamento';
+      case 'ru':
+        return 'PackBuddy • Бюджет';
+      case 'zh':
+        return 'PackBuddy • 预算';
+      case 'ja':
+        return 'PackBuddy • 予算';
+      case 'ko':
+        return 'PackBuddy • 예산';
+      case 'hi':
+        return 'PackBuddy • बजट';
+      case 'ar':
+        return 'PackBuddy • الميزانية';
+      case 'nl':
+        return 'PackBuddy • Budget';
+      case 'el':
+        return 'PackBuddy • Προϋπολογισμός';
+      case 'sv':
+        return 'PackBuddy • Budget';
+      case 'pl':
+        return 'PackBuddy • Budżet';
+      case 'id':
+        return 'PackBuddy • Anggaran';
+      case 'th':
+        return 'PackBuddy • งบประมาณ';
+      case 'vi':
+        return 'PackBuddy • Ngân sách';
+      default:
+        return 'PackBuddy • Budget';
+    }
+  }
+
+  /// Labels for custom mini option switches
+  static String getShowContinentsLabel(String lang) {
+    switch (lang) {
+      case 'tr':
+        return 'Kıta İstatistiklerini Göster';
+      case 'es':
+        return 'Mostrar estadísticas de continentes';
+      case 'fr':
+        return 'Afficher les statistiques de continents';
+      case 'de':
+        return 'Kontinent-Statistiken anzeigen';
+      default:
+        return 'Show Continent Stats';
+    }
+  }
+
+  static String getShowWishlistLabel(String lang) {
+    switch (lang) {
+      case 'tr':
+        return 'Hedef Ülkeleri Göster';
+      case 'es':
+        return 'Mostrar países deseados';
+      case 'fr':
+        return 'Afficher la liste des souhaits';
+      case 'de':
+        return 'Wunschländer anzeigen';
+      default:
+        return 'Show Wishlist Countries';
+    }
+  }
+
+  static String getShowLiveRateLabel(String lang) {
+    switch (lang) {
+      case 'tr':
+        return 'Canlı / Çevrimdışı Kur Göstergesi';
+      case 'es':
+        return 'Mostrar indicador en vivo / sin conexión';
+      case 'fr':
+        return 'Afficher l\'indicateur direct / hors-ligne';
+      case 'de':
+        return 'Live / Offline-Indikator anzeigen';
+      default:
+        return 'Show Live / Offline Indicator';
+    }
+  }
+
+  static String getShowReverseRateLabel(String lang) {
+    switch (lang) {
+      case 'tr':
+        return 'Ters Çevrim Kurunu Göster';
+      case 'es':
+        return 'Mostrar tasa de cambio inversa';
+      case 'fr':
+        return 'Afficher le taux de change inverse';
+      case 'de':
+        return 'Inversen Wechselkurs anzeigen';
+      default:
+        return 'Show Inverse Conversion Rate';
+    }
+  }
+
+  static String getShowRemainingBudgetLabel(String lang) {
+    switch (lang) {
+      case 'tr':
+        return 'Kalan Bütçeyi Göster';
+      case 'es':
+        return 'Mostrar presupuesto restante';
+      case 'fr':
+        return 'Afficher le budget restant';
+      case 'de':
+        return 'Verbleibendes Budget anzeigen';
+      default:
+        return 'Show Remaining Budget';
+    }
+  }
+
+  static String getShowLastExpenseLabel(String lang) {
+    switch (lang) {
+      case 'tr':
+        return 'Son Harcama Detayını Göster';
+      case 'es':
+        return 'Mostrar último gasto';
+      case 'fr':
+        return 'Afficher la dernière dépense';
+      case 'de':
+        return 'Letzte Ausgabe anzeigen';
+      default:
+        return 'Show Last Expense Summary';
+    }
+  }
+
   /// App name badge header for World Map
   static String getWorldHeader(String lang) {
     switch (lang) {

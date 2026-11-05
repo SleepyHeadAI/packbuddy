@@ -47,7 +47,7 @@ class WidgetThemeConfig {
     required this.badgeBgColor,
     required this.statBgColor,
     this.livedColor = const Color(0xFF10B981),
-    this.visitedColor = const Color(0xFFEA580C),
+    this.visitedColor = const Color(0xFFE7B623),
     this.wishlistColor = const Color(0xFFEF4444),
     this.emoji = '🌌',
     this.isLight = false,
@@ -257,16 +257,16 @@ class WidgetThemeConfig {
           unvisitedLandColor: Color(0xFFCBD5E1),
           countryBorderColor: Color(0xFF94A3B8),
           mapBorderColor: Color(0xFFCBD5E1),
-          accentColor: Color(0xFFEA580C),
+          accentColor: Color(0xFF856404),
           legendBgColor: Color(0xEEFFFFFF),
           legendBorderColor: Color(0x40CBD5E1),
           legendTextColor: Color(0xFF0F172A),
           titleTextColor: Color(0xFF0F172A),
           subtitleTextColor: Color(0xFF475569),
-          badgeBgColor: Color(0xFFEA580C),
+          badgeBgColor: Color(0xFF856404),
           statBgColor: Color(0xFFF1F5F9),
           livedColor: Color(0xFF059669),
-          visitedColor: Color(0xFFEA580C),
+          visitedColor: Color(0xFFE7B623),
           wishlistColor: Color(0xFFE11D48),
           emoji: '❄️',
           isLight: true,
@@ -427,7 +427,7 @@ class WidgetThemeConfig {
           unvisitedLandColor: Color(0xFF1E293B),
           countryBorderColor: Color(0xFF1E293B),
           mapBorderColor: Color(0xFF1F2937),
-          accentColor: Color(0xFFF97316),
+          accentColor: Color(0xFFE7B623),
           legendBgColor: Color(0xDD111827),
           legendBorderColor: Color(0x4038BDF8),
           legendTextColor: Colors.white,
@@ -436,7 +436,7 @@ class WidgetThemeConfig {
           badgeBgColor: Color(0xFF2563EB),
           statBgColor: Color(0xFF1F2937),
           livedColor: Color(0xFF10B981),
-          visitedColor: Color(0xFFF97316),
+          visitedColor: Color(0xFFE7B623),
           wishlistColor: Color(0xFFF43F5E),
           emoji: '🌌',
           isLight: false,
@@ -485,7 +485,7 @@ class WidgetMapRenderer {
         }
       }
 
-      final lang = PreferencesService.instance.getLocale()?.languageCode ?? 'en';
+      final lang = PreferencesService.instance.getLocale()?.languageCode ?? 'tr';
       final livedCount = countries.where((c) => c.isLived).length;
       final visitedCount = countries.where((c) => c.isVisited || c.isLived).length;
       final wishlistCount = countries.where((c) => c.isWishlist).length;
@@ -497,10 +497,11 @@ class WidgetMapRenderer {
               .toSet()
               .length;
 
-      // 1. Large Map with Centered Projection and Legend (360x220 dp)
+      // 1. Large Map with Centered Projection without embedded Legend (360x220 dp)
+      // Native AppWidget views render the localized badges and stats dynamically.
       final largeWidget = _buildMapCanvas(
         colorMap: colorMap,
-        showLegend: true,
+        showLegend: false,
         lang: lang,
         themeKey: currentTheme,
         livedCount: livedCount,

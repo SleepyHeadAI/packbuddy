@@ -7,6 +7,7 @@ import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
+import 'package:packbuddy/features/budget/domain/city_localization.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/expense_controller.dart';
@@ -474,6 +475,7 @@ class _ModernTripCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
     final country = Country.findByCode(trip.countryCode);
     final transportIcon = TripsScreen.getTransportIcon(trip.transportMode);
@@ -489,8 +491,13 @@ class _ModernTripCard extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.fromLTRB(16, 12, 12, 10),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+              border: Border(
+                bottom: BorderSide(
+                  color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+                  width: 1,
+                ),
+              ),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             ),
             child: Row(
               children: [
@@ -503,7 +510,10 @@ class _ModernTripCard extends ConsumerWidget {
                 ],
                 Expanded(
                   child: Text(
-                    trip.destination,
+                    CityLocalization.localizeDestination(
+                      trip.destination,
+                      Localizations.localeOf(context).languageCode,
+                    ),
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: theme.colorScheme.onSurface,
@@ -532,23 +542,15 @@ class _ModernTripCard extends ConsumerWidget {
                       width: 42,
                       height: 42,
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            theme.colorScheme.primaryContainer,
-                            theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
-                          ],
-                        ),
+                        color: isDark
+                            ? AppColors.primaryContainerDark
+                            : AppColors.primaryContainerLight,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                        ),
                       ),
                       child: Center(
                         child: Icon(
                           transportIcon,
-                          color: theme.colorScheme.primary,
+                          color: isDark ? AppColors.primaryAmber : AppColors.primaryLight,
                           size: 21,
                         ),
                       ),

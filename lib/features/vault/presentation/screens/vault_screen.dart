@@ -269,6 +269,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final vaultState = ref.watch(vaultControllerProvider);
     final tripState = ref.watch(tripControllerProvider);
     final dateFormat = DateFormat.yMMMd(Localizations.localeOf(context).languageCode);
@@ -422,17 +423,11 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                               constraints: const BoxConstraints(minHeight: 155),
                               padding: const EdgeInsets.all(14),
                               decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
-                                    theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
+                                color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
-                                  color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                                  color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+                                  width: 1,
                                 ),
                               ),
                               child: Column(
@@ -539,36 +534,36 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                 constraints: const BoxConstraints(minHeight: 155),
                                 padding: const EdgeInsets.all(14),
                                 decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: passportDoc != null
-                                      ? [
-                                          const Color(0xFF1E3A8A),
-                                          const Color(0xFF172554),
-                                        ]
-                                      : [
-                                          theme.colorScheme.secondaryContainer.withValues(alpha: 0.6),
-                                          theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-                                        ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
                                   color: passportDoc != null
-                                      ? const Color(0xFFF59E0B).withValues(alpha: 0.5)
-                                      : theme.colorScheme.outlineVariant,
-                                  width: 1.5,
+                                      ? null
+                                      : (isDark ? AppColors.surfaceDark : AppColors.surfaceLight),
+                                  gradient: passportDoc != null
+                                      ? const LinearGradient(
+                                          colors: [
+                                            Color(0xFF1E3A8A),
+                                            Color(0xFF172554),
+                                          ],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        )
+                                      : null,
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: passportDoc != null
+                                        ? const Color(0xFFF59E0B).withValues(alpha: 0.5)
+                                        : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
+                                    width: 1,
+                                  ),
+                                  boxShadow: passportDoc != null
+                                      ? [
+                                          BoxShadow(
+                                            color: const Color(0xFF1E3A8A).withValues(alpha: 0.25),
+                                            blurRadius: 10,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ]
+                                      : null,
                                 ),
-                                boxShadow: passportDoc != null
-                                    ? [
-                                        BoxShadow(
-                                          color: const Color(0xFF1E3A8A).withValues(alpha: 0.25),
-                                          blurRadius: 10,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ]
-                                    : null,
-                              ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

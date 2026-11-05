@@ -298,7 +298,7 @@ void main() {
 
       // Verify header, dynamic luggage guide, and item are present
       expect(find.text('Bavul & Kontrol Listesi'), findsWidgets);
-      expect(find.text('Bavul Hazırlığı & Bagaj Rehberi'), findsOneWidget);
+      expect(find.text('Hazırlık Durumu'), findsOneWidget);
       expect(find.text('Gürültü Engelleyici Kulaklık & Kılıfı'), findsOneWidget);
 
       // Verify top-right add button is removed while bottom-right FAB remains

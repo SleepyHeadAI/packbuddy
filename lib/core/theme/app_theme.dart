@@ -4,8 +4,17 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
-/// Sophisticated, executive Material 3 ThemeData powered by Google Fonts (Plus Jakarta Sans).
-/// Designed specifically for a premium, top-tier modern travel companion experience.
+/// Serene Voyage Material 3 ThemeData
+/// Implements the exact Serene Voyage Design System:
+/// - Typography Hierarchy:
+///     - Headline / Display: Outfit (Geometric, modern, bold)
+///     - Body / Interface: Plus Jakarta Sans (Clean, legible, balanced)
+///     - Label / Technical: JetBrains Mono (Precision badges, codes, dates, chips)
+/// - Serene Voyage Palette:
+///     - Primary: Warm Sun Gold (#E7B623 / #856404)
+///     - Secondary: Deep Pine Teal / Sea Emerald (#0F766E)
+///     - Tertiary: Slate Grey-Blue (#64748B)
+///     - Neutral: Soft Pearl Alabaster (#F3F5F7)
 class AppTheme {
   // Test environment detection to prevent network font loader exceptions during automated unit tests
   static bool get _isTesting {
@@ -16,8 +25,35 @@ class AppTheme {
     }
   }
 
-  /// Unified typography creator with seamless Google Fonts Plus Jakarta Sans in app and safe fallback in tests
-  static TextStyle _font({
+  /// Headline font (Outfit) for bold, modern geometric headers, titles and displays
+  static TextStyle headlineFont({
+    required double fontSize,
+    required FontWeight fontWeight,
+    double letterSpacing = 0.0,
+    double? height,
+    Color? color,
+  }) {
+    if (_isTesting) {
+      return TextStyle(
+        fontFamily: 'Outfit',
+        fontSize: fontSize,
+        fontWeight: fontWeight,
+        letterSpacing: letterSpacing,
+        height: height,
+        color: color,
+      );
+    }
+    return GoogleFonts.outfit(
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      letterSpacing: letterSpacing,
+      height: height,
+      color: color,
+    );
+  }
+
+  /// Body font (Plus Jakarta Sans) for clean, highly readable interface text and paragraphs
+  static TextStyle bodyFont({
     required double fontSize,
     required FontWeight fontWeight,
     double letterSpacing = 0.0,
@@ -43,117 +79,158 @@ class AppTheme {
     );
   }
 
-  /// Builds a complete Plus Jakarta Sans TextTheme with refined typographic hierarchy
-  /// Featuring bold, breathable headlines and highly readable, eye-friendly body copy.
+  /// Label & technical font (JetBrains Mono) for badges, codes, dates, numbers, and tags
+  static TextStyle labelFont({
+    required double fontSize,
+    required FontWeight fontWeight,
+    double letterSpacing = 0.0,
+    double? height,
+    Color? color,
+  }) {
+    if (_isTesting) {
+      return TextStyle(
+        fontFamily: 'JetBrains Mono',
+        fontSize: fontSize,
+        fontWeight: fontWeight,
+        letterSpacing: letterSpacing,
+        height: height,
+        color: color,
+      );
+    }
+    return GoogleFonts.jetBrainsMono(
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      letterSpacing: letterSpacing,
+      height: height,
+      color: color,
+    );
+  }
+
+  /// Alias for labelFont (monospace typography)
+  static TextStyle monoFont({
+    required double fontSize,
+    required FontWeight fontWeight,
+    double letterSpacing = 0.0,
+    double? height,
+    Color? color,
+  }) => labelFont(
+    fontSize: fontSize,
+    fontWeight: fontWeight,
+    letterSpacing: letterSpacing,
+    height: height,
+    color: color,
+  );
+
+  /// Builds the complete Serene Voyage TextTheme with refined typographic hierarchy:
+  /// - Headlines & Displays in Outfit
+  /// - Titles, Subtitles & Body in Plus Jakarta Sans
+  /// - Labels, Badges & Chips in JetBrains Mono
   static TextTheme _buildTextTheme(bool isDark) {
     final onSurface = isDark ? AppColors.onSurfaceDark : AppColors.onSurfaceLight;
     final onSurfaceVariant = isDark ? AppColors.onSurfaceVariantDark : AppColors.onSurfaceVariantLight;
     final textMuted = isDark ? AppColors.textMutedDark : AppColors.textMutedLight;
     final baseTextTheme = isDark ? ThemeData.dark().textTheme : ThemeData.light().textTheme;
-    final textTheme = _isTesting
-        ? baseTextTheme
-        : GoogleFonts.plusJakartaSansTextTheme(baseTextTheme);
 
-    return textTheme.copyWith(
-      displayLarge: _font(
+    return baseTextTheme.copyWith(
+      displayLarge: headlineFont(
         fontSize: 34,
         fontWeight: FontWeight.w800,
         letterSpacing: -1.0,
         height: 1.2,
         color: onSurface,
       ),
-      displayMedium: _font(
+      displayMedium: headlineFont(
         fontSize: 28,
         fontWeight: FontWeight.w700,
         letterSpacing: -0.8,
         height: 1.25,
         color: onSurface,
       ),
-      displaySmall: _font(
+      displaySmall: headlineFont(
         fontSize: 24,
         fontWeight: FontWeight.w700,
         letterSpacing: -0.6,
         height: 1.3,
         color: onSurface,
       ),
-      headlineLarge: _font(
+      headlineLarge: headlineFont(
         fontSize: 30,
         fontWeight: FontWeight.w800,
         letterSpacing: -0.8,
         height: 1.25,
         color: onSurface,
       ),
-      headlineMedium: _font(
-        fontSize: 26,
+      headlineMedium: headlineFont(
+        fontSize: 24,
         fontWeight: FontWeight.w700,
         letterSpacing: -0.6,
         height: 1.3,
         color: onSurface,
       ),
-      headlineSmall: _font(
-        fontSize: 22,
+      headlineSmall: headlineFont(
+        fontSize: 20,
         fontWeight: FontWeight.w700,
         letterSpacing: -0.4,
         height: 1.35,
         color: onSurface,
       ),
-      titleLarge: _font(
+      titleLarge: bodyFont(
         fontSize: 20,
         fontWeight: FontWeight.w700,
         letterSpacing: -0.3,
         height: 1.35,
         color: onSurface,
       ),
-      titleMedium: _font(
+      titleMedium: bodyFont(
         fontSize: 16,
         fontWeight: FontWeight.w600,
         letterSpacing: -0.2,
         height: 1.4,
         color: onSurface,
       ),
-      titleSmall: _font(
+      titleSmall: bodyFont(
         fontSize: 14,
         fontWeight: FontWeight.w600,
         letterSpacing: -0.1,
         height: 1.4,
         color: onSurface,
       ),
-      bodyLarge: _font(
+      bodyLarge: bodyFont(
         fontSize: 16,
         fontWeight: FontWeight.w400,
         letterSpacing: -0.1,
         height: 1.5,
         color: onSurface,
       ),
-      bodyMedium: _font(
+      bodyMedium: bodyFont(
         fontSize: 14,
         fontWeight: FontWeight.w400,
         letterSpacing: 0,
         height: 1.5,
         color: onSurfaceVariant,
       ),
-      bodySmall: _font(
+      bodySmall: bodyFont(
         fontSize: 12,
         fontWeight: FontWeight.w400,
         letterSpacing: 0,
         height: 1.5,
         color: textMuted,
       ),
-      labelLarge: _font(
-        fontSize: 14,
+      labelLarge: labelFont(
+        fontSize: 13,
         fontWeight: FontWeight.w700,
         letterSpacing: 0.1,
         height: 1.4,
         color: onSurface,
       ),
-      labelMedium: _font(
+      labelMedium: labelFont(
         fontSize: 12,
         fontWeight: FontWeight.w600,
         letterSpacing: 0.1,
         height: 1.4,
         color: onSurfaceVariant,
       ),
-      labelSmall: _font(
+      labelSmall: labelFont(
         fontSize: 11,
         fontWeight: FontWeight.w600,
         letterSpacing: 0.2,
@@ -195,6 +272,8 @@ class AppTheme {
       onSurfaceVariant: AppColors.onSurfaceVariantLight,
       outline: AppColors.outlineLight,
       outlineVariant: AppColors.outlineVariantLight,
+      error: AppColors.errorPastel,
+      onError: Colors.white,
     );
 
     return ThemeData(
@@ -210,7 +289,7 @@ class AppTheme {
         scrolledUnderElevation: 0,
         centerTitle: true,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
-        titleTextStyle: _font(
+        titleTextStyle: headlineFont(
           color: AppColors.onSurfaceLight,
           fontSize: 18,
           fontWeight: FontWeight.w700,
@@ -224,7 +303,7 @@ class AppTheme {
         shadowColor: const Color(0xFF0F172A).withValues(alpha: 0.03),
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(22),
           side: const BorderSide(
             color: AppColors.outlineLight,
             width: 1,
@@ -252,7 +331,7 @@ class AppTheme {
             width: 1,
           ),
         ),
-        titleTextStyle: _font(
+        titleTextStyle: headlineFont(
           fontSize: 18,
           fontWeight: FontWeight.w700,
           color: AppColors.onSurfaceLight,
@@ -265,10 +344,10 @@ class AppTheme {
           elevation: 0,
           shadowColor: AppColors.primaryLight.withValues(alpha: 0.25),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(22),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          textStyle: _font(
+          textStyle: headlineFont(
             fontSize: 15,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.2,
@@ -277,19 +356,19 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.surfaceLight,
+          backgroundColor: AppColors.surfaceVariantLight,
           foregroundColor: AppColors.onSurfaceLight,
           elevation: 0,
           shadowColor: Colors.black.withValues(alpha: 0.04),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-            side: BorderSide(
-              color: AppColors.outlineLight.withValues(alpha: 0.8),
+            borderRadius: BorderRadius.circular(22),
+            side: const BorderSide(
+              color: AppColors.outlineLight,
               width: 1,
             ),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          textStyle: _font(
+          textStyle: bodyFont(
             fontSize: 15,
             fontWeight: FontWeight.w600,
             letterSpacing: -0.2,
@@ -300,14 +379,14 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primaryLight,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(22),
           ),
-          side: BorderSide(
-            color: AppColors.outlineLight.withValues(alpha: 0.9),
+          side: const BorderSide(
+            color: AppColors.outlineLight,
             width: 1.2,
           ),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          textStyle: _font(
+          textStyle: bodyFont(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             letterSpacing: -0.1,
@@ -315,28 +394,28 @@ class AppTheme {
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: AppColors.primaryLight,
-        foregroundColor: AppColors.onPrimaryLight,
+        backgroundColor: AppColors.primaryAmber,
+        foregroundColor: const Color(0xFF281C00),
         elevation: 2,
         focusElevation: 3,
         hoverElevation: 3,
         highlightElevation: 4,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(22),
         ),
-        extendedTextStyle: _font(
+        extendedTextStyle: headlineFont(
           fontWeight: FontWeight.w700,
           fontSize: 14,
           letterSpacing: -0.2,
         ),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: AppColors.surfaceVariantLight.withValues(alpha: 0.6),
+        backgroundColor: AppColors.surfaceVariantLight.withValues(alpha: 0.8),
         side: const BorderSide(color: AppColors.outlineLight, width: 1),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
         ),
-        labelStyle: _font(
+        labelStyle: labelFont(
           fontSize: 12,
           fontWeight: FontWeight.w600,
           color: AppColors.onSurfaceLight,
@@ -344,19 +423,19 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surfaceVariantLight.withValues(alpha: 0.6),
+        fillColor: AppColors.surfaceVariantLight.withValues(alpha: 0.7),
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        labelStyle: _font(
+        labelStyle: bodyFont(
           color: AppColors.onSurfaceVariantLight,
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
-        floatingLabelStyle: _font(
+        floatingLabelStyle: headlineFont(
           color: AppColors.primaryLight,
           fontSize: 13,
           fontWeight: FontWeight.w700,
         ),
-        hintStyle: _font(
+        hintStyle: bodyFont(
           color: AppColors.onSurfaceVariantLight.withValues(alpha: 0.7),
           fontSize: 14,
           fontWeight: FontWeight.w400,
@@ -364,24 +443,79 @@ class AppTheme {
         prefixIconColor: AppColors.onSurfaceVariantLight,
         suffixIconColor: AppColors.onSurfaceVariantLight,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(22),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(22),
           borderSide: const BorderSide(color: AppColors.outlineLight, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(22),
           borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.8),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(22),
           borderSide: const BorderSide(color: AppColors.errorPastel, width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(22),
           borderSide: const BorderSide(color: AppColors.errorPastel, width: 1.8),
+        ),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        height: 66,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        indicatorColor: const Color(0xFFF0D076),
+        indicatorShape: const CircleBorder(),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(
+              size: 22,
+              color: Color(0xFF281C00),
+            );
+          }
+          return const IconThemeData(
+            size: 22,
+            color: AppColors.textMutedLight,
+          );
+        }),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return bodyFont(
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xFF543C00),
+            );
+          }
+          return bodyFont(
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textMutedLight,
+          );
+        }),
+      ),
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: AppColors.primaryAmber,
+        linearTrackColor: AppColors.surfaceVariantLight,
+        linearMinHeight: 6,
+        borderRadius: BorderRadius.circular(100),
+      ),
+      searchBarTheme: SearchBarThemeData(
+        elevation: const WidgetStatePropertyAll(0),
+        backgroundColor: const WidgetStatePropertyAll(AppColors.surfaceVariantLight),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(100),
+            side: const BorderSide(color: AppColors.outlineLight, width: 1),
+          ),
+        ),
+        hintStyle: WidgetStatePropertyAll(
+          bodyFont(fontSize: 14, fontWeight: FontWeight.w400, color: AppColors.textMutedLight),
+        ),
+        textStyle: WidgetStatePropertyAll(
+          bodyFont(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.onSurfaceLight),
         ),
       ),
       dividerTheme: const DividerThemeData(
@@ -391,9 +525,6 @@ class AppTheme {
       ),
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return Colors.white;
-          }
           return Colors.white;
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
@@ -445,6 +576,8 @@ class AppTheme {
       onSurfaceVariant: AppColors.onSurfaceVariantDark,
       outline: AppColors.outlineDark,
       outlineVariant: AppColors.outlineVariantDark,
+      error: AppColors.errorPastel,
+      onError: Colors.white,
     );
 
     return ThemeData(
@@ -460,7 +593,7 @@ class AppTheme {
         scrolledUnderElevation: 0,
         centerTitle: true,
         systemOverlayStyle: SystemUiOverlayStyle.light,
-        titleTextStyle: _font(
+        titleTextStyle: headlineFont(
           color: AppColors.onSurfaceDark,
           fontSize: 18,
           fontWeight: FontWeight.w700,
@@ -474,7 +607,7 @@ class AppTheme {
         shadowColor: Colors.black.withValues(alpha: 0.25),
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(22),
           side: const BorderSide(
             color: AppColors.outlineDark,
             width: 1,
@@ -502,7 +635,7 @@ class AppTheme {
             width: 1,
           ),
         ),
-        titleTextStyle: _font(
+        titleTextStyle: headlineFont(
           fontSize: 18,
           fontWeight: FontWeight.w700,
           color: AppColors.onSurfaceDark,
@@ -515,10 +648,10 @@ class AppTheme {
           elevation: 0,
           shadowColor: AppColors.primaryDark.withValues(alpha: 0.25),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(22),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          textStyle: _font(
+          textStyle: headlineFont(
             fontSize: 15,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.2,
@@ -527,16 +660,16 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.surfaceDark,
+          backgroundColor: AppColors.surfaceVariantDark,
           foregroundColor: AppColors.onSurfaceDark,
           elevation: 0,
           shadowColor: Colors.black.withValues(alpha: 0.2),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(22),
             side: const BorderSide(color: AppColors.outlineDark, width: 1),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          textStyle: _font(
+          textStyle: bodyFont(
             fontSize: 15,
             fontWeight: FontWeight.w600,
             letterSpacing: -0.2,
@@ -547,11 +680,11 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primaryDark,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(22),
           ),
           side: const BorderSide(color: AppColors.outlineDark, width: 1.2),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          textStyle: _font(
+          textStyle: bodyFont(
             fontSize: 14,
             fontWeight: FontWeight.w600,
             letterSpacing: -0.1,
@@ -566,9 +699,9 @@ class AppTheme {
         hoverElevation: 3,
         highlightElevation: 4,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(22),
         ),
-        extendedTextStyle: _font(
+        extendedTextStyle: headlineFont(
           fontWeight: FontWeight.w700,
           fontSize: 14,
           letterSpacing: -0.2,
@@ -578,9 +711,9 @@ class AppTheme {
         backgroundColor: AppColors.surfaceVariantDark.withValues(alpha: 0.6),
         side: const BorderSide(color: AppColors.outlineDark, width: 1),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
         ),
-        labelStyle: _font(
+        labelStyle: labelFont(
           fontSize: 12,
           fontWeight: FontWeight.w600,
           color: AppColors.onSurfaceDark,
@@ -590,17 +723,17 @@ class AppTheme {
         filled: true,
         fillColor: AppColors.surfaceVariantDark.withValues(alpha: 0.6),
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        labelStyle: _font(
+        labelStyle: bodyFont(
           color: AppColors.onSurfaceVariantDark,
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
-        floatingLabelStyle: _font(
+        floatingLabelStyle: headlineFont(
           color: AppColors.primaryDark,
           fontSize: 13,
           fontWeight: FontWeight.w700,
         ),
-        hintStyle: _font(
+        hintStyle: bodyFont(
           color: AppColors.onSurfaceVariantDark.withValues(alpha: 0.7),
           fontSize: 14,
           fontWeight: FontWeight.w400,
@@ -608,24 +741,79 @@ class AppTheme {
         prefixIconColor: AppColors.onSurfaceVariantDark,
         suffixIconColor: AppColors.onSurfaceVariantDark,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(22),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(22),
           borderSide: const BorderSide(color: AppColors.outlineDark, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(22),
           borderSide: const BorderSide(color: AppColors.primaryDark, width: 1.8),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(22),
           borderSide: const BorderSide(color: AppColors.errorPastel, width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(22),
           borderSide: const BorderSide(color: AppColors.errorPastel, width: 1.8),
+        ),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        height: 66,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        indicatorColor: AppColors.primaryDark,
+        indicatorShape: const CircleBorder(),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(
+              size: 22,
+              color: AppColors.onPrimaryDark,
+            );
+          }
+          return const IconThemeData(
+            size: 22,
+            color: AppColors.textMutedDark,
+          );
+        }),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return bodyFont(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: AppColors.onSurfaceDark,
+            );
+          }
+          return bodyFont(
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textMutedDark,
+          );
+        }),
+      ),
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: AppColors.primaryDark,
+        linearTrackColor: AppColors.surfaceVariantDark,
+        linearMinHeight: 6,
+        borderRadius: BorderRadius.circular(100),
+      ),
+      searchBarTheme: SearchBarThemeData(
+        elevation: const WidgetStatePropertyAll(0),
+        backgroundColor: const WidgetStatePropertyAll(AppColors.surfaceVariantDark),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(100),
+            side: const BorderSide(color: AppColors.outlineDark, width: 1),
+          ),
+        ),
+        hintStyle: WidgetStatePropertyAll(
+          bodyFont(fontSize: 14, fontWeight: FontWeight.w400, color: AppColors.textMutedDark),
+        ),
+        textStyle: WidgetStatePropertyAll(
+          bodyFont(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.onSurfaceDark),
         ),
       ),
       dividerTheme: const DividerThemeData(
@@ -635,10 +823,7 @@ class AppTheme {
       ),
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return Colors.white;
-          }
-          return const Color(0xFFE2E8F0);
+          return Colors.white;
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {

@@ -53,9 +53,10 @@
                 <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
-        <!-- Home Screen App Widget -->
+        <!-- Home Screen App Widget - Trip Countdown (Default) -->
         <receiver
             android:name=".PackBuddyWidgetProvider"
+            android:label="PackBuddy: Seyahat"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -67,6 +68,7 @@
 
         <receiver
             android:name=".PackBuddyMediumWidgetProvider"
+            android:label="PackBuddy: Seyahat (Orta)"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -78,6 +80,118 @@
 
         <receiver
             android:name=".PackBuddyLargeWidgetProvider"
+            android:label="PackBuddy: Seyahat (Geniş)"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/packbuddy_large_widget_info" />
+        </receiver>
+
+        <!-- Home Screen App Widget - World Travel Map -->
+        <receiver
+            android:name=".PackBuddyMapWidgetProvider"
+            android:label="PackBuddy: Dünya Haritası"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/packbuddy_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".PackBuddyMapMediumWidgetProvider"
+            android:label="PackBuddy: Dünya Haritası (Orta)"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/packbuddy_medium_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".PackBuddyMapLargeWidgetProvider"
+            android:label="PackBuddy: Dünya Haritası (Geniş)"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/packbuddy_large_widget_info" />
+        </receiver>
+
+        <!-- Home Screen App Widget - Quick Expense -->
+        <receiver
+            android:name=".PackBuddyExpenseWidgetProvider"
+            android:label="PackBuddy: Hızlı Harcama"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/packbuddy_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".PackBuddyExpenseMediumWidgetProvider"
+            android:label="PackBuddy: Hızlı Harcama (Orta)"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/packbuddy_medium_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".PackBuddyExpenseLargeWidgetProvider"
+            android:label="PackBuddy: Hızlı Harcama (Geniş)"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/packbuddy_large_widget_info" />
+        </receiver>
+
+        <!-- Home Screen App Widget - Currency Converter -->
+        <receiver
+            android:name=".PackBuddyCurrencyWidgetProvider"
+            android:label="PackBuddy: Döviz Kurları"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/packbuddy_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".PackBuddyCurrencyMediumWidgetProvider"
+            android:label="PackBuddy: Döviz Kurları (Orta)"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/packbuddy_medium_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".PackBuddyCurrencyLargeWidgetProvider"
+            android:label="PackBuddy: Döviz Kurları (Geniş)"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -106,6 +220,12 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="packbuddy" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

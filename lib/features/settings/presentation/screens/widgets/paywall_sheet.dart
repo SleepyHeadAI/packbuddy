@@ -131,18 +131,11 @@ class PaywallSheet extends ConsumerWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  theme.colorScheme.tertiaryContainer,
-                  theme.colorScheme.primaryContainer,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: isDark ? AppColors.primaryContainerDark : AppColors.primaryContainerLight,
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                  color: (isDark ? AppColors.primaryDark : AppColors.primaryLight).withValues(alpha: 0.25),
                   blurRadius: 18,
                   offset: const Offset(0, 6),
                 ),
@@ -150,7 +143,7 @@ class PaywallSheet extends ConsumerWidget {
             ),
             child: Icon(
               Icons.auto_awesome_rounded,
-              color: theme.colorScheme.primary,
+              color: isDark ? AppColors.primaryAmber : AppColors.primaryLight,
               size: 32,
             ),
           ),

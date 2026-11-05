@@ -381,7 +381,7 @@ class _GlobePainter extends CustomPainter {
       ..strokeWidth = 0.85;
 
     final visitedLandPaint = Paint()
-      ..color = const Color(0xFFEA580C) // Been Orange
+      ..color = const Color(0xFFE7B623) // Serene Sun Gold
       ..style = PaintingStyle.fill;
 
     final visitedBorderPaint = Paint()

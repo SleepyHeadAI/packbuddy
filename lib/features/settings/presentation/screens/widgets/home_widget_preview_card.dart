@@ -51,12 +51,18 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
   ];
 
   int _selectedSize = 1; // 0: Small, 1: Medium, 2: Large
-  late String _widgetMode; // 'auto', 'trip', 'world_map'
+  late String _widgetMode; // 'trip', 'world_map', 'currency_converter', 'quick_expense'
   late String _widgetTheme;
   int _selectedThemeCategory = 0; // 0: Dark (9), 1: Light (7)
   late bool _showCountdown;
   late bool _showPacking;
   late bool _showBudget;
+  late bool _showContinents;
+  late bool _showWishlist;
+  late bool _showLiveRate;
+  late bool _showReverseRate;
+  late bool _showRemainingBudget;
+  late bool _showLastExpense;
   AppWidgetData? _widgetData;
   List<TravelCountry> _countries = const [];
 
@@ -65,13 +71,19 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
     super.initState();
     final prefs = PreferencesService.instance;
     _widgetMode = prefs.getWidgetMode();
-    _widgetTheme = prefs.getWidgetTheme();
+    _widgetTheme = prefs.getWidgetThemeForMode(_widgetMode);
     if (_widgetTheme == 'light') _widgetTheme = 'minimalLight';
     if (_widgetTheme == 'ocean') _widgetTheme = 'oceanLight';
     _selectedThemeCategory = lightWidgetThemes.contains(_widgetTheme) ? 1 : 0;
     _showCountdown = prefs.isWidgetShowCountdown();
     _showPacking = prefs.isWidgetShowPacking();
     _showBudget = prefs.isWidgetShowBudget();
+    _showContinents = prefs.isWidgetShowContinents();
+    _showWishlist = prefs.isWidgetShowWishlist();
+    _showLiveRate = prefs.isWidgetShowLiveRate();
+    _showReverseRate = prefs.isWidgetShowReverseRate();
+    _showRemainingBudget = prefs.isWidgetShowRemainingBudget();
+    _showLastExpense = prefs.isWidgetShowLastExpense();
     _loadPayload();
   }
 
@@ -90,15 +102,21 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
   }
 
   Future<void> _updateWidgetMode(String mode) async {
-    setState(() => _widgetMode = mode);
-    await PreferencesService.instance.setWidgetMode(mode);
-    await AppWidgetService.syncCurrentState(widgetMode: mode, widgetTheme: _widgetTheme);
+    final prefs = PreferencesService.instance;
+    final themeForMode = prefs.getWidgetThemeForMode(mode);
+    setState(() {
+      _widgetMode = mode;
+      _widgetTheme = themeForMode;
+      _selectedThemeCategory = lightWidgetThemes.contains(themeForMode) ? 1 : 0;
+    });
+    await prefs.setWidgetMode(mode);
+    await AppWidgetService.syncCurrentState(widgetMode: mode, widgetTheme: themeForMode);
     await _loadPayload();
   }
 
   Future<void> _updateWidgetTheme(String themeKey) async {
     setState(() => _widgetTheme = themeKey);
-    await PreferencesService.instance.setWidgetTheme(themeKey);
+    await PreferencesService.instance.setWidgetThemeForMode(_widgetMode, themeKey);
     await AppWidgetService.syncCurrentState(widgetMode: _widgetMode, widgetTheme: themeKey);
     await _loadPayload();
   }
@@ -127,13 +145,36 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
         widgetTheme: _widgetTheme,
       );
 
+      await HomeWidget.saveWidgetData<String>('pending_pin_mode', _widgetMode);
+      await HomeWidget.saveWidgetData<String>('pending_pin_theme', _widgetTheme);
       await HomeWidget.saveWidgetData<int>('user_selected_size', _selectedSize);
 
       final isSupported = await HomeWidget.isRequestPinWidgetSupported() ?? false;
       if (isSupported) {
-        final providerName = _selectedSize == 2
-            ? 'PackBuddyLargeWidgetProvider'
-            : (_selectedSize == 1 ? 'PackBuddyMediumWidgetProvider' : 'PackBuddyWidgetProvider');
+        String providerName;
+        switch (_widgetMode) {
+          case 'world_map':
+            providerName = _selectedSize == 2
+                ? 'PackBuddyMapLargeWidgetProvider'
+                : (_selectedSize == 1 ? 'PackBuddyMapMediumWidgetProvider' : 'PackBuddyMapWidgetProvider');
+            break;
+          case 'quick_expense':
+            providerName = _selectedSize == 2
+                ? 'PackBuddyExpenseLargeWidgetProvider'
+                : (_selectedSize == 1 ? 'PackBuddyExpenseMediumWidgetProvider' : 'PackBuddyExpenseWidgetProvider');
+            break;
+          case 'currency_converter':
+            providerName = _selectedSize == 2
+                ? 'PackBuddyCurrencyLargeWidgetProvider'
+                : (_selectedSize == 1 ? 'PackBuddyCurrencyMediumWidgetProvider' : 'PackBuddyCurrencyWidgetProvider');
+            break;
+          case 'trip':
+          default:
+            providerName = _selectedSize == 2
+                ? 'PackBuddyLargeWidgetProvider'
+                : (_selectedSize == 1 ? 'PackBuddyMediumWidgetProvider' : 'PackBuddyWidgetProvider');
+            break;
+        }
 
         await HomeWidget.requestPinWidget(
           name: providerName,
@@ -202,16 +243,55 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
   Future<void> _updateCountdown(bool val) async {
     setState(() => _showCountdown = val);
     await PreferencesService.instance.setWidgetShowCountdown(val);
+    await AppWidgetService.syncCurrentState(widgetMode: _widgetMode, widgetTheme: _widgetTheme);
   }
 
   Future<void> _updatePacking(bool val) async {
     setState(() => _showPacking = val);
     await PreferencesService.instance.setWidgetShowPacking(val);
+    await AppWidgetService.syncCurrentState(widgetMode: _widgetMode, widgetTheme: _widgetTheme);
   }
 
   Future<void> _updateBudget(bool val) async {
     setState(() => _showBudget = val);
     await PreferencesService.instance.setWidgetShowBudget(val);
+    await AppWidgetService.syncCurrentState(widgetMode: _widgetMode, widgetTheme: _widgetTheme);
+  }
+
+  Future<void> _updateContinents(bool val) async {
+    setState(() => _showContinents = val);
+    await PreferencesService.instance.setWidgetShowContinents(val);
+    await AppWidgetService.syncCurrentState(widgetMode: _widgetMode, widgetTheme: _widgetTheme);
+  }
+
+  Future<void> _updateWishlist(bool val) async {
+    setState(() => _showWishlist = val);
+    await PreferencesService.instance.setWidgetShowWishlist(val);
+    await AppWidgetService.syncCurrentState(widgetMode: _widgetMode, widgetTheme: _widgetTheme);
+  }
+
+  Future<void> _updateLiveRate(bool val) async {
+    setState(() => _showLiveRate = val);
+    await PreferencesService.instance.setWidgetShowLiveRate(val);
+    await AppWidgetService.syncCurrentState(widgetMode: _widgetMode, widgetTheme: _widgetTheme);
+  }
+
+  Future<void> _updateReverseRate(bool val) async {
+    setState(() => _showReverseRate = val);
+    await PreferencesService.instance.setWidgetShowReverseRate(val);
+    await AppWidgetService.syncCurrentState(widgetMode: _widgetMode, widgetTheme: _widgetTheme);
+  }
+
+  Future<void> _updateRemainingBudget(bool val) async {
+    setState(() => _showRemainingBudget = val);
+    await PreferencesService.instance.setWidgetShowRemainingBudget(val);
+    await AppWidgetService.syncCurrentState(widgetMode: _widgetMode, widgetTheme: _widgetTheme);
+  }
+
+  Future<void> _updateLastExpense(bool val) async {
+    setState(() => _showLastExpense = val);
+    await PreferencesService.instance.setWidgetShowLastExpense(val);
+    await AppWidgetService.syncCurrentState(widgetMode: _widgetMode, widgetTheme: _widgetTheme);
   }
 
   @override
@@ -281,12 +361,6 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
             child: Row(
               children: [
                 _buildModeChoiceChip(
-                  key: 'auto',
-                  label: AppWidgetLocalization.getAutoModeLabel(lang),
-                  theme: theme,
-                ),
-                const SizedBox(width: 8),
-                _buildModeChoiceChip(
                   key: 'trip',
                   label: AppWidgetLocalization.getTripModeLabel(lang),
                   theme: theme,
@@ -295,6 +369,18 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                 _buildModeChoiceChip(
                   key: 'world_map',
                   label: AppWidgetLocalization.getWorldMapModeLabel(lang),
+                  theme: theme,
+                ),
+                const SizedBox(width: 8),
+                _buildModeChoiceChip(
+                  key: 'currency_converter',
+                  label: AppWidgetLocalization.getCurrencyConverterModeLabel(lang),
+                  theme: theme,
+                ),
+                const SizedBox(width: 8),
+                _buildModeChoiceChip(
+                  key: 'quick_expense',
+                  label: AppWidgetLocalization.getQuickExpenseModeLabel(lang),
                   theme: theme,
                 ),
               ],
@@ -471,22 +557,57 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
           ),
           const SizedBox(height: 16),
 
-          // Customization switches
-          _buildSwitchRow(
-            title: l10n?.showCountdown ?? 'Show Countdown',
-            value: _showCountdown,
-            onChanged: _updateCountdown,
-          ),
-          _buildSwitchRow(
-            title: l10n?.showPackingProgress ?? 'Show Packing Progress',
-            value: _showPacking,
-            onChanged: _updatePacking,
-          ),
-          _buildSwitchRow(
-            title: l10n?.showBudgetData ?? 'Show Budget Summary',
-            value: _showBudget,
-            onChanged: _updateBudget,
-          ),
+          // Customization switches dynamically matching the selected mode
+          if (_widgetMode == 'trip') ...[
+            _buildSwitchRow(
+              title: l10n?.showCountdown ?? 'Show Countdown',
+              value: _showCountdown,
+              onChanged: _updateCountdown,
+            ),
+            _buildSwitchRow(
+              title: l10n?.showPackingProgress ?? 'Show Packing Progress',
+              value: _showPacking,
+              onChanged: _updatePacking,
+            ),
+            _buildSwitchRow(
+              title: l10n?.showBudgetData ?? 'Show Budget Summary',
+              value: _showBudget,
+              onChanged: _updateBudget,
+            ),
+          ] else if (_widgetMode == 'world_map') ...[
+            _buildSwitchRow(
+              title: AppWidgetLocalization.getShowContinentsLabel(lang),
+              value: _showContinents,
+              onChanged: _updateContinents,
+            ),
+            _buildSwitchRow(
+              title: AppWidgetLocalization.getShowWishlistLabel(lang),
+              value: _showWishlist,
+              onChanged: _updateWishlist,
+            ),
+          ] else if (_widgetMode == 'currency_converter') ...[
+            _buildSwitchRow(
+              title: AppWidgetLocalization.getShowLiveRateLabel(lang),
+              value: _showLiveRate,
+              onChanged: _updateLiveRate,
+            ),
+            _buildSwitchRow(
+              title: AppWidgetLocalization.getShowReverseRateLabel(lang),
+              value: _showReverseRate,
+              onChanged: _updateReverseRate,
+            ),
+          ] else if (_widgetMode == 'quick_expense') ...[
+            _buildSwitchRow(
+              title: AppWidgetLocalization.getShowRemainingBudgetLabel(lang),
+              value: _showRemainingBudget,
+              onChanged: _updateRemainingBudget,
+            ),
+            _buildSwitchRow(
+              title: AppWidgetLocalization.getShowLastExpenseLabel(lang),
+              value: _showLastExpense,
+              onChanged: _updateLastExpense,
+            ),
+          ],
           const SizedBox(height: 14),
 
           // Pin Widget to Home Screen Action Button
@@ -637,14 +758,6 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
       _ => 140.0,
     };
 
-    final bool showWorldMap = switch (_widgetMode) {
-      'world_map' => true,
-      'trip' => false,
-      _ => !(_widgetData?.hasUpcomingTrip ?? false) &&
-          ((_widgetData?.visitedCountriesCount ?? 0) > 0 ||
-              (_widgetData?.wishlistCountriesCount ?? 0) > 0),
-    };
-
     final themeConfig = WidgetThemeConfig.fromKey(_widgetTheme);
 
     // Build the country color map for our miniature vector World Map
@@ -712,25 +825,38 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
             ),
           ],
         ),
-        child: showWorldMap
-            ? _buildWorldMapContent(
-                theme: theme,
-                isDark: isDark,
-                lang: lang,
-                themeConfig: themeConfig,
-                visitedCount: visitedCount,
-                livedCount: livedCount,
-                wishlistCount: wishlistCount,
-                continentsCount: continentsCount,
-                worldPercent: worldPercent,
-                colorMap: colorMap,
-              )
-            : _buildTripContent(
-                theme: theme,
-                isDark: isDark,
-                lang: lang,
-                l10n: l10n,
-              ),
+        child: switch (_widgetMode) {
+          'world_map' => _buildWorldMapContent(
+              theme: theme,
+              isDark: isDark,
+              lang: lang,
+              themeConfig: themeConfig,
+              visitedCount: visitedCount,
+              livedCount: livedCount,
+              wishlistCount: wishlistCount,
+              continentsCount: continentsCount,
+              worldPercent: worldPercent,
+              colorMap: colorMap,
+            ),
+          'currency_converter' => _buildCurrencyContent(
+              theme: theme,
+              isDark: isDark,
+              lang: lang,
+              themeConfig: themeConfig,
+            ),
+          'quick_expense' => _buildQuickExpenseContent(
+              theme: theme,
+              isDark: isDark,
+              lang: lang,
+              themeConfig: themeConfig,
+            ),
+          _ => _buildTripContent(
+              theme: theme,
+              isDark: isDark,
+              lang: lang,
+              l10n: l10n,
+            ),
+        },
       ),
     );
   }
@@ -1793,4 +1919,818 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
         ],
       );
     }
+
+  // ==========================================
+  // CURRENCY CONVERTER WIDGET PREVIEWS
+  // ==========================================
+
+  Widget _buildCurrencyContent({
+    required ThemeData theme,
+    required bool isDark,
+    required String lang,
+    required WidgetThemeConfig themeConfig,
+  }) {
+    switch (_selectedSize) {
+      case 0:
+        return _buildSmallCurrency(
+          theme: theme,
+          isDark: isDark,
+          lang: lang,
+          themeConfig: themeConfig,
+        );
+      case 1:
+        return _buildMediumCurrency(
+          theme: theme,
+          isDark: isDark,
+          lang: lang,
+          themeConfig: themeConfig,
+        );
+      case 2:
+      default:
+        return _buildLargeCurrency(
+          theme: theme,
+          isDark: isDark,
+          lang: lang,
+          themeConfig: themeConfig,
+        );
+    }
+  }
+
+  Widget _buildSmallCurrency({
+    required ThemeData theme,
+    required bool isDark,
+    required String lang,
+    required WidgetThemeConfig themeConfig,
+  }) {
+    final currencyHeader = AppWidgetLocalization.getCurrencyHeader(lang);
+    final userCurrency = _widgetData?.userCurrency ?? 'TRY';
+    final usdRate = _widgetData?.currencyRateUSD ?? '34.25';
+    final eurRate = _widgetData?.currencyRateEUR ?? '37.10';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // Top header
+        Row(
+          children: [
+            Icon(Icons.currency_exchange_rounded, size: 13, color: themeConfig.accentColor),
+            const SizedBox(width: 4),
+            Expanded(
+              child: Text(
+                currencyHeader,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w800,
+                  color: themeConfig.accentColor,
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+              decoration: BoxDecoration(
+                color: themeConfig.badgeBgColor,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                userCurrency,
+                style: const TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        // Main Rate
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '1 USD',
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: themeConfig.subtitleTextColor,
+              ),
+            ),
+            const SizedBox(height: 1),
+            Text(
+              usdRate,
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w900,
+                color: themeConfig.titleTextColor,
+                letterSpacing: -0.3,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+
+        // Bottom EUR rate
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+          decoration: BoxDecoration(
+            color: themeConfig.statBgColor,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '1 EUR',
+                style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
+              ),
+              Text(
+                eurRate,
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: themeConfig.titleTextColor),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMediumCurrency({
+    required ThemeData theme,
+    required bool isDark,
+    required String lang,
+    required WidgetThemeConfig themeConfig,
+  }) {
+    final currencyHeader = AppWidgetLocalization.getCurrencyHeader(lang);
+    final userCurrency = _widgetData?.userCurrency ?? 'TRY';
+    final usdRate = _widgetData?.currencyRateUSD ?? '34.25';
+    final eurRate = _widgetData?.currencyRateEUR ?? '37.10';
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Left Column: Rates & Details
+        Expanded(
+          flex: 3,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Header
+              Row(
+                children: [
+                  Icon(Icons.currency_exchange_rounded, size: 13, color: themeConfig.accentColor),
+                  const SizedBox(width: 4),
+                  Text(
+                    currencyHeader,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      color: themeConfig.accentColor,
+                    ),
+                  ),
+                ],
+              ),
+
+              // Rates Row
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: themeConfig.statBgColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('1 USD', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor)),
+                          const SizedBox(height: 2),
+                          Text(usdRate, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: themeConfig.titleTextColor), maxLines: 1, overflow: TextOverflow.ellipsis),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: themeConfig.statBgColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('1 EUR', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor)),
+                          const SizedBox(height: 2),
+                          Text(eurRate, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: themeConfig.titleTextColor), maxLines: 1, overflow: TextOverflow.ellipsis),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              // Bottom status
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    '● Canlı Kurlar',
+                    style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
+                  ),
+                  if (_showReverseRate)
+                    Text(
+                      '1 $userCurrency ≈ \$${(1.0 / (double.tryParse(usdRate.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 34.25)).toStringAsFixed(2)}',
+                      style: TextStyle(fontSize: 9, color: themeConfig.subtitleTextColor),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
+
+        // Right Column: Currency Badge Box
+        Container(
+          width: 90,
+          margin: const EdgeInsets.only(left: 10),
+          decoration: BoxDecoration(
+            color: themeConfig.statBgColor,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          padding: const EdgeInsets.all(8),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: themeConfig.accentColor.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Icon(Icons.swap_horiz_rounded, color: themeConfig.accentColor, size: 22),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                userCurrency,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                  color: themeConfig.titleTextColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLargeCurrency({
+    required ThemeData theme,
+    required bool isDark,
+    required String lang,
+    required WidgetThemeConfig themeConfig,
+  }) {
+    final currencyHeader = AppWidgetLocalization.getCurrencyHeader(lang);
+    final userCurrency = _widgetData?.userCurrency ?? 'TRY';
+    final usdRate = _widgetData?.currencyRateUSD ?? '34.25';
+    final eurRate = _widgetData?.currencyRateEUR ?? '37.10';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // Top Header
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.currency_exchange_rounded, size: 14, color: themeConfig.accentColor),
+                const SizedBox(width: 4),
+                Text(
+                  currencyHeader,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: themeConfig.accentColor,
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+              decoration: BoxDecoration(
+                color: themeConfig.badgeBgColor,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                userCurrency,
+                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+
+        // Hero Rates Row
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: themeConfig.statBgColor,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('1 USD', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor)),
+                    const SizedBox(height: 4),
+                    Text(usdRate, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: themeConfig.titleTextColor), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: themeConfig.statBgColor,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('1 EUR', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor)),
+                    const SizedBox(height: 4),
+                    Text(eurRate, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: themeConfig.titleTextColor), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        // Quick Conversions Presets
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: themeConfig.statBgColor.withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Hızlı Çevrimler',
+                style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w700, color: themeConfig.titleTextColor),
+              ),
+              const SizedBox(height: 6),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('\$10 ≈ ${(10 * (double.tryParse(usdRate.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 34.25)).toStringAsFixed(1)} $userCurrency',
+                      style: TextStyle(fontSize: 9.5, color: themeConfig.subtitleTextColor)),
+                  Text('\$50 ≈ ${(50 * (double.tryParse(usdRate.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 34.25)).toStringAsFixed(1)} $userCurrency',
+                      style: TextStyle(fontSize: 9.5, color: themeConfig.subtitleTextColor)),
+                  Text('\$100 ≈ ${(100 * (double.tryParse(usdRate.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 34.25)).toStringAsFixed(0)} $userCurrency',
+                      style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: themeConfig.accentColor)),
+                ],
+              ),
+            ],
+          ),
+        ),
+
+        // Live Rate footer
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '✓ Otomatik Çift Yönlü Senkron',
+              style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
+            ),
+            const Text(
+              'Çevrim Çevrimdışı Hazır',
+              style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // ==========================================
+  // QUICK EXPENSE WIDGET PREVIEWS
+  // ==========================================
+
+  Widget _buildQuickExpenseContent({
+    required ThemeData theme,
+    required bool isDark,
+    required String lang,
+    required WidgetThemeConfig themeConfig,
+  }) {
+    switch (_selectedSize) {
+      case 0:
+        return _buildSmallQuickExpense(
+          theme: theme,
+          isDark: isDark,
+          lang: lang,
+          themeConfig: themeConfig,
+        );
+      case 1:
+        return _buildMediumQuickExpense(
+          theme: theme,
+          isDark: isDark,
+          lang: lang,
+          themeConfig: themeConfig,
+        );
+      case 2:
+      default:
+        return _buildLargeQuickExpense(
+          theme: theme,
+          isDark: isDark,
+          lang: lang,
+          themeConfig: themeConfig,
+        );
+    }
+  }
+
+  Widget _buildSmallQuickExpense({
+    required ThemeData theme,
+    required bool isDark,
+    required String lang,
+    required WidgetThemeConfig themeConfig,
+  }) {
+    final expenseHeader = AppWidgetLocalization.getExpenseHeader(lang);
+    final budgetSpent = _widgetData?.budgetSpent ?? '₺0.00';
+    final remainingBudget = _widgetData?.remainingBudget;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // Top Header
+        Row(
+          children: [
+            Icon(Icons.account_balance_wallet_rounded, size: 13, color: themeConfig.accentColor),
+            const SizedBox(width: 4),
+            Expanded(
+              child: Text(
+                expenseHeader,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w800,
+                  color: themeConfig.accentColor,
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+              decoration: BoxDecoration(
+                color: themeConfig.badgeBgColor,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: const Text(
+                '+',
+                style: TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        // Big Spent
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Harcanan',
+              style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
+            ),
+            const SizedBox(height: 1),
+            Text(
+              budgetSpent,
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w900,
+                color: themeConfig.titleTextColor,
+                letterSpacing: -0.3,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+
+        // Remaining or prompt
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+          decoration: BoxDecoration(
+            color: themeConfig.statBgColor,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                _showRemainingBudget && remainingBudget != null ? 'Kalan' : '+ Hızlı Harcama',
+                style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: themeConfig.accentColor),
+              ),
+              if (_showRemainingBudget && remainingBudget != null)
+                Text(
+                  remainingBudget,
+                  style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: themeConfig.titleTextColor),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMediumQuickExpense({
+    required ThemeData theme,
+    required bool isDark,
+    required String lang,
+    required WidgetThemeConfig themeConfig,
+  }) {
+    final expenseHeader = AppWidgetLocalization.getExpenseHeader(lang);
+    final budgetSpent = _widgetData?.budgetSpent ?? '₺0.00';
+    final remainingBudget = _widgetData?.remainingBudget;
+    final lastExpense = _widgetData?.lastExpenseText;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Left Column: Spent & Remaining
+        Expanded(
+          flex: 3,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Header
+              Row(
+                children: [
+                  Icon(Icons.account_balance_wallet_rounded, size: 13, color: themeConfig.accentColor),
+                  const SizedBox(width: 4),
+                  Text(
+                    expenseHeader,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      color: themeConfig.accentColor,
+                    ),
+                  ),
+                ],
+              ),
+
+              // Big Spent & Subtitle
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    budgetSpent,
+                    style: TextStyle(
+                      fontSize: 19,
+                      fontWeight: FontWeight.w900,
+                      color: themeConfig.titleTextColor,
+                      letterSpacing: -0.4,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (remainingBudget != null && _showRemainingBudget)
+                    Text(
+                      'Kalan Bütçe: $remainingBudget',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: themeConfig.subtitleTextColor,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                ],
+              ),
+
+              // Last Expense or Trip title
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      _showLastExpense && lastExpense != null ? 'Son: $lastExpense' : (_widgetData?.tripTitle ?? 'PackBuddy'),
+                      style: TextStyle(fontSize: 9.5, color: themeConfig.subtitleTextColor),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+
+        // Right Column: Big Add Expense Button
+        Container(
+          width: 95,
+          margin: const EdgeInsets.only(left: 10),
+          decoration: BoxDecoration(
+            color: themeConfig.accentColor,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Icon(Icons.add_rounded, color: themeConfig.accentColor, size: 22),
+                ),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Harcama Ekle',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLargeQuickExpense({
+    required ThemeData theme,
+    required bool isDark,
+    required String lang,
+    required WidgetThemeConfig themeConfig,
+  }) {
+    final expenseHeader = AppWidgetLocalization.getExpenseHeader(lang);
+    final budgetSpent = _widgetData?.budgetSpent ?? '₺0.00';
+    final remainingBudget = _widgetData?.remainingBudget;
+    final lastExpense = _widgetData?.lastExpenseText;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // Top Header
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.account_balance_wallet_rounded, size: 14, color: themeConfig.accentColor),
+                const SizedBox(width: 4),
+                Text(
+                  expenseHeader,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: themeConfig.accentColor,
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+              decoration: BoxDecoration(
+                color: themeConfig.badgeBgColor,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Text(
+                'Hızlı Kayıt',
+                style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+
+        // Big Spent & Remaining cards
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: themeConfig.statBgColor,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Harcanan Bütçe', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor)),
+                    const SizedBox(height: 4),
+                    Text(budgetSpent, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: themeConfig.titleTextColor), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  ],
+                ),
+              ),
+            ),
+            if (remainingBudget != null) ...[
+              const SizedBox(width: 10),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: themeConfig.statBgColor,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Kalan Bütçe', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor)),
+                      const SizedBox(height: 4),
+                      Text(remainingBudget, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: const Color(0xFF10B981)), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+
+        // Last logged expense card
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: themeConfig.statBgColor.withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.receipt_long_rounded, size: 16, color: themeConfig.accentColor),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Son Harcama',
+                      style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
+                    ),
+                    Text(
+                      lastExpense ?? 'Henüz harcama kaydedilmedi',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: themeConfig.titleTextColor),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Action Button: Tap to add expense
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 9),
+          decoration: BoxDecoration(
+            color: themeConfig.accentColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          alignment: Alignment.center,
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.add_circle_outline_rounded, size: 16, color: Colors.white),
+              SizedBox(width: 6),
+              Text(
+                '+ Harcama Ekle',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.white),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }

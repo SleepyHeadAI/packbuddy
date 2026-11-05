@@ -25,6 +25,7 @@ enum class WidgetLayoutSize {
 open class PackBuddyWidgetProvider : HomeWidgetProvider() {
 
     protected open val defaultLayoutSize: WidgetLayoutSize = WidgetLayoutSize.SMALL
+    protected open val inherentMode: String? = null
 
     companion object {
         const val TAG = "PackBuddyWidget"
@@ -66,11 +67,21 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                 val mediumViews = buildRemoteViews(context, widgetData, WidgetLayoutSize.MEDIUM, widgetId)
                 val largeViews = buildRemoteViews(context, widgetData, WidgetLayoutSize.LARGE, widgetId)
 
-                val viewsMap = mapOf(
-                    SizeF(100f, 100f) to smallViews,
-                    SizeF(210f, 100f) to mediumViews,
-                    SizeF(210f, 170f) to largeViews
-                )
+                val viewsMap = when (defaultLayoutSize) {
+                    WidgetLayoutSize.MEDIUM -> mapOf(
+                        SizeF(140f, 90f) to mediumViews,
+                        SizeF(210f, 250f) to largeViews
+                    )
+                    WidgetLayoutSize.LARGE -> mapOf(
+                        SizeF(140f, 90f) to mediumViews,
+                        SizeF(210f, 160f) to largeViews
+                    )
+                    else -> mapOf(
+                        SizeF(100f, 100f) to smallViews,
+                        SizeF(210f, 100f) to mediumViews,
+                        SizeF(210f, 250f) to largeViews
+                    )
+                }
                 val responsiveViews = RemoteViews(viewsMap)
                 appWidgetManager.updateAppWidget(widgetId, responsiveViews)
                 return
@@ -82,7 +93,9 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             val minHeight = opts?.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 0) ?: 0
 
             val chosenSize = when {
-                minHeight >= 170 -> WidgetLayoutSize.LARGE
+                defaultLayoutSize == WidgetLayoutSize.MEDIUM && minHeight < 250 -> WidgetLayoutSize.MEDIUM
+                defaultLayoutSize == WidgetLayoutSize.LARGE -> WidgetLayoutSize.LARGE
+                minHeight >= 250 -> WidgetLayoutSize.LARGE
                 minWidth >= 210 -> WidgetLayoutSize.MEDIUM
                 defaultLayoutSize != WidgetLayoutSize.SMALL -> defaultLayoutSize
                 else -> WidgetLayoutSize.SMALL
@@ -116,7 +129,37 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
 
         val views = RemoteViews(context.packageName, layoutId)
 
-        val mode = widgetData.getString("widget_mode", "auto") ?: "auto"
+        // 1. Resolve Mode & Theme Per Widget Instance with Isolation
+        val widgetModeKey = "widget_${widgetId}_mode"
+        val widgetThemeKey = "widget_${widgetId}_theme"
+
+        val pendingPinMode = widgetData.getString("pending_pin_mode", null)
+        val pendingPinTheme = widgetData.getString("pending_pin_theme", null)
+
+        // Automatically bind newly pinned widget instances to their specific configuration
+        if (!widgetData.contains(widgetModeKey)) {
+            val assignMode = inherentMode ?: pendingPinMode
+            if (assignMode != null) {
+                widgetData.edit().putString(widgetModeKey, assignMode).apply()
+            }
+        }
+        if (!widgetData.contains(widgetThemeKey)) {
+            val assignTheme = pendingPinTheme ?: widgetData.getString("${inherentMode}_theme", null)
+            if (assignTheme != null) {
+                widgetData.edit().putString(widgetThemeKey, assignTheme).apply()
+            }
+        }
+
+        val mode = inherentMode
+            ?: widgetData.getString(widgetModeKey, null)
+            ?: widgetData.getString("widget_mode", "trip")
+            ?: "trip"
+
+        val widgetTheme = widgetData.getString(widgetThemeKey, null)
+            ?: widgetData.getString("${mode}_theme", null)
+            ?: widgetData.getString("widget_theme", "midnight")
+            ?: "midnight"
+
         val hasUpcomingTrip = widgetData.getBoolean("has_upcoming_trip", false)
         val visitedCount = safeGetInt(widgetData, "map_visited_count", 0)
         val worldPercent = widgetData.getString("map_world_percent", null) ?: "%0.0"
@@ -129,18 +172,16 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
         val tripPacking = widgetData.getString("trip_packing", null) ?: "0/0"
         val tripBudget = widgetData.getString("trip_budget", null) ?: ""
 
-        // Pre-formatted localized texts from Flutter
-        val customAppName = widgetData.getString("custom_app_name", null)
-        val customDays = widgetData.getString("custom_days", null)
-        val customTitle = widgetData.getString("custom_title", null)
-        val customSubtitle = widgetData.getString("custom_subtitle", null)
-        val customStat1 = widgetData.getString("custom_stat1", null)
-        val customStat2 = widgetData.getString("custom_stat2", null)
-        val customStat3 = widgetData.getString("custom_stat3", null)
+        // Mode-isolated pre-formatted localized texts from Flutter
+        val customAppName = widgetData.getString("${mode}_app_name", null) ?: widgetData.getString("custom_app_name", null)
+        val customDays = widgetData.getString("${mode}_days", null) ?: widgetData.getString("custom_days", null)
+        val customTitle = widgetData.getString("${mode}_title", null) ?: widgetData.getString("custom_title", null)
+        val customSubtitle = widgetData.getString("${mode}_subtitle", null) ?: widgetData.getString("custom_subtitle", null)
+        val customStat1 = widgetData.getString("${mode}_stat1", null) ?: widgetData.getString("custom_stat1", null)
+        val customStat2 = widgetData.getString("${mode}_stat2", null) ?: widgetData.getString("custom_stat2", null)
+        val customStat3 = widgetData.getString("${mode}_stat3", null) ?: widgetData.getString("custom_stat3", null)
 
-        val widgetTheme = widgetData.getString("widget_theme", "midnight") ?: "midnight"
         val bgRes: Int
-        val mapBgRes: Int
         val statBgRes: Int
         val badgeBgRes: Int
         val textColor: Int
@@ -150,7 +191,6 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
         when (widgetTheme) {
             "sunset" -> {
                 bgRes = R.drawable.widget_bg_sunset
-                mapBgRes = R.drawable.widget_map_bg_sunset
                 statBgRes = R.drawable.widget_stat_bg_sunset
                 badgeBgRes = R.drawable.widget_badge_bg_sunset
                 textColor = android.graphics.Color.parseColor("#FFFFFF")
@@ -159,7 +199,6 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             }
             "emerald" -> {
                 bgRes = R.drawable.widget_bg_emerald
-                mapBgRes = R.drawable.widget_map_bg_emerald
                 statBgRes = R.drawable.widget_stat_bg_emerald
                 badgeBgRes = R.drawable.widget_badge_bg_emerald
                 textColor = android.graphics.Color.parseColor("#FFFFFF")
@@ -168,7 +207,6 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             }
             "cyberpunk" -> {
                 bgRes = R.drawable.widget_bg_cyberpunk
-                mapBgRes = R.drawable.widget_map_bg_cyberpunk
                 statBgRes = R.drawable.widget_stat_bg_cyberpunk
                 badgeBgRes = R.drawable.widget_badge_bg_cyberpunk
                 textColor = android.graphics.Color.parseColor("#FFFFFF")
@@ -177,7 +215,6 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             }
             "volcano" -> {
                 bgRes = R.drawable.widget_bg_volcano
-                mapBgRes = R.drawable.widget_map_bg_volcano
                 statBgRes = R.drawable.widget_stat_bg_volcano
                 badgeBgRes = R.drawable.widget_badge_bg_volcano
                 textColor = android.graphics.Color.parseColor("#FFFFFF")
@@ -186,7 +223,6 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             }
             "nordicForest", "nordic_forest" -> {
                 bgRes = R.drawable.widget_bg_nordic_forest
-                mapBgRes = R.drawable.widget_map_bg_nordic_forest
                 statBgRes = R.drawable.widget_stat_bg_nordic_forest
                 badgeBgRes = R.drawable.widget_badge_bg_nordic_forest
                 textColor = android.graphics.Color.parseColor("#FFFFFF")
@@ -195,7 +231,6 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             }
             "goldenHour", "golden_hour" -> {
                 bgRes = R.drawable.widget_bg_golden_hour
-                mapBgRes = R.drawable.widget_map_bg_golden_hour
                 statBgRes = R.drawable.widget_stat_bg_golden_hour
                 badgeBgRes = R.drawable.widget_badge_bg_golden_hour
                 textColor = android.graphics.Color.parseColor("#FFFFFF")
@@ -204,7 +239,6 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             }
             "galaxy" -> {
                 bgRes = R.drawable.widget_bg_galaxy
-                mapBgRes = R.drawable.widget_map_bg_galaxy
                 statBgRes = R.drawable.widget_stat_bg_galaxy
                 badgeBgRes = R.drawable.widget_badge_bg_galaxy
                 textColor = android.graphics.Color.parseColor("#FFFFFF")
@@ -213,7 +247,6 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             }
             "monochromeDark", "monochrome_dark" -> {
                 bgRes = R.drawable.widget_bg_monochrome_dark
-                mapBgRes = R.drawable.widget_map_bg_monochrome_dark
                 statBgRes = R.drawable.widget_stat_bg_monochrome_dark
                 badgeBgRes = R.drawable.widget_badge_bg_monochrome_dark
                 textColor = android.graphics.Color.parseColor("#FFFFFF")
@@ -222,7 +255,6 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             }
             "minimalLight", "minimal_light", "light" -> {
                 bgRes = R.drawable.widget_bg_minimal_light
-                mapBgRes = R.drawable.widget_map_bg_minimal_light
                 statBgRes = R.drawable.widget_stat_bg_minimal_light
                 badgeBgRes = R.drawable.widget_badge_bg_minimal_light
                 textColor = android.graphics.Color.parseColor("#0F172A")
@@ -231,7 +263,6 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             }
             "sandLight", "sand_light" -> {
                 bgRes = R.drawable.widget_bg_sand_light
-                mapBgRes = R.drawable.widget_map_bg_sand_light
                 statBgRes = R.drawable.widget_stat_bg_sand_light
                 badgeBgRes = R.drawable.widget_badge_bg_sand_light
                 textColor = android.graphics.Color.parseColor("#292524")
@@ -240,7 +271,6 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             }
             "oceanLight", "ocean_light", "ocean" -> {
                 bgRes = R.drawable.widget_bg_ocean_light
-                mapBgRes = R.drawable.widget_map_bg_ocean_light
                 statBgRes = R.drawable.widget_stat_bg_ocean_light
                 badgeBgRes = R.drawable.widget_badge_bg_ocean_light
                 textColor = android.graphics.Color.parseColor("#0C4A6E")
@@ -249,7 +279,6 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             }
             "cherryBlossom", "cherry_blossom" -> {
                 bgRes = R.drawable.widget_bg_cherry_blossom
-                mapBgRes = R.drawable.widget_map_bg_cherry_blossom
                 statBgRes = R.drawable.widget_stat_bg_cherry_blossom
                 badgeBgRes = R.drawable.widget_badge_bg_cherry_blossom
                 textColor = android.graphics.Color.parseColor("#4C0519")
@@ -258,7 +287,6 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             }
             "vintageSepia", "vintage_sepia" -> {
                 bgRes = R.drawable.widget_bg_vintage_sepia
-                mapBgRes = R.drawable.widget_map_bg_vintage_sepia
                 statBgRes = R.drawable.widget_stat_bg_vintage_sepia
                 badgeBgRes = R.drawable.widget_badge_bg_vintage_sepia
                 textColor = android.graphics.Color.parseColor("#422006")
@@ -267,7 +295,6 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             }
             "matcha" -> {
                 bgRes = R.drawable.widget_bg_matcha
-                mapBgRes = R.drawable.widget_map_bg_matcha
                 statBgRes = R.drawable.widget_stat_bg_matcha
                 badgeBgRes = R.drawable.widget_badge_bg_matcha
                 textColor = android.graphics.Color.parseColor("#14532D")
@@ -276,7 +303,6 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             }
             "pastelDream", "pastel_dream" -> {
                 bgRes = R.drawable.widget_bg_pastel_dream
-                mapBgRes = R.drawable.widget_map_bg_pastel_dream
                 statBgRes = R.drawable.widget_stat_bg_pastel_dream
                 badgeBgRes = R.drawable.widget_badge_bg_pastel_dream
                 textColor = android.graphics.Color.parseColor("#4C1D95")
@@ -285,7 +311,6 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             }
             else -> { // midnight
                 bgRes = R.drawable.widget_bg_midnight
-                mapBgRes = R.drawable.widget_map_bg_midnight
                 statBgRes = R.drawable.widget_stat_bg_midnight
                 badgeBgRes = R.drawable.widget_badge_bg_midnight
                 textColor = android.graphics.Color.parseColor("#FFFFFF")
@@ -305,34 +330,27 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             views.setInt(R.id.widget_stat3, "setBackgroundResource", statBgRes)
         } catch (_: Throwable) {}
 
+        // Seamless map container without redundant inner stroke
         try {
-            views.setInt(R.id.widget_map_container, "setBackgroundResource", mapBgRes)
+            views.setInt(R.id.widget_map_container, "setBackgroundColor", android.graphics.Color.TRANSPARENT)
         } catch (_: Throwable) {}
 
-        val showWorldMap = when (mode) {
-            "world_map" -> true
-            "trip" -> false
-            else -> !hasUpcomingTrip && (visitedCount > 0 || wishlistCount > 0)
+        val showWorldMap = (mode == "world_map")
+        val isQuickExpense = (mode == "quick_expense")
+        val isCurrency = (mode == "currency_converter")
+
+        val savedLang = widgetData.getString("app_language", null) ?: java.util.Locale.getDefault().language
+        val isTurkish = savedLang.startsWith("tr", ignoreCase = true)
+
+        views.setViewVisibility(R.id.widget_title_row, View.VISIBLE)
+        views.setViewVisibility(R.id.widget_title, View.VISIBLE)
+        if (size == WidgetLayoutSize.LARGE) {
+            views.setViewVisibility(R.id.widget_bottom_stats, View.VISIBLE)
         }
-
-        val isTurkish = java.util.Locale.getDefault().language.equals("tr", ignoreCase = true)
-
-        if (size == WidgetLayoutSize.LARGE && showWorldMap) {
-            views.setViewVisibility(R.id.widget_title_row, View.GONE)
-            views.setViewVisibility(R.id.widget_title, View.GONE)
+        if (customSubtitle.isNullOrEmpty()) {
             views.setViewVisibility(R.id.widget_destination, View.GONE)
-            views.setViewVisibility(R.id.widget_bottom_stats, View.GONE)
         } else {
-            if (size == WidgetLayoutSize.LARGE) {
-                views.setViewVisibility(R.id.widget_title_row, View.VISIBLE)
-                views.setViewVisibility(R.id.widget_title, View.VISIBLE)
-                views.setViewVisibility(R.id.widget_bottom_stats, View.VISIBLE)
-            }
-            if (showWorldMap || customSubtitle.isNullOrEmpty()) {
-                views.setViewVisibility(R.id.widget_destination, View.GONE)
-            } else {
-                views.setViewVisibility(R.id.widget_destination, View.VISIBLE)
-            }
+            views.setViewVisibility(R.id.widget_destination, View.VISIBLE)
         }
 
         if (!customTitle.isNullOrEmpty()) {
@@ -430,7 +448,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             }
         } catch (_: Throwable) {}
 
-        // Map Image Rendering for Medium and Large
+        // Map Image Rendering: STRICTLY for world_map only!
         if (size != WidgetLayoutSize.SMALL && showWorldMap) {
             val mapPath = when (size) {
                 WidgetLayoutSize.LARGE -> widgetData.getString("map_image_large", null)
@@ -461,9 +479,45 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             } catch (_: Throwable) {}
         }
 
-        // Open PackBuddy on click
+        // Quick Expense Action & Hero Views
+        try {
+            if (isQuickExpense) {
+                views.setViewVisibility(R.id.widget_action_container, View.VISIBLE)
+                views.setViewVisibility(R.id.widget_expense_hero, View.VISIBLE)
+                views.setTextViewText(R.id.widget_action_text, if (isTurkish) "Harcama Ekle" else "Add Expense")
+                views.setTextViewText(R.id.widget_large_add_text, if (isTurkish) "Harcama Ekle" else "Add Expense")
+                views.setInt(R.id.widget_action_container, "setBackgroundResource", statBgRes)
+                views.setInt(R.id.widget_action_icon, "setBackgroundResource", badgeBgRes)
+                views.setInt(R.id.widget_large_add_btn, "setBackgroundResource", badgeBgRes)
+            } else {
+                views.setViewVisibility(R.id.widget_action_container, View.GONE)
+                views.setViewVisibility(R.id.widget_expense_hero, View.GONE)
+            }
+        } catch (_: Throwable) {}
+
+        // Currency Container
+        try {
+            if (isCurrency) {
+                views.setViewVisibility(R.id.widget_currency_container, View.VISIBLE)
+                views.setTextViewText(R.id.widget_currency_text, if (isTurkish) "Döviz" else "Currency")
+                views.setInt(R.id.widget_currency_container, "setBackgroundResource", statBgRes)
+                views.setInt(R.id.widget_currency_icon, "setBackgroundResource", badgeBgRes)
+            } else {
+                views.setViewVisibility(R.id.widget_currency_container, View.GONE)
+            }
+        } catch (_: Throwable) {}
+
+        // Open PackBuddy via deep link matching the widget mode
+        val actionUri = when (mode) {
+            "quick_expense" -> "packbuddy://add_expense"
+            "currency_converter" -> "packbuddy://currency"
+            "world_map" -> "packbuddy://map"
+            "trip" -> "packbuddy://trip"
+            else -> "packbuddy://home"
+        }
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            data = android.net.Uri.parse(actionUri)
         }
         val pendingIntent = PendingIntent.getActivity(
             context,
@@ -472,6 +526,12 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         views.setOnClickPendingIntent(R.id.widget_container, pendingIntent)
+
+        // Specifically wire action buttons for direct click
+        try {
+            views.setOnClickPendingIntent(R.id.widget_action_container, pendingIntent)
+            views.setOnClickPendingIntent(R.id.widget_large_add_btn, pendingIntent)
+        } catch (_: Throwable) {}
 
         return views
     }

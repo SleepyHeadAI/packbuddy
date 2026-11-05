@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_colors.dart';
 
-/// Sophisticated, executive card container with soft diffusion shadow,
+/// Serene Voyage card container with soft diffusion shadow,
 /// subtle 1px border, generous border radius, and bouncy tactile spring feedback on tap.
 class AppCard extends StatefulWidget {
   final Widget child;
@@ -20,7 +21,7 @@ class AppCard extends StatefulWidget {
     this.backgroundColor,
     this.gradient,
     this.border,
-    this.borderRadius = 20,
+    this.borderRadius = 22,
     this.customShadow,
   });
 
@@ -67,8 +68,8 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
         ? Border.fromBorderSide(widget.border!)
         : Border.all(
             color: isDark
-                ? const Color(0xFF1E293B)
-                : const Color(0xFFDDE3ED),
+                ? AppColors.outlineDark
+                : AppColors.outlineLight,
             width: 1,
           );
 

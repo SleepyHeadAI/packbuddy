@@ -464,7 +464,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get standardBaggageLimitNote =>
-      'Standart Limit: Kabin 8 kg • Kargo 20-23 kg';
+      'Standart Limit: Kabin 8 kg • Uçak Altı 20-23 kg';
 
   @override
   String get airlineBaggageLimits => 'Havayolu Limitleri';
@@ -859,7 +859,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get cabinBaggage => 'Kabin Bagajı';
 
   @override
-  String get checkedBaggage => 'Kargo / Kayıtlı';
+  String get checkedBaggage => 'Uçak Altı Bagajı';
 
   @override
   String get standardEconomy => 'Standart Ekonomi';

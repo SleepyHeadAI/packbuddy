@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
@@ -233,7 +234,7 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+            color: isDark ? AppColors.surfaceVariantDark : AppColors.surfaceVariantLight,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
@@ -309,7 +310,7 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
                   )
                 : null,
             filled: true,
-            fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+            fillColor: isDark ? AppColors.surfaceVariantDark : AppColors.surfaceVariantLight,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide(
@@ -361,22 +362,11 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: isDark
-                  ? [
-                      theme.colorScheme.primary.withValues(alpha: 0.18),
-                      theme.colorScheme.secondary.withValues(alpha: 0.10),
-                    ]
-                  : [
-                      theme.colorScheme.primary.withValues(alpha: 0.08),
-                      theme.colorScheme.secondary.withValues(alpha: 0.04),
-                    ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            color: isDark ? AppColors.surfaceVariantDark : AppColors.surfaceVariantLight,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: theme.colorScheme.primary.withValues(alpha: 0.25),
+              color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+              width: 1,
             ),
           ),
           child: Column(
@@ -435,10 +425,10 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
                   Flexible(
                     child: Text(
                       '1 $_fromCurrency = ${rateFromTo.toStringAsFixed(4)} $_toCurrency',
-                      style: TextStyle(
+                      style: AppTheme.monoFont(
                         fontSize: 11,
+                        fontWeight: FontWeight.w600,
                         color: theme.colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w500,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -448,10 +438,10 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
                   Flexible(
                     child: Text(
                       '1 $_toCurrency = ${rateToFrom.toStringAsFixed(4)} $_fromCurrency',
-                      style: TextStyle(
+                      style: AppTheme.monoFont(
                         fontSize: 11,
+                        fontWeight: FontWeight.w600,
                         color: theme.colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w500,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
