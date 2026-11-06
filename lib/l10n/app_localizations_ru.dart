@@ -478,10 +478,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get luggagePreparationGuide => 'Руководство по сборам багажа';
 
   @override
-  String get weighingResponsibilityNote =>
-      '⚖️ Контроль веса лежит на ответственности путешественника.';
-
-  @override
   String get digitalWallet => 'Цифровой кошелек';
 
   @override

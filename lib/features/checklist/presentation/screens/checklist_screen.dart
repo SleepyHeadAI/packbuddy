@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
+import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/features/checklist/domain/packing_item.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
@@ -314,40 +315,37 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                     ),
                     child: Builder(
                       builder: (context) {
-                        final langCode = Localizations.localeOf(context).languageCode;
-                        final isTr = langCode.toLowerCase().startsWith('tr');
-
                         final cardTitle = widget.tripTitle != null
-                            ? (isTr ? '${widget.tripTitle} Bavulu' : '${widget.tripTitle} Luggage')
-                            : (isTr ? 'Hazırlık Durumu' : 'Packing Status');
+                            ? '${widget.tripTitle} • ${l10n.baggageAndChecklist}'
+                            : l10n.baggageAndChecklist;
 
                         String airlineTitle;
                         String airlineSubtitle;
 
                         if (checklistState.baggageAllowanceMode == BaggageAllowanceMode.none) {
-                          airlineTitle = isTr ? 'Bagaj Limiti: Belirlenmedi' : 'Baggage Limit: None';
-                          airlineSubtitle = isTr ? 'Limitsiz veya sadece kişisel çanta' : 'No limit / personal item only';
+                          airlineTitle = l10n.airlineBaggageLimits;
+                          airlineSubtitle = l10n.standardBaggageLimitNote;
                         } else if (checklistState.selectedAirline != null) {
                           final air = checklistState.selectedAirline!;
                           if (checklistState.baggageAllowanceMode == BaggageAllowanceMode.cabinOnly) {
-                            airlineTitle = '${air.airlineName} (Kabin)';
-                            airlineSubtitle = '${air.countryFlag} Sadece Kabin: ${air.cabinLimitKg.toInt()} kg (${air.cabinDimensions})';
+                            airlineTitle = '${air.airlineName} (${l10n.cabinBaggage})';
+                            airlineSubtitle = '${air.countryFlag} ${l10n.cabinBaggage}: ${air.cabinLimitKg.toInt()} kg (${air.cabinDimensions})';
                           } else if (checklistState.baggageAllowanceMode == BaggageAllowanceMode.checkedOnly) {
-                            airlineTitle = '${air.airlineName} (Uçak Altı)';
-                            airlineSubtitle = '${air.countryFlag} Sadece Uçak Altı: ${air.checkedLimitKg.toInt()} kg';
+                            airlineTitle = '${air.airlineName} (${l10n.checkedBaggage})';
+                            airlineSubtitle = '${air.countryFlag} ${l10n.checkedBaggage}: ${air.checkedLimitKg.toInt()} kg';
                           } else {
                             airlineTitle = air.airlineName;
-                            airlineSubtitle = '${air.countryFlag} Kabin ${air.cabinLimitKg.toInt()} kg • Kargo ${air.checkedLimitKg.toInt()} kg';
+                            airlineSubtitle = '${air.countryFlag} ${l10n.cabinBaggage} ${air.cabinLimitKg.toInt()} kg • ${l10n.checkedBaggage} ${air.checkedLimitKg.toInt()} kg';
                           }
                         } else {
                           if (checklistState.baggageAllowanceMode == BaggageAllowanceMode.cabinOnly) {
-                            airlineTitle = isTr ? 'Standart Kabin Limiti' : 'Standard Cabin Limit';
-                            airlineSubtitle = '✈️ Kabin: 8 kg (55x40x20 cm)';
+                            airlineTitle = '${l10n.cabinBaggage} (8 kg)';
+                            airlineSubtitle = '✈️ 8 kg (55x40x20 cm)';
                           } else if (checklistState.baggageAllowanceMode == BaggageAllowanceMode.checkedOnly) {
-                            airlineTitle = isTr ? 'Standart Uçak Altı Limiti' : 'Standard Checked Limit';
-                            airlineSubtitle = '✈️ Kargo: 20-23 kg';
+                            airlineTitle = '${l10n.checkedBaggage} (20-23 kg)';
+                            airlineSubtitle = '✈️ 20-23 kg';
                           } else {
-                            airlineTitle = isTr ? 'Standart Havayolu Limiti' : l10n.airlineBaggageLimits;
+                            airlineTitle = l10n.airlineBaggageLimits;
                             airlineSubtitle = l10n.standardBaggageLimitNote;
                           }
                         }
@@ -544,7 +542,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                               ),
                                             ),
                                             child: Text(
-                                              _getSetActionLabel(langCode),
+                                              l10n.set,
                                               style: TextStyle(
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.w700,
@@ -578,7 +576,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                                 ),
                                                 const SizedBox(width: 4),
                                                 Text(
-                                                  _getTemplatesActionLabel(langCode),
+                                                  l10n.readyTemplates,
                                                   style: const TextStyle(
                                                     fontSize: 11,
                                                     fontWeight: FontWeight.w700,
@@ -651,12 +649,12 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                   ),
                 ),
 
-              // 4. Smooth Category Filter Bar with Edge Fading ShaderMask
+              // 4. Tactile Baggage Category Selector Bar
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 8, bottom: 6),
+                  padding: const EdgeInsets.only(top: 10, bottom: 8),
                   child: SizedBox(
-                    height: 38,
+                    height: 42,
                     child: ShaderMask(
                       shaderCallback: (Rect bounds) {
                         return const LinearGradient(
@@ -668,15 +666,16 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                             Colors.white,
                             Colors.transparent,
                           ],
-                          stops: [0.0, 0.04, 0.96, 1.0],
+                          stops: [0.0, 0.03, 0.97, 1.0],
                         ).createShader(bounds);
                       },
                       blendMode: BlendMode.dstIn,
-                      child: ListView.builder(
+                      child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         physics: const BouncingScrollPhysics(),
                         itemCount: _categories.length,
+                        separatorBuilder: (_, _) => const SizedBox(width: 8),
                         itemBuilder: (context, index) {
                           final category = _categories[index];
                           final categoryLabels = {
@@ -687,40 +686,74 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                             'Belgeler': l10n.categoryDocuments,
                             'Aksesuar': l10n.categoryAccessories,
                           };
+                          final categoryIcons = {
+                            'Tümü': Icons.grid_view_rounded,
+                            'Kıyafet': Icons.checkroom_rounded,
+                            'Elektronik': Icons.devices_rounded,
+                            'Kişisel Bakım': Icons.spa_rounded,
+                            'Belgeler': Icons.description_rounded,
+                            'Aksesuar': Icons.watch_rounded,
+                          };
                           final displayLabel = categoryLabels[category] ?? category;
+                          final displayIcon = categoryIcons[category] ?? Icons.category_rounded;
                           final isSelected = (category == 'Tümü' && checklistState.selectedCategory == null) ||
                               (checklistState.selectedCategory == category);
 
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8),
+                          return BouncyPressable(
+                            scaleFactor: 0.92,
+                            onTap: () {
+                              controller.setCategoryFilter(category == 'Tümü' ? null : category);
+                            },
                             child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
+                              duration: const Duration(milliseconds: 220),
                               curve: Curves.easeOutCubic,
-                              child: ChoiceChip(
-                                label: Text(displayLabel),
-                                selected: isSelected,
-                                selectedColor: theme.colorScheme.primary,
-                                showCheckmark: false,
-                                labelStyle: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: isSelected
-                                      ? theme.colorScheme.onPrimary
-                                      : theme.colorScheme.onSurfaceVariant,
-                                ),
-                                backgroundColor: isDark
-                                    ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
-                                    : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
-                                side: BorderSide(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? theme.colorScheme.primary
+                                    : (isDark
+                                        ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4)
+                                        : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.55)),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
                                   color: isSelected
                                       ? theme.colorScheme.primary
-                                      : theme.colorScheme.outline.withValues(alpha: 0.25),
+                                      : theme.colorScheme.outlineVariant.withValues(alpha: 0.25),
                                   width: 1,
                                 ),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                onSelected: (_) {
-                                  controller.setCategoryFilter(category == 'Tümü' ? null : category);
-                                },
+                                boxShadow: isSelected
+                                    ? [
+                                        BoxShadow(
+                                          color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                      ]
+                                    : null,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    displayIcon,
+                                    size: 15,
+                                    color: isSelected
+                                        ? theme.colorScheme.onPrimary
+                                        : theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    displayLabel,
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                                      color: isSelected
+                                          ? theme.colorScheme.onPrimary
+                                          : theme.colorScheme.onSurface,
+                                      letterSpacing: -0.1,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           );
@@ -824,31 +857,5 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
         ),
       ),
     );
-  }
-
-  static String _getSetActionLabel(String lang) {
-    if (lang == 'tr') return 'Ayarla';
-    if (lang == 'de') return 'Einstellen';
-    if (lang == 'fr') return 'Régler';
-    if (lang == 'es') return 'Ajustar';
-    if (lang == 'it') return 'Imposta';
-    if (lang == 'ru') return 'Настроить';
-    if (lang == 'ar') return 'ضبط';
-    if (lang == 'pt') return 'Ajustar';
-    if (lang == 'nl') return 'Instellen';
-    return 'Set';
-  }
-
-  static String _getTemplatesActionLabel(String lang) {
-    if (lang == 'tr') return 'Şablon';
-    if (lang == 'de') return 'Vorlagen';
-    if (lang == 'fr') return 'Modèles';
-    if (lang == 'es') return 'Plantillas';
-    if (lang == 'it') return 'Modelli';
-    if (lang == 'ru') return 'Шаблоны';
-    if (lang == 'ar') return 'قوالب';
-    if (lang == 'pt') return 'Modelos';
-    if (lang == 'nl') return 'Sjablonen';
-    return 'Templates';
   }
 }

@@ -75,7 +75,6 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
   void initState() {
     super.initState();
     _selectedTripFilter = widget.initialTripId;
-    SecurityService.instance.enableSecureScreen();
   }
 
   @override
@@ -86,7 +85,6 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
 
   @override
   void dispose() {
-    SecurityService.instance.disableSecureScreen();
     super.dispose();
   }
 

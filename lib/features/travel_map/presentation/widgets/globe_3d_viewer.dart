@@ -198,15 +198,17 @@ class _Globe3DViewerState extends State<Globe3DViewer> {
           onTapUp: (details) => _handleTapUp(details, size, radius),
           child: Stack(
             children: [
-              CustomPaint(
-                size: size,
-                painter: _GlobePainter(
-                  countries: widget.countries,
-                  polygons: GlobeWorldData.getPolygons(),
-                  rotLat: _rotLat,
-                  rotLng: _rotLng,
-                  radius: radius,
-                  isDark: widget.isDark,
+              RepaintBoundary(
+                child: CustomPaint(
+                  size: size,
+                  painter: _GlobePainter(
+                    countries: widget.countries,
+                    polygons: GlobeWorldData.getPolygons(),
+                    rotLat: _rotLat,
+                    rotLng: _rotLng,
+                    radius: radius,
+                    isDark: widget.isDark,
+                  ),
                 ),
               ),
 

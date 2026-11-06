@@ -154,6 +154,15 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
       await HomeWidget.saveWidgetData<String>('${_widgetMode}_theme', _widgetTheme);
       await HomeWidget.saveWidgetData<String>('widget_theme', _widgetTheme);
       await HomeWidget.saveWidgetData<int>('user_selected_size', _selectedSize);
+      await HomeWidget.saveWidgetData<bool>('pending_pin_map_show_continents', _showContinents);
+      await HomeWidget.saveWidgetData<bool>('pending_pin_map_show_wishlist', _showWishlist);
+      await HomeWidget.saveWidgetData<bool>('pending_pin_trip_show_countdown', _showCountdown);
+      await HomeWidget.saveWidgetData<bool>('pending_pin_trip_show_packing', _showPacking);
+      await HomeWidget.saveWidgetData<bool>('pending_pin_trip_show_budget', _showBudget);
+      await HomeWidget.saveWidgetData<bool>('pending_pin_currency_show_live_rate', _showLiveRate);
+      await HomeWidget.saveWidgetData<bool>('pending_pin_currency_show_reverse_rate', _showReverseRate);
+      await HomeWidget.saveWidgetData<bool>('pending_pin_quick_expense_show_remaining', _showRemainingBudget);
+      await HomeWidget.saveWidgetData<bool>('pending_pin_quick_expense_show_last', _showLastExpense);
 
       final isSupported = await HomeWidget.isRequestPinWidgetSupported() ?? false;
       if (isSupported) {
@@ -189,6 +198,15 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
             'theme': _widgetTheme,
             'size': _selectedSize,
             'provider': providerName,
+            'showContinents': _showContinents,
+            'showWishlist': _showWishlist,
+            'showCountdown': _showCountdown,
+            'showPacking': _showPacking,
+            'showBudget': _showBudget,
+            'showLiveRate': _showLiveRate,
+            'showReverseRate': _showReverseRate,
+            'showRemainingBudget': _showRemainingBudget,
+            'showLastExpense': _showLastExpense,
           });
           pinnedViaNative = res == true;
         } catch (_) {}
@@ -787,7 +805,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
         colorMap[code] = themeConfig.livedColor;
       } else if (country.isVisited) {
         colorMap[code] = themeConfig.visitedColor;
-      } else if (country.isWishlist) {
+      } else if (country.isWishlist && _showWishlist) {
         colorMap[code] = themeConfig.wishlistColor;
       }
     }
@@ -798,19 +816,19 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
         colorMap['cy'] = themeConfig.livedColor;
       } else if (nc.isVisited) {
         colorMap['cy'] = themeConfig.visitedColor;
-      } else if (nc.isWishlist && colorMap['cy'] == null) {
+      } else if (nc.isWishlist && _showWishlist && colorMap['cy'] == null) {
         colorMap['cy'] = themeConfig.wishlistColor;
       }
     }
 
-    final int livedCount = _countries.where((c) => c.isLived).length;
-    final int visitedCount = _countries.isNotEmpty
+    int livedCount = _countries.where((c) => c.isLived).length;
+    int visitedCount = _countries.isNotEmpty
         ? _countries.where((c) => c.isVisited || c.isLived).length
         : (_widgetData?.visitedCountriesCount ?? 0);
-    final int wishlistCount = _countries.isNotEmpty
+    int wishlistCount = _countries.isNotEmpty
         ? _countries.where((c) => c.isWishlist).length
         : (_widgetData?.wishlistCountriesCount ?? 0);
-    final int continentsCount = _countries.isNotEmpty
+    int continentsCount = _countries.isNotEmpty
         ? _countries
             .where((c) => c.isVisited || c.isLived)
             .map((c) => c.continent)
@@ -819,9 +837,29 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
             .length
         : (_widgetData?.continentsCount ?? 0);
 
+    // Provide attractive preview fallback if user hasn't marked countries yet
+    if (visitedCount == 0 && livedCount == 0 && wishlistCount == 0) {
+      visitedCount = 28;
+      livedCount = 2;
+      wishlistCount = 5;
+      continentsCount = 3;
+      colorMap['tr'] = themeConfig.livedColor;
+      colorMap['de'] = themeConfig.visitedColor;
+      colorMap['it'] = themeConfig.visitedColor;
+      colorMap['fr'] = themeConfig.visitedColor;
+      colorMap['es'] = themeConfig.visitedColor;
+      colorMap['us'] = themeConfig.visitedColor;
+      colorMap['br'] = themeConfig.visitedColor;
+      if (_showWishlist) {
+        colorMap['jp'] = themeConfig.wishlistColor;
+        colorMap['ca'] = themeConfig.wishlistColor;
+        colorMap['au'] = themeConfig.wishlistColor;
+      }
+    }
+
     final String rawPct = (_widgetData?.worldPercentage ?? '0.0').replaceAll('%', '').trim();
     final double worldPercent = double.tryParse(rawPct) ??
-        (visitedCount > 0 ? (visitedCount / 229.0 * 100.0) : 0.0);
+        (visitedCount > 0 ? (visitedCount / 229.0 * 100.0) : 12.2);
 
     return FittedBox(
       fit: BoxFit.scaleDown,
@@ -1016,15 +1054,16 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            Text(
-              continentsSub,
-              style: TextStyle(
-                fontSize: 9.5,
-                color: themeConfig.subtitleTextColor,
+            if (_showContinents)
+              Text(
+                continentsSub,
+                style: TextStyle(
+                  fontSize: 9.5,
+                  color: themeConfig.subtitleTextColor,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
           ],
         ),
 
@@ -1049,10 +1088,11 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                   '✈️ $visitedCount',
                   style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
                 ),
-                Text(
-                  '🌟 $wishlistCount',
-                  style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
-                ),
+                if (_showWishlist)
+                  Text(
+                    '🌟 $wishlistCount',
+                    style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
+                  ),
               ],
             ),
           ],
@@ -1180,15 +1220,17 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const SizedBox(width: 4),
-                  Flexible(
-                    child: Text(
-                      wishlistStatLabel,
-                      style: TextStyle(fontSize: 9.5, color: themeConfig.subtitleTextColor),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                  if (_showWishlist) ...[
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        wishlistStatLabel,
+                        style: TextStyle(fontSize: 9.5, color: themeConfig.subtitleTextColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ],
@@ -1233,24 +1275,26 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 2),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
-                  decoration: BoxDecoration(
-                    color: themeConfig.statBgColor,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    continentsStatLabel,
-                    style: TextStyle(
-                      fontSize: 8.5,
-                      fontWeight: FontWeight.w700,
-                      color: themeConfig.accentColor,
+                if (_showContinents) ...[
+                  const SizedBox(height: 2),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
+                    decoration: BoxDecoration(
+                      color: themeConfig.statBgColor,
+                      borderRadius: BorderRadius.circular(6),
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    child: Text(
+                      continentsStatLabel,
+                      style: TextStyle(
+                        fontSize: 8.5,
+                        fontWeight: FontWeight.w700,
+                        color: themeConfig.accentColor,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
@@ -1383,9 +1427,11 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                           _buildLegendIndicator(themeConfig.livedColor, '$legendLived ($livedCount)', themeConfig.legendTextColor),
                           const SizedBox(width: 8),
                           _buildLegendIndicator(themeConfig.visitedColor, '$legendVisited ($visitedCount)', themeConfig.legendTextColor),
-                          const SizedBox(width: 8),
-                          _buildLegendIndicator(themeConfig.wishlistColor, '$legendWishlist ($wishlistCount)', themeConfig.legendTextColor),
-                          if (continentsCount > 0) ...[
+                          if (_showWishlist) ...[
+                            const SizedBox(width: 8),
+                            _buildLegendIndicator(themeConfig.wishlistColor, '$legendWishlist ($wishlistCount)', themeConfig.legendTextColor),
+                          ],
+                          if (_showContinents && continentsCount > 0) ...[
                             const SizedBox(width: 8),
                             Text(
                               continentsStatLabel,
@@ -1458,14 +1504,21 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
     required AppLocalizations? l10n,
     required WidgetThemeConfig themeConfig,
   }) {
+    final hasTrip = _widgetData?.hasUpcomingTrip ?? false;
     final defaultDestination = AppWidgetLocalization.getDefaultDestination(lang);
-    final tripTitle = _widgetData?.tripTitle ?? (l10n?.appName ?? 'PackBuddy');
-    final destination = _widgetData?.destination ?? defaultDestination;
-    final int days = _widgetData?.daysUntil ?? 0;
+    final tripTitle = _widgetData?.tripTitle ?? (lang == 'tr' ? 'Roma Tatili' : 'Rome Trip');
+    final destination = (_widgetData?.destination != null && _widgetData!.destination!.isNotEmpty)
+        ? _widgetData!.destination!
+        : defaultDestination;
+    final int days = hasTrip ? (_widgetData?.daysUntil ?? 0) : 14;
     final String daysText = AppWidgetLocalization.formatDaysUntil(lang, days);
-    final int totalItems = _widgetData?.totalItems ?? 0;
-    final int packedItems = _widgetData?.packedItems ?? 0;
-    final double packingProgress = totalItems > 0 ? (packedItems / totalItems).clamp(0.0, 1.0) : 0.0;
+    final int totalItems = hasTrip ? (_widgetData?.totalItems ?? 0) : 24;
+    final int packedItems = hasTrip ? (_widgetData?.packedItems ?? 0) : 18;
+    final double packingProgress = totalItems > 0 ? (packedItems / totalItems).clamp(0.0, 1.0) : 0.75;
+    final userCurrency = _widgetData?.userCurrency ?? 'TRY';
+    final String budgetSpent = (_widgetData?.budgetSpent != null && _widgetData!.budgetSpent!.isNotEmpty)
+        ? _widgetData!.budgetSpent!
+        : (userCurrency == 'TRY' ? '₺3,450.00' : '\$450.00');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1531,7 +1584,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
           ],
         ),
 
-        // Packing
+        // Packing / Budget / Countdown
         if (_showPacking)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
@@ -1568,6 +1621,27 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
               ],
             ),
           )
+        else if (_showBudget)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            decoration: BoxDecoration(
+              color: themeConfig.statBgColor,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  AppWidgetLocalization.getSpentLabel(lang),
+                  style: TextStyle(fontSize: 9, color: themeConfig.subtitleTextColor),
+                ),
+                Text(
+                  budgetSpent,
+                  style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: themeConfig.accentColor),
+                ),
+              ],
+            ),
+          )
         else
           Text(
             daysText,
@@ -1584,17 +1658,23 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
     required AppLocalizations? l10n,
     required WidgetThemeConfig themeConfig,
   }) {
+    final hasTrip = _widgetData?.hasUpcomingTrip ?? false;
     final tripHeader = AppWidgetLocalization.getTripHeader(lang);
     final defaultDestination = AppWidgetLocalization.getDefaultDestination(lang);
-    final tripTitle = _widgetData?.tripTitle ?? (l10n?.appName ?? 'PackBuddy');
-    final destination = _widgetData?.destination ?? defaultDestination;
-    final int days = _widgetData?.daysUntil ?? 0;
+    final tripTitle = _widgetData?.tripTitle ?? (lang == 'tr' ? 'Roma Seyahati' : 'Rome Trip');
+    final destination = (_widgetData?.destination != null && _widgetData!.destination!.isNotEmpty)
+        ? _widgetData!.destination!
+        : defaultDestination;
+    final int days = hasTrip ? (_widgetData?.daysUntil ?? 0) : 12;
     final String daysText = AppWidgetLocalization.formatDaysUntil(lang, days);
-    final int totalItems = _widgetData?.totalItems ?? 0;
-    final int packedItems = _widgetData?.packedItems ?? 0;
-    final int packingPercent = _widgetData?.packingPercent ?? 0;
-    final double packingProgress = totalItems > 0 ? (packedItems / totalItems).clamp(0.0, 1.0) : 0.0;
-    final String budgetSpent = _widgetData?.budgetSpent ?? '';
+    final int totalItems = hasTrip ? (_widgetData?.totalItems ?? 0) : 24;
+    final int packedItems = hasTrip ? (_widgetData?.packedItems ?? 0) : 18;
+    final int packingPercent = totalItems > 0 ? ((packedItems / totalItems) * 100).toInt() : 75;
+    final double packingProgress = totalItems > 0 ? (packedItems / totalItems).clamp(0.0, 1.0) : 0.75;
+    final userCurrency = _widgetData?.userCurrency ?? 'TRY';
+    final String budgetSpent = (_widgetData?.budgetSpent != null && _widgetData!.budgetSpent!.isNotEmpty)
+        ? _widgetData!.budgetSpent!
+        : (userCurrency == 'TRY' ? '₺4,850.00' : '\$620.00');
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1763,17 +1843,23 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
     required AppLocalizations? l10n,
     required WidgetThemeConfig themeConfig,
   }) {
+    final hasTrip = _widgetData?.hasUpcomingTrip ?? false;
     final tripHeader = AppWidgetLocalization.getTripHeader(lang);
     final defaultDestination = AppWidgetLocalization.getDefaultDestination(lang);
-    final tripTitle = _widgetData?.tripTitle ?? (l10n?.appName ?? 'PackBuddy');
-    final destination = _widgetData?.destination ?? defaultDestination;
-    final int days = _widgetData?.daysUntil ?? 0;
+    final tripTitle = _widgetData?.tripTitle ?? (lang == 'tr' ? 'Roma Seyahati' : 'Rome Trip');
+    final destination = (_widgetData?.destination != null && _widgetData!.destination!.isNotEmpty)
+        ? _widgetData!.destination!
+        : defaultDestination;
+    final int days = hasTrip ? (_widgetData?.daysUntil ?? 0) : 12;
     final String daysText = AppWidgetLocalization.formatDaysUntil(lang, days);
-    final int totalItems = _widgetData?.totalItems ?? 0;
-    final int packedItems = _widgetData?.packedItems ?? 0;
-    final int packingPercent = _widgetData?.packingPercent ?? 0;
-    final double packingProgress = totalItems > 0 ? (packedItems / totalItems).clamp(0.0, 1.0) : 0.0;
-    final String budgetSpent = _widgetData?.budgetSpent ?? '';
+    final int totalItems = hasTrip ? (_widgetData?.totalItems ?? 0) : 24;
+    final int packedItems = hasTrip ? (_widgetData?.packedItems ?? 0) : 18;
+    final int packingPercent = totalItems > 0 ? ((packedItems / totalItems) * 100).toInt() : 75;
+    final double packingProgress = totalItems > 0 ? (packedItems / totalItems).clamp(0.0, 1.0) : 0.75;
+    final userCurrency = _widgetData?.userCurrency ?? 'TRY';
+    final String budgetSpent = (_widgetData?.budgetSpent != null && _widgetData!.budgetSpent!.isNotEmpty)
+        ? _widgetData!.budgetSpent!
+        : (userCurrency == 'TRY' ? '₺4,850.00' : '\$620.00');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2027,6 +2113,17 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                 ),
               ),
             ),
+            if (_showLiveRate) ...[
+              Container(
+                width: 6,
+                height: 6,
+                margin: const EdgeInsets.only(right: 5),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF10B981),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ],
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
               decoration: BoxDecoration(
@@ -2072,7 +2169,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
           ],
         ),
 
-        // Bottom EUR rate
+        // Bottom EUR / Reverse rate
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
           decoration: BoxDecoration(
@@ -2083,11 +2180,13 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '1 EUR',
+                _showReverseRate ? '1 $userCurrency' : '1 EUR',
                 style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
               ),
               Text(
-                eurRate,
+                _showReverseRate
+                    ? '\$${(1.0 / (double.tryParse(usdRate.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 34.25)).toStringAsFixed(2)}'
+                    : eurRate,
                 style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: themeConfig.titleTextColor),
               ),
             ],
@@ -2179,10 +2278,16 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    AppWidgetLocalization.getLiveRatesLabel(lang),
-                    style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
-                  ),
+                  if (_showLiveRate)
+                    Text(
+                      AppWidgetLocalization.getLiveRatesLabel(lang),
+                      style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
+                    )
+                  else
+                    Text(
+                      AppWidgetLocalization.getOfflineReadyLabel(lang),
+                      style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
+                    ),
                   if (_showReverseRate)
                     Text(
                       '1 $userCurrency ≈ \$${(1.0 / (double.tryParse(usdRate.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 34.25)).toStringAsFixed(2)}',
@@ -2351,18 +2456,42 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
           ),
         ),
 
+        // Optional Reverse Rate Comparison Strip
+        if (_showReverseRate)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: themeConfig.statBgColor.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '1 $userCurrency ≈ \$${(1.0 / (double.tryParse(usdRate.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 34.25)).toStringAsFixed(2)}  •  1 $userCurrency ≈ €${(1.0 / (double.tryParse(eurRate.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 37.10)).toStringAsFixed(2)}',
+              style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: themeConfig.accentColor),
+              textAlign: TextAlign.center,
+            ),
+          ),
+
         // Live Rate footer
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              AppWidgetLocalization.getAutoSyncLabel(lang),
+              _showLiveRate
+                  ? AppWidgetLocalization.getAutoSyncLabel(lang)
+                  : AppWidgetLocalization.getOfflineReadyLabel(lang),
               style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
             ),
-            Text(
-              AppWidgetLocalization.getOfflineReadyLabel(lang),
-              style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
-            ),
+            if (_showLiveRate)
+              Text(
+                AppWidgetLocalization.getLiveRatesLabel(lang),
+                style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
+              )
+            else
+              Text(
+                'Sabit Kur Modu',
+                style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: themeConfig.subtitleTextColor),
+              ),
           ],
         ),
       ],
@@ -2412,8 +2541,10 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
     required WidgetThemeConfig themeConfig,
   }) {
     final expenseHeader = AppWidgetLocalization.getExpenseHeader(lang);
-    final budgetSpent = _widgetData?.budgetSpent ?? '₺0.00';
-    final remainingBudget = _widgetData?.remainingBudget;
+    final userCurrency = _widgetData?.userCurrency ?? 'TRY';
+    final budgetSpent = _widgetData?.budgetSpent ?? (userCurrency == 'TRY' ? '₺0.00' : '\$0.00');
+    final remainingBudget = _widgetData?.remainingBudget ?? (userCurrency == 'TRY' ? '₺2,500.00' : '\$2,500.00');
+    final lastExpense = _widgetData?.lastExpenseText ?? (lang == 'tr' ? '₺85.00' : '\$4.50');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2488,14 +2619,21 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                _showRemainingBudget && remainingBudget != null
+                _showRemainingBudget
                     ? AppWidgetLocalization.getRemainingBudgetTitle(lang)
-                    : AppWidgetLocalization.getAddExpenseActionLabel(lang),
+                    : (_showLastExpense
+                        ? AppWidgetLocalization.getLastExpenseLabel(lang)
+                        : AppWidgetLocalization.getAddExpenseActionLabel(lang)),
                 style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: themeConfig.accentColor),
               ),
-              if (_showRemainingBudget && remainingBudget != null)
+              if (_showRemainingBudget)
                 Text(
                   remainingBudget,
+                  style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: themeConfig.titleTextColor),
+                )
+              else if (_showLastExpense)
+                Text(
+                  lastExpense,
                   style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: themeConfig.titleTextColor),
                 ),
             ],
@@ -2512,9 +2650,10 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
     required WidgetThemeConfig themeConfig,
   }) {
     final expenseHeader = AppWidgetLocalization.getExpenseHeader(lang);
-    final budgetSpent = _widgetData?.budgetSpent ?? '₺0.00';
-    final remainingBudget = _widgetData?.remainingBudget;
-    final lastExpense = _widgetData?.lastExpenseText;
+    final userCurrency = _widgetData?.userCurrency ?? 'TRY';
+    final budgetSpent = _widgetData?.budgetSpent ?? (userCurrency == 'TRY' ? '₺0.00' : '\$0.00');
+    final remainingBudget = _widgetData?.remainingBudget ?? (userCurrency == 'TRY' ? '₺2,500.00' : '\$2,500.00');
+    final lastExpense = _widgetData?.lastExpenseText ?? (lang == 'tr' ? 'Kahve: ₺85.00' : 'Coffee: \$4.50');
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2557,7 +2696,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (remainingBudget != null && _showRemainingBudget)
+                  if (_showRemainingBudget)
                     Text(
                       '${AppWidgetLocalization.getRemainingBudgetTitle(lang)}: $remainingBudget',
                       style: TextStyle(
@@ -2572,20 +2711,19 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
               ),
 
               // Last Expense or Trip title
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      _showLastExpense && lastExpense != null
-                          ? '${AppWidgetLocalization.getLastExpenseLabel(lang)}: $lastExpense'
-                          : (_widgetData?.tripTitle ?? 'PackBuddy'),
-                      style: TextStyle(fontSize: 9.5, color: themeConfig.subtitleTextColor),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+              if (_showLastExpense)
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '${AppWidgetLocalization.getLastExpenseLabel(lang)}: $lastExpense',
+                        style: TextStyle(fontSize: 9.5, color: themeConfig.subtitleTextColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
             ],
           ),
         ),
@@ -2637,9 +2775,10 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
     required WidgetThemeConfig themeConfig,
   }) {
     final expenseHeader = AppWidgetLocalization.getExpenseHeader(lang);
-    final budgetSpent = _widgetData?.budgetSpent ?? '₺0.00';
-    final remainingBudget = _widgetData?.remainingBudget;
-    final lastExpense = _widgetData?.lastExpenseText;
+    final userCurrency = _widgetData?.userCurrency ?? 'TRY';
+    final budgetSpent = _widgetData?.budgetSpent ?? (userCurrency == 'TRY' ? '₺0.00' : '\$0.00');
+    final remainingBudget = _widgetData?.remainingBudget ?? (userCurrency == 'TRY' ? '₺2,500.00' : '\$2,500.00');
+    final lastExpense = _widgetData?.lastExpenseText ?? (lang == 'tr' ? 'Kahve & Tatlı: ₺120.00' : 'Coffee & Snack: \$6.50');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2700,7 +2839,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                 ),
               ),
             ),
-            if (remainingBudget != null) ...[
+            if (_showRemainingBudget) ...[
               const SizedBox(width: 10),
               Expanded(
                 child: Container(
@@ -2727,36 +2866,38 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
         ),
 
         // Last logged expense card
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          decoration: BoxDecoration(
-            color: themeConfig.statBgColor.withValues(alpha: 0.6),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.receipt_long_rounded, size: 16, color: themeConfig.accentColor),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppWidgetLocalization.getLastExpenseLabel(lang),
-                      style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
-                    ),
-                    Text(
-                      lastExpense ?? AppWidgetLocalization.getNoExpensesLoggedLabel(lang),
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: themeConfig.titleTextColor),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+        if (_showLastExpense) ...[
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: themeConfig.statBgColor.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.receipt_long_rounded, size: 16, color: themeConfig.accentColor),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppWidgetLocalization.getLastExpenseLabel(lang),
+                        style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
+                      ),
+                      Text(
+                        lastExpense,
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: themeConfig.titleTextColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+        ],
 
         // Action Button: Tap to add expense
         Container(

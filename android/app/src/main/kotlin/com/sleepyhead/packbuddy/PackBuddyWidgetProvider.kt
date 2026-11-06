@@ -476,8 +476,18 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     val noLast = widgetData.getString("quick_expense_no_last", "Henüz harcama kaydedilmedi") ?: "Henüz harcama kaydedilmedi"
                     val addAction = widgetData.getString("quick_expense_add_action", "+ Harcama Ekle") ?: "+ Harcama Ekle"
                     val quickLog = widgetData.getString("quick_expense_quick_log", "Hızlı Kayıt") ?: "Hızlı Kayıt"
-                    val showRemaining = widgetData.getBoolean("quick_expense_show_remaining", true)
-                    val showLast = widgetData.getBoolean("quick_expense_show_last", true)
+                    val showRemaining = safeGetBoolean(
+                        widgetData,
+                        if (widgetId > 0) "widget_${widgetId}_quick_expense_show_remaining" else "pending_pin_quick_expense_show_remaining",
+                        "quick_expense_show_remaining",
+                        true
+                    )
+                    val showLast = safeGetBoolean(
+                        widgetData,
+                        if (widgetId > 0) "widget_${widgetId}_quick_expense_show_last" else "pending_pin_quick_expense_show_last",
+                        "quick_expense_show_last",
+                        true
+                    )
                     val expMode = safeGetInt(widgetData, "widget_${widgetId}_exp_mode", 0)
 
                     try {
@@ -504,6 +514,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                             views.setTextViewText(R.id.widget_spent_val, if (expMode == 1 && remaining != null) remaining else spent)
                             views.setTextViewText(R.id.widget_last_expense_label, lastLabel)
                             views.setTextViewText(R.id.widget_last_expense_val, if (showLast) (lastExpense ?: noLast) else noLast)
+                            views.setViewVisibility(R.id.widget_last_card, if (showLast) View.VISIBLE else View.GONE)
                             views.setTextViewText(R.id.widget_large_add_text, addAction)
 
                             if (remaining != null && showRemaining) {
@@ -548,8 +559,15 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                                     views.setViewVisibility(R.id.widget_remaining_val, View.GONE)
                                 }
                             }
-                            val lastText = if (showLast && lastExpense != null) "$lastLabel: $lastExpense" else (widgetData.getString("trip_title", "PackBuddy") ?: "PackBuddy")
-                            views.setTextViewText(R.id.widget_last_expense_val, lastText)
+                            if (showLast && lastExpense != null) {
+                                views.setTextViewText(R.id.widget_last_expense_val, "$lastLabel: $lastExpense")
+                                views.setViewVisibility(R.id.widget_last_expense_val, View.VISIBLE)
+                            } else if (showLast) {
+                                views.setTextViewText(R.id.widget_last_expense_val, widgetData.getString("trip_title", "PackBuddy") ?: "PackBuddy")
+                                views.setViewVisibility(R.id.widget_last_expense_val, View.VISIBLE)
+                            } else {
+                                views.setViewVisibility(R.id.widget_last_expense_val, View.GONE)
+                            }
 
                             if (widgetId > 0) {
                                 views.setOnClickPendingIntent(R.id.widget_spent_val, makeBroadcastPendingIntent(ACTION_TOGGLE_EXPENSE_VIEW, 5))
@@ -626,6 +644,18 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     val liveStatus = widgetData.getString("currency_converter_live_status", "● Canlı Kurlar") ?: "● Canlı Kurlar"
                     val syncStatus = widgetData.getString("currency_converter_sync_status", "✓ Otomatik Çift Yönlü Senkron") ?: "✓ Otomatik Çift Yönlü Senkron"
                     val offlineStatus = widgetData.getString("currency_converter_offline_status", "Çevrim Çevrimdışı Hazır") ?: "Çevrim Çevrimdışı Hazır"
+                    val showLiveRate = safeGetBoolean(
+                        widgetData,
+                        if (widgetId > 0) "widget_${widgetId}_currency_show_live_rate" else "pending_pin_currency_show_live_rate",
+                        "currency_show_live_rate",
+                        true
+                    )
+                    val showReverseRate = safeGetBoolean(
+                        widgetData,
+                        if (widgetId > 0) "widget_${widgetId}_currency_show_reverse_rate" else "pending_pin_currency_show_reverse_rate",
+                        "currency_show_reverse_rate",
+                        true
+                    )
 
                     val convBase = if (convBaseEur) "EUR" else "USD"
                     val convSym = CurrencyHelper.getSymbol(convBase)
@@ -668,6 +698,8 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                             views.setTextViewText(R.id.widget_conv_3, conv3)
                             views.setTextViewText(R.id.widget_sync_status, syncStatus)
                             views.setTextViewText(R.id.widget_offline_status, offlineStatus)
+                            views.setViewVisibility(R.id.widget_sync_status, if (showLiveRate) View.VISIBLE else View.GONE)
+                            views.setViewVisibility(R.id.widget_offline_status, if (showLiveRate) View.VISIBLE else View.GONE)
 
                             if (widgetId > 0) {
                                 views.setOnClickPendingIntent(R.id.widget_badge, makeBroadcastPendingIntent(ACTION_CYCLE_CURRENCY, 1))
@@ -691,6 +723,8 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
 
                             views.setTextViewText(R.id.widget_live_status, liveStatus)
                             views.setTextViewText(R.id.widget_reverse_rate, revRateText)
+                            views.setViewVisibility(R.id.widget_live_status, if (showLiveRate) View.VISIBLE else View.GONE)
+                            views.setViewVisibility(R.id.widget_reverse_rate, if (showReverseRate) View.VISIBLE else View.GONE)
 
                             if (widgetId > 0) {
                                 views.setOnClickPendingIntent(R.id.widget_action_btn, makeBroadcastPendingIntent(ACTION_CYCLE_CURRENCY, 1))
@@ -733,6 +767,18 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     val stat1 = widgetData.getString("world_map_stat1", "✈️ $visitedCount Gezildi") ?: "✈️ $visitedCount Gezildi"
                     val stat2 = widgetData.getString("world_map_stat2", "🌟 $wishlistCount Hedef") ?: "🌟 $wishlistCount Hedef"
                     val stat3 = widgetData.getString("world_map_stat3", "🌍 $continentsCount Kıta") ?: "🌍 $continentsCount Kıta"
+                    val showContinents = safeGetBoolean(
+                        widgetData,
+                        if (widgetId > 0) "widget_${widgetId}_map_show_continents" else "pending_pin_map_show_continents",
+                        "map_show_continents",
+                        true
+                    )
+                    val showWishlist = safeGetBoolean(
+                        widgetData,
+                        if (widgetId > 0) "widget_${widgetId}_map_show_wishlist" else "pending_pin_map_show_wishlist",
+                        "map_show_wishlist",
+                        true
+                    )
                     val mapMode = safeGetInt(widgetData, "widget_${widgetId}_map_mode", 0)
 
                     val badgeDisplay = when (mapMode) {
@@ -741,33 +787,40 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                         else -> percent
                     }
 
+                    val pctNum = try {
+                        percent.replace("%", "").trim().toDouble().toInt().coerceIn(0, 100)
+                    } catch (_: Exception) { 0 }
+
                     try {
-                        views.setTextViewText(R.id.widget_app_name, appName)
+                        val cleanAppName = if (appName.startsWith("PackBuddy") && !appName.startsWith("🌐")) "🌐 $appName" else appName
+                        views.setTextViewText(R.id.widget_app_name, cleanAppName)
                         views.setTextViewText(R.id.widget_badge, badgeDisplay)
-                        views.setTextViewText(R.id.widget_title, title)
-                        views.setTextViewText(R.id.widget_destination, subtitle)
 
                         if (size == WidgetLayoutSize.LARGE) {
                             setBgRes(views, R.id.widget_map_container, theme.mapResId)
                             setBgRes(views, R.id.widget_bottom_stats, theme.statResId)
 
-                            views.setTextColor(R.id.widget_visited_count, theme.accentColor)
-                            views.setTextColor(R.id.widget_packing, theme.visitedColor)
+                            views.setTextColor(R.id.widget_lived, theme.visitedColor)
+                            views.setTextColor(R.id.widget_packing, theme.accentColor)
                             views.setTextColor(R.id.widget_budget, theme.wishlistColor)
                             views.setTextColor(R.id.widget_stat3, theme.accentColor)
 
-                            views.setTextViewText(R.id.widget_visited_count, visitedCount.toString())
+                            val livedCount = safeGetInt(widgetData, "map_lived_count", 0)
+                            val livedText = widgetData.getString("world_map_lived_stat", "● Yaşandı ($livedCount)") ?: "● Yaşandı ($livedCount)"
+                            views.setTextViewText(R.id.widget_lived, livedText)
                             views.setTextViewText(R.id.widget_packing, stat1)
                             views.setTextViewText(R.id.widget_budget, stat2)
                             views.setTextViewText(R.id.widget_stat3, stat3)
+                            views.setViewVisibility(R.id.widget_budget, if (showWishlist) View.VISIBLE else View.GONE)
+                            views.setViewVisibility(R.id.widget_stat3, if (showContinents) View.VISIBLE else View.GONE)
                         } else if (size == WidgetLayoutSize.MEDIUM) {
                             setBgRes(views, R.id.widget_map_container, theme.mapResId)
                             setBgRes(views, R.id.widget_stat3, theme.statResId)
 
                             views.setTextColor(R.id.widget_title, theme.titleTextColor)
                             views.setTextColor(R.id.widget_destination, theme.subtitleTextColor)
-                            views.setTextColor(R.id.widget_packing, theme.visitedColor)
-                            views.setTextColor(R.id.widget_budget, theme.wishlistColor)
+                            views.setTextColor(R.id.widget_packing, theme.subtitleTextColor)
+                            views.setTextColor(R.id.widget_budget, theme.subtitleTextColor)
                             views.setTextColor(R.id.widget_stat3, theme.accentColor)
 
                             views.setTextViewText(R.id.widget_title, title)
@@ -775,30 +828,60 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                             views.setTextViewText(R.id.widget_packing, stat1)
                             views.setTextViewText(R.id.widget_budget, stat2)
                             views.setTextViewText(R.id.widget_stat3, stat3)
-                        } else { // SMALL
-                            setBgRes(views, R.id.widget_bottom_card, theme.statResId)
 
+                            views.setProgressBar(R.id.widget_progress, 100, pctNum, false)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                views.setColorStateList(R.id.widget_progress, "setProgressTintList", ColorStateList.valueOf(theme.accentColor))
+                            }
+
+                            views.setViewVisibility(R.id.widget_budget, if (showWishlist) View.VISIBLE else View.GONE)
+                            views.setViewVisibility(R.id.widget_stat3, if (showContinents) View.VISIBLE else View.GONE)
+                        } else { // SMALL
                             views.setTextColor(R.id.widget_visited_count, theme.accentColor)
                             views.setTextColor(R.id.widget_title, theme.titleTextColor)
                             views.setTextColor(R.id.widget_destination, theme.subtitleTextColor)
-                            views.setTextColor(R.id.widget_bottom_label, theme.titleTextColor)
-                            views.setTextColor(R.id.widget_bottom_val, theme.subtitleTextColor)
+                            views.setTextColor(R.id.widget_packing, theme.subtitleTextColor)
+                            views.setTextColor(R.id.widget_budget, theme.subtitleTextColor)
 
+                            val smallAppName = if (appName.startsWith("PackBuddy") && !appName.startsWith("🌐")) "🌐 PackBuddy" else "PackBuddy"
+                            views.setTextViewText(R.id.widget_app_name, smallAppName)
                             views.setTextViewText(R.id.widget_visited_count, visitedCount.toString())
                             views.setTextViewText(R.id.widget_title, title)
-                            views.setTextViewText(R.id.widget_destination, subtitle)
-                            views.setTextViewText(R.id.widget_bottom_label, stat2)
-                            views.setTextViewText(R.id.widget_bottom_val, stat3)
+                            views.setTextViewText(R.id.widget_destination, if (showContinents) (stat3.ifBlank { subtitle }) else subtitle)
+                            views.setTextViewText(R.id.widget_packing, "✈️ $visitedCount")
+                            views.setTextViewText(R.id.widget_budget, "🌟 $wishlistCount")
+
+                            views.setProgressBar(R.id.widget_progress, 100, pctNum, false)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                views.setColorStateList(R.id.widget_progress, "setProgressTintList", ColorStateList.valueOf(theme.accentColor))
+                            }
+
+                            views.setViewVisibility(R.id.widget_budget, if (showWishlist) View.VISIBLE else View.GONE)
+                            views.setViewVisibility(R.id.widget_destination, if (showContinents) View.VISIBLE else View.GONE)
                         }
 
                         // Render World Map Bitmap
                         if (size != WidgetLayoutSize.SMALL) {
-                            val mapPath = when (size) {
-                                WidgetLayoutSize.LARGE -> widgetData.getString("map_image_large", null)
-                                    ?: widgetData.getString("map_image_medium", null)
-                                WidgetLayoutSize.MEDIUM -> widgetData.getString("map_image_medium", null)
-                                    ?: widgetData.getString("map_image_large", null)
-                                WidgetLayoutSize.SMALL -> null
+                            val mapPath = if (showWishlist) {
+                                when (size) {
+                                    WidgetLayoutSize.LARGE -> widgetData.getString("map_image_large", null)
+                                        ?: widgetData.getString("map_image_medium", null)
+                                    WidgetLayoutSize.MEDIUM -> widgetData.getString("map_image_medium", null)
+                                        ?: widgetData.getString("map_image_large", null)
+                                    WidgetLayoutSize.SMALL -> null
+                                }
+                            } else {
+                                when (size) {
+                                    WidgetLayoutSize.LARGE -> widgetData.getString("map_image_large_nowishlist", null)
+                                        ?: widgetData.getString("map_image_large", null)
+                                        ?: widgetData.getString("map_image_medium_nowishlist", null)
+                                        ?: widgetData.getString("map_image_medium", null)
+                                    WidgetLayoutSize.MEDIUM -> widgetData.getString("map_image_medium_nowishlist", null)
+                                        ?: widgetData.getString("map_image_medium", null)
+                                        ?: widgetData.getString("map_image_large_nowishlist", null)
+                                        ?: widgetData.getString("map_image_large", null)
+                                    WidgetLayoutSize.SMALL -> null
+                                }
                             }
                             if (!mapPath.isNullOrEmpty()) {
                                 val file = File(mapPath)
@@ -835,12 +918,39 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
 
                     val title = widgetData.getString("trip_title", "PackBuddy") ?: "PackBuddy"
                     val destination = widgetData.getString("trip_destination", "") ?: ""
-                    val packing = widgetData.getString("trip_stat1", "🎒 0/0") ?: "🎒 0/0"
-                    val budget = widgetData.getString("trip_stat2", "") ?: ""
+                    val packing = widgetData.getString("trip_packing", "0/0") ?: "0/0"
+                    val budget = widgetData.getString("trip_budget", "") ?: ""
                     val footer = widgetData.getString("trip_footer", "Geri sayım başladı") ?: "Geri sayım başladı"
+                    val showCountdown = safeGetBoolean(
+                        widgetData,
+                        if (widgetId > 0) "widget_${widgetId}_trip_show_countdown" else "pending_pin_trip_show_countdown",
+                        "trip_show_countdown",
+                        true
+                    )
+                    val showPacking = safeGetBoolean(
+                        widgetData,
+                        if (widgetId > 0) "widget_${widgetId}_trip_show_packing" else "pending_pin_trip_show_packing",
+                        "trip_show_packing",
+                        true
+                    )
+                    val showBudget = safeGetBoolean(
+                        widgetData,
+                        if (widgetId > 0) "widget_${widgetId}_trip_show_budget" else "pending_pin_trip_show_budget",
+                        "trip_show_budget",
+                        true
+                    )
+
+                    val packingLabel = widgetData.getString("trip_packing_label", "Bagaj") ?: "Bagaj"
+                    val spentLabel = widgetData.getString("trip_spent_label", "Harcanan") ?: "Harcanan"
+
+                    val packingParts = packing.replace("🎒", "").trim().split("/")
+                    val packedNum = packingParts.getOrNull(0)?.toIntOrNull() ?: 0
+                    val totalNum = packingParts.getOrNull(1)?.toIntOrNull() ?: 0
+                    val packingPct = if (totalNum > 0) ((packedNum * 100) / totalNum).coerceIn(0, 100) else 0
 
                     try {
-                        views.setTextViewText(R.id.widget_app_name, appName)
+                        val cleanAppName = if (appName.startsWith("PackBuddy") && !appName.startsWith("✈️")) "✈️ $appName" else appName
+                        views.setTextViewText(R.id.widget_app_name, cleanAppName)
                         views.setTextViewText(R.id.widget_days, daysDisplay)
                         views.setTextViewText(R.id.widget_title, title)
                         views.setTextViewText(R.id.widget_destination, destination)
@@ -855,12 +965,24 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                             views.setTextColor(R.id.widget_title, theme.titleTextColor)
                             views.setTextColor(R.id.widget_destination, theme.subtitleTextColor)
                             views.setTextColor(R.id.widget_packing, theme.titleTextColor)
+                            views.setTextColor(R.id.widget_packing_pct, theme.titleTextColor)
                             views.setTextColor(R.id.widget_budget, theme.titleTextColor)
                             views.setTextColor(R.id.widget_footer, theme.subtitleTextColor)
 
-                            views.setTextViewText(R.id.widget_packing, packing)
-                            views.setTextViewText(R.id.widget_budget, budget)
+                            views.setTextViewText(R.id.widget_days, daysDisplay.uppercase(Locale.ROOT))
+                            views.setTextViewText(R.id.widget_packing, "$packingLabel: $packedNum/$totalNum")
+                            views.setTextViewText(R.id.widget_packing_pct, "$packingPct%")
+                            views.setProgressBar(R.id.widget_packing_progress, 100, packingPct, false)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                views.setColorStateList(R.id.widget_packing_progress, "setProgressTintList", ColorStateList.valueOf(theme.accentColor))
+                            }
+
+                            views.setTextViewText(R.id.widget_budget, "$spentLabel: $budget")
                             views.setTextViewText(R.id.widget_footer, footer)
+
+                            views.setViewVisibility(R.id.widget_days, if (showCountdown) View.VISIBLE else View.GONE)
+                            views.setViewVisibility(R.id.widget_packing_card, if (showPacking) View.VISIBLE else View.GONE)
+                            views.setViewVisibility(R.id.widget_budget_card, if (showBudget) View.VISIBLE else View.GONE)
 
                             if (widgetId > 0) {
                                 views.setOnClickPendingIntent(R.id.widget_days, makeBroadcastPendingIntent(ACTION_TOGGLE_TRIP_VIEW, 8))
@@ -874,11 +996,26 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                             views.setTextColor(R.id.widget_days, theme.badgeTextColor)
                             views.setTextColor(R.id.widget_title, theme.titleTextColor)
                             views.setTextColor(R.id.widget_destination, theme.subtitleTextColor)
-                            views.setTextColor(R.id.widget_packing, theme.visitedColor)
+                            views.setTextColor(R.id.widget_packing_label, theme.subtitleTextColor)
+                            views.setTextColor(R.id.widget_packing_pct, theme.titleTextColor)
+                            views.setTextColor(R.id.widget_packing, theme.subtitleTextColor)
+                            views.setTextColor(R.id.widget_budget_label, theme.subtitleTextColor)
                             views.setTextColor(R.id.widget_budget, theme.accentColor)
 
-                            views.setTextViewText(R.id.widget_packing, packing)
+                            views.setTextViewText(R.id.widget_packing_label, packingLabel)
+                            views.setTextViewText(R.id.widget_packing_pct, "$packingPct%")
+                            views.setTextViewText(R.id.widget_packing, "$packedNum/$totalNum")
+                            views.setProgressBar(R.id.widget_packing_progress, 100, packingPct, false)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                views.setColorStateList(R.id.widget_packing_progress, "setProgressTintList", ColorStateList.valueOf(theme.accentColor))
+                            }
+
+                            views.setTextViewText(R.id.widget_budget_label, spentLabel)
                             views.setTextViewText(R.id.widget_budget, budget)
+
+                            views.setViewVisibility(R.id.widget_days, if (showCountdown) View.VISIBLE else View.GONE)
+                            views.setViewVisibility(R.id.widget_packing_box, if (showPacking) View.VISIBLE else View.GONE)
+                            views.setViewVisibility(R.id.widget_budget_box, if (showBudget) View.VISIBLE else View.GONE)
 
                             if (widgetId > 0) {
                                 views.setOnClickPendingIntent(R.id.widget_days, makeBroadcastPendingIntent(ACTION_TOGGLE_TRIP_VIEW, 8))
@@ -891,10 +1028,20 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                             views.setTextColor(R.id.widget_title, theme.titleTextColor)
                             views.setTextColor(R.id.widget_destination, theme.subtitleTextColor)
                             views.setTextColor(R.id.widget_packing, theme.accentColor)
-                            views.setTextColor(R.id.widget_budget, theme.titleTextColor)
 
-                            views.setTextViewText(R.id.widget_packing, packing)
-                            views.setTextViewText(R.id.widget_budget, budget)
+                            val smallAppName = if (appName.startsWith("PackBuddy") && !appName.startsWith("✈️")) "✈️ PackBuddy" else "PackBuddy"
+                            views.setTextViewText(R.id.widget_app_name, smallAppName)
+                            val smallPackingText = if (showPacking) "$packingLabel: $packedNum/$totalNum" else budget
+                            views.setTextViewText(R.id.widget_packing, smallPackingText)
+
+                            views.setProgressBar(R.id.widget_packing_progress, 100, packingPct, false)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                views.setColorStateList(R.id.widget_packing_progress, "setProgressTintList", ColorStateList.valueOf(theme.accentColor))
+                            }
+                            views.setViewVisibility(R.id.widget_packing_progress, if (showPacking) View.VISIBLE else View.GONE)
+
+                            views.setViewVisibility(R.id.widget_days, if (showCountdown) View.VISIBLE else View.GONE)
+                            views.setViewVisibility(R.id.widget_bottom_card, if (showPacking || showBudget) View.VISIBLE else View.GONE)
 
                             if (widgetId > 0) {
                                 views.setOnClickPendingIntent(R.id.widget_days, makeBroadcastPendingIntent(ACTION_TOGGLE_TRIP_VIEW, 8))
@@ -928,6 +1075,32 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                 } catch (_: Exception) {
                     default
                 }
+            }
+        }
+
+        fun safeGetBoolean(prefs: SharedPreferences, primaryKey: String, fallbackKey: String, default: Boolean): Boolean {
+            return try {
+                if (prefs.contains(primaryKey)) {
+                    val raw = prefs.all[primaryKey]
+                    when (raw) {
+                        is Boolean -> raw
+                        is String -> raw.toBoolean()
+                        is Number -> raw.toInt() != 0
+                        else -> default
+                    }
+                } else if (prefs.contains(fallbackKey)) {
+                    val raw = prefs.all[fallbackKey]
+                    when (raw) {
+                        is Boolean -> raw
+                        is String -> raw.toBoolean()
+                        is Number -> raw.toInt() != 0
+                        else -> default
+                    }
+                } else {
+                    default
+                }
+            } catch (_: Exception) {
+                default
             }
         }
     }
@@ -1094,19 +1267,20 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                 val largeViews = buildRemoteViews(context, widgetData, WidgetLayoutSize.LARGE, widgetId)
 
                 val viewsMap = when (defaultLayoutSize) {
+                    WidgetLayoutSize.SMALL -> mapOf(
+                        SizeF(40f, 40f) to smallViews,
+                        SizeF(230f, 40f) to mediumViews,
+                        SizeF(230f, 210f) to largeViews
+                    )
                     WidgetLayoutSize.MEDIUM -> mapOf(
-                        SizeF(40f, 40f) to mediumViews,
-                        SizeF(150f, 40f) to mediumViews,
-                        SizeF(150f, 220f) to largeViews
+                        SizeF(40f, 40f) to smallViews,
+                        SizeF(210f, 40f) to mediumViews,
+                        SizeF(210f, 210f) to largeViews
                     )
                     WidgetLayoutSize.LARGE -> mapOf(
-                        SizeF(40f, 40f) to mediumViews,
-                        SizeF(150f, 150f) to largeViews
-                    )
-                    else -> mapOf(
                         SizeF(40f, 40f) to smallViews,
-                        SizeF(150f, 40f) to mediumViews,
-                        SizeF(150f, 220f) to largeViews
+                        SizeF(210f, 40f) to mediumViews,
+                        SizeF(210f, 210f) to largeViews
                     )
                 }
                 val responsiveViews = RemoteViews(viewsMap)
@@ -1120,12 +1294,21 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             val minHeight = opts?.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 0) ?: 0
 
             val chosenSize = when {
-                defaultLayoutSize == WidgetLayoutSize.MEDIUM && minHeight < 220 -> WidgetLayoutSize.MEDIUM
-                defaultLayoutSize == WidgetLayoutSize.LARGE -> WidgetLayoutSize.LARGE
-                minWidth >= 170 && minHeight >= 220 -> WidgetLayoutSize.LARGE
-                minWidth >= 170 -> WidgetLayoutSize.MEDIUM
-                minHeight >= 220 && minWidth >= 150 -> WidgetLayoutSize.LARGE
-                else -> WidgetLayoutSize.SMALL
+                defaultLayoutSize == WidgetLayoutSize.SMALL -> {
+                    if (minWidth >= 230 && minHeight >= 210) WidgetLayoutSize.LARGE
+                    else if (minWidth >= 230) WidgetLayoutSize.MEDIUM
+                    else WidgetLayoutSize.SMALL
+                }
+                defaultLayoutSize == WidgetLayoutSize.MEDIUM -> {
+                    if (minHeight >= 210 && minWidth >= 210) WidgetLayoutSize.LARGE
+                    else if (minWidth < 210) WidgetLayoutSize.SMALL
+                    else WidgetLayoutSize.MEDIUM
+                }
+                defaultLayoutSize == WidgetLayoutSize.LARGE -> {
+                    if (minWidth < 210 && minHeight < 210) WidgetLayoutSize.SMALL
+                    else if (minHeight < 210) WidgetLayoutSize.MEDIUM
+                    else WidgetLayoutSize.LARGE
+                }
             }
 
             val views = buildRemoteViews(context, widgetData, chosenSize, widgetId)
@@ -1150,31 +1333,68 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
     ): RemoteViews {
         val widgetModeKey = "widget_${widgetId}_mode"
         val widgetThemeKey = "widget_${widgetId}_theme"
+        val widgetConfiguredKey = "widget_${widgetId}_configured"
 
-        val pendingPinMode = widgetData.getString("pending_pin_mode", null)
-        val pendingPinTheme = widgetData.getString("pending_pin_theme", null)
+        if (widgetId > 0 && !widgetData.contains(widgetConfiguredKey)) {
+            val pendingPinMode = widgetData.getString("pending_pin_mode", null)
+            val pendingPinTheme = widgetData.getString("pending_pin_theme", null)
+            val assignMode = inherentMode ?: pendingPinMode ?: widgetData.getString("widget_mode", "trip") ?: "trip"
+            val assignTheme = pendingPinTheme ?: widgetData.getString("${assignMode}_theme", null) ?: "midnight"
 
-        if (!widgetData.contains(widgetModeKey)) {
-            val assignMode = inherentMode ?: pendingPinMode
-            if (assignMode != null) {
-                widgetData.edit().putString(widgetModeKey, assignMode).commit()
-            }
-        }
-        if (!widgetData.contains(widgetThemeKey)) {
-            val assignTheme = pendingPinTheme ?: widgetData.getString("${inherentMode}_theme", null)
-            if (assignTheme != null) {
-                widgetData.edit().putString(widgetThemeKey, assignTheme).commit()
-            }
+            val editor = widgetData.edit()
+            editor.putString(widgetModeKey, assignMode)
+            editor.putString(widgetThemeKey, assignTheme)
+
+            editor.putBoolean(
+                "widget_${widgetId}_map_show_continents",
+                safeGetBoolean(widgetData, "pending_pin_map_show_continents", "map_show_continents", true)
+            )
+            editor.putBoolean(
+                "widget_${widgetId}_map_show_wishlist",
+                safeGetBoolean(widgetData, "pending_pin_map_show_wishlist", "map_show_wishlist", true)
+            )
+            editor.putBoolean(
+                "widget_${widgetId}_trip_show_countdown",
+                safeGetBoolean(widgetData, "pending_pin_trip_show_countdown", "trip_show_countdown", true)
+            )
+            editor.putBoolean(
+                "widget_${widgetId}_trip_show_packing",
+                safeGetBoolean(widgetData, "pending_pin_trip_show_packing", "trip_show_packing", true)
+            )
+            editor.putBoolean(
+                "widget_${widgetId}_trip_show_budget",
+                safeGetBoolean(widgetData, "pending_pin_trip_show_budget", "trip_show_budget", true)
+            )
+            editor.putBoolean(
+                "widget_${widgetId}_currency_show_live_rate",
+                safeGetBoolean(widgetData, "pending_pin_currency_show_live_rate", "currency_show_live_rate", true)
+            )
+            editor.putBoolean(
+                "widget_${widgetId}_currency_show_reverse_rate",
+                safeGetBoolean(widgetData, "pending_pin_currency_show_reverse_rate", "currency_show_reverse_rate", true)
+            )
+            editor.putBoolean(
+                "widget_${widgetId}_quick_expense_show_remaining",
+                safeGetBoolean(widgetData, "pending_pin_quick_expense_show_remaining", "quick_expense_show_remaining", true)
+            )
+            editor.putBoolean(
+                "widget_${widgetId}_quick_expense_show_last",
+                safeGetBoolean(widgetData, "pending_pin_quick_expense_show_last", "quick_expense_show_last", true)
+            )
+
+            editor.putBoolean(widgetConfiguredKey, true)
+            editor.commit()
         }
 
         val mode = inherentMode
             ?: widgetData.getString(widgetModeKey, null)
+            ?: widgetData.getString("pending_pin_mode", null)
             ?: widgetData.getString("widget_mode", "trip")
             ?: "trip"
 
         val widgetTheme = widgetData.getString("${mode}_theme", null)
+            ?: widgetData.getString("pending_pin_theme", null)
             ?: widgetData.getString(widgetThemeKey, null)
-            ?: pendingPinTheme
             ?: widgetData.getString("widget_theme", "midnight")
             ?: "midnight"
 

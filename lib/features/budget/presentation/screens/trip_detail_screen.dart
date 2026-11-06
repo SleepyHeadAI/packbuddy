@@ -672,38 +672,6 @@ class TripDetailScreen extends ConsumerWidget {
             ],
           ),
 
-          // Waypoints list if multi-stop itinerary exists
-          if (currentTrip.waypoints.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 6,
-              runSpacing: 4,
-              children: currentTrip.waypoints.map((wp) {
-                return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surface.withValues(alpha: 0.7),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(
-                      color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.location_on_outlined, size: 10, color: Color(0xFFE05A47)),
-                      const SizedBox(width: 3),
-                      Text(
-                        wp.name,
-                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-
           // Trip Notes Banner if present
           if (currentTrip.notes != null && currentTrip.notes!.trim().isNotEmpty) ...[
             const SizedBox(height: 10),

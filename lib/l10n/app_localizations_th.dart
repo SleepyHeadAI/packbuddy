@@ -476,10 +476,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get luggagePreparationGuide => 'คู่มือการจัดกระเป๋าและสัมภาระ';
 
   @override
-  String get weighingResponsibilityNote =>
-      '⚖️ การชั่งน้ำหนักสัมภาระเป็นความรับผิดชอบของผู้โดยสาร';
-
-  @override
   String get digitalWallet => 'กระเป๋าเงินดิจิทัล';
 
   @override

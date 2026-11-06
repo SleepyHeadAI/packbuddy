@@ -473,10 +473,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get luggagePreparationGuide => 'सामान तैयारी गाइड';
 
   @override
-  String get weighingResponsibilityNote =>
-      '⚖️ वज़न की ज़िम्मेदारी यात्री की होती है।';
-
-  @override
   String get digitalWallet => 'डिजिटल वॉलेट';
 
   @override

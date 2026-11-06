@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../core/utils/date_formatter.dart';
@@ -19,19 +20,18 @@ import '../../budget/presentation/screens/trip_detail_screen.dart';
 import '../../budget/presentation/screens/trip_comparison_screen.dart';
 import '../../budget/presentation/screens/widgets/add_trip_sheet.dart';
 import '../../settings/data/mock_revenuecat_service.dart';
-import '../../settings/presentation/screens/settings_screen.dart';
 import '../../vault/presentation/controllers/vault_controller.dart';
-import '../../vault/presentation/screens/vault_screen.dart';
 import '../../checklist/presentation/controllers/checklist_controller.dart';
-import '../../checklist/presentation/screens/checklist_screen.dart';
 import '../../auth/auth_controller.dart';
 import '../../budget/presentation/widgets/currency_converter_card.dart';
 import '../../../shared/widgets/app_animations.dart';
 import '../../../core/services/app_widget_service.dart';
 import '../../../core/services/preferences_service.dart';
-import '../../travel_map/presentation/screens/travel_map_screen.dart';
 import '../../travel_map/presentation/controllers/travel_map_controller.dart';
+import '../../../core/l10n/language_selector_sheet.dart';
+import 'navigation_provider.dart';
 import 'widgets/notifications_center_sheet.dart';
+import 'widgets/bento_hub_grid.dart';
 
 /// Sophisticated, cinematic Dashboard for PackBuddy with live Riverpod state integration
 class DashboardScreen extends ConsumerStatefulWidget {
@@ -331,7 +331,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     height: 7,
                     margin: const EdgeInsets.only(top: 1, right: 1),
                     decoration: const BoxDecoration(
-                      color: Color(0xFFEF4444),
+                      color: AppColors.errorPastel,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -350,7 +350,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           // Language Switcher Compact Pill
           InkWell(
             borderRadius: BorderRadius.circular(12),
-            onTap: () => _showLanguageSelector(context, ref, currentLocale),
+            onTap: () => showLanguageSelectorSheet(context, ref, currentLocale),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
               decoration: BoxDecoration(
@@ -388,9 +388,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             tooltip: l10n.settings,
             onPressed: () {
-              Navigator.of(context).push(
-                _createSmoothRoute(const SettingsScreen()),
-              );
+              ref.read(mainNavigationIndexProvider.notifier).state = 4;
             },
           ),
           const SizedBox(width: 8),
@@ -404,6 +402,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       ),
       body: SafeArea(
         child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          scrollCacheExtent: const ScrollCacheExtent.pixels(800.0),
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 96),
           children: [
             // 1. My Trips Section (Seyahatler) at the very top
@@ -599,61 +599,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             ),
             const SizedBox(height: 20),
 
-            // 3. Bento Summary Grid (Trips Counter & Vault Counter)
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Trips Bento Item
-                  Expanded(
-                    child: _BentoStatCard(
-                      title: l10n.trips,
-                      count: '$tripCount',
-                      description: l10n.multiCurrency,
-                      icon: Icons.flight_takeoff_rounded,
-                      accentColor: theme.colorScheme.primary,
-                      gradientStart: theme.colorScheme.primary.withValues(alpha: 0.12),
-                      heroTagBadge: 'trips-hero-badge',
-                      heroTagTitle: 'trips-hero-title',
-                      onTap: () {
-                        Navigator.of(context).push(
-                          _createSmoothRoute(const TripsScreen()),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-
-                  // Vault Bento Item
-                  Expanded(
-                    child: _BentoStatCard(
-                      title: l10n.vault,
-                      count: '$docCount',
-                      description: '🔒 ${l10n.offlineVault}',
-                      icon: Icons.shield_outlined,
-                      accentColor: theme.colorScheme.tertiary,
-                      gradientStart: theme.colorScheme.tertiary.withValues(alpha: 0.12),
-                      heroTagBadge: 'vault-hero-badge',
-                      heroTagTitle: 'vault-hero-title',
-                      onTap: () {
-                        Navigator.of(context).push(
-                          _createSmoothRoute(const VaultScreen()),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // 3b. Luggage & Packing Bento Card (Progress & Airline Guide)
+            // Luggage & Packing Card (Checklist progress for active trip)
             AppCard(
               padding: const EdgeInsets.all(16),
               onTap: () {
-                Navigator.of(context).push(
-                  _createSmoothRoute(const ChecklistScreen()),
-                );
+                ref.read(mainNavigationIndexProvider.notifier).state = 2;
               },
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -777,207 +727,34 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 ],
               ),
             ),
-            const SizedBox(height: 18),
-
-            // World Travel Map Showcase Banner
-            AppCard(
-              padding: const EdgeInsets.all(16),
-              onTap: () {
-                Navigator.of(context).push(
-                  _createSmoothRoute(const TravelMapScreen()),
-                );
-              },
-              child: Row(
-                children: [
-                  Hero(
-                    tag: 'travel-map-hero-badge',
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF10B981), Color(0xFF0D9488)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF10B981).withValues(alpha: 0.35),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.public_rounded,
-                          color: Colors.white,
-                          size: 26,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Hero(
-                          tag: 'travel-map-hero-title',
-                          child: Material(
-                            type: MaterialType.transparency,
-                            child: Text(
-                              l10n.worldTravelMapTitle,
-                              style: theme.textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.w800,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          l10n.worldTravelMapStats(
-                            travelMapState.visitedCount,
-                            travelMapState.wishlistCount,
-                            travelMapState.worldPercentage.toStringAsFixed(1),
-                          ),
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                            fontSize: 11.5,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 13,
-                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                  ),
-                ],
-              ),
-            ),
             const SizedBox(height: 24),
 
-            // Features Hub
-            Text(
-              l10n.travelAssistant,
-              style: theme.textTheme.labelSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: theme.colorScheme.onSurfaceVariant,
-                letterSpacing: 1.1,
-              ),
-            ),
-            const SizedBox(height: 10),
-
-            _HubFeatureCard(
-              icon: Icons.account_balance_wallet_rounded,
-              iconColor: theme.colorScheme.primary,
-              iconContainerColor: theme.colorScheme.primaryContainer,
-              title: l10n.budget,
-              subtitle: tripCount == 0 ? l10n.budgetDescription : '$tripCount ${l10n.tripsPlanned}',
-              badgeText: tripCount > 0 ? '$tripCount' : null,
-              onTap: () {
+            // Bento Grid for Discovery & Travel Features
+            BentoHubGrid(
+              tripCount: tripCount,
+              docCount: docCount,
+              visitedCountriesCount: travelMapState.visitedCount,
+              wishlistCount: travelMapState.wishlistCount,
+              worldPercentage: travelMapState.worldPercentage,
+              onOpenMap: () {
+                ref.read(mainNavigationIndexProvider.notifier).state = 1;
+              },
+              onOpenTrips: () {
                 Navigator.of(context).push(
                   _createSmoothRoute(const TripsScreen()),
                 );
               },
-            ),
-            const SizedBox(height: 12),
-
-            _HubFeatureCard(
-              icon: Icons.public_rounded,
-              iconColor: const Color(0xFF0EA5E9),
-              iconContainerColor: const Color(0xFF0EA5E9).withValues(alpha: 0.15),
-              title: l10n.worldTravelMapTitle,
-              subtitle: l10n.worldTravelMapSubtitle,
-              badgeText: travelMapState.visitedCount > 0 ? '${travelMapState.visitedCount}' : null,
-              onTap: () {
-                Navigator.of(context).push(
-                  _createSmoothRoute(const TravelMapScreen()),
-                );
-              },
-            ),
-            const SizedBox(height: 12),
-
-            _HubFeatureCard(
-              icon: Icons.currency_exchange_rounded,
-              iconColor: const Color(0xFFF59E0B),
-              iconContainerColor: const Color(0xFFF59E0B).withValues(alpha: 0.15),
-              title: l10n.currencyConverter,
-              subtitle: l10n.quickConvert,
-              onTap: () => CurrencyConverterCard.showAsModal(context),
-            ),
-            const SizedBox(height: 12),
-
-            _HubFeatureCard(
-              icon: Icons.compare_arrows_rounded,
-              iconColor: const Color(0xFF6366F1),
-              iconContainerColor: const Color(0xFF6366F1).withValues(alpha: 0.15),
-              title: l10n.compareTrips,
-              subtitle: l10n.comparisonSummary,
-              heroTagBadge: 'compare-trips-hero-badge',
-              heroTagTitle: 'compare-trips-hero-title',
-              onTap: () {
+              onOpenCurrency: () => CurrencyConverterCard.showAsModal(context),
+              onOpenComparison: () {
                 Navigator.of(context).push(
                   _createSmoothRoute(const TripComparisonScreen()),
                 );
               },
-            ),
-            const SizedBox(height: 12),
-
-            _HubFeatureCard(
-              icon: Icons.checklist_rtl_rounded,
-              iconColor: checklistStatusColor,
-              iconContainerColor: checklistStatusColor.withValues(alpha: 0.15),
-              title: l10n.baggageAndChecklist,
-              subtitle: checklistState.totalCount == 0
-                  ? l10n.noItemsYet
-                  : '${checklistState.packedCount}/${checklistState.totalCount} ${l10n.itemsReady} • %${(checklistCompletionRatio * 100).toInt()} ${l10n.completed}',
-              badgeText: checklistState.totalCount > 0 ? '${checklistState.packedCount}/${checklistState.totalCount}' : null,
-              onTap: () {
-                Navigator.of(context).push(
-                  _createSmoothRoute(const ChecklistScreen()),
-                );
+              onOpenVault: () {
+                ref.read(mainNavigationIndexProvider.notifier).state = 3;
               },
             ),
-            const SizedBox(height: 12),
-
-            _HubFeatureCard(
-              icon: Icons.folder_shared_rounded,
-              iconColor: const Color(0xFF10B981),
-              iconContainerColor: const Color(0xFF10B981).withValues(alpha: 0.15),
-              title: l10n.vault,
-              subtitle: docCount == 0 ? l10n.vaultDescription : '$docCount ${l10n.documentsSaved}',
-              badgeText: docCount > 0 ? '$docCount' : null,
-              onTap: () {
-                Navigator.of(context).push(
-                  _createSmoothRoute(const VaultScreen()),
-                );
-              },
-            ),
-            const SizedBox(height: 12),
-
-            _HubFeatureCard(
-              icon: Icons.tune_rounded,
-              iconColor: theme.colorScheme.secondary,
-              iconContainerColor: theme.colorScheme.secondaryContainer,
-              title: l10n.settings,
-              subtitle: l10n.settingsDescription,
-              heroTagBadge: 'settings-hero-badge',
-              heroTagTitle: 'settings-hero-title',
-              onTap: () {
-                Navigator.of(context).push(
-                  _createSmoothRoute(const SettingsScreen()),
-                );
-              },
-            ),
-            const SizedBox(height: 28),
+            const SizedBox(height: 24),
 
             // Footer Architecture Phase
             Center(
@@ -989,203 +766,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 ),
               ),
             ),
+            const SizedBox(height: 20),
           ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-          border: Border(
-            top: BorderSide(
-              color: isDark
-                  ? theme.colorScheme.outlineVariant.withValues(alpha: 0.15)
-                  : AppColors.outlineLight,
-              width: 1,
-            ),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.04),
-              blurRadius: 16,
-              offset: const Offset(0, -4),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          top: false,
-          child: NavigationBar(
-            height: 64,
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            indicatorColor: isDark ? AppColors.primaryDark : const Color(0xFFF0D076),
-            selectedIndex: 0,
-            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-            onDestinationSelected: (index) {
-              if (index == 0) {
-                // Already on Dashboard
-              } else if (index == 1) {
-                Navigator.of(context).push(
-                  _createSmoothRoute(const TravelMapScreen()),
-                );
-              } else if (index == 2) {
-                Navigator.of(context).push(
-                  _createSmoothRoute(const ChecklistScreen()),
-                );
-              } else if (index == 3) {
-                Navigator.of(context).push(
-                  _createSmoothRoute(const VaultScreen()),
-                );
-              } else if (index == 4) {
-                Navigator.of(context).push(
-                  _createSmoothRoute(const SettingsScreen()),
-                );
-              }
-            },
-            destinations: [
-              NavigationDestination(
-                icon: const Icon(Icons.home_outlined, size: 22),
-                selectedIcon: const Icon(Icons.home_rounded, size: 22),
-                label: l10n.navHome,
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.public_outlined, size: 22),
-                selectedIcon: const Icon(Icons.public_rounded, size: 22),
-                label: l10n.navMap,
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.checklist_rounded, size: 22),
-                selectedIcon: const Icon(Icons.checklist_rtl_rounded, size: 22),
-                label: l10n.navBaggage,
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.folder_shared_outlined, size: 22),
-                selectedIcon: const Icon(Icons.folder_shared_rounded, size: 22),
-                label: l10n.navVault,
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.tune_outlined, size: 22),
-                selectedIcon: const Icon(Icons.tune_rounded, size: 22),
-                label: l10n.navSettings,
-              ),
-            ],
-          ),
         ),
       ),
     );
-  }
-
-  void _showLanguageSelector(BuildContext context, WidgetRef ref, Locale currentLocale) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      sheetAnimationStyle: const AnimationStyle(
-        duration: Duration(milliseconds: 250),
-        curve: Curves.easeOutCubic,
-        reverseDuration: Duration(milliseconds: 200),
-        reverseCurve: Curves.easeInCubic,
-      ),
-      builder: (ctx) {
-        final theme = Theme.of(ctx);
-        final l10n = AppLocalizations.of(ctx)!;
-
-        return RepaintBoundary(
-          child: Container(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(ctx).size.height * 0.75,
-            ),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-          ),
-          child: Column(
-            children: [
-              const SizedBox(height: 12),
-              Container(
-                width: 44,
-                height: 4.5,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(3),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(Icons.translate_rounded, size: 20, color: theme.colorScheme.primary),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      l10n.language,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const Spacer(),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        '20 ${l10n.language}',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(height: 1),
-              Expanded(
-                child: ListView.separated(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemCount: L10n.all.length,
-                  separatorBuilder: (context, index) => const Divider(height: 1, indent: 64),
-                  itemBuilder: (context, index) {
-                    final locale = L10n.all[index];
-                    final isSelected = locale.languageCode == currentLocale.languageCode;
-
-                    return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2),
-                      leading: Text(
-                        L10n.getLanguageFlag(locale.languageCode),
-                        style: const TextStyle(fontSize: 22),
-                      ),
-                      title: Text(
-                        L10n.getLanguageName(locale.languageCode),
-                        style: TextStyle(
-                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                          color: isSelected ? theme.colorScheme.primary : null,
-                        ),
-                      ),
-                      trailing: isSelected
-                          ? Icon(Icons.check_circle_rounded, color: theme.colorScheme.primary)
-                          : null,
-                      onTap: () {
-                        ref.read(localeProvider.notifier).setLocale(locale);
-                        Navigator.of(ctx).pop();
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    },
-  );
   }
 }
 
@@ -1572,236 +1157,8 @@ class _EmptyTripsPromptCard extends StatelessWidget {
   }
 }
 
-/// Bento-Grid Stat Card
-class _BentoStatCard extends StatelessWidget {
-  final String title;
-  final String count;
-  final String description;
-  final IconData icon;
-  final Color accentColor;
-  final Color gradientStart;
-  final VoidCallback onTap;
-  final String? heroTagBadge;
-  final String? heroTagTitle;
-
-  const _BentoStatCard({
-    required this.title,
-    required this.count,
-    required this.description,
-    required this.icon,
-    required this.accentColor,
-    required this.gradientStart,
-    required this.onTap,
-    this.heroTagBadge,
-    this.heroTagTitle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    final iconWidget = Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(
-        color: gradientStart,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Center(
-        child: Icon(icon, color: accentColor, size: 20),
-      ),
-    );
-
-    return AppCard(
-      onTap: onTap,
-      padding: const EdgeInsets.all(18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              heroTagBadge != null
-                  ? Hero(tag: heroTagBadge!, child: iconWidget)
-                  : iconWidget,
-              const SizedBox(width: 8),
-              Flexible(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    count,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: accentColor,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          heroTagTitle != null
-              ? Hero(
-                  tag: heroTagTitle!,
-                  child: Material(
-                    type: MaterialType.transparency,
-                    child: Text(
-                      title,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                )
-              : Text(
-                  title,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-          const SizedBox(height: 2),
-          Text(
-            description,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-              fontSize: 11,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 
 
-/// Modern Feature Hub Row Card
-class _HubFeatureCard extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final Color iconContainerColor;
-  final String title;
-  final String subtitle;
-  final String? badgeText;
-  final VoidCallback onTap;
-  final String? heroTagBadge;
-  final String? heroTagTitle;
 
-  const _HubFeatureCard({
-    required this.icon,
-    required this.iconColor,
-    required this.iconContainerColor,
-    required this.title,
-    required this.subtitle,
-    this.badgeText,
-    required this.onTap,
-    this.heroTagBadge,
-    this.heroTagTitle,
-  });
 
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    final iconWidget = Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(
-        color: iconContainerColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Center(
-        child: Icon(icon, color: iconColor, size: 20),
-      ),
-    );
-
-    return AppCard(
-      onTap: onTap,
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-      child: Row(
-        children: [
-          heroTagBadge != null
-              ? Hero(tag: heroTagBadge!, child: iconWidget)
-              : iconWidget,
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: heroTagTitle != null
-                            ? Hero(
-                                tag: heroTagTitle!,
-                                child: Material(
-                                  type: MaterialType.transparency,
-                                  child: Text(
-                                    title,
-                                    style: theme.textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : Text(
-                                title,
-                                style: theme.textTheme.titleSmall?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                      ),
-                    ),
-                    if (badgeText != null) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: iconContainerColor,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          badgeText!,
-                          style: TextStyle(
-                            color: iconColor,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  subtitle,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          Icon(
-            Icons.arrow_forward_ios_rounded,
-            size: 14,
-            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-          ),
-        ],
-      ),
-    );
-  }
-}

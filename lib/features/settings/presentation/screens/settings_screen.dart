@@ -19,6 +19,7 @@ import 'package:packbuddy/features/admin/admin_dashboard_screen.dart';
 import 'package:packbuddy/features/settings/presentation/screens/widgets/home_widget_preview_card.dart';
 import 'package:packbuddy/core/services/biometric_service.dart';
 import 'package:packbuddy/features/onboarding/presentation/screens/onboarding_screen.dart';
+import 'package:packbuddy/core/l10n/language_selector_sheet.dart';
 
 /// Complete Settings screen handling Language, Theme, Sync, and PackBuddy Pro
 class SettingsScreen extends ConsumerWidget {
@@ -147,7 +148,7 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                 ),
                 trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () => _showLanguageSelector(context, ref, currentLocale),
+                onTap: () => showLanguageSelectorSheet(context, ref, currentLocale),
               ),
             ),
           ),
@@ -606,104 +607,6 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  void _showLanguageSelector(BuildContext context, WidgetRef ref, Locale currentLocale) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      sheetAnimationStyle: const AnimationStyle(
-        duration: Duration(milliseconds: 250),
-        curve: Curves.easeOutCubic,
-        reverseDuration: Duration(milliseconds: 200),
-        reverseCurve: Curves.easeInCubic,
-      ),
-      builder: (ctx) {
-        final theme = Theme.of(ctx);
-        final l10n = AppLocalizations.of(ctx)!;
-
-        return RepaintBoundary(
-          child: Container(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(ctx).size.height * 0.75,
-            ),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-          ),
-          child: Column(
-            children: [
-              const SizedBox(height: 12),
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                child: Row(
-                  children: [
-                    const Icon(Icons.translate_rounded, size: 22),
-                    const SizedBox(width: 12),
-                    Text(
-                      l10n.language,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      '20 ${l10n.language}',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Divider(height: 1),
-              Expanded(
-                child: ListView.separated(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemCount: L10n.all.length,
-                  separatorBuilder: (context, index) => const Divider(height: 1, indent: 64),
-                  itemBuilder: (context, index) {
-                    final locale = L10n.all[index];
-                    final isSelected = locale.languageCode == currentLocale.languageCode;
-
-                    return ListTile(
-                      leading: Text(
-                        L10n.getLanguageFlag(locale.languageCode),
-                        style: const TextStyle(fontSize: 24),
-                      ),
-                      title: Text(
-                        L10n.getLanguageName(locale.languageCode),
-                        style: TextStyle(
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isSelected ? theme.colorScheme.primary : null,
-                        ),
-                      ),
-                      trailing: isSelected
-                          ? Icon(Icons.check_circle_rounded, color: theme.colorScheme.primary)
-                          : null,
-                      onTap: () {
-                        ref.read(localeProvider.notifier).setLocale(locale);
-                        Navigator.of(ctx).pop();
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    },
-  );
-  }
-
   IconData _getSyncIcon(SyncStatus status) {
     switch (status) {
       case SyncStatus.syncing:
@@ -800,17 +703,16 @@ class _ProBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
 
     return AppCard(
       onTap: onTap,
       padding: const EdgeInsets.all(18),
-      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+      backgroundColor: theme.colorScheme.surface,
       border: BorderSide(
         color: isPro
             ? AppColors.successPastel.withValues(alpha: 0.35)
-            : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
+            : theme.colorScheme.outlineVariant.withValues(alpha: 0.35),
         width: 1,
       ),
       child: Row(
@@ -1184,9 +1086,9 @@ class _AdminDashboardBanner extends StatelessWidget {
     return AppCard(
       borderRadius: 22,
       onTap: onTap,
-      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+      backgroundColor: theme.colorScheme.surface,
       border: BorderSide(
-        color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+        color: theme.colorScheme.outlineVariant.withValues(alpha: 0.35),
         width: 1,
       ),
       padding: const EdgeInsets.all(18),

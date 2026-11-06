@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'trip_waypoint.dart';
 
 /// Domain entity representing a travel Trip with soft-delete, two-way sync,
 /// and collaborative shared travel list support (Feature F-1).
@@ -25,9 +24,6 @@ class Trip {
   final List<String> collaborators;
   final String sharedRole; // 'owner', 'editor', 'viewer'
 
-  // Travel Map & Waypoints Route (Feature F-2)
-  final List<TripWaypoint> waypoints;
-
   const Trip({
     required this.id,
     this.userId = '',
@@ -47,7 +43,6 @@ class Trip {
     this.inviteCode,
     this.collaborators = const [],
     this.sharedRole = 'owner',
-    this.waypoints = const [],
   });
 
   /// Creates a copy with optionally modified fields
@@ -70,7 +65,6 @@ class Trip {
     String? inviteCode,
     List<String>? collaborators,
     String? sharedRole,
-    List<TripWaypoint>? waypoints,
   }) {
     return Trip(
       id: id ?? this.id,
@@ -91,20 +85,18 @@ class Trip {
       inviteCode: inviteCode ?? this.inviteCode,
       collaborators: collaborators ?? this.collaborators,
       sharedRole: sharedRole ?? this.sharedRole,
-      waypoints: waypoints ?? this.waypoints,
     );
   }
 
-  /// Helper to encode collaboration and waypoint metadata into SQLite notes column safely
+  /// Helper to encode collaboration metadata into SQLite notes column safely
   static String? _encodeNotes(
     String? cleanNotes,
     bool isShared,
     String? inviteCode,
     List<String> collaborators,
-    String sharedRole, [
-    List<TripWaypoint> waypoints = const [],
-  ]) {
-    if (!isShared && inviteCode == null && collaborators.isEmpty && waypoints.isEmpty) {
+    String sharedRole,
+  ) {
+    if (!isShared && inviteCode == null && collaborators.isEmpty) {
       return cleanNotes;
     }
     final meta = <String, dynamic>{
@@ -113,9 +105,6 @@ class Trip {
       'collaborators': collaborators,
       'sharedRole': sharedRole,
     };
-    if (waypoints.isNotEmpty) {
-      meta['waypoints'] = TripWaypoint.encodeList(waypoints);
-    }
     final metaStr = '<!--PB_COLLAB:${jsonEncode(meta)}-->';
     if (cleanNotes == null || cleanNotes.isEmpty) {
       return metaStr;
@@ -123,17 +112,16 @@ class Trip {
     return '$cleanNotes\n$metaStr';
   }
 
-  /// Helper to decode collaboration and waypoint metadata from SQLite notes column safely
+  /// Helper to decode collaboration metadata from SQLite notes column safely
   static (
     String? cleanNotes,
     bool isShared,
     String? inviteCode,
     List<String> collaborators,
     String sharedRole,
-    List<TripWaypoint> waypoints,
   ) _decodeNotes(String? rawNotes) {
     if (rawNotes == null || !rawNotes.contains('<!--PB_COLLAB:')) {
-      return (rawNotes, false, null, const <String>[], 'owner', const <TripWaypoint>[]);
+      return (rawNotes, false, null, const <String>[], 'owner');
     }
 
     try {
@@ -154,16 +142,12 @@ class Trip {
             ? rawCollabs.map((e) => e.toString()).toList()
             : const <String>[];
         final role = decoded['sharedRole'] as String? ?? 'owner';
-        final rawWaypoints = decoded['waypoints'] as String?;
-        final waypoints = rawWaypoints != null && rawWaypoints.isNotEmpty
-            ? TripWaypoint.decodeList(rawWaypoints)
-            : const <TripWaypoint>[];
 
-        return (clean.isEmpty ? null : clean, isShared, inviteCode, collaborators, role, waypoints);
+        return (clean.isEmpty ? null : clean, isShared, inviteCode, collaborators, role);
       }
     } catch (_) {}
 
-    return (rawNotes, false, null, const <String>[], 'owner', const <TripWaypoint>[]);
+    return (rawNotes, false, null, const <String>[], 'owner');
   }
 
   /// Serialization for Cloud Firestore / JSON APIs
@@ -193,7 +177,6 @@ class Trip {
       'invite_code': inviteCode,
       'collaborators': collaborators,
       'sharedRole': sharedRole,
-      'waypoints': TripWaypoint.encodeList(waypoints),
     };
   }
 
@@ -209,7 +192,7 @@ class Trip {
     }
 
     final rawNotes = json['notes'] as String?;
-    final (cleanNotes, decodedShared, decodedCode, decodedCollabs, decodedRole, decodedWaypoints) =
+    final (cleanNotes, decodedShared, decodedCode, decodedCollabs, decodedRole) =
         _decodeNotes(rawNotes);
 
     final isShared = json['isShared'] as bool? ??
@@ -224,18 +207,6 @@ class Trip {
     }
     final sharedRole =
         (json['sharedRole'] ?? json['shared_role'] ?? decodedRole) as String? ?? 'owner';
-
-    final rawWaypoints = json['waypoints'];
-    final List<TripWaypoint> waypoints;
-    if (rawWaypoints is String && rawWaypoints.isNotEmpty) {
-      waypoints = TripWaypoint.decodeList(rawWaypoints);
-    } else if (rawWaypoints is List) {
-      waypoints = rawWaypoints
-          .map((e) => TripWaypoint.fromJson(e as Map<String, dynamic>))
-          .toList();
-    } else {
-      waypoints = decodedWaypoints;
-    }
 
     return Trip(
       id: (json['id'] ?? '') as String,
@@ -260,13 +231,12 @@ class Trip {
       inviteCode: inviteCode,
       collaborators: collaborators,
       sharedRole: sharedRole,
-      waypoints: waypoints,
     );
   }
 
   /// Serialization for local SQLite database
   Map<String, dynamic> toMap() {
-    final encodedNotes = _encodeNotes(notes, isShared, inviteCode, collaborators, sharedRole, waypoints);
+    final encodedNotes = _encodeNotes(notes, isShared, inviteCode, collaborators, sharedRole);
     return {
       'id': id,
       'user_id': userId,
@@ -297,7 +267,7 @@ class Trip {
     }
 
     final rawNotes = map['notes'] as String?;
-    final (cleanNotes, isShared, inviteCode, collaborators, sharedRole, waypoints) =
+    final (cleanNotes, isShared, inviteCode, collaborators, sharedRole) =
         _decodeNotes(rawNotes);
 
     return Trip(
@@ -319,7 +289,6 @@ class Trip {
       inviteCode: inviteCode,
       collaborators: collaborators,
       sharedRole: sharedRole,
-      waypoints: waypoints,
     );
   }
 }

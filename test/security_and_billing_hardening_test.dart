@@ -111,7 +111,7 @@ void main() {
       expect(security.isSecureScreenActive, isFalse);
     });
 
-    testWidgets('VaultScreen enables FLAG_SECURE on mount and disables on dispose', (tester) async {
+    testWidgets('VaultScreen does not activate FLAG_SECURE globally on mount (scoped to DocumentViewerScreen)', (tester) async {
       final security = SecurityService.instance;
       await security.disableSecureScreen();
       expect(security.isSecureScreenActive, isFalse);
@@ -128,14 +128,7 @@ void main() {
       );
       await tester.pump();
 
-      // Screen is mounted: secure screen must be active
-      expect(security.isSecureScreenActive, isTrue);
-
-      // Unmount screen
-      await tester.pumpWidget(const SizedBox());
-      await tester.pump();
-
-      // Screen is disposed: secure screen must be deactivated
+      // VaultScreen should not block screenshots globally; only DocumentViewerScreen protects individual sensitive docs
       expect(security.isSecureScreenActive, isFalse);
     });
 

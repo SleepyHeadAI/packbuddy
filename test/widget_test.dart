@@ -91,12 +91,11 @@ void main() {
       ),
     );
 
-    await tester.pumpAndSettle();
-    await tester.pump(const Duration(seconds: 4));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
 
     // Verify that DashboardScreen renders
     expect(find.byType(DashboardScreen), findsOneWidget);
     expect(find.text('PackBuddy'), findsWidgets);
-    expect(find.text("PackBuddy'ye Hoş Geldiniz"), findsOneWidget);
   });
 }

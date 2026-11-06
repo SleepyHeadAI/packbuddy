@@ -58,7 +58,6 @@ void main() {
         currency: 'JPY',
         category: 'Transportation',
         date: now,
-        receiptPath: '/path/to/receipt.jpg',
         createdAt: now,
         updatedAt: now,
         isDeleted: false,

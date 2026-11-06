@@ -481,10 +481,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get luggagePreparationGuide => 'Luggage Preparation & Baggage Guide';
 
   @override
-  String get weighingResponsibilityNote =>
-      '⚖️ Weighing responsibility belongs to traveler. Weight calculation is not active.';
-
-  @override
   String get digitalWallet => 'Digital Wallet';
 
   @override

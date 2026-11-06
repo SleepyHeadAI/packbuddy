@@ -469,9 +469,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get luggagePreparationGuide => '行李打包指南';
 
   @override
-  String get weighingResponsibilityNote => '⚖️ 称重合规责任归旅客所有。';
-
-  @override
   String get digitalWallet => '电子卡包';
 
   @override

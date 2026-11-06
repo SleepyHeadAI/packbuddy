@@ -22,6 +22,7 @@ import 'features/auth/presentation/screens/email_verification_screen.dart';
 import 'features/auth/presentation/screens/banned_screen.dart';
 import 'features/admin/user_moderation_provider.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
+import 'features/dashboard/presentation/main_shell_scaffold.dart';
 import 'features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'data/sync_engine/sync_engine.dart';
 
@@ -53,6 +54,10 @@ void main() async {
     // Non-blocking background sync when online
     CurrencyService.syncRates();
   } catch (_) {}
+
+  // 120 FPS performance optimizations: boost image cache for smooth fling scrolling
+  PaintingBinding.instance.imageCache.maximumSize = 1000;
+  PaintingBinding.instance.imageCache.maximumSizeBytes = 100 * 1024 * 1024; // 100 MB
 
   runApp(
     const ProviderScope(
@@ -257,9 +262,9 @@ class AuthWallGate extends ConsumerWidget {
       );
     }
 
-    // 6. Fully authenticated and verified -> DashboardScreen
-    return const DashboardScreen(
-      key: ValueKey('authenticated_dashboard'),
+    // 6. Fully authenticated and verified -> Main Navigation Shell (Persistent Scaffold)
+    return const MainShellScaffold(
+      key: ValueKey('authenticated_shell'),
     );
   }
 }

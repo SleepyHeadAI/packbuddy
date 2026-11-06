@@ -483,10 +483,6 @@ class AppLocalizationsEl extends AppLocalizations {
   String get luggagePreparationGuide => 'Οδηγός προετοιμασίας αποσκευών';
 
   @override
-  String get weighingResponsibilityNote =>
-      '⚖️ Η ευθύνη ζύγισης ανήκει στον επιβάτη.';
-
-  @override
   String get digitalWallet => 'Ψηφιακό πορτοφόλι';
 
   @override

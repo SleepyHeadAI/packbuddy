@@ -469,9 +469,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get luggagePreparationGuide => '짐 싸기 가이드';
 
   @override
-  String get weighingResponsibilityNote => '⚖️ 수하물 무게 준수 책임은 여행자 본인에게 있습니다.';
-
-  @override
   String get digitalWallet => '디지털 지갑';
 
   @override

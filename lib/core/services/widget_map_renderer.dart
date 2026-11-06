@@ -4,7 +4,6 @@ import 'package:home_widget/home_widget.dart';
 import 'package:countries_world_map/countries_world_map.dart';
 import 'package:countries_world_map/data/maps/world_map.dart';
 import '../../features/travel_map/domain/travel_country.dart';
-import 'app_widget_localization.dart';
 import 'preferences_service.dart';
 
 /// Predefined theme configurations for Home Screen Widgets and Miniature World Map
@@ -462,56 +461,56 @@ class WidgetMapRenderer {
       final currentTheme = theme ?? PreferencesService.instance.getWidgetTheme();
       final themeConfig = WidgetThemeConfig.fromKey(currentTheme);
 
-      final colorMap = <String, Color>{};
+      final colorMapWithWishlist = <String, Color>{};
+      final colorMapNoWishlist = <String, Color>{};
       for (final country in countries) {
         final code = country.code.toLowerCase().trim();
         if (country.isLived) {
-          colorMap[code] = themeConfig.livedColor;
+          colorMapWithWishlist[code] = themeConfig.livedColor;
+          colorMapNoWishlist[code] = themeConfig.livedColor;
         } else if (country.isVisited) {
-          colorMap[code] = themeConfig.visitedColor;
+          colorMapWithWishlist[code] = themeConfig.visitedColor;
+          colorMapNoWishlist[code] = themeConfig.visitedColor;
         } else if (country.isWishlist) {
-          colorMap[code] = themeConfig.wishlistColor;
+          colorMapWithWishlist[code] = themeConfig.wishlistColor;
         }
       }
 
       final nc = countries.where((c) => c.code == 'NC').firstOrNull;
-      if (nc != null && (colorMap['cy'] == null || nc.isLived || nc.isVisited)) {
+      if (nc != null) {
         if (nc.isLived) {
-          colorMap['cy'] = themeConfig.livedColor;
+          colorMapWithWishlist['cy'] = themeConfig.livedColor;
+          colorMapNoWishlist['cy'] = themeConfig.livedColor;
         } else if (nc.isVisited) {
-          colorMap['cy'] = themeConfig.visitedColor;
-        } else if (nc.isWishlist && colorMap['cy'] == null) {
-          colorMap['cy'] = themeConfig.wishlistColor;
+          colorMapWithWishlist['cy'] = themeConfig.visitedColor;
+          colorMapNoWishlist['cy'] = themeConfig.visitedColor;
+        } else if (nc.isWishlist) {
+          if (colorMapWithWishlist['cy'] == null) {
+            colorMapWithWishlist['cy'] = themeConfig.wishlistColor;
+          }
         }
       }
 
-      final lang = PreferencesService.instance.getLocale()?.languageCode ?? 'tr';
-      final livedCount = countries.where((c) => c.isLived).length;
-      final visitedCount = countries.where((c) => c.isVisited || c.isLived).length;
-      final wishlistCount = countries.where((c) => c.isWishlist).length;
-      final resolvedContinents = continentsCount ??
-          countries
-              .where((c) => c.isVisited || c.isLived)
-              .map((c) => c.continent)
-              .where((c) => c.isNotEmpty)
-              .toSet()
-              .length;
+      // Attractive preview fallback if user hasn't marked countries yet, matching in-app preview
+      if (colorMapWithWishlist.isEmpty) {
+        colorMapWithWishlist['tr'] = themeConfig.livedColor;
+        colorMapNoWishlist['tr'] = themeConfig.livedColor;
+        for (final c in ['de', 'it', 'fr', 'es', 'us', 'br']) {
+          colorMapWithWishlist[c] = themeConfig.visitedColor;
+          colorMapNoWishlist[c] = themeConfig.visitedColor;
+        }
+        for (final c in ['jp', 'ca', 'au']) {
+          colorMapWithWishlist[c] = themeConfig.wishlistColor;
+        }
+      }
 
-      // 1. Large Map with Centered Projection without embedded Legend (360x220 dp)
-      // Native AppWidget views render the localized badges and stats dynamically.
+      // 1. Large Map with Centered Projection (360x220 dp) - With Wishlist
       final largeWidget = _buildMapCanvas(
-        colorMap: colorMap,
-        showLegend: false,
-        lang: lang,
+        colorMap: colorMapWithWishlist,
         themeKey: currentTheme,
-        livedCount: livedCount,
-        visitedCount: visitedCount,
-        wishlistCount: wishlistCount,
-        continentsCount: resolvedContinents,
         width: 360,
         height: 220,
       );
-
       final largePath = await HomeWidget.renderFlutterWidget(
         largeWidget,
         key: 'map_image_large',
@@ -520,20 +519,28 @@ class WidgetMapRenderer {
       );
       await HomeWidget.saveWidgetData<String>('map_image_large', largePath);
 
-      // 2. Medium Map with Centered Projection without Legend (200x120 dp)
-      final mediumWidget = _buildMapCanvas(
-        colorMap: colorMap,
-        showLegend: false,
-        lang: lang,
+      // 1b. Large Map without Wishlist (for widgets where showWishlist is false)
+      final largeNoWishlistWidget = _buildMapCanvas(
+        colorMap: colorMapNoWishlist,
         themeKey: currentTheme,
-        livedCount: livedCount,
-        visitedCount: visitedCount,
-        wishlistCount: wishlistCount,
-        continentsCount: resolvedContinents,
+        width: 360,
+        height: 220,
+      );
+      final largeNoWishlistPath = await HomeWidget.renderFlutterWidget(
+        largeNoWishlistWidget,
+        key: 'map_image_large_nowishlist',
+        logicalSize: const Size(360, 220),
+        pixelRatio: 2.5,
+      );
+      await HomeWidget.saveWidgetData<String>('map_image_large_nowishlist', largeNoWishlistPath);
+
+      // 2. Medium Map with Centered Projection (200x120 dp) - With Wishlist
+      final mediumWidget = _buildMapCanvas(
+        colorMap: colorMapWithWishlist,
+        themeKey: currentTheme,
         width: 200,
         height: 120,
       );
-
       final mediumPath = await HomeWidget.renderFlutterWidget(
         mediumWidget,
         key: 'map_image_medium',
@@ -541,6 +548,21 @@ class WidgetMapRenderer {
         pixelRatio: 2.5,
       );
       await HomeWidget.saveWidgetData<String>('map_image_medium', mediumPath);
+
+      // 2b. Medium Map without Wishlist
+      final mediumNoWishlistWidget = _buildMapCanvas(
+        colorMap: colorMapNoWishlist,
+        themeKey: currentTheme,
+        width: 200,
+        height: 120,
+      );
+      final mediumNoWishlistPath = await HomeWidget.renderFlutterWidget(
+        mediumNoWishlistWidget,
+        key: 'map_image_medium_nowishlist',
+        logicalSize: const Size(200, 120),
+        pixelRatio: 2.5,
+      );
+      await HomeWidget.saveWidgetData<String>('map_image_medium_nowishlist', mediumNoWishlistPath);
     } catch (e) {
       debugPrint('[WidgetMapRenderer] Error rendering map image: $e');
     }
@@ -548,116 +570,30 @@ class WidgetMapRenderer {
 
   static Widget _buildMapCanvas({
     required Map<String, Color> colorMap,
-    required bool showLegend,
-    required String lang,
     required String themeKey,
-    required int livedCount,
-    required int visitedCount,
-    required int wishlistCount,
-    int continentsCount = 0,
     required double width,
     required double height,
   }) {
     final themeConfig = WidgetThemeConfig.fromKey(themeKey);
 
-    final legendLived = AppWidgetLocalization.getLegendLived(lang);
-    final legendVisited = AppWidgetLocalization.getLegendVisited(lang);
-    final legendWishlist = AppWidgetLocalization.getLegendWishlist(lang);
-    final continentsStatLabel = AppWidgetLocalization.getContinentsStatLabel(lang, continentsCount);
-
     return SizedBox(
       width: width,
       height: height,
-      child: Container(
-        decoration: BoxDecoration(
-          color: themeConfig.oceanColor,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // Center the entire world map maintaining exact 2000:857 aspect ratio
-            Center(
-              child: AspectRatio(
-                aspectRatio: 2000 / 857,
-                child: SimpleMap(
-                  instructions: SMapWorld.instructions,
-                  defaultColor: themeConfig.unvisitedLandColor,
-                  colors: colorMap,
-                  countryBorder: CountryBorder(
-                    color: themeConfig.countryBorderColor,
-                    width: 0.45,
-                  ),
-                  fit: BoxFit.contain,
-                ),
-              ),
+      child: Center(
+        child: AspectRatio(
+          aspectRatio: 2000 / 857,
+          child: SimpleMap(
+            instructions: SMapWorld.instructions,
+            defaultColor: themeConfig.unvisitedLandColor,
+            colors: colorMap,
+            countryBorder: CountryBorder(
+              color: themeConfig.countryBorderColor,
+              width: 0.45,
             ),
-            if (showLegend)
-              Positioned(
-                bottom: 2,
-                left: 4,
-                right: 4,
-                child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
-                    decoration: BoxDecoration(
-                      color: themeConfig.legendBgColor,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: themeConfig.legendBorderColor,
-                        width: 0.8,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _buildIndicator(themeConfig.livedColor, '$legendLived ($livedCount)', themeConfig.legendTextColor),
-                        const SizedBox(width: 8),
-                        _buildIndicator(themeConfig.visitedColor, '$legendVisited ($visitedCount)', themeConfig.legendTextColor),
-                        const SizedBox(width: 8),
-                        _buildIndicator(themeConfig.wishlistColor, '$legendWishlist ($wishlistCount)', themeConfig.legendTextColor),
-                        if (continentsCount > 0) ...[
-                          const SizedBox(width: 8),
-                          Text(
-                            continentsStatLabel,
-                            style: TextStyle(
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
-                              color: themeConfig.legendTextColor,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  static Widget _buildIndicator(Color color, String text, Color textColor) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 6,
-          height: 6,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 3.5),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 9,
-            fontWeight: FontWeight.bold,
-            color: textColor,
+            fit: BoxFit.contain,
           ),
         ),
-      ],
+      ),
     );
   }
 }

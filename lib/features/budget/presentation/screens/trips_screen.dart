@@ -305,30 +305,40 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
                   )
                 : Column(
                     children: [
-                      // Segment Filter Bar: Tümü • Aktif & Yaklaşan • Geçmiş
+                      // Modern Segmented Filter Bar: Tümü • Aktif • Tamamlandı
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.fromLTRB(20, 8, 20, 10),
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest.withValues(
+                              alpha: Theme.of(context).brightness == Brightness.dark ? 0.35 : 0.55,
+                            ),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
+                              width: 1,
+                            ),
+                          ),
                           child: Row(
                             children: [
-                              _buildFilterChip(
+                              _buildSegmentItem(
                                 key: 'all',
                                 label: l10n.allTrips,
                                 count: allTrips.length,
                                 isSelected: _selectedFilter == 'all',
                                 theme: theme,
                               ),
-                              const SizedBox(width: 8),
-                              _buildFilterChip(
+                              const SizedBox(width: 4),
+                              _buildSegmentItem(
                                 key: 'active',
-                                label: '${l10n.ongoingTrip} & ${l10n.upcomingRoute}',
+                                label: l10n.ongoingTrip,
                                 count: activeCount,
                                 isSelected: _selectedFilter == 'active',
                                 theme: theme,
                               ),
-                              const SizedBox(width: 8),
-                              _buildFilterChip(
+                              const SizedBox(width: 4),
+                              _buildSegmentItem(
                                 key: 'past',
                                 label: l10n.completed,
                                 count: pastCount,
@@ -407,50 +417,75 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
     );
   }
 
-  Widget _buildFilterChip({
+  Widget _buildSegmentItem({
     required String key,
     required String label,
     required int count,
     required bool isSelected,
     required ThemeData theme,
   }) {
-    return ChoiceChip(
-      selected: isSelected,
-      onSelected: (_) => setState(() => _selectedFilter = key),
-      selectedColor: theme.colorScheme.primary,
-      backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-      showCheckmark: false,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      label: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-              color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
-            ),
+    return Expanded(
+      child: BouncyPressable(
+        scaleFactor: 0.95,
+        onTap: () => setState(() => _selectedFilter = key),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected ? theme.colorScheme.primary : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.28),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
           ),
-          const SizedBox(width: 6),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? theme.colorScheme.onPrimary.withValues(alpha: 0.25)
-                  : theme.colorScheme.primary.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text(
-              '$count',
-              style: TextStyle(
-                fontSize: 10.5,
-                fontWeight: FontWeight.w800,
-                color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.primary,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                    color: isSelected
+                        ? theme.colorScheme.onPrimary
+                        : theme.colorScheme.onSurfaceVariant,
+                    letterSpacing: -0.2,
+                  ),
+                ),
               ),
-            ),
+              const SizedBox(width: 5),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? theme.colorScheme.onPrimary.withValues(alpha: 0.22)
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '$count',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    color: isSelected
+                        ? theme.colorScheme.onPrimary
+                        : theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

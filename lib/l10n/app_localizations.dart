@@ -1052,12 +1052,6 @@ abstract class AppLocalizations {
   /// **'Luggage Preparation & Baggage Guide'**
   String get luggagePreparationGuide;
 
-  /// Luggage weight disclaimer
-  ///
-  /// In en, this message translates to:
-  /// **'⚖️ Weighing responsibility belongs to traveler. Weight calculation is not active.'**
-  String get weighingResponsibilityNote;
-
   /// Digital wallet payment method
   ///
   /// In en, this message translates to:

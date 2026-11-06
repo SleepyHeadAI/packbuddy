@@ -11,7 +11,6 @@ import 'package:packbuddy/core/services/share_service.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 import 'package:packbuddy/features/budget/domain/trip.dart';
-import 'package:packbuddy/features/budget/domain/trip_waypoint.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
 import 'package:packbuddy/features/budget/presentation/screens/trip_detail_screen.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
@@ -26,6 +25,8 @@ import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/auth/auth_screen.dart';
 import 'package:packbuddy/features/auth/presentation/screens/banned_screen.dart';
 import 'package:packbuddy/features/admin/user_moderation_provider.dart';
+import 'package:packbuddy/core/services/story_card_localization.dart';
+import 'package:packbuddy/features/travel_map/presentation/widgets/travel_map_story_card.dart';
 
 // Test Fakes
 class FakeUser extends Fake implements User {
@@ -184,14 +185,9 @@ void main() {
     });
   });
 
-  group('2. Waypoint Persistence & Trip Domain Entity Integrity', () {
-    test('Trip stores, persists in SQLite notes, and restores waypoints cleanly', () {
+  group('2. Trip Domain Entity Integrity & SQLite Serialization', () {
+    test('Trip stores, persists in SQLite notes, and restores metadata cleanly', () {
       final now = DateTime.now();
-      const waypoints = [
-        TripWaypoint(id: 'wp1', tripId: 'trip_100', name: 'Tokyo Tower', latitude: 35.6586, longitude: 139.7454),
-        TripWaypoint(id: 'wp2', tripId: 'trip_100', name: 'Shinjuku Gyoen', latitude: 35.6852, longitude: 139.7101),
-      ];
-
       final trip = Trip(
         id: 'trip_100',
         title: 'Japan Tour',
@@ -201,36 +197,37 @@ void main() {
         notes: 'Hotel booked at Ginza',
         createdAt: now,
         updatedAt: now,
-        waypoints: waypoints,
+        isShared: true,
+        inviteCode: 'TRIP123',
+        collaborators: ['user-a', 'user-b'],
+        sharedRole: 'editor',
       );
 
       // Verify SQLite serialization
       final map = trip.toMap();
       expect(map['notes'], contains('<!--PB_COLLAB:'));
-      expect(map['notes'], contains('Tokyo Tower'));
+      expect(map['notes'], contains('TRIP123'));
 
       // Verify SQLite deserialization
       final restored = Trip.fromMap(map);
       expect(restored.notes, equals('Hotel booked at Ginza'));
-      expect(restored.waypoints.length, equals(2));
-      expect(restored.waypoints[0].name, equals('Tokyo Tower'));
-      expect(restored.waypoints[1].name, equals('Shinjuku Gyoen'));
+      expect(restored.isShared, isTrue);
+      expect(restored.inviteCode, equals('TRIP123'));
+      expect(restored.collaborators.length, equals(2));
+      expect(restored.sharedRole, equals('editor'));
 
       // Verify JSON round-trip
       final json = trip.toJson();
       final fromJson = Trip.fromJson(json);
-      expect(fromJson.waypoints.length, equals(2));
-      expect(fromJson.waypoints[0].name, equals('Tokyo Tower'));
+      expect(fromJson.id, equals('trip_100'));
+      expect(fromJson.inviteCode, equals('TRIP123'));
 
-      // Verify copyWith with updated waypoints
+      // Verify copyWith
       final updated = trip.copyWith(
-        waypoints: [
-          ...waypoints,
-          const TripWaypoint(id: 'wp3', tripId: 'trip_100', name: 'Akihabara', latitude: 35.6984, longitude: 139.7731),
-        ],
+        collaborators: [...trip.collaborators, 'user-c'],
       );
-      expect(updated.waypoints.length, equals(3));
-      expect(updated.waypoints[2].name, equals('Akihabara'));
+      expect(updated.collaborators.length, equals(3));
+      expect(updated.collaborators[2], equals('user-c'));
     });
   });
 
@@ -420,10 +417,6 @@ void main() {
         notes: 'Winter jacket and warm thermal gloves required',
         createdAt: now,
         updatedAt: now,
-        waypoints: const [
-          TripWaypoint(id: 'wp1', tripId: 'detail_test_trip', name: 'Hermitage Museum', latitude: 59.9398, longitude: 30.3146),
-          TripWaypoint(id: 'wp2', tripId: 'detail_test_trip', name: 'Nevsky Prospekt', latitude: 59.9343, longitude: 30.3351),
-        ],
       );
 
       for (final lang in ['ru', 'de', 'el', 'tr', 'en']) {
@@ -449,6 +442,49 @@ void main() {
           debugPrint('DEBUG EXCEPTION: ${(ex is FlutterError) ? ex.toStringDeep() : ex.toString()}');
         }
         expect(ex, isNull, reason: 'Overflow in TripDetailScreen with locale $lang');
+      }
+    });
+
+    testWidgets('StoryCardLocalization & TravelMapStoryCard 20-Language Complete Verification', (tester) async {
+      tester.view.physicalSize = const Size(1080, 1920);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.resetPhysicalSize());
+
+      const languages = [
+        'en', 'tr', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'zh', 'ja',
+        'ko', 'hi', 'ar', 'nl', 'el', 'sv', 'pl', 'id', 'th', 'vi'
+      ];
+
+      for (final lang in languages) {
+        // 1. Verify all localization methods return non-empty strings
+        expect(StoryCardLocalization.getWorldTravelerHeader(lang).isNotEmpty, isTrue);
+        expect(StoryCardLocalization.getAtlasArchiveHeader(lang, 12.3).isNotEmpty, isTrue);
+        expect(StoryCardLocalization.getMinimalQuote(lang).isNotEmpty, isTrue);
+        expect(StoryCardLocalization.getShowcaseExploredBadge(lang, 28).isNotEmpty, isTrue);
+        expect(StoryCardLocalization.getJourneyLogHeader(lang).isNotEmpty, isTrue);
+        expect(StoryCardLocalization.getExplorationRateHeader(lang).isNotEmpty, isTrue);
+        expect(StoryCardLocalization.getCountriesCountBadge(lang, 28).isNotEmpty, isTrue);
+        expect(StoryCardLocalization.getContinentsCountBadge(lang, 2).isNotEmpty, isTrue);
+        expect(StoryCardLocalization.getPostcardHeader(lang).isNotEmpty, isTrue);
+        expect(StoryCardLocalization.getPostcardCaption(lang, 28).isNotEmpty, isTrue);
+        expect(StoryCardLocalization.getPostcardNote(lang, 28, 2).isNotEmpty, isTrue);
+        expect(StoryCardLocalization.getInfographicHeader(lang).isNotEmpty, isTrue);
+        expect(StoryCardLocalization.getVisaPendingBadge(lang).isNotEmpty, isTrue);
+        expect(StoryCardLocalization.getTargetDestinationsHeader(lang).isNotEmpty, isTrue);
+        expect(StoryCardLocalization.getReadyForTakeoffHint(lang).isNotEmpty, isTrue);
+        expect(StoryCardLocalization.getVisaAdmittedStamp(lang).isNotEmpty, isTrue);
+        expect(StoryCardLocalization.getNextRadarHeader(lang).isNotEmpty, isTrue);
+        expect(StoryCardLocalization.getHorizonAwaitsHeader(lang).isNotEmpty, isTrue);
+        expect(StoryCardLocalization.getExplorerEmptyPrompt(lang).isNotEmpty, isTrue);
+        expect(StoryCardLocalization.getNewAdventuresPrompt(lang).isNotEmpty, isTrue);
+
+        for (final theme in StoryCardTheme.values) {
+          expect(StoryCardLocalization.getThemeName(theme.name, lang).isNotEmpty, isTrue);
+        }
+
+        for (final layout in StoryCardLayout.values) {
+          expect(StoryCardLocalization.getLayoutName(layout, lang).isNotEmpty, isTrue);
+        }
       }
     });
   });

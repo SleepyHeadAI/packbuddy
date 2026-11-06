@@ -479,10 +479,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get luggagePreparationGuide => 'Guida preparazione bagagli';
 
   @override
-  String get weighingResponsibilityNote =>
-      '⚖️ La responsabilità del peso è a carico del passeggero.';
-
-  @override
   String get digitalWallet => 'Portafoglio digitale';
 
   @override

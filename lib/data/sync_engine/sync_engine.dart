@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite/sqflite.dart';
 import '../local_db/database_helper.dart';
@@ -97,9 +98,14 @@ class SyncEngine extends StateNotifier<SyncState> {
     _startPeriodicHeartbeat();
   }
 
+  bool get _isTestEnvironment {
+    return Platform.environment.containsKey('FLUTTER_TEST') ||
+        WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test');
+  }
+
   /// Automatically monitors device network connectivity and schedules sync on restore
   void _initConnectivityListener() {
-    if (Platform.environment.containsKey('FLUTTER_TEST')) return;
+    if (_isTestEnvironment) return;
     try {
       _connectivitySubscription = Connectivity().onConnectivityChanged.listen(
         (List<ConnectivityResult> results) {
@@ -135,7 +141,7 @@ class SyncEngine extends StateNotifier<SyncState> {
 
   /// Periodic silent background heartbeat (every 5 minutes) to sync multi-device modifications
   void _startPeriodicHeartbeat() {
-    if (Platform.environment.containsKey('FLUTTER_TEST')) return;
+    if (_isTestEnvironment) return;
     _heartbeatTimer?.cancel();
     _heartbeatTimer = Timer.periodic(const Duration(minutes: 5), (_) {
       if (mounted && !_isSyncing && state.status != SyncStatus.syncing) {
@@ -146,7 +152,7 @@ class SyncEngine extends StateNotifier<SyncState> {
 
   /// Schedules exponential backoff retry upon sync errors (15s, 30s, 45s...)
   void _scheduleRetry() {
-    if (Platform.environment.containsKey('FLUTTER_TEST')) return;
+    if (_isTestEnvironment) return;
     _retryTimer?.cancel();
     if (_retryCount < 5) {
       _retryCount++;
@@ -424,7 +430,7 @@ class SyncEngine extends StateNotifier<SyncState> {
 
   /// Simple, fast, and resilient check for internet connection with multi-host fallback
   Future<bool> hasInternetConnection() async {
-    if (Platform.environment.containsKey('FLUTTER_TEST')) {
+    if (_isTestEnvironment) {
       return false;
     }
     try {

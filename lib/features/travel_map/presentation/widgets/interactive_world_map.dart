@@ -423,21 +423,23 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                         boundaryMargin: const EdgeInsets.symmetric(horizontal: 160, vertical: 120),
                         onInteractionStart: (_) => _setInteracting(true),
                         onInteractionEnd: (_) => _setInteracting(false),
-                        child: SizedBox(
-                          width: constraints.maxWidth,
-                          height: 390,
-                          child: SimpleMap(
-                            instructions: SMapWorld.instructions,
-                            defaultColor: unvisitedLandColor,
-                            colors: colorMap,
-                            countryBorder: CountryBorder(
-                              color: borderColor,
-                              width: 0.65,
+                        child: RepaintBoundary(
+                          child: SizedBox(
+                            width: constraints.maxWidth,
+                            height: 390,
+                            child: SimpleMap(
+                              instructions: SMapWorld.instructions,
+                              defaultColor: unvisitedLandColor,
+                              colors: colorMap,
+                              countryBorder: CountryBorder(
+                                color: borderColor,
+                                width: 0.65,
+                              ),
+                              fit: BoxFit.contain,
+                              callback: (id, name, tapDetails) {
+                                _handleCountryTap(id, name);
+                              },
                             ),
-                            fit: BoxFit.contain,
-                            callback: (id, name, tapDetails) {
-                              _handleCountryTap(id, name);
-                            },
                           ),
                         ),
                       );

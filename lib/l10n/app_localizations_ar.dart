@@ -472,10 +472,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get luggagePreparationGuide => 'دليل إعداد الأمتعة والحقائب';
 
   @override
-  String get weighingResponsibilityNote =>
-      '⚖️ مسؤولية الالتزام بالوزن تقع على المسافر.';
-
-  @override
   String get digitalWallet => 'المحفظة الرقمية';
 
   @override

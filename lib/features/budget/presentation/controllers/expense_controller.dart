@@ -94,7 +94,6 @@ class ExpenseController extends StateNotifier<ExpenseState> {
     required String currency,
     required String category,
     required DateTime date,
-    String? receiptPath,
     String? paymentMethod,
     String? notes,
   }) async {
@@ -118,7 +117,6 @@ class ExpenseController extends StateNotifier<ExpenseState> {
         currency: currency,
         category: category,
         date: date,
-        receiptPath: receiptPath,
         paymentMethod: paymentMethod,
         notes: notes,
         createdAt: now,

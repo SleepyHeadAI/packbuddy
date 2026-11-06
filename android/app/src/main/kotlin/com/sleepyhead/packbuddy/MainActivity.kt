@@ -27,6 +27,18 @@ class MainActivity : FlutterFragmentActivity() {
         enableHighRefreshRate()
     }
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        enableHighRefreshRate()
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            enableHighRefreshRate()
+        }
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
@@ -51,11 +63,19 @@ class MainActivity : FlutterFragmentActivity() {
                             bestMode = mode
                         }
                     }
+                    val params = window.attributes
                     if (bestMode != null) {
-                        val params = window.attributes
                         params.preferredDisplayModeId = bestMode.modeId
-                        window.attributes = params
                     }
+                    try {
+                        val minField = params.javaClass.getField("preferredMinDisplayRefreshRate")
+                        minField.setFloat(params, maxRate)
+                        val maxField = params.javaClass.getField("preferredMaxDisplayRefreshRate")
+                        maxField.setFloat(params, maxRate)
+                    } catch (_: Exception) {
+                        // Fields might not be present on older SDK compile targets
+                    }
+                    window.attributes = params
                 }
             } catch (_: Exception) {
                 // Ignore if device restricts dynamic mode switching
@@ -92,6 +112,16 @@ class MainActivity : FlutterFragmentActivity() {
                             val sizeInt = call.argument<Int>("size") ?: 0
                             val providerName = call.argument<String>("provider") ?: "PackBuddyWidgetProvider"
 
+                            val showContinents = call.argument<Boolean>("showContinents") ?: true
+                            val showWishlist = call.argument<Boolean>("showWishlist") ?: true
+                            val showCountdown = call.argument<Boolean>("showCountdown") ?: true
+                            val showPacking = call.argument<Boolean>("showPacking") ?: true
+                            val showBudget = call.argument<Boolean>("showBudget") ?: true
+                            val showLiveRate = call.argument<Boolean>("showLiveRate") ?: true
+                            val showReverseRate = call.argument<Boolean>("showReverseRate") ?: true
+                            val showRemainingBudget = call.argument<Boolean>("showRemainingBudget") ?: true
+                            val showLastExpense = call.argument<Boolean>("showLastExpense") ?: true
+
                             val size = when (sizeInt) {
                                 2 -> WidgetLayoutSize.LARGE
                                 1 -> WidgetLayoutSize.MEDIUM
@@ -102,6 +132,15 @@ class MainActivity : FlutterFragmentActivity() {
                             widgetData.edit()
                                 .putString("pending_pin_mode", mode)
                                 .putString("pending_pin_theme", theme)
+                                .putBoolean("pending_pin_map_show_continents", showContinents)
+                                .putBoolean("pending_pin_map_show_wishlist", showWishlist)
+                                .putBoolean("pending_pin_trip_show_countdown", showCountdown)
+                                .putBoolean("pending_pin_trip_show_packing", showPacking)
+                                .putBoolean("pending_pin_trip_show_budget", showBudget)
+                                .putBoolean("pending_pin_currency_show_live_rate", showLiveRate)
+                                .putBoolean("pending_pin_currency_show_reverse_rate", showReverseRate)
+                                .putBoolean("pending_pin_quick_expense_show_remaining", showRemainingBudget)
+                                .putBoolean("pending_pin_quick_expense_show_last", showLastExpense)
                                 .putString("${mode}_theme", theme)
                                 .putString("widget_theme", theme)
                                 .commit()

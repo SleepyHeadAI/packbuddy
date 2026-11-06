@@ -477,10 +477,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get luggagePreparationGuide => 'Bagageguide & packningshjälp';
 
   @override
-  String get weighingResponsibilityNote =>
-      '⚖️ Resenären ansvarar själv för invägning av bagaget.';
-
-  @override
   String get digitalWallet => 'Digital plånbok';
 
   @override

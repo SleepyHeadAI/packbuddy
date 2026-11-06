@@ -233,6 +233,7 @@ class AppWidgetService {
 
       final visitedCountries = mapCountries.where((c) => c.isVisited || c.isLived).toList();
       final visitedCount = visitedCountries.length;
+      final livedCount = mapCountries.where((c) => c.isLived).length;
       final wishlistCount = mapCountries.where((c) => c.isWishlist).length;
       final continentsCount = visitedCountries.map((c) => c.continent).where((c) => c.isNotEmpty).toSet().length;
       final totalCountries = mapCountries.isNotEmpty ? mapCountries.length : 229;
@@ -370,10 +371,12 @@ class AppWidgetService {
         final worldTitle = AppWidgetLocalization.getVisitedTitle(lang, visitedCount);
         final worldSubtitle = AppWidgetLocalization.getExplorationRateLabel(lang);
         final worldStat1 = AppWidgetLocalization.getVisitedStatLabel(lang, visitedCount);
-        final worldStat2 = PreferencesService.instance.isWidgetShowWishlist()
+        final showWishlist = PreferencesService.instance.isWidgetShowWishlist();
+        final showContinents = PreferencesService.instance.isWidgetShowContinents();
+        final worldStat2 = showWishlist
             ? AppWidgetLocalization.getWishlistStatLabel(lang, wishlistCount)
             : '';
-        final worldStat3 = PreferencesService.instance.isWidgetShowContinents()
+        final worldStat3 = showContinents
             ? AppWidgetLocalization.getContinentsStatLabel(lang, continentsCount)
             : '';
         final worldTheme = PreferencesService.instance.getWidgetThemeForMode('world_map');
@@ -385,7 +388,13 @@ class AppWidgetService {
         await HomeWidget.saveWidgetData<String>('world_map_stat1', worldStat1);
         await HomeWidget.saveWidgetData<String>('world_map_stat2', worldStat2);
         await HomeWidget.saveWidgetData<String>('world_map_stat3', worldStat3);
+        await HomeWidget.saveWidgetData<int>('map_lived_count', livedCount);
+        await HomeWidget.saveWidgetData<String>('world_map_lived_stat', '● ${AppWidgetLocalization.getLegendLived(lang)} ($livedCount)');
+        await HomeWidget.saveWidgetData<String>('trip_packing_label', AppWidgetLocalization.getPackingLabel(lang));
+        await HomeWidget.saveWidgetData<String>('trip_spent_label', AppWidgetLocalization.getSpentLabel(lang));
         await HomeWidget.saveWidgetData<String>('world_map_theme', worldTheme);
+        await HomeWidget.saveWidgetData<bool>('map_show_continents', showContinents);
+        await HomeWidget.saveWidgetData<bool>('map_show_wishlist', showWishlist);
 
         // Render high-resolution vector world map image for any world map widgets
         await WidgetMapRenderer.renderAndSaveMapImages(
@@ -409,6 +418,10 @@ class AppWidgetService {
         final conv2 = '\$50 ≈ ${(50 * rateUsd).toStringAsFixed(1)} $userCurrency';
         final conv3 = '\$100 ≈ ${(100 * rateUsd).toStringAsFixed(0)} $userCurrency';
 
+        final showLiveRate = PreferencesService.instance.isWidgetShowLiveRate();
+        final showReverseRate = PreferencesService.instance.isWidgetShowReverseRate();
+        await HomeWidget.saveWidgetData<bool>('currency_show_live_rate', showLiveRate);
+        await HomeWidget.saveWidgetData<bool>('currency_show_reverse_rate', showReverseRate);
         await HomeWidget.saveWidgetData<String>('currency_converter_app_name', currencyAppName);
         await HomeWidget.saveWidgetData<String>('currency_converter_days', currencyDays);
         await HomeWidget.saveWidgetData<String>('currency_converter_title', currencyTitle);
@@ -506,6 +519,13 @@ class AppWidgetService {
           tripStat3 = AppWidgetLocalization.getWorldHeader(lang);
         }
         final tripTheme = PreferencesService.instance.getWidgetThemeForMode('trip');
+
+        final showCountdown = PreferencesService.instance.isWidgetShowCountdown();
+        final showPacking = PreferencesService.instance.isWidgetShowPacking();
+        final showBudget = PreferencesService.instance.isWidgetShowBudget();
+        await HomeWidget.saveWidgetData<bool>('trip_show_countdown', showCountdown);
+        await HomeWidget.saveWidgetData<bool>('trip_show_packing', showPacking);
+        await HomeWidget.saveWidgetData<bool>('trip_show_budget', showBudget);
 
         await HomeWidget.saveWidgetData<String>('trip_app_name', tripAppName);
         await HomeWidget.saveWidgetData<String>('trip_days', tripDays);

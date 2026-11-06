@@ -479,10 +479,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get luggagePreparationGuide => 'Panduan Persiapan Bagasi';
 
   @override
-  String get weighingResponsibilityNote =>
-      '⚖️ Tanggung jawab penimbangan berada pada penumpang.';
-
-  @override
   String get digitalWallet => 'Dompet Digital';
 
   @override

@@ -10,7 +10,6 @@ import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/features/auth/auth_screen.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
-import 'package:packbuddy/features/budget/domain/trip_waypoint.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/budget_analytics_card.dart';
 import 'package:packbuddy/features/budget/presentation/screens/trip_comparison_screen.dart';
@@ -328,46 +327,6 @@ void main() {
         inviteCode: 'BCN123',
       );
       expect(sharedInvite, isTrue);
-    });
-  });
-
-  group('F-2 Travel Map & Waypoints Route Tests', () {
-    test('TripWaypoint serializes and deserializes cleanly', () {
-      const waypoint = TripWaypoint(
-        id: 'wp-1',
-        tripId: 'wp-trip-1',
-        name: 'Eiffel Tower',
-        latitude: 48.8584,
-        longitude: 2.2945,
-        address: 'Champ de Mars, 5 Av. Anatole France, 75007 Paris',
-        notes: 'Sunset visit',
-        orderIndex: 0,
-      );
-
-      final json = waypoint.toJson();
-      final restored = TripWaypoint.fromJson(json);
-
-      expect(restored.id, 'wp-1');
-      expect(restored.tripId, 'wp-trip-1');
-      expect(restored.name, 'Eiffel Tower');
-      expect(restored.latitude, 48.8584);
-      expect(restored.longitude, 2.2945);
-      expect(restored.orderIndex, 0);
-    });
-
-    test('TripWaypoint encodes and decodes lists accurately', () {
-      const waypoints = [
-        TripWaypoint(id: 'wp1', tripId: 'trip-1', name: 'Shinjuku', latitude: 35.6938, longitude: 139.7034),
-        TripWaypoint(id: 'wp2', tripId: 'trip-1', name: 'Shibuya', latitude: 35.6580, longitude: 139.7016),
-      ];
-
-      final encoded = TripWaypoint.encodeList(waypoints);
-      expect(encoded, contains('Shinjuku'));
-
-      final decoded = TripWaypoint.decodeList(encoded);
-      expect(decoded.length, 2);
-      expect(decoded[0].name, 'Shinjuku');
-      expect(decoded[1].name, 'Shibuya');
     });
   });
 

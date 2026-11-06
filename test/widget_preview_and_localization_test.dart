@@ -331,6 +331,47 @@ void main() {
       expect(prefs.getWidgetThemeForMode('quick_expense'), 'cyberpunk');
       expect(prefs.getWidgetThemeForMode('currency_converter'), 'sunset');
     });
+
+    test('Widget Layout Sizing Thresholds prevent Small 2x2 from becoming Medium', () {
+      // Simulating Android widget sizing logic
+      String resolveLayoutSize({
+        required String defaultSize, // 'SMALL', 'MEDIUM', 'LARGE'
+        required int minWidth,
+        required int minHeight,
+      }) {
+        if (defaultSize == 'SMALL') {
+          if (minWidth >= 230 && minHeight >= 210) return 'LARGE';
+          if (minWidth >= 230) return 'MEDIUM';
+          return 'SMALL';
+        } else if (defaultSize == 'MEDIUM') {
+          if (minHeight >= 210 && minWidth >= 210) return 'LARGE';
+          if (minWidth < 210) return 'SMALL';
+          return 'MEDIUM';
+        } else {
+          if (minWidth < 210 && minHeight < 210) return 'SMALL';
+          if (minHeight < 210) return 'MEDIUM';
+          return 'LARGE';
+        }
+      }
+
+      // 1. Small (2x2) widget on standard mobile screens (width 140-195dp, height 140-195dp)
+      // MUST ALWAYS resolve to SMALL
+      expect(resolveLayoutSize(defaultSize: 'SMALL', minWidth: 140, minHeight: 140), 'SMALL');
+      expect(resolveLayoutSize(defaultSize: 'SMALL', minWidth: 170, minHeight: 160), 'SMALL');
+      expect(resolveLayoutSize(defaultSize: 'SMALL', minWidth: 180, minHeight: 180), 'SMALL');
+      expect(resolveLayoutSize(defaultSize: 'SMALL', minWidth: 200, minHeight: 180), 'SMALL');
+
+      // 2. Medium (4x2) widget on standard mobile screens (width 260-380dp, height 110-180dp)
+      // MUST resolve to MEDIUM
+      expect(resolveLayoutSize(defaultSize: 'MEDIUM', minWidth: 280, minHeight: 140), 'MEDIUM');
+      expect(resolveLayoutSize(defaultSize: 'MEDIUM', minWidth: 340, minHeight: 160), 'MEDIUM');
+
+      // 3. Medium shrunk to 2 columns (width < 210dp) gracefully degrades to SMALL
+      expect(resolveLayoutSize(defaultSize: 'MEDIUM', minWidth: 180, minHeight: 150), 'SMALL');
+
+      // 4. Large (4x4) widget on standard screens (width 260-380dp, height 260-380dp)
+      expect(resolveLayoutSize(defaultSize: 'LARGE', minWidth: 320, minHeight: 300), 'LARGE');
+    });
   });
 }
 

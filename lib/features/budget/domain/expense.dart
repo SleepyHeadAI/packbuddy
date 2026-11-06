@@ -8,7 +8,6 @@ class Expense {
   final String currency;
   final String category;
   final DateTime date;
-  final String? receiptPath;
   final String? paymentMethod;
   final String? notes;
   final DateTime createdAt;
@@ -24,7 +23,6 @@ class Expense {
     required this.currency,
     required this.category,
     required this.date,
-    this.receiptPath,
     this.paymentMethod,
     this.notes,
     required this.createdAt,
@@ -42,7 +40,6 @@ class Expense {
     String? currency,
     String? category,
     DateTime? date,
-    String? receiptPath,
     String? paymentMethod,
     String? notes,
     DateTime? createdAt,
@@ -58,7 +55,6 @@ class Expense {
       currency: currency ?? this.currency,
       category: category ?? this.category,
       date: date ?? this.date,
-      receiptPath: receiptPath ?? this.receiptPath,
       paymentMethod: paymentMethod ?? this.paymentMethod,
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
@@ -80,8 +76,6 @@ class Expense {
       'currency': currency,
       'category': category,
       'date': date.toIso8601String(),
-      'receiptPath': receiptPath,
-      'receipt_path': receiptPath,
       'paymentMethod': paymentMethod,
       'payment_method': paymentMethod,
       'notes': notes,
@@ -114,7 +108,6 @@ class Expense {
       currency: (json['currency'] as String?) ?? 'USD',
       category: json['category'] as String? ?? 'General',
       date: parseDate(json['date']),
-      receiptPath: json['receiptPath'] as String?,
       paymentMethod: json['paymentMethod'] as String?,
       notes: json['notes'] as String?,
       createdAt: json['createdAt'] != null || json['created_at'] != null
@@ -138,7 +131,6 @@ class Expense {
       'currency': currency,
       'category': category,
       'date': date.toIso8601String(),
-      'receipt_path': receiptPath,
       'payment_method': paymentMethod,
       'notes': notes,
       'created_at': createdAt.millisecondsSinceEpoch,
@@ -164,7 +156,6 @@ class Expense {
       currency: (map['currency'] as String?) ?? 'USD',
       category: (map['category'] as String?) ?? 'General',
       date: parseDate(map['date']),
-      receiptPath: (map['receipt_path'] ?? map['receiptPath']) as String?,
       paymentMethod: (map['payment_method'] ?? map['paymentMethod']) as String?,
       notes: map['notes'] as String?,
       createdAt: parseDate(map['created_at'] ?? map['createdAt']),

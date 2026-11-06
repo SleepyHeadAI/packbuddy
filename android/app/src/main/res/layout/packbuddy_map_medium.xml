@@ -7,15 +7,14 @@
     android:orientation="horizontal"
     android:padding="12dp">
 
-    <!-- Left Column: Metrics -->
+    <!-- Left Column: Metrics & Progress (Matches In-App Preview 1:1) -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:gravity="center_vertical"
         android:orientation="vertical">
 
-        <!-- Header -->
+        <!-- Header: App Title & Exploration Percent Badge -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,9 +28,9 @@
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="PackBuddy • Dünya"
+                android:text="🌐 PackBuddy • Dünya"
                 android:textColor="#3B82F6"
-                android:textSize="10.5sp"
+                android:textSize="10sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -51,8 +50,10 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="4dp" />
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
+        <!-- Title -->
         <TextView
             android:id="@+id/widget_title"
             android:layout_width="match_parent"
@@ -61,28 +62,46 @@
             android:maxLines="1"
             android:text="0 Ülke Gezildi"
             android:textColor="#FFFFFF"
-            android:textSize="14sp"
+            android:textSize="13.5sp"
             android:textStyle="bold" />
 
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Exploration Rate Label & Progress Bar -->
         <TextView
             android:id="@+id/widget_destination"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:text="Keşif Oranı"
             android:textColor="#94A3B8"
-            android:textSize="9.5sp" />
+            android:textSize="9sp" />
+
+        <ProgressBar
+            android:id="@+id/widget_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="3.5dp"
+            android:layout_marginTop="2.5dp"
+            android:max="100"
+            android:progress="0"
+            android:progressBackgroundTint="#4094A3B8"
+            android:progressTint="#3B82F6" />
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="4dp" />
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
         <!-- Bottom Stats Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <TextView
@@ -108,36 +127,34 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Right Column: Vector Map Image & Continents Badge -->
+    <!-- Right Column: Miniature Painted World Map Card (Matches Preview 1:1) -->
     <LinearLayout
-        android:id="@+id/widget_right_column"
-        android:layout_width="110dp"
+        android:id="@+id/widget_map_container"
+        android:layout_width="120dp"
         android:layout_height="match_parent"
         android:layout_marginStart="10dp"
+        android:background="@drawable/widget_map_bg"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="5dp">
 
-        <FrameLayout
-            android:id="@+id/widget_map_container"
+        <ImageView
+            android:id="@+id/widget_map_image"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1">
-
-            <ImageView
-                android:id="@+id/widget_map_image"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:contentDescription="World Map"
-                android:scaleType="fitCenter" />
-        </FrameLayout>
+            android:layout_weight="1"
+            android:contentDescription="World Map"
+            android:scaleType="fitCenter" />
 
         <TextView
             android:id="@+id/widget_stat3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="3dp"
             android:background="@drawable/widget_stat_bg"
             android:ellipsize="end"
+            android:gravity="center"
             android:maxLines="1"
             android:paddingStart="6dp"
             android:paddingTop="2dp"
@@ -150,4 +167,3 @@
     </LinearLayout>
 
 </LinearLayout>
-

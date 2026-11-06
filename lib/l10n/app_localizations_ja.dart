@@ -469,9 +469,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get luggagePreparationGuide => 'パッキング＆手荷物ガイド';
 
   @override
-  String get weighingResponsibilityNote => '⚖️ 計量の責任は旅行者本人にあります。';
-
-  @override
   String get digitalWallet => 'デジタルウォレット';
 
   @override

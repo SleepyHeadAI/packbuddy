@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+export 'bouncy_pressable.dart';
 
 /// Standard smooth cubic page route transition with subtle slide and fade
 class AppPageRoute<T> extends PageRouteBuilder<T> {
@@ -79,7 +80,10 @@ class _AppFadeSlideState extends State<AppFadeSlide>
       curve: widget.curve,
     ));
 
-    if (widget.delay == Duration.zero) {
+    final isTestEnvironment = (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) ||
+        WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test');
+
+    if (widget.delay == Duration.zero || isTestEnvironment) {
       _controller.forward();
     } else {
       Future.delayed(widget.delay, () {
@@ -98,18 +102,20 @@ class _AppFadeSlideState extends State<AppFadeSlide>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Opacity(
-          opacity: _fadeAnimation.value.clamp(0.0, 1.0),
-          child: Transform.translate(
-            offset: _slideAnimation.value,
-            child: child,
-          ),
-        );
-      },
-      child: widget.child,
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Opacity(
+            opacity: _fadeAnimation.value.clamp(0.0, 1.0),
+            child: Transform.translate(
+              offset: _slideAnimation.value,
+              child: child,
+            ),
+          );
+        },
+        child: widget.child,
+      ),
     );
   }
 }
@@ -156,7 +162,8 @@ class _AppPulseState extends State<AppPulse>
       curve: Curves.easeInOutSine,
     ));
 
-    final isTestEnvironment = !kIsWeb && Platform.environment.containsKey('FLUTTER_TEST');
+    final isTestEnvironment = (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) ||
+        WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test');
     if (widget.autoRepeat && !isTestEnvironment) {
       _controller.repeat(reverse: true);
     } else {
@@ -172,9 +179,11 @@ class _AppPulseState extends State<AppPulse>
 
   @override
   Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: _scaleAnimation,
-      child: widget.child,
+    return RepaintBoundary(
+      child: ScaleTransition(
+        scale: _scaleAnimation,
+        child: widget.child,
+      ),
     );
   }
 }

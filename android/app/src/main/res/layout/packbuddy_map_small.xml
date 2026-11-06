@@ -21,9 +21,9 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="PackBuddy"
+            android:text="🌐 PackBuddy"
             android:textColor="#3B82F6"
-            android:textSize="10.5sp"
+            android:textSize="9.5sp"
             android:textStyle="bold" />
 
         <TextView
@@ -31,13 +31,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/widget_badge_bg"
-            android:paddingStart="7dp"
+            android:paddingStart="6dp"
             android:paddingTop="2dp"
-            android:paddingEnd="7dp"
+            android:paddingEnd="6dp"
             android:paddingBottom="2dp"
             android:text="%0.0"
             android:textColor="#FFFFFF"
-            android:textSize="9.5sp"
+            android:textSize="9sp"
             android:textStyle="bold" />
     </LinearLayout>
 
@@ -85,6 +85,18 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
+    <!-- Progress Bar -->
+    <ProgressBar
+        android:id="@+id/widget_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3.5dp"
+        android:layout_marginBottom="4dp"
+        android:max="100"
+        android:progress="0"
+        android:progressBackgroundTint="#4094A3B8"
+        android:progressTint="#3B82F6" />
+
     <!-- Bottom Stats Row -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -117,4 +129,3 @@
     </LinearLayout>
 
 </LinearLayout>
-

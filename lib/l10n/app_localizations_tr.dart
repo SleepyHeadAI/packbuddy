@@ -484,10 +484,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get luggagePreparationGuide => 'Bavul Hazırlığı & Bagaj Rehberi';
 
   @override
-  String get weighingResponsibilityNote =>
-      '⚖️ Tartım sorumluluğu yolcuya aittir. Kilo hesaplama aktif değildir.';
-
-  @override
   String get digitalWallet => 'Dijital Cüzdan';
 
   @override

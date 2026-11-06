@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:padding="12dp">
 
-    <!-- Top Header: App Name & Days Badge -->
+    <!-- Top Header: App Name & Days Badge (Matches Preview 1:1) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,7 +21,7 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="PackBuddy • Seyahat"
+            android:text="✈️ PackBuddy • Seyahat"
             android:textColor="#3B82F6"
             android:textSize="11.5sp"
             android:textStyle="bold" />
@@ -74,7 +74,7 @@
             android:textSize="10.5sp" />
     </LinearLayout>
 
-    <!-- Packing Checklist Card -->
+    <!-- Packing Checklist Card with Percentage & Progress Bar -->
     <LinearLayout
         android:id="@+id/widget_packing_card"
         android:layout_width="match_parent"
@@ -84,16 +84,43 @@
         android:orientation="vertical"
         android:padding="10dp">
 
-        <TextView
-            android:id="@+id/widget_packing"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="🎒 Bavul Listesi: 0/0"
-            android:textColor="#FFFFFF"
-            android:textSize="11sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/widget_packing"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Bagaj: 0/0"
+                android:textColor="#FFFFFF"
+                android:textSize="10.5sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_packing_pct"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0%"
+                android:textColor="#FFFFFF"
+                android:textSize="10.5sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/widget_packing_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="4.5dp"
+            android:layout_marginTop="4dp"
+            android:max="100"
+            android:progress="0"
+            android:progressBackgroundTint="#4094A3B8"
+            android:progressTint="#3B82F6" />
     </LinearLayout>
 
     <!-- Budget Card -->
@@ -112,7 +139,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="Harcanan Bütçe: ₺0"
+            android:text="Harcanan: ₺0"
             android:textColor="#10B981"
             android:textSize="11.5sp"
             android:textStyle="bold" />
@@ -137,4 +164,3 @@
         android:textStyle="bold" />
 
 </LinearLayout>
-

@@ -477,10 +477,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get luggagePreparationGuide => 'Cẩm nang chuẩn bị hành lý';
 
   @override
-  String get weighingResponsibilityNote =>
-      '⚖️ Trách nhiệm cân hành lý thuộc về hành khách.';
-
-  @override
   String get digitalWallet => 'Ví kỹ thuật số';
 
   @override

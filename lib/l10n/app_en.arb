@@ -612,10 +612,6 @@
   "@luggagePreparationGuide": {
     "description": "Luggage guide title"
   },
-  "weighingResponsibilityNote": "⚖️ Weighing responsibility belongs to traveler. Weight calculation is not active.",
-  "@weighingResponsibilityNote": {
-    "description": "Luggage weight disclaimer"
-  },
   "digitalWallet": "Digital Wallet",
   "@digitalWallet": {
     "description": "Digital wallet payment method"

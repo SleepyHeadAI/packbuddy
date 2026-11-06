@@ -478,10 +478,6 @@ class AppLocalizationsPl extends AppLocalizations {
   String get luggagePreparationGuide => 'Poradnik pakowania i bagażu';
 
   @override
-  String get weighingResponsibilityNote =>
-      '⚖️ Odpowiedzialność za wagę spoczywa na podróżnym.';
-
-  @override
   String get digitalWallet => 'Cyfrowy portfel';
 
   @override
