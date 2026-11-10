@@ -161,5 +161,31 @@ void main() {
       expect(find.text('Belge Ekle'), findsWidgets);
       expect(find.text('Pasaport Slotu'), findsOneWidget);
     });
+
+    testWidgets('VaultScreen renders "All" trip filter chip and removes redundant "General" chip', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            vaultControllerProvider.overrideWith(
+              (ref) => FakeVaultController(const VaultState(isLoading: false, documents: [])),
+            ),
+          ],
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
+            home: VaultScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify "All" filter chip exists (l10n.allFilter)
+      expect(find.text('All'), findsWidgets);
+      // Verify redundant "General" trip filter chip is removed
+      expect(find.text('General'), findsNothing);
+      expect(find.text('All Trips'), findsNothing);
+    });
   });
 }

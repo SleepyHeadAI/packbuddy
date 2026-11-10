@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:packbuddy/core/l10n/l10n.dart';
+import 'package:packbuddy/core/l10n/language_selector_sheet.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/core/services/app_widget_localization.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
@@ -332,7 +334,7 @@ void main() {
       expect(prefs.getWidgetThemeForMode('currency_converter'), 'sunset');
     });
 
-    test('Widget Layout Sizing Thresholds prevent Small 2x2 from becoming Medium', () {
+    test('Widget Layout Sizing Thresholds prevent Small 2x2 from becoming Medium and Medium 4x2 from becoming Large', () {
       // Simulating Android widget sizing logic
       String resolveLayoutSize({
         required String defaultSize, // 'SMALL', 'MEDIUM', 'LARGE'
@@ -340,16 +342,16 @@ void main() {
         required int minHeight,
       }) {
         if (defaultSize == 'SMALL') {
-          if (minWidth >= 230 && minHeight >= 210) return 'LARGE';
-          if (minWidth >= 230) return 'MEDIUM';
+          if (minWidth >= 240 && minHeight >= 265) return 'LARGE';
+          if (minWidth >= 240) return 'MEDIUM';
           return 'SMALL';
         } else if (defaultSize == 'MEDIUM') {
-          if (minHeight >= 210 && minWidth >= 210) return 'LARGE';
-          if (minWidth < 210) return 'SMALL';
+          if (minHeight >= 265 && minWidth >= 200) return 'LARGE';
+          if (minWidth < 200) return 'SMALL';
           return 'MEDIUM';
         } else {
-          if (minWidth < 210 && minHeight < 210) return 'SMALL';
-          if (minHeight < 210) return 'MEDIUM';
+          if (minWidth < 200 && minHeight < 200) return 'SMALL';
+          if (minHeight < 250) return 'MEDIUM';
           return 'LARGE';
         }
       }
@@ -361,16 +363,101 @@ void main() {
       expect(resolveLayoutSize(defaultSize: 'SMALL', minWidth: 180, minHeight: 180), 'SMALL');
       expect(resolveLayoutSize(defaultSize: 'SMALL', minWidth: 200, minHeight: 180), 'SMALL');
 
-      // 2. Medium (4x2) widget on standard mobile screens (width 260-380dp, height 110-180dp)
-      // MUST resolve to MEDIUM
+      // 2. Medium (4x2) widget on standard mobile and tall launcher screens (width 260-380dp, height 110-230dp)
+      // MUST resolve to MEDIUM (never jump to Large on Samsung 215dp height!)
       expect(resolveLayoutSize(defaultSize: 'MEDIUM', minWidth: 280, minHeight: 140), 'MEDIUM');
       expect(resolveLayoutSize(defaultSize: 'MEDIUM', minWidth: 340, minHeight: 160), 'MEDIUM');
+      expect(resolveLayoutSize(defaultSize: 'MEDIUM', minWidth: 340, minHeight: 215), 'MEDIUM');
+      expect(resolveLayoutSize(defaultSize: 'MEDIUM', minWidth: 360, minHeight: 225), 'MEDIUM');
 
-      // 3. Medium shrunk to 2 columns (width < 210dp) gracefully degrades to SMALL
+      // 3. Medium shrunk to 2 columns (width < 200dp) gracefully degrades to SMALL
       expect(resolveLayoutSize(defaultSize: 'MEDIUM', minWidth: 180, minHeight: 150), 'SMALL');
 
-      // 4. Large (4x4) widget on standard screens (width 260-380dp, height 260-380dp)
+      // 4. Large (4x4 / 4x3) widget on standard screens (width 260-380dp, height 265-380dp)
       expect(resolveLayoutSize(defaultSize: 'LARGE', minWidth: 320, minHeight: 300), 'LARGE');
+      expect(resolveLayoutSize(defaultSize: 'MEDIUM', minWidth: 320, minHeight: 300), 'LARGE');
+    });
+
+    test('L10n: Language alphabetical order in every language verification', () {
+      const allCodes = [
+        'tr', 'en', 'es', 'fr', 'de', 'it', 'pt', 'ru',
+        'zh', 'ja', 'ko', 'hi', 'ar', 'nl', 'el', 'sv',
+        'pl', 'id', 'th', 'vi',
+      ];
+
+      // 1. Verify every language has exactly 20 unique locales sorted
+      for (final lang in allCodes) {
+        final sorted = L10n.getSortedLocales(lang);
+        expect(sorted.length, 20, reason: 'Language $lang must have 20 locales');
+        final uniqueCodes = sorted.map((l) => l.languageCode).toSet();
+        expect(uniqueCodes.length, 20, reason: 'Language $lang must have 20 unique codes');
+        for (final code in allCodes) {
+          expect(uniqueCodes.contains(code), isTrue, reason: 'Missing code $code in $lang');
+        }
+      }
+
+      // 2. English alphabetical order check
+      final enSorted = L10n.getSortedLocales('en').map((l) => l.languageCode).toList();
+      expect(enSorted, [
+        'ar', 'zh', 'nl', 'en', 'fr', 'de', 'el', 'hi', 'id', 'it',
+        'ja', 'ko', 'pl', 'pt', 'ru', 'es', 'sv', 'th', 'tr', 'vi',
+      ]);
+      final enDisplayNames = enSorted.map((c) => L10n.getLanguageDisplayName(c, 'en')).toList();
+      expect(enDisplayNames.first, 'Arabic (العربية)');
+      expect(enDisplayNames[3], 'English'); // Same native/localized = clean without duplicate
+      expect(enDisplayNames.last, 'Vietnamese (Tiếng Việt)');
+
+      // 3. Turkish alphabetical order check
+      final trSorted = L10n.getSortedLocales('tr').map((l) => l.languageCode).toList();
+      expect(trSorted, [
+        'de', 'ar', 'zh', 'id', 'nl', 'fr', 'hi', 'en', 'es', 'sv',
+        'it', 'ja', 'ko', 'pl', 'pt', 'ru', 'th', 'tr', 'vi', 'el',
+      ]);
+      final trDisplayNames = trSorted.map((c) => L10n.getLanguageDisplayName(c, 'tr')).toList();
+      expect(trDisplayNames.first, 'Almanca (Deutsch)');
+      expect(trDisplayNames[17], 'Türkçe'); // Turkish clean without duplicate
+      expect(trDisplayNames.last, 'Yunanca (Ελληνικά)');
+
+      // 4. German alphabetical order check
+      final deSorted = L10n.getSortedLocales('de').map((l) => l.languageCode).toList();
+      expect(deSorted.first, 'ar'); // Arabisch
+      expect(deSorted[2], 'de'); // Deutsch
+      expect(deSorted.last, 'vi'); // Vietnamesisch
+
+      // 5. French alphabetical order check
+      final frSorted = L10n.getSortedLocales('fr').map((l) => l.languageCode).toList();
+      expect(frSorted.first, 'de'); // Allemand
+      expect(frSorted[1], 'en'); // Anglais
+      expect(frSorted[6], 'fr'); // Français
+      expect(frSorted.last, 'vi'); // Vietnamien
+    });
+
+    testWidgets('showLanguageSelectorSheet displays alphabetical order dynamically', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('en'),
+            home: Scaffold(
+              body: Consumer(
+                builder: (context, ref, _) => ElevatedButton(
+                  onPressed: () => showLanguageSelectorSheet(context, ref, const Locale('en')),
+                  child: const Text('Open Picker'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Picker'));
+      await tester.pumpAndSettle();
+
+      // Top of list should be Arabic (العربية), then Chinese (中文) in English!
+      expect(find.text('Arabic (العربية)'), findsOneWidget);
+      expect(find.text('Chinese (中文)'), findsWidgets);
     });
   });
 }

@@ -3,6 +3,8 @@ import '../../core/services/telemetry_service.dart';
 import '../auth/auth_controller.dart';
 import '../settings/data/mock_revenuecat_service.dart';
 import 'admin_service.dart';
+import 'domain/broadcast_announcement.dart';
+import 'domain/admin_audit_log.dart';
 
 /// Analytics period for geo and user activity calculations
 enum AnalyticsPeriod {
@@ -80,6 +82,8 @@ class AdminState {
   final String searchQuery;
   final UserFilterChip userFilter;
   final AnalyticsPeriod analyticsPeriod;
+  final List<AdminAuditLog> auditLogs;
+  final String auditLogFilter;
   final String? errorMessage;
   final DateTime? lastRefreshedAt;
 
@@ -93,9 +97,17 @@ class AdminState {
     this.searchQuery = '',
     this.userFilter = UserFilterChip.all,
     this.analyticsPeriod = AnalyticsPeriod.daily,
+    this.auditLogs = const [],
+    this.auditLogFilter = 'all',
     this.errorMessage,
     this.lastRefreshedAt,
   });
+
+  /// Filtered audit logs based on selected audit filter category
+  List<AdminAuditLog> get filteredAuditLogs {
+    if (auditLogFilter == 'all') return auditLogs;
+    return auditLogs.where((l) => l.category == auditLogFilter).toList();
+  }
 
   /// Cutoff DateTime for active users in the selected analytics period
   DateTime get periodCutoff {
@@ -237,6 +249,9 @@ class AdminState {
       return u.email.toLowerCase().contains(q) ||
           u.displayName.toLowerCase().contains(q) ||
           u.uid.toLowerCase().contains(q) ||
+          u.effectiveLiveCountryCode.toLowerCase().contains(q) ||
+          u.effectiveLiveCountryName.toLowerCase().contains(q) ||
+          u.liveCity.toLowerCase().contains(q) ||
           u.countryCode.toLowerCase().contains(q) ||
           u.countryName.toLowerCase().contains(q);
     }).toList();
@@ -252,6 +267,8 @@ class AdminState {
     String? searchQuery,
     UserFilterChip? userFilter,
     AnalyticsPeriod? analyticsPeriod,
+    List<AdminAuditLog>? auditLogs,
+    String? auditLogFilter,
     String? errorMessage,
     DateTime? lastRefreshedAt,
     bool clearError = false,
@@ -266,6 +283,8 @@ class AdminState {
       searchQuery: searchQuery ?? this.searchQuery,
       userFilter: userFilter ?? this.userFilter,
       analyticsPeriod: analyticsPeriod ?? this.analyticsPeriod,
+      auditLogs: auditLogs ?? this.auditLogs,
+      auditLogFilter: auditLogFilter ?? this.auditLogFilter,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       lastRefreshedAt: lastRefreshedAt ?? this.lastRefreshedAt,
     );
@@ -289,17 +308,20 @@ class AdminController extends StateNotifier<AdminState> {
         _adminService.fetchMetrics(),
         _adminService.fetchUsers(),
         _adminService.fetchDetailedAnalytics(),
+        _adminService.fetchAuditLogs(),
       ]);
 
       final metrics = results[0] as AdminPlatformMetrics;
       final users = results[1] as List<AdminUserModel>;
       final analytics = results[2] as AdminDetailedAnalytics;
+      final auditLogs = results[3] as List<AdminAuditLog>;
 
       state = state.copyWith(
         isLoading: false,
         metrics: metrics,
         allUsers: users,
         detailedAnalytics: analytics,
+        auditLogs: auditLogs,
         lastRefreshedAt: DateTime.now(),
       );
     } catch (e) {
@@ -308,6 +330,19 @@ class AdminController extends StateNotifier<AdminState> {
         errorMessage: e.toString(),
       );
     }
+  }
+
+  /// Sets the audit log category filter
+  void setAuditLogFilter(String filter) {
+    state = state.copyWith(auditLogFilter: filter);
+  }
+
+  /// Reloads audit logs
+  Future<void> fetchAuditLogs() async {
+    try {
+      final logs = await _adminService.fetchAuditLogs();
+      state = state.copyWith(auditLogs: logs);
+    } catch (_) {}
   }
 
   /// Changes the active tab in the Country Travel Demand Hub ('wishlist', 'visited', 'lived', 'continents')
@@ -361,10 +396,16 @@ class AdminController extends StateNotifier<AdminState> {
         _ref.read(proSubscriptionProvider.notifier).updateProStatus(isPremium, uid: uid);
       }
 
+      List<AdminAuditLog> freshLogs = state.auditLogs;
+      try {
+        freshLogs = await _adminService.fetchAuditLogs();
+      } catch (_) {}
+
       state = state.copyWith(
         isActionLoading: false,
         allUsers: updatedUsers,
         metrics: updatedMetrics,
+        auditLogs: freshLogs,
       );
       return true;
     } catch (e) {
@@ -426,10 +467,16 @@ class AdminController extends StateNotifier<AdminState> {
         _ref.read(proSubscriptionProvider.notifier).updateProStatus(isPremium, uid: uid);
       }
 
+      List<AdminAuditLog> freshLogs = state.auditLogs;
+      try {
+        freshLogs = await _adminService.fetchAuditLogs();
+      } catch (_) {}
+
       state = state.copyWith(
         isActionLoading: false,
         allUsers: updatedUsers,
         metrics: updatedMetrics,
+        auditLogs: freshLogs,
       );
       return true;
     } catch (e) {
@@ -505,10 +552,22 @@ class AdminController extends StateNotifier<AdminState> {
     state = state.copyWith(isActionLoading: true, clearError: true);
     try {
       await _adminService.purgeUserDataAsAdmin(uid);
+      final userToPurge = state.allUsers.where((u) => u.uid == uid).firstOrNull;
+      final wasPro = userToPurge?.isPremium == true;
       final updatedUsers = state.allUsers.where((u) => u.uid != uid).toList();
+      final updatedMetrics = state.metrics.copyWith(
+        totalUsers: (state.metrics.totalUsers - 1).clamp(0, 9999999),
+        proUsers: wasPro ? (state.metrics.proUsers - 1).clamp(0, 9999999) : null,
+      );
+      List<AdminAuditLog> freshLogs = state.auditLogs;
+      try {
+        freshLogs = await _adminService.fetchAuditLogs();
+      } catch (_) {}
       state = state.copyWith(
         isActionLoading: false,
         allUsers: updatedUsers,
+        metrics: updatedMetrics,
+        auditLogs: freshLogs,
       );
       return true;
     } catch (e) {
@@ -559,7 +618,14 @@ class AdminController extends StateNotifier<AdminState> {
       if (success) {
         await loadUsers();
       }
-      state = state.copyWith(isActionLoading: false);
+      List<AdminAuditLog> freshLogs = state.auditLogs;
+      try {
+        freshLogs = await _adminService.fetchAuditLogs();
+      } catch (_) {}
+      state = state.copyWith(
+        isActionLoading: false,
+        auditLogs: freshLogs,
+      );
       return success;
     } catch (e) {
       state = state.copyWith(
@@ -568,6 +634,60 @@ class AdminController extends StateNotifier<AdminState> {
       );
       return false;
     }
+  }
+
+  /// Sends a broadcast / marketing announcement to all users or specific segments
+  Future<bool> sendBroadcastAnnouncement({
+    required String title,
+    required String message,
+    String type = 'discount',
+    String targetAction = 'paywall',
+    String targetAudience = 'all',
+    int? discountPercent,
+    String? actionLabel,
+  }) async {
+    state = state.copyWith(isActionLoading: true, clearError: true);
+    try {
+      final success = await _adminService.sendBroadcastAnnouncement(
+        title: title,
+        message: message,
+        type: type,
+        targetAction: targetAction,
+        targetAudience: targetAudience,
+        discountPercent: discountPercent,
+        actionLabel: actionLabel,
+      );
+      List<AdminAuditLog> freshLogs = state.auditLogs;
+      try {
+        freshLogs = await _adminService.fetchAuditLogs();
+      } catch (_) {}
+      state = state.copyWith(
+        isActionLoading: false,
+        auditLogs: freshLogs,
+      );
+      return success;
+    } catch (e) {
+      state = state.copyWith(
+        isActionLoading: false,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
+  }
+
+  /// Fetches past broadcast campaigns
+  Future<List<BroadcastAnnouncement>> fetchBroadcastHistory() async {
+    return _adminService.fetchBroadcastAnnouncements();
+  }
+
+  /// Toggles broadcast active status
+  Future<bool> toggleBroadcastActive(String broadcastId, bool active) async {
+    return _adminService.toggleBroadcastActive(broadcastId, active);
+  }
+
+  /// Deletes a broadcast announcement
+  Future<bool> deleteBroadcastAnnouncement(String broadcastId) async {
+    return _adminService.deleteBroadcastAnnouncement(broadcastId);
   }
 
   /// Clears active error notification

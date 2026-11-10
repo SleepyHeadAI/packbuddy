@@ -1,126 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/widget_bg"
-    android:orientation="vertical"
-    android:padding="12dp">
+    android:layout_height="match_parent">
 
-    <!-- Top Header: App Name & Percent Badge -->
+    <!-- 1:1 High-Resolution Flutter Rendered Card -->
+    <ImageView
+        android:id="@+id/widget_rendered_card"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:visibility="gone" />
+
+    <!-- Native XML Fallback Layout -->
     <LinearLayout
+        android:id="@+id/widget_native_content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:background="@drawable/widget_bg"
+        android:orientation="vertical"
+        android:padding="12dp">
 
-        <TextView
-            android:id="@+id/widget_app_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="🌐 PackBuddy • Dünya"
-            android:textColor="#3B82F6"
-            android:textSize="11.5sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/widget_badge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/widget_badge_bg"
-            android:paddingStart="8dp"
-            android:paddingTop="3dp"
-            android:paddingEnd="8dp"
-            android:paddingBottom="3dp"
-            android:text="%0.0"
-            android:textColor="#FFFFFF"
-            android:textSize="10sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <!-- Center Hero: World Map Image with embedded Legend inside (Matches Preview 1:1) -->
-    <FrameLayout
-        android:id="@+id/widget_map_container"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="6dp"
-        android:layout_weight="1"
-        android:background="@drawable/widget_map_bg"
-        android:padding="6dp">
-
-        <ImageView
-            android:id="@+id/widget_map_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:contentDescription="World Map"
-            android:scaleType="fitCenter" />
-
-        <!-- Floating Legend Pill Bar positioned at bottom inside the map card -->
+        <!-- Top Header: App Name & Percent Badge -->
         <LinearLayout
-            android:id="@+id/widget_bottom_stats"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:layout_marginBottom="4dp"
-            android:background="@drawable/widget_stat_bg"
             android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="8dp"
-            android:paddingTop="3dp"
-            android:paddingEnd="8dp"
-            android:paddingBottom="3dp">
+            android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/widget_lived"
-                android:layout_width="wrap_content"
+                android:id="@+id/widget_app_name"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="● Yaşandı (0)"
-                android:textColor="#10B981"
-                android:textSize="8.5sp"
+                android:text="🌐 PackBuddy • Dünya"
+                android:textColor="#3B82F6"
+                android:textSize="11.5sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/widget_packing"
+                android:id="@+id/widget_badge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="● Gezildi (0)"
-                android:textColor="#38BDF8"
-                android:textSize="8.5sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/widget_budget"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="● Hedef (0)"
-                android:textColor="#FBBF24"
-                android:textSize="8.5sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/widget_stat3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="🌍 0 Kıta"
-                android:textColor="#34D399"
-                android:textSize="8.5sp"
+                android:background="@drawable/widget_badge_bg"
+                android:paddingStart="8dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="3dp"
+                android:text="%0.0"
+                android:textColor="#FFFFFF"
+                android:textSize="10sp"
                 android:textStyle="bold" />
         </LinearLayout>
-    </FrameLayout>
 
-</LinearLayout>
+        <!-- Center Hero: World Map Image with embedded Legend inside (Matches Preview 1:1) -->
+        <FrameLayout
+            android:id="@+id/widget_map_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="6dp"
+            android:layout_weight="1"
+            android:background="@drawable/widget_map_bg"
+            android:padding="6dp">
+
+            <ImageView
+                android:id="@+id/widget_map_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="World Map"
+                android:scaleType="fitCenter" />
+
+            <!-- Floating Legend Pill Bar positioned at bottom inside the map card -->
+            <LinearLayout
+                android:id="@+id/widget_bottom_stats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="4dp"
+                android:background="@drawable/widget_stat_bg"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="8dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="3dp">
+
+                <TextView
+                    android:id="@+id/widget_lived"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="● Yaşandı (0)"
+                    android:textColor="#10B981"
+                    android:textSize="8.5sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/widget_packing"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="● Gezildi (0)"
+                    android:textColor="#38BDF8"
+                    android:textSize="8.5sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/widget_budget"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="● Hedef (0)"
+                    android:textColor="#FBBF24"
+                    android:textSize="8.5sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/widget_stat3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="🌍 0 Kıta"
+                    android:textColor="#34D399"
+                    android:textSize="8.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+</FrameLayout>

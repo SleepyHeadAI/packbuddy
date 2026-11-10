@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/bouncy_pressable.dart';
+import '../../shared/widgets/app_logo.dart';
 import 'auth_controller.dart';
 
 /// Authentication Screen Mode (Sign In vs Sign Up)
@@ -275,50 +276,28 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     );
   }
 
-  /// Luxury Header with Glowing Compass/Luggage Badge
+  /// Luxury Header with App Brand Logo
   Widget _buildBrandHeader(bool isDark, String title, String subtitle) {
     return Column(
       children: [
-        // App Icon Badge
+        // App Logo (Transparent on background color)
         Container(
-          width: 76,
-          height: 76,
+          width: 88,
+          height: 88,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: isDark
-                  ? const [AppColors.primaryDark, Color(0xFFD4A054)]
-                  : const [AppColors.primaryLight, Color(0xFF6E5203)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(22),
+            shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
                 color: (isDark ? AppColors.primaryDark : AppColors.primaryLight)
-                    .withValues(alpha: 0.28),
-                blurRadius: 22,
-                offset: const Offset(0, 10),
+                    .withValues(alpha: 0.16),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Icon(
-                Icons.luggage_rounded,
-                size: 38,
-                color: isDark ? AppColors.onPrimaryDark : Colors.white,
-              ),
-              Positioned(
-                top: 14,
-                right: 14,
-                child: Icon(
-                  Icons.auto_awesome_rounded,
-                  size: 14,
-                  color: AppColors.goldAccent,
-                ),
-              ),
-            ],
+          child: const AppLogo.transparent(
+            size: 88,
+            heroTag: 'app-brand-logo',
           ),
         ),
         const SizedBox(height: 16),

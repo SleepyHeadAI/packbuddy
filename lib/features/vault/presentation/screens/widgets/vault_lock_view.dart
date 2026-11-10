@@ -3,63 +3,120 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/services/biometric_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/features/dashboard/presentation/navigation_provider.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import '../../controllers/vault_controller.dart';
 
 /// Secure PIN and Biometric authentication gate for Document Vault
 class VaultLockView extends ConsumerStatefulWidget {
-  const VaultLockView({super.key});
+  final bool isTabMode;
+
+  const VaultLockView({
+    super.key,
+    this.isTabMode = false,
+  });
 
   @override
   ConsumerState<VaultLockView> createState() => _VaultLockViewState();
 }
 
-class _VaultLockViewState extends ConsumerState<VaultLockView> {
+class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindingObserver {
   String _enteredPin = '';
   bool _isError = false;
   bool _canCheckBiometrics = false;
+  bool _isAuthenticating = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _checkBiometrics();
   }
 
-  Future<void> _checkBiometrics() async {
-    final available = await BiometricService.instance.isBiometricsAvailable();
-    if (mounted) {
-      setState(() => _canCheckBiometrics = available);
-      final vaultState = ref.read(vaultControllerProvider);
-      if (available && vaultState.isBiometricEnabled && vaultState.hasPin) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted && ref.read(vaultControllerProvider).isLocked) {
-            _triggerBiometricAuth();
-          }
-        });
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      if (mounted) {
+        final currentTab = ref.read(mainNavigationIndexProvider);
+        final isVaultActive = !widget.isTabMode || currentTab == 3;
+        if (isVaultActive && ref.read(vaultControllerProvider).isLocked) {
+          _checkBiometrics();
+        }
       }
     }
   }
 
+  Future<void> _checkBiometrics() async {
+    final available = await BiometricService.instance.isBiometricsAvailable();
+    if (!mounted) return;
+    setState(() => _canCheckBiometrics = available);
+
+    // STRICT ISOLATION GUARD:
+    // Only auto-trigger biometric prompt if user is actively on the Vault screen!
+    final currentTab = ref.read(mainNavigationIndexProvider);
+    final isVaultActive = !widget.isTabMode || currentTab == 3;
+    if (!isVaultActive) {
+      return;
+    }
+
+    final vaultState = ref.read(vaultControllerProvider);
+    if (available && vaultState.isBiometricEnabled && vaultState.hasPin) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final tabNow = ref.read(mainNavigationIndexProvider);
+        final isStillVaultActive = !widget.isTabMode || tabNow == 3;
+        if (isStillVaultActive && ref.read(vaultControllerProvider).isLocked) {
+          _triggerBiometricAuth();
+        }
+      });
+    }
+  }
+
   Future<void> _triggerBiometricAuth() async {
-    HapticFeedback.mediumImpact();
-    final l10n = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-    final reason = l10n?.vaultBiometricReason ??
-        'Kasanın kilidini açmak için parmak izinizi doğrulayın';
-    final failMsg = l10n?.biometricsFailed ??
-        'Biyometrik doğrulama başarısız oldu veya iptal edildi.';
-    final success = await ref
-        .read(vaultControllerProvider.notifier)
-        .authenticateWithBiometrics(reason: reason);
-    if (!success && mounted) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(failMsg),
-          backgroundColor: AppColors.errorPastel,
-          duration: const Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+    if (_isAuthenticating) return;
+
+    // Strict guard: Never prompt biometrics if user is on another page
+    final currentTab = ref.read(mainNavigationIndexProvider);
+    final isVaultActive = !widget.isTabMode || currentTab == 3;
+    if (!isVaultActive) {
+      return;
+    }
+
+    _isAuthenticating = true;
+    try {
+      HapticFeedback.mediumImpact();
+      final l10n = AppLocalizations.of(context);
+      final messenger = ScaffoldMessenger.maybeOf(context);
+      final reason = l10n?.vaultBiometricReason ??
+          'Kasanın kilidini açmak için parmak izinizi doğrulayın';
+      final failMsg = l10n?.biometricsFailed ??
+          'Biyometrik doğrulama başarısız oldu veya iptal edildi.';
+      final success = await ref
+          .read(vaultControllerProvider.notifier)
+          .authenticateWithBiometrics(reason: reason);
+      if (!success && mounted) {
+        final isStillOnVault = !widget.isTabMode || ref.read(mainNavigationIndexProvider) == 3;
+        if (isStillOnVault && messenger != null) {
+          messenger.showSnackBar(
+            SnackBar(
+              content: Text(failMsg),
+              backgroundColor: AppColors.errorPastel,
+              duration: const Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    } finally {
+      if (mounted) {
+        _isAuthenticating = false;
+      }
     }
   }
 

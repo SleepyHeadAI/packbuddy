@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:countries_world_map/countries_world_map.dart';
-import 'package:countries_world_map/data/maps/world_map.dart';
 import 'package:packbuddy/core/services/story_card_localization.dart';
+import 'package:packbuddy/features/travel_map/data/world_map_instructions.dart';
 import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
 import 'package:packbuddy/features/travel_map/presentation/widgets/country_flag.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
@@ -869,6 +869,76 @@ class TravelMapStoryCard extends StatelessWidget {
     }
   }
 
+  Widget _buildTopHeaderBadge({
+    required StoryCardPalette palette,
+    required String title,
+    IconData? fallbackIcon,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
+      decoration: BoxDecoration(
+        color: palette.accentColor.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: palette.accentColor.withValues(alpha: 0.38)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: Image.asset(
+              'assets/images/logo_transparent.png',
+              width: 14,
+              height: 14,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) => Icon(
+                fallbackIcon ?? Icons.public_rounded,
+                size: 13,
+                color: palette.accentColor,
+              ),
+            ),
+          ),
+          const SizedBox(width: 5),
+          Text(
+            'PackBuddy',
+            style: TextStyle(
+              color: palette.textColor,
+              fontSize: 9.0,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0.5,
+            ),
+          ),
+          if (title.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Text(
+                '•',
+                style: TextStyle(
+                  color: palette.accentColor.withValues(alpha: 0.6),
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            Flexible(
+              child: Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: palette.accentColor,
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   // 1. CLASSIC LAYOUT (Balanced Map, Hero Stats, Flag Strip)
   Widget _buildClassicLayout(
     AppLocalizations l10n,
@@ -884,29 +954,11 @@ class TravelMapStoryCard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            const Spacer(),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
-              decoration: BoxDecoration(
-                color: palette.accentColor.withValues(alpha: 0.14),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: palette.accentColor.withValues(alpha: 0.38)),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.public_rounded, size: 12, color: palette.accentColor),
-                  const SizedBox(width: 5),
-                  Text(
-                    StoryCardLocalization.getWorldTravelerHeader(currentLocale),
-                    style: TextStyle(
-                      color: palette.accentColor,
-                      fontSize: 8.5,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.8,
-                    ),
-                  ),
-                ],
+            Flexible(
+              child: _buildTopHeaderBadge(
+                palette: palette,
+                title: StoryCardLocalization.getWorldTravelerHeader(currentLocale),
+                fallbackIcon: Icons.public_rounded,
               ),
             ),
           ],
@@ -961,29 +1013,11 @@ class TravelMapStoryCard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            const Spacer(),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
-              decoration: BoxDecoration(
-                color: palette.accentColor.withValues(alpha: 0.16),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: palette.accentColor.withValues(alpha: 0.45)),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.verified_user_rounded, size: 12, color: palette.accentColor),
-                  const SizedBox(width: 5),
-                  Text(
-                    (l10n.passportOfficialDocument).toUpperCase(),
-                    style: TextStyle(
-                      color: palette.textColor,
-                      fontSize: 8.5,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.0,
-                    ),
-                  ),
-                ],
+            Flexible(
+              child: _buildTopHeaderBadge(
+                palette: palette,
+                title: (l10n.passportOfficialDocument).toUpperCase(),
+                fallbackIcon: Icons.verified_user_rounded,
               ),
             ),
           ],
@@ -1093,14 +1127,11 @@ class TravelMapStoryCard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            const Spacer(),
-            Text(
-              StoryCardLocalization.getAtlasArchiveHeader(currentLocale, worldPercentage),
-              style: TextStyle(
-                color: palette.accentColor,
-                fontSize: 8.5,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.5,
+            Flexible(
+              child: _buildTopHeaderBadge(
+                palette: palette,
+                title: StoryCardLocalization.getAtlasArchiveHeader(currentLocale, worldPercentage),
+                fallbackIcon: Icons.explore_rounded,
               ),
             ),
           ],
@@ -1182,22 +1213,11 @@ class TravelMapStoryCard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            const Spacer(),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-              decoration: BoxDecoration(
-                color: palette.accentColor.withValues(alpha: 0.18),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: palette.accentColor.withValues(alpha: 0.45)),
-              ),
-              child: Text(
-                '%${worldPercentage.toStringAsFixed(1)} ${l10n.ofTheWorld.toUpperCase()}',
-                style: TextStyle(
-                  color: palette.accentColor,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 8.5,
-                  letterSpacing: 0.8,
-                ),
+            Flexible(
+              child: _buildTopHeaderBadge(
+                palette: palette,
+                title: '%${worldPercentage.toStringAsFixed(1)} ${l10n.ofTheWorld.toUpperCase()}',
+                fallbackIcon: Icons.auto_awesome_rounded,
               ),
             ),
           ],
@@ -1303,29 +1323,11 @@ class TravelMapStoryCard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            const Spacer(),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-              decoration: BoxDecoration(
-                color: palette.accentColor.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: palette.accentColor.withValues(alpha: 0.4)),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.explore_rounded, size: 11, color: palette.accentColor),
-                  const SizedBox(width: 5),
-                  Text(
-                    StoryCardLocalization.getJourneyLogHeader(currentLocale),
-                    style: TextStyle(
-                      color: palette.accentColor,
-                      fontSize: 8.5,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.8,
-                    ),
-                  ),
-                ],
+            Flexible(
+              child: _buildTopHeaderBadge(
+                palette: palette,
+                title: StoryCardLocalization.getJourneyLogHeader(currentLocale),
+                fallbackIcon: Icons.route_rounded,
               ),
             ),
           ],
@@ -1461,29 +1463,11 @@ class TravelMapStoryCard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            const Spacer(),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
-              decoration: BoxDecoration(
-                color: palette.accentColor.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: palette.accentColor.withValues(alpha: 0.4)),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.photo_filter_rounded, size: 11, color: Colors.amber),
-                  const SizedBox(width: 4),
-                  Text(
-                    StoryCardLocalization.getPostcardHeader(currentLocale),
-                    style: TextStyle(
-                      color: palette.textColor,
-                      fontSize: 8.5,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.8,
-                    ),
-                  ),
-                ],
+            Flexible(
+              child: _buildTopHeaderBadge(
+                palette: palette,
+                title: StoryCardLocalization.getPostcardHeader(currentLocale),
+                fallbackIcon: Icons.photo_filter_rounded,
               ),
             ),
           ],
@@ -1630,22 +1614,11 @@ class TravelMapStoryCard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            const Spacer(),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
-              decoration: BoxDecoration(
-                color: palette.accentColor.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: palette.accentColor.withValues(alpha: 0.4)),
-              ),
-              child: Text(
-                StoryCardLocalization.getInfographicHeader(currentLocale),
-                style: TextStyle(
-                  color: palette.accentColor,
-                  fontSize: 8.5,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.8,
-                ),
+            Flexible(
+              child: _buildTopHeaderBadge(
+                palette: palette,
+                title: StoryCardLocalization.getInfographicHeader(currentLocale),
+                fallbackIcon: Icons.analytics_rounded,
               ),
             ),
           ],
@@ -2267,7 +2240,7 @@ class TravelMapStoryCard extends StatelessWidget {
           children: [
             Center(
               child: SimpleMap(
-                instructions: SMapWorld.instructions,
+                instructions: WorldMapInstructions.instructions,
                 defaultColor: palette.unvisitedLandColor,
                 colors: colorMap,
                 countryBorder: CountryBorder(

@@ -9,6 +9,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'preferences_service.dart';
+import 'push_notification_service.dart';
 
 /// Abstract contract for the Smart Notification System in PackBuddy.
 /// Decouples UI and business logic from the underlying notification engine
@@ -110,6 +111,7 @@ class LocalNotificationService implements INotificationService {
         settings: initSettings,
         onDidReceiveNotificationResponse: (response) {
           debugPrint('[LocalNotificationService] Notification tapped: ${response.payload}');
+          PushNotificationService.handlePayloadRoute(response.payload);
         },
       );
 

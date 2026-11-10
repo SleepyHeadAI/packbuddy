@@ -9,6 +9,11 @@ import 'package:packbuddy/features/admin/admin_dashboard_screen.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/settings/presentation/screens/settings_screen.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
+import 'package:packbuddy/features/budget/domain/trip.dart';
+import 'package:packbuddy/features/budget/domain/expense.dart';
+import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
+import 'package:packbuddy/features/admin/domain/broadcast_announcement.dart';
+import 'package:packbuddy/features/admin/domain/admin_audit_log.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 /// Fake Firebase [User] for testing
@@ -238,6 +243,18 @@ class MockAdminService implements AdminService {
   }
 
   @override
+  Future<List<Trip>> fetchUserTrips(String uid) async => [];
+
+  @override
+  Future<List<Expense>> fetchUserExpenses(String uid) async => [];
+
+  @override
+  Future<List<AdminUserSessionLog>> fetchUserSessions(String uid) async => [];
+
+  @override
+  Future<List<TravelCountry>> fetchUserTravelCountries(String uid) async => [];
+
+  @override
   Future<void> deleteUserDocumentAsAdmin({required String uid, required String documentId}) async {}
 
   @override
@@ -322,6 +339,39 @@ class MockAdminService implements AdminService {
       purgedUserEmails: purgedEmails,
     );
   }
+
+  @override
+  Future<bool> sendBroadcastAnnouncement({
+    required String title,
+    required String message,
+    String type = 'discount',
+    String targetAction = 'paywall',
+    String targetAudience = 'all',
+    int? discountPercent,
+    String? actionLabel,
+  }) async => true;
+
+  @override
+  Future<List<BroadcastAnnouncement>> fetchBroadcastAnnouncements() async => [];
+
+  @override
+  Future<bool> toggleBroadcastActive(String broadcastId, bool active) async => true;
+
+  @override
+  Future<bool> deleteBroadcastAnnouncement(String broadcastId) async => true;
+
+  @override
+  Future<void> recordAuditLog({
+    required String action,
+    required String actionTitle,
+    required String targetUid,
+    String? targetUserEmail,
+    String? targetUserName,
+    Map<String, dynamic> details = const {},
+  }) async {}
+
+  @override
+  Future<List<AdminAuditLog>> fetchAuditLogs({int limit = 100}) async => const [];
 }
 
 void main() {
@@ -722,7 +772,7 @@ void main() {
 
     testWidgets('Admin dashboard renders platform metrics and user cards when isAdmin',
         (tester) async {
-      tester.view.physicalSize = const Size(800, 3200);
+      tester.view.physicalSize = const Size(800, 4200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
 
@@ -792,7 +842,7 @@ void main() {
 
     testWidgets('Admin dashboard renders Detailed Analytics Hub & Country Demand tabs',
         (tester) async {
-      tester.view.physicalSize = const Size(800, 2000);
+      tester.view.physicalSize = const Size(800, 4800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
 

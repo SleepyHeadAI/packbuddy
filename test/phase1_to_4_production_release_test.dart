@@ -328,6 +328,10 @@ void main() {
     });
 
     testWidgets('Switching locale from tr to en and de dynamically translates seeded checklist items in ChecklistScreen', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 2.0;
+      addTearDown(() => tester.view.resetPhysicalSize());
+
       final seededPassport = PackingItem(
         id: 'default_u1_passport',
         name: 'Pasaport, Vize & Uçuş Biletleri', // Stored in DB originally in Turkish

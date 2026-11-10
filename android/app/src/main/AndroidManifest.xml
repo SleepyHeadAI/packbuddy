@@ -42,6 +42,14 @@
             android:name="com.posthog.posthog.CAPTURE_APPLICATION_LIFECYCLE_EVENTS"
             android:value="true" />
 
+        <!-- Firebase Cloud Messaging Default Channel & Icon -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="packbuddy_urgent_alerts" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/ic_launcher" />
+
         <!-- Scheduled Local Notification Receivers for Device Reboot and Exact Timing -->
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver" />
         <receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />

@@ -12,16 +12,11 @@ import 'package:packbuddy/features/budget/domain/city_localization.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/expense_controller.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
-import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
-import 'package:packbuddy/features/vault/presentation/controllers/vault_controller.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/budget_progress_card.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/budget_analytics_card.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/add_expense_sheet.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/add_trip_sheet.dart';
 import 'package:packbuddy/features/budget/presentation/screens/trips_screen.dart';
-import 'package:packbuddy/features/vault/presentation/screens/vault_screen.dart';
-import 'package:packbuddy/features/checklist/presentation/screens/checklist_screen.dart';
-import 'package:packbuddy/features/budget/domain/emergency_guide.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/share_trip_sheet.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/emergency_guide_sheet.dart';
 
@@ -148,26 +143,6 @@ class TripDetailScreen extends ConsumerWidget {
     final country = Country.findByCode(currentTrip.countryCode);
     final transportIcon = TripsScreen.getTransportIcon(currentTrip.transportMode);
 
-    // Watch linked Checklist Items and Vault Documents safely
-    int packedCount = 0;
-    int checklistTotal = 0;
-    double checklistRatio = 0.0;
-    try {
-      final allChecklistItems = ref.watch(checklistControllerProvider).items;
-      final tripChecklistItems = allChecklistItems
-          .where((i) => i.tripId == currentTrip.id || i.tripId == null)
-          .toList();
-      packedCount = tripChecklistItems.where((i) => i.isPacked).length;
-      checklistTotal = tripChecklistItems.length;
-      checklistRatio = checklistTotal > 0 ? (packedCount / checklistTotal) : 0.0;
-    } catch (_) {}
-
-    int vaultDocCount = 0;
-    try {
-      final allVaultDocs = ref.watch(vaultControllerProvider).documents;
-      vaultDocCount = allVaultDocs.where((d) => d.tripId == currentTrip.id).length;
-    } catch (_) {}
-
     // Listen for database errors and notify user cleanly
     ref.listen<ExpenseState>(expenseControllerProvider(currentTrip.id), (previous, next) {
       if (next.errorMessage != null && next.errorMessage != previous?.errorMessage) {
@@ -222,6 +197,11 @@ class TripDetailScreen extends ConsumerWidget {
             },
           ),
           actions: [
+            IconButton(
+              icon: const Icon(Icons.sos_rounded, color: AppColors.errorPastel),
+              tooltip: l10n.emergencyGuideTitle,
+              onPressed: () => EmergencyGuideSheet.show(context, currentTrip),
+            ),
             IconButton(
               icon: const Icon(Icons.share_rounded),
               tooltip: l10n.shareTrip,
@@ -282,20 +262,7 @@ class TripDetailScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 16),
 
-                      // 2. TRAVEL HUB BENTO: Bavul, Belgeler, Acil Durum
-                      _buildTripHubBento(
-                        context: context,
-                        currentTrip: currentTrip,
-                        checklistTotal: checklistTotal,
-                        packedCount: packedCount,
-                        checklistRatio: checklistRatio,
-                        vaultDocCount: vaultDocCount,
-                        l10n: l10n,
-                        theme: theme,
-                      ),
-                      const SizedBox(height: 20),
-
-                      // 3. BUDGET & ANALYTICS SECTION
+                      // 2. BUDGET & ANALYTICS SECTION
                       BudgetProgressCard(
                         budgetLimit: currentTrip.budgetLimit,
                         totalSpent: expenseState.totalSpent,
@@ -351,7 +318,7 @@ class TripDetailScreen extends ConsumerWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              l10n.budgetDescription,
+                              _getExpensesSectionTitle(context),
                               style: theme.textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.w700,
                                 color: theme.colorScheme.onSurface,
@@ -558,6 +525,53 @@ class TripDetailScreen extends ConsumerWidget {
     );
   }
 
+  String _getExpensesSectionTitle(BuildContext context) {
+    final lang = Localizations.localeOf(context).languageCode;
+    switch (lang) {
+      case 'tr':
+        return 'Harcamalar';
+      case 'de':
+        return 'Ausgaben';
+      case 'fr':
+        return 'Dépenses';
+      case 'es':
+        return 'Gastos';
+      case 'it':
+        return 'Spese';
+      case 'pt':
+        return 'Despesas';
+      case 'ru':
+        return 'Расходы';
+      case 'nl':
+        return 'Uitgaven';
+      case 'sv':
+        return 'Utgifter';
+      case 'pl':
+        return 'Wydatki';
+      case 'id':
+        return 'Pengeluaran';
+      case 'vi':
+        return 'Chi tiêu';
+      case 'el':
+        return 'Έξοδα';
+      case 'ar':
+        return 'المصروفات';
+      case 'zh':
+        return '支出明细';
+      case 'ja':
+        return '支出履歴';
+      case 'ko':
+        return '지출 내역';
+      case 'hi':
+        return 'खर्च';
+      case 'th':
+        return 'รายการค่าใช้จ่าย';
+      case 'en':
+      default:
+        return 'Expenses';
+    }
+  }
+
   /// 1. Hero Travel Banner Card
   Widget _buildTripOverviewHeroCard(
     Trip currentTrip,
@@ -649,7 +663,7 @@ class TripDetailScreen extends ConsumerWidget {
                 ),
               ],
               ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width - 64),
+                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width - 76),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -714,256 +728,6 @@ class TripDetailScreen extends ConsumerWidget {
     );
   }
 
-  /// 2. Travel Hub Bento Grid (Bavul Listesi, Kasa Belgeleri, Acil Durum Rehberi)
-  Widget _buildTripHubBento({
-    required BuildContext context,
-    required Trip currentTrip,
-    required int checklistTotal,
-    required int packedCount,
-    required double checklistRatio,
-    required int vaultDocCount,
-    required AppLocalizations l10n,
-    required ThemeData theme,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            // Left Bento Card: BAVUL & KONTROL LİSTESİ
-            Expanded(
-              child: InkWell(
-                borderRadius: BorderRadius.circular(16),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => ChecklistScreen(
-                        tripId: currentTrip.id,
-                        tripTitle: currentTrip.title,
-                      ),
-                    ),
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primaryContainer.withValues(alpha: 0.35),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.2),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(Icons.luggage_rounded, size: 16, color: theme.colorScheme.primary),
-                          ),
-                          Icon(Icons.arrow_forward_ios_rounded, size: 11, color: theme.colorScheme.primary),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        l10n.baggageAndChecklist,
-                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        checklistTotal > 0
-                            ? '$packedCount / $checklistTotal (${(checklistRatio * 100).toInt()}%)'
-                            : l10n.addFirstItem,
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: theme.colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 6),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(3),
-                        child: LinearProgressIndicator(
-                          value: checklistRatio,
-                          minHeight: 3.5,
-                          backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            checklistRatio >= 1.0 ? AppColors.successPastel : theme.colorScheme.primary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-
-            // Right Bento Card: KASA & BELGELER
-            Expanded(
-              child: InkWell(
-                borderRadius: BorderRadius.circular(16),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => VaultScreen(initialTripId: currentTrip.id),
-                    ),
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: const Color(0xFFF59E0B).withValues(alpha: 0.25),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF59E0B).withValues(alpha: 0.2),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.shield_outlined, size: 16, color: Color(0xFFD97706)),
-                          ),
-                          const Icon(Icons.arrow_forward_ios_rounded, size: 11, color: Color(0xFFD97706)),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        l10n.travelDocuments,
-                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        vaultDocCount > 0
-                            ? '$vaultDocCount ${l10n.savedDocument}'
-                            : l10n.addDocument,
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: theme.colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 6),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(3),
-                        child: LinearProgressIndicator(
-                          value: vaultDocCount > 0 ? 1.0 : 0.0,
-                          minHeight: 3.5,
-                          backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-                          valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFD97706)),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-
-        // Full Width Bento Row: ACİL DURUM VE YEREL REHBER (SOS)
-        Builder(
-          builder: (context) {
-            final guides = EmergencyGuide.forTrip(currentTrip);
-            final guideSub = guides.map((g) => '${g.countryName}: SOS ${g.generalSos}').join(' • ');
-
-            return InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: () => EmergencyGuideSheet.show(context, currentTrip),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: AppColors.errorPastel.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppColors.errorPastel.withValues(alpha: 0.25),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(7),
-                      decoration: BoxDecoration(
-                        color: AppColors.errorPastel.withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.sos_rounded,
-                        color: AppColors.errorPastel,
-                        size: 18,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.emergencyGuideTitle,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 12,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 1),
-                          Text(
-                            guideSub.isNotEmpty
-                                ? guideSub
-                                : CityLocalization.localizeDestination(
-                                    currentTrip.destination,
-                                    Localizations.localeOf(context).languageCode,
-                                  ),
-                            style: TextStyle(
-                              color: theme.colorScheme.onSurfaceVariant,
-                              fontSize: 10.5,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: 12,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
   Widget _buildTripStatusBadge(Trip currentTrip, AppLocalizations l10n, ThemeData theme) {
     if (currentTrip.isOngoing) {
       return Container(
@@ -993,13 +757,17 @@ class TripDetailScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(width: 4),
-            Text(
-              l10n.ongoingTrip.toUpperCase(),
-              style: const TextStyle(
-                fontSize: 9.5,
-                fontWeight: FontWeight.w800,
-                color: AppColors.successPastel,
-                letterSpacing: 0.3,
+            Flexible(
+              child: Text(
+                l10n.ongoingTrip.toUpperCase(),
+                style: const TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.successPastel,
+                  letterSpacing: 0.3,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -1024,13 +792,17 @@ class TripDetailScreen extends ConsumerWidget {
           children: [
             Icon(Icons.schedule_rounded, size: 10, color: theme.colorScheme.primary),
             const SizedBox(width: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 9.5,
-                fontWeight: FontWeight.w800,
-                color: theme.colorScheme.primary,
-                letterSpacing: 0.3,
+            Flexible(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w800,
+                  color: theme.colorScheme.primary,
+                  letterSpacing: 0.3,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -1048,13 +820,17 @@ class TripDetailScreen extends ConsumerWidget {
           children: [
             Icon(Icons.check_circle_outline_rounded, size: 10, color: theme.colorScheme.onSurfaceVariant),
             const SizedBox(width: 4),
-            Text(
-              l10n.completed.toUpperCase(),
-              style: TextStyle(
-                fontSize: 9.5,
-                fontWeight: FontWeight.w700,
-                color: theme.colorScheme.onSurfaceVariant,
-                letterSpacing: 0.3,
+            Flexible(
+              child: Text(
+                l10n.completed.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurfaceVariant,
+                  letterSpacing: 0.3,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

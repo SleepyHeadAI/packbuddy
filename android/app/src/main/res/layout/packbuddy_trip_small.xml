@@ -1,112 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/widget_bg"
-    android:orientation="vertical"
-    android:padding="12dp">
+    android:layout_height="match_parent">
 
-    <!-- Header: App Name & Days Badge (Matches Preview 1:1) -->
+    <!-- 1:1 High-Resolution Flutter Rendered Card -->
+    <ImageView
+        android:id="@+id/widget_rendered_card"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:visibility="gone" />
+
+    <!-- Native XML Fallback Layout -->
     <LinearLayout
+        android:id="@+id/widget_native_content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/widget_app_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="✈️ PackBuddy"
-            android:textColor="#3B82F6"
-            android:textSize="9.5sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/widget_days"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/widget_badge_bg"
-            android:paddingStart="6dp"
-            android:paddingTop="2dp"
-            android:paddingEnd="6dp"
-            android:paddingBottom="2dp"
-            android:text="0d"
-            android:textColor="#FFFFFF"
-            android:textSize="9sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <!-- Center: Trip Title & Destination -->
-    <TextView
-        android:id="@+id/widget_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="PackBuddy"
-        android:textColor="#FFFFFF"
-        android:textSize="13sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/widget_destination"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="1dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text=""
-        android:textColor="#94A3B8"
-        android:textSize="9.5sp" />
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <!-- Bottom: Packing Stats Pill Card with Progress Bar -->
-    <LinearLayout
-        android:id="@+id/widget_bottom_card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/widget_stat_bg"
+        android:layout_height="match_parent"
+        android:background="@drawable/widget_bg"
         android:orientation="vertical"
-        android:paddingStart="8dp"
-        android:paddingTop="4dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="4dp">
+        android:padding="12dp">
 
-        <TextView
-            android:id="@+id/widget_packing"
+        <!-- Header: App Name & Days Badge -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="Bagaj: 0/0"
-            android:textColor="#38BDF8"
-            android:textSize="9sp"
-            android:textStyle="bold" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <ProgressBar
-            android:id="@+id/widget_packing_progress"
-            style="?android:attr/progressBarStyleHorizontal"
+            <TextView
+                android:id="@+id/widget_app_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="✈️ PackBuddy"
+                android:textColor="#3B82F6"
+                android:textSize="9.5sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_days"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/widget_badge_bg"
+                android:paddingStart="6dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="6dp"
+                android:paddingBottom="2dp"
+                android:text="0d"
+                android:textColor="#FFFFFF"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Center: Trip Title & Destination -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="3.5dp"
-            android:layout_marginTop="2.5dp"
-            android:max="100"
-            android:progress="0"
-            android:progressBackgroundTint="#4094A3B8"
-            android:progressTint="#3B82F6" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/widget_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="PackBuddy"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_destination"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text=""
+                android:textColor="#94A3B8"
+                android:textSize="9.5sp" />
+        </LinearLayout>
+
+        <!-- Bottom: Packing Stats Pill Card with Progress Bar -->
+        <LinearLayout
+            android:id="@+id/widget_bottom_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/widget_stat_bg"
+            android:orientation="vertical"
+            android:paddingStart="8dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="4dp">
+
+            <TextView
+                android:id="@+id/widget_packing"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Bagaj: 0/0"
+                android:textColor="#38BDF8"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+
+            <ProgressBar
+                android:id="@+id/widget_packing_progress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="3.5dp"
+                android:layout_marginTop="2.5dp"
+                android:max="100"
+                android:progress="0"
+                android:progressBackgroundTint="#4094A3B8"
+                android:progressTint="#3B82F6" />
+        </LinearLayout>
     </LinearLayout>
 
-</LinearLayout>
+</FrameLayout>

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,6 +36,7 @@ class PreferencesService {
   static const String keyTotalSessionSeconds = 'packbuddy_total_session_seconds';
   static const String keySessionCount = 'packbuddy_session_count';
   static const String keyLastSessionSeconds = 'packbuddy_last_session_seconds';
+  static const String keySessionHistory = 'packbuddy_session_history';
   static const String keyRestrictedFeatures = 'packbuddy_restricted_features';
   static const String keyBanStatus = 'packbuddy_ban_status';
   static const String keyBanExpiresAt = 'packbuddy_ban_expires_at';
@@ -502,6 +504,45 @@ class PreferencesService {
     await _prefs?.setInt(key, timestamp);
   }
 
+  // --- Persistent Notification Delivery & Anti-Spam Deduplication Engine ---
+  static const String keyDeliveredNotificationIds = 'delivered_notification_ids';
+  final Set<String> _inMemoryDeliveredIds = {};
+
+  List<String> getDeliveredNotificationIds() {
+    final list = _prefs?.getStringList(keyDeliveredNotificationIds) ?? [];
+    _inMemoryDeliveredIds.addAll(list);
+    return list;
+  }
+
+  bool hasDeliveredNotification(String notificationId) {
+    if (notificationId.isEmpty) return false;
+    if (_inMemoryDeliveredIds.contains(notificationId)) return true;
+    final list = _prefs?.getStringList(keyDeliveredNotificationIds) ?? [];
+    if (list.contains(notificationId)) {
+      _inMemoryDeliveredIds.add(notificationId);
+      return true;
+    }
+    return false;
+  }
+
+  Future<void> markNotificationDelivered(String notificationId) async {
+    if (notificationId.isEmpty) return;
+    _inMemoryDeliveredIds.add(notificationId);
+    final list = List<String>.from(_prefs?.getStringList(keyDeliveredNotificationIds) ?? []);
+    if (!list.contains(notificationId)) {
+      list.add(notificationId);
+      if (list.length > 200) {
+        list.removeRange(0, list.length - 200);
+      }
+      await _prefs?.setStringList(keyDeliveredNotificationIds, list);
+    }
+  }
+
+  Future<void> clearDeliveredNotifications() async {
+    _inMemoryDeliveredIds.clear();
+    await _prefs?.remove(keyDeliveredNotificationIds);
+  }
+
   // --- Checklist First-Time Seeding Tracking ---
   bool hasSeededChecklist({String? uid}) {
     final key = uid != null && uid.isNotEmpty ? 'has_seeded_checklist_$uid' : 'has_seeded_checklist';
@@ -522,6 +563,11 @@ class PreferencesService {
     final key = uid != null && uid.isNotEmpty ? 'has_cleared_checklist_$uid' : 'has_cleared_checklist';
     await _prefs?.setBool(key, value);
   }
+
+  // --- User Feedback Cache ---
+  static const String keyFeedbackCache = 'packbuddy_user_feedback_cache';
+  String? getFeedbackCache() => _prefs?.getString(keyFeedbackCache);
+  Future<void> saveFeedbackCache(String json) async => _prefs?.setString(keyFeedbackCache, json);
 
   // --- Travel Map Mode (2D flat vs 3D Globe) ---
   bool getTravelMapIs3D() => _prefs?.getBool(keyTravelMapIs3D) ?? false;
@@ -569,15 +615,50 @@ class PreferencesService {
     return _prefs?.getInt(keyLastSessionSeconds) ?? 0;
   }
 
-  Future<void> recordSession(int seconds, {String? uid}) async {
+  List<Map<String, dynamic>> getSessionLogs({String? uid}) {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    final key = effectiveUid != null ? '${keySessionHistory}_$effectiveUid' : keySessionHistory;
+    final raw = _prefs?.getString(key);
+    if (raw == null || raw.isEmpty) return [];
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List) {
+        return decoded
+            .whereType<Map>()
+            .map((e) => Map<String, dynamic>.from(e))
+            .toList();
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  Future<void> recordSession(int seconds, {String? uid, DateTime? timestamp}) async {
     final effectiveUid = _resolveEffectiveUid(uid);
     final curTotal = getTotalSessionSeconds(uid: effectiveUid);
     final curCount = getSessionCount(uid: effectiveUid);
     final totalKey = effectiveUid != null ? '${keyTotalSessionSeconds}_$effectiveUid' : keyTotalSessionSeconds;
     final countKey = effectiveUid != null ? '${keySessionCount}_$effectiveUid' : keySessionCount;
     final lastKey = effectiveUid != null ? '${keyLastSessionSeconds}_$effectiveUid' : keyLastSessionSeconds;
+    final histKey = effectiveUid != null ? '${keySessionHistory}_$effectiveUid' : keySessionHistory;
+
     await _prefs?.setInt(totalKey, curTotal + seconds);
     await _prefs?.setInt(countKey, curCount + 1);
     await _prefs?.setInt(lastKey, seconds);
+
+    final logs = getSessionLogs(uid: effectiveUid);
+    logs.insert(0, {
+      'durationSeconds': seconds,
+      'timestamp': (timestamp ?? DateTime.now()).toIso8601String(),
+    });
+    if (logs.length > 200) {
+      logs.removeRange(200, logs.length);
+    }
+    await _prefs?.setString(histKey, jsonEncode(logs));
+  }
+
+  /// Get user-scoped travel countries raw JSON
+  String? getScopedTravelCountriesJson(String uid) {
+    if (uid.isEmpty) return null;
+    return _prefs?.getString('packbuddy_travel_map_countries_v1_$uid');
   }
 }

@@ -20,6 +20,9 @@ import 'package:packbuddy/features/settings/presentation/screens/widgets/home_wi
 import 'package:packbuddy/core/services/biometric_service.dart';
 import 'package:packbuddy/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:packbuddy/core/l10n/language_selector_sheet.dart';
+import 'package:packbuddy/features/feedback/domain/feedback_localization.dart';
+import 'package:packbuddy/features/feedback/presentation/widgets/feedback_sheet.dart';
+import 'package:packbuddy/shared/widgets/app_logo.dart';
 
 /// Complete Settings screen handling Language, Theme, Sync, and PackBuddy Pro
 class SettingsScreen extends ConsumerWidget {
@@ -36,6 +39,7 @@ class SettingsScreen extends ConsumerWidget {
     final packingRemindersEnabled = ref.watch(packingRemindersProvider);
     final isAdmin = ref.watch(isAdminProvider);
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return PopScope(
       canPop: true,
@@ -519,24 +523,91 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
           ),
+          const SizedBox(height: 16),
+
+          // 7. Feedback & Suggestions Section
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: AppCard(
+              padding: const EdgeInsets.all(16),
+              borderRadius: 20,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: (isDark ? AppColors.primaryAmber : AppColors.primaryLight)
+                              .withValues(alpha: 0.14),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          Icons.lightbulb_rounded,
+                          size: 18,
+                          color: isDark ? AppColors.primaryAmber : AppColors.primaryLight,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              FeedbackL10n.getTitle(Localizations.localeOf(context).languageCode),
+                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5),
+                            ),
+                            Text(
+                              FeedbackL10n.getSubtitle(Localizations.localeOf(context).languageCode),
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () => FeedbackSheet.show(context),
+                      icon: const Icon(Icons.edit_note_rounded, size: 18),
+                      label: Text(
+                        FeedbackL10n.getTitle(Localizations.localeOf(context).languageCode),
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           const SizedBox(height: 28),
 
-          // 7. App Footer
+          // 8. Clean App Version Footer with Logo
           Center(
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
+                const AppLogo(
+                  size: 48,
+                ),
+                const SizedBox(height: 8),
                 Text(
                   'PackBuddy v1.0.0',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  'SleepyHead INC. CO. • Offline-First Travel Companion',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],

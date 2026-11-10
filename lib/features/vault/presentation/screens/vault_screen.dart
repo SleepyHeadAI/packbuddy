@@ -18,13 +18,19 @@ import 'widgets/add_document_sheet.dart';
 import 'widgets/vault_lock_view.dart';
 import 'widgets/vault_thumbnail_widget.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:packbuddy/features/dashboard/presentation/navigation_provider.dart';
 import '../../../../core/services/security_service.dart';
 
 /// Redesigned Document Vault screen with pinned passport hero slot, trip filters, and format-specific windows
 class VaultScreen extends ConsumerStatefulWidget {
   final String? initialTripId;
+  final bool isTabMode;
 
-  const VaultScreen({super.key, this.initialTripId});
+  const VaultScreen({
+    super.key,
+    this.initialTripId,
+    this.isTabMode = false,
+  });
 
   static String getCategoryLabel(String cat, AppLocalizations l10n) {
     switch (cat.toLowerCase()) {
@@ -66,26 +72,64 @@ class VaultScreen extends ConsumerStatefulWidget {
   ConsumerState<VaultScreen> createState() => _VaultScreenState();
 }
 
-class _VaultScreenState extends ConsumerState<VaultScreen> {
-  String? _selectedTripFilter; // null = all, 'general' = unassigned, or trip.id
+class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingObserver {
+  String? _selectedTripFilter; // null = all, or trip.id
   String? _selectedCategoryFilter; // null = all, or category name
   String? _selectedSubCategoryFilter; // null = all, or subcategory name for Biletler
+
+  bool get _isTabActive {
+    if (!widget.isTabMode) return true;
+    return ref.watch(mainNavigationIndexProvider) == 3;
+  }
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _selectedTripFilter = widget.initialTripId;
+
+    // Enforce biometric/PIN authentication when vault tab is opened
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (!widget.isTabMode || ref.read(mainNavigationIndexProvider) == 3) {
+        final vaultState = ref.read(vaultControllerProvider);
+        if (vaultState.hasPin && !vaultState.isLocked) {
+          ref.read(vaultControllerProvider.notifier).lockVault();
+        }
+      }
+    });
   }
 
   @override
   void deactivate() {
     ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
+    // Lock vault when screen is deactivated / popped
+    try {
+      final vaultState = ref.read(vaultControllerProvider);
+      if (vaultState.hasPin && !vaultState.isLocked) {
+        ref.read(vaultControllerProvider.notifier).lockVault();
+      }
+    } catch (_) {}
     super.deactivate();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState lifecycleState) {
+    if (lifecycleState == AppLifecycleState.paused ||
+        lifecycleState == AppLifecycleState.inactive ||
+        lifecycleState == AppLifecycleState.hidden) {
+      // Immediately lock vault whenever app is backgrounded or minimized
+      final vaultState = ref.read(vaultControllerProvider);
+      if (vaultState.hasPin && !vaultState.isLocked) {
+        ref.read(vaultControllerProvider.notifier).lockVault();
+      }
+    }
   }
 
   Color _getCategoryColor(String category) {
@@ -292,6 +336,20 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
       }
     });
 
+    // Enforce biometric/PIN re-auth whenever user leaves or returns to Vault tab
+    ref.listen<int>(mainNavigationIndexProvider, (previous, next) {
+      final currentVaultState = ref.read(vaultControllerProvider);
+      if (!currentVaultState.hasPin) return;
+
+      if (previous == 3 && next != 3) {
+        // Leaving Vault tab -> lock immediately
+        ref.read(vaultControllerProvider.notifier).lockVault();
+      } else if (next == 3 && previous != 3) {
+        // Entering Vault tab -> lock to enforce re-auth
+        ref.read(vaultControllerProvider.notifier).lockVault();
+      }
+    });
+
     // Find the latest uploaded passport document if any
     final passportDoc = vaultState.documents.cast<Document?>().firstWhere(
           (d) => d?.category.toLowerCase() == 'passport' || d?.category.toLowerCase() == 'pasaport',
@@ -300,12 +358,8 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
 
     // Filter documents based on trip selection, category, and subcategory
     final filteredDocuments = vaultState.documents.where((d) {
-      if (_selectedTripFilter != null) {
-        if (_selectedTripFilter == 'general') {
-          if (d.tripId != null && d.tripId!.isNotEmpty) return false;
-        } else if (d.tripId != _selectedTripFilter) {
-          return false;
-        }
+      if (_selectedTripFilter != null && d.tripId != _selectedTripFilter) {
+        return false;
       }
       if (!_matchesCategory(d, _selectedCategoryFilter)) return false;
       if (_selectedCategoryFilter == 'Biletler' && !_matchesSubCategory(d, _selectedSubCategoryFilter)) {
@@ -313,6 +367,14 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
       }
       return true;
     }).toList();
+
+    // If hosted inside navigation shell and not the active tab, render a lightweight shell
+    // to strictly prevent background biometric prompts and unnecessary heavy renders
+    if (!_isTabActive) {
+      return const Scaffold(
+        body: SizedBox.shrink(),
+      );
+    }
 
     return PopScope(
       canPop: true,
@@ -391,7 +453,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                 heroTag: null,
                 onPressed: () => AddDocumentSheet.show(
                   context,
-                  initialTripId: _selectedTripFilter == 'general' ? null : _selectedTripFilter,
+                  initialTripId: _selectedTripFilter,
                 ),
                 backgroundColor: theme.colorScheme.primary,
                 foregroundColor: theme.colorScheme.onPrimary,
@@ -399,10 +461,10 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                 icon: const Icon(Icons.add_rounded),
                 label: Text(l10n.addDocument, style: const TextStyle(fontWeight: FontWeight.w600)),
               ),
-      body: vaultState.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : vaultState.isLocked
-              ? const VaultLockView()
+      body: vaultState.isLocked
+          ? VaultLockView(isTabMode: widget.isTabMode)
+          : vaultState.isLoading
+              ? const Center(child: CircularProgressIndicator())
               : CustomScrollView(
                   scrollCacheExtent: const ScrollCacheExtent.pixels(600.0),
                   slivers: [
@@ -928,7 +990,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                           child: Row(
                             children: [
                               ChoiceChip(
-                                label: Text(l10n.allTrips),
+                                label: Text(l10n.allFilter),
                                 selected: _selectedTripFilter == null,
                                 selectedColor: theme.colorScheme.secondaryContainer,
                                 labelStyle: TextStyle(
@@ -940,23 +1002,6 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                 ),
                                 onSelected: (val) {
                                   if (val) setState(() => _selectedTripFilter = null);
-                                },
-                              ),
-                              const SizedBox(width: 6),
-                              ChoiceChip(
-                                avatar: const Icon(Icons.public_rounded, size: 13),
-                                label: Text(l10n.general),
-                                selected: _selectedTripFilter == 'general',
-                                selectedColor: theme.colorScheme.secondaryContainer,
-                                labelStyle: TextStyle(
-                                  color: _selectedTripFilter == 'general'
-                                      ? theme.colorScheme.onSecondaryContainer
-                                      : theme.colorScheme.onSurfaceVariant,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 11,
-                                ),
-                                onSelected: (val) {
-                                  if (val) setState(() => _selectedTripFilter = 'general');
                                 },
                               ),
                               ...tripState.trips.map((trip) {
@@ -976,7 +1021,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
                                       fontSize: 11,
                                     ),
                                     onSelected: (val) {
-                                      if (val) setState(() => _selectedTripFilter = trip.id);
+                                      setState(() => _selectedTripFilter = val ? trip.id : null);
                                     },
                                   ),
                                 );

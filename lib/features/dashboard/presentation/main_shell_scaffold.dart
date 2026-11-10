@@ -6,6 +6,7 @@ import '../../checklist/presentation/screens/checklist_screen.dart';
 import '../../settings/presentation/screens/settings_screen.dart';
 import '../../travel_map/presentation/screens/travel_map_screen.dart';
 import '../../vault/presentation/screens/vault_screen.dart';
+import '../../vault/presentation/controllers/vault_controller.dart';
 import 'dashboard_screen.dart';
 import 'navigation_provider.dart';
 
@@ -32,7 +33,7 @@ class _MainShellScaffoldState extends ConsumerState<MainShellScaffold> {
       DashboardScreen(),
       TravelMapScreen(),
       ChecklistScreen(),
-      VaultScreen(),
+      VaultScreen(isTabMode: true),
       SettingsScreen(),
     ];
   }
@@ -61,7 +62,7 @@ class _MainShellScaffoldState extends ConsumerState<MainShellScaffold> {
         }
       },
       child: Scaffold(
-        body: IndexedStack(
+        body: FadeIndexedStack(
           index: selectedIndex.clamp(0, _screens.length - 1),
           children: _screens,
         ),
@@ -97,6 +98,12 @@ class _MainShellScaffoldState extends ConsumerState<MainShellScaffold> {
               labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
               onDestinationSelected: (index) {
                 if (index != selectedIndex) {
+                  // If transitioning away from or into Vault tab (index 3),
+                  // immediately lock the vault to enforce security verification
+                  final vaultState = ref.read(vaultControllerProvider);
+                  if (vaultState.hasPin && (selectedIndex == 3 || index == 3)) {
+                    ref.read(vaultControllerProvider.notifier).lockVault();
+                  }
                   ref.read(mainNavigationIndexProvider.notifier).state = index;
                 }
               },
@@ -150,6 +157,63 @@ class _MainShellScaffoldState extends ConsumerState<MainShellScaffold> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Animated IndexedStack providing smooth fade transitions between main navigation tabs
+/// while preserving full state, scroll offsets, and active forms across all tabs.
+class FadeIndexedStack extends StatefulWidget {
+  final int index;
+  final List<Widget> children;
+  final Duration duration;
+
+  const FadeIndexedStack({
+    super.key,
+    required this.index,
+    required this.children,
+    this.duration = const Duration(milliseconds: 220),
+  });
+
+  @override
+  State<FadeIndexedStack> createState() => _FadeIndexedStackState();
+}
+
+class _FadeIndexedStackState extends State<FadeIndexedStack>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: widget.duration);
+    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
+    _controller.forward();
+  }
+
+  @override
+  void didUpdateWidget(FadeIndexedStack oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.index != oldWidget.index) {
+      _controller.forward(from: 0.0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _animation,
+      child: IndexedStack(
+        index: widget.index,
+        children: widget.children,
       ),
     );
   }

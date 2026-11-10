@@ -203,7 +203,7 @@ class PackingTemplatesRepository {
         PackingItemTemplate(name: 'Evrensel Priz Dönüştürücü / Seyahat Adaptörü', category: 'Elektronik', quantity: 1, tag: 'CABIN ONLY', compartment: 'Ön Cep'),
         PackingItemTemplate(name: 'Hızlı Şarj Adaptörü & Telefon Kablosu', category: 'Elektronik', quantity: 1, tag: 'CABIN ONLY', compartment: 'Ön Cep'),
         PackingItemTemplate(name: 'Kompakt Powerbank', category: 'Elektronik', quantity: 1, tag: 'CABIN ONLY', compartment: 'Ön Cep'),
-        PackingItemTemplate(name: 'Seyahat Boy Diş Bakım Seti', category: 'Kişisel Bakım', quantity: 1, tag: 'CABIN ONLY', compartment: 'Kozmetik Bölmesi'),
+        PackingItemTemplate(name: 'Seyahat Boy Diş Fırçası & Macunu', category: 'Kişisel Bakım', quantity: 1, tag: 'CABIN ONLY', compartment: 'Kozmetik Bölmesi'),
         PackingItemTemplate(name: 'Kimlik, Pasaport & Ulaşım Kartları', category: 'Belgeler', quantity: 1, tag: 'ESSENTIAL', compartment: 'Ön Cep'),
       ],
     ),

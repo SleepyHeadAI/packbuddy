@@ -74,17 +74,19 @@ class TravelMapService {
       } catch (_) {}
     }
 
-    // 1. Read legacy fallback keys first
-    for (final k in _fallbackKeys) {
-      mergeRaw(prefs.getString(k));
-    }
+    final effective = _resolveUid(uid);
 
-    // 2. Read global primary key
-    mergeRaw(prefs.getString(_keyCountries));
+    if (effective == null || effective.isEmpty) {
+      // 1. Read legacy fallback keys only for unauthenticated guest user
+      for (final k in _fallbackKeys) {
+        mergeRaw(prefs.getString(k));
+      }
 
-    // 3. Read user-scoped key (authoritative for logged-in user in SharedPreferences)
-    final scoped = _scopedKey(uid);
-    if (scoped != _keyCountries) {
+      // 2. Read global primary key only for unauthenticated guest user
+      mergeRaw(prefs.getString(_keyCountries));
+    } else {
+      // 3. Read strictly user-scoped key (authoritative for this specific user)
+      final scoped = _scopedKey(effective);
       mergeRaw(prefs.getString(scoped));
     }
 
@@ -237,10 +239,11 @@ class TravelMapService {
 
     final encoded = jsonEncode(savedMap);
     // 2. Persist to SharedPreferences
-    await prefs.setString(_keyCountries, encoded);
-    await prefs.setString('packbuddy_travel_map_countries', encoded);
-    if (effectiveUid != null) {
+    if (effectiveUid != null && effectiveUid.isNotEmpty) {
       await prefs.setString(_scopedKey(effectiveUid), encoded);
+    } else {
+      await prefs.setString(_keyCountries, encoded);
+      await prefs.setString('packbuddy_travel_map_countries', encoded);
     }
 
     // 3. Immediately backup to Firestore (both dedicated collection and users/{uid})
@@ -334,10 +337,11 @@ class TravelMapService {
     }
 
     final encoded = jsonEncode(savedMap);
-    await prefs.setString(_keyCountries, encoded);
-    await prefs.setString('packbuddy_travel_map_countries', encoded);
-    if (effectiveUid != null) {
+    if (effectiveUid != null && effectiveUid.isNotEmpty) {
       await prefs.setString(_scopedKey(effectiveUid), encoded);
+    } else {
+      await prefs.setString(_keyCountries, encoded);
+      await prefs.setString('packbuddy_travel_map_countries', encoded);
     }
   }
 
@@ -436,9 +440,12 @@ class TravelMapService {
 
       // Save merged to local SharedPreferences
       final encoded = jsonEncode(mergedMap);
-      await prefs.setString(_keyCountries, encoded);
-      await prefs.setString('packbuddy_travel_map_countries', encoded);
-      await prefs.setString(_scopedKey(effectiveUid), encoded);
+      if (effectiveUid.isNotEmpty) {
+        await prefs.setString(_scopedKey(effectiveUid), encoded);
+      } else {
+        await prefs.setString(_keyCountries, encoded);
+        await prefs.setString('packbuddy_travel_map_countries', encoded);
+      }
 
       // Push merged to Firestore ONLY if local has newer/added data, or if remote was empty and local has data
       if (remoteNeedsUpdate || (remoteMap.isEmpty && mergedMap.isNotEmpty)) {
@@ -504,10 +511,11 @@ class TravelMapService {
     if (!modified) return null;
 
     final encoded = jsonEncode(savedMap);
-    await prefs.setString(_keyCountries, encoded);
-    await prefs.setString('packbuddy_travel_map_countries', encoded);
-    if (effectiveUid != null) {
+    if (effectiveUid != null && effectiveUid.isNotEmpty) {
       await prefs.setString(_scopedKey(effectiveUid), encoded);
+    } else {
+      await prefs.setString(_keyCountries, encoded);
+      await prefs.setString('packbuddy_travel_map_countries', encoded);
     }
 
     if (effectiveUid != null && _isFirebaseReady) {

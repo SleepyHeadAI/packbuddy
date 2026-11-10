@@ -12,10 +12,14 @@ import 'package:packbuddy/features/auth/auth_service.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/auth/presentation/screens/banned_screen.dart';
 import 'package:packbuddy/features/admin/admin_service.dart';
+import 'package:packbuddy/features/admin/domain/broadcast_announcement.dart';
+import 'package:packbuddy/features/admin/domain/admin_audit_log.dart';
 import 'package:packbuddy/features/admin/admin_controller.dart';
 import 'package:packbuddy/features/admin/admin_dashboard_screen.dart';
 import 'package:packbuddy/features/admin/user_moderation_provider.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
+import 'package:packbuddy/features/budget/domain/expense.dart';
+import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/vault/presentation/controllers/vault_controller.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
@@ -148,6 +152,18 @@ class MockAdminServiceForTest implements AdminService {
   Future<List<VaultDocument>> fetchUserDocuments(String uid) async => [];
 
   @override
+  Future<List<Trip>> fetchUserTrips(String uid) async => [];
+
+  @override
+  Future<List<Expense>> fetchUserExpenses(String uid) async => [];
+
+  @override
+  Future<List<AdminUserSessionLog>> fetchUserSessions(String uid) async => [];
+
+  @override
+  Future<List<TravelCountry>> fetchUserTravelCountries(String uid) async => [];
+
+  @override
   Future<void> deleteUserDocumentAsAdmin({required String uid, required String documentId}) async {}
 
   @override
@@ -171,6 +187,39 @@ class MockAdminServiceForTest implements AdminService {
 
   @override
   Future<InactivityScanResult> processInactivityPolicies() async => const InactivityScanResult();
+
+  @override
+  Future<bool> sendBroadcastAnnouncement({
+    required String title,
+    required String message,
+    String type = 'discount',
+    String targetAction = 'paywall',
+    String targetAudience = 'all',
+    int? discountPercent,
+    String? actionLabel,
+  }) async => true;
+
+  @override
+  Future<List<BroadcastAnnouncement>> fetchBroadcastAnnouncements() async => [];
+
+  @override
+  Future<bool> toggleBroadcastActive(String broadcastId, bool active) async => true;
+
+  @override
+  Future<bool> deleteBroadcastAnnouncement(String broadcastId) async => true;
+
+  @override
+  Future<void> recordAuditLog({
+    required String action,
+    required String actionTitle,
+    required String targetUid,
+    String? targetUserEmail,
+    String? targetUserName,
+    Map<String, dynamic> details = const {},
+  }) async {}
+
+  @override
+  Future<List<AdminAuditLog>> fetchAuditLogs({int limit = 100}) async => const [];
 }
 
 void main() {
@@ -573,16 +622,23 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);
+      await tester.scrollUntilVisible(
+        find.text('Geographic & Activity Analytics'),
+        150,
+        scrollable: find.byType(Scrollable).first,
+      );
       expect(find.text('Geographic & Activity Analytics'), findsOneWidget);
       expect(find.text('Live (15m)'), findsOneWidget);
       expect(find.text('Daily (24h)'), findsOneWidget);
 
       // Scroll down to Geo-Analytics country list
-      await tester.drag(find.byType(ListView), const Offset(0, -400));
-      await tester.pumpAndSettle();
-
-      // Verify Country Breakdown appears and tap Turkey to expand city breakdown
       final turkeyFinder = find.byKey(const ValueKey('geo_country_TR'));
+      await tester.scrollUntilVisible(
+        turkeyFinder,
+        100,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
       expect(turkeyFinder, findsOneWidget);
 
       await tester.tap(turkeyFinder);

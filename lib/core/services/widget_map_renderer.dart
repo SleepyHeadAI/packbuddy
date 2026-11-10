@@ -2,7 +2,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:countries_world_map/countries_world_map.dart';
-import 'package:countries_world_map/data/maps/world_map.dart';
+import '../../features/travel_map/data/world_map_instructions.dart';
 import '../../features/travel_map/domain/travel_country.dart';
 import 'preferences_service.dart';
 
@@ -28,6 +28,8 @@ class WidgetThemeConfig {
   final Color wishlistColor;
   final String emoji;
   final bool isLight;
+
+  bool get isDark => !isLight;
 
   const WidgetThemeConfig({
     required this.key,
@@ -583,7 +585,7 @@ class WidgetMapRenderer {
         child: AspectRatio(
           aspectRatio: 2000 / 857,
           child: SimpleMap(
-            instructions: SMapWorld.instructions,
+            instructions: WorldMapInstructions.instructions,
             defaultColor: themeConfig.unvisitedLandColor,
             colors: colorMap,
             countryBorder: CountryBorder(

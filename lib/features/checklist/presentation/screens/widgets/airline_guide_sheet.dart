@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/features/checklist/domain/airline_baggage_guide.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
+import 'package:packbuddy/core/widgets/legal_disclaimer_card.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 /// Modal bottom sheet displaying airline baggage allowances and enabling quick limit sync
@@ -52,7 +53,12 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
         _filteredAirlines = AirlineBaggageRepository.airlines.where((airline) {
           return airline.airlineName.toLowerCase().contains(q) ||
               airline.iataCode.toLowerCase().contains(q) ||
-              airline.notes.toLowerCase().contains(q);
+              airline.notes.toLowerCase().contains(q) ||
+              (q.contains('turkish') && airline.iataCode == 'TK') ||
+              (q == 'thy' && airline.iataCode == 'TK') ||
+              (q == 'ana' && airline.iataCode == 'NH') ||
+              (q == 'jal' && airline.iataCode == 'JL') ||
+              (q == 'sas' && airline.iataCode == 'SK');
         }).toList();
       }
     });
@@ -332,15 +338,18 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
           const SizedBox(height: 6),
           const Divider(height: 1),
 
-          // Airline rules list
+          // Airline rules list with Legal Disclaimer header
           Flexible(
             child: ListView.separated(
               padding: const EdgeInsets.fromLTRB(20, 14, 20, 32),
               physics: const BouncingScrollPhysics(),
-              itemCount: filteredAirlines.length,
+              itemCount: filteredAirlines.length + 1,
               separatorBuilder: (_, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
-                final airline = filteredAirlines[index];
+                if (index == 0) {
+                  return const LegalDisclaimerBanner.airline();
+                }
+                final airline = filteredAirlines[index - 1];
                 final isCurrent = selectedAirline != null &&
                     selectedAirline.iataCode == airline.iataCode;
 
@@ -659,6 +668,16 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
         if (lang == 'ar') return 'الكل (يدوية + مسجلة)';
         if (lang == 'pt') return 'Todos (Cabine + Porão)';
         if (lang == 'nl') return 'Alles (Handbagage + Ruim)';
+        if (lang == 'zh') return '全部 (随身 + 托运)';
+        if (lang == 'ja') return 'すべて (機内 + 受託)';
+        if (lang == 'ko') return '전체 (기내 + 위탁)';
+        if (lang == 'hi') return 'सभी (केबिन + चेक)';
+        if (lang == 'id') return 'Semua (Kabin + Bagasi)';
+        if (lang == 'pl') return 'Wszystko (Podręczny + Rejestrowany)';
+        if (lang == 'el') return 'Όλα (Χειραποσκευή + Αποσκευή)';
+        if (lang == 'vi') return 'Tất cả (Xách tay + Ký gửi)';
+        if (lang == 'th') return 'ทั้งหมด (ถือขึ้นเครื่อง + โหลดใต้เครื่อง)';
+        if (lang == 'sv') return 'Alla (Kabinväska + Incheckat)';
         return 'All (Cabin + Checked)';
       case BaggageAllowanceMode.cabinOnly:
         if (lang == 'tr') return 'Sadece Kabin';
@@ -670,6 +689,16 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
         if (lang == 'ar') return 'حقيبة اليد فقط';
         if (lang == 'pt') return 'Apenas cabine';
         if (lang == 'nl') return 'Alleen handbagage';
+        if (lang == 'zh') return '仅随身行李';
+        if (lang == 'ja') return '機内持ち込みのみ';
+        if (lang == 'ko') return '기내 수하물만';
+        if (lang == 'hi') return 'केवल केबिन';
+        if (lang == 'id') return 'Hanya Kabin';
+        if (lang == 'pl') return 'Tylko podręczny';
+        if (lang == 'el') return 'Μόνο χειραποσκευή';
+        if (lang == 'vi') return 'Chỉ xách tay';
+        if (lang == 'th') return 'เฉพาะถือขึ้นเครื่อง';
+        if (lang == 'sv') return 'Endast kabinväska';
         return 'Cabin Only';
       case BaggageAllowanceMode.checkedOnly:
         if (lang == 'tr') return 'Sadece Uçak Altı';
@@ -681,6 +710,16 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
         if (lang == 'ar') return 'الأمتعة المسجلة فقط';
         if (lang == 'pt') return 'Apenas porão';
         if (lang == 'nl') return 'Alleen ruimbagage';
+        if (lang == 'zh') return '仅托运行李';
+        if (lang == 'ja') return '受託手荷物のみ';
+        if (lang == 'ko') return '위탁 수하물만';
+        if (lang == 'hi') return 'केवल चेक बैगेज';
+        if (lang == 'id') return 'Hanya Bagasi Terdaftar';
+        if (lang == 'pl') return 'Tylko rejestrowany';
+        if (lang == 'el') return 'Μόνο αποσκευή';
+        if (lang == 'vi') return 'Chỉ ký gửi';
+        if (lang == 'th') return 'เฉพาะโหลดใต้เครื่อง';
+        if (lang == 'sv') return 'Endast incheckat';
         return 'Checked Only';
       case BaggageAllowanceMode.none:
         if (lang == 'tr') return 'Hiçbiri (Limitsiz)';
@@ -692,6 +731,16 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
         if (lang == 'ar') return 'بدون قيود';
         if (lang == 'pt') return 'Nenhum (Sem limite)';
         if (lang == 'nl') return 'Geen (Onbeperkt)';
+        if (lang == 'zh') return '无限制';
+        if (lang == 'ja') return '制限なし';
+        if (lang == 'ko') return '제한 없음';
+        if (lang == 'hi') return 'कोई सीमा नहीं';
+        if (lang == 'id') return 'Tanpa Batas';
+        if (lang == 'pl') return 'Brak limitu';
+        if (lang == 'el') return 'Χωρίς όριο';
+        if (lang == 'vi') return 'Không giới hạn';
+        if (lang == 'th') return 'ไม่จำกัด';
+        if (lang == 'sv') return 'Ingen gräns';
         return 'None (No Limit)';
     }
   }
@@ -706,6 +755,16 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
     if (lang == 'ar') return 'تمت إزالة قيود الأمتعة (غير محدود)';
     if (lang == 'pt') return 'Limite de bagagem removido (Sem limite)';
     if (lang == 'nl') return 'Bagagelimiet verwijderd (Onbeperkt)';
+    if (lang == 'zh') return '已移除行李限制 (无限制)';
+    if (lang == 'ja') return '手荷物制限が解除されました (無制限)';
+    if (lang == 'ko') return '수하물 제한이 해제되었습니다 (무제한)';
+    if (lang == 'hi') return 'बैगेज सीमा हटा दी गई (असीमित)';
+    if (lang == 'id') return 'Batas bagasi dihapus (Tanpa batas)';
+    if (lang == 'pl') return 'Limit bagażu został usunięty (Bez limitu)';
+    if (lang == 'el') return 'Το όριο αποσκευών αφαιρέθηκε (Χωρίς όριο)';
+    if (lang == 'vi') return 'Đã gỡ bỏ giới hạn hành lý (Không giới hạn)';
+    if (lang == 'th') return 'ยกเลิกขีดจำกัดสัมภาระแล้ว (ไม่จำกัด)';
+    if (lang == 'sv') return 'Bagagegräns borttagen (Obegränsad)';
     return 'Baggage limit removed (No limit)';
   }
 

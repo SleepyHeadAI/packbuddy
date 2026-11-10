@@ -8,7 +8,12 @@ import 'package:packbuddy/core/constants/app_constants.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
+import 'package:packbuddy/features/budget/domain/trip.dart';
+import 'package:packbuddy/features/budget/domain/expense.dart';
+import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
 import 'package:packbuddy/features/admin/admin_service.dart';
+import 'package:packbuddy/features/admin/domain/broadcast_announcement.dart';
+import 'package:packbuddy/features/admin/domain/admin_audit_log.dart';
 import 'package:packbuddy/features/admin/admin_controller.dart';
 import 'package:packbuddy/features/admin/admin_dashboard_screen.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
@@ -90,6 +95,18 @@ class MockCloudAdminService implements AdminService {
   }
 
   @override
+  Future<List<Trip>> fetchUserTrips(String uid) async => [];
+
+  @override
+  Future<List<Expense>> fetchUserExpenses(String uid) async => [];
+
+  @override
+  Future<List<AdminUserSessionLog>> fetchUserSessions(String uid) async => [];
+
+  @override
+  Future<List<TravelCountry>> fetchUserTravelCountries(String uid) async => [];
+
+  @override
   Future<void> deleteUserDocumentAsAdmin({
     required String uid,
     required String documentId,
@@ -133,6 +150,39 @@ class MockCloudAdminService implements AdminService {
 
   @override
   Future<InactivityScanResult> processInactivityPolicies() async => const InactivityScanResult();
+
+  @override
+  Future<bool> sendBroadcastAnnouncement({
+    required String title,
+    required String message,
+    String type = 'discount',
+    String targetAction = 'paywall',
+    String targetAudience = 'all',
+    int? discountPercent,
+    String? actionLabel,
+  }) async => true;
+
+  @override
+  Future<List<BroadcastAnnouncement>> fetchBroadcastAnnouncements() async => [];
+
+  @override
+  Future<bool> toggleBroadcastActive(String broadcastId, bool active) async => true;
+
+  @override
+  Future<bool> deleteBroadcastAnnouncement(String broadcastId) async => true;
+
+  @override
+  Future<void> recordAuditLog({
+    required String action,
+    required String actionTitle,
+    required String targetUid,
+    String? targetUserEmail,
+    String? targetUserName,
+    Map<String, dynamic> details = const {},
+  }) async {}
+
+  @override
+  Future<List<AdminAuditLog>> fetchAuditLogs({int limit = 100}) async => const [];
 }
 
 void main() {
@@ -303,7 +353,7 @@ void main() {
     });
 
     testWidgets('Opens moderation sheet and inspects uploaded image & PDF vault documents', (tester) async {
-      tester.view.physicalSize = const Size(1000, 3200);
+      tester.view.physicalSize = const Size(1000, 4800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
 
@@ -361,6 +411,13 @@ void main() {
       );
       await tester.tap(moderateBtn);
       await tester.pumpAndSettle();
+
+      // Switch to Stats & Details tab (where vault documents are located)
+      final statsTab = find.byKey(const ValueKey('tab_user_stats_details'));
+      if (statsTab.evaluate().isNotEmpty) {
+        await tester.tap(statsTab);
+        await tester.pumpAndSettle();
+      }
 
       // Verify Uploaded Vault Documents section header and documents
       expect(find.text('Uploaded Vault Documents (Inspect / Moderate)'), findsOneWidget);

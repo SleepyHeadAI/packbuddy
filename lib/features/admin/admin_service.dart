@@ -5,6 +5,8 @@ import '../../core/services/email_dispatch_service.dart';
 import '../../core/services/notification_service.dart';
 import '../../data/local_db/database_helper.dart';
 import '../budget/domain/country.dart';
+import '../budget/domain/trip.dart';
+import '../budget/domain/expense.dart';
 import '../vault/domain/document.dart';
 import '../travel_map/data/world_countries_data.dart';
 import '../travel_map/domain/travel_country.dart';
@@ -17,6 +19,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../auth/auth_controller.dart';
+import 'domain/broadcast_announcement.dart';
+import 'domain/admin_audit_log.dart';
 
 /// Designated Executive Super Admin Email
 const String kAdminEmail = 'sleepyheadaitr@gmail.com';
@@ -556,6 +560,33 @@ class InactivityScanResult {
   });
 }
 
+class AdminUserSessionLog {
+  final int durationSeconds;
+  final DateTime timestamp;
+
+  const AdminUserSessionLog({
+    required this.durationSeconds,
+    required this.timestamp,
+  });
+
+  factory AdminUserSessionLog.fromMap(Map<String, dynamic> map) {
+    DateTime ts = DateTime.now();
+    final raw = map['timestamp'] ?? map['createdAt'];
+    if (raw is Timestamp) {
+      ts = raw.toDate();
+    } else if (raw is String) {
+      ts = DateTime.tryParse(raw) ?? ts;
+    } else if (raw is int) {
+      ts = DateTime.fromMillisecondsSinceEpoch(raw);
+    }
+    final sec = (map['durationSeconds'] ?? map['seconds'] ?? map['duration']) as num?;
+    return AdminUserSessionLog(
+      durationSeconds: sec?.toInt() ?? 0,
+      timestamp: ts,
+    );
+  }
+}
+
 /// Contract for Admin Data Service
 abstract class AdminService {
   Future<AdminPlatformMetrics> fetchMetrics();
@@ -571,6 +602,10 @@ abstract class AdminService {
     required List<String> restrictedFeatures,
   });
   Future<List<VaultDocument>> fetchUserDocuments(String uid);
+  Future<List<Trip>> fetchUserTrips(String uid);
+  Future<List<Expense>> fetchUserExpenses(String uid);
+  Future<List<AdminUserSessionLog>> fetchUserSessions(String uid);
+  Future<List<TravelCountry>> fetchUserTravelCountries(String uid);
   Future<void> deleteUserDocumentAsAdmin({required String uid, required String documentId});
   Future<void> cancelAccountDeletionAsAdmin(String uid);
   Future<void> purgeUserDataAsAdmin(String uid);
@@ -583,6 +618,27 @@ abstract class AdminService {
     bool sendInAppNotification = true,
     bool sendEmail = true,
   });
+  Future<bool> sendBroadcastAnnouncement({
+    required String title,
+    required String message,
+    String type = 'discount',
+    String targetAction = 'paywall',
+    String targetAudience = 'all',
+    int? discountPercent,
+    String? actionLabel,
+  });
+  Future<List<BroadcastAnnouncement>> fetchBroadcastAnnouncements();
+  Future<bool> toggleBroadcastActive(String broadcastId, bool active);
+  Future<bool> deleteBroadcastAnnouncement(String broadcastId);
+  Future<void> recordAuditLog({
+    required String action,
+    required String actionTitle,
+    required String targetUid,
+    String? targetUserEmail,
+    String? targetUserName,
+    Map<String, dynamic> details = const {},
+  });
+  Future<List<AdminAuditLog>> fetchAuditLogs({int limit = 100});
   Future<InactivityScanResult> processInactivityPolicies();
   bool isCurrentUserAdmin();
 }
@@ -1533,6 +1589,26 @@ class FirebaseAdminService implements AdminService {
         'updatedAt': DateTime.now().toIso8601String(),
       }, SetOptions(merge: true));
       await PreferencesService.instance.setProUser(isPremium, uid: uid);
+
+      // Audit log recording
+      String? targetEmail;
+      String? targetName;
+      try {
+        final uDoc = await firestore.collection('users').doc(uid).get();
+        if (uDoc.exists && uDoc.data() != null) {
+          targetEmail = uDoc.data()!['email'] as String?;
+          targetName = uDoc.data()!['displayName'] as String?;
+        }
+      } catch (_) {}
+
+      await recordAuditLog(
+        action: isPremium ? 'pro_grant' : 'pro_revoke',
+        actionTitle: isPremium ? 'Kullanıcıya Pro Lisansı Verildi' : 'Kullanıcının Pro Lisansı Geri Alındı',
+        targetUid: uid,
+        targetUserEmail: targetEmail,
+        targetUserName: targetName,
+        details: {'isPremium': isPremium},
+      );
     } catch (e) {
       debugPrint('[AdminService] toggleUserProStatus error: $e');
       rethrow;
@@ -1568,6 +1644,48 @@ class FirebaseAdminService implements AdminService {
           .doc(uid)
           .set(updates, SetOptions(merge: true));
       await PreferencesService.instance.setProUser(isPremium, uid: uid);
+
+      // Audit log recording
+      String? targetEmail;
+      String? targetName;
+      try {
+        final uDoc = await firestore.collection('users').doc(uid).get();
+        if (uDoc.exists && uDoc.data() != null) {
+          targetEmail = uDoc.data()!['email'] as String?;
+          targetName = uDoc.data()!['displayName'] as String?;
+        }
+      } catch (_) {}
+
+      String action = 'moderate_user';
+      String actionTitle = 'Kullanıcı Moderasyon Ayarları Güncellendi';
+      if (banStatus == 'banned') {
+        action = 'ban_user';
+        actionTitle = 'Kullanıcı Kalıcı Olarak Engellendi';
+      } else if (banStatus == 'temporary') {
+        action = 'ban_user';
+        actionTitle = 'Kullanıcı Geçici Olarak Engellendi';
+      } else if (banStatus == 'none' && restrictedFeatures.isNotEmpty) {
+        action = 'restrict_feature';
+        actionTitle = 'Kullanıcı Özellik Kısıtlamaları Güncellendi';
+      } else if (banStatus == 'none') {
+        action = 'unban_user';
+        actionTitle = 'Kullanıcı Engeli Kaldırıldı';
+      }
+
+      await recordAuditLog(
+        action: action,
+        actionTitle: actionTitle,
+        targetUid: uid,
+        targetUserEmail: targetEmail,
+        targetUserName: targetName,
+        details: {
+          'banStatus': banStatus,
+          'banReason': banReason ?? '',
+          'banExpiresAt': banExpiresAt ?? '',
+          'restrictedFeatures': restrictedFeatures,
+          'isPremium': isPremium,
+        },
+      );
     } catch (e) {
       debugPrint('[AdminService] updateUserModeration error: $e');
       rethrow;
@@ -1622,6 +1740,273 @@ class FirebaseAdminService implements AdminService {
   }
 
   @override
+  Future<List<Trip>> fetchUserTrips(String uid) async {
+    final firestore = _effectiveFirestore;
+    final trips = <Trip>[];
+
+    if (firestore != null) {
+      try {
+        var snapshot = await firestore
+            .collection('trips')
+            .where('user_id', isEqualTo: uid)
+            .get();
+        if (snapshot.docs.isEmpty) {
+          snapshot = await firestore
+              .collection('trips')
+              .where('userId', isEqualTo: uid)
+              .get();
+        }
+        for (final doc in snapshot.docs) {
+          try {
+            final data = doc.data();
+            final isDel = data['is_deleted'] == 1 || data['is_deleted'] == true || data['isDeleted'] == true;
+            if (!isDel) {
+              trips.add(Trip.fromMap(data));
+            }
+          } catch (_) {}
+        }
+      } catch (e) {
+        debugPrint('[AdminService] fetchUserTrips firestore error: $e');
+      }
+    }
+
+    if (trips.isEmpty) {
+      try {
+        final localTrips = await DatabaseHelper.instance.getTrips(userId: uid);
+        for (final t in localTrips) {
+          if (!t.isDeleted) {
+            trips.add(t);
+          }
+        }
+      } catch (e) {
+        debugPrint('[AdminService] fetchUserTrips local error: $e');
+      }
+    }
+
+    trips.sort((a, b) => b.startDate.compareTo(a.startDate));
+    return trips;
+  }
+
+  @override
+  Future<List<Expense>> fetchUserExpenses(String uid) async {
+    final firestore = _effectiveFirestore;
+    final expenses = <Expense>[];
+
+    if (firestore != null) {
+      try {
+        var snapshot = await firestore
+            .collection('expenses')
+            .where('user_id', isEqualTo: uid)
+            .get();
+        if (snapshot.docs.isEmpty) {
+          snapshot = await firestore
+              .collection('expenses')
+              .where('userId', isEqualTo: uid)
+              .get();
+        }
+        for (final doc in snapshot.docs) {
+          try {
+            final data = doc.data();
+            final isDel = data['is_deleted'] == 1 || data['is_deleted'] == true || data['isDeleted'] == true;
+            if (!isDel) {
+              expenses.add(Expense.fromMap(data));
+            }
+          } catch (_) {}
+        }
+      } catch (e) {
+        debugPrint('[AdminService] fetchUserExpenses firestore error: $e');
+      }
+    }
+
+    if (expenses.isEmpty) {
+      try {
+        final localExpenses = await DatabaseHelper.instance.getExpenses(userId: uid);
+        for (final e in localExpenses) {
+          if (!e.isDeleted) {
+            expenses.add(e);
+          }
+        }
+      } catch (e) {
+        debugPrint('[AdminService] fetchUserExpenses local error: $e');
+      }
+    }
+
+    expenses.sort((a, b) => b.date.compareTo(a.date));
+    return expenses;
+  }
+
+  @override
+  Future<List<AdminUserSessionLog>> fetchUserSessions(String uid) async {
+    final firestore = _effectiveFirestore;
+    final logs = <AdminUserSessionLog>[];
+
+    if (firestore != null) {
+      try {
+        final snap = await firestore
+            .collection('users')
+            .doc(uid)
+            .collection('sessions')
+            .orderBy('timestamp', descending: true)
+            .limit(200)
+            .get();
+        for (final d in snap.docs) {
+          try {
+            logs.add(AdminUserSessionLog.fromMap(d.data()));
+          } catch (_) {}
+        }
+      } catch (e) {
+        debugPrint('[AdminService] fetchUserSessions firestore error: $e');
+      }
+    }
+
+    if (logs.isEmpty) {
+      try {
+        final localLogs = PreferencesService.instance.getSessionLogs(uid: uid);
+        for (final m in localLogs) {
+          logs.add(AdminUserSessionLog.fromMap(m));
+        }
+      } catch (e) {
+        debugPrint('[AdminService] fetchUserSessions local error: $e');
+      }
+    }
+
+    logs.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    return logs;
+  }
+
+  @override
+  Future<List<TravelCountry>> fetchUserTravelCountries(String uid) async {
+    final firestore = _effectiveFirestore;
+    final Map<String, dynamic> rawCountryMap = {};
+
+    // 1. Fetch from Firestore users/{uid}.travelMapCountries
+    if (firestore != null) {
+      try {
+        final userDoc = await firestore.collection('users').doc(uid).get();
+        if (userDoc.exists && userDoc.data() != null) {
+          final data = userDoc.data()!;
+          if (data['travelMapCountries'] is Map) {
+            final tMap = Map<String, dynamic>.from(data['travelMapCountries'] as Map);
+            for (final e in tMap.entries) {
+              rawCountryMap[e.key.toUpperCase().trim()] = e.value;
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint('[AdminService] fetchUserTravelCountries user doc error: $e');
+      }
+
+      // 2. Fetch from Firestore travel_map collection filtered strictly by user_id
+      try {
+        var snap = await firestore
+            .collection('travel_map')
+            .where('user_id', isEqualTo: uid)
+            .get();
+        if (snap.docs.isEmpty) {
+          snap = await firestore
+              .collection('travel_map')
+              .where('userId', isEqualTo: uid)
+              .get();
+        }
+        for (final doc in snap.docs) {
+          final d = doc.data();
+          final isDel = d['is_deleted'] == 1 || d['is_deleted'] == true || d['isDeleted'] == true;
+          if (isDel) continue;
+          final code = (d['code'] ?? d['country_code'] ?? '').toString().toUpperCase().trim();
+          if (code.isNotEmpty) {
+            rawCountryMap[code] = {
+              'status': d['status'] ?? 'visited',
+              'visitedDate': d['visited_date'] ?? d['visitedDate'],
+              'notes': d['notes'],
+            };
+          }
+        }
+      } catch (e) {
+        debugPrint('[AdminService] fetchUserTravelCountries travel_map collection error: $e');
+      }
+    }
+
+    // 3. Fallback: local SQLite filtered strictly by this user's UID (no empty/guest rows)
+    if (rawCountryMap.isEmpty) {
+      try {
+        final localRows = await DatabaseHelper.instance.getTravelMapCountries(userId: uid);
+        for (final row in localRows) {
+          final code = (row['country_code'] ?? '').toString().toUpperCase().trim();
+          if (code.isNotEmpty) {
+            rawCountryMap[code] = {
+              'status': row['status'] ?? 'visited',
+              'visitedDate': row['visited_date'],
+              'notes': row['notes'],
+            };
+          }
+        }
+      } catch (e) {
+        debugPrint('[AdminService] fetchUserTravelCountries local SQLite error: $e');
+      }
+    }
+
+    // 4. Fallback: user-scoped SharedPreferences
+    if (rawCountryMap.isEmpty) {
+      try {
+        final rawJson = PreferencesService.instance.getScopedTravelCountriesJson(uid);
+        if (rawJson != null && rawJson.isNotEmpty) {
+          final decoded = jsonDecode(rawJson);
+          if (decoded is Map) {
+            for (final e in decoded.entries) {
+              rawCountryMap[e.key.toString().toUpperCase().trim()] = e.value;
+            }
+          }
+        }
+      } catch (e) {
+        debugPrint('[AdminService] fetchUserTravelCountries scoped prefs error: $e');
+      }
+    }
+
+    // 5. Map entries into WorldCountriesData.allCountries strictly for this user
+    return WorldCountriesData.allCountries.map((c) {
+      final codeUpper = c.code.toUpperCase().trim();
+      final userEntry = rawCountryMap[codeUpper];
+      if (userEntry == null) return c;
+
+      String statusStr = '';
+      DateTime? vDate;
+      String? notes;
+
+      if (userEntry is Map) {
+        statusStr = (userEntry['status'] ?? '').toString().toLowerCase().trim();
+        final rawDate = userEntry['visitedDate'] ?? userEntry['visited_date'];
+        if (rawDate is int) {
+          vDate = DateTime.fromMillisecondsSinceEpoch(rawDate);
+        } else if (rawDate is String) {
+          vDate = DateTime.tryParse(rawDate);
+        }
+        notes = userEntry['notes']?.toString();
+      } else if (userEntry is String) {
+        statusStr = userEntry.toLowerCase().trim();
+      }
+
+      CountryStatus status = CountryStatus.none;
+      if (statusStr.contains('visited') || statusStr == 'gezilen' || statusStr == 'gezi') {
+        status = CountryStatus.visited;
+      } else if (statusStr.contains('wish') || statusStr == 'hedef' || statusStr == 'istek') {
+        status = CountryStatus.wishlist;
+      } else if (statusStr.contains('lived') || statusStr == 'yasayan') {
+        status = CountryStatus.lived;
+      }
+
+      if (status == CountryStatus.none) {
+        return c;
+      }
+
+      return c.copyWith(
+        status: status,
+        visitedDate: vDate,
+        notes: notes,
+      );
+    }).toList();
+  }
+
+  @override
   Future<void> deleteUserDocumentAsAdmin({
     required String uid,
     required String documentId,
@@ -1635,6 +2020,14 @@ class FirebaseAdminService implements AdminService {
         'updated_at': DateTime.now().millisecondsSinceEpoch,
         'updatedAt': DateTime.now().toIso8601String(),
       }, SetOptions(merge: true));
+
+      await recordAuditLog(
+        action: 'delete_document',
+        actionTitle: 'Kullanıcı Kasa Belgesi Silindi',
+        targetUid: uid,
+        details: {'documentId': documentId},
+      );
+
       TelemetryService.instance.logAdminAction(
         action: 'delete_user_document',
         targetUid: uid,
@@ -1657,6 +2050,13 @@ class FirebaseAdminService implements AdminService {
         'scheduledPermanentDeletionAt': null,
         'updatedAt': DateTime.now().toIso8601String(),
       }, SetOptions(merge: true));
+
+      await recordAuditLog(
+        action: 'cancel_deletion',
+        actionTitle: 'Hesap Silme Talebi İptal Edildi',
+        targetUid: uid,
+      );
+
       TelemetryService.instance.logAdminAction(
         action: 'cancel_account_deletion',
         targetUid: uid,
@@ -1672,6 +2072,19 @@ class FirebaseAdminService implements AdminService {
     final firestore = _effectiveFirestore;
     if (firestore == null) return;
     try {
+      // 1. Fetch user snapshot first to preserve details for audit logging
+      String targetEmail = '';
+      String targetName = '';
+      try {
+        final uDoc = await firestore.collection('users').doc(uid).get();
+        if (uDoc.exists && uDoc.data() != null) {
+          final d = uDoc.data()!;
+          targetEmail = (d['email'] as String?) ?? '';
+          targetName = (d['displayName'] as String?) ?? '';
+        }
+      } catch (_) {}
+
+      // 2. Delete linked collections
       final collections = ['trips', 'expenses', 'checklist_items', 'documents'];
       for (final coll in collections) {
         try {
@@ -1689,15 +2102,58 @@ class FirebaseAdminService implements AdminService {
           }
         } catch (_) {}
       }
-      await firestore.collection('users').doc(uid).set({
-        'deletionStatus': 'none',
-        'deletionRequestedAt': null,
-        'scheduledPermanentDeletionAt': null,
-        'isPremium': false,
-        'totalVaultStorageBytes': 0,
-        'travelMapCountries': {},
-        'updatedAt': DateTime.now().toIso8601String(),
-      }, SetOptions(merge: true));
+
+      // Also clean feedback linked to this user
+      try {
+        final fbSnap1 = await firestore.collection('feedback').where('user_id', isEqualTo: uid).get();
+        for (final doc in fbSnap1.docs) {
+          await doc.reference.delete();
+        }
+      } catch (_) {}
+      try {
+        final fbSnap2 = await firestore.collection('feedback').where('userId', isEqualTo: uid).get();
+        for (final doc in fbSnap2.docs) {
+          await doc.reference.delete();
+        }
+      } catch (_) {}
+
+      // 3. Delete user subcollections
+      final subcollections = ['notifications', 'sessions', 'vault_documents'];
+      for (final sub in subcollections) {
+        try {
+          final subSnap = await firestore.collection('users').doc(uid).collection(sub).get();
+          for (final doc in subSnap.docs) {
+            await doc.reference.delete();
+          }
+        } catch (_) {}
+      }
+
+      // 4. Delete the root user document completely from Firestore!
+      await firestore.collection('users').doc(uid).delete();
+
+      // 5. Record real persistent audit log
+      await recordAuditLog(
+        action: 'purge_user',
+        actionTitle: 'Kullanıcı ve Tüm Verileri Kalıcı Olarak Silindi',
+        targetUid: uid,
+        targetUserEmail: targetEmail.isNotEmpty ? targetEmail : null,
+        targetUserName: targetName.isNotEmpty ? targetName : null,
+        details: {
+          'reason': 'Yönetici tarafından kalıcı silindi',
+          'deletedCollections': [
+            'trips',
+            'expenses',
+            'checklist_items',
+            'documents',
+            'feedback',
+            'notifications',
+            'sessions',
+            'vault_documents',
+          ],
+          'purgedAt': DateTime.now().toIso8601String(),
+        },
+      );
+
       TelemetryService.instance.logAdminAction(
         action: 'purge_user_data',
         targetUid: uid,
@@ -1854,8 +2310,10 @@ class FirebaseAdminService implements AdminService {
 
         // If warning is addressed to the active local user on this device, immediately trigger local notification & history!
         if (currentUid == uid) {
+          final notifId = notifRef?.id ?? '$nowTimestamp';
+          await PreferencesService.instance.markNotificationDelivered(notifId);
           final recordJson = jsonEncode({
-            'id': notifRef?.id ?? '$nowTimestamp',
+            'id': notifId,
             'title': title,
             'body': message,
             'timestamp': nowTimestamp,
@@ -1868,7 +2326,7 @@ class FirebaseAdminService implements AdminService {
               id: (nowTimestamp % 1000000000).abs(),
               title: title,
               body: message,
-              payload: 'admin_warning:${notifRef?.id ?? nowTimestamp}',
+              payload: 'admin_warning:$notifId',
             );
           } catch (e) {
             debugPrint('[AdminService] Local notification dispatch error: $e');
@@ -1924,6 +2382,20 @@ class FirebaseAdminService implements AdminService {
         }, SetOptions(merge: true));
       }
 
+      await recordAuditLog(
+        action: 'send_warning',
+        actionTitle: 'Kullanıcıya Yönetici Uyarısı Gönderildi: $title',
+        targetUid: uid,
+        targetUserEmail: email.isNotEmpty ? email : null,
+        targetUserName: displayName.isNotEmpty ? displayName : null,
+        details: {
+          'warningType': warningType,
+          'message': message,
+          'sentEmail': sendEmail,
+          'sentInApp': sendInAppNotification,
+        },
+      );
+
       TelemetryService.instance.logAdminAction(
         action: 'send_user_warning',
         targetUid: uid,
@@ -1933,6 +2405,215 @@ class FirebaseAdminService implements AdminService {
     } catch (e) {
       debugPrint('[AdminService] sendUserWarning error: $e');
       return false;
+    }
+  }
+
+  @override
+  Future<bool> sendBroadcastAnnouncement({
+    required String title,
+    required String message,
+    String type = 'discount',
+    String targetAction = 'paywall',
+    String targetAudience = 'all',
+    int? discountPercent,
+    String? actionLabel,
+  }) async {
+    final firestore = _effectiveFirestore;
+    if (firestore == null) {
+      debugPrint('[AdminService] Firestore not initialized for broadcast.');
+      return false;
+    }
+
+    try {
+      final now = DateTime.now();
+      final adminUser = _effectiveAuth?.currentUser;
+      final sentBy = adminUser?.email ?? kAdminEmail;
+
+      final docRef = await firestore.collection('broadcast_announcements').add({
+        'title': title,
+        'message': message,
+        'type': type,
+        'targetAction': targetAction,
+        'targetAudience': targetAudience,
+        'discountPercent': discountPercent,
+        'actionLabel': actionLabel,
+        'active': true,
+        'sentBy': sentBy,
+        'createdAt': FieldValue.serverTimestamp(),
+        'timestamp': now.millisecondsSinceEpoch,
+      });
+
+      // Update doc with its generated ID
+      await docRef.set({'id': docRef.id}, SetOptions(merge: true));
+
+      // Also publish a global latest broadcast signal to trigger active client listeners
+      await firestore.collection('system_announcements').doc('latest').set({
+        'id': docRef.id,
+        'title': title,
+        'message': message,
+        'type': type,
+        'targetAction': targetAction,
+        'targetAudience': targetAudience,
+        'discountPercent': discountPercent,
+        'active': true,
+        'timestamp': now.millisecondsSinceEpoch,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      // If active admin user on this device matches audience, mark delivered immediately so no duplicate
+      await PreferencesService.instance.markNotificationDelivered(docRef.id);
+
+      await recordAuditLog(
+        action: 'broadcast_sent',
+        actionTitle: 'Toplu Kampanya / Duyuru Gönderildi: $title',
+        targetUid: 'broadcast_all',
+        details: {
+          'type': type,
+          'targetAudience': targetAudience,
+          'targetAction': targetAction,
+          'discountPercent': discountPercent,
+          'actionLabel': actionLabel,
+          'broadcastId': docRef.id,
+        },
+      );
+
+      TelemetryService.instance.logAdminAction(
+        action: 'send_broadcast_announcement',
+        targetUid: 'ALL_USERS',
+      );
+
+      return true;
+    } catch (e) {
+      debugPrint('[AdminService] sendBroadcastAnnouncement error: $e');
+      return false;
+    }
+  }
+
+  @override
+  Future<List<BroadcastAnnouncement>> fetchBroadcastAnnouncements() async {
+    final firestore = _effectiveFirestore;
+    if (firestore == null) return [];
+
+    try {
+      final snap = await firestore
+          .collection('broadcast_announcements')
+          .orderBy('createdAt', descending: true)
+          .limit(50)
+          .get();
+
+      return snap.docs
+          .map((doc) => BroadcastAnnouncement.fromMap(doc.data(), doc.id))
+          .toList();
+    } catch (e) {
+      debugPrint('[AdminService] fetchBroadcastAnnouncements error: $e');
+      return [];
+    }
+  }
+
+  @override
+  Future<bool> toggleBroadcastActive(String broadcastId, bool active) async {
+    final firestore = _effectiveFirestore;
+    if (firestore == null) return false;
+
+    try {
+      await firestore.collection('broadcast_announcements').doc(broadcastId).set({
+        'active': active,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+
+      TelemetryService.instance.logAdminAction(
+        action: 'toggle_broadcast_active',
+        targetUid: broadcastId,
+      );
+      return true;
+    } catch (e) {
+      debugPrint('[AdminService] toggleBroadcastActive error: $e');
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> deleteBroadcastAnnouncement(String broadcastId) async {
+    final firestore = _effectiveFirestore;
+    if (firestore == null) return false;
+
+    try {
+      await firestore.collection('broadcast_announcements').doc(broadcastId).delete();
+      TelemetryService.instance.logAdminAction(
+        action: 'delete_broadcast_announcement',
+        targetUid: broadcastId,
+      );
+      return true;
+    } catch (e) {
+      debugPrint('[AdminService] deleteBroadcastAnnouncement error: $e');
+      return false;
+    }
+  }
+
+  @override
+  Future<void> recordAuditLog({
+    required String action,
+    required String actionTitle,
+    required String targetUid,
+    String? targetUserEmail,
+    String? targetUserName,
+    Map<String, dynamic> details = const {},
+  }) async {
+    final firestore = _effectiveFirestore;
+    if (firestore == null) return;
+
+    try {
+      final now = DateTime.now();
+      final adminEmail = _effectiveAuth?.currentUser?.email ?? kAdminEmail;
+      final docRef = firestore.collection('admin_audit_logs').doc();
+      final log = AdminAuditLog(
+        id: docRef.id,
+        action: action,
+        actionTitle: actionTitle,
+        adminEmail: adminEmail,
+        targetUid: targetUid,
+        targetUserEmail: targetUserEmail,
+        targetUserName: targetUserName,
+        details: details,
+        timestamp: now,
+      );
+      await docRef.set(log.toMap());
+    } catch (e) {
+      debugPrint('[AdminService] recordAuditLog error: $e');
+    }
+  }
+
+  @override
+  Future<List<AdminAuditLog>> fetchAuditLogs({int limit = 100}) async {
+    final firestore = _effectiveFirestore;
+    if (firestore == null) return const [];
+
+    try {
+      final snap = await firestore
+          .collection('admin_audit_logs')
+          .orderBy('timestamp', descending: true)
+          .limit(limit)
+          .get();
+
+      return snap.docs
+          .map((doc) => AdminAuditLog.fromMap(doc.data(), doc.id))
+          .toList();
+    } catch (e) {
+      // Fallback in case of index creation or mock environment
+      try {
+        final snap = await firestore
+            .collection('admin_audit_logs')
+            .limit(limit)
+            .get();
+        final list = snap.docs
+            .map((doc) => AdminAuditLog.fromMap(doc.data(), doc.id))
+            .toList();
+        list.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+        return list;
+      } catch (e2) {
+        debugPrint('[AdminService] fetchAuditLogs error: $e2');
+        return const [];
+      }
     }
   }
 
@@ -1991,6 +2672,21 @@ class FirebaseAdminService implements AdminService {
           }
         }
       }
+    }
+
+    if (purged > 0 || warnings > 0) {
+      await recordAuditLog(
+        action: 'inactivity_scan',
+        actionTitle: 'Otomatik İnaktiflik Taraması Tamamlandı',
+        targetUid: 'system_scan',
+        details: {
+          'totalScanned': users.length,
+          'warningsSent': warnings,
+          'accountsPurged': purged,
+          'purgedUserEmails': purgedEmails,
+          'warningUserEmails': warningEmails,
+        },
+      );
     }
 
     return InactivityScanResult(

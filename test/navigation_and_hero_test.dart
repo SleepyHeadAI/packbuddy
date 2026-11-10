@@ -93,8 +93,8 @@ void main() {
       await tester.pumpWidget(createTestWidget(child: const DashboardScreen()));
       await tester.pumpAndSettle();
 
-      // Navigate to TripsScreen via Bento card
-      final tripsCard = find.widgetWithText(InkWell, 'Seyahatler');
+      // Navigate to TripsScreen via View All button
+      final tripsCard = find.text('Tümünü Gör');
       expect(tripsCard, findsWidgets);
       await tester.tap(tripsCard.first);
       await tester.pumpAndSettle();
@@ -122,14 +122,21 @@ void main() {
     });
 
     testWidgets('VaultScreen FAB has heroTag null and leading back button pops properly', (tester) async {
+      tester.view.physicalSize = const Size(1000, 2000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.resetPhysicalSize());
+
       await tester.pumpWidget(createTestWidget(child: const DashboardScreen()));
       await tester.pumpAndSettle();
 
       // Navigate to VaultScreen via Bento card
-      final vaultCard = find.widgetWithText(InkWell, 'Belge Kasası');
+      await tester.scrollUntilVisible(
+        find.text('Belge Kasası'),
+        200.0,
+        scrollable: find.byType(Scrollable).first,
+      );
+      final vaultCard = find.text('Belge Kasası');
       expect(vaultCard, findsWidgets);
-      await tester.ensureVisible(vaultCard.first);
-      await tester.pumpAndSettle();
       await tester.tap(vaultCard.first);
       await tester.pumpAndSettle();
 

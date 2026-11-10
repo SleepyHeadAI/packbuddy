@@ -41,6 +41,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
     'Kişisel Bakım',
     'Belgeler',
     'Aksesuar',
+    'Diğer',
   ];
 
   @override
@@ -681,28 +682,39 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                           final categoryLabels = {
                             'Tümü': l10n.allCategories,
                             'Kıyafet': l10n.categoryClothing,
+                            'Giyim': l10n.categoryClothing,
                             'Elektronik': l10n.categoryElectronics,
                             'Kişisel Bakım': l10n.categoryToiletries,
                             'Belgeler': l10n.categoryDocuments,
                             'Aksesuar': l10n.categoryAccessories,
+                            'Diğer': l10n.other == 'Other' ? 'Others' : l10n.other,
                           };
                           final categoryIcons = {
                             'Tümü': Icons.grid_view_rounded,
                             'Kıyafet': Icons.checkroom_rounded,
+                            'Giyim': Icons.checkroom_rounded,
                             'Elektronik': Icons.devices_rounded,
                             'Kişisel Bakım': Icons.spa_rounded,
                             'Belgeler': Icons.description_rounded,
                             'Aksesuar': Icons.watch_rounded,
+                            'Diğer': Icons.more_horiz_rounded,
                           };
                           final displayLabel = categoryLabels[category] ?? category;
                           final displayIcon = categoryIcons[category] ?? Icons.category_rounded;
                           final isSelected = (category == 'Tümü' && checklistState.selectedCategory == null) ||
-                              (checklistState.selectedCategory == category);
+                              (checklistState.selectedCategory == category) ||
+                              (checklistState.selectedCategory != null &&
+                                  ChecklistState.normalizeCategoryToken(checklistState.selectedCategory!) ==
+                                      ChecklistState.normalizeCategoryToken(category));
 
                           return BouncyPressable(
                             scaleFactor: 0.92,
                             onTap: () {
-                              controller.setCategoryFilter(category == 'Tümü' ? null : category);
+                              if (isSelected && category != 'Tümü') {
+                                controller.setCategoryFilter(null);
+                              } else {
+                                controller.setCategoryFilter(category == 'Tümü' ? null : category);
+                              }
                             },
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 220),

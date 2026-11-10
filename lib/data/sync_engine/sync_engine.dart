@@ -77,6 +77,7 @@ class SyncEngine extends StateNotifier<SyncState> {
   final Ref? ref;
   final void Function(bool isPro)? onProStatusSynced;
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _userDocSubscription;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _broadcastSubscription;
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
   final Map<String, List<StreamSubscription>> _sharedTripSubscriptions = {};
   Timer? _debounceTimer;
@@ -176,16 +177,12 @@ class SyncEngine extends StateNotifier<SyncState> {
     if (!isFirebaseReady && _firestoreInstance == null) return;
     final firestore = _firestoreInstance ?? FirebaseFirestore.instance;
 
-    bool isInitialSnapshot = true;
-
     _userDocSubscription = firestore
         .collection('users')
         .doc(uid)
         .snapshots()
         .listen(
-      (snapshot) {
-        final isFirst = isInitialSnapshot;
-        isInitialSnapshot = false;
+      (snapshot) async {
         if (snapshot.exists && snapshot.data() != null) {
           final data = snapshot.data()!;
           final bool hasProKey = data.containsKey('isPremium') ||
@@ -219,7 +216,7 @@ class SyncEngine extends StateNotifier<SyncState> {
           if (data.containsKey('latestAdminWarning')) {
             final warningMap = data['latestAdminWarning'];
             if (warningMap is Map) {
-              final wId = warningMap['id']?.toString() ?? '';
+              final wId = warningMap['id']?.toString() ?? 'warn_${warningMap['timestamp'] ?? DateTime.now().millisecondsSinceEpoch}';
               final wTitle = warningMap['title']?.toString() ?? 'PackBuddy Bildirimi';
               final wBody = warningMap['message']?.toString() ?? '';
               final wTimestamp = (warningMap['timestamp'] as num?)?.toInt() ?? 0;
@@ -227,11 +224,13 @@ class SyncEngine extends StateNotifier<SyncState> {
               final localLastSeen = PreferencesService.instance.getLastSeenAdminWarningAt(uid: uid);
               final effectiveLastSeen = cloudLastSeen > localLastSeen ? cloudLastSeen : localLastSeen;
 
-              final nowMs = DateTime.now().millisecondsSinceEpoch;
-              final isOldWarning = (nowMs - wTimestamp) > 180000; // > 3 minutes old
+              // Anti-repeat deduplication: Ensure each warning ID is delivered exactly once
+              final bool isDelivered = PreferencesService.instance.hasDeliveredNotification(wId);
+              final bool isNewTimestamp = wTimestamp > effectiveLastSeen;
 
-              if (wTimestamp > effectiveLastSeen) {
-                PreferencesService.instance.setLastSeenAdminWarningAt(wTimestamp, uid: uid);
+              if (!isDelivered && (isNewTimestamp || effectiveLastSeen == 0)) {
+                await PreferencesService.instance.markNotificationDelivered(wId);
+                await PreferencesService.instance.setLastSeenAdminWarningAt(wTimestamp, uid: uid);
                 try {
                   firestore.collection('users').doc(uid).set({
                     'lastSeenAdminWarningAt': wTimestamp,
@@ -245,20 +244,19 @@ class SyncEngine extends StateNotifier<SyncState> {
                   'timestamp': wTimestamp > 0 ? wTimestamp : DateTime.now().millisecondsSinceEpoch,
                   'type': 'admin_warning',
                 });
-                PreferencesService.instance.addNotificationHistoryItem(recordJson);
+                await PreferencesService.instance.addNotificationHistoryItem(recordJson);
 
-                // Do not pop instant heads-up alert if this is an old historical warning on first app load / reinstall
-                final shouldAlert = !isOldWarning && !isFirst;
-                if (shouldAlert) {
-                  try {
-                    final notifService = ref?.read(notificationServiceProvider);
-                    notifService?.showInstantNotification(
-                      id: (wTimestamp % 1000000000).abs(),
-                      title: wTitle,
-                      body: wBody,
-                      payload: 'admin_warning:$wId',
-                    );
-                  } catch (_) {}
+                // Show phone notification immediately so user ALWAYS receives it
+                try {
+                  final notifService = ref?.read(notificationServiceProvider);
+                  await notifService?.showInstantNotification(
+                    id: (wId.hashCode % 1000000000).abs(),
+                    title: wTitle,
+                    body: wBody,
+                    payload: 'admin_warning:$wId',
+                  );
+                } catch (e) {
+                  debugPrint('[SyncEngine] Warning notification error: $e');
                 }
               }
             }
@@ -269,12 +267,79 @@ class SyncEngine extends StateNotifier<SyncState> {
         debugPrint('[SyncEngine] userDoc subscription error: $err');
       },
     );
+
+    // Also start real-time listener for active broadcast announcements & marketing campaigns
+    _listenToBroadcastAnnouncements(uid, firestore);
   }
 
-  /// Cancels any active Firestore user profile listener
+  /// Listens to active broadcast campaigns & announcements with deduplication
+  void _listenToBroadcastAnnouncements(String uid, FirebaseFirestore firestore) {
+    _broadcastSubscription?.cancel();
+    try {
+      _broadcastSubscription = firestore
+          .collection('broadcast_announcements')
+          .where('active', isEqualTo: true)
+          .snapshots()
+          .listen((snapshot) async {
+        for (final doc in snapshot.docs) {
+          final data = doc.data();
+          final bId = doc.id;
+          final targetAudience = data['targetAudience']?.toString() ?? 'all';
+          final isPro = PreferencesService.instance.isProUser(uid: uid);
+
+          // Target audience segmentation filter
+          if (targetAudience == 'free_only' && isPro) continue;
+          if (targetAudience == 'pro_only' && !isPro) continue;
+
+          // Deduplication: Only alert if not already delivered to this device
+          if (!PreferencesService.instance.hasDeliveredNotification(bId)) {
+            await PreferencesService.instance.markNotificationDelivered(bId);
+
+            final title = data['title']?.toString() ?? 'PackBuddy Fırsatı 🚀';
+            final body = data['message']?.toString() ?? data['body']?.toString() ?? '';
+            final type = data['type']?.toString() ?? 'broadcast_discount';
+            final targetAction = data['targetAction']?.toString() ?? 'paywall';
+            final discount = (data['discountPercent'] as num?)?.toInt();
+            final ts = (data['timestamp'] as num?)?.toInt() ?? DateTime.now().millisecondsSinceEpoch;
+
+            final recordJson = jsonEncode({
+              'id': bId,
+              'title': title,
+              'body': body,
+              'timestamp': ts,
+              'type': type,
+              'targetAction': targetAction,
+              'discountPercent': ?discount,
+            });
+            await PreferencesService.instance.addNotificationHistoryItem(recordJson);
+
+            try {
+              final notifService = ref?.read(notificationServiceProvider);
+              await notifService?.showInstantNotification(
+                id: (bId.hashCode % 1000000000).abs(),
+                title: title,
+                body: body,
+                payload: 'broadcast:$targetAction:$bId',
+              );
+            } catch (e) {
+              debugPrint('[SyncEngine] Broadcast notification error: $e');
+            }
+          }
+        }
+      }, onError: (err) {
+        debugPrint('[SyncEngine] Broadcast listener notice: $err');
+      });
+    } catch (e) {
+      debugPrint('[SyncEngine] Error attaching broadcast listener: $e');
+    }
+  }
+
+  /// Cancels any active Firestore user profile and broadcast listener
   void cancelUserDocSubscription() {
     _userDocSubscription?.cancel();
     _userDocSubscription = null;
+    _broadcastSubscription?.cancel();
+    _broadcastSubscription = null;
     cancelAllSharedTripListeners();
   }
 
@@ -420,6 +485,7 @@ class SyncEngine extends StateNotifier<SyncState> {
   @override
   void dispose() {
     _userDocSubscription?.cancel();
+    _broadcastSubscription?.cancel();
     _connectivitySubscription?.cancel();
     cancelAllSharedTripListeners();
     _debounceTimer?.cancel();

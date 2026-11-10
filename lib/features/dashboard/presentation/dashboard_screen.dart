@@ -10,6 +10,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../data/sync_engine/sync_engine.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/app_card.dart';
+import '../../../shared/widgets/app_logo.dart';
 import '../../../shared/widgets/status_badge.dart';
 import '../../budget/domain/country.dart';
 import '../../budget/domain/city_localization.dart';
@@ -29,6 +30,8 @@ import '../../../core/services/app_widget_service.dart';
 import '../../../core/services/preferences_service.dart';
 import '../../travel_map/presentation/controllers/travel_map_controller.dart';
 import '../../../core/l10n/language_selector_sheet.dart';
+import '../../settings/presentation/screens/settings_screen.dart';
+import '../../vault/presentation/screens/vault_screen.dart';
 import 'navigation_provider.dart';
 import 'widgets/notifications_center_sheet.dart';
 import 'widgets/bento_hub_grid.dart';
@@ -271,6 +274,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            const AppLogo.transparent(size: 28),
+            const SizedBox(width: 9),
             Flexible(
               child: Text(
                 l10n.appName,
@@ -388,7 +393,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             tooltip: l10n.settings,
             onPressed: () {
-              ref.read(mainNavigationIndexProvider.notifier).state = 4;
+              Navigator.of(context).push(
+                _createSmoothRoute(const SettingsScreen()),
+              );
             },
           ),
           const SizedBox(width: 8),
@@ -751,20 +758,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 );
               },
               onOpenVault: () {
-                ref.read(mainNavigationIndexProvider.notifier).state = 3;
+                Navigator.of(context).push(
+                  _createSmoothRoute(const VaultScreen()),
+                );
               },
-            ),
-            const SizedBox(height: 24),
-
-            // Footer Architecture Phase
-            Center(
-              child: Text(
-                l10n.architecturePhase,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                  letterSpacing: 0.4,
-                ),
-              ),
             ),
             const SizedBox(height: 20),
           ],

@@ -12,16 +12,18 @@ class DonutChartPainter extends CustomPainter {
   final List<double> values;
   final List<Color> colors;
   final double strokeWidth;
+  final double progress;
 
   DonutChartPainter({
     required this.values,
     required this.colors,
     this.strokeWidth = 14.0,
+    this.progress = 1.0,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (values.isEmpty) return;
+    if (values.isEmpty || progress <= 0) return;
 
     final total = values.fold<double>(0.0, (sum, v) => sum + v);
     if (total <= 0) return;
@@ -30,7 +32,7 @@ class DonutChartPainter extends CustomPainter {
     final radius = (math.min(size.width, size.height) - strokeWidth) / 2;
 
     double startAngle = -math.pi / 2;
-    final totalArc = 2 * math.pi;
+    final totalArc = 2 * math.pi * progress;
 
     for (int i = 0; i < values.length; i++) {
       final sweepAngle = (values[i] / total) * totalArc;
@@ -41,7 +43,7 @@ class DonutChartPainter extends CustomPainter {
         ..strokeCap = StrokeCap.round;
 
       // Slight gap between segments
-      final gap = values.length > 1 ? 0.04 : 0.0;
+      final gap = values.length > 1 ? 0.04 * progress : 0.0;
       if (sweepAngle > gap) {
         canvas.drawArc(
           Rect.fromCircle(center: center, radius: radius),
@@ -57,7 +59,9 @@ class DonutChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant DonutChartPainter oldDelegate) {
-    return oldDelegate.values != values || oldDelegate.colors != colors;
+    return oldDelegate.values != values ||
+        oldDelegate.colors != colors ||
+        oldDelegate.progress != progress;
   }
 }
 
@@ -170,7 +174,6 @@ class BudgetAnalyticsCard extends StatelessWidget {
     double? plannedDailyBudget;
     double? projectedTotal;
     int tripDays = 1;
-    int remainingDays = 0;
     String pacingStatus = 'onTrack';
 
     if (trip != null) {
@@ -182,24 +185,62 @@ class BudgetAnalyticsCard extends StatelessWidget {
       final tripStart = DateTime(trip!.startDate.year, trip!.startDate.month, trip!.startDate.day);
       final tripEnd = DateTime(trip!.endDate.year, trip!.endDate.month, trip!.endDate.day);
 
-      int elapsedDays = todayDate.difference(tripStart).inDays + 1;
-      if (elapsedDays < 1) elapsedDays = 1;
-      if (elapsedDays > tripDays) elapsedDays = tripDays;
+      final bool isUpcoming = todayDate.isBefore(tripStart);
+      final bool isPast = todayDate.isAfter(tripEnd);
 
-      remainingDays = tripEnd.difference(todayDate).inDays;
-      if (remainingDays < 0) remainingDays = 0;
+      int elapsedDays;
+      if (isUpcoming) {
+        elapsedDays = 0;
+        // Seyahat henüz başlamadı: harcamalar ön hazırlık/rezervasyon harcamalarıdır.
+        // Günlük harcama oranı, seyahat günlerine yayılan peşin maliyet payıdır.
+        dailyBurnRate = totalSpent / tripDays;
+      } else if (isPast) {
+        elapsedDays = tripDays;
+        dailyBurnRate = totalSpent / tripDays;
+      } else {
+        // Devam eden seyahat
+        elapsedDays = (todayDate.difference(tripStart).inDays + 1).clamp(1, tripDays);
+        dailyBurnRate = totalSpent / elapsedDays;
+      }
 
-      dailyBurnRate = totalSpent / elapsedDays;
       if (trip!.budgetLimit != null && trip!.budgetLimit! > 0) {
-        plannedDailyBudget = trip!.budgetLimit! / tripDays;
-        projectedTotal = dailyBurnRate * tripDays;
+        final limit = trip!.budgetLimit!;
+        plannedDailyBudget = limit / tripDays;
+        final budgetRatio = totalSpent / limit;
 
-        if (totalSpent > trip!.budgetLimit!) {
+        if (totalSpent > limit) {
           pacingStatus = 'over';
-        } else if (projectedTotal > trip!.budgetLimit!) {
-          pacingStatus = 'warning';
-        } else {
+        } else if (isUpcoming) {
+          // Seyahat başlamadan önce yapılan 1-2 harcama (uçak/otel vb.) bütçenin %90'ını aşmadıkça 'onTrack' kalmalıdır.
+          pacingStatus = budgetRatio >= 0.90 ? 'warning' : 'onTrack';
+        } else if (isPast) {
           pacingStatus = 'onTrack';
+        } else {
+          // Devam eden seyahat tempo analizi:
+          final double timeRatio = elapsedDays / tripDays;
+
+          // Erken aşama koruması: Seyahatin ilk gününde veya ilk 1-2 harcamada
+          // bütçenin %45'inden azı harcanmışsa asla erkenden 'Yüksek Harcama Hızı' uyarısı verilmemelidir.
+          if (elapsedDays <= 1 || expenses.length <= 2) {
+            if (budgetRatio <= 0.45) {
+              pacingStatus = 'onTrack';
+            } else if (budgetRatio > 0.85) {
+              pacingStatus = 'warning';
+            } else {
+              pacingStatus = 'onTrack';
+            }
+          } else {
+            projectedTotal = dailyBurnRate * tripDays;
+            // Seyahatin ilerleyen günlerinde: bütçenin en az %35'i harcanmışsa,
+            // harcama zaman ilerlemesinin belirgin (%20) önündeyse ve öngörülen toplam bütçeyi aşıyorsa:
+            if (budgetRatio >= 0.35 &&
+                budgetRatio > (timeRatio + 0.20) &&
+                projectedTotal > (limit * 1.10)) {
+              pacingStatus = 'warning';
+            } else {
+              pacingStatus = 'onTrack';
+            }
+          }
         }
       }
     }
@@ -347,13 +388,21 @@ class BudgetAnalyticsCard extends StatelessWidget {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  CustomPaint(
-                    size: const Size(140, 140),
-                    painter: DonutChartPainter(
-                      values: chartValues,
-                      colors: chartColors,
-                      strokeWidth: 14,
-                    ),
+                  TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0.0, end: 1.0),
+                    duration: const Duration(milliseconds: 650),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, progress, child) {
+                      return CustomPaint(
+                        size: const Size(140, 140),
+                        painter: DonutChartPainter(
+                          values: chartValues,
+                          colors: chartColors,
+                          strokeWidth: 14,
+                          progress: progress,
+                        ),
+                      );
+                    },
                   ),
                   Column(
                     mainAxisSize: MainAxisSize.min,
@@ -495,25 +544,33 @@ class BudgetAnalyticsCard extends StatelessWidget {
             const SizedBox(height: 16),
           ],
 
-          // Multi-segmented colored distribution bar
-          ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: SizedBox(
-              height: 8,
-              child: Row(
-                children: sortedEntries.map((entry) {
-                  final ratio = totalSpent > 0 ? (entry.value / totalSpent).clamp(0.01, 1.0) : 0.0;
-                  final color = getCategoryColor(entry.key);
-                  return Flexible(
-                    flex: (ratio * 1000).toInt(),
-                    child: Container(
-                      color: color,
-                      margin: const EdgeInsets.symmetric(horizontal: 0.5),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
+          // Multi-segmented colored distribution bar with smooth opening animation
+          TweenAnimationBuilder<double>(
+            tween: Tween<double>(begin: 0.0, end: 1.0),
+            duration: const Duration(milliseconds: 600),
+            curve: Curves.easeOutCubic,
+            builder: (context, factor, child) {
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: SizedBox(
+                  height: 8,
+                  child: Row(
+                    children: sortedEntries.map((entry) {
+                      final ratio = totalSpent > 0 ? (entry.value / totalSpent).clamp(0.01, 1.0) : 0.0;
+                      final color = getCategoryColor(entry.key);
+                      final flexVal = ((ratio * 1000) * factor).toInt();
+                      return Flexible(
+                        flex: flexVal > 0 ? flexVal : 1,
+                        child: Container(
+                          color: color,
+                          margin: const EdgeInsets.symmetric(horizontal: 0.5),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 16),
 

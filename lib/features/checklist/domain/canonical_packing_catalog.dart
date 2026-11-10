@@ -82,8 +82,15 @@ class CanonicalPackingCatalog {
     if (n.contains('kisisel bakim') || n.contains('kozmetik cantasi') || n.contains('toiletry') || n.contains('kulturbeutel') || n.contains('trousse de toilette')) {
       return 'toiletries';
     }
-    // Toothbrush
-    if (n.contains('dis fircasi') || n.contains('toothbrush') || n.contains('zahnbuerste') || n.contains('brosse a dents')) {
+    // Toothbrush / Dental kit
+    if (n.contains('dis fircasi') ||
+        n.contains('dis bakim') ||
+        n.contains('dis macunu') ||
+        n.contains('dis seti') ||
+        n.contains('toothbrush') ||
+        n.contains('zahnbuerste') ||
+        n.contains('brosse a dents') ||
+        n.contains('dental')) {
       return 'toothbrush';
     }
     // Walking shoes / sneakers
@@ -111,7 +118,15 @@ class CanonicalPackingCatalog {
       return 'underwear_socks';
     }
     // Beach slippers
-    if (n.contains('terlik') || n.contains('slipper') || n.contains('flip flop') || n.contains('badelatschen')) {
+    if (n.contains('terlik') ||
+        n.contains('terlig') ||
+        n.contains('sandalet') ||
+        n.contains('sandal') ||
+        n.contains('slipper') ||
+        n.contains('flip flop') ||
+        n.contains('badelatschen') ||
+        n.contains('chanclas') ||
+        n.contains('tongs')) {
       return 'beach_slippers';
     }
     // Sunscreen
@@ -135,7 +150,16 @@ class CanonicalPackingCatalog {
       return 'sun_hat';
     }
     // Waterproof pouch
-    if (n.contains('su gecirmez kilif') || n.contains('waterproof') && (n.contains('case') || n.contains('pouch'))) {
+    if ((n.contains('su gecirmez') &&
+            (n.contains('kilif') ||
+                n.contains('canta') ||
+                n.contains('telefon') ||
+                n.contains('cuzdan'))) ||
+        (n.contains('waterproof') &&
+            (n.contains('case') ||
+                n.contains('pouch') ||
+                n.contains('bag') ||
+                n.contains('phone')))) {
       return 'waterproof_case';
     }
     // Ski jacket / parka
@@ -616,7 +640,7 @@ class CanonicalPackingCatalog {
       'ko': '비치 슬리퍼 및 샌들',
       'hi': 'बीच चप्पल और सैंडल',
       'ar': 'صنادل وأحذية الشاطئ',
-      'nl': 'Strand倜lippers & sandalen',
+      'nl': 'Strandslippers & sandalen',
       'el': 'Σαγιονάρες & Σανδάλια Παραλίας',
       'sv': 'Badtofflor & sandaler',
       'pl': 'Klapki plażowe i sandały',

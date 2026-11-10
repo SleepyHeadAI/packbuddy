@@ -18,6 +18,7 @@ import '../utils/currency_formatter.dart';
 import 'app_widget_localization.dart';
 import 'currency_service.dart';
 import 'preferences_service.dart';
+import 'widget_card_renderer.dart';
 import 'widget_map_renderer.dart';
 
 /// App Widget Payload model for iOS WidgetKit / Android AppWidgets (Feature F-9)
@@ -595,6 +596,15 @@ class AppWidgetService {
         await HomeWidget.saveWidgetData<String>('custom_stat1', customStat1);
         await HomeWidget.saveWidgetData<String>('custom_stat2', customStat2);
         await HomeWidget.saveWidgetData<String>('custom_stat3', customStat3);
+
+        // Render 1:1 high-resolution widget cards across all modes for home screen parity
+        try {
+          await WidgetCardRenderer.renderAllModes(
+            payload: payload,
+            countries: mapCountries,
+            lang: lang,
+          );
+        } catch (_) {}
 
         const allProviders = [
           'PackBuddyWidgetProvider',

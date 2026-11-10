@@ -173,7 +173,7 @@ class _Globe3DViewerState extends State<Globe3DViewer> {
       builder: (context, constraints) {
         final size = Size(constraints.maxWidth, 390);
         final baseRadius = math.min(size.width, size.height) * 0.40;
-        final radius = (baseRadius * _scale).clamp(70.0, 260.0);
+        final radius = (baseRadius * _scale).clamp(70.0, 500.0);
 
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
@@ -184,7 +184,7 @@ class _Globe3DViewerState extends State<Globe3DViewer> {
           },
           onScaleUpdate: (details) {
             setState(() {
-              _scale = (_baseScale * details.scale).clamp(0.75, 1.85);
+              _scale = (_baseScale * details.scale).clamp(0.75, 3.2);
               // Rotation sensitivity (natural 1:1 finger tracking)
               _rotLng -= details.focalPointDelta.dx * 0.0075;
               _rotLat = (_rotLat + details.focalPointDelta.dy * 0.0075)

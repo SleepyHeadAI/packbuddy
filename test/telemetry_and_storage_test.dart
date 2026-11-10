@@ -10,6 +10,7 @@ import 'package:packbuddy/core/services/telemetry_service.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
 import 'package:packbuddy/features/admin/admin_service.dart';
 import 'package:packbuddy/features/admin/admin_controller.dart';
+import 'package:packbuddy/features/admin/domain/broadcast_announcement.dart';
 import 'package:packbuddy/features/admin/admin_dashboard_screen.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
@@ -100,6 +101,34 @@ class FakeAdminController extends StateNotifier<AdminState>
 
   @override
   Future<InactivityScanResult?> runInactivityScan() async => const InactivityScanResult();
+
+  @override
+  Future<bool> sendBroadcastAnnouncement({
+    required String title,
+    required String message,
+    String type = 'discount',
+    String targetAction = 'paywall',
+    String targetAudience = 'all',
+    int? discountPercent,
+    String? actionLabel,
+  }) async => true;
+
+  @override
+  Future<List<BroadcastAnnouncement>> fetchBroadcastHistory() async => [];
+
+  @override
+  Future<bool> toggleBroadcastActive(String broadcastId, bool active) async => true;
+
+  @override
+  Future<bool> deleteBroadcastAnnouncement(String broadcastId) async => true;
+
+  @override
+  void setAuditLogFilter(String filter) {
+    state = state.copyWith(auditLogFilter: filter);
+  }
+
+  @override
+  Future<void> fetchAuditLogs() async {}
 }
 
 void main() {

@@ -16,9 +16,28 @@ import '../../shared/widgets/app_card.dart';
 import '../../shared/widgets/status_badge.dart';
 import '../../shared/widgets/bouncy_pressable.dart';
 import '../vault/domain/document.dart';
+import '../budget/domain/trip.dart';
+import '../budget/domain/expense.dart';
+import '../travel_map/domain/travel_country.dart';
+import '../travel_map/data/world_countries_data.dart';
 import '../budget/domain/country_localization.dart';
+import '../feedback/presentation/screens/admin_feedback_screen.dart';
+import '../../shared/widgets/app_logo.dart';
+import 'domain/broadcast_announcement.dart';
+import 'domain/admin_audit_log.dart';
 import 'admin_service.dart';
 import 'admin_controller.dart';
+
+/// Helper to format relative or exact audit timestamp
+String _formatAuditTimestamp(DateTime time, bool isTr) {
+  final now = DateTime.now();
+  final diff = now.difference(time);
+  if (diff.inSeconds < 60) return isTr ? 'Az önce' : 'Just now';
+  if (diff.inMinutes < 60) return isTr ? '${diff.inMinutes} dk önce' : '${diff.inMinutes}m ago';
+  if (diff.inHours < 24) return isTr ? '${diff.inHours} sa önce' : '${diff.inHours}h ago';
+  if (diff.inDays < 7) return isTr ? '${diff.inDays} gün önce' : '${diff.inDays}d ago';
+  return '${time.day.toString().padLeft(2, '0')}.${time.month.toString().padLeft(2, '0')}.${time.year} ${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+}
 
 /// Executive Admin Dashboard providing platform metrics, Geo-Analytics,
 /// and interactive user entitlement & moderation management.
@@ -147,6 +166,31 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.history_rounded),
+            tooltip: Localizations.localeOf(context).languageCode == 'tr'
+                ? 'Denetim Günlüğü'
+                : 'Audit Trail',
+            onPressed: () => _showAllAuditLogsBottomSheet(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.campaign_rounded),
+            tooltip: Localizations.localeOf(context).languageCode == 'tr'
+                ? 'Toplu Bildirim & Reklam'
+                : 'Broadcast & Ads',
+            onPressed: () => _showBroadcastCampaignBottomSheet(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.lightbulb_rounded),
+            tooltip: Localizations.localeOf(context).languageCode == 'tr'
+                ? 'Kullanıcı Önerileri'
+                : 'User Suggestions',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const AdminFeedbackScreen()),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh_rounded),
             tooltip: l10n.syncNow,
             onPressed: () => ref.read(adminControllerProvider.notifier).refreshData(),
@@ -177,6 +221,18 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
 
             // Platform Metrics Grid (Clutter-free, no redundant Verified card)
             _buildMetricsGrid(context, adminState.metrics, isDark),
+            const SizedBox(height: 20),
+
+            // User Feedback & Suggestions Hub Card
+            _buildFeedbackHubCard(context, isDark),
+            const SizedBox(height: 20),
+
+            // Toplu Bildirim & Reklam/Kampanya Paneli (Broadcast Hub)
+            _buildBroadcastCampaignHubCard(context, isDark),
+            const SizedBox(height: 20),
+
+            // Yönetici Aksiyon & Denetim Günlüğü (Executive Audit Trail)
+            _buildAuditLogsSection(context, adminState, isDark),
             const SizedBox(height: 20),
 
             // Geographic & Activity Analytics Section
@@ -428,6 +484,808 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               : const Color(0xFFE0F2FE),
         ),
       ],
+    );
+  }
+
+  /// Hub card to review user suggestions and feedback
+  Widget _buildFeedbackHubCard(BuildContext context, bool isDark) {
+    final theme = Theme.of(context);
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      borderRadius: 18,
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: (isDark ? AppColors.primaryAmber : AppColors.primaryLight).withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              Icons.lightbulb_rounded,
+              color: isDark ? AppColors.primaryAmber : AppColors.primaryLight,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isTr ? 'Kullanıcı Önerileri' : 'User Suggestions & Feedback',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  isTr
+                      ? 'Kullanıcılardan gelen geri bildirimleri ve ekli görselleri inceleyin'
+                      : 'Review user feedback, bug reports, and attached screenshots',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          FilledButton.tonalIcon(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const AdminFeedbackScreen()),
+              );
+            },
+            icon: const Icon(Icons.open_in_new_rounded, size: 16),
+            label: Text(
+              isTr ? 'İncele' : 'View',
+              style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700),
+            ),
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Super Admin Broadcast Campaign & Marketing Hub Card
+  Widget _buildBroadcastCampaignHubCard(BuildContext context, bool isDark) {
+    final theme = Theme.of(context);
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      borderRadius: 18,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF8B5CF6), Color(0xFF6366F1)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.campaign_rounded,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            isTr ? 'Toplu Bildirim & Reklam Paneli' : 'Broadcast & Ad Campaign Hub',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            isTr ? 'Canlı İletim' : 'Live Push',
+                            style: const TextStyle(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF8B5CF6),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      isTr
+                          ? 'Tüm kullanıcılara veya ücretsiz üyelere anında indirim, kampanya ve duyuru bildirimleri gönderin.'
+                          : 'Push mass discount alerts, seasonal campaigns, and feature notices to all or segmented users.',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: () => _showBroadcastCampaignBottomSheet(context),
+                  icon: const Icon(Icons.send_rounded, size: 16),
+                  label: Text(
+                    isTr ? 'Yeni Reklam / Bildirim Gönder' : 'Dispatch Broadcast',
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                  ),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF8B5CF6),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 11),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              OutlinedButton.icon(
+                onPressed: () => _showBroadcastHistoryBottomSheet(context),
+                icon: const Icon(Icons.history_rounded, size: 16),
+                label: Text(
+                  isTr ? 'Geçmiş' : 'History',
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showBroadcastCampaignBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      sheetAnimationStyle: const AnimationStyle(
+        duration: Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
+        reverseDuration: Duration(milliseconds: 200),
+        reverseCurve: Curves.easeInCubic,
+      ),
+      builder: (ctx) => const _BroadcastCampaignBottomSheet(),
+    );
+  }
+
+  void _showBroadcastHistoryBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      sheetAnimationStyle: const AnimationStyle(
+        duration: Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
+        reverseDuration: Duration(milliseconds: 200),
+        reverseCurve: Curves.easeInCubic,
+      ),
+      builder: (ctx) => const _BroadcastHistoryBottomSheet(),
+    );
+  }
+
+  /// Real-time Executive Action & Moderation Audit Trail Section
+  Widget _buildAuditLogsSection(
+    BuildContext context,
+    AdminState state,
+    bool isDark,
+  ) {
+    final theme = Theme.of(context);
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    final logs = state.auditLogs;
+    final filteredLogs = state.filteredAuditLogs;
+    final currentFilter = state.auditLogFilter;
+
+    final filterOptions = [
+      {'key': 'all', 'label': isTr ? 'Tümü' : 'All', 'count': logs.length},
+      {
+        'key': 'deletion',
+        'label': isTr ? 'Silmeler' : 'Deletions',
+        'count': logs.where((l) => l.category == 'deletion').length,
+      },
+      {
+        'key': 'ban',
+        'label': isTr ? 'Engellemeler' : 'Bans',
+        'count': logs.where((l) => l.category == 'ban').length,
+      },
+      {
+        'key': 'warning',
+        'label': isTr ? 'Uyarılar' : 'Warnings',
+        'count': logs.where((l) => l.category == 'warning').length,
+      },
+      {
+        'key': 'pro',
+        'label': isTr ? 'Pro' : 'Pro',
+        'count': logs.where((l) => l.category == 'pro').length,
+      },
+      {
+        'key': 'broadcast',
+        'label': isTr ? 'Duyurular' : 'Broadcasts',
+        'count': logs.where((l) => l.category == 'broadcast').length,
+      },
+    ];
+
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      borderRadius: 18,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header Row
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF0284C7), Color(0xFF2563EB)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF2563EB).withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.receipt_long_rounded,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            isTr ? 'Yönetici Aksiyon & Denetim Günlüğü' : 'Admin Action & Audit Trail',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF0284C7).withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            '${logs.length} ${isTr ? "Kayıt" : "Logs"}',
+                            style: const TextStyle(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF0284C7),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      isTr
+                          ? 'Silme, engelleme, uyarı, pro ve duyuru aksiyonlarının canlı denetim kaydı.'
+                          : 'Live immutable record of bans, purges, warnings, pro grants, and campaigns.',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // Filter Chips Horizontal Scroll
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: filterOptions.map((opt) {
+                final key = opt['key'] as String;
+                final label = opt['label'] as String;
+                final count = opt['count'] as int;
+                final isSelected = currentFilter == key;
+
+                return Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: ChoiceChip(
+                    label: Text(
+                      count > 0 ? '$label ($count)' : label,
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                        color: isSelected
+                            ? Colors.white
+                            : (isDark ? Colors.white70 : Colors.black87),
+                      ),
+                    ),
+                    selected: isSelected,
+                    selectedColor: const Color(0xFF2563EB),
+                    backgroundColor: isDark
+                        ? Colors.white.withValues(alpha: 0.06)
+                        : Colors.black.withValues(alpha: 0.04),
+                    visualDensity: VisualDensity.compact,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: BorderSide(
+                        color: isSelected
+                            ? const Color(0xFF2563EB)
+                            : (isDark ? Colors.white12 : Colors.black12),
+                      ),
+                    ),
+                    onSelected: (_) {
+                      ref.read(adminControllerProvider.notifier).setAuditLogFilter(key);
+                    },
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Log List (Show top 5 inline)
+          if (filteredLogs.isEmpty) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.02),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isDark ? Colors.white10 : Colors.black12,
+                ),
+              ),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.history_toggle_off_rounded,
+                    size: 32,
+                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    isTr
+                        ? 'Bu kategoride henüz bir yönetici aksiyon kaydı bulunmuyor.'
+                        : 'No administrative audit logs found in this category.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ] else ...[
+            ...filteredLogs.take(5).map((log) => _buildAuditLogTile(context, log, isDark, isTr)),
+          ],
+
+          if (filteredLogs.length > 5 || logs.length > 5) ...[
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => _showAllAuditLogsBottomSheet(context),
+                icon: const Icon(Icons.list_alt_rounded, size: 16),
+                label: Text(
+                  isTr
+                      ? 'Tüm Aksiyon Günlüğünü Görüntüle (${logs.length})'
+                      : 'View Complete Audit History (${logs.length})',
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                ),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAuditLogTile(
+    BuildContext context,
+    AdminAuditLog log,
+    bool isDark,
+    bool isTr,
+  ) {
+    final theme = Theme.of(context);
+    final timeStr = _formatAuditTimestamp(log.timestamp, isTr);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.02),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: log.color.withValues(alpha: 0.2),
+        ),
+      ),
+      child: InkWell(
+        onTap: () => _showAuditLogDetailsDialog(context, log, isTr),
+        borderRadius: BorderRadius.circular(12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(7),
+              decoration: BoxDecoration(
+                color: log.color.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(log.icon, size: 18, color: log.color),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          log.actionTitle,
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        timeStr,
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  // Target and Admin details
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: [
+                      if (log.targetUserEmail != null && log.targetUserEmail!.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            log.targetUserEmail!,
+                            style: TextStyle(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w600,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        )
+                      else if (log.targetUid == 'broadcast_all')
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            isTr ? 'Hedef: Tüm Kullanıcılar' : 'Target: All Users',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF3B82F6),
+                            ),
+                          ),
+                        )
+                      else if (log.targetUid.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            'UID: ${log.targetUid.length > 8 ? "${log.targetUid.substring(0, 8)}..." : log.targetUid}',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      if (log.details.containsKey('reason') && (log.details['reason']?.toString().isNotEmpty == true))
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                          decoration: BoxDecoration(
+                            color: log.color.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            '${isTr ? "Sebep" : "Reason"}: ${log.details['reason']}',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: log.color,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showAuditLogDetailsDialog(
+    BuildContext context,
+    AdminAuditLog log,
+    bool isTr,
+  ) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+        contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: log.color.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(log.icon, color: log.color, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                log.actionTitle,
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Divider(),
+                const SizedBox(height: 8),
+                _buildAuditDetailRow(
+                  isTr ? 'Aksiyon Türü' : 'Action Type',
+                  log.action,
+                  theme,
+                ),
+                _buildAuditDetailRow(
+                  isTr ? 'Kategori' : 'Category',
+                  log.category.toUpperCase(),
+                  theme,
+                  badgeColor: log.color,
+                ),
+                _buildAuditDetailRow(
+                  isTr ? 'Yönetici' : 'Admin',
+                  log.adminEmail,
+                  theme,
+                ),
+                if (log.targetUserEmail != null && log.targetUserEmail!.isNotEmpty)
+                  _buildAuditDetailRow(
+                    isTr ? 'Hedef E-posta' : 'Target Email',
+                    log.targetUserEmail!,
+                    theme,
+                  ),
+                if (log.targetUserName != null && log.targetUserName!.isNotEmpty)
+                  _buildAuditDetailRow(
+                    isTr ? 'Kullanıcı Adı' : 'Display Name',
+                    log.targetUserName!,
+                    theme,
+                  ),
+                if (log.targetUid.isNotEmpty)
+                  _buildAuditDetailRow(
+                    isTr ? 'Hedef UID' : 'Target UID',
+                    log.targetUid,
+                    theme,
+                  ),
+                _buildAuditDetailRow(
+                  isTr ? 'Tarih & Saat' : 'Timestamp',
+                  '${log.timestamp.day.toString().padLeft(2, '0')}.${log.timestamp.month.toString().padLeft(2, '0')}.${log.timestamp.year} ${log.timestamp.hour.toString().padLeft(2, '0')}:${log.timestamp.minute.toString().padLeft(2, '0')}:${log.timestamp.second.toString().padLeft(2, '0')}',
+                  theme,
+                ),
+                if (log.details.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    isTr ? 'İşlem Detayları & Parametreler:' : 'Operation Details:',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: isDark ? Colors.white12 : Colors.black12,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: log.details.entries.map((entry) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Text(
+                            '• ${entry.key}: ${entry.value}',
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontFamily: 'monospace',
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(isTr ? 'Kapat' : 'Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAuditDetailRow(
+    String label,
+    String value,
+    ThemeData theme, {
+    Color? badgeColor,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 105,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: theme.colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: badgeColor != null
+                ? Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                      decoration: BoxDecoration(
+                        color: badgeColor.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        value,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: badgeColor,
+                        ),
+                      ),
+                    ),
+                  )
+                : Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAllAuditLogsBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      sheetAnimationStyle: const AnimationStyle(
+        duration: Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
+        reverseDuration: Duration(milliseconds: 200),
+        reverseCurve: Curves.easeInCubic,
+      ),
+      builder: (ctx) => const _AllAuditLogsBottomSheet(),
     );
   }
 
@@ -2249,7 +3107,8 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
     final lastActiveStr =
         AppDateFormatter.formatDateTime(user.effectiveLastActiveAt);
 
-    final flagEmoji = countryCodeToFlagEmoji(user.countryCode);
+    final effectiveCountry = user.effectiveLiveCountryCode;
+    final flagEmoji = countryCodeToFlagEmoji(effectiveCountry);
     final isBanned = user.isCurrentlyBanned;
     final isRestricted = user.restrictedFeatures.isNotEmpty;
 
@@ -2413,13 +3272,15 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               runSpacing: 6,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                // Country Badge
+                // Location Badge (Live Country & City)
                 StatusBadge(
-                  label: '$flagEmoji ${user.countryCode}',
+                  label: user.liveCity.isNotEmpty
+                      ? '$flagEmoji ${user.liveCity}, $effectiveCountry'
+                      : '$flagEmoji $effectiveCountry',
                   icon: Icons.place_outlined,
                   backgroundColor: theme.colorScheme.surfaceContainerHighest,
                   textColor: theme.colorScheme.onSurface,
-                  maxWidth: 90,
+                  maxWidth: 130,
                 ),
 
                 // Currency Badge
@@ -2786,25 +3647,52 @@ class _UserModerationBottomSheet extends ConsumerStatefulWidget {
       _UserModerationBottomSheetState();
 }
 
+enum _ModerationUsagePeriod {
+  daily,
+  weekly,
+  monthly,
+  allTime,
+  custom,
+}
+
 class _UserModerationBottomSheetState
-    extends ConsumerState<_UserModerationBottomSheet> {
+    extends ConsumerState<_UserModerationBottomSheet>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   late bool _isPro;
   late String _banStatus; // 'none', 'temporary', 'permanent'
   late String? _banExpiresAt;
   late TextEditingController _reasonController;
   late Set<String> _restrictions;
+
+  // Real live data futures
   late Future<List<VaultDocument>> _documentsFuture;
+  late Future<List<Trip>> _tripsFuture;
+  late Future<List<Expense>> _expensesFuture;
+  late Future<List<AdminUserSessionLog>> _sessionsFuture;
+  late Future<List<TravelCountry>> _countriesFuture;
+
+  // Usage Period selection state
+  _ModerationUsagePeriod _usagePeriod = _ModerationUsagePeriod.daily;
+  DateTimeRange? _customDateRange;
+
   bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     _isPro = widget.user.isPremium;
     _banStatus = widget.user.banStatus;
     _banExpiresAt = widget.user.banExpiresAt;
     _reasonController = TextEditingController(text: widget.user.banReason ?? '');
     _restrictions = Set.from(widget.user.restrictedFeatures);
+
     _documentsFuture = ref.read(adminServiceProvider).fetchUserDocuments(widget.user.uid);
+    _tripsFuture = ref.read(adminServiceProvider).fetchUserTrips(widget.user.uid);
+    _expensesFuture = ref.read(adminServiceProvider).fetchUserExpenses(widget.user.uid);
+    _sessionsFuture = ref.read(adminServiceProvider).fetchUserSessions(widget.user.uid);
+    _countriesFuture = ref.read(adminServiceProvider).fetchUserTravelCountries(widget.user.uid);
   }
 
   void _reloadDocuments() {
@@ -2813,8 +3701,19 @@ class _UserModerationBottomSheetState
     });
   }
 
+  void _reloadAllData() {
+    setState(() {
+      _documentsFuture = ref.read(adminServiceProvider).fetchUserDocuments(widget.user.uid);
+      _tripsFuture = ref.read(adminServiceProvider).fetchUserTrips(widget.user.uid);
+      _expensesFuture = ref.read(adminServiceProvider).fetchUserExpenses(widget.user.uid);
+      _sessionsFuture = ref.read(adminServiceProvider).fetchUserSessions(widget.user.uid);
+      _countriesFuture = ref.read(adminServiceProvider).fetchUserTravelCountries(widget.user.uid);
+    });
+  }
+
   @override
   void dispose() {
+    _tabController.dispose();
     _reasonController.dispose();
     super.dispose();
   }
@@ -2867,45 +3766,144 @@ class _UserModerationBottomSheetState
     }
   }
 
+  ({int totalSeconds, int sessionCount, double avgSeconds}) _calculatePeriodUsage(
+    List<AdminUserSessionLog> logs,
+    AdminUserModel user,
+  ) {
+    final now = DateTime.now();
+    DateTime? start;
+    DateTime? end;
+
+    switch (_usagePeriod) {
+      case _ModerationUsagePeriod.daily:
+        start = now.subtract(const Duration(hours: 24));
+        end = now;
+        break;
+      case _ModerationUsagePeriod.weekly:
+        start = now.subtract(const Duration(days: 7));
+        end = now;
+        break;
+      case _ModerationUsagePeriod.monthly:
+        start = now.subtract(const Duration(days: 30));
+        end = now;
+        break;
+      case _ModerationUsagePeriod.allTime:
+        start = null;
+        end = null;
+        break;
+      case _ModerationUsagePeriod.custom:
+        if (_customDateRange != null) {
+          start = DateTime(_customDateRange!.start.year, _customDateRange!.start.month, _customDateRange!.start.day);
+          end = DateTime(_customDateRange!.end.year, _customDateRange!.end.month, _customDateRange!.end.day, 23, 59, 59);
+        }
+        break;
+    }
+
+    if (logs.isNotEmpty) {
+      List<AdminUserSessionLog> filtered;
+      if (start != null && end != null) {
+        filtered = logs.where((l) => l.timestamp.isAfter(start!) && l.timestamp.isBefore(end!)).toList();
+      } else {
+        filtered = logs;
+      }
+      final total = filtered.fold<int>(0, (sum, l) => sum + l.durationSeconds);
+      final count = filtered.length;
+      final avg = count > 0 ? (total / count) : 0.0;
+      return (totalSeconds: total, sessionCount: count, avgSeconds: avg);
+    }
+
+    // Historical fallback for accounts without granular session logs
+    if (_usagePeriod == _ModerationUsagePeriod.allTime) {
+      final total = user.totalSessionSeconds;
+      final count = user.sessionCount;
+      final avg = count > 0 ? (total / count).toDouble() : 0.0;
+      return (totalSeconds: total, sessionCount: count, avgSeconds: avg);
+    }
+
+    if (start != null && end != null) {
+      final lastActive = user.effectiveLastActiveAt;
+      if (lastActive.isAfter(start) && lastActive.isBefore(end)) {
+        final sec = user.lastSessionSeconds > 0 ? user.lastSessionSeconds : user.totalSessionSeconds;
+        return (totalSeconds: sec, sessionCount: 1, avgSeconds: sec.toDouble());
+      }
+    }
+
+    return (totalSeconds: 0, sessionCount: 0, avgSeconds: 0.0);
+  }
+
+  Future<void> _selectCustomDateRange(BuildContext context) async {
+    final now = DateTime.now();
+    final initialRange = _customDateRange ??
+        DateTimeRange(
+          start: now.subtract(const Duration(days: 7)),
+          end: now,
+        );
+
+    final picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2022),
+      lastDate: now,
+      initialDateRange: initialRange,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+                  primary: Theme.of(context).colorScheme.primary,
+                ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        _customDateRange = picked;
+        _usagePeriod = _ModerationUsagePeriod.custom;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final isTr = Localizations.localeOf(context).languageCode == 'tr';
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    final user = ref.watch(adminControllerProvider).allUsers.firstWhere(
+      (u) => u.uid == widget.user.uid,
+      orElse: () => widget.user,
+    );
 
     return Container(
+      height: screenHeight * 0.90,
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
       ),
       child: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.only(
-            left: 20,
-            right: 20,
-            top: 12,
-            bottom: bottomInset + 20,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Grab Handle
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+        child: Column(
+          children: [
+            // Grab Handle
+            const SizedBox(height: 12),
+            Center(
+              child: Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              const SizedBox(height: 16),
+            ),
+            const SizedBox(height: 12),
 
-              // Title Header
-              Row(
+            // User Info Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
@@ -2914,8 +3912,8 @@ class _UserModerationBottomSheetState
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
-                      Icons.security_rounded,
-                      size: 22,
+                      Icons.manage_accounts_rounded,
+                      size: 24,
                       color: theme.colorScheme.primary,
                     ),
                   ),
@@ -2924,16 +3922,42 @@ class _UserModerationBottomSheetState
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          l10n.adminModerateUser,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
-                          ),
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                user.displayName.isNotEmpty
+                                    ? user.displayName
+                                    : (isTr ? 'Kullanıcı' : 'User'),
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            if (user.isPremium) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFD97706).withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Text(
+                                  'PRO',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFFD97706),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                         Text(
-                          widget.user.email.isNotEmpty
-                              ? widget.user.email
-                              : widget.user.uid,
+                          user.email.isNotEmpty ? user.email : user.uid,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
@@ -2943,68 +3967,734 @@ class _UserModerationBottomSheetState
                       ],
                     ),
                   ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
                 ],
               ),
-              const SizedBox(height: 20),
+            ),
+            const SizedBox(height: 14),
 
-              // Pending Deletion Banner & Super Admin Controls
-              if (widget.user.deletionStatus == 'pending_deletion') ...[
-                AppCard(
-                  borderRadius: 18,
-                  padding: const EdgeInsets.all(14),
+            // TabBar for switching between the TWO DISTINCT PAGES
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: TabBar(
+                  controller: _tabController,
+                  indicator: BoxDecoration(
+                    color: theme.colorScheme.primary,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  labelColor: Colors.white,
+                  unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
+                  labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                  unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                  dividerColor: Colors.transparent,
+                  tabs: [
+                    Tab(
+                      key: const ValueKey('tab_moderation_actions'),
+                      icon: const Icon(Icons.gavel_rounded, size: 18),
+                      text: isTr ? 'Aksiyon & Yönetim' : 'Actions & Moderation',
+                    ),
+                    Tab(
+                      key: const ValueKey('tab_user_stats_details'),
+                      icon: const Icon(Icons.analytics_rounded, size: 18),
+                      text: isTr ? 'İstatistikler & Detaylar' : 'Stats & Details',
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // TabBarView displaying the two distinct pages
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildActionsPage(context, user, l10n, isTr, bottomInset),
+                  _buildStatisticsPage(context, user, l10n, isTr, bottomInset),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // =========================================================================
+  // PAGE 1: AKSIYON & YÖNETİM (Actions & Moderation Page)
+  // =========================================================================
+  Widget _buildActionsPage(
+    BuildContext context,
+    AdminUserModel user,
+    AppLocalizations l10n,
+    bool isTr,
+    double bottomInset,
+  ) {
+    final theme = Theme.of(context);
+
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 8,
+        bottom: bottomInset + 24,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 1. Pending Deletion Warning Banner & Super Admin Controls
+          if (user.deletionStatus == 'pending_deletion') ...[
+            AppCard(
+              borderRadius: 18,
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.warning_amber_rounded, color: Color(0xFFD97706), size: 22),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          l10n.adminPendingDeletionBadge(user.daysUntilPermanentDeletion ?? 15),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFD97706),
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          onPressed: () async {
+                            await ref.read(adminServiceProvider).cancelAccountDeletionAsAdmin(user.uid);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).clearSnackBars();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(l10n.adminDeletionCancelled),
+                                  backgroundColor: AppColors.successPastel,
+                                ),
+                              );
+                              Navigator.of(context).pop();
+                              ref.read(adminControllerProvider.notifier).loadUsers();
+                            }
+                          },
+                          child: Text(l10n.adminCancelDeletion),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.errorPastel,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          onPressed: () => _confirmPurgeUser(context, l10n),
+                          child: Text(l10n.adminPurgeNow),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+
+          // 2. Inactivity & Auto-Deletion Status Card
+          _buildInactivityStatusCard(context),
+          const SizedBox(height: 16),
+
+          // 3. User Warning Dispatcher Card
+          _buildWarningDispatchCard(context, user, isTr),
+          const SizedBox(height: 16),
+
+          // 4. Pro Membership Toggle
+          AppCard(
+            borderRadius: 18,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFD97706).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.workspace_premium_rounded,
+                    color: Color(0xFFD97706),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
+                      Text(
+                        l10n.adminProUsers,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
+                      ),
+                      Text(
+                        _isPro ? l10n.adminGrantPro : l10n.adminRevokePro,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Switch.adaptive(
+                  value: _isPro,
+                  activeThumbColor: const Color(0xFFD97706),
+                  activeTrackColor: const Color(0xFFD97706).withValues(alpha: 0.5),
+                  onChanged: (val) => setState(() => _isPro = val),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // 5. Account Ban & Suspension Section
+          Text(
+            l10n.adminBanStatusLabel,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 8),
+          AppCard(
+            borderRadius: 18,
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _buildBanChoiceChip(
+                      label: l10n.adminUnbanned,
+                      isSelected: _banStatus == 'none',
+                      onTap: () => _setBanDuration('none', null),
+                      activeColor: AppColors.successPastel,
+                    ),
+                    _buildBanChoiceChip(
+                      label: l10n.adminBan24h,
+                      isSelected: _banStatus == 'temporary' &&
+                          _banExpiresAt != null &&
+                          _isExpiresWithin(const Duration(hours: 25)),
+                      onTap: () => _setBanDuration('temporary', const Duration(hours: 24)),
+                      activeColor: AppColors.warningPastel,
+                    ),
+                    _buildBanChoiceChip(
+                      label: l10n.adminBan7d,
+                      isSelected: _banStatus == 'temporary' &&
+                          _banExpiresAt != null &&
+                          _isExpiresAround(7),
+                      onTap: () => _setBanDuration('temporary', const Duration(days: 7)),
+                      activeColor: AppColors.warningPastel,
+                    ),
+                    _buildBanChoiceChip(
+                      label: l10n.adminBan30d,
+                      isSelected: _banStatus == 'temporary' &&
+                          _banExpiresAt != null &&
+                          _isExpiresAround(30),
+                      onTap: () => _setBanDuration('temporary', const Duration(days: 30)),
+                      activeColor: AppColors.warningPastel,
+                    ),
+                    _buildBanChoiceChip(
+                      label: l10n.adminPermanentBan,
+                      isSelected: _banStatus == 'permanent',
+                      onTap: () => _setBanDuration('permanent', null),
+                      activeColor: AppColors.errorPastel,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _reasonController,
+                  decoration: InputDecoration(
+                    labelText: l10n.adminBanReasonLabel,
+                    hintText: l10n.adminBanReasonHint,
+                    prefixIcon: const Icon(Icons.edit_note_rounded, size: 20),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // 6. Granular Feature Restrictions
+          Text(
+            l10n.adminFeatureRestrictionsLabel,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 8),
+          AppCard(
+            borderRadius: 18,
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              children: [
+                _buildRestrictionToggle(
+                  keyName: 'trip_create',
+                  title: isTr ? 'Seyahat Oluşturma' : l10n.adminRestrictTripCreate,
+                  subtitle: isTr ? 'Yeni gezi planı ve rota ekleme' : 'Create new trip itineraries',
+                  icon: Icons.flight_takeoff_rounded,
+                ),
+                const Divider(height: 1),
+                _buildRestrictionToggle(
+                  keyName: 'trip_share',
+                  title: isTr ? 'Seyahat Paylaşımı & İşbirliği' : 'Trip Collaboration',
+                  subtitle: isTr ? 'Gezilere arkadaş davet etme ve ortak yönetim' : 'Invite members & share trips',
+                  icon: Icons.group_add_rounded,
+                ),
+                const Divider(height: 1),
+                _buildRestrictionToggle(
+                  keyName: 'expense_add',
+                  title: isTr ? 'Harcama & Bütçe Girişi' : l10n.adminRestrictExpenseAdd,
+                  subtitle: isTr ? 'Seyahat harcaması ve bütçe kaydetme' : 'Add expenses & manage budget',
+                  icon: Icons.receipt_long_rounded,
+                ),
+                const Divider(height: 1),
+                _buildRestrictionToggle(
+                  keyName: 'checklist_manage',
+                  title: isTr ? 'Bavul Listesi Yönetimi' : 'Packing Checklist',
+                  subtitle: isTr ? 'Bavul eşyaları ekleme ve düzenleme' : 'Manage packing luggage items',
+                  icon: Icons.checklist_rounded,
+                ),
+                const Divider(height: 1),
+                _buildRestrictionToggle(
+                  keyName: 'vault_upload',
+                  title: isTr ? 'Güvenli Kasa Dosya Yükleme' : l10n.adminRestrictVaultUpload,
+                  subtitle: isTr ? 'Pasaport, bilet ve kasa belgesi yükleme' : 'Upload vault documents & tickets',
+                  icon: Icons.cloud_upload_rounded,
+                ),
+                const Divider(height: 1),
+                _buildRestrictionToggle(
+                  keyName: 'travel_map_edit',
+                  title: isTr ? 'Dünya Haritası İşaretleme' : 'World Travel Map Editing',
+                  subtitle: isTr ? 'Ülke işaretleme ve keşif hedefleri ekleme' : 'Mark countries & wishlist on map',
+                  icon: Icons.public_rounded,
+                ),
+                const Divider(height: 1),
+                _buildRestrictionToggle(
+                  keyName: 'cloud_sync',
+                  title: isTr ? 'Bulut Senkronizasyonu' : l10n.adminRestrictCloudSync,
+                  subtitle: isTr ? 'Verilerin buluta senkronize edilmesi' : 'Sync data with remote cloud',
+                  icon: Icons.sync_disabled_rounded,
+                ),
+                const Divider(height: 1),
+                _buildRestrictionToggle(
+                  keyName: 'ai_features',
+                  title: isTr ? 'Akıllı Asistan & AI Önerileri' : 'Smart AI Suggestions',
+                  subtitle: isTr ? 'Yapay zeka bavul ve gezi tavsiyeleri' : 'Smart AI luggage recommendations',
+                  icon: Icons.auto_awesome_rounded,
+                ),
+                const Divider(height: 1),
+                _buildRestrictionToggle(
+                  keyName: 'export_data',
+                  title: isTr ? 'Rapor & Veri Dışa Aktarma' : 'Data & PDF Export',
+                  subtitle: isTr ? 'PDF seyahat özeti ve veri dışa aktarımı' : 'Export PDF itineraries & records',
+                  icon: Icons.file_download_rounded,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // 7. Direct Account & All Data Purge Card
+          AppCard(
+            borderRadius: 18,
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.errorPastel.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.delete_forever_rounded,
+                        color: AppColors.errorPastel,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.warning_amber_rounded, color: Color(0xFFD97706), size: 22),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              l10n.adminPendingDeletionBadge(widget.user.daysUntilPermanentDeletion ?? 15),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFFD97706),
-                                fontSize: 13,
-                              ),
-                            ),
+                          Text(
+                            isTr ? 'Hesabı ve Tüm Verilerini Sil' : 'Purge Account & All Data',
+                            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                          ),
+                          Text(
+                            isTr
+                                ? 'Kullanıcının hesabı, seyahatleri, harcamaları ve kasa verileri kalıcı olarak silinir.'
+                                : 'Permanently purges account, trips, expenses, and cloud documents.',
+                            style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.errorPastel,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                    onPressed: () => _confirmPurgeUser(context, l10n),
+                    icon: const Icon(Icons.delete_forever_rounded, size: 18),
+                    label: Text(
+                      isTr ? 'Hesabı ve Tüm Verileri Temizle (Purge)' : 'Purge Account & All Data Now',
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // 8. Save Moderation Changes Button
+          BouncyPressable(
+            onTap: _isSaving ? null : _saveChanges,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Center(
+                child: _isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(
+                        l10n.adminSaveChanges,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // =========================================================================
+  // PAGE 2: İSTATİSTİKLER & DETAYLAR (Stats, Analytics & Details Page)
+  // =========================================================================
+  Widget _buildStatisticsPage(
+    BuildContext context,
+    AdminUserModel user,
+    AppLocalizations l10n,
+    bool isTr,
+    double bottomInset,
+  ) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 8,
+        bottom: bottomInset + 24,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                isTr ? 'Kullanıcı İstatistik & Veri Merkezi' : 'User Statistics & Data Hub',
+                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+              ),
+              IconButton(
+                icon: const Icon(Icons.refresh_rounded, size: 18),
+                onPressed: _reloadAllData,
+                tooltip: isTr ? 'Tüm Verileri Yenile' : 'Refresh All Data',
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // 1. Live Geo, Identity & Preferences Overview Card
+          _buildUserIdentityCard(context, user, isTr),
+          const SizedBox(height: 16),
+
+          // 2. Country Journey (Gezdiği, Gezmek İstediği ve Yaşadığı Ülke)
+          _buildCountryJourneySection(context, user, isTr),
+          const SizedBox(height: 16),
+
+          // 3. Dynamic App Usage Duration Analytics (Günlük, Haftalık, Aylık, Tüm Zamanlar, Özel Tarihler)
+          _buildUsageAnalyticsSection(context, user, isTr),
+          const SizedBox(height: 16),
+
+          // 4. Kasadakileri Görme (Vault Documents Inspection - CRITICAL: PRESERVED EXACTLY AS-IS)
+          _buildVaultDocumentsSection(context, l10n, isTr),
+          const SizedBox(height: 16),
+
+          // 5. Seyahat Planlarını Görme (Travel Plans & Itineraries)
+          _buildTripsSection(context, isTr),
+          const SizedBox(height: 16),
+
+          // 6. Harcamalarını Görme (Expenses & Budget Breakdown)
+          _buildExpensesSection(context, isTr),
+          const SizedBox(height: 16),
+
+          // 7. Cihaz, Depolama & Hesap Detayları (Account Metadata)
+          _buildAccountMetadataCard(context, user, isTr),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+
+  // =========================================================================
+  // SECTION WIDGETS
+  // =========================================================================
+
+  /// Warning Dispatch Card in Action Page
+  Widget _buildWarningDispatchCard(BuildContext context, AdminUserModel user, bool isTr) {
+    final theme = Theme.of(context);
+    final lastWarningStr = user.lastInactivityWarningAt != null
+        ? AppDateFormatter.formatDateTime(user.lastInactivityWarningAt!)
+        : (isTr ? 'Henüz gönderilmedi' : 'None sent yet');
+
+    return AppCard(
+      borderRadius: 18,
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.campaign_rounded,
+                  color: Color(0xFFF59E0B),
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isTr ? 'Kullanıcıya Uyarı Gönderme' : 'Dispatch User Warning',
+                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                    ),
+                    Text(
+                      isTr
+                          ? 'Uygulama içi anlık bildirim ve resmi uyarı e-postası gönderin.'
+                          : 'Send in-app notification & urgent warning email.',
+                      style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          const Divider(height: 1),
+          const SizedBox(height: 8),
+          _buildInfoRow(
+            icon: Icons.mark_email_read_rounded,
+            label: isTr ? 'Gönderilen Uyarılar:' : 'Warnings Sent:',
+            value: isTr
+                ? '${user.inactivityWarningCount} adet (Son: $lastWarningStr)'
+                : '${user.inactivityWarningCount} sent (Last: $lastWarningStr)',
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+              ),
+              onPressed: () => _showSendWarningBottomSheet(context, user),
+              icon: const Icon(Icons.send_rounded, size: 16),
+              label: Text(
+                isTr ? 'Uyarı Mesajı / E-posta Gönder' : 'Send Warning Notification / Email',
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Live Identity, Live Location & Preferences Card
+  Widget _buildUserIdentityCard(BuildContext context, AdminUserModel user, bool isTr) {
+    final theme = Theme.of(context);
+    final liveFlag = countryCodeToFlagEmoji(user.effectiveLiveCountryCode);
+
+    String themeLabel;
+    String themeIcon;
+    switch (user.appThemeMode.toLowerCase()) {
+      case 'dark':
+        themeLabel = isTr ? 'Koyu Tema' : 'Dark Theme';
+        themeIcon = '🌙';
+        break;
+      case 'light':
+        themeLabel = isTr ? 'Açık Tema' : 'Light Theme';
+        themeIcon = '☀️';
+        break;
+      default:
+        themeLabel = isTr ? 'Sistem' : 'System';
+        themeIcon = '⚙️';
+        break;
+    }
+
+    String langLabel;
+    String langFlag;
+    switch (user.appLanguage.toLowerCase()) {
+      case 'tr':
+        langLabel = 'Türkçe';
+        langFlag = '🇹🇷';
+        break;
+      case 'en':
+        langLabel = 'English';
+        langFlag = '🇬🇧';
+        break;
+      case 'de':
+        langLabel = 'Deutsch';
+        langFlag = '🇩🇪';
+        break;
+      case 'fr':
+        langLabel = 'Français';
+        langFlag = '🇫🇷';
+        break;
+      case 'es':
+        langLabel = 'Español';
+        langFlag = '🇪🇸';
+        break;
+      default:
+        langLabel = user.appLanguage.toUpperCase();
+        langFlag = '🌐';
+        break;
+    }
+
+    return AppCard(
+      borderRadius: 18,
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0EA5E9).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.person_pin_circle_rounded, color: Color(0xFF0EA5E9), size: 20),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isTr ? 'Konum ve Sistem Bilgileri' : 'Location & System Overview',
+                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                    ),
+                    Text(
+                      isTr ? 'Canlı konum, ana para birimi ve dil/tema ayarları' : 'Live location, base currency & preferences',
+                      style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isTr ? 'Canlı Konum' : 'Live Location',
+                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                      const SizedBox(height: 4),
                       Row(
                         children: [
+                          Text(liveFlag, style: const TextStyle(fontSize: 16)),
+                          const SizedBox(width: 6),
                           Expanded(
-                            child: OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              ),
-                              onPressed: () async {
-                                await ref.read(adminServiceProvider).cancelAccountDeletionAsAdmin(widget.user.uid);
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).clearSnackBars();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(l10n.adminDeletionCancelled),
-                                      backgroundColor: AppColors.successPastel,
-                                    ),
-                                  );
-                                  Navigator.of(context).pop();
-                                  ref.read(adminControllerProvider.notifier).loadUsers();
-                                }
-                              },
-                              child: Text(l10n.adminCancelDeletion),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: FilledButton(
-                              style: FilledButton.styleFrom(
-                                backgroundColor: AppColors.errorPastel,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              ),
-                              onPressed: () => _confirmPurgeUser(context, l10n),
-                              child: Text(l10n.adminPurgeNow),
+                            child: Text(
+                              user.liveCity.isNotEmpty
+                                  ? '${user.effectiveLiveCountryName} (${user.liveCity})'
+                                  : user.effectiveLiveCountryName,
+                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -3012,358 +4702,1057 @@ class _UserModerationBottomSheetState
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
-              ],
-
-              // Inactivity & Auto-Deletion Status (6 Months / 5th Month Policy)
-              _buildInactivityStatusCard(context),
-              const SizedBox(height: 16),
-
-              // Comprehensive User Analytics & Metrics Hub
-              _buildUserAnalyticsHub(context, widget.user),
-              const SizedBox(height: 16),
-
-              // SECTION 1: Pro Membership Toggle
-              AppCard(
-                borderRadius: 18,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFD97706).withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.workspace_premium_rounded,
-                        color: Color(0xFFD97706),
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.adminProUsers,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 14,
-                            ),
-                          ),
-                          Text(
-                            _isPro ? l10n.adminGrantPro : l10n.adminRevokePro,
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Switch.adaptive(
-                      value: _isPro,
-                      activeThumbColor: const Color(0xFFD97706),
-                      activeTrackColor: const Color(0xFFD97706).withValues(alpha: 0.5),
-                      onChanged: (val) => setState(() => _isPro = val),
-                    ),
-                  ],
-                ),
               ),
-              const SizedBox(height: 16),
-
-              // SECTION 2: Account Ban & Suspension
-              Text(
-                l10n.adminBanStatusLabel,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 8),
-              AppCard(
-                borderRadius: 18,
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _buildBanChoiceChip(
-                          label: l10n.adminUnbanned,
-                          isSelected: _banStatus == 'none',
-                          onTap: () => _setBanDuration('none', null),
-                          activeColor: AppColors.successPastel,
-                        ),
-                        _buildBanChoiceChip(
-                          label: l10n.adminBan24h,
-                          isSelected: _banStatus == 'temporary' &&
-                              _banExpiresAt != null &&
-                              _isExpiresWithin(const Duration(hours: 25)),
-                          onTap: () => _setBanDuration('temporary', const Duration(hours: 24)),
-                          activeColor: AppColors.warningPastel,
-                        ),
-                        _buildBanChoiceChip(
-                          label: l10n.adminBan7d,
-                          isSelected: _banStatus == 'temporary' &&
-                              _banExpiresAt != null &&
-                              _isExpiresAround(7),
-                          onTap: () => _setBanDuration('temporary', const Duration(days: 7)),
-                          activeColor: AppColors.warningPastel,
-                        ),
-                        _buildBanChoiceChip(
-                          label: l10n.adminBan30d,
-                          isSelected: _banStatus == 'temporary' &&
-                              _banExpiresAt != null &&
-                              _isExpiresAround(30),
-                          onTap: () => _setBanDuration('temporary', const Duration(days: 30)),
-                          activeColor: AppColors.warningPastel,
-                        ),
-                        _buildBanChoiceChip(
-                          label: l10n.adminPermanentBan,
-                          isSelected: _banStatus == 'permanent',
-                          onTap: () => _setBanDuration('permanent', null),
-                          activeColor: AppColors.errorPastel,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: _reasonController,
-                      decoration: InputDecoration(
-                        labelText: l10n.adminBanReasonLabel,
-                        hintText: l10n.adminBanReasonHint,
-                        prefixIcon: const Icon(Icons.edit_note_rounded, size: 20),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // SECTION 3: Granular Feature Restrictions
-              Text(
-                l10n.adminFeatureRestrictionsLabel,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 8),
-              AppCard(
-                borderRadius: 18,
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  children: [
-                    _buildRestrictionToggle(
-                      keyName: 'trip_create',
-                      title: isTr ? 'Seyahat Oluşturma' : l10n.adminRestrictTripCreate,
-                      subtitle: isTr ? 'Yeni gezi planı ve rota ekleme' : 'Create new trip itineraries',
-                      icon: Icons.flight_takeoff_rounded,
-                    ),
-                    const Divider(height: 1),
-                    _buildRestrictionToggle(
-                      keyName: 'trip_share',
-                      title: isTr ? 'Seyahat Paylaşımı & İşbirliği' : 'Trip Collaboration',
-                      subtitle: isTr ? 'Gezilere arkadaş davet etme ve ortak yönetim' : 'Invite members & share trips',
-                      icon: Icons.group_add_rounded,
-                    ),
-                    const Divider(height: 1),
-                    _buildRestrictionToggle(
-                      keyName: 'expense_add',
-                      title: isTr ? 'Harcama & Bütçe Girişi' : l10n.adminRestrictExpenseAdd,
-                      subtitle: isTr ? 'Seyahat harcaması ve bütçe kaydetme' : 'Add expenses & manage budget',
-                      icon: Icons.receipt_long_rounded,
-                    ),
-                    const Divider(height: 1),
-                    _buildRestrictionToggle(
-                      keyName: 'checklist_manage',
-                      title: isTr ? 'Bavul Listesi Yönetimi' : 'Packing Checklist',
-                      subtitle: isTr ? 'Bavul eşyaları ekleme ve düzenleme' : 'Manage packing luggage items',
-                      icon: Icons.checklist_rounded,
-                    ),
-                    const Divider(height: 1),
-                    _buildRestrictionToggle(
-                      keyName: 'vault_upload',
-                      title: isTr ? 'Güvenli Kasa Dosya Yükleme' : l10n.adminRestrictVaultUpload,
-                      subtitle: isTr ? 'Pasaport, bilet ve kasa belgesi yükleme' : 'Upload vault documents & tickets',
-                      icon: Icons.cloud_upload_rounded,
-                    ),
-                    const Divider(height: 1),
-                    _buildRestrictionToggle(
-                      keyName: 'travel_map_edit',
-                      title: isTr ? 'Dünya Haritası İşaretleme' : 'World Travel Map Editing',
-                      subtitle: isTr ? 'Ülke işaretleme ve keşif hedefleri ekleme' : 'Mark countries & wishlist on map',
-                      icon: Icons.public_rounded,
-                    ),
-                    const Divider(height: 1),
-                    _buildRestrictionToggle(
-                      keyName: 'cloud_sync',
-                      title: isTr ? 'Bulut Senkronizasyonu' : l10n.adminRestrictCloudSync,
-                      subtitle: isTr ? 'Verilerin buluta senkronize edilmesi' : 'Sync data with remote cloud',
-                      icon: Icons.sync_disabled_rounded,
-                    ),
-                    const Divider(height: 1),
-                    _buildRestrictionToggle(
-                      keyName: 'ai_features',
-                      title: isTr ? 'Akıllı Asistan & AI Önerileri' : 'Smart AI Suggestions',
-                      subtitle: isTr ? 'Yapay zeka bavul ve gezi tavsiyeleri' : 'Smart AI luggage recommendations',
-                      icon: Icons.auto_awesome_rounded,
-                    ),
-                    const Divider(height: 1),
-                    _buildRestrictionToggle(
-                      keyName: 'export_data',
-                      title: isTr ? 'Rapor & Veri Dışa Aktarma' : 'Data & PDF Export',
-                      subtitle: isTr ? 'PDF seyahat özeti ve veri dışa aktarımı' : 'Export PDF itineraries & records',
-                      icon: Icons.file_download_rounded,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // SECTION 4: Uploaded Vault Documents (Inspect / Moderate)
-              Text(
-                l10n.adminVaultDocumentsTitle,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 8),
-              FutureBuilder<List<VaultDocument>>(
-                future: _documentsFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(16),
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    );
-                  }
-                  final docs = snapshot.data ?? [];
-                  if (docs.isEmpty) {
-                    return AppCard(
-                      borderRadius: 16,
-                      padding: const EdgeInsets.all(16),
-                      child: Center(
-                        child: Text(
-                          l10n.adminNoDocumentsUploaded,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    );
-                  }
-
-                  return Column(
-                    children: docs.map((doc) {
-                      final ext = doc.fileExtension?.toUpperCase() ?? 'DOC';
-                      final isImage = ['JPG', 'JPEG', 'PNG', 'WEBP', 'GIF'].contains(ext);
-                      final isPdf = ext == 'PDF';
-
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: AppCard(
-                          borderRadius: 14,
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: (isImage ? const Color(0xFF3B82F6) : const Color(0xFFEF4444)).withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Icon(
-                                  isImage ? Icons.image_rounded : (isPdf ? Icons.picture_as_pdf_rounded : Icons.description_rounded),
-                                  size: 20,
-                                  color: isImage ? const Color(0xFF3B82F6) : const Color(0xFFEF4444),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      doc.title,
-                                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      '${doc.category} • $ext • ${formatStorageBytes(doc.fileSize)}',
-                                      style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              OutlinedButton(
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                  minimumSize: Size.zero,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                ),
-                                onPressed: () => _inspectDocument(context, doc, l10n),
-                                child: Text(l10n.adminInspectDocument, style: const TextStyle(fontSize: 11)),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  );
-                },
-              ),
-              const SizedBox(height: 24),
-
-              // SAVE BUTTON
-              BouncyPressable(
-                onTap: _isSaving ? null : _saveChanges,
+              const SizedBox(width: 8),
+              Expanded(
                 child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(16),
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Center(
-                    child: _isSaving
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : Text(
-                            l10n.adminSaveChanges,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isTr ? 'Para Birimi & Tercihler' : 'Currency & Style',
+                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${user.currencyCode} • $themeIcon $themeLabel • $langFlag $langLabel',
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
                 ),
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  /// Country Travel Stats (Gezdiği, Gezmek İstediği ve Yaşadığı Ülke)
+  Widget _buildCountryJourneySection(BuildContext context, AdminUserModel user, bool isTr) {
+    final theme = Theme.of(context);
+
+    return AppCard(
+      borderRadius: 18,
+      padding: const EdgeInsets.all(16),
+      child: FutureBuilder<List<TravelCountry>>(
+        future: _countriesFuture,
+        builder: (context, snapshot) {
+          final isLoading = snapshot.connectionState == ConnectionState.waiting;
+          final countries = snapshot.data ?? [];
+          final visited = countries.where((c) => c.status == CountryStatus.visited || c.isVisited).toList();
+          final wishlist = countries.where((c) => c.status == CountryStatus.wishlist || c.isWishlist).toList();
+          final lived = countries.where((c) => c.status == CountryStatus.lived || c.isLived).toList();
+
+          // User-specific live counts (no data contagion)
+          final visitedCount = isLoading ? user.visitedWorldMapCount : visited.length;
+          final wishlistCount = isLoading ? user.wishlistWorldMapCount : wishlist.length;
+          final livedCount = isLoading
+              ? (user.livedWorldMapCount > 0 ? user.livedWorldMapCount : 1)
+              : (lived.isNotEmpty ? lived.length : 1);
+          final exploredPercent = WorldCountriesData.allCountries.isNotEmpty
+              ? (visitedCount / WorldCountriesData.allCountries.length * 100)
+              : user.worldExploredPercentage;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Text('🌍', style: TextStyle(fontSize: 18)),
+                      const SizedBox(width: 8),
+                      Text(
+                        isTr ? 'Ülke ve Seyahat Haritası' : 'Country & Travel Journey',
+                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                      ),
+                      if (isLoading) ...[
+                        const SizedBox(width: 8),
+                        const SizedBox(
+                          width: 12,
+                          height: 12,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ],
+                    ],
+                  ),
+                  Text(
+                    '%${exploredPercent.toStringAsFixed(1)} ${isTr ? "Keşif" : "Explored"}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFFF97316),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: (exploredPercent / 100).clamp(0.0, 1.0),
+                  minHeight: 6,
+                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFF97316)),
+                ),
+              ),
+              const SizedBox(height: 14),
+
+              // 1. YAŞADIĞI ÜLKE (Living Country)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF8B5CF6).withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFF8B5CF6).withValues(alpha: 0.2)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.home_work_rounded, color: Color(0xFF8B5CF6), size: 16),
+                        const SizedBox(width: 6),
+                        Text(
+                          isTr ? 'Yaşadığı Ülke / İkamet ($livedCount)' : 'Living / Resident Country ($livedCount)',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF8B5CF6)),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: [
+                        // Live / Detected Home Country
+                        Chip(
+                          backgroundColor: theme.colorScheme.surface,
+                          side: BorderSide(color: const Color(0xFF8B5CF6).withValues(alpha: 0.3)),
+                          labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+                          visualDensity: VisualDensity.compact,
+                          avatar: Text(
+                            countryCodeToFlagEmoji(user.effectiveLiveCountryCode),
+                            style: const TextStyle(fontSize: 14),
+                          ),
+                          label: Text(
+                            user.liveCity.isNotEmpty
+                                ? '${user.effectiveLiveCountryName} (${user.liveCity})'
+                                : user.effectiveLiveCountryName,
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        // Additional countries marked as lived
+                        ...lived.where((c) => c.code.toUpperCase() != user.effectiveLiveCountryCode.toUpperCase()).map((c) {
+                          return Chip(
+                            backgroundColor: theme.colorScheme.surface,
+                            side: BorderSide(color: const Color(0xFF8B5CF6).withValues(alpha: 0.3)),
+                            labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+                            visualDensity: VisualDensity.compact,
+                            avatar: Text(c.flag, style: const TextStyle(fontSize: 14)),
+                            label: Text(
+                              c.getLocalizedName(isTr ? 'tr' : 'en'),
+                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              // 2. GEZDİĞİ ÜLKELER (Visited Countries)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.2)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.flight_takeoff_rounded, color: Color(0xFF10B981), size: 16),
+                        const SizedBox(width: 6),
+                        Text(
+                          isTr ? 'Gezdiği Ülkeler ($visitedCount)' : 'Visited Countries ($visitedCount)',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    if (visited.isEmpty)
+                      Text(
+                        visitedCount > 0
+                            ? (isTr ? '$visitedCount ülke gezildi olarak işaretli' : '$visitedCount countries marked as visited')
+                            : (isTr ? 'Henüz gezilen ülke eklenmedi.' : 'No visited countries added yet.'),
+                        style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                      )
+                    else
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: visited.map((c) {
+                          return Chip(
+                            backgroundColor: theme.colorScheme.surface,
+                            side: BorderSide(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
+                            labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+                            visualDensity: VisualDensity.compact,
+                            avatar: Text(c.flag, style: const TextStyle(fontSize: 14)),
+                            label: Text(
+                              c.getLocalizedName(isTr ? 'tr' : 'en'),
+                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              // 3. GEZMEK İSTEDİĞİ ÜLKELER (Wishlist Countries)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF3B82F6).withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.2)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.bookmark_added_rounded, color: Color(0xFF3B82F6), size: 16),
+                        const SizedBox(width: 6),
+                        Text(
+                          isTr ? 'Gezmek İstediği Ülkeler ($wishlistCount)' : 'Wishlist / Target Countries ($wishlistCount)',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF3B82F6)),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    if (wishlist.isEmpty)
+                      Text(
+                        wishlistCount > 0
+                            ? (isTr ? '$wishlistCount hedef ülke listede' : '$wishlistCount target countries in wishlist')
+                            : (isTr ? 'Henüz hedef ülke eklenmedi.' : 'No wishlist countries added yet.'),
+                        style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                      )
+                    else
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: wishlist.map((c) {
+                          return Chip(
+                            backgroundColor: theme.colorScheme.surface,
+                            side: BorderSide(color: const Color(0xFF3B82F6).withValues(alpha: 0.3)),
+                            labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+                            visualDensity: VisualDensity.compact,
+                            avatar: Text(c.flag, style: const TextStyle(fontSize: 14)),
+                            label: Text(
+                              c.getLocalizedName(isTr ? 'tr' : 'en'),
+                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  /// App Usage Duration Analytics (Günlük, Haftalık, Aylık, Tüm Zamanlar, Özel Tarihler)
+  Widget _buildUsageAnalyticsSection(BuildContext context, AdminUserModel user, bool isTr) {
+    final theme = Theme.of(context);
+
+    return AppCard(
+      borderRadius: 18,
+      padding: const EdgeInsets.all(16),
+      child: FutureBuilder<List<AdminUserSessionLog>>(
+        future: _sessionsFuture,
+        builder: (context, snapshot) {
+          final logs = snapshot.data ?? [];
+          final usage = _calculatePeriodUsage(logs, user);
+
+          String customRangeLabel = '';
+          if (_usagePeriod == _ModerationUsagePeriod.custom) {
+            if (_customDateRange != null) {
+              customRangeLabel = AppDateFormatter.formatDateRange(
+                _customDateRange!.start,
+                _customDateRange!.end,
+                locale: isTr ? 'tr' : 'en',
+                includeYear: true,
+              );
+            } else {
+              customRangeLabel = isTr ? 'Tarih Seçin' : 'Select Dates';
+            }
+          }
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(7),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF6366F1).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.timer_outlined, color: Color(0xFF6366F1), size: 18),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    isTr ? 'Uygulama Kullanım Süresi' : 'App Usage Duration',
+                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // Filter Chips: Günlük, Haftalık, Aylık, Tüm Zamanlar, Özel Tarihler
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildUsagePeriodChip(
+                      key: const ValueKey('moderation_chip_daily'),
+                      label: isTr ? 'Günlük (24s)' : 'Daily (24h)',
+                      isSelected: _usagePeriod == _ModerationUsagePeriod.daily,
+                      onTap: () => setState(() => _usagePeriod = _ModerationUsagePeriod.daily),
+                    ),
+                    const SizedBox(width: 6),
+                    _buildUsagePeriodChip(
+                      key: const ValueKey('moderation_chip_weekly'),
+                      label: isTr ? 'Haftalık (7g)' : 'Weekly (7d)',
+                      isSelected: _usagePeriod == _ModerationUsagePeriod.weekly,
+                      onTap: () => setState(() => _usagePeriod = _ModerationUsagePeriod.weekly),
+                    ),
+                    const SizedBox(width: 6),
+                    _buildUsagePeriodChip(
+                      key: const ValueKey('moderation_chip_monthly'),
+                      label: isTr ? 'Aylık (30g)' : 'Monthly (30d)',
+                      isSelected: _usagePeriod == _ModerationUsagePeriod.monthly,
+                      onTap: () => setState(() => _usagePeriod = _ModerationUsagePeriod.monthly),
+                    ),
+                    const SizedBox(width: 6),
+                    _buildUsagePeriodChip(
+                      key: const ValueKey('moderation_chip_all_time'),
+                      label: isTr ? 'Tüm Zamanlar' : 'All-Time',
+                      isSelected: _usagePeriod == _ModerationUsagePeriod.allTime,
+                      onTap: () => setState(() => _usagePeriod = _ModerationUsagePeriod.allTime),
+                    ),
+                    const SizedBox(width: 6),
+                    _buildUsagePeriodChip(
+                      key: const ValueKey('moderation_chip_custom'),
+                      label: isTr ? 'Özel Tarihler' : 'Custom Dates',
+                      isSelected: _usagePeriod == _ModerationUsagePeriod.custom,
+                      onTap: () => _selectCustomDateRange(context),
+                      icon: Icons.calendar_month_rounded,
+                    ),
+                  ],
+                ),
+              ),
+
+              // Custom Date Range Indicator
+              if (_usagePeriod == _ModerationUsagePeriod.custom) ...[
+                const SizedBox(height: 10),
+                InkWell(
+                  onTap: () => _selectCustomDateRange(context),
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF6366F1).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: const Color(0xFF6366F1).withValues(alpha: 0.3)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.date_range_rounded, size: 14, color: Color(0xFF6366F1)),
+                        const SizedBox(width: 6),
+                        Text(
+                          customRangeLabel,
+                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF6366F1)),
+                        ),
+                        const SizedBox(width: 6),
+                        const Icon(Icons.edit_rounded, size: 12, color: Color(0xFF6366F1)),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: 12),
+
+              // Dynamic Metric Cards
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isTr ? 'Toplam Kullanım' : 'Total Usage',
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            formatDurationSeconds(usage.totalSeconds.toDouble()),
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isTr ? 'Oturum Sayısı' : 'Sessions',
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${usage.sessionCount} ${isTr ? "oturum" : "sessions"}',
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isTr ? 'Ortalama' : 'Avg Session',
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            formatDurationSeconds(usage.avgSeconds),
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildUsagePeriodChip({
+    Key? key,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+    IconData? icon,
+  }) {
+    final theme = Theme.of(context);
+    return BouncyPressable(
+      key: key,
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? const Color(0xFF6366F1)
+              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(icon, size: 12, color: isSelected ? Colors.white : theme.colorScheme.onSurface),
+              const SizedBox(width: 4),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected ? Colors.white : theme.colorScheme.onSurface,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
+
+  /// Kasadaki Belgeleri Görme (PRESERVED EXACTLY AS-IS)
+  Widget _buildVaultDocumentsSection(BuildContext context, AppLocalizations l10n, bool isTr) {
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(7),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF6B7280).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.shield_rounded, size: 18, color: Color(0xFF6B7280)),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      l10n.adminVaultDocumentsTitle,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              onPressed: _reloadDocuments,
+              tooltip: isTr ? 'Yenile' : 'Refresh',
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        FutureBuilder<List<VaultDocument>>(
+          future: _documentsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              );
+            }
+            final docs = snapshot.data ?? [];
+            if (docs.isEmpty) {
+              return AppCard(
+                borderRadius: 16,
+                padding: const EdgeInsets.all(16),
+                child: Center(
+                  child: Text(
+                    l10n.adminNoDocumentsUploaded,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              );
+            }
+
+            return Column(
+              children: docs.map((doc) {
+                final ext = doc.fileExtension?.toUpperCase() ?? 'DOC';
+                final isImage = ['JPG', 'JPEG', 'PNG', 'WEBP', 'GIF'].contains(ext);
+                final isPdf = ext == 'PDF';
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: AppCard(
+                    borderRadius: 14,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: (isImage ? const Color(0xFF3B82F6) : const Color(0xFFEF4444)).withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            isImage ? Icons.image_rounded : (isPdf ? Icons.picture_as_pdf_rounded : Icons.description_rounded),
+                            size: 20,
+                            color: isImage ? const Color(0xFF3B82F6) : const Color(0xFFEF4444),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                doc.title,
+                                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${doc.category} • $ext • ${formatStorageBytes(doc.fileSize)}',
+                                style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                              ),
+                            ],
+                          ),
+                        ),
+                        OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            minimumSize: Size.zero,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          onPressed: () => _inspectDocument(context, doc, l10n),
+                          child: Text(l10n.adminInspectDocument, style: const TextStyle(fontSize: 11)),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  /// Seyahat Planlarını Görme (Travel Plans & Trips)
+  Widget _buildTripsSection(BuildContext context, bool isTr) {
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(7),
+              decoration: BoxDecoration(
+                color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.luggage_rounded, size: 18, color: Color(0xFF3B82F6)),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              isTr ? 'Seyahat Planları' : 'Travel Plans & Itineraries',
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        FutureBuilder<List<Trip>>(
+          future: _tripsFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              );
+            }
+            final trips = snapshot.data ?? [];
+            if (trips.isEmpty) {
+              return AppCard(
+                borderRadius: 16,
+                padding: const EdgeInsets.all(16),
+                child: Center(
+                  child: Text(
+                    isTr ? 'Kullanıcının kayıtlı seyahati bulunmuyor.' : 'No registered trips found for this user.',
+                    style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurfaceVariant),
+                  ),
+                ),
+              );
+            }
+
+            return Column(
+              children: trips.map((t) {
+                final isPast = t.endDate.isBefore(DateTime.now());
+                final isUpcoming = t.startDate.isAfter(DateTime.now());
+                final statusText = isUpcoming
+                    ? (isTr ? 'Yaklaşan' : 'Upcoming')
+                    : (isPast ? (isTr ? 'Tamamlandı' : 'Completed') : (isTr ? 'Devam Ediyor' : 'Ongoing'));
+                final statusColor = isUpcoming
+                    ? const Color(0xFF3B82F6)
+                    : (isPast ? const Color(0xFF6B7280) : const Color(0xFF10B981));
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: AppCard(
+                    borderRadius: 14,
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Text(
+                                    countryCodeToFlagEmoji(t.countryCode ?? 'US'),
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      t.title,
+                                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: statusColor.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                statusText,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: statusColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            Icon(Icons.place_rounded, size: 14, color: theme.colorScheme.onSurfaceVariant),
+                            const SizedBox(width: 4),
+                            Text(
+                              t.destination,
+                              style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                            ),
+                            const SizedBox(width: 12),
+                            Icon(Icons.date_range_rounded, size: 14, color: theme.colorScheme.onSurfaceVariant),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                AppDateFormatter.formatDateRange(
+                                  t.startDate,
+                                  t.endDate,
+                                  locale: isTr ? 'tr' : 'en',
+                                ),
+                                style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (t.budgetLimit != null && t.budgetLimit! > 0) ...[
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              const Icon(Icons.account_balance_wallet_rounded, size: 14, color: Color(0xFF10B981)),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${isTr ? "Bütçe Sınırı:" : "Budget Limit:"} ${t.budgetLimit!.toStringAsFixed(2)} ${t.defaultCurrency}',
+                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                              ),
+                              if (t.isShared) ...[
+                                const Spacer(),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.group_rounded, size: 11, color: Color(0xFF8B5CF6)),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        isTr ? 'Ortak Seyahat' : 'Shared Trip',
+                                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF8B5CF6)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  /// Harcamalarını Görme (Expenses & Budget Breakdown)
+  Widget _buildExpensesSection(BuildContext context, bool isTr) {
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(7),
+              decoration: BoxDecoration(
+                color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.receipt_long_rounded, size: 18, color: Color(0xFF10B981)),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              isTr ? 'Harcamalar & Bütçe' : 'Expenses & Budget',
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        FutureBuilder<List<Expense>>(
+          future: _expensesFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              );
+            }
+            final expenses = snapshot.data ?? [];
+            if (expenses.isEmpty) {
+              return AppCard(
+                borderRadius: 16,
+                padding: const EdgeInsets.all(16),
+                child: Center(
+                  child: Text(
+                    isTr ? 'Kullanıcının kayıtlı harcaması bulunmuyor.' : 'No registered expenses found for this user.',
+                    style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurfaceVariant),
+                  ),
+                ),
+              );
+            }
+
+            // Group total sums by currency
+            final Map<String, double> currencySums = {};
+            for (final exp in expenses) {
+              currencySums[exp.currency] = (currencySums[exp.currency] ?? 0.0) + exp.amount;
+            }
+
+            final totalSumString = currencySums.entries
+                .map((e) => '${e.value.toStringAsFixed(2)} ${e.key}')
+                .join(' • ');
+
+            return Column(
+              children: [
+                // Total Expense Summary Card
+                AppCard(
+                  borderRadius: 14,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.payments_rounded, color: Color(0xFF10B981), size: 18),
+                      const SizedBox(width: 8),
+                      Text(
+                        isTr ? 'Toplam Harcama:' : 'Total Spending:',
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          totalSumString,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 13,
+                            color: Color(0xFF10B981),
+                          ),
+                          textAlign: TextAlign.end,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                // Recent expenses list
+                ...expenses.take(15).map((exp) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: AppCard(
+                      borderRadius: 12,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.shopping_bag_outlined, size: 16, color: Color(0xFF10B981)),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  exp.title,
+                                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  '${exp.category} • ${AppDateFormatter.formatYMMMd(exp.date, locale: isTr ? 'tr' : 'en')}',
+                                  style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurfaceVariant),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            '${exp.amount.toStringAsFixed(2)} ${exp.currency}',
+                            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  /// Metadata & Device Info Card
+  Widget _buildAccountMetadataCard(BuildContext context, AdminUserModel user, bool isTr) {
+    return AppCard(
+      borderRadius: 18,
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.info_outline_rounded, size: 18),
+              const SizedBox(width: 8),
+              Text(
+                isTr ? 'Hesap & Cihaz Detayları' : 'Account & Device Metadata',
+                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          const Divider(height: 1),
+          const SizedBox(height: 8),
+          _buildInfoRow(
+            icon: Icons.fingerprint_rounded,
+            label: 'UID:',
+            value: user.uid,
+          ),
+          const SizedBox(height: 4),
+          _buildInfoRow(
+            icon: Icons.calendar_today_rounded,
+            label: isTr ? 'Kayıt Tarihi:' : 'Registered:',
+            value: user.createdAt != null
+                ? AppDateFormatter.formatDateTime(user.createdAt!)
+                : (isTr ? 'Bilinmiyor' : 'Unknown'),
+          ),
+          const SizedBox(height: 4),
+          _buildInfoRow(
+            icon: Icons.login_rounded,
+            label: isTr ? 'Son Giriş:' : 'Last Login:',
+            value: user.lastLoginAt != null
+                ? AppDateFormatter.formatDateTime(user.lastLoginAt!)
+                : (isTr ? 'Bilinmiyor' : 'Unknown'),
+          ),
+          const SizedBox(height: 4),
+          _buildInfoRow(
+            icon: Icons.cloud_done_rounded,
+            label: isTr ? 'Kasa Depolama Alanı:' : 'Vault Storage Used:',
+            value: formatStorageBytes(user.totalVaultStorageBytes),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // =========================================================================
+  // HELPER WIDGETS & METHODS
+  // =========================================================================
 
   bool _isExpiresWithin(Duration d) {
     if (_banExpiresAt == null) return false;
@@ -3465,6 +5854,7 @@ class _UserModerationBottomSheetState
             ),
           ),
           Switch.adaptive(
+            key: ValueKey('switch_restriction_$keyName'),
             value: isRestricted,
             activeThumbColor: const Color(0xFF8B5CF6),
             activeTrackColor: const Color(0xFF8B5CF6).withValues(alpha: 0.5),
@@ -3595,353 +5985,8 @@ class _UserModerationBottomSheetState
               value: isTr ? '${180 - inactiveDays} gün kaldı' : '${180 - inactiveDays} days remaining',
             ),
           ],
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              // Interactive warning button
-              Expanded(
-                child: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                  ),
-                  onPressed: () => _showSendWarningBottomSheet(context, user),
-                  icon: const Icon(Icons.send_rounded, size: 14),
-                  label: Text(
-                    isTr ? 'Uyarı Gönder' : 'Send Warning',
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                ),
-              ),
-              if (is6thMonth) ...[
-                const SizedBox(width: 8),
-                Expanded(
-                  child: FilledButton.icon(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.errorPastel,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                    ),
-                    onPressed: () => _confirmPurgeUser(context, AppLocalizations.of(context)!),
-                    icon: const Icon(Icons.delete_forever_rounded, size: 14),
-                    label: Text(
-                      isTr ? 'Şimdi Sil' : 'Purge Now',
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
         ],
       ),
-    );
-  }
-
-  /// Displays comprehensive analytics and metrics hub for this specific user
-  Widget _buildUserAnalyticsHub(BuildContext context, AdminUserModel baseUser) {
-    final theme = Theme.of(context);
-    final isTr = Localizations.localeOf(context).languageCode == 'tr';
-    final user = ref.watch(adminControllerProvider).allUsers.firstWhere(
-      (u) => u.uid == baseUser.uid,
-      orElse: () => baseUser,
-    );
-    final liveFlag = countryCodeToFlagEmoji(user.effectiveLiveCountryCode);
-
-    String themeLabel;
-    String themeIcon;
-    switch (user.appThemeMode.toLowerCase()) {
-      case 'dark':
-        themeLabel = isTr ? 'Koyu Tema' : 'Dark Theme';
-        themeIcon = '🌙';
-        break;
-      case 'light':
-        themeLabel = isTr ? 'Açık Tema' : 'Light Theme';
-        themeIcon = '☀️';
-        break;
-      default:
-        themeLabel = isTr ? 'Sistem' : 'System';
-        themeIcon = '⚙️';
-        break;
-    }
-
-    String langLabel;
-    String langFlag;
-    switch (user.appLanguage.toLowerCase()) {
-      case 'tr':
-        langLabel = 'Türkçe';
-        langFlag = '🇹🇷';
-        break;
-      case 'en':
-        langLabel = 'English';
-        langFlag = '🇬🇧';
-        break;
-      case 'de':
-        langLabel = 'Deutsch';
-        langFlag = '🇩🇪';
-        break;
-      case 'fr':
-        langLabel = 'Français';
-        langFlag = '🇫🇷';
-        break;
-      case 'es':
-        langLabel = 'Español';
-        langFlag = '🇪🇸';
-        break;
-      default:
-        langLabel = user.appLanguage.toUpperCase();
-        langFlag = '🌐';
-        break;
-    }
-
-    return AppCard(
-      borderRadius: 18,
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0EA5E9).withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.analytics_rounded,
-                  color: Color(0xFF0EA5E9),
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      isTr ? 'Kullanıcı İstatistik & Analitik Özeti' : 'User Analytics & Metrics',
-                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
-                    ),
-                    Text(
-                      isTr
-                          ? 'Canlı konum, oturum ve seyahat verileri'
-                          : 'Live location, sessions, and travel metrics',
-                      style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-
-          // 1. Canlı Konum ve Tercihler
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        isTr ? 'Canlı Konum' : 'Live Location',
-                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Text(liveFlag, style: const TextStyle(fontSize: 15)),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              user.liveCity.isNotEmpty
-                                  ? '${user.effectiveLiveCountryName} (${user.liveCity})'
-                                  : user.effectiveLiveCountryName,
-                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        isTr ? 'Tercihler' : 'Preferences',
-                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '$themeIcon $themeLabel • $langFlag $langLabel',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 10),
-
-          // 2. Oturum & Kullanım Metrikleri
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        isTr ? 'Toplam Oturum' : 'Total Sessions',
-                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${user.sessionCount} ${isTr ? "oturum" : "sessions"}',
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
-                      ),
-                      Text(
-                        formatDurationSeconds(user.totalSessionSeconds.toDouble()),
-                        style: TextStyle(fontSize: 11, color: theme.colorScheme.primary, fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        isTr ? 'Ortalama Süre' : 'Avg Duration',
-                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        formatDurationSeconds(user.sessionCount > 0 ? (user.totalSessionSeconds / user.sessionCount) : 0.0),
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
-                      ),
-                      Text(
-                        '${isTr ? "Son:" : "Last:"} ${formatDurationSeconds(user.lastSessionSeconds.toDouble())}',
-                        style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 10),
-
-          // 3. Dünya Haritası İstatistikleri
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF97316).withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFF97316).withValues(alpha: 0.2)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        const Text('🌍', style: TextStyle(fontSize: 14)),
-                        const SizedBox(width: 6),
-                        Text(
-                          isTr ? 'Dünya Haritası Keşfi' : 'World Map Exploration',
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      '%${user.worldExploredPercentage.toStringAsFixed(1)}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFFF97316),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: LinearProgressIndicator(
-                    value: (user.worldExploredPercentage / 100).clamp(0.0, 1.0),
-                    minHeight: 6,
-                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFF97316)),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildUserStatBadge(isTr ? 'Gezilen' : 'Visited', '${user.visitedWorldMapCount}', const Color(0xFF10B981)),
-                    _buildUserStatBadge(isTr ? 'Hedef' : 'Wishlist', '${user.wishlistWorldMapCount}', const Color(0xFF3B82F6)),
-                    _buildUserStatBadge(isTr ? 'Yaşanan' : 'Lived', '${user.livedWorldMapCount}', const Color(0xFF8B5CF6)),
-                    _buildUserStatBadge(isTr ? 'Kasa' : 'Vault', formatStorageBytes(user.totalVaultStorageBytes), const Color(0xFF6B7280)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildUserStatBadge(String label, String value, Color color) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: color),
-        ),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 10, color: Colors.grey),
-        ),
-      ],
     );
   }
 
@@ -3992,18 +6037,32 @@ class _UserModerationBottomSheetState
             onPressed: () async {
               final nav = Navigator.of(context);
               final messenger = ScaffoldMessenger.of(context);
+              final isTr = Localizations.localeOf(context).languageCode == 'tr';
               Navigator.of(ctx).pop();
-              await ref.read(adminServiceProvider).purgeUserDataAsAdmin(widget.user.uid);
+              final success = await ref
+                  .read(adminControllerProvider.notifier)
+                  .purgeUser(widget.user.uid);
               if (mounted) {
-                messenger.clearSnackBars();
-                messenger.showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.adminDataPurged),
-                    backgroundColor: AppColors.errorPastel,
-                  ),
-                );
-                nav.pop();
-                ref.read(adminControllerProvider.notifier).loadUsers();
+                if (success) {
+                  messenger.clearSnackBars();
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text(l10n.adminDataPurged),
+                      backgroundColor: AppColors.errorPastel,
+                    ),
+                  );
+                  nav.pop();
+                } else {
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        ref.read(adminControllerProvider).errorMessage ??
+                            (isTr ? 'Kullanıcı silinemedi' : 'Failed to purge user'),
+                      ),
+                      backgroundColor: AppColors.errorPastel,
+                    ),
+                  );
+                }
               }
             },
             child: Text(l10n.adminPurgeNow),
@@ -5021,6 +7080,1446 @@ class _MetricCard extends StatelessWidget {
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Super Admin Mass Broadcast & Marketing Notification Bottom Sheet
+class _BroadcastCampaignBottomSheet extends ConsumerStatefulWidget {
+  const _BroadcastCampaignBottomSheet();
+
+  @override
+  ConsumerState<_BroadcastCampaignBottomSheet> createState() =>
+      _BroadcastCampaignBottomSheetState();
+}
+
+class _BroadcastCampaignBottomSheetState
+    extends ConsumerState<_BroadcastCampaignBottomSheet> {
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
+
+  String _selectedAudience = 'all'; // 'all', 'free_only', 'pro_only'
+  String _selectedType = 'discount'; // 'discount', 'announcement', 'feature', 'campaign'
+  String _selectedAction = 'paywall'; // 'paywall', 'travel_map', 'vault', 'checklist', 'none'
+  int? _discountPercent = 50;
+  bool _isSending = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _applyPreset('discount_50');
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  void _applyPreset(String key) {
+    setState(() {
+      if (key == 'discount_50') {
+        _titleController.text = "PackBuddy Pro'da %50 İndirim Fırsatı! 🚀";
+        _messageController.text =
+            "Sınırsız seyahat, otomatik hava durumu ve kasa belgeleri şimdi %50 indirimde!";
+        _selectedType = 'discount';
+        _selectedAction = 'paywall';
+        _discountPercent = 50;
+        _selectedAudience = 'free_only';
+      } else if (key == 'world_map') {
+        _titleController.text = "Dünya Seyahat Haritanızı Keşfedin! 🌍";
+        _messageController.text =
+            "Gezdiğiniz, yaşamak istediğiniz ülkeleri renklendirin ve seyahat izinizi hikaye olarak paylaşın.";
+        _selectedType = 'feature';
+        _selectedAction = 'travel_map';
+        _discountPercent = null;
+        _selectedAudience = 'all';
+      } else if (key == 'vacation') {
+        _titleController.text = "Tatil Sezonu Başladı! Bavulunuz Hazır mı? 🧳";
+        _messageController.text =
+            "Akıllı bagaj limitleri ve otomatik paketleme listeleriyle seyahatinize eksiksiz hazırlanın.";
+        _selectedType = 'campaign';
+        _selectedAction = 'checklist';
+        _discountPercent = null;
+        _selectedAudience = 'all';
+      } else if (key == 'vault') {
+        _titleController.text = "Seyahat Belgeleriniz Güvende mi? 🔐";
+        _messageController.text =
+            "Pasaport, vize ve uçak biletlerinizi biyometrik korumalı kasada saklayın, çevrimdışı dahi erişin.";
+        _selectedType = 'announcement';
+        _selectedAction = 'vault';
+        _discountPercent = null;
+        _selectedAudience = 'all';
+      }
+    });
+  }
+
+  Future<void> _handleSend() async {
+    final title = _titleController.text.trim();
+    final message = _messageController.text.trim();
+
+    if (title.isEmpty || message.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Lütfen bildirim başlığı ve açıklama metnini doldurun.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    final audienceText = _selectedAudience == 'all'
+        ? (isTr ? 'Tüm Kullanıcılar' : 'All Users')
+        : (_selectedAudience == 'free_only'
+            ? (isTr ? 'Ücretsiz Kullanıcılar' : 'Free Users')
+            : (isTr ? 'Pro Kullanıcılar' : 'Pro Users'));
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Icons.campaign_rounded, color: Color(0xFF8B5CF6)),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                isTr ? 'Toplu Bildirimi Onayla' : 'Confirm Broadcast',
+                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              isTr
+                  ? 'Bu bildirim seçilen kitledeki ($audienceText) tüm kullanıcılara telefon bildirimi olarak iletilecektir.'
+                  : 'This alert will be delivered as a push notification to all users in ($audienceText).',
+              style: const TextStyle(fontSize: 13.5),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF8B5CF6).withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFF8B5CF6).withValues(alpha: 0.2)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    message,
+                    style: const TextStyle(fontSize: 12),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(isTr ? 'Vazgeç' : 'Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFF8B5CF6),
+            ),
+            child: Text(isTr ? 'Hemen Gönder' : 'Dispatch Now'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    setState(() => _isSending = true);
+
+    final success =
+        await ref.read(adminControllerProvider.notifier).sendBroadcastAnnouncement(
+              title: title,
+              message: message,
+              type: _selectedType,
+              targetAction: _selectedAction,
+              targetAudience: _selectedAudience,
+              discountPercent: _discountPercent,
+            );
+
+    if (!mounted) return;
+    setState(() => _isSending = false);
+
+    if (success) {
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isTr
+                ? 'Toplu bildirim başarıyla yayınlandı ve cihazlara iletildi! 🚀'
+                : 'Broadcast notification successfully dispatched to devices! 🚀',
+          ),
+          backgroundColor: const Color(0xFF10B981),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isTr
+                ? 'Bildirim gönderilirken bir hata oluştu.'
+                : 'Failed to dispatch broadcast notification.',
+          ),
+          backgroundColor: const Color(0xFFEF4444),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.90,
+      ),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E1E24) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Drag Handle
+            Center(
+              child: Container(
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.6),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+
+            // Header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 16, 12),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.campaign_rounded,
+                      color: Color(0xFF8B5CF6),
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isTr
+                              ? 'Toplu Bildirim & Reklam Gönder'
+                              : 'Dispatch Broadcast & Ad',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        Text(
+                          isTr
+                              ? 'Tüm cihazların bildirim çubuğuna anında iletilir'
+                              : 'Delivered directly to phone system notification tray',
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+
+            // Scrollable Form Content
+            Flexible(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+                children: [
+                  // 1. Hedef Kitle (Target Audience)
+                  Text(
+                    isTr ? 'Hedef Kitle Segmenti' : 'Target Audience',
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      ChoiceChip(
+                        avatar: const Icon(Icons.groups_rounded, size: 16),
+                        label: Text(isTr ? 'Tüm Kullanıcılar' : 'All Users'),
+                        selected: _selectedAudience == 'all',
+                        onSelected: (val) {
+                          if (val) setState(() => _selectedAudience = 'all');
+                        },
+                      ),
+                      ChoiceChip(
+                        avatar: const Icon(Icons.money_off_csred_rounded, size: 16),
+                        label: Text(isTr ? 'Ücretsiz Üyeler (İndirim İçin)' : 'Free Tier Users'),
+                        selected: _selectedAudience == 'free_only',
+                        onSelected: (val) {
+                          if (val) setState(() => _selectedAudience = 'free_only');
+                        },
+                      ),
+                      ChoiceChip(
+                        avatar: const Icon(Icons.workspace_premium_rounded, size: 16),
+                        label: Text(isTr ? 'Sadece Pro Üyeler' : 'Pro Users Only'),
+                        selected: _selectedAudience == 'pro_only',
+                        onSelected: (val) {
+                          if (val) setState(() => _selectedAudience = 'pro_only');
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+
+                  // 2. Hızlı Şablonlar (Quick Templates)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        isTr ? 'Hazır Reklam Şablonları' : 'Quick Ad Presets',
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                      ),
+                      Text(
+                        isTr ? 'Tek tıkla doldur' : 'One-tap auto-fill',
+                        style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        ActionChip(
+                          avatar: const Text('🏷️', style: TextStyle(fontSize: 13)),
+                          label: Text(isTr ? '%50 Pro İndirimi' : '%50 Pro Discount'),
+                          onPressed: () => _applyPreset('discount_50'),
+                        ),
+                        const SizedBox(width: 8),
+                        ActionChip(
+                          avatar: const Text('🌍', style: TextStyle(fontSize: 13)),
+                          label: Text(isTr ? 'Dünya Haritası' : 'World Map'),
+                          onPressed: () => _applyPreset('world_map'),
+                        ),
+                        const SizedBox(width: 8),
+                        ActionChip(
+                          avatar: const Text('🧳', style: TextStyle(fontSize: 13)),
+                          label: Text(isTr ? 'Tatil Sezonu' : 'Vacation Season'),
+                          onPressed: () => _applyPreset('vacation'),
+                        ),
+                        const SizedBox(width: 8),
+                        ActionChip(
+                          avatar: const Text('🔐', style: TextStyle(fontSize: 13)),
+                          label: Text(isTr ? 'Belge Kasası' : 'Document Vault'),
+                          onPressed: () => _applyPreset('vault'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+
+                  // 3. Bildirim Türü & İndirim Oranı
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              isTr ? 'Bildirim Türü' : 'Notification Type',
+                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                            ),
+                            const SizedBox(height: 8),
+                            DropdownButtonFormField<String>(
+                              isExpanded: true,
+                              initialValue: _selectedType,
+                              decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              items: [
+                                DropdownMenuItem(
+                                  value: 'discount',
+                                  child: Text(isTr ? '🏷️ İndirim & Fırsat' : '🏷️ Discount & Offer', overflow: TextOverflow.ellipsis, maxLines: 1),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'campaign',
+                                  child: Text(isTr ? '🎁 Sezon Kampanyası' : '🎁 Seasonal Campaign', overflow: TextOverflow.ellipsis, maxLines: 1),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'feature',
+                                  child: Text(isTr ? '🚀 Yeni Özellik' : '🚀 Feature Launch', overflow: TextOverflow.ellipsis, maxLines: 1),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'announcement',
+                                  child: Text(isTr ? '📢 Genel Duyuru' : '📢 Announcement', overflow: TextOverflow.ellipsis, maxLines: 1),
+                                ),
+                              ],
+                              onChanged: (val) {
+                                if (val != null) setState(() => _selectedType = val);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              isTr ? 'İndirim Rozeti' : 'Discount Badge',
+                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                            ),
+                            const SizedBox(height: 8),
+                            DropdownButtonFormField<int?>(
+                              isExpanded: true,
+                              initialValue: _discountPercent,
+                              decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              items: [
+                                DropdownMenuItem(
+                                  value: null,
+                                  child: Text(isTr ? 'Yok / Standart' : 'None / Standard', overflow: TextOverflow.ellipsis, maxLines: 1),
+                                ),
+                                const DropdownMenuItem(value: 20, child: Text('%20 İndirim', overflow: TextOverflow.ellipsis, maxLines: 1)),
+                                const DropdownMenuItem(value: 30, child: Text('%30 İndirim', overflow: TextOverflow.ellipsis, maxLines: 1)),
+                                const DropdownMenuItem(value: 50, child: Text('%50 İndirim', overflow: TextOverflow.ellipsis, maxLines: 1)),
+                                const DropdownMenuItem(value: 70, child: Text('%70 İndirim', overflow: TextOverflow.ellipsis, maxLines: 1)),
+                              ],
+                              onChanged: (val) {
+                                setState(() => _discountPercent = val);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+
+                  // 4. Yönlendirme Aksiyonu (Target Action Route)
+                  Text(
+                    isTr ? 'Bildirime Tıklanınca Açılacak Sayfa' : 'Destination on Notification Tap',
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    isExpanded: true,
+                    initialValue: _selectedAction,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: 'paywall',
+                        child: Text(isTr ? '💳 Pro Satın Alma / İndirim Sayfası' : '💳 Pro Paywall / Subscription', overflow: TextOverflow.ellipsis, maxLines: 1),
+                      ),
+                      DropdownMenuItem(
+                        value: 'travel_map',
+                        child: Text(isTr ? '🌍 Dünya Seyahat Haritası' : '🌍 World Travel Map', overflow: TextOverflow.ellipsis, maxLines: 1),
+                      ),
+                      DropdownMenuItem(
+                        value: 'checklist',
+                        child: Text(isTr ? '🧳 Kontrol Listesi & Bagaj' : '🧳 Packing Checklist', overflow: TextOverflow.ellipsis, maxLines: 1),
+                      ),
+                      DropdownMenuItem(
+                        value: 'vault',
+                        child: Text(isTr ? '🔐 Güvenli Belge Kasası' : '🔐 Document Vault', overflow: TextOverflow.ellipsis, maxLines: 1),
+                      ),
+                      DropdownMenuItem(
+                        value: 'none',
+                        child: Text(isTr ? 'ℹ️ Sadece Bilgilendirme (Sayfa Açma)' : 'ℹ️ Alert Only', overflow: TextOverflow.ellipsis, maxLines: 1),
+                      ),
+                    ],
+                    onChanged: (val) {
+                      if (val != null) setState(() => _selectedAction = val);
+                    },
+                  ),
+                  const SizedBox(height: 18),
+
+                  // 5. Başlık ve Mesaj Girişi
+                  Text(
+                    isTr ? 'Bildirim Başlığı' : 'Notification Title',
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                  ),
+                  const SizedBox(height: 6),
+                  TextField(
+                    controller: _titleController,
+                    onChanged: (_) => setState(() {}),
+                    decoration: InputDecoration(
+                      hintText: isTr ? 'Örn: PackBuddy Pro\'da %50 İndirim! 🚀' : 'e.g. 50% Off PackBuddy Pro!',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  Text(
+                    isTr ? 'Açıklama / Reklam Metni' : 'Message Body',
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                  ),
+                  const SizedBox(height: 6),
+                  TextField(
+                    controller: _messageController,
+                    maxLines: 3,
+                    onChanged: (_) => setState(() {}),
+                    decoration: InputDecoration(
+                      hintText: isTr
+                          ? 'Örn: Sınırsız seyahat ve belge kasası şimdi indirimde!'
+                          : 'e.g. Unlimited travel planning and document vault on sale!',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 22),
+
+                  // 6. Canlı Telefon Bildirim Önizlemesi (Live Preview)
+                  Text(
+                    isTr ? 'Canlı Telefon Bildirim Önizlemesi' : 'Live Push Notification Preview',
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF26262E) : const Color(0xFFF3F4F6),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: const Color(0xFF8B5CF6).withValues(alpha: 0.35),
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.06),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // System tray header
+                        Row(
+                          children: [
+                            const AppLogo(size: 20),
+                            const SizedBox(width: 8),
+                            const Text(
+                              'PackBuddy',
+                              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
+                            ),
+                            const Text(
+                              ' • şimdi',
+                              style: TextStyle(fontSize: 11, color: Colors.grey),
+                            ),
+                            const Spacer(),
+                            if (_discountPercent != null)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF8B5CF6),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  '%$_discountPercent İNDİRİM',
+                                  style: const TextStyle(
+                                    fontSize: 9.5,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _titleController.text.isNotEmpty
+                              ? _titleController.text
+                              : (isTr ? 'Bildirim Başlığı Buraya Gelecek' : 'Notification Title Placeholder'),
+                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _messageController.text.isNotEmpty
+                              ? _messageController.text
+                              : (isTr
+                                  ? 'Kullanıcılara iletilecek reklam veya kampanya mesajı burada görünecek.'
+                                  : 'Message body placeholder will be displayed here.'),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            const Icon(Icons.touch_app_rounded, size: 14, color: Color(0xFF8B5CF6)),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                _selectedAction == 'paywall'
+                                    ? (isTr ? 'Tıklanınca: Pro İndirim Sayfası Açılacak' : 'Tap: Opens Pro Paywall')
+                                    : (_selectedAction == 'travel_map'
+                                        ? (isTr ? 'Tıklanınca: Dünya Haritası Açılacak' : 'Tap: Opens World Map')
+                                        : (_selectedAction == 'checklist'
+                                            ? (isTr ? 'Tıklanınca: Kontrol Listesi Açılacak' : 'Tap: Opens Checklist')
+                                            : (_selectedAction == 'vault'
+                                                ? (isTr ? 'Tıklanınca: Belge Kasası Açılacak' : 'Tap: Opens Vault')
+                                                : (isTr ? 'Tıklanınca: Uygulama Açılacak' : 'Tap: Opens App')))),
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF8B5CF6),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // 7. Gönder Butonu
+                  FilledButton.icon(
+                    onPressed: _isSending ? null : _handleSend,
+                    icon: _isSending
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          )
+                        : const Icon(Icons.send_rounded, size: 18),
+                    label: Text(
+                      _isSending
+                          ? (isTr ? 'Yayınlanıyor...' : 'Dispatching...')
+                          : (isTr ? 'Toplu Bildirimi Yayınla & Gönder' : 'Dispatch Broadcast Now'),
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
+                    ),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFF8B5CF6),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Super Admin Broadcast Campaign History Bottom Sheet
+class _BroadcastHistoryBottomSheet extends ConsumerStatefulWidget {
+  const _BroadcastHistoryBottomSheet();
+
+  @override
+  ConsumerState<_BroadcastHistoryBottomSheet> createState() =>
+      _BroadcastHistoryBottomSheetState();
+}
+
+class _BroadcastHistoryBottomSheetState
+    extends ConsumerState<_BroadcastHistoryBottomSheet> {
+  List<BroadcastAnnouncement>? _history;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadHistory();
+  }
+
+  Future<void> _loadHistory() async {
+    setState(() => _isLoading = true);
+    final list =
+        await ref.read(adminControllerProvider.notifier).fetchBroadcastHistory();
+    if (!mounted) return;
+    setState(() {
+      _history = list;
+      _isLoading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.85,
+      ),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E1E24) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            Center(
+              child: Container(
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.6),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 16, 12),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.history_rounded,
+                      color: Color(0xFF8B5CF6),
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isTr ? 'Gönderilen Reklam & Bildirimler' : 'Dispatched Campaigns',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        Text(
+                          isTr
+                              ? 'Daha önce yayınlanan tüm toplu bildirimler'
+                              : 'All previously dispatched broadcast announcements',
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.refresh_rounded),
+                    onPressed: _loadHistory,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(color: Color(0xFF8B5CF6)),
+                    )
+                  : (_history == null || _history!.isEmpty)
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.campaign_outlined,
+                                size: 56,
+                                color: theme.colorScheme.outlineVariant,
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                isTr
+                                    ? 'Henüz gönderilmiş toplu bildirim yok'
+                                    : 'No broadcast campaigns dispatched yet',
+                                style: theme.textTheme.titleSmall,
+                              ),
+                            ],
+                          ),
+                        )
+                      : ListView.separated(
+                          padding: const EdgeInsets.all(20),
+                          itemCount: _history!.length,
+                          separatorBuilder: (_, _) => const SizedBox(height: 12),
+                          itemBuilder: (ctx, index) {
+                            final b = _history![index];
+
+                            return Container(
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
+                                    : const Color(0xFFF9FAFB),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: b.active
+                                      ? const Color(0xFF8B5CF6).withValues(alpha: 0.3)
+                                      : theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          b.title,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 13.5,
+                                          ),
+                                        ),
+                                      ),
+                                      if (b.discountPercent != null)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+                                            borderRadius: BorderRadius.circular(6),
+                                          ),
+                                          child: Text(
+                                            '%${b.discountPercent} İNDİRİM',
+                                            style: const TextStyle(
+                                              fontSize: 9.5,
+                                              fontWeight: FontWeight.w900,
+                                              color: Color(0xFF8B5CF6),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    b.message,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue.withValues(alpha: 0.12),
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        child: Text(
+                                          b.targetAudience == 'free_only'
+                                              ? (isTr ? 'Ücretsiz Üyeler' : 'Free Users')
+                                              : (b.targetAudience == 'pro_only'
+                                                  ? (isTr ? 'Pro Üyeler' : 'Pro Users')
+                                                  : (isTr ? 'Tüm Gezginler' : 'All Users')),
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.blue,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        AppDateFormatter.formatDateTime(b.createdAt),
+                                        style: TextStyle(
+                                          fontSize: 10.5,
+                                          color: theme.colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      Text(
+                                        b.active ? (isTr ? 'Aktif' : 'Active') : (isTr ? 'Yayında Değil' : 'Inactive'),
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w700,
+                                          color: b.active ? const Color(0xFF10B981) : Colors.grey,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Switch.adaptive(
+                                        value: b.active,
+                                        activeThumbColor: const Color(0xFF8B5CF6),
+                                        onChanged: (newVal) async {
+                                          await ref
+                                              .read(adminControllerProvider.notifier)
+                                              .toggleBroadcastActive(b.id, newVal);
+                                          _loadHistory();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Full-Screen Searchable & Filterable Admin Audit Log History Sheet
+class _AllAuditLogsBottomSheet extends ConsumerStatefulWidget {
+  const _AllAuditLogsBottomSheet();
+
+  @override
+  ConsumerState<_AllAuditLogsBottomSheet> createState() =>
+      _AllAuditLogsBottomSheetState();
+}
+
+class _AllAuditLogsBottomSheetState
+    extends ConsumerState<_AllAuditLogsBottomSheet> {
+  final TextEditingController _searchController = TextEditingController();
+  String _selectedCategory = 'all';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _showDetailDialog(AdminAuditLog log, bool isTr) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+        contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: log.color.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(log.icon, color: log.color, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                log.actionTitle,
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Divider(),
+                const SizedBox(height: 8),
+                _buildRow(isTr ? 'Aksiyon' : 'Action', log.action, theme),
+                _buildRow(isTr ? 'Kategori' : 'Category', log.category.toUpperCase(), theme, badgeColor: log.color),
+                _buildRow(isTr ? 'Yönetici' : 'Admin', log.adminEmail, theme),
+                if (log.targetUserEmail != null && log.targetUserEmail!.isNotEmpty)
+                  _buildRow(isTr ? 'Hedef E-posta' : 'Target Email', log.targetUserEmail!, theme),
+                if (log.targetUserName != null && log.targetUserName!.isNotEmpty)
+                  _buildRow(isTr ? 'Kullanıcı Adı' : 'Display Name', log.targetUserName!, theme),
+                if (log.targetUid.isNotEmpty)
+                  _buildRow(isTr ? 'Hedef UID' : 'Target UID', log.targetUid, theme),
+                _buildRow(
+                  isTr ? 'Tarih & Saat' : 'Timestamp',
+                  '${log.timestamp.day.toString().padLeft(2, '0')}.${log.timestamp.month.toString().padLeft(2, '0')}.${log.timestamp.year} ${log.timestamp.hour.toString().padLeft(2, '0')}:${log.timestamp.minute.toString().padLeft(2, '0')}:${log.timestamp.second.toString().padLeft(2, '0')}',
+                  theme,
+                ),
+                if (log.details.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    isTr ? 'İşlem Parametreleri:' : 'Parameters:',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: isDark ? Colors.white12 : Colors.black12,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: log.details.entries.map((entry) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Text(
+                            '• ${entry.key}: ${entry.value}',
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontFamily: 'monospace',
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(isTr ? 'Kapat' : 'Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRow(String label, String value, ThemeData theme, {Color? badgeColor}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 105,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: theme.colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: badgeColor != null
+                ? Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                      decoration: BoxDecoration(
+                        color: badgeColor.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        value,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: badgeColor,
+                        ),
+                      ),
+                    ),
+                  )
+                : Text(
+                    value,
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    final adminState = ref.watch(adminControllerProvider);
+    final allLogs = adminState.auditLogs;
+
+    // Filter by category
+    var filtered = _selectedCategory == 'all'
+        ? allLogs
+        : allLogs.where((l) => l.category == _selectedCategory).toList();
+
+    // Filter by search query
+    final query = _searchController.text.trim().toLowerCase();
+    if (query.isNotEmpty) {
+      filtered = filtered.where((l) {
+        return l.actionTitle.toLowerCase().contains(query) ||
+            l.action.toLowerCase().contains(query) ||
+            l.adminEmail.toLowerCase().contains(query) ||
+            l.targetUid.toLowerCase().contains(query) ||
+            (l.targetUserEmail?.toLowerCase().contains(query) ?? false) ||
+            (l.targetUserName?.toLowerCase().contains(query) ?? false) ||
+            l.details.values.any((v) => v.toString().toLowerCase().contains(query));
+      }).toList();
+    }
+
+    final categories = [
+      {'key': 'all', 'label': isTr ? 'Tümü' : 'All', 'count': allLogs.length},
+      {
+        'key': 'deletion',
+        'label': isTr ? 'Silmeler' : 'Deletions',
+        'count': allLogs.where((l) => l.category == 'deletion').length,
+      },
+      {
+        'key': 'ban',
+        'label': isTr ? 'Engellemeler' : 'Bans',
+        'count': allLogs.where((l) => l.category == 'ban').length,
+      },
+      {
+        'key': 'warning',
+        'label': isTr ? 'Uyarılar' : 'Warnings',
+        'count': allLogs.where((l) => l.category == 'warning').length,
+      },
+      {
+        'key': 'pro',
+        'label': isTr ? 'Pro' : 'Pro',
+        'count': allLogs.where((l) => l.category == 'pro').length,
+      },
+      {
+        'key': 'broadcast',
+        'label': isTr ? 'Duyurular' : 'Broadcasts',
+        'count': allLogs.where((l) => l.category == 'broadcast').length,
+      },
+    ];
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.88,
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        children: [
+          // Drag handle
+          Center(
+            child: Container(
+              margin: const EdgeInsets.only(top: 12, bottom: 8),
+              width: 44,
+              height: 4,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+
+          // Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF0284C7), Color(0xFF2563EB)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.history_rounded, color: Colors.white, size: 20),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        isTr ? 'Denetim & Aksiyon Geçmişi' : 'Audit & Action Trail',
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                      ),
+                      Text(
+                        '${filtered.length} / ${allLogs.length} ${isTr ? "kayıt listelendi" : "logs listed"}',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.refresh_rounded, size: 20),
+                  tooltip: isTr ? 'Yenile' : 'Refresh',
+                  onPressed: () => ref.read(adminControllerProvider.notifier).fetchAuditLogs(),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded, size: 20),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+
+          // Search Bar
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (_) => setState(() {}),
+              decoration: InputDecoration(
+                hintText: isTr
+                    ? 'Aksiyon, e-posta veya UID ile ara...'
+                    : 'Search by action, email, or UID...',
+                hintStyle: TextStyle(
+                  fontSize: 13,
+                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                ),
+                prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear_rounded, size: 18),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() {});
+                        },
+                      )
+                    : null,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                filled: true,
+                fillColor: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+          ),
+
+          // Category Filter Chips
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Row(
+              children: categories.map((cat) {
+                final key = cat['key'] as String;
+                final label = cat['label'] as String;
+                final count = cat['count'] as int;
+                final isSelected = _selectedCategory == key;
+
+                return Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: ChoiceChip(
+                    label: Text(
+                      count > 0 ? '$label ($count)' : label,
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                        color: isSelected
+                            ? Colors.white
+                            : (isDark ? Colors.white70 : Colors.black87),
+                      ),
+                    ),
+                    selected: isSelected,
+                    selectedColor: const Color(0xFF2563EB),
+                    backgroundColor: isDark
+                        ? Colors.white.withValues(alpha: 0.06)
+                        : Colors.black.withValues(alpha: 0.04),
+                    visualDensity: VisualDensity.compact,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: BorderSide(
+                        color: isSelected
+                            ? const Color(0xFF2563EB)
+                            : (isDark ? Colors.white12 : Colors.black12),
+                      ),
+                    ),
+                    onSelected: (_) {
+                      setState(() {
+                        _selectedCategory = key;
+                      });
+                    },
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // List of logs
+          Expanded(
+            child: filtered.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.history_toggle_off_rounded,
+                          size: 48,
+                          color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          isTr
+                              ? 'Eşleşen denetim kaydı bulunamadı'
+                              : 'No matching audit records found',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: theme.colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                    itemCount: filtered.length,
+                    itemBuilder: (ctx, index) {
+                      final log = filtered[index];
+                      final timeStr = _formatAuditTimestamp(log.timestamp, isTr);
+
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.white.withValues(alpha: 0.04) : Colors.black.withValues(alpha: 0.02),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: log.color.withValues(alpha: 0.2),
+                          ),
+                        ),
+                        child: ListTile(
+                          onTap: () => _showDetailDialog(log, isTr),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          leading: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: log.color.withValues(alpha: 0.15),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(log.icon, size: 20, color: log.color),
+                          ),
+                          title: Text(
+                            log.actionTitle,
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 3),
+                              Text(
+                                log.targetUserEmail != null && log.targetUserEmail!.isNotEmpty
+                                    ? log.targetUserEmail!
+                                    : (log.targetUid == 'broadcast_all'
+                                        ? (isTr ? 'Hedef: Tüm Kullanıcılar' : 'Target: All Users')
+                                        : 'UID: ${log.targetUid}'),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              if (log.details.isNotEmpty) ...[
+                                const SizedBox(height: 2),
+                                Text(
+                                  log.details.entries.map((e) => '${e.key}: ${e.value}').join(' • '),
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ],
+                          ),
+                          trailing: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                timeStr,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Icon(
+                                Icons.chevron_right_rounded,
+                                size: 16,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),

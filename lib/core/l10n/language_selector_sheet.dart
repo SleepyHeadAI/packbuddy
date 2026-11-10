@@ -19,6 +19,7 @@ void showLanguageSelectorSheet(BuildContext context, WidgetRef ref, Locale curre
     builder: (ctx) {
       final theme = Theme.of(ctx);
       final l10n = AppLocalizations.of(ctx);
+      final sortedLocales = L10n.getSortedLocales(currentLocale.languageCode);
 
       return RepaintBoundary(
         child: Material(
@@ -67,7 +68,7 @@ void showLanguageSelectorSheet(BuildContext context, WidgetRef ref, Locale curre
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '${L10n.all.length} ${l10n?.language ?? "Dil"}',
+                        '${sortedLocales.length} ${l10n?.language ?? "Dil"}',
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                           fontWeight: FontWeight.w600,
@@ -81,11 +82,15 @@ void showLanguageSelectorSheet(BuildContext context, WidgetRef ref, Locale curre
               Expanded(
                 child: ListView.separated(
                   padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemCount: L10n.all.length,
+                  itemCount: sortedLocales.length,
                   separatorBuilder: (context, index) => const Divider(height: 1, indent: 64),
                   itemBuilder: (context, index) {
-                    final locale = L10n.all[index];
+                    final locale = sortedLocales[index];
                     final isSelected = locale.languageCode == currentLocale.languageCode;
+                    final displayName = L10n.getLanguageDisplayName(
+                      locale.languageCode,
+                      currentLocale.languageCode,
+                    );
 
                     return ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2),
@@ -94,7 +99,7 @@ void showLanguageSelectorSheet(BuildContext context, WidgetRef ref, Locale curre
                         style: const TextStyle(fontSize: 22),
                       ),
                       title: Text(
-                        L10n.getLanguageName(locale.languageCode),
+                        displayName,
                         style: TextStyle(
                           fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                           color: isSelected ? theme.colorScheme.primary : null,

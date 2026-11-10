@@ -5,6 +5,7 @@ import 'package:packbuddy/core/l10n/l10n.dart';
 import 'package:packbuddy/core/l10n/locale_provider.dart';
 import 'package:packbuddy/core/l10n/language_selector_sheet.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
+import 'package:packbuddy/shared/widgets/app_logo.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 class OnboardingPageData {
@@ -167,21 +168,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               child: Row(
                 children: [
                   // App branding badge
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.luggage_rounded,
-                        size: 16,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                  ),
+                  const AppLogo.transparent(size: 28),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(

@@ -187,6 +187,13 @@ void main() {
     });
 
     testWidgets('OnboardingScreen displays language selector pill in top-right and allows switching languages dynamically', (tester) async {
+      tester.view.physicalSize = const Size(1000, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
       await PreferencesService.instance.setOnboardingCompleted(false);
       await PreferencesService.instance.setLocale(const Locale('tr'));
 
@@ -207,11 +214,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // Modal bottom sheet with languages should open
-      expect(find.text('English'), findsOneWidget);
-      expect(find.text('Deutsch'), findsOneWidget);
+      expect(find.textContaining('English'), findsOneWidget);
+      expect(find.textContaining('Deutsch'), findsOneWidget);
 
       // Select English
-      await tester.tap(find.text('English'));
+      await tester.tap(find.textContaining('English'));
       await tester.pumpAndSettle();
 
       // Onboarding screen should now be in English!

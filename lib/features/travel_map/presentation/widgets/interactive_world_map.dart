@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:countries_world_map/countries_world_map.dart';
-import 'package:countries_world_map/data/maps/world_map.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/features/budget/domain/country_localization.dart';
 import 'package:packbuddy/features/travel_map/data/world_countries_data.dart';
+import 'package:packbuddy/features/travel_map/data/world_map_instructions.dart';
 import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
 import 'package:packbuddy/features/travel_map/presentation/widgets/country_flag.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
@@ -78,7 +78,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
   void _zoomBy(double factor) {
     final matrix = _transformController.value.clone();
     final currentScale = matrix.storage[0];
-    final newScale = (currentScale * factor).clamp(1.0, 8.0);
+    final newScale = (currentScale * factor).clamp(1.0, 30.0);
     final effectiveFactor = newScale / currentScale;
     if ((effectiveFactor - 1.0).abs() < 0.001) return;
 
@@ -92,8 +92,8 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
     _transformController.value = translation * scale * invTranslation * matrix;
   }
 
-  void _zoomIn() => _zoomBy(1.35);
-  void _zoomOut() => _zoomBy(0.74);
+  void _zoomIn() => _zoomBy(1.45);
+  void _zoomOut() => _zoomBy(0.69);
 
   @override
   void dispose() {
@@ -418,9 +418,9 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                       return InteractiveViewer(
                         transformationController: _transformController,
                         minScale: 1.0,
-                        maxScale: 8.0,
+                        maxScale: 30.0,
                         panAxis: PanAxis.free,
-                        boundaryMargin: const EdgeInsets.symmetric(horizontal: 160, vertical: 120),
+                        boundaryMargin: const EdgeInsets.symmetric(horizontal: 320, vertical: 260),
                         onInteractionStart: (_) => _setInteracting(true),
                         onInteractionEnd: (_) => _setInteracting(false),
                         child: RepaintBoundary(
@@ -428,7 +428,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                             width: constraints.maxWidth,
                             height: 390,
                             child: SimpleMap(
-                              instructions: SMapWorld.instructions,
+                              instructions: WorldMapInstructions.instructions,
                               defaultColor: unvisitedLandColor,
                               colors: colorMap,
                               countryBorder: CountryBorder(

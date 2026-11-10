@@ -1,131 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/widget_bg"
-    android:orientation="vertical"
-    android:padding="12dp">
+    android:layout_height="match_parent">
 
-    <!-- Header: App Name & Percent Badge -->
-    <LinearLayout
+    <!-- 1:1 High-Resolution Flutter Rendered Card -->
+    <ImageView
+        android:id="@+id/widget_rendered_card"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/widget_app_name"
-            android:layout_width="0dp"
+    <!-- Native XML Fallback Layout -->
+    <LinearLayout
+        android:id="@+id/widget_native_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/widget_bg"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- Header: App Name & Percent Badge -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/widget_app_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="🌐 PackBuddy"
+                android:textColor="#3B82F6"
+                android:textSize="9.5sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/widget_badge_bg"
+                android:paddingStart="6dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="6dp"
+                android:paddingBottom="2dp"
+                android:text="%0.0"
+                android:textColor="#FFFFFF"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Center: Big Visited Count & Subtitle -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="🌐 PackBuddy"
-            android:textColor="#3B82F6"
-            android:textSize="9.5sp"
-            android:textStyle="bold" />
+            android:gravity="center_vertical"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/widget_badge"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/widget_visited_count"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="0"
+                android:textColor="#3B82F6"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="0 Ülke Gezildi"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_destination"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="0 Kıta Keşfedildi"
+                android:textColor="#94A3B8"
+                android:textSize="9.5sp" />
+        </LinearLayout>
+
+        <!-- Progress Bar -->
+        <ProgressBar
+            android:id="@+id/widget_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="3.5dp"
+            android:layout_marginBottom="4dp"
+            android:max="100"
+            android:progress="0"
+            android:progressBackgroundTint="#4094A3B8"
+            android:progressTint="#3B82F6" />
+
+        <!-- Bottom Stats Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/widget_badge_bg"
-            android:paddingStart="6dp"
-            android:paddingTop="2dp"
-            android:paddingEnd="6dp"
-            android:paddingBottom="2dp"
-            android:text="%0.0"
-            android:textColor="#FFFFFF"
-            android:textSize="9sp"
-            android:textStyle="bold" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/widget_packing"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="✈️ 0"
+                android:textColor="#94A3B8"
+                android:textSize="9.5sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_budget"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="🌟 0"
+                android:textColor="#94A3B8"
+                android:textSize="9.5sp"
+                android:textStyle="bold" />
+        </LinearLayout>
     </LinearLayout>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <!-- Center: Big Visited Count & Subtitle -->
-    <TextView
-        android:id="@+id/widget_visited_count"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="0"
-        android:textColor="#3B82F6"
-        android:textSize="26sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/widget_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="1dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="0 Ülke Gezildi"
-        android:textColor="#FFFFFF"
-        android:textSize="11sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/widget_destination"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="0 Kıta Keşfedildi"
-        android:textColor="#94A3B8"
-        android:textSize="9.5sp" />
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <!-- Progress Bar -->
-    <ProgressBar
-        android:id="@+id/widget_progress"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="3.5dp"
-        android:layout_marginBottom="4dp"
-        android:max="100"
-        android:progress="0"
-        android:progressBackgroundTint="#4094A3B8"
-        android:progressTint="#3B82F6" />
-
-    <!-- Bottom Stats Row -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/widget_packing"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="✈️ 0"
-            android:textColor="#94A3B8"
-            android:textSize="9.5sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/widget_budget"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="🌟 0"
-            android:textColor="#94A3B8"
-            android:textSize="9.5sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-</LinearLayout>
+</FrameLayout>

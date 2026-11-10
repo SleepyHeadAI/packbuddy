@@ -1,166 +1,182 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/widget_bg"
-    android:orientation="vertical"
-    android:padding="12dp">
+    android:layout_height="match_parent">
 
-    <!-- Top Header: App Name & Days Badge (Matches Preview 1:1) -->
-    <LinearLayout
+    <!-- 1:1 High-Resolution Flutter Rendered Card -->
+    <ImageView
+        android:id="@+id/widget_rendered_card"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/widget_app_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="✈️ PackBuddy • Seyahat"
-            android:textColor="#3B82F6"
-            android:textSize="11.5sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/widget_days"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/widget_badge_bg"
-            android:paddingStart="8dp"
-            android:paddingTop="3dp"
-            android:paddingEnd="8dp"
-            android:paddingBottom="3dp"
-            android:text="0d"
-            android:textColor="#FFFFFF"
-            android:textSize="10sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <!-- Destination Showcase Card -->
+    <!-- Native XML Fallback Layout -->
     <LinearLayout
-        android:id="@+id/widget_destination_card"
+        android:id="@+id/widget_native_content"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/widget_stat_bg"
+        android:layout_height="match_parent"
+        android:background="@drawable/widget_bg"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:padding="12dp">
 
-        <TextView
-            android:id="@+id/widget_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="PackBuddy"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/widget_destination"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text=""
-            android:textColor="#94A3B8"
-            android:textSize="10.5sp" />
-    </LinearLayout>
-
-    <!-- Packing Checklist Card with Percentage & Progress Bar -->
-    <LinearLayout
-        android:id="@+id/widget_packing_card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/widget_stat_bg"
-        android:orientation="vertical"
-        android:padding="10dp">
-
+        <!-- Top Header: App Name & Days Badge (Matches Preview 1:1) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/widget_packing"
+                android:id="@+id/widget_app_name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Bagaj: 0/0"
-                android:textColor="#FFFFFF"
-                android:textSize="10.5sp"
+                android:text="✈️ PackBuddy • Seyahat"
+                android:textColor="#3B82F6"
+                android:textSize="11.5sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/widget_packing_pct"
+                android:id="@+id/widget_days"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0%"
+                android:background="@drawable/widget_badge_bg"
+                android:paddingStart="8dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="3dp"
+                android:text="0d"
                 android:textColor="#FFFFFF"
-                android:textSize="10.5sp"
+                android:textSize="10sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <ProgressBar
-            android:id="@+id/widget_packing_progress"
-            style="?android:attr/progressBarStyleHorizontal"
+        <!-- Destination Showcase Card -->
+        <LinearLayout
+            android:id="@+id/widget_destination_card"
             android:layout_width="match_parent"
-            android:layout_height="4.5dp"
-            android:layout_marginTop="4dp"
-            android:max="100"
-            android:progress="0"
-            android:progressBackgroundTint="#4094A3B8"
-            android:progressTint="#3B82F6" />
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/widget_stat_bg"
+            android:orientation="vertical"
+            android:padding="10dp">
 
-    <!-- Budget Card -->
-    <LinearLayout
-        android:id="@+id/widget_budget_card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/widget_stat_bg"
-        android:orientation="vertical"
-        android:padding="10dp">
+            <TextView
+                android:id="@+id/widget_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="PackBuddy"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
+            <TextView
+                android:id="@+id/widget_destination"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text=""
+                android:textColor="#94A3B8"
+                android:textSize="10.5sp" />
+        </LinearLayout>
+
+        <!-- Packing Checklist Card with Percentage & Progress Bar -->
+        <LinearLayout
+            android:id="@+id/widget_packing_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/widget_stat_bg"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/widget_packing"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="Bagaj: 0/0"
+                    android:textColor="#FFFFFF"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/widget_packing_pct"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0%"
+                    android:textColor="#FFFFFF"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/widget_packing_progress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="4.5dp"
+                android:layout_marginTop="4dp"
+                android:max="100"
+                android:progress="0"
+                android:progressBackgroundTint="#4094A3B8"
+                android:progressTint="#3B82F6" />
+        </LinearLayout>
+
+        <!-- Budget Card -->
+        <LinearLayout
+            android:id="@+id/widget_budget_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/widget_stat_bg"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/widget_budget"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Harcanan: ₺0"
+                android:textColor="#10B981"
+                android:textSize="11.5sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Footer: Status -->
         <TextView
-            android:id="@+id/widget_budget"
+            android:id="@+id/widget_footer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
+            android:gravity="center"
             android:maxLines="1"
-            android:text="Harcanan: ₺0"
-            android:textColor="#10B981"
-            android:textSize="11.5sp"
+            android:text="Geri sayım başladı"
+            android:textColor="#94A3B8"
+            android:textSize="9.5sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <!-- Footer: Status -->
-    <TextView
-        android:id="@+id/widget_footer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:gravity="center"
-        android:maxLines="1"
-        android:text="Geri sayım başladı"
-        android:textColor="#94A3B8"
-        android:textSize="9.5sp"
-        android:textStyle="bold" />
-
-</LinearLayout>
+</FrameLayout>

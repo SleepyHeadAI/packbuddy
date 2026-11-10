@@ -4,6 +4,7 @@ import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
 import 'package:packbuddy/features/budget/domain/emergency_guide.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
+import 'package:packbuddy/core/widgets/legal_disclaimer_card.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 class EmergencyGuideSheet extends StatefulWidget {
@@ -182,6 +183,11 @@ class _EmergencyGuideSheetState extends State<EmergencyGuideSheet> {
             child: ListView(
               padding: const EdgeInsets.all(20),
               children: [
+                // Legal Liability Disclaimer Banner
+                const LegalDisclaimerBanner.emergency(
+                  margin: EdgeInsets.only(bottom: 16),
+                ),
+
                 // Emergency Numbers Section
                 Text(
                   l10n.emergencyGeneralSos,

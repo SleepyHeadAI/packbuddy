@@ -73,6 +73,7 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
   String? _selectedSubCategory;
   String? _selectedTripId;
   bool _initializedTitles = false;
+  bool _isSubCategoryExpanded = false;
 
   final List<String> _ticketSubCategories = [
     'flightTicket',
@@ -81,6 +82,79 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
     'trainTicket',
     'otherTransport',
   ];
+
+  static String _getOptionalSuffix(String locale) {
+    switch (locale) {
+      case 'tr': return '(Opsiyonel)';
+      case 'de': return '(Optional)';
+      case 'es': return '(Opcional)';
+      case 'fr': return '(Optionnel)';
+      case 'it': return '(Opzionale)';
+      case 'pt': return '(Opcional)';
+      case 'ru': return '(Необязательно)';
+      case 'zh': return '(可选)';
+      case 'ja': return '(任意)';
+      case 'ko': return '(선택)';
+      case 'ar': return '(اختياري)';
+      case 'hi': return '(वैकल्पिक)';
+      case 'id': return '(Opsional)';
+      case 'nl': return '(Optioneel)';
+      case 'pl': return '(Opcjonalnie)';
+      case 'sv': return '(Valfritt)';
+      case 'th': return '(ไม่บังคับ)';
+      case 'vi': return '(Tùy chọn)';
+      case 'el': return '(Προαιρετικό)';
+      case 'en':
+      default: return '(Optional)';
+    }
+  }
+
+  static String _getNoneSubCategoryLabel(String locale) {
+    switch (locale) {
+      case 'tr': return 'Genel / Belirtilmemiş';
+      case 'de': return 'Allgemein / Nicht angegeben';
+      case 'es': return 'General / No especificado';
+      case 'fr': return 'Général / Non spécifié';
+      case 'it': return 'Generale / Non specificato';
+      case 'pt': return 'Geral / Não especificado';
+      case 'ru': return 'Общий / Не указано';
+      case 'zh': return '常规 / 未指定';
+      case 'ja': return '一般 / 未指定';
+      case 'ko': return '일반 / 지정 안 됨';
+      case 'ar': return 'عام / غير محدد';
+      case 'hi': return 'सामान्य / अनिर्दिष्ट';
+      case 'id': return 'Umum / Tidak ditentukan';
+      case 'nl': return 'Algemeen / Niet gespecificeerd';
+      case 'pl': return 'Ogólne / Nie określono';
+      case 'sv': return 'Allmänt / Ej specificerat';
+      case 'th': return 'ทั่วไป / ไม่ได้ระบุ';
+      case 'vi': return 'Chung / Không xác định';
+      case 'el': return 'Γενικό / Μη καθορισμένο';
+      case 'en':
+      default: return 'General / Unspecified';
+    }
+  }
+
+  static IconData _getSubCategoryIcon(String key) {
+    switch (key) {
+      case 'flightTicket':
+      case 'Uçak Bileti':
+        return Icons.flight_rounded;
+      case 'busTicket':
+      case 'Otobüs Bileti':
+        return Icons.directions_bus_rounded;
+      case 'ferryTicket':
+      case 'Gemi / Feribot Bileti':
+        return Icons.directions_boat_rounded;
+      case 'trainTicket':
+      case 'Tren Bileti':
+        return Icons.train_rounded;
+      case 'otherTransport':
+      case 'Diğer Ulaşım':
+      default:
+        return Icons.commute_rounded;
+    }
+  }
 
   String _getSubCategoryLabel(String key, AppLocalizations l10n) {
     switch (key) {
@@ -107,7 +181,8 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
   void initState() {
     super.initState();
     _selectedCategory = widget.initialCategory ?? 'Ticket';
-    _selectedSubCategory = widget.initialSubCategory ?? (_selectedCategory == 'Ticket' ? 'flightTicket' : null);
+    _selectedSubCategory = widget.initialSubCategory;
+    _isSubCategoryExpanded = widget.initialSubCategory != null;
     _selectedTripId = widget.initialTripId;
   }
 
@@ -121,7 +196,11 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
         if (_selectedCategory == 'Passport') {
           _titleController.text = l10n.myPassport;
         } else if (_selectedCategory == 'Ticket') {
-          _titleController.text = _getSubCategoryLabel(_selectedSubCategory ?? 'flightTicket', l10n);
+          if (_selectedSubCategory != null) {
+            _titleController.text = _getSubCategoryLabel(_selectedSubCategory!, l10n);
+          } else {
+            _titleController.text = l10n.tickets;
+          }
         } else if (_selectedCategory == 'Booking') {
           _titleController.text = l10n.hotelBooking;
         }
@@ -182,6 +261,7 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final currentLocale = Localizations.localeOf(context).languageCode;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final tripState = ref.watch(tripControllerProvider);
@@ -329,8 +409,9 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
                           if (selected) {
                             setState(() {
                               _selectedCategory = cat['key'] as String;
-                              if (_selectedCategory == 'Ticket' && _selectedSubCategory == null) {
-                                _selectedSubCategory = 'flightTicket';
+                              if (_selectedCategory != 'Ticket') {
+                                _selectedSubCategory = null;
+                                _isSubCategoryExpanded = false;
                               }
                             });
                           }
@@ -342,65 +423,13 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
               ),
               const SizedBox(height: 12),
 
-              // Sub-category selector (Only shown for Biletler / Ticket category)
+              // Sub-category selector (Only shown for Biletler / Ticket category, compact & collapsible)
               if (_selectedCategory == 'Ticket') ...[
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primaryContainer.withValues(alpha: 0.35),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.2),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.subtitles_rounded, size: 14, color: theme.colorScheme.primary),
-                          const SizedBox(width: 6),
-                          Text(
-                            l10n.ticketTypeSubCategory,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 6,
-                        children: _ticketSubCategories.map((sub) {
-                          final isSubSelected = _selectedSubCategory == sub;
-                          return ChoiceChip(
-                            label: Text(_getSubCategoryLabel(sub, l10n)),
-                            selected: isSubSelected,
-                            selectedColor: theme.colorScheme.primary,
-                            labelStyle: TextStyle(
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w700,
-                              color: isSubSelected ? Colors.white : theme.colorScheme.onSurface,
-                            ),
-                            onSelected: (val) {
-                              if (val) {
-                                setState(() {
-                                  _selectedSubCategory = sub;
-                                  if (_titleController.text.isEmpty ||
-                                      _ticketSubCategories.any((k) => _titleController.text == _getSubCategoryLabel(k, l10n))) {
-                                    _titleController.text = _getSubCategoryLabel(sub, l10n);
-                                  }
-                                });
-                              }
-                            },
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
+                _buildSubCategorySection(
+                  theme: theme,
+                  isDark: isDark,
+                  l10n: l10n,
+                  currentLocale: currentLocale,
                 ),
                 const SizedBox(height: 14),
               ],
@@ -626,4 +655,236 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
     ),
   );
 }
+
+  Widget _buildSubCategorySection({
+    required ThemeData theme,
+    required bool isDark,
+    required AppLocalizations l10n,
+    required String currentLocale,
+  }) {
+    final hasSelection = _selectedSubCategory != null;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark
+            ? const Color(0xFF1E293B).withValues(alpha: 0.6)
+            : const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: hasSelection
+              ? theme.colorScheme.primary.withValues(alpha: 0.35)
+              : (isDark ? Colors.white12 : const Color(0xFFE2E8F0)),
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Compact Header Bar (tappable to expand/collapse)
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _isSubCategoryExpanded = !_isSubCategoryExpanded;
+                });
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.alt_route_rounded,
+                      size: 18,
+                      color: hasSelection ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text.rich(
+                            TextSpan(
+                              text: l10n.ticketTypeSubCategory,
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w700,
+                                color: theme.colorScheme.onSurface,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: ' ${_getOptionalSuffix(currentLocale)}',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.75),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          if (!_isSubCategoryExpanded && !hasSelection) ...[
+                            const SizedBox(height: 1),
+                            Text(
+                              _getNoneSubCategoryLabel(currentLocale),
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.65),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    if (hasSelection) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              _getSubCategoryIcon(_selectedSubCategory!),
+                              size: 13,
+                              color: theme.colorScheme.primary,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              _getSubCategoryLabel(_selectedSubCategory!, l10n),
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                            const SizedBox(width: 5),
+                            GestureDetector(
+                              key: const Key('clear_subcategory_button'),
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () {
+                                setState(() {
+                                  _selectedSubCategory = null;
+                                });
+                              },
+                              child: Icon(
+                                Icons.close_rounded,
+                                size: 14,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                    AnimatedRotation(
+                      turns: _isSubCategoryExpanded ? 0.5 : 0.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        size: 20,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Animated Collapsible Sub-category Selection Panel
+            AnimatedSize(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeInOutCubic,
+              alignment: Alignment.topCenter,
+              child: _isSubCategoryExpanded
+                  ? Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Divider(
+                          height: 1,
+                          thickness: 1,
+                          color: isDark ? Colors.white10 : const Color(0xFFE2E8F0),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              // Unspecified / General Option (Explicitly clears subcategory)
+                              ChoiceChip(
+                                avatar: Icon(
+                                  Icons.check_circle_outline_rounded,
+                                  size: 14,
+                                  color: _selectedSubCategory == null ? Colors.white : theme.colorScheme.onSurfaceVariant,
+                                ),
+                                label: Text(_getNoneSubCategoryLabel(currentLocale)),
+                                selected: _selectedSubCategory == null,
+                                selectedColor: isDark ? const Color(0xFF334155) : const Color(0xFF64748B),
+                                labelStyle: TextStyle(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: _selectedSubCategory == null ? Colors.white : theme.colorScheme.onSurface,
+                                ),
+                                onSelected: (val) {
+                                  if (val) {
+                                    setState(() {
+                                      _selectedSubCategory = null;
+                                    });
+                                  }
+                                },
+                              ),
+
+                              // Ticket types
+                              ..._ticketSubCategories.map((sub) {
+                                final isSubSelected = _selectedSubCategory == sub;
+                                return ChoiceChip(
+                                  avatar: Icon(
+                                    _getSubCategoryIcon(sub),
+                                    size: 14,
+                                    color: isSubSelected ? Colors.white : theme.colorScheme.primary,
+                                  ),
+                                  label: Text(_getSubCategoryLabel(sub, l10n)),
+                                  selected: isSubSelected,
+                                  selectedColor: theme.colorScheme.primary,
+                                  labelStyle: TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: isSubSelected ? Colors.white : theme.colorScheme.onSurface,
+                                  ),
+                                  onSelected: (val) {
+                                    setState(() {
+                                      _selectedSubCategory = val ? sub : null;
+                                      if (val) {
+                                        if (_titleController.text.isEmpty ||
+                                            _titleController.text == l10n.tickets ||
+                                            _ticketSubCategories.any((k) => _titleController.text == _getSubCategoryLabel(k, l10n))) {
+                                          _titleController.text = _getSubCategoryLabel(sub, l10n);
+                                        }
+                                      }
+                                    });
+                                  },
+                                );
+                              }),
+                            ],
+                          ),
+                        ),
+                      ],
+                    )
+                  : const SizedBox.shrink(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

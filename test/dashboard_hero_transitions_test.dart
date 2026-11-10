@@ -43,31 +43,19 @@ void main() {
       final heroWidgets = tester.widgetList<Hero>(find.byType(Hero)).toList();
       final tags = heroWidgets.map((h) => h.tag).toList();
 
-      // Check for expected tags
-      expect(tags, contains('trips-hero-badge'));
-      expect(tags, contains('trips-hero-title'));
-      expect(tags, contains('vault-hero-badge'));
-      expect(tags, contains('vault-hero-title'));
-      expect(tags, contains('travel-map-hero-badge'));
-      expect(tags, contains('travel-map-hero-title'));
+      // Check for expected tags in Dashboard bento & showcase
       expect(tags, contains('checklist-hero-badge'));
       expect(tags, contains('checklist-hero-title'));
+      expect(tags, contains('travel-map-hero-badge'));
+      expect(tags, contains('travel-map-hero-title'));
+      expect(tags, contains('vault-hero-badge'));
+      expect(tags, contains('vault-hero-title'));
+      expect(tags, contains('compare-trips-hero-badge'));
+      expect(tags, contains('compare-trips-hero-title'));
 
-      // Scroll to reveal the bottom Hub feature cards
-      await tester.drag(find.byType(ListView).first, const Offset(0, -600));
-      await tester.pumpAndSettle();
-
-      final updatedHeroWidgets = tester.widgetList<Hero>(find.byType(Hero)).toList();
-      final updatedTags = updatedHeroWidgets.map((h) => h.tag).toList();
-
-      expect(updatedTags, contains('compare-trips-hero-badge'));
-      expect(updatedTags, contains('compare-trips-hero-title'));
-      expect(updatedTags, contains('settings-hero-badge'));
-      expect(updatedTags, contains('settings-hero-title'));
-
-      // Verify tag uniqueness (no duplicates in the active widget tree)
-      final uniqueTags = updatedTags.toSet();
-      expect(updatedTags.length, uniqueTags.length, reason: 'Duplicate Hero tags found in subtree: $updatedTags');
+      // Verify tag uniqueness (no duplicate Hero tags in the active widget tree)
+      final uniqueTags = tags.toSet();
+      expect(tags.length, uniqueTags.length, reason: 'Duplicate Hero tags found in subtree: $tags');
     });
 
     testWidgets('TripsScreen renders matching trips-hero-badge and trips-hero-title', (tester) async {
@@ -112,7 +100,7 @@ void main() {
       expect(find.byWidgetPredicate((w) => w is Hero && w.tag == 'settings-hero-title'), findsOneWidget);
     });
 
-    testWidgets('Tapping Travel Map card on Dashboard executes Hero flight without errors', (tester) async {
+    testWidgets('Tapping Trip Comparison card on Dashboard executes Hero flight without errors', (tester) async {
       tester.view.physicalSize = const Size(1080, 2400);
       tester.view.devicePixelRatio = 2.0;
       addTearDown(() => tester.view.resetPhysicalSize());
@@ -120,38 +108,24 @@ void main() {
       await tester.pumpWidget(buildTestableWidget(const DashboardScreen()));
       await tester.pumpAndSettle();
 
-      // Tap on the Travel Map showcase banner
-      await tester.tap(find.text('Dünya Seyahat Haritam').first);
+      // Scroll down to reveal Trip Comparison tile
+      await tester.drag(find.byType(ListView).first, const Offset(0, -600));
+      await tester.pumpAndSettle();
+
+      // Tap on Trip Comparison tile
+      final compareFinder = find.byWidgetPredicate(
+        (w) => w is Hero && w.tag == 'compare-trips-hero-title',
+      );
+      expect(compareFinder, findsOneWidget);
+      await tester.tap(compareFinder);
+
       // Pump middle of transition to exercise Hero flight
       await tester.pump(const Duration(milliseconds: 130));
       await tester.pumpAndSettle();
 
-      // We should now be on TravelMapScreen
-      expect(find.byType(TravelMapScreen), findsOneWidget);
-      expect(find.byWidgetPredicate((w) => w is Hero && w.tag == 'travel-map-hero-title'), findsOneWidget);
-    });
-
-    testWidgets('Tapping Settings card on Dashboard executes Hero flight without errors', (tester) async {
-      tester.view.physicalSize = const Size(1080, 2400);
-      tester.view.devicePixelRatio = 2.0;
-      addTearDown(() => tester.view.resetPhysicalSize());
-
-      await tester.pumpWidget(buildTestableWidget(const DashboardScreen()));
-      await tester.pumpAndSettle();
-
-      // Scroll down to settings card
-      await tester.drag(find.byType(ListView).first, const Offset(0, -600));
-      await tester.pumpAndSettle();
-
-      // Tap on Settings feature card
-      await tester.tap(find.text('Ayarlar').first);
-      // Pump transition
-      await tester.pump(const Duration(milliseconds: 130));
-      await tester.pumpAndSettle();
-
-      // We should now be on SettingsScreen
-      expect(find.byType(SettingsScreen), findsOneWidget);
-      expect(find.byWidgetPredicate((w) => w is Hero && w.tag == 'settings-hero-title'), findsOneWidget);
+      // We should now be on TripComparisonScreen
+      expect(find.byType(TripComparisonScreen), findsOneWidget);
+      expect(find.byWidgetPredicate((w) => w is Hero && w.tag == 'compare-trips-hero-title'), findsOneWidget);
     });
   });
 }

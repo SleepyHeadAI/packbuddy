@@ -18,6 +18,7 @@ import 'package:posthog_flutter/posthog_flutter.dart';
 import 'core/services/app_widget_service.dart';
 import 'core/services/telemetry_service.dart';
 import 'core/services/notification_service.dart';
+import 'core/services/push_notification_service.dart';
 import 'features/auth/presentation/screens/email_verification_screen.dart';
 import 'features/auth/presentation/screens/banned_screen.dart';
 import 'features/admin/user_moderation_provider.dart';
@@ -87,6 +88,7 @@ class _PackBuddyAppState extends ConsumerState<PackBuddyApp>
         final notifService = ref.read(notificationServiceProvider);
         notifService.initialize();
         notifService.requestPermissions();
+        PushNotificationService.instance.initialize();
       } catch (e) {
         debugPrint('[PackBuddyApp] notification service warmup notice: $e');
       }
@@ -142,6 +144,7 @@ class _PackBuddyAppState extends ConsumerState<PackBuddyApp>
       final isPassword = ref.read(authControllerProvider).isPasswordProvider;
       if (user != null) {
         ref.read(authServiceProvider).updateLastActive(user.uid).catchError((_) {});
+        PushNotificationService.instance.syncUserFcmToken(user.uid).catchError((_) {});
         if (isVerified || !isPassword) {
           ref.read(syncEngineProvider.notifier).performSync().catchError((_) {});
         }

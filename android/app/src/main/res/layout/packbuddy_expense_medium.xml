@@ -1,148 +1,163 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/widget_bg"
-    android:orientation="horizontal"
-    android:padding="12dp">
+    android:layout_height="match_parent">
 
-    <!-- Left Column: Metrics -->
-    <LinearLayout
-        android:layout_width="0dp"
+    <!-- 1:1 High-Resolution Flutter Rendered Card -->
+    <ImageView
+        android:id="@+id/widget_rendered_card"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center_vertical"
-        android:orientation="vertical">
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:visibility="gone" />
 
-        <!-- Header: App Name & Badge -->
+    <!-- Native XML Fallback Layout -->
+    <LinearLayout
+        android:id="@+id/widget_native_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/widget_bg"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <!-- Left Column: Metrics -->
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/widget_app_name"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="PackBuddy • Bütçe"
-                android:textColor="#3B82F6"
-                android:textSize="10.5sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/widget_badge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/widget_badge_bg"
-                android:paddingStart="6dp"
-                android:paddingTop="2dp"
-                android:paddingEnd="6dp"
-                android:paddingBottom="2dp"
-                android:text="Hızlı Kayıt"
-                android:textColor="#FFFFFF"
-                android:textSize="8.5sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <!-- Themed Stat Card: Spent -->
-        <LinearLayout
-            android:id="@+id/widget_spent_card"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:background="@drawable/widget_stat_bg"
-            android:orientation="vertical"
-            android:paddingStart="8dp"
-            android:paddingTop="4dp"
-            android:paddingEnd="8dp"
-            android:paddingBottom="4dp">
-
-            <TextView
-                android:id="@+id/widget_spent_card_label"
+            <!-- Header: App Name & Badge -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="Harcanan Bütçe"
-                android:textColor="#94A3B8"
-                android:textSize="9sp" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/widget_app_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="PackBuddy • Bütçe"
+                    android:textColor="#3B82F6"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/widget_badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/widget_badge_bg"
+                    android:paddingStart="6dp"
+                    android:paddingTop="2dp"
+                    android:paddingEnd="6dp"
+                    android:paddingBottom="2dp"
+                    android:text="Hızlı Kayıt"
+                    android:textColor="#FFFFFF"
+                    android:textSize="8.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Themed Stat Card: Spent -->
+            <LinearLayout
+                android:id="@+id/widget_spent_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/widget_stat_bg"
+                android:orientation="vertical"
+                android:paddingStart="8dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="4dp">
+
+                <TextView
+                    android:id="@+id/widget_spent_card_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="Harcanan Bütçe"
+                    android:textColor="#94A3B8"
+                    android:textSize="9sp" />
+
+                <TextView
+                    android:id="@+id/widget_spent_val"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="1dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="₺0.00"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <TextView
-                android:id="@+id/widget_spent_val"
+                android:id="@+id/widget_remaining_val"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text=""
+                android:textColor="#94A3B8"
+                android:textSize="9.5sp" />
+
+            <TextView
+                android:id="@+id/widget_last_expense_val"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="1dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="₺0.00"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:text="PackBuddy"
+                android:textColor="#94A3B8"
+                android:textSize="9sp" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/widget_remaining_val"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text=""
-            android:textColor="#94A3B8"
-            android:textSize="9.5sp" />
+        <!-- Right Column: Add Expense Action Button -->
+        <LinearLayout
+            android:id="@+id/widget_action_btn"
+            android:layout_width="95dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/widget_badge_bg"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="8dp">
 
-        <TextView
-            android:id="@+id/widget_last_expense_val"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="PackBuddy"
-            android:textColor="#94A3B8"
-            android:textSize="9sp" />
+            <TextView
+                android:id="@+id/widget_action_icon"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="@drawable/widget_circle_white"
+                android:gravity="center"
+                android:text="+"
+                android:textColor="#2563EB"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/widget_action_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:text="Harcama Ekle"
+                android:textColor="#FFFFFF"
+                android:textSize="10.5sp"
+                android:textStyle="bold" />
+        </LinearLayout>
     </LinearLayout>
 
-    <!-- Right Column: Add Expense Action Button -->
-    <LinearLayout
-        android:id="@+id/widget_action_btn"
-        android:layout_width="95dp"
-        android:layout_height="match_parent"
-        android:layout_marginStart="10dp"
-        android:background="@drawable/widget_badge_bg"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="8dp">
-
-        <TextView
-            android:id="@+id/widget_action_icon"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:background="@drawable/widget_circle_white"
-            android:gravity="center"
-            android:text="+"
-            android:textColor="#2563EB"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/widget_action_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:ellipsize="end"
-            android:gravity="center"
-            android:maxLines="1"
-            android:text="Harcama Ekle"
-            android:textColor="#FFFFFF"
-            android:textSize="10.5sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-</LinearLayout>
-
+</FrameLayout>

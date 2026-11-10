@@ -672,7 +672,8 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 600));
       await tester.pump(const Duration(seconds: 4));
 
       expect(find.byType(DashboardScreen), findsOneWidget);
@@ -703,7 +704,8 @@ void main() {
         ),
       );
 
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 600));
       await tester.pump(const Duration(seconds: 4));
 
       expect(find.byType(DashboardScreen), findsOneWidget);

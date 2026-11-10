@@ -60,6 +60,8 @@ class ChecklistState {
       'clothing': 'clothing',
       'kıyafet': 'clothing',
       'kiyafet': 'clothing',
+      'giyim': 'clothing',
+      'giysi': 'clothing',
       'kleidung': 'clothing',
       'ropa': 'clothing',
       'vetements': 'clothing',
@@ -90,6 +92,17 @@ class ChecklistState {
       'accesorios': 'accessories',
       'accessoires': 'accessories',
       'аксессуары': 'accessories',
+      'other': 'other',
+      'others': 'other',
+      'diğer': 'other',
+      'diger': 'other',
+      'sonstiges': 'other',
+      'autre': 'other',
+      'otro': 'other',
+      'otros': 'other',
+      'altro': 'other',
+      'altri': 'other',
+      'другое': 'other',
     };
 
     // Dynamically register localized tokens across all 20 supported languages
@@ -102,6 +115,7 @@ class ChecklistState {
         map[l10n.categoryToiletries.trim().toLowerCase()] = 'toiletries';
         map[l10n.categoryDocuments.trim().toLowerCase()] = 'documents';
         map[l10n.categoryAccessories.trim().toLowerCase()] = 'accessories';
+        map[l10n.other.trim().toLowerCase()] = 'other';
       } catch (_) {}
     }
     return map;
@@ -121,9 +135,22 @@ class ChecklistState {
         final selectedToken = normalizeCategoryToken(selectedCategory!);
         if (selectedToken != 'all') {
           final itemToken = normalizeCategoryToken(item.category);
-          if (itemToken != selectedToken &&
-              item.category.toLowerCase() != selectedCategory!.toLowerCase()) {
-            return false;
+          if (selectedToken == 'other') {
+            const standardTokens = {
+              'clothing',
+              'electronics',
+              'toiletries',
+              'documents',
+              'accessories',
+            };
+            if (standardTokens.contains(itemToken)) {
+              return false;
+            }
+          } else {
+            if (itemToken != selectedToken &&
+                item.category.toLowerCase() != selectedCategory!.toLowerCase()) {
+              return false;
+            }
           }
         }
       }

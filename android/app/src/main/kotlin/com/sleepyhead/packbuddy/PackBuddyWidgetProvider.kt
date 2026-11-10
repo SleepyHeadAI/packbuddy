@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.database.sqlite.SQLiteDatabase
 import android.graphics.BitmapFactory
 import android.os.Build
@@ -176,6 +177,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     badgeTextColor = 0xFFFFFFFF.toInt(),
                     visitedColor = 0xFFFF5722.toInt(),
                     wishlistColor = 0xFFEC4899.toInt(),
+                    livedColor = 0xFFF59E0B.toInt(),
                     isLight = false
                 )
                 "emerald" -> WidgetThemeInfo(
@@ -190,6 +192,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     badgeTextColor = 0xFFFFFFFF.toInt(),
                     visitedColor = 0xFF10B981.toInt(),
                     wishlistColor = 0xFFFBBF24.toInt(),
+                    livedColor = 0xFF34D399.toInt(),
                     isLight = false
                 )
                 "cyberpunk" -> WidgetThemeInfo(
@@ -204,6 +207,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     badgeTextColor = 0xFF000000.toInt(),
                     visitedColor = 0xFF06B6D4.toInt(),
                     wishlistColor = 0xFFF43F5E.toInt(),
+                    livedColor = 0xFFFACC15.toInt(),
                     isLight = false
                 )
                 "volcano" -> WidgetThemeInfo(
@@ -218,6 +222,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     badgeTextColor = 0xFFFFFFFF.toInt(),
                     visitedColor = 0xFFFF3D00.toInt(),
                     wishlistColor = 0xFFD50000.toInt(),
+                    livedColor = 0xFFF59E0B.toInt(),
                     isLight = false
                 )
                 "nordic_forest" -> WidgetThemeInfo(
@@ -232,6 +237,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     badgeTextColor = 0xFFFFFFFF.toInt(),
                     visitedColor = 0xFF38BDF8.toInt(),
                     wishlistColor = 0xFFF472B6.toInt(),
+                    livedColor = 0xFF10B981.toInt(),
                     isLight = false
                 )
                 "golden_hour" -> WidgetThemeInfo(
@@ -246,6 +252,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     badgeTextColor = 0xFFFFFFFF.toInt(),
                     visitedColor = 0xFFF59E0B.toInt(),
                     wishlistColor = 0xFFEF4444.toInt(),
+                    livedColor = 0xFFF59E0B.toInt(),
                     isLight = false
                 )
                 "galaxy" -> WidgetThemeInfo(
@@ -260,6 +267,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     badgeTextColor = 0xFFFFFFFF.toInt(),
                     visitedColor = 0xFFA855F7.toInt(),
                     wishlistColor = 0xFFEC4899.toInt(),
+                    livedColor = 0xFFA855F7.toInt(),
                     isLight = false
                 )
                 "monochrome_dark" -> WidgetThemeInfo(
@@ -274,6 +282,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     badgeTextColor = 0xFFFFFFFF.toInt(),
                     visitedColor = 0xFFE2E8F0.toInt(),
                     wishlistColor = 0xFFF59E0B.toInt(),
+                    livedColor = 0xFF10B981.toInt(),
                     isLight = false
                 )
                 "minimal_light" -> WidgetThemeInfo(
@@ -288,6 +297,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     badgeTextColor = 0xFFFFFFFF.toInt(),
                     visitedColor = 0xFF059669.toInt(),
                     wishlistColor = 0xFFE11D48.toInt(),
+                    livedColor = 0xFF10B981.toInt(),
                     isLight = true
                 )
                 "sand_light" -> WidgetThemeInfo(
@@ -302,6 +312,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     badgeTextColor = 0xFFFFFFFF.toInt(),
                     visitedColor = 0xFF16A34A.toInt(),
                     wishlistColor = 0xFFDC2626.toInt(),
+                    livedColor = 0xFF059669.toInt(),
                     isLight = true
                 )
                 "ocean_light" -> WidgetThemeInfo(
@@ -316,6 +327,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     badgeTextColor = 0xFFFFFFFF.toInt(),
                     visitedColor = 0xFF0284C7.toInt(),
                     wishlistColor = 0xFFF43F5E.toInt(),
+                    livedColor = 0xFF0D9488.toInt(),
                     isLight = true
                 )
                 "cherry_blossom" -> WidgetThemeInfo(
@@ -330,6 +342,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     badgeTextColor = 0xFFFFFFFF.toInt(),
                     visitedColor = 0xFFE11D48.toInt(),
                     wishlistColor = 0xFF9333EA.toInt(),
+                    livedColor = 0xFFDB2777.toInt(),
                     isLight = true
                 )
                 "vintage_sepia" -> WidgetThemeInfo(
@@ -344,6 +357,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     badgeTextColor = 0xFFFFFFFF.toInt(),
                     visitedColor = 0xFF854D0E.toInt(),
                     wishlistColor = 0xFFB91C1C.toInt(),
+                    livedColor = 0xFF059669.toInt(),
                     isLight = true
                 )
                 "matcha" -> WidgetThemeInfo(
@@ -358,6 +372,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     badgeTextColor = 0xFFFFFFFF.toInt(),
                     visitedColor = 0xFF4D7C0F.toInt(),
                     wishlistColor = 0xFFDC2626.toInt(),
+                    livedColor = 0xFF15803D.toInt(),
                     isLight = true
                 )
                 "pastel_dream" -> WidgetThemeInfo(
@@ -372,6 +387,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     badgeTextColor = 0xFFFFFFFF.toInt(),
                     visitedColor = 0xFF8B5CF6.toInt(),
                     wishlistColor = 0xFFF43F5E.toInt(),
+                    livedColor = 0xFF10B981.toInt(),
                     isLight = true
                 )
                 else -> WidgetThemeInfo( // "midnight"
@@ -386,6 +402,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     badgeTextColor = 0xFFFFFFFF.toInt(),
                     visitedColor = 0xFF22C55E.toInt(),
                     wishlistColor = 0xFFF59E0B.toInt(),
+                    livedColor = 0xFF10B981.toInt(),
                     isLight = false
                 )
             }
@@ -457,7 +474,35 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                 )
             }
 
-            // Mode-Isolated Content Population & Styling
+            // 1:1 High-Resolution Flutter Card Display
+            val sizeName = size.name.lowercase()
+            val cardKey = "widget_card_${mode}_$sizeName"
+            val genericKey = "widget_card_$sizeName"
+            val cardPath = widgetData.getString(cardKey, null)?.takeIf { it.isNotBlank() }
+                ?: widgetData.getString(genericKey, null)?.takeIf { it.isNotBlank() }
+
+            var hasRenderedCard = false
+            if (!cardPath.isNullOrEmpty()) {
+                val file = File(cardPath)
+                if (file.exists() && file.length() > 0) {
+                    val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                    if (bitmap != null) {
+                        views.setImageViewBitmap(R.id.widget_rendered_card, bitmap)
+                        views.setViewVisibility(R.id.widget_rendered_card, View.VISIBLE)
+                        views.setViewVisibility(R.id.widget_native_content, View.GONE)
+                        views.setInt(R.id.widget_container, "setBackgroundColor", Color.TRANSPARENT)
+                        views.setOnClickPendingIntent(R.id.widget_rendered_card, pendingIntent)
+                        hasRenderedCard = true
+                    }
+                }
+            }
+
+            if (!hasRenderedCard) {
+                views.setViewVisibility(R.id.widget_rendered_card, View.GONE)
+                views.setViewVisibility(R.id.widget_native_content, View.VISIBLE)
+            }
+
+            // Mode-Isolated Content Population & Styling (Fallback)
             when (mode) {
                 "quick_expense" -> {
                     setBgRes(views, R.id.widget_container, theme.bgResId)
@@ -800,7 +845,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                             setBgRes(views, R.id.widget_map_container, theme.mapResId)
                             setBgRes(views, R.id.widget_bottom_stats, theme.statResId)
 
-                            views.setTextColor(R.id.widget_lived, theme.visitedColor)
+                            views.setTextColor(R.id.widget_lived, theme.livedColor)
                             views.setTextColor(R.id.widget_packing, theme.accentColor)
                             views.setTextColor(R.id.widget_budget, theme.wishlistColor)
                             views.setTextColor(R.id.widget_stat3, theme.accentColor)
@@ -1051,6 +1096,10 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                 }
             }
 
+            if (hasRenderedCard) {
+                views.setInt(R.id.widget_container, "setBackgroundColor", Color.TRANSPARENT)
+            }
+
             return views
         }
 
@@ -1269,18 +1318,23 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                 val viewsMap = when (defaultLayoutSize) {
                     WidgetLayoutSize.SMALL -> mapOf(
                         SizeF(40f, 40f) to smallViews,
-                        SizeF(230f, 40f) to mediumViews,
-                        SizeF(230f, 210f) to largeViews
+                        SizeF(240f, 40f) to mediumViews,
+                        SizeF(240f, 265f) to largeViews
                     )
                     WidgetLayoutSize.MEDIUM -> mapOf(
                         SizeF(40f, 40f) to smallViews,
-                        SizeF(210f, 40f) to mediumViews,
-                        SizeF(210f, 210f) to largeViews
+                        SizeF(180f, 40f) to mediumViews,
+                        SizeF(180f, 265f) to largeViews
                     )
                     WidgetLayoutSize.LARGE -> mapOf(
                         SizeF(40f, 40f) to smallViews,
-                        SizeF(210f, 40f) to mediumViews,
-                        SizeF(210f, 210f) to largeViews
+                        SizeF(200f, 40f) to mediumViews,
+                        SizeF(200f, 250f) to largeViews
+                    )
+                    else -> mapOf(
+                        SizeF(40f, 40f) to smallViews,
+                        SizeF(180f, 40f) to mediumViews,
+                        SizeF(180f, 265f) to largeViews
                     )
                 }
                 val responsiveViews = RemoteViews(viewsMap)
@@ -1293,22 +1347,23 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             val minWidth = opts?.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 0) ?: 0
             val minHeight = opts?.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 0) ?: 0
 
-            val chosenSize = when {
-                defaultLayoutSize == WidgetLayoutSize.SMALL -> {
-                    if (minWidth >= 230 && minHeight >= 210) WidgetLayoutSize.LARGE
-                    else if (minWidth >= 230) WidgetLayoutSize.MEDIUM
+            val chosenSize = when (defaultLayoutSize) {
+                WidgetLayoutSize.SMALL -> {
+                    if (minWidth >= 240 && minHeight >= 265) WidgetLayoutSize.LARGE
+                    else if (minWidth >= 240) WidgetLayoutSize.MEDIUM
                     else WidgetLayoutSize.SMALL
                 }
-                defaultLayoutSize == WidgetLayoutSize.MEDIUM -> {
-                    if (minHeight >= 210 && minWidth >= 210) WidgetLayoutSize.LARGE
-                    else if (minWidth < 210) WidgetLayoutSize.SMALL
+                WidgetLayoutSize.MEDIUM -> {
+                    if (minHeight >= 265 && minWidth >= 200) WidgetLayoutSize.LARGE
+                    else if (minWidth < 200) WidgetLayoutSize.SMALL
                     else WidgetLayoutSize.MEDIUM
                 }
-                defaultLayoutSize == WidgetLayoutSize.LARGE -> {
-                    if (minWidth < 210 && minHeight < 210) WidgetLayoutSize.SMALL
-                    else if (minHeight < 210) WidgetLayoutSize.MEDIUM
+                WidgetLayoutSize.LARGE -> {
+                    if (minWidth < 200 && minHeight < 200) WidgetLayoutSize.SMALL
+                    else if (minHeight < 250) WidgetLayoutSize.MEDIUM
                     else WidgetLayoutSize.LARGE
                 }
+                else -> WidgetLayoutSize.SMALL
             }
 
             val views = buildRemoteViews(context, widgetData, chosenSize, widgetId)
@@ -1414,6 +1469,7 @@ data class WidgetThemeInfo(
     val badgeTextColor: Int,
     val visitedColor: Int,
     val wishlistColor: Int,
+    val livedColor: Int,
     val isLight: Boolean
 )
 

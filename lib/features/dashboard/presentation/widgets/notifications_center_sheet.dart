@@ -9,6 +9,8 @@ import 'package:packbuddy/core/services/notification_service.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
+import 'package:packbuddy/features/settings/presentation/screens/widgets/paywall_sheet.dart';
+import 'package:packbuddy/core/services/push_notification_service.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 /// In-app notification history record
@@ -17,7 +19,9 @@ class InAppNotificationRecord {
   final String title;
   final String body;
   final DateTime timestamp;
-  final String type; // 'reminder', 'test', 'system'
+  final String type; // 'reminder', 'test', 'system', 'admin_warning', 'discount', 'campaign'
+  final String? targetAction;
+  final int? discountPercent;
 
   InAppNotificationRecord({
     required this.id,
@@ -25,6 +29,8 @@ class InAppNotificationRecord {
     required this.body,
     required this.timestamp,
     this.type = 'reminder',
+    this.targetAction,
+    this.discountPercent,
   });
 
   Map<String, dynamic> toJson() => {
@@ -33,14 +39,19 @@ class InAppNotificationRecord {
         'body': body,
         'timestamp': timestamp.millisecondsSinceEpoch,
         'type': type,
+        if (targetAction != null) 'targetAction': targetAction,
+        if (discountPercent != null) 'discountPercent': discountPercent,
       };
 
   factory InAppNotificationRecord.fromJson(Map<String, dynamic> json) => InAppNotificationRecord(
         id: json['id'] as String? ?? '',
         title: json['title'] as String? ?? '',
         body: json['body'] as String? ?? '',
-        timestamp: DateTime.fromMillisecondsSinceEpoch(json['timestamp'] as int? ?? 0),
+        timestamp: DateTime.fromMillisecondsSinceEpoch(
+            (json['timestamp'] as num?)?.toInt() ?? 0),
         type: json['type'] as String? ?? 'reminder',
+        targetAction: json['targetAction'] as String?,
+        discountPercent: (json['discountPercent'] as num?)?.toInt(),
       );
 }
 
@@ -666,110 +677,216 @@ class _NotificationsCenterSheetState extends ConsumerState<NotificationsCenterSh
         final item = _history[index];
         final isTest = item.type == 'test';
         final isAdminWarning = item.type == 'admin_warning';
+        final isDiscount = item.type == 'discount' ||
+            item.type == 'broadcast_discount' ||
+            item.discountPercent != null;
+        final isBroadcast = isDiscount ||
+            item.type.startsWith('broadcast') ||
+            item.type == 'campaign' ||
+            item.type == 'feature';
 
         final iconColor = isAdminWarning
             ? const Color(0xFFEA580C)
-            : (isTest ? const Color(0xFF10B981) : theme.colorScheme.primary);
+            : (isDiscount
+                ? const Color(0xFF8B5CF6)
+                : (isBroadcast
+                    ? const Color(0xFF3B82F6)
+                    : (isTest ? const Color(0xFF10B981) : theme.colorScheme.primary)));
         final iconBgColor = iconColor.withValues(alpha: 0.15);
         final borderColor = isAdminWarning
             ? const Color(0xFFEA580C).withValues(alpha: 0.35)
-            : theme.colorScheme.outlineVariant.withValues(alpha: 0.3);
+            : (isDiscount
+                ? const Color(0xFF8B5CF6).withValues(alpha: 0.35)
+                : theme.colorScheme.outlineVariant.withValues(alpha: 0.3));
 
-        return Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: isDark
-                ? (isAdminWarning
-                    ? const Color(0xFF2A1B12).withValues(alpha: 0.5)
-                    : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3))
-                : (isAdminWarning
-                    ? const Color(0xFFFFF7ED)
-                    : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.25)),
+        final isTr = Localizations.localeOf(context).languageCode == 'tr';
+
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: borderColor),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: iconBgColor,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  isAdminWarning
-                      ? Icons.warning_amber_rounded
-                      : (isTest ? Icons.verified_rounded : Icons.notifications_rounded),
-                  size: 16,
-                  color: iconColor,
-                ),
+            onTap: () {
+              if (item.targetAction == 'paywall' || isDiscount) {
+                PaywallSheet.show(context);
+              } else if (item.targetAction != null && item.targetAction!.isNotEmpty) {
+                PushNotificationService.handlePayloadRoute(
+                    'broadcast:${item.targetAction}:${item.id}');
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? (isAdminWarning
+                        ? const Color(0xFF2A1B12).withValues(alpha: 0.5)
+                        : (isDiscount
+                            ? const Color(0xFF221638).withValues(alpha: 0.5)
+                            : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)))
+                    : (isAdminWarning
+                        ? const Color(0xFFFFF7ED)
+                        : (isDiscount
+                            ? const Color(0xFFF5F3FF)
+                            : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.25))),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: borderColor),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: iconBgColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      isAdminWarning
+                          ? Icons.warning_amber_rounded
+                          : (isDiscount
+                              ? Icons.local_offer_rounded
+                              : (isBroadcast
+                                  ? Icons.campaign_rounded
+                                  : (isTest ? Icons.verified_rounded : Icons.notifications_rounded))),
+                      size: 16,
+                      color: iconColor,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  item.title,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 13,
-                                    color: isAdminWarning ? const Color(0xFFC2410C) : null,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              if (isAdminWarning) ...[
-                                const SizedBox(width: 6),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFEA580C).withValues(alpha: 0.15),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Text(
-                                    Localizations.localeOf(context).languageCode == 'tr' ? 'Yönetici' : 'Admin',
-                                    style: const TextStyle(
-                                      fontSize: 9.5,
-                                      fontWeight: FontWeight.w800,
-                                      color: Color(0xFFEA580C),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      item.title,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 13,
+                                        color: isAdminWarning
+                                            ? const Color(0xFFC2410C)
+                                            : (isDiscount ? const Color(0xFF7C3AED) : null),
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                ),
-                              ],
-                            ],
-                          ),
+                                  if (isAdminWarning) ...[
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFEA580C).withValues(alpha: 0.15),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        isTr ? 'Yönetici' : 'Admin',
+                                        style: const TextStyle(
+                                          fontSize: 9.5,
+                                          fontWeight: FontWeight.w800,
+                                          color: Color(0xFFEA580C),
+                                        ),
+                                      ),
+                                    ),
+                                  ] else if (item.discountPercent != null) ...[
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        '%${item.discountPercent} ${isTr ? 'İNDİRİM' : 'OFF'}',
+                                        style: const TextStyle(
+                                          fontSize: 9.5,
+                                          fontWeight: FontWeight.w800,
+                                          color: Color(0xFF8B5CF6),
+                                        ),
+                                      ),
+                                    ),
+                                  ] else if (isDiscount) ...[
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        isTr ? 'Fırsat' : 'Deal',
+                                        style: const TextStyle(
+                                          fontSize: 9.5,
+                                          fontWeight: FontWeight.w800,
+                                          color: Color(0xFF8B5CF6),
+                                        ),
+                                      ),
+                                    ),
+                                  ] else if (isBroadcast) ...[
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        isTr ? 'Duyuru' : 'Notice',
+                                        style: const TextStyle(
+                                          fontSize: 9.5,
+                                          fontWeight: FontWeight.w800,
+                                          color: Color(0xFF3B82F6),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                            Text(
+                              dateFormat.format(item.timestamp),
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
                         ),
+                        const SizedBox(height: 4),
                         Text(
-                          dateFormat.format(item.timestamp),
+                          item.body,
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: 11.5,
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
+                        if (item.targetAction == 'paywall' || isDiscount) ...[
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                isTr ? 'Fırsatı İncele →' : 'View Offer →',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF8B5CF6),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      item.body,
-                      style: TextStyle(
-                        fontSize: 11.5,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         );
       },

@@ -149,6 +149,57 @@ void main() {
       expect(tagSearch.filteredItems.first.tag, 'CARRY-ON');
     });
 
+    test('Category filter including Others / Diğer isolates other and custom categories', () {
+      final itemClothing = PackingItem(
+        id: '1',
+        name: 'T-Shirt',
+        category: 'Kıyafet',
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      final itemOther1 = PackingItem(
+        id: '2',
+        name: 'Guitar Picks',
+        category: 'Diğer',
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      final itemOther2 = PackingItem(
+        id: '3',
+        name: 'Board Game',
+        category: 'Other',
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      final itemCustom = PackingItem(
+        id: '4',
+        name: 'Yoga Mat',
+        category: 'Hobi & Spor',
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+
+      final allItems = [itemClothing, itemOther1, itemOther2, itemCustom];
+
+      // 1. Filter by Clothing -> only itemClothing
+      final stateClothing = ChecklistState(items: allItems, selectedCategory: 'Kıyafet');
+      expect(stateClothing.filteredItems.length, 1);
+      expect(stateClothing.filteredItems.first.name, 'T-Shirt');
+
+      // 2. Filter by Diğer / Other / Others -> includes Guitar Picks, Board Game, and Yoga Mat
+      final stateOther = ChecklistState(items: allItems, selectedCategory: 'Diğer');
+      expect(stateOther.filteredItems.length, 3);
+      expect(stateOther.filteredItems.map((i) => i.name).toList(), containsAll(['Guitar Picks', 'Board Game', 'Yoga Mat']));
+
+      // 3. Filter by English "Others"
+      final stateOthersEn = ChecklistState(items: allItems, selectedCategory: 'Others');
+      expect(stateOthersEn.filteredItems.length, 3);
+
+      // 4. Filter by All (null) -> all 4 items
+      final stateAll = ChecklistState(items: allItems, selectedCategory: null);
+      expect(stateAll.filteredItems.length, 4);
+    });
+
     test('importTemplate retains packed items while clearing unselected/unpacked items from previous templates', () async {
       final packedItem = PackingItem(
         id: 'p1',
@@ -298,7 +349,7 @@ void main() {
 
       // Verify header, dynamic luggage guide, and item are present
       expect(find.text('Bavul & Kontrol Listesi'), findsWidgets);
-      expect(find.text('Hazırlık Durumu'), findsOneWidget);
+      expect(find.text('HAZIRLANIYOR'), findsOneWidget);
       expect(find.text('Gürültü Engelleyici Kulaklık & Kılıfı'), findsOneWidget);
 
       // Verify top-right add button is removed while bottom-right FAB remains
@@ -307,6 +358,38 @@ void main() {
 
       // Verify compartment breakdown bar is completely removed
       expect(find.textContaining('Bölme Dağılımı'), findsNothing);
+
+      // Verify category selector bar includes Diğer / Others (in horizontal ListView, check without offstage constraint)
+      expect(find.text('Diğer', skipOffstage: false), findsOneWidget);
+    });
+
+    testWidgets('ChecklistScreen renders "Others" category chip in English locale', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            checklistControllerProvider.overrideWith(
+              (ref) => ChecklistNotifier(
+                null,
+                ChecklistState(
+                  isLoading: false,
+                  items: [],
+                ),
+              ),
+            ),
+          ],
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
+            home: ChecklistScreen(),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      expect(find.text('Others', skipOffstage: false), findsOneWidget);
+      expect(find.text('Clothing'), findsOneWidget);
+      expect(find.text('Electronics'), findsOneWidget);
     });
 
     testWidgets('DashboardScreen renders live luggage card and profile top bar without overflow', (tester) async {

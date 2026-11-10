@@ -584,8 +584,12 @@ class FirebaseAuthService implements AuthService {
         'lastActiveAt': now,
         'lastInactivityWarningAt': null,
         'inactivityWarningCount': 0,
-        'countryCode': countryCode,
-        'countryName': countryName,
+        'countryCode': (countryCode.isNotEmpty && countryCode != 'US')
+            ? countryCode
+            : (liveLoc.countryCode.isNotEmpty ? liveLoc.countryCode : countryCode),
+        'countryName': (countryName.isNotEmpty && countryName != 'United States')
+            ? countryName
+            : (liveLoc.countryName.isNotEmpty ? liveLoc.countryName : countryName),
         'currencyCode': currencyCode,
         'liveCountryCode': liveLoc.countryCode,
         'liveCountryName': liveLoc.countryName,
@@ -690,6 +694,13 @@ class FirebaseAuthService implements AuthService {
       } catch (_) {}
 
       await firestore.collection('users').doc(uid).set(updateData, SetOptions(merge: true));
+      try {
+        await firestore.collection('users').doc(uid).collection('sessions').add({
+          'durationSeconds': seconds,
+          'timestamp': FieldValue.serverTimestamp(),
+          'createdAt': now,
+        });
+      } catch (_) {}
     } catch (_) {}
   }
 }

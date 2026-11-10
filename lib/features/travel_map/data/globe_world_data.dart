@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:math' as math;
-import 'package:countries_world_map/data/maps/world_map.dart';
+import 'world_map_instructions.dart';
 
 /// Representation of a single country polygon projected in spherical spherical radians (lat, lng)
 class GlobePolygon {
@@ -30,7 +30,7 @@ class GlobeWorldData {
 
     final List<GlobePolygon> list = [];
     try {
-      final Map<String, dynamic> data = jsonDecode(SMapWorld.instructions) as Map<String, dynamic>;
+      final Map<String, dynamic> data = jsonDecode(WorldMapInstructions.instructions) as Map<String, dynamic>;
       final List items = data['i'] as List;
 
       for (final item in items) {

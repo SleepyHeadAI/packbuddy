@@ -1212,17 +1212,30 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getTravelMapCountries({String? userId, bool includeDeleted = false}) async {
     final db = await database;
     final effectiveUid = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
+    if (effectiveUid.isNotEmpty) {
+      if (includeDeleted) {
+        return await db.query(
+          AppConstants.tableTravelMap,
+          where: 'user_id = ?',
+          whereArgs: [effectiveUid],
+        );
+      }
+      return await db.query(
+        AppConstants.tableTravelMap,
+        where: 'user_id = ? AND is_deleted = 0',
+        whereArgs: [effectiveUid],
+      );
+    }
+
     if (includeDeleted) {
       return await db.query(
         AppConstants.tableTravelMap,
-        where: 'user_id = ? OR user_id = ""',
-        whereArgs: [effectiveUid],
+        where: 'user_id = "" OR user_id IS NULL',
       );
     }
     return await db.query(
       AppConstants.tableTravelMap,
-      where: '(user_id = ? OR user_id = "") AND is_deleted = 0',
-      whereArgs: [effectiveUid],
+      where: '(user_id = "" OR user_id IS NULL) AND is_deleted = 0',
     );
   }
 
