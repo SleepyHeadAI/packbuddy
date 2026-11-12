@@ -26,7 +26,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get budgetDescription => 'Reseutgifter i flera valutor';
 
   @override
-  String get vault => 'Dokumentvalv';
+  String get vault => 'Säkert Valv';
 
   @override
   String get vaultDescription => 'Pass, biljetter och bokningar';
@@ -210,7 +210,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get proFeature1 => 'Obegränsade resor och utgiftsspårning';
 
   @override
-  String get proFeature2 => 'Obegränsat dokumentvalv';
+  String get proFeature2 => 'Obegränsad lagring i säkert valv';
 
   @override
   String get proFeature3 => 'Automatisk tvåvägssynk i molnet';
@@ -2125,4 +2125,114 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get countryLabel => 'Land';
+
+  @override
+  String get privatePhotos => 'Privata foton';
+
+  @override
+  String get privatePhotosSubtitle => 'Skyddad med PIN-kod och biometri';
+
+  @override
+  String get privatePhotosReason =>
+      'Verifiera fingeravtryck eller Face ID för att visa privata foton';
+
+  @override
+  String get addPrivatePhoto => 'Lägg till privat foto';
+
+  @override
+  String get noPrivatePhotosYet => 'Inga privata foton ännu';
+
+  @override
+  String get noPrivatePhotosDesc =>
+      'Foton som läggs till här döljs från huvudvalvet och har extra kryptering.';
+
+  @override
+  String get lockAndExit => 'Lås och avsluta';
+
+  @override
+  String get setPinFirstForPrivatePhotos =>
+      'Ställ in en PIN-kod först för att skydda dina privata foton';
+
+  @override
+  String get secureVaultBannerTitle => 'Säkert valv oskyddat';
+
+  @override
+  String get secureVaultBannerDesc =>
+      'Ställ in en 4-siffrig PIN-kod för att skydda ditt valv och dina foton.';
+
+  @override
+  String get privateVault => 'Privat Valv';
+
+  @override
+  String get lockedBadge => 'LÅST';
+
+  @override
+  String get unlockedBadge => 'UPPLÅST';
+
+  @override
+  String get forgotPin => 'Glömt PIN-kod?';
+
+  @override
+  String get resetVaultPinTitle => 'Återställ valv-PIN';
+
+  @override
+  String get resetVaultPinEmailDesc =>
+      'En 6-siffrig verifieringskod skickas till din e-postadress:';
+
+  @override
+  String get sendVerificationCode => 'Skicka verifieringskod';
+
+  @override
+  String get enterVerificationCode => 'Ange verifieringskod';
+
+  @override
+  String get enterVerificationCodeDesc =>
+      'Ange den 6-siffriga koden som skickats till din e-post:';
+
+  @override
+  String get verificationCode => 'Verifieringskod';
+
+  @override
+  String get verifyAndContinue => 'Verifiera och fortsätt';
+
+  @override
+  String get invalidVerificationCode => 'Ogiltig verifieringskod. Försök igen.';
+
+  @override
+  String get resendCode => 'Skicka kod igen';
+
+  @override
+  String get codeResent => 'Verifieringskoden har skickats igen.';
+
+  @override
+  String get setNewVaultPin => 'Ange ny valv-PIN';
+
+  @override
+  String get newPin => 'Ny 4-siffrig PIN-kod';
+
+  @override
+  String get confirmNewPin => 'Bekräfta ny PIN-kod';
+
+  @override
+  String get pinsDoNotMatch => 'PIN-koderna matchar inte.';
+
+  @override
+  String get saveNewPinAndUnlock => 'Spara PIN & Lås upp';
+
+  @override
+  String get vaultPinResetSuccess =>
+      'Valv-PIN har återställts och valvet är upplåst.';
+
+  @override
+  String get vaultPinRequiredTitle => 'Valv-PIN krävs';
+
+  @override
+  String get vaultPinRequiredDesc =>
+      'En 4-siffrig PIN-kod krävs för att skydda dina resehandlingar och privata foton.';
+
+  @override
+  String get enterYourEmail => 'Ange din e-postadress';
+
+  @override
+  String get invalidEmail => 'Ange en giltig e-postadress.';
 }

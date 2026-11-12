@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +7,8 @@ import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/features/dashboard/presentation/navigation_provider.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import '../../controllers/vault_controller.dart';
+import 'vault_pin_recovery_sheet.dart';
+import 'package:packbuddy/features/dashboard/presentation/dashboard_localization.dart';
 
 /// Secure PIN and Biometric authentication gate for Document Vault
 class VaultLockView extends ConsumerStatefulWidget {
@@ -25,31 +28,58 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
   bool _isError = false;
   bool _canCheckBiometrics = false;
   bool _isAuthenticating = false;
+  Timer? _lockoutTimer;
+  int _lockoutRemainingSeconds = 0;
+  int _remainingAttempts = 5;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    _remainingAttempts = ref.read(vaultControllerProvider.notifier).getRemainingPinAttempts();
     _checkBiometrics();
+    _checkLockout();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    _lockoutTimer?.cancel();
     super.dispose();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      if (mounted) {
-        final currentTab = ref.read(mainNavigationIndexProvider);
-        final isVaultActive = !widget.isTabMode || currentTab == 3;
-        if (isVaultActive && ref.read(vaultControllerProvider).isLocked) {
-          _checkBiometrics();
-        }
-      }
+  void _checkLockout() {
+    final controller = ref.read(vaultControllerProvider.notifier);
+    if (controller.isPinLockedOut()) {
+      _lockoutRemainingSeconds = controller.getPinLockoutRemainingSeconds();
+      _startLockoutCountdown();
     }
+  }
+
+  void _startLockoutCountdown() {
+    _lockoutTimer?.cancel();
+    _lockoutTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      final remaining = ref.read(vaultControllerProvider.notifier).getPinLockoutRemainingSeconds();
+      if (remaining <= 0) {
+        timer.cancel();
+        setState(() {
+          _lockoutRemainingSeconds = 0;
+          _isError = false;
+        });
+      } else {
+        setState(() {
+          _lockoutRemainingSeconds = remaining;
+        });
+      }
+    });
+  }
+
+  String _formatLockoutTime(int totalSeconds) {
+    final minutes = totalSeconds ~/ 60;
+    final seconds = totalSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
   Future<void> _checkBiometrics() async {
@@ -58,7 +88,8 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
     setState(() => _canCheckBiometrics = available);
 
     // STRICT ISOLATION GUARD:
-    // Only auto-trigger biometric prompt if user is actively on the Vault screen!
+    // Only auto-trigger biometric prompt if user actively opened Vault tab in shell!
+    // NEVER auto-trigger on background resume or screen lock/unlock!
     final currentTab = ref.read(mainNavigationIndexProvider);
     final isVaultActive = !widget.isTabMode || currentTab == 3;
     if (!isVaultActive) {
@@ -92,27 +123,11 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
     try {
       HapticFeedback.mediumImpact();
       final l10n = AppLocalizations.of(context);
-      final messenger = ScaffoldMessenger.maybeOf(context);
       final reason = l10n?.vaultBiometricReason ??
           'Kasanın kilidini açmak için parmak izinizi doğrulayın';
-      final failMsg = l10n?.biometricsFailed ??
-          'Biyometrik doğrulama başarısız oldu veya iptal edildi.';
-      final success = await ref
+      await ref
           .read(vaultControllerProvider.notifier)
           .authenticateWithBiometrics(reason: reason);
-      if (!success && mounted) {
-        final isStillOnVault = !widget.isTabMode || ref.read(mainNavigationIndexProvider) == 3;
-        if (isStillOnVault && messenger != null) {
-          messenger.showSnackBar(
-            SnackBar(
-              content: Text(failMsg),
-              backgroundColor: AppColors.errorPastel,
-              duration: const Duration(seconds: 2),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-        }
-      }
     } finally {
       if (mounted) {
         _isAuthenticating = false;
@@ -121,6 +136,10 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
   }
 
   void _onDigitPressed(String digit) {
+    if (_lockoutRemainingSeconds > 0) {
+      HapticFeedback.heavyImpact();
+      return;
+    }
     if (_enteredPin.length < 4) {
       HapticFeedback.lightImpact();
       setState(() {
@@ -135,6 +154,7 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
   }
 
   void _onBackspace() {
+    if (_lockoutRemainingSeconds > 0) return;
     if (_enteredPin.isNotEmpty) {
       HapticFeedback.selectionClick();
       setState(() {
@@ -146,33 +166,67 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
 
   void _verifyPin() {
     final controller = ref.read(vaultControllerProvider.notifier);
+    if (controller.isPinLockedOut()) {
+      _checkLockout();
+      return;
+    }
+
     final success = controller.unlockVault(_enteredPin);
 
     if (success) {
+      _lockoutTimer?.cancel();
+      _lockoutRemainingSeconds = 0;
+      _remainingAttempts = 5;
       HapticFeedback.mediumImpact();
     } else {
       HapticFeedback.heavyImpact();
+      final remaining = controller.getRemainingPinAttempts();
       setState(() {
         _isError = true;
         _enteredPin = '';
+        _remainingAttempts = remaining;
       });
-      final l10n = AppLocalizations.of(context)!;
-      final errorMsg = l10n.wrongPinTryAgain;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.error_outline_rounded, color: Colors.white, size: 20),
-              const SizedBox(width: 10),
-              Expanded(child: Text(errorMsg)),
-            ],
+
+      final lang = Localizations.localeOf(context).languageCode;
+      if (controller.isPinLockedOut()) {
+        _checkLockout();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.lock_clock_rounded, color: Colors.white, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    DashboardLocalization.vaultLockedSnackbar(lang),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: AppColors.errorPastel,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 4),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
-          backgroundColor: AppColors.errorPastel,
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-      );
+        );
+      } else {
+        final errorMsg = DashboardLocalization.vaultIncorrectPinBanner(lang, remaining, 5);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline_rounded, color: Colors.white, size: 20),
+                const SizedBox(width: 10),
+                Expanded(child: Text(errorMsg, style: const TextStyle(fontWeight: FontWeight.w600))),
+              ],
+            ),
+            backgroundColor: AppColors.errorPastel,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 3),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
     }
   }
 
@@ -211,12 +265,17 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
             child: Text(l10n.cancel),
           ),
           FilledButton(
-            onPressed: () {
+            onPressed: () async {
               final pin = pinController.text.trim();
               if (pin.length == 4) {
-                ref.read(vaultControllerProvider.notifier).setPin(pin);
+                await ref.read(vaultControllerProvider.notifier).setPin(pin);
+                if (await BiometricService.instance.isBiometricsAvailable()) {
+                  await ref.read(vaultControllerProvider.notifier).setBiometricEnabled(true);
+                }
                 ref.read(vaultControllerProvider.notifier).unlockVault(pin);
-                Navigator.of(ctx).pop();
+                if (ctx.mounted) {
+                  Navigator.of(ctx).pop();
+                }
               }
             },
             child: Text(l10n.saveAndOpen),
@@ -265,7 +324,7 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
             const SizedBox(height: 20),
 
             Text(
-              l10n.vaultLocked,
+              vaultState.hasPin ? l10n.vaultLocked : l10n.vaultPinRequiredTitle,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w800,
                 letterSpacing: -0.5,
@@ -275,13 +334,61 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
             Text(
               vaultState.hasPin
                   ? l10n.enterPinToUnlockVault
-                  : l10n.vaultNotProtectedWithPin,
+                  : l10n.vaultPinRequiredDesc,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
+
+            if (_lockoutRemainingSeconds > 0) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                margin: const EdgeInsets.only(bottom: 24),
+                decoration: BoxDecoration(
+                  color: AppColors.errorPastel.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: AppColors.errorPastel.withValues(alpha: 0.4),
+                    width: 1.2,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.timer_rounded, color: AppColors.errorPastel, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          DashboardLocalization.vaultLockedTitle(
+                            Localizations.localeOf(context).languageCode,
+                            _formatLockoutTime(_lockoutRemainingSeconds),
+                          ),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.errorPastel,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      DashboardLocalization.vaultLockedDesc(
+                        Localizations.localeOf(context).languageCode,
+                      ),
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontSize: 11.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
 
             if (vaultState.hasPin) ...[
               // PIN Dots Indicator
@@ -309,7 +416,49 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
                   );
                 }),
               ),
-              const SizedBox(height: 36),
+              const SizedBox(height: 14),
+
+              // Prominently Visible In-Place Warning Banner & Remaining Attempt Counter
+              if (_lockoutRemainingSeconds <= 0 && (_isError || _remainingAttempts < 5)) ...[
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: AppColors.errorPastel.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: AppColors.errorPastel.withValues(alpha: 0.35),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.error_outline_rounded,
+                        color: AppColors.errorPastel,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        DashboardLocalization.vaultIncorrectPinBanner(
+                          Localizations.localeOf(context).languageCode,
+                          _remainingAttempts,
+                          5,
+                        ),
+                        style: const TextStyle(
+                          color: AppColors.errorPastel,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ] else ...[
+                const SizedBox(height: 36),
+              ],
 
               // Number Pad (1-9, 0, Backspace, Biometric)
               ConstrainedBox(
@@ -341,11 +490,32 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
                         ),
                       ],
                     ),
+                    const SizedBox(height: 16),
+                    // Forgot PIN Action
+                    TextButton.icon(
+                      key: const Key('forgot_vault_pin_button'),
+                      onPressed: () async {
+                        final reset = await VaultPinRecoverySheet.show(context);
+                        if (reset == true && mounted) {
+                          _lockoutTimer?.cancel();
+                          setState(() {
+                            _lockoutRemainingSeconds = 0;
+                            _isError = false;
+                            _enteredPin = '';
+                          });
+                        }
+                      },
+                      icon: const Icon(Icons.help_outline_rounded, size: 16),
+                      label: Text(
+                        l10n.forgotPin,
+                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ] else ...[
-              // Setup PIN Button
+              // Setup PIN Button (Mandatory - No continue unlocked!)
               FilledButton.icon(
                 onPressed: _showSetPinDialog,
                 icon: const Icon(Icons.shield_outlined),
@@ -354,13 +524,6 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () {
-                  ref.read(vaultControllerProvider.notifier).unlockVault('');
-                },
-                child: Text(l10n.continueUnlocked),
               ),
             ],
           ],
@@ -378,25 +541,29 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
 
   Widget _buildNumberKey(String digit) {
     final theme = Theme.of(context);
-    return InkWell(
-      onTap: () => _onDigitPressed(digit),
-      borderRadius: BorderRadius.circular(36),
-      child: Container(
-        width: 68,
-        height: 68,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-          border: Border.all(
-            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-            width: 1,
+    final isLockedOut = _lockoutRemainingSeconds > 0;
+    return Opacity(
+      opacity: isLockedOut ? 0.35 : 1.0,
+      child: InkWell(
+        onTap: isLockedOut ? null : () => _onDigitPressed(digit),
+        borderRadius: BorderRadius.circular(36),
+        child: Container(
+          width: 68,
+          height: 68,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+            border: Border.all(
+              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+              width: 1,
+            ),
           ),
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          digit,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w700,
+          alignment: Alignment.center,
+          child: Text(
+            digit,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ),
@@ -405,18 +572,22 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
 
   Widget _buildActionButton({required IconData icon, required VoidCallback onTap}) {
     final theme = Theme.of(context);
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(36),
-      child: Container(
-        width: 68,
-        height: 68,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.2),
+    final isLockedOut = _lockoutRemainingSeconds > 0;
+    return Opacity(
+      opacity: isLockedOut ? 0.35 : 1.0,
+      child: InkWell(
+        onTap: isLockedOut ? null : onTap,
+        borderRadius: BorderRadius.circular(36),
+        child: Container(
+          width: 68,
+          height: 68,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.2),
+          ),
+          alignment: Alignment.center,
+          child: Icon(icon, size: 26, color: theme.colorScheme.onSurfaceVariant),
         ),
-        alignment: Alignment.center,
-        child: Icon(icon, size: 26, color: theme.colorScheme.onSurfaceVariant),
       ),
     );
   }

@@ -26,7 +26,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get budgetDescription => 'ติดตามค่าใช้จ่ายการเดินทางหลายสกุลเงิน';
 
   @override
-  String get vault => 'คลังเอกสาร';
+  String get vault => 'ตู้นิรภัยที่ปลอดภัย';
 
   @override
   String get vaultDescription => 'หนังสือเดินทาง ตั๋ว และการจอง';
@@ -207,7 +207,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get proFeature1 => 'ทริปและการติดตามค่าใช้จ่ายไม่จำกัด';
 
   @override
-  String get proFeature2 => 'พื้นที่จัดเก็บคลังเอกสารไม่จำกัด';
+  String get proFeature2 => 'พื้นที่จัดเก็บตู้นิรภัยไม่จำกัด';
 
   @override
   String get proFeature3 => 'ซิงค์สองทางบนคลาวด์อัตโนมัติ';
@@ -2120,4 +2120,114 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get countryLabel => 'ประเทศ';
+
+  @override
+  String get privatePhotos => 'รูปภาพส่วนตัว';
+
+  @override
+  String get privatePhotosSubtitle => 'ได้รับการปกป้องด้วย PIN และไบโอเมตริก';
+
+  @override
+  String get privatePhotosReason =>
+      'ยืนยันลายนิ้วมือหรือ Face ID เพื่อดูรูปภาพส่วนตัว';
+
+  @override
+  String get addPrivatePhoto => 'เพิ่มรูปภาพส่วนตัว';
+
+  @override
+  String get noPrivatePhotosYet => 'ยังไม่มีรูปภาพส่วนตัว';
+
+  @override
+  String get noPrivatePhotosDesc =>
+      'รูปภาพที่เพิ่มที่นี่จะถูกซ่อนจากตู้นิรภัยหลักและได้รับการเข้ารหัสเพิ่มเติม';
+
+  @override
+  String get lockAndExit => 'ล็อกและออก';
+
+  @override
+  String get setPinFirstForPrivatePhotos =>
+      'โปรดตั้งค่า PIN ก่อนเพื่อปกป้องรูปภาพส่วนตัวของคุณ';
+
+  @override
+  String get secureVaultBannerTitle => 'ตู้นิรภัยยังไม่ได้รับการปกป้อง';
+
+  @override
+  String get secureVaultBannerDesc =>
+      'ตั้งค่า PIN 4 หลักเพื่อปกป้องตู้นิรภัยและรูปภาพของคุณ';
+
+  @override
+  String get privateVault => 'ตู้นิรภัยส่วนตัว';
+
+  @override
+  String get lockedBadge => 'ล็อคแล้ว';
+
+  @override
+  String get unlockedBadge => 'ปลดล็อคแล้ว';
+
+  @override
+  String get forgotPin => 'ลืมรหัส PIN?';
+
+  @override
+  String get resetVaultPinTitle => 'รีเซ็ตรหัส PIN ตู้นิรภัย';
+
+  @override
+  String get resetVaultPinEmailDesc =>
+      'รหัสยืนยัน 6 หลักจะถูกส่งไปยังอีเมลของคุณ:';
+
+  @override
+  String get sendVerificationCode => 'ส่งรหัสยืนยัน';
+
+  @override
+  String get enterVerificationCode => 'ป้อนรหัสยืนยัน';
+
+  @override
+  String get enterVerificationCodeDesc =>
+      'โปรดป้อนรหัส 6 หลักที่ส่งไปยังอีเมลของคุณ:';
+
+  @override
+  String get verificationCode => 'รหัสยืนยัน';
+
+  @override
+  String get verifyAndContinue => 'ยืนยันและดำเนินการต่อ';
+
+  @override
+  String get invalidVerificationCode => 'รหัสยืนยันไม่ถูกต้อง โปรดลองอีกครั้ง';
+
+  @override
+  String get resendCode => 'ส่งรหัสอีกครั้ง';
+
+  @override
+  String get codeResent => 'ส่งรหัสยืนยันอีกครั้งแล้ว';
+
+  @override
+  String get setNewVaultPin => 'ตั้งรหัส PIN ตู้นิรภัยใหม่';
+
+  @override
+  String get newPin => 'รหัส PIN 4 หลักใหม่';
+
+  @override
+  String get confirmNewPin => 'ยืนยันรหัส PIN ใหม่';
+
+  @override
+  String get pinsDoNotMatch => 'รหัส PIN ไม่ตรงกัน';
+
+  @override
+  String get saveNewPinAndUnlock => 'บันทึก PIN และปลดล็อก';
+
+  @override
+  String get vaultPinResetSuccess =>
+      'รีเซ็ตรหัส PIN ตู้นิรภัยสำเร็จและปลดล็อกตู้นิรภัยแล้ว';
+
+  @override
+  String get vaultPinRequiredTitle => 'จำเป็นต้องตั้งรหัส PIN ตู้นิรภัย';
+
+  @override
+  String get vaultPinRequiredDesc =>
+      'จำเป็นต้องสร้างรหัส PIN 4 หลักเพื่อปกป้องเอกสารและรูปภาพส่วนตัวของคุณ';
+
+  @override
+  String get enterYourEmail => 'ป้อนอีเมลของคุณ';
+
+  @override
+  String get invalidEmail => 'โปรดป้อนที่อยู่อีเมลที่ถูกต้อง';
 }

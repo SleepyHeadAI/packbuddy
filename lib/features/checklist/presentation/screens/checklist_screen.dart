@@ -6,6 +6,7 @@ import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/features/checklist/domain/packing_item.dart';
+import 'package:packbuddy/features/checklist/domain/packing_tag.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
 import 'package:packbuddy/features/checklist/presentation/screens/widgets/add_packing_item_sheet.dart';
 import 'package:packbuddy/features/checklist/presentation/screens/widgets/packing_item_tile.dart';
@@ -137,7 +138,8 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          titleSpacing: 8,
+          automaticallyImplyLeading: false,
+          titleSpacing: 16,
           title: FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
@@ -185,15 +187,6 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
               ],
             ),
           ),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded),
-            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-            onPressed: () {
-              if (Navigator.of(context).canPop()) {
-                Navigator.of(context).pop();
-              }
-            },
-          ),
           actions: [
             // Collapsible Search Toggle Icon
             IconButton(
@@ -237,14 +230,13 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
             const SizedBox(width: 4),
           ],
         ),
-        floatingActionButton: FloatingActionButton.extended(
+        floatingActionButton: FloatingActionButton(
           heroTag: null,
           onPressed: () => AddPackingItemSheet.show(context, tripId: widget.tripId),
           backgroundColor: theme.colorScheme.primary,
           foregroundColor: theme.colorScheme.onPrimary,
           elevation: 3,
-          icon: const Icon(Icons.add_rounded, size: 20),
-          label: Text(l10n.addItem, style: const TextStyle(fontWeight: FontWeight.w600)),
+          child: const Icon(Icons.add_rounded, size: 26),
         ),
         body: SafeArea(
           child: CustomScrollView(
@@ -316,6 +308,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                     ),
                     child: Builder(
                       builder: (context) {
+                        final langCode = Localizations.localeOf(context).languageCode;
                         final cardTitle = widget.tripTitle != null
                             ? '${widget.tripTitle} • ${l10n.baggageAndChecklist}'
                             : l10n.baggageAndChecklist;
@@ -328,15 +321,26 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                           airlineSubtitle = l10n.standardBaggageLimitNote;
                         } else if (checklistState.selectedAirline != null) {
                           final air = checklistState.selectedAirline!;
+                          final pkg = air.activePackage;
+                          final hasPkg = air.packages.isNotEmpty;
+                          final pkgSuffix = hasPkg ? ' • ${pkg.name}' : '';
+                          final personalShort = PackingTagHelper.getShortTag('PERSONAL', langCode);
+                          final cabinShort = PackingTagHelper.getShortTag('CABIN', langCode);
+                          final checkedShort = PackingTagHelper.getShortTag('CHECKED', langCode);
+
+                          final personalStr = pkg.personalItemLimitKg > 0 ? '${pkg.personalItemLimitKg.toInt()} kg' : '-';
+                          final cabinStr = pkg.cabinLimitKg > 0 ? '${pkg.cabinLimitKg.toInt()} kg' : '-';
+                          final checkedStr = pkg.checkedLimitKg > 0 ? '${pkg.checkedLimitKg.toInt()} kg' : '-';
+
                           if (checklistState.baggageAllowanceMode == BaggageAllowanceMode.cabinOnly) {
-                            airlineTitle = '${air.airlineName} (${l10n.cabinBaggage})';
-                            airlineSubtitle = '${air.countryFlag} ${l10n.cabinBaggage}: ${air.cabinLimitKg.toInt()} kg (${air.cabinDimensions})';
+                            airlineTitle = '${air.airlineName}$pkgSuffix ($cabinShort)';
+                            airlineSubtitle = '${air.countryFlag} $personalShort: $personalStr • $cabinShort: $cabinStr (${pkg.cabinDimensions})';
                           } else if (checklistState.baggageAllowanceMode == BaggageAllowanceMode.checkedOnly) {
-                            airlineTitle = '${air.airlineName} (${l10n.checkedBaggage})';
-                            airlineSubtitle = '${air.countryFlag} ${l10n.checkedBaggage}: ${air.checkedLimitKg.toInt()} kg';
+                            airlineTitle = '${air.airlineName}$pkgSuffix ($checkedShort)';
+                            airlineSubtitle = '${air.countryFlag} $checkedShort: $checkedStr';
                           } else {
-                            airlineTitle = air.airlineName;
-                            airlineSubtitle = '${air.countryFlag} ${l10n.cabinBaggage} ${air.cabinLimitKg.toInt()} kg • ${l10n.checkedBaggage} ${air.checkedLimitKg.toInt()} kg';
+                            airlineTitle = '${air.airlineName}$pkgSuffix';
+                            airlineSubtitle = '${air.countryFlag} $personalShort: $personalStr • $cabinShort: $cabinStr • $checkedShort: $checkedStr';
                           }
                         } else {
                           if (checklistState.baggageAllowanceMode == BaggageAllowanceMode.cabinOnly) {

@@ -21,6 +21,8 @@ import 'core/services/notification_service.dart';
 import 'core/services/push_notification_service.dart';
 import 'features/auth/presentation/screens/email_verification_screen.dart';
 import 'features/auth/presentation/screens/banned_screen.dart';
+import 'features/auth/presentation/screens/legal_consent_screen.dart';
+import 'features/auth/legal_consent_provider.dart';
 import 'features/admin/user_moderation_provider.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'features/dashboard/presentation/main_shell_scaffold.dart';
@@ -210,6 +212,7 @@ class AuthWallGate extends ConsumerWidget {
     final user = ref.watch(authUserProvider);
     final moderation = ref.watch(userModerationProvider);
     final onboardingCompleted = ref.watch(onboardingCompletedProvider);
+    final hasAcceptedLegalConsent = ref.watch(legalConsentProvider);
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 350),
@@ -221,7 +224,13 @@ class AuthWallGate extends ConsumerWidget {
           child: child,
         );
       },
-      child: _buildGatedScreen(user, moderation, onboardingCompleted, ref),
+      child: _buildGatedScreen(
+        user,
+        moderation,
+        onboardingCompleted,
+        hasAcceptedLegalConsent,
+        ref,
+      ),
     );
   }
 
@@ -229,6 +238,7 @@ class AuthWallGate extends ConsumerWidget {
     User? user,
     UserModerationState moderation,
     bool onboardingCompleted,
+    bool hasAcceptedLegalConsent,
     WidgetRef ref,
   ) {
     // 1. First-time app open: show interactive onboarding walkthrough before login
@@ -265,7 +275,16 @@ class AuthWallGate extends ConsumerWidget {
       );
     }
 
-    // 6. Fully authenticated and verified -> Main Navigation Shell (Persistent Scaffold)
+    // 6. Mandatory Legal Consent & Data Protection Wall (Zorunlu Sözleşme ve Açık Rıza Duvarı)
+    // Users cannot enter the dashboard or use any feature without accepting terms.
+    if (!hasAcceptedLegalConsent) {
+      return const LegalConsentScreen(
+        key: ValueKey('mandatory_legal_consent_wall'),
+        isMandatoryGate: true,
+      );
+    }
+
+    // 7. Fully authenticated, verified, and legally consented -> Main Navigation Shell
     return const MainShellScaffold(
       key: ValueKey('authenticated_shell'),
     );

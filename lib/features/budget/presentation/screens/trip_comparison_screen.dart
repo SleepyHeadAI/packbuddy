@@ -336,7 +336,7 @@ class _TripComparisonScreenState extends ConsumerState<TripComparisonScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${CurrencyFormatter.format(lowestDailyCost, currency: activeCurrency)}/day',
+                    '${CurrencyFormatter.format(lowestDailyCost, currency: activeCurrency)} / ${l10n?.daysUnit ?? 'day'}',
                     style: TextStyle(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w600,
@@ -393,7 +393,7 @@ class _TripComparisonScreenState extends ConsumerState<TripComparisonScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '%${highestPackingRate.toStringAsFixed(0)} packed',
+                    '${highestPackingRate.toStringAsFixed(0)}% ${l10n?.packed ?? 'Packed'}',
                     style: TextStyle(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w600,
@@ -468,7 +468,7 @@ class _TripComparisonScreenState extends ConsumerState<TripComparisonScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      '${trip.destination} • $duration days',
+                      '${trip.destination} • $duration ${l10n?.daysUnit ?? 'days'}',
                       style: TextStyle(
                         fontSize: 11,
                         color: theme.colorScheme.onSurfaceVariant,
@@ -578,7 +578,7 @@ class _TripComparisonScreenState extends ConsumerState<TripComparisonScreen> {
                       fit: BoxFit.scaleDown,
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        '${CurrencyFormatter.format(dailyCost, currency: trip.defaultCurrency)}/d',
+                        '${CurrencyFormatter.format(dailyCost, currency: trip.defaultCurrency)} / ${l10n?.daysUnit ?? 'day'}',
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w800,
@@ -621,7 +621,7 @@ class _TripComparisonScreenState extends ConsumerState<TripComparisonScreen> {
                 ),
               ),
               Text(
-                '%${packingRate.toStringAsFixed(0)}',
+                '${packingRate.toStringAsFixed(0)}%',
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,

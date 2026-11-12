@@ -203,6 +203,8 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
           }
         } else if (_selectedCategory == 'Booking') {
           _titleController.text = l10n.hotelBooking;
+        } else if (_selectedCategory == 'PrivatePhotos') {
+          _titleController.text = l10n.privatePhotos;
         }
       }
     }
@@ -215,11 +217,29 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
     super.dispose();
   }
 
+  static bool _isPrivateTitle(String title) {
+    final t = title.toLowerCase().trim();
+    if (t.isEmpty) return false;
+    const keywords = [
+      'private', 'özel', 'ozel', 'الصور الخاصة', 'private fotos', 'προσωπικ',
+      'fotos privadas', 'foto privada', 'photos privées', 'photo privée',
+      'निजी', 'foto pribadi', 'foto private', 'プライベート', '비공개',
+      'privéfoto', 'prywatne', 'личные', 'privata foton', 'ส่วนตัว', 'riêng tư', '隐私'
+    ];
+    for (final kw in keywords) {
+      if (t.contains(kw)) return true;
+    }
+    return false;
+  }
+
   void _pickAndSaveImage(ImageSource source) {
     if (_formKey.currentState?.validate() ?? false) {
       final title = _titleController.text.trim();
-      final category = _selectedCategory;
-      final subCategory = _selectedCategory == 'Ticket' ? _selectedSubCategory : null;
+      var category = _selectedCategory;
+      if (category == 'Ticket' && _isPrivateTitle(title)) {
+        category = 'PrivatePhotos';
+      }
+      final subCategory = category == 'Ticket' ? _selectedSubCategory : null;
       final notes = _notesController.text.trim().isNotEmpty
           ? _notesController.text.trim()
           : null;
@@ -240,8 +260,11 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
   void _pickAndSaveFile() {
     if (_formKey.currentState?.validate() ?? false) {
       final title = _titleController.text.trim();
-      final category = _selectedCategory;
-      final subCategory = _selectedCategory == 'Ticket' ? _selectedSubCategory : null;
+      var category = _selectedCategory;
+      if (category == 'Ticket' && _isPrivateTitle(title)) {
+        category = 'PrivatePhotos';
+      }
+      final subCategory = category == 'Ticket' ? _selectedSubCategory : null;
       final notes = _notesController.text.trim().isNotEmpty
           ? _notesController.text.trim()
           : null;
@@ -271,6 +294,7 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
       {'key': 'Booking', 'label': l10n.accommodation, 'icon': Icons.hotel_outlined, 'color': AppColors.warningPastel},
       {'key': 'Passport', 'label': l10n.idAndPassport, 'icon': Icons.badge_outlined, 'color': AppColors.primaryLight},
       {'key': 'Insurance', 'label': l10n.healthAndInsurance, 'icon': Icons.health_and_safety_outlined, 'color': AppColors.errorPastel},
+      {'key': 'PrivatePhotos', 'label': l10n.privatePhotos, 'icon': Icons.lock_outline_rounded, 'color': const Color(0xFFE11D48)},
       {'key': 'Other', 'label': l10n.otherDocuments, 'icon': Icons.folder_open_rounded, 'color': theme.colorScheme.outline},
     ];
 
@@ -352,6 +376,15 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
                 controller: _titleController,
                 textCapitalization: TextCapitalization.words,
                 autofocus: false,
+                onChanged: (val) {
+                  if (_selectedCategory == 'Ticket' && _isPrivateTitle(val)) {
+                    setState(() {
+                      _selectedCategory = 'PrivatePhotos';
+                      _selectedSubCategory = null;
+                      _isSubCategoryExpanded = false;
+                    });
+                  }
+                },
                 decoration: InputDecoration(
                   labelText: l10n.documentName,
                   hintText: l10n.documentNameHint,
@@ -413,6 +446,11 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
                                 _selectedSubCategory = null;
                                 _isSubCategoryExpanded = false;
                               }
+                              if (_selectedCategory == 'PrivatePhotos' &&
+                                  (_titleController.text.isEmpty ||
+                                   _titleController.text == l10n.tickets)) {
+                                _titleController.text = l10n.privatePhotos;
+                              }
                             });
                           }
                         },
@@ -438,6 +476,7 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
               if (tripState.trips.isNotEmpty) ...[
                 DropdownButtonFormField<String?>(
                   initialValue: _selectedTripId,
+                  isExpanded: true,
                   menuMaxHeight: 280,
                   borderRadius: BorderRadius.circular(16),
                   decoration: InputDecoration(
@@ -448,13 +487,18 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
                   items: [
                     DropdownMenuItem<String?>(
                       value: null,
-                      child: Text(l10n.generalDocumentAllTrips),
+                      child: Text(
+                        l10n.generalDocumentAllTrips,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     ...tripState.trips.map((trip) {
                       return DropdownMenuItem<String?>(
                         value: trip.id,
                         child: Text(
                           '✈️ ${trip.title} (${trip.destination})',
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       );

@@ -495,27 +495,72 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
         isExpanded: true,
         icon: const Icon(Icons.arrow_drop_down_rounded, size: 20),
         borderRadius: BorderRadius.circular(16),
+        selectedItemBuilder: (context) {
+          return CurrencyService.supportedCurrencies.map((code) {
+            final flag = CurrencyFormatter.getFlag(code);
+            final symbol = CurrencyService.getCurrencySymbol(code);
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(flag, style: const TextStyle(fontSize: 14)),
+                const SizedBox(width: 6),
+                Text(
+                  code,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '($symbol)',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            );
+          }).toList();
+        },
         items: CurrencyService.supportedCurrencies.map((code) {
+          final flag = CurrencyFormatter.getFlag(code);
           final symbol = CurrencyService.getCurrencySymbol(code);
+          final name = CurrencyFormatter.getCleanName(code);
           return DropdownMenuItem<String>(
             value: code,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  symbol,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary,
-                    fontSize: 13,
-                  ),
-                ),
+                Text(flag, style: const TextStyle(fontSize: 14)),
                 const SizedBox(width: 6),
                 Text(
                   code,
                   style: const TextStyle(
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w800,
                     fontSize: 13,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '($symbol)',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.primary,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    name,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],

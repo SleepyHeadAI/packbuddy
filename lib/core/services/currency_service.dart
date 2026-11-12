@@ -69,8 +69,9 @@ class CurrencyService {
   /// Returns true if live rates have been loaded or synchronized
   static bool get isUsingLiveRates => _lastUpdatedAt != null;
 
-  /// Supported currency codes (all 30 canonical travel currencies)
-  static List<String> get supportedCurrencies => defaultRatesAgainstUsd.keys.toList();
+  /// Supported currency codes sorted alphabetically (all 30 canonical travel currencies)
+  static List<String> get supportedCurrencies =>
+      (List<String>.from(defaultRatesAgainstUsd.keys)..sort());
 
   /// Initializes the service by loading locally cached rates from SharedPreferences
   static Future<void> init() async {
@@ -215,6 +216,16 @@ class CurrencyService {
   /// Currency symbol helper delegating to canonical CurrencyFormatter
   static String getCurrencySymbol(String currencyCode) {
     return CurrencyFormatter.getSymbol(currencyCode.toUpperCase().trim());
+  }
+
+  /// Currency flag emoji helper
+  static String getCurrencyFlag(String currencyCode) {
+    return CurrencyFormatter.getFlag(currencyCode.toUpperCase().trim());
+  }
+
+  /// Currency clean name helper
+  static String getCurrencyName(String currencyCode) {
+    return CurrencyFormatter.getCleanName(currencyCode.toUpperCase().trim());
   }
 
   /// Formats amount with proper symbol and decimal places

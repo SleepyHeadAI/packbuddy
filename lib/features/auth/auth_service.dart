@@ -63,6 +63,13 @@ abstract class AuthService {
 
   /// Send password reset link to user's email address
   Future<void> sendPasswordResetEmail({required String email});
+
+  /// Records legally binding user consent in Firestore for audit & compliance
+  Future<void> recordLegalConsent({
+    required String uid,
+    required String version,
+    required bool analyticsConsent,
+  });
 }
 
 /// Firebase implementation of [AuthService]
@@ -551,6 +558,18 @@ class FirebaseAuthService implements AuthService {
         debugPrint('[FirebaseAuthService] Travel map sync in syncUserProfile notice: $e');
       }
 
+      // LEGAL CONSENT & DATA PRIVACY AGREEMENT RESTORATION:
+      if (remoteExists && remoteData != null && remoteData['legalConsentAccepted'] == true) {
+        final remoteVersion = remoteData['legalConsentVersion'] as String? ?? PreferencesService.currentLegalConsentVersion;
+        final remoteAnalytics = remoteData['legalAnalyticsConsent'] as bool? ?? true;
+        await PreferencesService.instance.setLegalConsentAccepted(
+          true,
+          uid: user.uid,
+          version: remoteVersion,
+          analyticsConsent: remoteAnalytics,
+        );
+      }
+
       final remoteCreatedAt =
           remoteExists && remoteData != null ? remoteData['createdAt'] : null;
       final effectiveCreatedAt =
@@ -702,6 +721,27 @@ class FirebaseAuthService implements AuthService {
         });
       } catch (_) {}
     } catch (_) {}
+  }
+
+  @override
+  Future<void> recordLegalConsent({
+    required String uid,
+    required String version,
+    required bool analyticsConsent,
+  }) async {
+    try {
+      if (!_isFirebaseReady && _firestore == null) return;
+      final firestore = _firestore ?? FirebaseFirestore.instance;
+      await firestore.collection('users').doc(uid).set({
+        'legalConsentAccepted': true,
+        'legalConsentVersion': version,
+        'legalConsentDate': FieldValue.serverTimestamp(),
+        'legalAnalyticsConsent': analyticsConsent,
+        'legalConsentUpdatedAt': DateTime.now().toIso8601String(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('[FirebaseAuthService] recordLegalConsent notice: $e');
+    }
   }
 }
 

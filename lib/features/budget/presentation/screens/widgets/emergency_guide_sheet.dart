@@ -301,10 +301,14 @@ class _EmergencyGuideSheetState extends State<EmergencyGuideSheet> {
                   children: [
                     Icon(Icons.record_voice_over_rounded, size: 18, color: theme.colorScheme.primary),
                     const SizedBox(width: 8),
-                    Text(
-                      l10n.emergencyPhrases,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
+                    Expanded(
+                      child: Text(
+                        l10n.emergencyPhrases,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],

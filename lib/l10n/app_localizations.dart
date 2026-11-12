@@ -167,7 +167,7 @@ abstract class AppLocalizations {
   /// Label for document vault feature
   ///
   /// In en, this message translates to:
-  /// **'Document Vault'**
+  /// **'Secure Vault'**
   String get vault;
 
   /// Description of vault feature
@@ -4135,6 +4135,210 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Country'**
   String get countryLabel;
+
+  /// No description provided for @privatePhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Private Photos'**
+  String get privatePhotos;
+
+  /// No description provided for @privatePhotosSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Protected by PIN & Biometrics'**
+  String get privatePhotosSubtitle;
+
+  /// No description provided for @privatePhotosReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify fingerprint or Face ID to view private photos'**
+  String get privatePhotosReason;
+
+  /// No description provided for @addPrivatePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Private Photo'**
+  String get addPrivatePhoto;
+
+  /// No description provided for @noPrivatePhotosYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No private photos yet'**
+  String get noPrivatePhotosYet;
+
+  /// No description provided for @noPrivatePhotosDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos added here are hidden from the main vault and extra encrypted.'**
+  String get noPrivatePhotosDesc;
+
+  /// No description provided for @lockAndExit.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock & Exit'**
+  String get lockAndExit;
+
+  /// No description provided for @setPinFirstForPrivatePhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Please set a PIN first to protect your private photos'**
+  String get setPinFirstForPrivatePhotos;
+
+  /// No description provided for @secureVaultBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure Vault Unprotected'**
+  String get secureVaultBannerTitle;
+
+  /// No description provided for @secureVaultBannerDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a 4-digit PIN to protect your safe and private photos.'**
+  String get secureVaultBannerDesc;
+
+  /// Title for the private vault hero card
+  ///
+  /// In en, this message translates to:
+  /// **'Private Vault'**
+  String get privateVault;
+
+  /// Badge indicating that private vault is locked
+  ///
+  /// In en, this message translates to:
+  /// **'LOCKED'**
+  String get lockedBadge;
+
+  /// Badge indicating that private vault is unlocked
+  ///
+  /// In en, this message translates to:
+  /// **'UNLOCKED'**
+  String get unlockedBadge;
+
+  /// Forgot PIN button text
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot PIN?'**
+  String get forgotPin;
+
+  /// Title for vault PIN reset
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Vault PIN'**
+  String get resetVaultPinTitle;
+
+  /// Description for vault PIN reset email
+  ///
+  /// In en, this message translates to:
+  /// **'A 6-digit verification code will be sent to your account email to reset your vault PIN:'**
+  String get resetVaultPinEmailDesc;
+
+  /// Send verification code button
+  ///
+  /// In en, this message translates to:
+  /// **'Send Verification Code'**
+  String get sendVerificationCode;
+
+  /// Enter verification code header
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Verification Code'**
+  String get enterVerificationCode;
+
+  /// Verification code input prompt
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter the 6-digit verification code sent to your email:'**
+  String get enterVerificationCodeDesc;
+
+  /// Verification code label
+  ///
+  /// In en, this message translates to:
+  /// **'Verification Code'**
+  String get verificationCode;
+
+  /// Verify code button
+  ///
+  /// In en, this message translates to:
+  /// **'Verify & Continue'**
+  String get verifyAndContinue;
+
+  /// Invalid code error message
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid verification code. Please check and try again.'**
+  String get invalidVerificationCode;
+
+  /// Resend code button
+  ///
+  /// In en, this message translates to:
+  /// **'Resend Code'**
+  String get resendCode;
+
+  /// Code resent snackbar
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code has been resent.'**
+  String get codeResent;
+
+  /// Set new vault PIN header
+  ///
+  /// In en, this message translates to:
+  /// **'Set New Vault PIN'**
+  String get setNewVaultPin;
+
+  /// New PIN input label
+  ///
+  /// In en, this message translates to:
+  /// **'New 4-Digit PIN'**
+  String get newPin;
+
+  /// Confirm PIN input label
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm New PIN'**
+  String get confirmNewPin;
+
+  /// PIN mismatch error
+  ///
+  /// In en, this message translates to:
+  /// **'PIN codes do not match.'**
+  String get pinsDoNotMatch;
+
+  /// Save PIN and unlock button
+  ///
+  /// In en, this message translates to:
+  /// **'Save PIN & Unlock'**
+  String get saveNewPinAndUnlock;
+
+  /// PIN reset success snackbar
+  ///
+  /// In en, this message translates to:
+  /// **'Vault PIN successfully reset and vault unlocked.'**
+  String get vaultPinResetSuccess;
+
+  /// Mandatory PIN screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Vault PIN Required'**
+  String get vaultPinRequiredTitle;
+
+  /// Mandatory PIN screen description
+  ///
+  /// In en, this message translates to:
+  /// **'A 4-digit PIN is required to protect your travel documents and private photos.'**
+  String get vaultPinRequiredDesc;
+
+  /// Email input label
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Your Email'**
+  String get enterYourEmail;
+
+  /// Invalid email error
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email address.'**
+  String get invalidEmail;
 }
 
 class _AppLocalizationsDelegate

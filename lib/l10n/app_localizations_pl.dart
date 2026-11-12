@@ -26,7 +26,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get budgetDescription => 'Wielowalutowe śledzenie wydatków w podróży';
 
   @override
-  String get vault => 'Sejf Dokumentów';
+  String get vault => 'Bezpieczny Sejf';
 
   @override
   String get vaultDescription => 'Paszporty, bilety i rezerwacje';
@@ -210,7 +210,7 @@ class AppLocalizationsPl extends AppLocalizations {
   String get proFeature1 => 'Nielimitowane podróże i wydatki';
 
   @override
-  String get proFeature2 => 'Nielimitowany sejf dokumentów';
+  String get proFeature2 => 'Nielimitowane miejsce w bezpiecznym sejfie';
 
   @override
   String get proFeature3 => 'Automatyczna synchronizacja w chmurze';
@@ -2136,4 +2136,115 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get countryLabel => 'Kraj';
+
+  @override
+  String get privatePhotos => 'Prywatne zdjęcia';
+
+  @override
+  String get privatePhotosSubtitle => 'Chronione kodem PIN i biometrią';
+
+  @override
+  String get privatePhotosReason =>
+      'Zweryfikuj odcisk palca lub Face ID, aby wyświetlić prywatne zdjęcia';
+
+  @override
+  String get addPrivatePhoto => 'Dodaj prywatne zdjęcie';
+
+  @override
+  String get noPrivatePhotosYet => 'Brak prywatnych zdjęć';
+
+  @override
+  String get noPrivatePhotosDesc =>
+      'Dodane tutaj zdjęcia są ukryte w głównym sejfie i dodatkowo szyfrowane.';
+
+  @override
+  String get lockAndExit => 'Zablokuj i wyjdź';
+
+  @override
+  String get setPinFirstForPrivatePhotos =>
+      'Najpierw ustaw kod PIN, aby chronić prywatne zdjęcia';
+
+  @override
+  String get secureVaultBannerTitle => 'Bezpieczny sejf bez ochrony';
+
+  @override
+  String get secureVaultBannerDesc =>
+      'Ustaw 4-cyfrowy PIN, aby chronić swój sejf i zdjęcia.';
+
+  @override
+  String get privateVault => 'Prywatny Sejf';
+
+  @override
+  String get lockedBadge => 'ZABLOKOWANY';
+
+  @override
+  String get unlockedBadge => 'ODBLOKOWANY';
+
+  @override
+  String get forgotPin => 'Nie pamiętasz kodu PIN?';
+
+  @override
+  String get resetVaultPinTitle => 'Resetuj PIN sejfu';
+
+  @override
+  String get resetVaultPinEmailDesc =>
+      '6-cyfrowy kod weryfikacyjny zostanie wysłany na Twój adres e-mail:';
+
+  @override
+  String get sendVerificationCode => 'Wyślij kod weryfikacyjny';
+
+  @override
+  String get enterVerificationCode => 'Wprowadź kod weryfikacyjny';
+
+  @override
+  String get enterVerificationCodeDesc =>
+      'Wprowadź 6-cyfrowy kod wysłany na Twój adres e-mail:';
+
+  @override
+  String get verificationCode => 'Kod weryfikacyjny';
+
+  @override
+  String get verifyAndContinue => 'Zweryfikuj i kontynuuj';
+
+  @override
+  String get invalidVerificationCode =>
+      'Nieprawidłowy kod weryfikacyjny. Spróbuj ponownie.';
+
+  @override
+  String get resendCode => 'Wyślij kod ponownie';
+
+  @override
+  String get codeResent => 'Kod weryfikacyjny został wysłany ponownie.';
+
+  @override
+  String get setNewVaultPin => 'Ustaw nowy PIN sejfu';
+
+  @override
+  String get newPin => 'Nowy 4-cyfrowy PIN';
+
+  @override
+  String get confirmNewPin => 'Potwierdź nowy PIN';
+
+  @override
+  String get pinsDoNotMatch => 'Kody PIN nie są zgodne.';
+
+  @override
+  String get saveNewPinAndUnlock => 'Zapisz PIN i odblokuj';
+
+  @override
+  String get vaultPinResetSuccess =>
+      'Kod PIN sejfu został pomyślnie zresetowany.';
+
+  @override
+  String get vaultPinRequiredTitle => 'PIN sejfu jest wymagany';
+
+  @override
+  String get vaultPinRequiredDesc =>
+      'Wymagane jest utworzenie 4-cyfrowego kodu PIN w celu ochrony dokumentów i zdjęć prywatnych.';
+
+  @override
+  String get enterYourEmail => 'Wprowadź adres e-mail';
+
+  @override
+  String get invalidEmail => 'Wprowadź prawidłowy adres e-mail.';
 }

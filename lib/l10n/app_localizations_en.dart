@@ -26,7 +26,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get budgetDescription => 'Multi-currency travel expense tracking';
 
   @override
-  String get vault => 'Document Vault';
+  String get vault => 'Secure Vault';
 
   @override
   String get vaultDescription => 'Passports, tickets and booking vouchers';
@@ -2124,4 +2124,115 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get countryLabel => 'Country';
+
+  @override
+  String get privatePhotos => 'Private Photos';
+
+  @override
+  String get privatePhotosSubtitle => 'Protected by PIN & Biometrics';
+
+  @override
+  String get privatePhotosReason =>
+      'Verify fingerprint or Face ID to view private photos';
+
+  @override
+  String get addPrivatePhoto => 'Add Private Photo';
+
+  @override
+  String get noPrivatePhotosYet => 'No private photos yet';
+
+  @override
+  String get noPrivatePhotosDesc =>
+      'Photos added here are hidden from the main vault and extra encrypted.';
+
+  @override
+  String get lockAndExit => 'Lock & Exit';
+
+  @override
+  String get setPinFirstForPrivatePhotos =>
+      'Please set a PIN first to protect your private photos';
+
+  @override
+  String get secureVaultBannerTitle => 'Secure Vault Unprotected';
+
+  @override
+  String get secureVaultBannerDesc =>
+      'Set a 4-digit PIN to protect your safe and private photos.';
+
+  @override
+  String get privateVault => 'Private Vault';
+
+  @override
+  String get lockedBadge => 'LOCKED';
+
+  @override
+  String get unlockedBadge => 'UNLOCKED';
+
+  @override
+  String get forgotPin => 'Forgot PIN?';
+
+  @override
+  String get resetVaultPinTitle => 'Reset Vault PIN';
+
+  @override
+  String get resetVaultPinEmailDesc =>
+      'A 6-digit verification code will be sent to your account email to reset your vault PIN:';
+
+  @override
+  String get sendVerificationCode => 'Send Verification Code';
+
+  @override
+  String get enterVerificationCode => 'Enter Verification Code';
+
+  @override
+  String get enterVerificationCodeDesc =>
+      'Please enter the 6-digit verification code sent to your email:';
+
+  @override
+  String get verificationCode => 'Verification Code';
+
+  @override
+  String get verifyAndContinue => 'Verify & Continue';
+
+  @override
+  String get invalidVerificationCode =>
+      'Invalid verification code. Please check and try again.';
+
+  @override
+  String get resendCode => 'Resend Code';
+
+  @override
+  String get codeResent => 'Verification code has been resent.';
+
+  @override
+  String get setNewVaultPin => 'Set New Vault PIN';
+
+  @override
+  String get newPin => 'New 4-Digit PIN';
+
+  @override
+  String get confirmNewPin => 'Confirm New PIN';
+
+  @override
+  String get pinsDoNotMatch => 'PIN codes do not match.';
+
+  @override
+  String get saveNewPinAndUnlock => 'Save PIN & Unlock';
+
+  @override
+  String get vaultPinResetSuccess =>
+      'Vault PIN successfully reset and vault unlocked.';
+
+  @override
+  String get vaultPinRequiredTitle => 'Vault PIN Required';
+
+  @override
+  String get vaultPinRequiredDesc =>
+      'A 4-digit PIN is required to protect your travel documents and private photos.';
+
+  @override
+  String get enterYourEmail => 'Enter Your Email';
+
+  @override
+  String get invalidEmail => 'Please enter a valid email address.';
 }

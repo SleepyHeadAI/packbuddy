@@ -178,6 +178,13 @@ class MockAuthService implements AuthService {
   @override
   Future<void> requestAccountDeletion(String uid) async {}
 
+  @override
+  Future<void> recordLegalConsent({
+    required String uid,
+    required String version,
+    required bool analyticsConsent,
+  }) async {}
+
   void dispose() {
     _controller.close();
   }
@@ -656,6 +663,7 @@ void main() {
         emailVerified: true,
         providerData: [FakeUserInfo(providerId: 'password')],
       );
+      await PreferencesService.instance.setLegalConsentAccepted(true, uid: verifiedUser.uid);
       final mockAuth = MockAuthService(initialUser: verifiedUser);
 
       await tester.pumpWidget(
@@ -688,6 +696,7 @@ void main() {
         emailVerified: false, // Even if raw flag is false, OAuth bypasses password gate
         providerData: [FakeUserInfo(providerId: 'google.com')],
       );
+      await PreferencesService.instance.setLegalConsentAccepted(true, uid: googleUser.uid);
       final mockAuth = MockAuthService(initialUser: googleUser);
 
       await tester.pumpWidget(

@@ -781,11 +781,15 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                         children: [
                           Icon(Icons.alt_route_rounded, size: 16, color: theme.colorScheme.primary),
                           const SizedBox(width: 6),
-                          Text(
-                            '${l10n.itineraryStops} (${_itineraryStops.length})',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.primary,
+                          Expanded(
+                            child: Text(
+                              '${l10n.itineraryStops} (${_itineraryStops.length})',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.primary,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],

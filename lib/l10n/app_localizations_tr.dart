@@ -26,7 +26,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get budgetDescription => 'Çoklu para birimli seyahat harcama takibi';
 
   @override
-  String get vault => 'Belge Kasası';
+  String get vault => 'Güvenli Kasa';
 
   @override
   String get vaultDescription => 'Pasaport, bilet ve rezervasyon belgeleri';
@@ -212,7 +212,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get proFeature1 => 'Sınırsız Seyahat ve Bütçe Takibi';
 
   @override
-  String get proFeature2 => 'Sınırsız Belge Kasası Depolama';
+  String get proFeature2 => 'Sınırsız Güvenli Kasa Depolama';
 
   @override
   String get proFeature3 => 'Otomatik Çift Yönlü Bulut Senkronizasyonu';
@@ -2137,4 +2137,115 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get countryLabel => 'Ülke';
+
+  @override
+  String get privatePhotos => 'Özel Resimler';
+
+  @override
+  String get privatePhotosSubtitle => 'Yalnızca PIN ve Biyometrik ile açılır';
+
+  @override
+  String get privatePhotosReason =>
+      'Özel resimlerinizi görüntülemek için parmak izinizi doğrulayın';
+
+  @override
+  String get addPrivatePhoto => 'Özel Resim Ekle';
+
+  @override
+  String get noPrivatePhotosYet => 'Henüz özel resim eklenmedi';
+
+  @override
+  String get noPrivatePhotosDesc =>
+      'Buraya eklediğiniz resimler ana kasanızda görünmez ve ekstra korunur.';
+
+  @override
+  String get lockAndExit => 'Kilitle ve Çık';
+
+  @override
+  String get setPinFirstForPrivatePhotos =>
+      'Özel resimlerinizi korumak için lütfen önce bir PIN belirleyin';
+
+  @override
+  String get secureVaultBannerTitle => 'Güvenli Kasa Korumasız';
+
+  @override
+  String get secureVaultBannerDesc =>
+      'Kasanızı ve fotoğraflarınızı korumak için 4 haneli bir PIN belirleyin.';
+
+  @override
+  String get privateVault => 'Özel Kasa';
+
+  @override
+  String get lockedBadge => 'KİLİTLİ';
+
+  @override
+  String get unlockedBadge => 'AÇIK';
+
+  @override
+  String get forgotPin => 'PIN Kodumu Unuttum';
+
+  @override
+  String get resetVaultPinTitle => 'Kasa PIN Kodunu Sıfırla';
+
+  @override
+  String get resetVaultPinEmailDesc =>
+      'Kasa PIN kodunuzu sıfırlamak için hesabınıza bağlı e-posta adresine 6 haneli bir doğrulama kodu gönderilecektir:';
+
+  @override
+  String get sendVerificationCode => 'Doğrulama Kodu Gönder';
+
+  @override
+  String get enterVerificationCode => 'Doğrulama Kodunu Girin';
+
+  @override
+  String get enterVerificationCodeDesc =>
+      'Lütfen e-posta adresinize gönderilen 6 haneli doğrulama kodunu girin:';
+
+  @override
+  String get verificationCode => 'Doğrulama Kodu';
+
+  @override
+  String get verifyAndContinue => 'Doğrula ve Devam Et';
+
+  @override
+  String get invalidVerificationCode =>
+      'Doğrulama kodu hatalı. Lütfen kontrol edip tekrar deneyin.';
+
+  @override
+  String get resendCode => 'Kodu Tekrar Gönder';
+
+  @override
+  String get codeResent => 'Doğrulama kodu tekrar gönderildi.';
+
+  @override
+  String get setNewVaultPin => 'Yeni Kasa PIN Kodu Belirleyin';
+
+  @override
+  String get newPin => 'Yeni 4 Haneli PIN';
+
+  @override
+  String get confirmNewPin => 'Yeni PIN\'i Onaylayın';
+
+  @override
+  String get pinsDoNotMatch => 'Girdiğiniz PIN kodları birbiriyle eşleşmiyor.';
+
+  @override
+  String get saveNewPinAndUnlock => 'PIN\'i Kaydet ve Kilit Aç';
+
+  @override
+  String get vaultPinResetSuccess =>
+      'Kasa PIN kodunuz başarıyla yenilendi ve kasanız açıldı.';
+
+  @override
+  String get vaultPinRequiredTitle => 'Kasa PIN Kodu Zorunludur';
+
+  @override
+  String get vaultPinRequiredDesc =>
+      'Kasanızdaki seyahat belgelerini ve özel fotoğrafları korumak için 4 haneli bir PIN kodu oluşturmanız zorunludur.';
+
+  @override
+  String get enterYourEmail => 'E-posta Adresinizi Girin';
+
+  @override
+  String get invalidEmail => 'Lütfen geçerli bir e-posta adresi girin.';
 }

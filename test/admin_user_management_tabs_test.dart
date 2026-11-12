@@ -281,6 +281,18 @@ void main() {
       createdAt: DateTime(2026, 9, 10),
       updatedAt: DateTime(2026, 9, 10),
     ),
+    VaultDocument(
+      id: 'doc-private-1',
+      userId: 'test-user-42',
+      title: 'Özel Pasaport Yedek Fotoğrafı.jpg',
+      category: 'PrivatePhotos',
+      fileExtension: 'JPG',
+      fileSizeBytes: 1024 * 500,
+      localImagePath: '',
+      cloudDataBase64: base64Encode(utf8.encode('Mock JPG Data')),
+      createdAt: DateTime(2026, 9, 11),
+      updatedAt: DateTime(2026, 9, 11),
+    ),
   ];
 
   final testSessions = [
@@ -391,10 +403,14 @@ void main() {
     expect(find.byKey(const ValueKey('moderation_chip_all_time')), findsOneWidget);
     expect(find.byKey(const ValueKey('moderation_chip_custom')), findsOneWidget);
 
-    // 6. Verify Kasadakileri Görme (Vault Documents) is in Page 2 and preserved
+    // 6. Verify Kasadakileri Görme (Vault Documents) is in Page 2 with dedicated Özel Kasa section
     expect(find.text('Yüklenen Kasa Belgeleri (İncele / Yönet)'), findsOneWidget);
+    expect(find.text('Genel Kasa Belgeleri'), findsOneWidget);
     expect(find.text('Biyometrik Pasaport.pdf'), findsOneWidget);
-    expect(find.widgetWithText(OutlinedButton, 'İncele'), findsOneWidget);
+    expect(find.text('Özel Kasa (Özel Resimler)'), findsOneWidget);
+    expect(find.text('Özel Pasaport Yedek Fotoğrafı.jpg'), findsOneWidget);
+    expect(find.text('GİZLİ'), findsOneWidget);
+    expect(find.widgetWithText(OutlinedButton, 'İncele'), findsNWidgets(2));
 
     // 7. Verify Seyahat Planlarını Görme (Trips)
     expect(find.text('Seyahat Planları'), findsOneWidget);

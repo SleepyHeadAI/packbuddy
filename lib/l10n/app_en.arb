@@ -1,4 +1,4 @@
-{
+﻿{
   "@@locale": "en",
   "appName": "PackBuddy",
   "@appName": {
@@ -20,7 +20,7 @@
   "@budgetDescription": {
     "description": "Description of budget feature"
   },
-  "vault": "Document Vault",
+  "vault": "Secure Vault",
   "@vault": {
     "description": "Label for document vault feature"
   },
@@ -2413,5 +2413,69 @@
   "customLocationTooltip": "Add custom location (e.g. My Village)",
   "notACountryOrCityPrompt": "\"{query}\" was not found in the verified country or city catalog. Would you like to add it as a custom location?",
   "cityLabel": "City",
-  "countryLabel": "Country"
+  "countryLabel": "Country",
+  "privatePhotos": "Private Photos",
+  "privatePhotosSubtitle": "Protected by PIN & Biometrics",
+  "privatePhotosReason": "Verify fingerprint or Face ID to view private photos",
+  "addPrivatePhoto": "Add Private Photo",
+  "noPrivatePhotosYet": "No private photos yet",
+  "noPrivatePhotosDesc": "Photos added here are hidden from the main vault and extra encrypted.",
+  "lockAndExit": "Lock & Exit",
+  "setPinFirstForPrivatePhotos": "Please set a PIN first to protect your private photos",
+  "secureVaultBannerTitle": "Secure Vault Unprotected",
+  "secureVaultBannerDesc": "Set a 4-digit PIN to protect your safe and private photos.",
+  "privateVault": "Private Vault",
+  "@privateVault": {
+    "description": "Title for the private vault hero card"
+  },
+  "lockedBadge": "LOCKED",
+  "@lockedBadge": {
+    "description": "Badge indicating that private vault is locked"
+  },
+  "unlockedBadge": "UNLOCKED",
+  "@unlockedBadge": {
+    "description": "Badge indicating that private vault is unlocked"
+  },
+  "forgotPin": "Forgot PIN?",
+  "@forgotPin": { "description": "Forgot PIN button text" },
+  "resetVaultPinTitle": "Reset Vault PIN",
+  "@resetVaultPinTitle": { "description": "Title for vault PIN reset" },
+  "resetVaultPinEmailDesc": "A 6-digit verification code will be sent to your account email to reset your vault PIN:",
+  "@resetVaultPinEmailDesc": { "description": "Description for vault PIN reset email" },
+  "sendVerificationCode": "Send Verification Code",
+  "@sendVerificationCode": { "description": "Send verification code button" },
+  "enterVerificationCode": "Enter Verification Code",
+  "@enterVerificationCode": { "description": "Enter verification code header" },
+  "enterVerificationCodeDesc": "Please enter the 6-digit verification code sent to your email:",
+  "@enterVerificationCodeDesc": { "description": "Verification code input prompt" },
+  "verificationCode": "Verification Code",
+  "@verificationCode": { "description": "Verification code label" },
+  "verifyAndContinue": "Verify & Continue",
+  "@verifyAndContinue": { "description": "Verify code button" },
+  "invalidVerificationCode": "Invalid verification code. Please check and try again.",
+  "@invalidVerificationCode": { "description": "Invalid code error message" },
+  "resendCode": "Resend Code",
+  "@resendCode": { "description": "Resend code button" },
+  "codeResent": "Verification code has been resent.",
+  "@codeResent": { "description": "Code resent snackbar" },
+  "setNewVaultPin": "Set New Vault PIN",
+  "@setNewVaultPin": { "description": "Set new vault PIN header" },
+  "newPin": "New 4-Digit PIN",
+  "@newPin": { "description": "New PIN input label" },
+  "confirmNewPin": "Confirm New PIN",
+  "@confirmNewPin": { "description": "Confirm PIN input label" },
+  "pinsDoNotMatch": "PIN codes do not match.",
+  "@pinsDoNotMatch": { "description": "PIN mismatch error" },
+  "saveNewPinAndUnlock": "Save PIN & Unlock",
+  "@saveNewPinAndUnlock": { "description": "Save PIN and unlock button" },
+  "vaultPinResetSuccess": "Vault PIN successfully reset and vault unlocked.",
+  "@vaultPinResetSuccess": { "description": "PIN reset success snackbar" },
+  "vaultPinRequiredTitle": "Vault PIN Required",
+  "@vaultPinRequiredTitle": { "description": "Mandatory PIN screen title" },
+  "vaultPinRequiredDesc": "A 4-digit PIN is required to protect your travel documents and private photos.",
+  "@vaultPinRequiredDesc": { "description": "Mandatory PIN screen description" },
+  "enterYourEmail": "Enter Your Email",
+  "@enterYourEmail": { "description": "Email input label" },
+  "invalidEmail": "Please enter a valid email address.",
+  "@invalidEmail": { "description": "Invalid email error" }
 }

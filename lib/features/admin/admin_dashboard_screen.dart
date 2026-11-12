@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:pdfx/pdfx.dart';
@@ -11,6 +13,8 @@ import '../../core/services/security_service.dart';
 import '../../core/services/email_dispatch_service.dart';
 import '../../core/utils/date_formatter.dart';
 import '../../core/theme/app_colors.dart';
+import '../../data/local_db/database_helper.dart';
+import '../../data/sync_engine/sync_engine.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/app_card.dart';
 import '../../shared/widgets/status_badge.dart';
@@ -74,6 +78,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
     if (!isAdmin) {
       return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: Text(l10n.adminDashboard),
         ),
         body: Center(
@@ -139,48 +144,60 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(10),
+        automaticallyImplyLeading: false,
+        titleSpacing: 16,
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.admin_panel_settings_rounded,
+                  size: 20,
+                  color: theme.colorScheme.primary,
+                ),
               ),
-              child: Icon(
-                Icons.admin_panel_settings_rounded,
-                size: 20,
-                color: theme.colorScheme.primary,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
+              const SizedBox(width: 8),
+              Text(
                 l10n.adminDashboard,
-                style: const TextStyle(fontWeight: FontWeight.w800),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.history_rounded),
+            visualDensity: VisualDensity.compact,
+            padding: const EdgeInsets.all(6),
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            icon: const Icon(Icons.history_rounded, size: 20),
             tooltip: Localizations.localeOf(context).languageCode == 'tr'
                 ? 'Denetim Günlüğü'
                 : 'Audit Trail',
             onPressed: () => _showAllAuditLogsBottomSheet(context),
           ),
           IconButton(
-            icon: const Icon(Icons.campaign_rounded),
+            visualDensity: VisualDensity.compact,
+            padding: const EdgeInsets.all(6),
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            icon: const Icon(Icons.campaign_rounded, size: 20),
             tooltip: Localizations.localeOf(context).languageCode == 'tr'
                 ? 'Toplu Bildirim & Reklam'
                 : 'Broadcast & Ads',
             onPressed: () => _showBroadcastCampaignBottomSheet(context),
           ),
           IconButton(
-            icon: const Icon(Icons.lightbulb_rounded),
+            visualDensity: VisualDensity.compact,
+            padding: const EdgeInsets.all(6),
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            icon: const Icon(Icons.lightbulb_rounded, size: 20),
             tooltip: Localizations.localeOf(context).languageCode == 'tr'
                 ? 'Kullanıcı Önerileri'
                 : 'User Suggestions',
@@ -191,10 +208,14 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.refresh_rounded),
+            visualDensity: VisualDensity.compact,
+            padding: const EdgeInsets.all(6),
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            icon: const Icon(Icons.refresh_rounded, size: 20),
             tooltip: l10n.syncNow,
             onPressed: () => ref.read(adminControllerProvider.notifier).refreshData(),
           ),
+          const SizedBox(width: 6),
         ],
       ),
       body: RefreshIndicator(
@@ -3806,7 +3827,7 @@ class _UserModerationBottomSheetState
       } else {
         filtered = logs;
       }
-      final total = filtered.fold<int>(0, (sum, l) => sum + l.durationSeconds);
+      final total = filtered.fold<int>(0, (acc, l) => acc + l.durationSeconds);
       final count = filtered.length;
       final avg = count > 0 ? (total / count) : 0.0;
       return (totalSeconds: total, sessionCount: count, avgSeconds: avg);
@@ -5307,68 +5328,256 @@ class _UserModerationBottomSheetState
               );
             }
 
-            return Column(
-              children: docs.map((doc) {
-                final ext = doc.fileExtension?.toUpperCase() ?? 'DOC';
-                final isImage = ['JPG', 'JPEG', 'PNG', 'WEBP', 'GIF'].contains(ext);
-                final isPdf = ext == 'PDF';
+            final isDark = theme.brightness == Brightness.dark;
+            final regularDocs = docs.where((d) => !d.isPrivate).toList();
+            final privateDocs = docs.where((d) => d.isPrivate).toList();
 
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: AppCard(
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 1. Genel Kasa Belgeleri (Standard Documents)
+                if (privateDocs.isNotEmpty) ...[
+                  Row(
+                    children: [
+                      const Icon(Icons.folder_open_rounded, size: 16, color: Color(0xFF6B7280)),
+                      const SizedBox(width: 6),
+                      Text(
+                        isTr ? 'Genel Kasa Belgeleri' : 'Standard Vault Documents',
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF6B7280).withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          '${regularDocs.length}',
+                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF6B7280)),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                ],
+                if (regularDocs.isEmpty && privateDocs.isNotEmpty)
+                  AppCard(
                     borderRadius: 14,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: (isImage ? const Color(0xFF3B82F6) : const Color(0xFFEF4444)).withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(
-                            isImage ? Icons.image_rounded : (isPdf ? Icons.picture_as_pdf_rounded : Icons.description_rounded),
-                            size: 20,
-                            color: isImage ? const Color(0xFF3B82F6) : const Color(0xFFEF4444),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                doc.title,
-                                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '${doc.category} • $ext • ${formatStorageBytes(doc.fileSize)}',
-                                style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
-                              ),
-                            ],
-                          ),
-                        ),
-                        OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                            minimumSize: Size.zero,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
-                          onPressed: () => _inspectDocument(context, doc, l10n),
-                          child: Text(l10n.adminInspectDocument, style: const TextStyle(fontSize: 11)),
-                        ),
-                      ],
+                    padding: const EdgeInsets.all(12),
+                    child: Center(
+                      child: Text(
+                        isTr ? 'Genel kasada yüklenmiş belge yok' : 'No standard documents uploaded',
+                        style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                    ),
+                  )
+                else
+                  ...regularDocs.map((doc) => _buildVaultDocumentItem(context, doc, l10n, theme, doc.isPrivate)),
+
+                // 2. Özel Kasa / Özel Resimler (Dedicated Private Safe Section)
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE11D48).withValues(alpha: isDark ? 0.08 : 0.04),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: const Color(0xFFE11D48).withValues(alpha: 0.25),
+                      width: 1,
                     ),
                   ),
-                );
-              }).toList(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE11D48).withValues(alpha: 0.15),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.lock_rounded, size: 14, color: Color(0xFFE11D48)),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      isTr ? 'Özel Kasa (Özel Resimler)' : 'Private Vault (Private Photos)',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 12.5,
+                                        color: Color(0xFFE11D48),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFE11D48).withValues(alpha: 0.18),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        '${privateDocs.length}',
+                                        style: const TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFFE11D48),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  isTr
+                                      ? 'PIN / Biyometrik ile korunan özel fotoğraflar'
+                                      : 'Private photos protected by PIN / Biometrics',
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      if (privateDocs.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Center(
+                            child: Text(
+                              isTr ? 'Özel kasada henüz resim/belge yok' : 'No photos/documents in private vault yet',
+                              style: TextStyle(fontSize: 11.5, color: theme.colorScheme.onSurfaceVariant),
+                            ),
+                          ),
+                        )
+                      else
+                        ...privateDocs.map((doc) => _buildVaultDocumentItem(context, doc, l10n, theme, true)),
+                    ],
+                  ),
+                ),
+              ],
             );
           },
         ),
       ],
+    );
+  }
+
+  Widget _buildVaultDocumentItem(
+    BuildContext context,
+    VaultDocument doc,
+    AppLocalizations l10n,
+    ThemeData theme,
+    bool isPrivate,
+  ) {
+    final ext = doc.fileExtension?.toUpperCase() ?? 'DOC';
+    final isImage = ['JPG', 'JPEG', 'PNG', 'WEBP', 'GIF'].contains(ext);
+    final isPdf = ext == 'PDF';
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+
+    final badgeColor = isPrivate
+        ? const Color(0xFFE11D48)
+        : (isImage ? const Color(0xFF3B82F6) : const Color(0xFFEF4444));
+
+    final icon = isPrivate
+        ? (isImage ? Icons.photo_library_rounded : Icons.lock_rounded)
+        : (isImage ? Icons.image_rounded : (isPdf ? Icons.picture_as_pdf_rounded : Icons.description_rounded));
+
+    final displayCategory = isPrivate
+        ? (isTr ? 'Özel Kasa' : 'Private Vault')
+        : doc.category;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: AppCard(
+        borderRadius: 14,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: badgeColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                icon,
+                size: 20,
+                color: badgeColor,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          doc.title,
+                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (isPrivate) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE11D48).withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(
+                              color: const Color(0xFFE11D48).withValues(alpha: 0.3),
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Text(
+                            isTr ? 'GİZLİ' : 'PRIVATE',
+                            style: const TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFFE11D48),
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '$displayCategory • $ext • ${formatStorageBytes(doc.fileSize)}',
+                    style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                minimumSize: Size.zero,
+                side: isPrivate ? const BorderSide(color: Color(0xFFE11D48), width: 1) : null,
+                foregroundColor: isPrivate ? const Color(0xFFE11D48) : null,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: () => _inspectDocument(context, doc, l10n),
+              child: Text(l10n.adminInspectDocument, style: const TextStyle(fontSize: 11)),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -5880,6 +6089,7 @@ class _UserModerationBottomSheetState
       builder: (ctx) => _AdminVaultInspectDialog(
         doc: doc,
         uid: widget.user.uid,
+        userEmail: widget.user.email,
         onDeleted: _reloadDocuments,
       ),
     );
@@ -6086,11 +6296,13 @@ class _UserModerationBottomSheetState
 class _AdminVaultInspectDialog extends ConsumerStatefulWidget {
   final VaultDocument doc;
   final String uid;
+  final String? userEmail;
   final VoidCallback onDeleted;
 
   const _AdminVaultInspectDialog({
     required this.doc,
     required this.uid,
+    this.userEmail,
     required this.onDeleted,
   });
 
@@ -6113,42 +6325,329 @@ class _AdminVaultInspectDialogState extends ConsumerState<_AdminVaultInspectDial
     _loadDocumentBytes();
   }
 
-  Future<void> _loadDocumentBytes() async {
+  Future<void> _loadDocumentBytes({bool forceCloud = false}) async {
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
     try {
-      Uint8List? rawBytes;
-      if (widget.doc.cloudDataBase64 != null && widget.doc.cloudDataBase64!.isNotEmpty) {
-        rawBytes = base64Decode(widget.doc.cloudDataBase64!);
-      } else if (widget.doc.localImagePath.isNotEmpty) {
-        final f = File(widget.doc.localImagePath);
-        if (await f.exists()) {
-          rawBytes = await f.readAsBytes();
+      Uint8List? resolvedBytes;
+      final targetUid = widget.uid.isNotEmpty ? widget.uid : widget.doc.userId;
+      final candidateSeeds = <String>{
+        if (widget.uid.isNotEmpty) widget.uid,
+        if (widget.doc.userId.isNotEmpty) widget.doc.userId,
+        if (widget.userEmail != null && widget.userEmail!.isNotEmpty) widget.userEmail!,
+      };
+      final effectiveDocId = widget.doc.id.isNotEmpty
+          ? widget.doc.id
+          : p.basenameWithoutExtension(widget.doc.localImagePath);
+
+      // 1. Direct cloud base64 payload from widget.doc (if present and not forcing clean cloud fetch)
+      if (!forceCloud && widget.doc.cloudDataBase64 != null && widget.doc.cloudDataBase64!.isNotEmpty) {
+        try {
+          var cleanB64 = widget.doc.cloudDataBase64!.trim();
+          if (cleanB64.contains(',')) cleanB64 = cleanB64.split(',').last;
+          final decoded = base64Decode(cleanB64);
+          if (decoded.isNotEmpty) {
+            if (SecurityService.isImageBytes(decoded) || SecurityService.isPdfBytes(decoded)) {
+              resolvedBytes = decoded;
+            } else {
+              final decrypted = await SecurityService.instance.decryptBytes(
+                decoded,
+                userId: targetUid,
+                extraSeeds: candidateSeeds.toList(),
+              );
+              if (!SecurityService.instance.isEncrypted(decrypted) ||
+                  SecurityService.isImageBytes(decrypted) ||
+                  SecurityService.isPdfBytes(decrypted)) {
+                resolvedBytes = decrypted;
+              } else {
+                resolvedBytes = decoded;
+              }
+            }
+          }
+        } catch (e) {
+          debugPrint('[_AdminVaultInspectDialog] direct cloudDataBase64 decode notice: $e');
         }
       }
 
-      if (rawBytes == null || rawBytes.isEmpty) {
+      // 1.5. Direct fetch of remote Firestore document documents/{effectiveDocId}
+      // Vital when cloudDataBase64 was updated after initial load or on forced cloud refresh
+      if (resolvedBytes == null || resolvedBytes.isEmpty) {
+        if (effectiveDocId.isNotEmpty) {
+          try {
+            final remoteSnap = await FirebaseFirestore.instance
+                .collection('documents')
+                .doc(effectiveDocId)
+                .get();
+            if (remoteSnap.exists && remoteSnap.data() != null) {
+              final data = remoteSnap.data()!;
+              final remoteB64 = (data['cloudDataBase64'] ?? data['cloud_data_base64']) as String?;
+              if (remoteB64 != null && remoteB64.isNotEmpty) {
+                var cleanB64 = remoteB64.trim();
+                if (cleanB64.contains(',')) cleanB64 = cleanB64.split(',').last;
+                final decoded = base64Decode(cleanB64);
+                if (decoded.isNotEmpty) {
+                  if (SecurityService.isImageBytes(decoded) || SecurityService.isPdfBytes(decoded)) {
+                    resolvedBytes = decoded;
+                  } else {
+                    final decrypted = await SecurityService.instance.decryptBytes(
+                      decoded,
+                      userId: targetUid,
+                      extraSeeds: candidateSeeds.toList(),
+                    );
+                    if (!SecurityService.instance.isEncrypted(decrypted) ||
+                        SecurityService.isImageBytes(decrypted) ||
+                        SecurityService.isPdfBytes(decrypted)) {
+                      resolvedBytes = decrypted;
+                    } else {
+                      resolvedBytes = decoded;
+                    }
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            debugPrint('[_AdminVaultInspectDialog] direct remote doc get notice: $e');
+          }
+        }
+      }
+
+      // 2. Local device file check (if not forcing cloud)
+      if (!forceCloud && (resolvedBytes == null || resolvedBytes.isEmpty)) {
+        File? localFile;
+        if (widget.doc.localImagePath.isNotEmpty) {
+          final f = File(widget.doc.localImagePath);
+          if (await f.exists()) {
+            localFile = f;
+          }
+        }
+        // Fallback: search in app documents vault / vault_docs by basename and doc id
+        if (localFile == null) {
+          try {
+            final appDir = await getApplicationDocumentsDirectory();
+            final baseName = p.basename(widget.doc.localImagePath);
+            final ext = widget.doc.fileExtension ?? (widget.doc.isPdf ? 'pdf' : 'jpg');
+            final candidates = [
+              if (baseName.isNotEmpty && baseName != '.') File(p.join(appDir.path, 'vault', baseName)),
+              if (baseName.isNotEmpty && baseName != '.') File(p.join(appDir.path, 'vault_docs', baseName)),
+              if (effectiveDocId.isNotEmpty) File(p.join(appDir.path, 'vault', '$effectiveDocId.$ext')),
+              if (effectiveDocId.isNotEmpty) File(p.join(appDir.path, 'vault_docs', '${effectiveDocId}_restored.$ext')),
+              if (effectiveDocId.isNotEmpty) File(p.join(appDir.path, 'vault_docs', '$effectiveDocId.$ext')),
+            ];
+            for (final c in candidates) {
+              if (await c.exists()) {
+                localFile = c;
+                break;
+              }
+            }
+          } catch (_) {}
+        }
+
+        if (localFile != null) {
+          try {
+            final rawBytes = await localFile.readAsBytes();
+            if (rawBytes.isNotEmpty) {
+              if (SecurityService.isImageBytes(rawBytes) || SecurityService.isPdfBytes(rawBytes)) {
+                resolvedBytes = rawBytes;
+              } else {
+                final decrypted = await SecurityService.instance.decryptBytes(
+                  rawBytes,
+                  userId: targetUid,
+                  extraSeeds: candidateSeeds.toList(),
+                );
+                if (!SecurityService.instance.isEncrypted(decrypted) ||
+                    SecurityService.isImageBytes(decrypted) ||
+                    SecurityService.isPdfBytes(decrypted)) {
+                  resolvedBytes = decrypted;
+                } else {
+                  resolvedBytes = rawBytes;
+                }
+              }
+            }
+          } catch (e) {
+            debugPrint('[_AdminVaultInspectDialog] local file read/decrypt notice: $e');
+          }
+        }
+      }
+
+      // 3. Firestore chunks subcollection (documents/{id}/chunks)
+      // Canonical cloud source of truth for documents > 500KB (up to 10MB)
+      if ((resolvedBytes == null || resolvedBytes.isEmpty) && effectiveDocId.isNotEmpty) {
+        try {
+          QuerySnapshot<Map<String, dynamic>>? chunksSnap;
+          try {
+            chunksSnap = await FirebaseFirestore.instance
+                .collection('documents')
+                .doc(effectiveDocId)
+                .collection('chunks')
+                .orderBy('index')
+                .get();
+          } catch (e) {
+            debugPrint('[_AdminVaultInspectDialog] ordered chunks query notice, trying unindexed get: $e');
+            chunksSnap = await FirebaseFirestore.instance
+                .collection('documents')
+                .doc(effectiveDocId)
+                .collection('chunks')
+                .get();
+          }
+
+          if (chunksSnap.docs.isNotEmpty) {
+            final sortedDocs = chunksSnap.docs.toList()
+              ..sort((a, b) {
+                final idxA = (a.data()['index'] as num?)?.toInt() ?? 0;
+                final idxB = (b.data()['index'] as num?)?.toInt() ?? 0;
+                return idxA.compareTo(idxB);
+              });
+            final buffer = StringBuffer();
+            for (final c in sortedDocs) {
+              final piece = c.data()['chunk'] as String?;
+              if (piece != null && piece.isNotEmpty) buffer.write(piece);
+            }
+            final chunkedStr = buffer.toString().trim();
+            if (chunkedStr.isNotEmpty) {
+              var cleanChunked = chunkedStr;
+              if (cleanChunked.contains(',')) cleanChunked = cleanChunked.split(',').last;
+              final decoded = base64Decode(cleanChunked);
+              if (decoded.isNotEmpty) {
+                if (SecurityService.isImageBytes(decoded) || SecurityService.isPdfBytes(decoded)) {
+                  resolvedBytes = decoded;
+                } else {
+                  final decrypted = await SecurityService.instance.decryptBytes(
+                    decoded,
+                    userId: targetUid,
+                    extraSeeds: candidateSeeds.toList(),
+                  );
+                  if (!SecurityService.instance.isEncrypted(decrypted) ||
+                      SecurityService.isImageBytes(decrypted) ||
+                      SecurityService.isPdfBytes(decrypted)) {
+                    resolvedBytes = decrypted;
+                  } else {
+                    resolvedBytes = decoded;
+                  }
+                }
+              }
+            }
+          }
+        } catch (e) {
+          debugPrint('[_AdminVaultInspectDialog] chunks loading notice: $e');
+        }
+      }
+
+      // 4. Local SQLite database fallback (if admin and user share device/test database)
+      if (resolvedBytes == null || resolvedBytes.isEmpty) {
+        try {
+          VaultDocument? localDoc;
+          if (effectiveDocId.isNotEmpty) {
+            localDoc = await DatabaseHelper.instance.getDocumentById(effectiveDocId);
+          }
+          if (localDoc == null && targetUid.isNotEmpty) {
+            final userDocs = await DatabaseHelper.instance.getDocuments(userId: targetUid);
+            localDoc = userDocs.where((d) =>
+              (effectiveDocId.isNotEmpty && d.id == effectiveDocId) ||
+              d.title == widget.doc.title
+            ).firstOrNull;
+          }
+          if (localDoc != null) {
+            if (localDoc.cloudDataBase64 != null && localDoc.cloudDataBase64!.isNotEmpty) {
+              var cleanB64 = localDoc.cloudDataBase64!.trim();
+              if (cleanB64.contains(',')) cleanB64 = cleanB64.split(',').last;
+              final decoded = base64Decode(cleanB64);
+              if (SecurityService.isImageBytes(decoded) || SecurityService.isPdfBytes(decoded)) {
+                resolvedBytes = decoded;
+              } else {
+                final decrypted = await SecurityService.instance.decryptBytes(
+                  decoded,
+                  userId: targetUid,
+                  extraSeeds: candidateSeeds.toList(),
+                );
+                resolvedBytes = (!SecurityService.instance.isEncrypted(decrypted) ||
+                        SecurityService.isImageBytes(decrypted) ||
+                        SecurityService.isPdfBytes(decrypted))
+                    ? decrypted
+                    : decoded;
+              }
+            } else if (localDoc.localImagePath.isNotEmpty) {
+              final f = File(localDoc.localImagePath);
+              if (await f.exists()) {
+                final rawBytes = await f.readAsBytes();
+                if (SecurityService.isImageBytes(rawBytes) || SecurityService.isPdfBytes(rawBytes)) {
+                  resolvedBytes = rawBytes;
+                } else {
+                  final decrypted = await SecurityService.instance.decryptBytes(
+                    rawBytes,
+                    userId: targetUid,
+                    extraSeeds: candidateSeeds.toList(),
+                  );
+                  resolvedBytes = (!SecurityService.instance.isEncrypted(decrypted) ||
+                          SecurityService.isImageBytes(decrypted) ||
+                          SecurityService.isPdfBytes(decrypted))
+                      ? decrypted
+                      : rawBytes;
+                }
+              }
+            }
+          }
+        } catch (e) {
+          debugPrint('[_AdminVaultInspectDialog] local fallback notice: $e');
+        }
+      }
+
+      // 5. Final decryption attempt if resolved bytes still have PBENC1 header
+      if (resolvedBytes != null && SecurityService.instance.isEncrypted(resolvedBytes)) {
+        final decrypted = await SecurityService.instance.decryptBytes(
+          resolvedBytes,
+          userId: targetUid,
+          extraSeeds: candidateSeeds.toList(),
+        );
+        if (!SecurityService.instance.isEncrypted(decrypted) ||
+            SecurityService.isImageBytes(decrypted) ||
+            SecurityService.isPdfBytes(decrypted)) {
+          resolvedBytes = decrypted;
+        } else {
+          resolvedBytes = null; // Guard against passing raw ciphertext to Image.memory
+        }
+      }
+
+      if (resolvedBytes == null || resolvedBytes.isEmpty) {
         if (mounted) {
           setState(() {
             _isLoading = false;
-            _errorMessage = 'Belge verisi (cloud payload) henüz cihazla eşitlenmemiş.';
+            _errorMessage = isTr
+                ? 'Belge verisi (cloud payload) henüz eşitlenmemiş veya cihazda bulunamadı.'
+                : 'Document payload is not yet synced or available on this device.';
           });
         }
         return;
       }
 
-      final decrypted = await SecurityService.instance.decryptBytes(rawBytes);
+      // Auto-repair local file with correctly decrypted/re-encrypted bytes if local file was missing or broken
+      if (!SecurityService.instance.isEncrypted(resolvedBytes) && widget.doc.localImagePath.isNotEmpty) {
+        try {
+          final f = File(widget.doc.localImagePath);
+          final parent = f.parent;
+          if (!await parent.exists()) await parent.create(recursive: true);
+          final reEncrypted = await SecurityService.instance.encryptBytes(resolvedBytes, userId: targetUid);
+          await f.writeAsBytes(reEncrypted);
+        } catch (_) {}
+      }
+
       if (!mounted) return;
 
       setState(() {
-        _decryptedBytes = decrypted;
+        _decryptedBytes = resolvedBytes;
         _isLoading = false;
       });
 
       final ext = widget.doc.fileExtension?.toUpperCase() ?? 'DOC';
-      final isPdf = ext == 'PDF' || widget.doc.isPdf;
+      final isPdf = SecurityService.isPdfBytes(resolvedBytes) || ext == 'PDF' || widget.doc.isPdf;
       if (isPdf) {
         try {
+          _pdfController?.dispose();
           _pdfController = PdfControllerPinch(
-            document: PdfDocument.openData(decrypted),
+            document: PdfDocument.openData(resolvedBytes),
           );
         } catch (e) {
           debugPrint('[_AdminVaultInspectDialog] PdfDocument error: $e');
@@ -6174,7 +6673,16 @@ class _AdminVaultInspectDialogState extends ConsumerState<_AdminVaultInspectDial
     if (_decryptedBytes == null) return;
     try {
       final tempDir = await getTemporaryDirectory();
-      final ext = widget.doc.fileExtension?.toLowerCase() ?? 'pdf';
+      var ext = widget.doc.fileExtension?.toLowerCase() ?? '';
+      if (ext.isEmpty || ext == 'doc') {
+        if (SecurityService.isPdfBytes(_decryptedBytes!) || widget.doc.isPdf) {
+          ext = 'pdf';
+        } else if (SecurityService.isImageBytes(_decryptedBytes!)) {
+          ext = 'jpg';
+        } else {
+          ext = 'bin';
+        }
+      }
       final tempFile = File('${tempDir.path}/packbuddy_inspect_${widget.doc.id}.$ext');
       await tempFile.writeAsBytes(_decryptedBytes!);
       await OpenFilex.open(tempFile.path);
@@ -6241,8 +6749,9 @@ class _AdminVaultInspectDialogState extends ConsumerState<_AdminVaultInspectDial
     final l10n = AppLocalizations.of(context)!;
     final isTr = Localizations.localeOf(context).languageCode == 'tr';
     final ext = widget.doc.fileExtension?.toUpperCase() ?? 'DOC';
-    final isImage = ['JPG', 'JPEG', 'PNG', 'WEBP', 'GIF'].contains(ext);
-    final isPdf = ext == 'PDF' || widget.doc.isPdf;
+    final hasDecrypted = _decryptedBytes != null && _decryptedBytes!.isNotEmpty;
+    final isDetectedPdf = (hasDecrypted && SecurityService.isPdfBytes(_decryptedBytes!)) || ext == 'PDF' || widget.doc.isPdf;
+    final isDetectedImage = (hasDecrypted && SecurityService.isImageBytes(_decryptedBytes!)) || ['JPG', 'JPEG', 'PNG', 'WEBP', 'GIF', 'HEIC', 'BMP'].contains(ext);
 
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
@@ -6254,19 +6763,25 @@ class _AdminVaultInspectDialogState extends ConsumerState<_AdminVaultInspectDial
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: (isPdf
-                      ? const Color(0xFFEF4444)
-                      : (isImage ? const Color(0xFF3B82F6) : theme.colorScheme.primary))
+              color: (widget.doc.isPrivate
+                      ? const Color(0xFFE11D48)
+                      : (isDetectedPdf
+                          ? const Color(0xFFEF4444)
+                          : (isDetectedImage ? const Color(0xFF3B82F6) : theme.colorScheme.primary)))
                   .withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
-              isPdf
-                  ? Icons.picture_as_pdf_rounded
-                  : (isImage ? Icons.image_rounded : Icons.description_rounded),
-              color: isPdf
-                  ? const Color(0xFFEF4444)
-                  : (isImage ? const Color(0xFF3B82F6) : theme.colorScheme.primary),
+              widget.doc.isPrivate
+                  ? Icons.lock_rounded
+                  : (isDetectedPdf
+                      ? Icons.picture_as_pdf_rounded
+                      : (isDetectedImage ? Icons.image_rounded : Icons.description_rounded)),
+              color: widget.doc.isPrivate
+                  ? const Color(0xFFE11D48)
+                  : (isDetectedPdf
+                      ? const Color(0xFFEF4444)
+                      : (isDetectedImage ? const Color(0xFF3B82F6) : theme.colorScheme.primary)),
               size: 20,
             ),
           ),
@@ -6281,7 +6796,7 @@ class _AdminVaultInspectDialogState extends ConsumerState<_AdminVaultInspectDial
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  '${widget.doc.category.toUpperCase()} • $ext • ${formatStorageBytes(widget.doc.fileSize)}',
+                  '${(widget.doc.isPrivate ? (isTr ? 'Özel Kasa' : 'Private Vault') : widget.doc.category).toUpperCase()} • $ext • ${formatStorageBytes(widget.doc.fileSize)}',
                   style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
                 ),
               ],
@@ -6324,20 +6839,40 @@ class _AdminVaultInspectDialogState extends ConsumerState<_AdminVaultInspectDial
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: AppColors.errorPastel.withValues(alpha: 0.3)),
                   ),
-                  child: Row(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.error_outline_rounded, color: AppColors.errorPastel, size: 20),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          _errorMessage!,
-                          style: const TextStyle(fontSize: 12, color: AppColors.errorPastel),
+                      Row(
+                        children: [
+                          const Icon(Icons.error_outline_rounded, color: AppColors.errorPastel, size: 20),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              _errorMessage!,
+                              style: const TextStyle(fontSize: 12, color: AppColors.errorPastel),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
+                        onPressed: () {
+                          try {
+                            ref.read(syncEngineProvider.notifier).performSync();
+                          } catch (_) {}
+                          _loadDocumentBytes(forceCloud: true);
+                        },
+                        icon: const Icon(Icons.cloud_download_rounded, size: 16),
+                        label: Text(isTr ? 'Buluttan Yeniden İndir' : 'Reload from Cloud'),
                       ),
                     ],
                   ),
                 )
-              else if (isPdf && _pdfController != null) ...[
+              else if (isDetectedPdf && _pdfController != null) ...[
                 // PDF Viewer Controls Bar
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -6407,7 +6942,66 @@ class _AdminVaultInspectDialogState extends ConsumerState<_AdminVaultInspectDial
                     ),
                   ),
                 ),
-              ] else if (isImage && _decryptedBytes != null) ...[
+              ] else if (isDetectedPdf && _pdfController == null) ...[
+                // PDF fallback card when renderer is warming up or openData needs external handler
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEF4444).withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: const Color(0xFFEF4444).withValues(alpha: 0.2)),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.picture_as_pdf_rounded, size: 48, color: Color(0xFFEF4444)),
+                      const SizedBox(height: 10),
+                      Text(
+                        widget.doc.title,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${formatStorageBytes(widget.doc.fileSize)} • PDF',
+                        style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                      const SizedBox(height: 16),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        alignment: WrapAlignment.center,
+                        children: [
+                          OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                            onPressed: () {
+                          try {
+                            ref.read(syncEngineProvider.notifier).performSync();
+                          } catch (_) {}
+                          _loadDocumentBytes(forceCloud: true);
+                        },
+                            icon: const Icon(Icons.cloud_download_rounded, size: 16),
+                            label: Text(isTr ? 'Buluttan Tekrar İndir' : 'Reload from Cloud'),
+                          ),
+                          FilledButton.icon(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: const Color(0xFFEF4444),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                            onPressed: _openExternal,
+                            icon: const Icon(Icons.open_in_new_rounded, size: 16),
+                            label: Text(isTr ? 'PDF Okuyucuda Aç' : 'Open in PDF App'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ] else if (isDetectedImage && _decryptedBytes != null) ...[
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Container(
@@ -6419,10 +7013,63 @@ class _AdminVaultInspectDialogState extends ConsumerState<_AdminVaultInspectDial
                       child: Image.memory(
                         _decryptedBytes!,
                         fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) => const Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Icon(Icons.broken_image_rounded, size: 40, color: Colors.grey),
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.broken_image_rounded, size: 42, color: Colors.grey),
+                              const SizedBox(height: 10),
+                              Text(
+                                isTr ? 'Görsel doğrudan yüklenemedi' : 'Image could not be rendered',
+                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                isTr
+                                    ? 'Dosya şifrelenmiş veya hasarlı olabilir. Harici uygulamada açabilir veya buluttan yeniden çekebilirsiniz.'
+                                    : 'File might be encrypted or damaged. You can open it externally or reload from cloud.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                              ),
+                              const SizedBox(height: 14),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                alignment: WrapAlignment.center,
+                                children: [
+                                  OutlinedButton.icon(
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                      minimumSize: Size.zero,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    onPressed: () {
+                          try {
+                            ref.read(syncEngineProvider.notifier).performSync();
+                          } catch (_) {}
+                          _loadDocumentBytes(forceCloud: true);
+                        },
+                                    icon: const Icon(Icons.cloud_download_rounded, size: 14),
+                                    label: Text(isTr ? 'Buluttan İndir' : 'Reload Cloud', style: const TextStyle(fontSize: 11)),
+                                  ),
+                                  FilledButton.icon(
+                                    style: FilledButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                      minimumSize: Size.zero,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    onPressed: _openExternal,
+                                    icon: const Icon(Icons.open_in_new_rounded, size: 14),
+                                    label: Text(isTr ? 'Cihazda Aç' : 'Open External', style: const TextStyle(fontSize: 11)),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -7458,7 +8105,7 @@ class _BroadcastCampaignBottomSheetState
                         const SizedBox(width: 8),
                         ActionChip(
                           avatar: const Text('🔐', style: TextStyle(fontSize: 13)),
-                          label: Text(isTr ? 'Belge Kasası' : 'Document Vault'),
+                          label: Text(isTr ? 'Güvenli Kasa' : 'Secure Vault'),
                           onPressed: () => _applyPreset('vault'),
                         ),
                       ],
@@ -7577,7 +8224,7 @@ class _BroadcastCampaignBottomSheetState
                       ),
                       DropdownMenuItem(
                         value: 'vault',
-                        child: Text(isTr ? '🔐 Güvenli Belge Kasası' : '🔐 Document Vault', overflow: TextOverflow.ellipsis, maxLines: 1),
+                        child: Text(isTr ? '🔐 Güvenli Kasa' : '🔐 Secure Vault', overflow: TextOverflow.ellipsis, maxLines: 1),
                       ),
                       DropdownMenuItem(
                         value: 'none',
@@ -7617,8 +8264,8 @@ class _BroadcastCampaignBottomSheetState
                     onChanged: (_) => setState(() {}),
                     decoration: InputDecoration(
                       hintText: isTr
-                          ? 'Örn: Sınırsız seyahat ve belge kasası şimdi indirimde!'
-                          : 'e.g. Unlimited travel planning and document vault on sale!',
+                          ? 'Örn: Sınırsız seyahat ve güvenli kasa şimdi indirimde!'
+                          : 'e.g. Unlimited travel planning and secure vault on sale!',
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
@@ -7715,7 +8362,7 @@ class _BroadcastCampaignBottomSheetState
                                         : (_selectedAction == 'checklist'
                                             ? (isTr ? 'Tıklanınca: Kontrol Listesi Açılacak' : 'Tap: Opens Checklist')
                                             : (_selectedAction == 'vault'
-                                                ? (isTr ? 'Tıklanınca: Belge Kasası Açılacak' : 'Tap: Opens Vault')
+                                                ? (isTr ? 'Tıklanınca: Güvenli Kasa Açılacak' : 'Tap: Opens Secure Vault')
                                                 : (isTr ? 'Tıklanınca: Uygulama Açılacak' : 'Tap: Opens App')))),
                                 style: const TextStyle(
                                   fontSize: 11,

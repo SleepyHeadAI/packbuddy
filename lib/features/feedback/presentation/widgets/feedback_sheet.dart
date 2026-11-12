@@ -302,6 +302,8 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
                   icon: const Icon(Icons.add_photo_alternate_outlined, size: 18),
                   label: Text(
                     FeedbackL10n.getAttachImage(langCode),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                   style: OutlinedButton.styleFrom(

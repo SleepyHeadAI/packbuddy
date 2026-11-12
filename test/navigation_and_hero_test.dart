@@ -8,7 +8,9 @@ import 'package:packbuddy/features/budget/presentation/controllers/trip_controll
 import 'package:packbuddy/features/budget/presentation/screens/trips_screen.dart';
 import 'package:packbuddy/features/budget/presentation/screens/trip_detail_screen.dart';
 import 'package:packbuddy/features/dashboard/presentation/dashboard_screen.dart';
+import 'package:packbuddy/features/checklist/presentation/screens/checklist_screen.dart';
 import 'package:packbuddy/features/settings/presentation/screens/settings_screen.dart';
+import 'package:packbuddy/features/vault/domain/document.dart';
 import 'package:packbuddy/features/vault/presentation/controllers/vault_controller.dart';
 import 'package:packbuddy/features/vault/presentation/screens/vault_screen.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
@@ -24,7 +26,22 @@ class FakeTripController extends StateNotifier<TripState> implements TripControl
 }
 
 class FakeVaultController extends StateNotifier<VaultState> implements VaultController {
-  FakeVaultController() : super(const VaultState(isLoading: false, documents: []));
+  FakeVaultController()
+      : super(
+          VaultState(
+            isLoading: false,
+            documents: [
+              Document(
+                id: 'test-doc-1',
+                title: 'Passport Copy',
+                category: 'Passport',
+                localImagePath: '/tmp/passport.jpg',
+                createdAt: DateTime(2026, 1, 1),
+                updatedAt: DateTime(2026, 1, 1),
+              ),
+            ],
+          ),
+        );
 
   @override
   Future<void> loadDocuments({String? tripId, String? userId}) async {}
@@ -121,7 +138,7 @@ void main() {
       expect(find.byType(DashboardScreen), findsOneWidget);
     });
 
-    testWidgets('VaultScreen FAB has heroTag null and leading back button pops properly', (tester) async {
+    testWidgets('VaultScreen FAB has heroTag null and has no leading back button (uses bottom nav bar)', (tester) async {
       tester.view.physicalSize = const Size(1000, 2000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
@@ -146,18 +163,14 @@ void main() {
       final vaultFab = tester.widget<FloatingActionButton>(find.byType(FloatingActionButton));
       expect(vaultFab.heroTag, isNull);
 
-      // Tap leading back button
+      // Verify VaultScreen has no leading back button
       final backButton = find.descendant(
         of: find.byType(AppBar),
-        matching: find.byType(IconButton),
+        matching: find.byWidgetPredicate(
+          (w) => w is IconButton && (w.icon as Icon).icon == Icons.arrow_back_rounded,
+        ),
       );
-      expect(backButton, findsOneWidget);
-
-      await tester.tap(backButton.first);
-      await tester.pumpAndSettle();
-
-      expect(find.byType(VaultScreen), findsNothing);
-      expect(find.byType(DashboardScreen), findsOneWidget);
+      expect(backButton, findsNothing);
     });
 
     testWidgets('TripDetailScreen FAB has heroTag null and leading back button pops properly', (tester) async {
@@ -180,32 +193,39 @@ void main() {
       expect(backButton, findsOneWidget);
     });
 
-    testWidgets('SettingsScreen leading back button pops properly', (tester) async {
+    testWidgets('DashboardScreen has no settings icon and SettingsScreen/ChecklistScreen have no leading back buttons', (tester) async {
       await tester.pumpWidget(createTestWidget(child: const DashboardScreen()));
       await tester.pumpAndSettle();
 
-      // Tap Settings button in Dashboard AppBar
-      final settingsIcon = find.byIcon(Icons.settings_outlined);
-      expect(settingsIcon, findsOneWidget);
-      await tester.tap(settingsIcon);
+      // Settings icon is removed from Dashboard AppBar
+      expect(find.byIcon(Icons.settings_outlined), findsNothing);
+
+      // SettingsScreen rendered directly has no back button
+      await tester.pumpWidget(createTestWidget(child: const SettingsScreen()));
       await tester.pumpAndSettle();
 
       expect(find.byType(SettingsScreen), findsOneWidget);
-
-      // Tap back button
-      final backButton = find.descendant(
+      final settingsBackButton = find.descendant(
         of: find.byType(AppBar),
         matching: find.byWidgetPredicate(
           (w) => w is IconButton && (w.icon as Icon).icon == Icons.arrow_back_rounded,
         ),
       );
-      expect(backButton, findsOneWidget);
+      expect(settingsBackButton, findsNothing);
 
-      await tester.tap(backButton.first);
-      await tester.pumpAndSettle();
+      // ChecklistScreen rendered directly has no back button
+      await tester.pumpWidget(createTestWidget(child: const ChecklistScreen()));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
 
-      expect(find.byType(SettingsScreen), findsNothing);
-      expect(find.byType(DashboardScreen), findsOneWidget);
+      expect(find.byType(ChecklistScreen), findsOneWidget);
+      final checklistBackButton = find.descendant(
+        of: find.byType(AppBar),
+        matching: find.byWidgetPredicate(
+          (w) => w is IconButton && (w.icon as Icon).icon == Icons.arrow_back_rounded,
+        ),
+      );
+      expect(checklistBackButton, findsNothing);
     });
   });
 }

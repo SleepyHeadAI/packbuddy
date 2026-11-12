@@ -26,7 +26,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get budgetDescription => 'Suivi des dépenses de voyage multidevises';
 
   @override
-  String get vault => 'Coffre-fort';
+  String get vault => 'Coffre-fort Sécurisé';
 
   @override
   String get vaultDescription => 'Passeports, billets et réservations';
@@ -211,7 +211,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get proFeature1 => 'Voyages et suivi des dépenses illimités';
 
   @override
-  String get proFeature2 => 'Stockage de documents illimité';
+  String get proFeature2 => 'Stockage illimité du coffre-fort sécurisé';
 
   @override
   String get proFeature3 => 'Synchronisation cloud automatique';
@@ -2156,4 +2156,115 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get countryLabel => 'Pays';
+
+  @override
+  String get privatePhotos => 'Photos Privées';
+
+  @override
+  String get privatePhotosSubtitle => 'Protégé par code PIN et biométrie';
+
+  @override
+  String get privatePhotosReason =>
+      'Vérifiez votre empreinte ou Face ID pour afficher les photos privées';
+
+  @override
+  String get addPrivatePhoto => 'Ajouter une photo privée';
+
+  @override
+  String get noPrivatePhotosYet => 'Aucune photo privée pour le moment';
+
+  @override
+  String get noPrivatePhotosDesc =>
+      'Les photos ajoutées ici sont masquées du coffre principal et bénéficient d\'un chiffrement renforcé.';
+
+  @override
+  String get lockAndExit => 'Verrouiller et quitter';
+
+  @override
+  String get setPinFirstForPrivatePhotos =>
+      'Veuillez d\'abord définir un code PIN pour protéger vos photos privées';
+
+  @override
+  String get secureVaultBannerTitle => 'Coffre-fort non protégé';
+
+  @override
+  String get secureVaultBannerDesc =>
+      'Définissez un code PIN à 4 chiffres pour protéger votre coffre et vos photos.';
+
+  @override
+  String get privateVault => 'Coffre Privé';
+
+  @override
+  String get lockedBadge => 'VERROUILLÉ';
+
+  @override
+  String get unlockedBadge => 'DÉVERROUILLÉ';
+
+  @override
+  String get forgotPin => 'Code PIN oublié ?';
+
+  @override
+  String get resetVaultPinTitle => 'Réinitialiser le code PIN du coffre';
+
+  @override
+  String get resetVaultPinEmailDesc =>
+      'Un code de vérification à 6 chiffres sera envoyé à votre adresse e-mail :';
+
+  @override
+  String get sendVerificationCode => 'Envoyer le code de vérification';
+
+  @override
+  String get enterVerificationCode => 'Entrer le code de vérification';
+
+  @override
+  String get enterVerificationCodeDesc =>
+      'Veuillez entrer le code à 6 chiffres envoyé à votre adresse e-mail :';
+
+  @override
+  String get verificationCode => 'Code de vérification';
+
+  @override
+  String get verifyAndContinue => 'Vérifier et continuer';
+
+  @override
+  String get invalidVerificationCode =>
+      'Code de vérification invalide. Veuillez réessayer.';
+
+  @override
+  String get resendCode => 'Renvoyer le code';
+
+  @override
+  String get codeResent => 'Le code de vérification a été renvoyé.';
+
+  @override
+  String get setNewVaultPin => 'Définir un nouveau code PIN';
+
+  @override
+  String get newPin => 'Nouveau code PIN à 4 chiffres';
+
+  @override
+  String get confirmNewPin => 'Confirmer le nouveau code PIN';
+
+  @override
+  String get pinsDoNotMatch => 'Les codes PIN ne correspondent pas.';
+
+  @override
+  String get saveNewPinAndUnlock => 'Enregistrer le PIN et déverrouiller';
+
+  @override
+  String get vaultPinResetSuccess =>
+      'Code PIN réinitialisé avec succès et coffre déverrouillé.';
+
+  @override
+  String get vaultPinRequiredTitle => 'Code PIN du coffre obligatoire';
+
+  @override
+  String get vaultPinRequiredDesc =>
+      'Un code PIN à 4 chiffres est obligatoire pour protéger vos documents et photos privées.';
+
+  @override
+  String get enterYourEmail => 'Entrez votre adresse e-mail';
+
+  @override
+  String get invalidEmail => 'Veuillez entrer une adresse e-mail valide.';
 }

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../core/utils/date_formatter.dart';
@@ -19,24 +18,29 @@ import '../../budget/presentation/controllers/trip_controller.dart';
 import '../../budget/presentation/screens/trips_screen.dart';
 import '../../budget/presentation/screens/trip_detail_screen.dart';
 import '../../budget/presentation/screens/trip_comparison_screen.dart';
-import '../../budget/presentation/screens/widgets/add_trip_sheet.dart';
 import '../../settings/data/mock_revenuecat_service.dart';
 import '../../vault/presentation/controllers/vault_controller.dart';
+import '../../vault/presentation/screens/vault_screen.dart';
 import '../../checklist/presentation/controllers/checklist_controller.dart';
 import '../../auth/auth_controller.dart';
-import '../../budget/presentation/widgets/currency_converter_card.dart';
 import '../../../shared/widgets/app_animations.dart';
 import '../../../core/services/app_widget_service.dart';
 import '../../../core/services/preferences_service.dart';
 import '../../travel_map/presentation/controllers/travel_map_controller.dart';
 import '../../../core/l10n/language_selector_sheet.dart';
-import '../../settings/presentation/screens/settings_screen.dart';
-import '../../vault/presentation/screens/vault_screen.dart';
 import 'navigation_provider.dart';
 import 'widgets/notifications_center_sheet.dart';
-import 'widgets/bento_hub_grid.dart';
+import 'dashboard_localization.dart';
+import 'widgets/horizontal_currency_converter_card.dart';
+import 'widgets/dashboard_customize_sheet.dart';
+import 'widgets/dashboard_mini_cards.dart';
+import '../../../shared/widgets/quick_actions_sheet.dart';
 
-/// Sophisticated, cinematic Dashboard for PackBuddy with live Riverpod state integration
+/// Customizable, clean, and elegant Dashboard for PackBuddy with live Riverpod state integration.
+///
+/// Top: Fixed horizontal greeting banner (Welcome, time-based greeting, live sync, customize trigger).
+/// Body: Reorderable sections (Active Trip, Baggage Checklist, Live Currency Converter, Mini Boxes).
+/// Graceful fallback: If an item is missing or empty, the lower sections automatically slide up.
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
@@ -46,11 +50,17 @@ class DashboardScreen extends ConsumerStatefulWidget {
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen>
     with WidgetsBindingObserver {
+  late List<String> _sectionOrder;
+  late Set<String> _hiddenSections;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // Automatic Cloud Sync & Local DB Refresh on Dashboard launch (non-blocking)
+
+    _sectionOrder = PreferencesService.instance.getDashboardSectionOrder();
+    _hiddenSections = PreferencesService.instance.getDashboardHiddenSections();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkAccountRestored();
       _triggerSyncAndRefresh();
@@ -110,7 +120,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
   }
 
   void _triggerSyncAndRefresh() {
-    // Non-blocking automatic cloud sync
     ref.read(syncEngineProvider.notifier).performSync().then((_) {
       if (mounted) {
         ref.read(tripControllerProvider.notifier).loadTrips().then((_) {
@@ -130,14 +139,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     }).catchError((_) {});
   }
 
-  String _getTimeBasedGreeting(AppLocalizations l10n) {
+  String _getTimeBasedGreeting(AppLocalizations l10n, String lang) {
     final hour = DateTime.now().hour;
-    if (hour < 12) {
+    if (hour >= 5 && hour < 12) {
       return l10n.goodMorning;
-    } else if (hour < 18) {
+    } else if (hour >= 12 && hour < 18) {
       return l10n.goodAfternoon;
-    } else {
+    } else if (hour >= 18 && hour < 23) {
       return l10n.goodEvening;
+    } else {
+      return DashboardLocalization.goodNight(lang);
     }
   }
 
@@ -166,21 +177,84 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     );
   }
 
+  void _openCustomizeSheet() {
+    DashboardCustomizeSheet.show(
+      context,
+      currentOrder: _sectionOrder,
+      hiddenSections: _hiddenSections,
+      onOrderChanged: (newOrder) async {
+        setState(() => _sectionOrder = newOrder);
+        await PreferencesService.instance.setDashboardSectionOrder(newOrder);
+      },
+      onHiddenChanged: (newHidden) async {
+        setState(() => _hiddenSections = newHidden);
+        await PreferencesService.instance.setDashboardHiddenSections(newHidden);
+      },
+      onResetToDefault: () async {
+        await PreferencesService.instance.resetDashboardCustomization();
+        setState(() {
+          _sectionOrder = PreferencesService.instance.getDashboardSectionOrder();
+          _hiddenSections = PreferencesService.instance.getDashboardHiddenSections();
+        });
+      },
+    );
+  }
+
+  bool _isMiniCard(String id) {
+    return id == 'mini_travel_map' ||
+        id == 'mini_vault' ||
+        id == 'mini_all_trips' ||
+        id == 'mini_trip_comparison';
+  }
+
+  Trip? _findFeaturedTrip(List<Trip> trips, DateTime now, DateTime today) {
+    if (trips.isEmpty) return null;
+
+    // 1. Ongoing trip
+    final ongoingTrips = trips.where((t) {
+      final start = DateTime(t.startDate.year, t.startDate.month, t.startDate.day);
+      final end = DateTime(t.endDate.year, t.endDate.month, t.endDate.day, 23, 59, 59);
+      return now.isAfter(start) && now.isBefore(end);
+    }).toList();
+
+    if (ongoingTrips.isNotEmpty) {
+      return ongoingTrips.first;
+    }
+
+    // 2. Upcoming trips in future (startDate >= today)
+    final futureTrips = trips.where((t) {
+      final start = DateTime(t.startDate.year, t.startDate.month, t.startDate.day);
+      return start.isAfter(today) || start.isAtSameMomentAs(today);
+    }).toList()
+      ..sort((a, b) => a.startDate.compareTo(b.startDate));
+
+    if (futureTrips.isNotEmpty) {
+      return futureTrips.first;
+    }
+
+    // 3. Fallback: most recently completed trip
+    final pastTrips = List<Trip>.from(trips)
+      ..sort((a, b) => b.endDate.compareTo(a.endDate));
+    return pastTrips.first;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final currentLocale = ref.watch(localeProvider);
+    final lang = currentLocale.languageCode;
     final syncState = ref.watch(syncEngineProvider);
     final tripState = ref.watch(tripControllerProvider);
     final vaultState = ref.watch(vaultControllerProvider);
     final checklistState = ref.watch(checklistControllerProvider);
     final proState = ref.watch(proSubscriptionProvider);
     final travelMapState = ref.watch(travelMapControllerProvider);
+    final authState = ref.watch(authControllerProvider);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final dateFormat = DateFormat.MMMd(currentLocale.languageCode);
+    final dateFormat = DateFormat.MMMd(lang);
 
-    // Dynamic Sync Badge UI attributes based on Riverpod SyncState
+    // Sync Badge Styling with concise banner labels
     String syncLabel;
     IconData syncIcon;
     Color syncBgColor;
@@ -188,31 +262,31 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
     switch (syncState.status) {
       case SyncStatus.syncing:
-        syncLabel = l10n.syncInProgress;
+        syncLabel = DashboardLocalization.syncStatusBanner(lang, 'syncing');
         syncIcon = Icons.sync_rounded;
         syncBgColor = AppColors.infoPastel.withValues(alpha: 0.15);
         syncTextColor = AppColors.infoPastel;
         break;
       case SyncStatus.upToDate:
-        syncLabel = l10n.syncUpToDate;
+        syncLabel = DashboardLocalization.syncStatusBanner(lang, 'upToDate');
         syncIcon = Icons.cloud_done_rounded;
         syncBgColor = AppColors.successPastel.withValues(alpha: 0.15);
         syncTextColor = AppColors.successPastel;
         break;
       case SyncStatus.failed:
-        syncLabel = l10n.syncFailed;
+        syncLabel = DashboardLocalization.syncStatusBanner(lang, 'failed');
         syncIcon = Icons.cloud_off_rounded;
         syncBgColor = AppColors.errorPastel.withValues(alpha: 0.15);
         syncTextColor = AppColors.errorPastel;
         break;
       case SyncStatus.noInternet:
-        syncLabel = l10n.offlineReady;
+        syncLabel = DashboardLocalization.syncStatusBanner(lang, 'noInternet');
         syncIcon = Icons.wifi_off_rounded;
         syncBgColor = theme.colorScheme.secondaryContainer.withValues(alpha: 0.7);
         syncTextColor = theme.colorScheme.secondary;
         break;
       case SyncStatus.idle:
-        syncLabel = l10n.syncReady;
+        syncLabel = DashboardLocalization.syncStatusBanner(lang, 'idle');
         syncIcon = Icons.cloud_sync_rounded;
         syncBgColor = theme.colorScheme.primaryContainer.withValues(alpha: 0.7);
         syncTextColor = theme.colorScheme.primary;
@@ -222,45 +296,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     final tripCount = tripState.trips.length;
     final docCount = vaultState.documents.length;
 
-    // Smart trip categorization for Dashboard banner
+    // Active / Upcoming Trip Resolution
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    Trip? featuredTrip;
+    final upcomingTrip = _findFeaturedTrip(tripState.trips, now, today);
+
     String featuredTripBadge = l10n.upcomingRoute.toUpperCase();
-
-    if (tripState.trips.isNotEmpty) {
-      // 1. Ongoing trip (today is between startDate and endDate inclusive)
-      final ongoingTrips = tripState.trips.where((t) {
-        final start = DateTime(t.startDate.year, t.startDate.month, t.startDate.day);
-        final end = DateTime(t.endDate.year, t.endDate.month, t.endDate.day, 23, 59, 59);
-        return now.isAfter(start) && now.isBefore(end);
-      }).toList();
-
-      if (ongoingTrips.isNotEmpty) {
-        featuredTrip = ongoingTrips.first;
+    if (upcomingTrip != null) {
+      final start = DateTime(upcomingTrip.startDate.year, upcomingTrip.startDate.month, upcomingTrip.startDate.day);
+      final end = DateTime(upcomingTrip.endDate.year, upcomingTrip.endDate.month, upcomingTrip.endDate.day, 23, 59, 59);
+      if (now.isAfter(start) && now.isBefore(end)) {
         featuredTripBadge = l10n.ongoingTrip.toUpperCase();
-      } else {
-        // 2. Upcoming trips in future (startDate >= today), sorted nearest first (ASC)
-        final futureTrips = tripState.trips.where((t) {
-          final start = DateTime(t.startDate.year, t.startDate.month, t.startDate.day);
-          return start.isAfter(today) || start.isAtSameMomentAs(today);
-        }).toList()
-          ..sort((a, b) => a.startDate.compareTo(b.startDate));
-
-        if (futureTrips.isNotEmpty) {
-          featuredTrip = futureTrips.first;
-          featuredTripBadge = l10n.upcomingRoute.toUpperCase();
-        } else {
-          // 3. All trips are in the past: show the most recently completed trip
-          final pastTrips = List<Trip>.from(tripState.trips)
-            ..sort((a, b) => b.endDate.compareTo(a.endDate));
-          featuredTrip = pastTrips.first;
-          featuredTripBadge = l10n.lastTrip.toUpperCase();
-        }
+      } else if (today.isAfter(end)) {
+        featuredTripBadge = l10n.lastTrip.toUpperCase();
       }
     }
 
-    final upcomingTrip = featuredTrip;
     final checklistCompletionRatio = checklistState.completionRatio;
     final checklistStatusColor = checklistCompletionRatio >= 1.0 && checklistState.totalCount > 0
         ? AppColors.successPastel
@@ -324,7 +375,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           ],
         ),
         actions: [
-          // Aligned Notification Bell
+          // Notification Bell
           IconButton(
             icon: Stack(
               alignment: Alignment.topRight,
@@ -352,7 +403,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             },
           ),
           const SizedBox(width: 4),
-          // Language Switcher Compact Pill
+
+          // Language Switcher Pill
           InkWell(
             borderRadius: BorderRadius.circular(12),
             onTap: () => showLanguageSelectorSheet(context, ref, currentLocale),
@@ -384,441 +436,445 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               ),
             ),
           ),
-          const SizedBox(width: 2),
-          // Settings Shortcut
-          IconButton(
-            icon: const Icon(Icons.settings_outlined, size: 21),
-            visualDensity: VisualDensity.compact,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-            tooltip: l10n.settings,
-            onPressed: () {
-              Navigator.of(context).push(
-                _createSmoothRoute(const SettingsScreen()),
-              );
-            },
-          ),
           const SizedBox(width: 8),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         heroTag: null,
-        onPressed: () => AddTripSheet.show(context),
-        icon: const Icon(Icons.add_rounded, size: 20),
-        label: Text(l10n.addTrip),
+        elevation: 3,
+        onPressed: () => QuickActionsSheet.showForDashboard(
+          context,
+          ref: ref,
+          activeTrip: upcomingTrip,
+        ),
+        child: const Icon(Icons.add_rounded, size: 26),
       ),
       body: SafeArea(
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-          scrollCacheExtent: const ScrollCacheExtent.pixels(800.0),
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 96),
+          padding: const EdgeInsets.fromLTRB(18, 10, 18, 96),
           children: [
-            // 1. My Trips Section (Seyahatler) at the very top
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.flight_takeoff_rounded,
-                          size: 16,
-                          color: theme.colorScheme.primary,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Flexible(
-                        child: Text(
-                          l10n.trips,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.3,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (tripCount > 0) ...[
-                        const SizedBox(width: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            '$tripCount',
-                            style: TextStyle(
-                              color: theme.colorScheme.primary,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Flexible(
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                      visualDensity: VisualDensity.compact,
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        _createSmoothRoute(const TripsScreen()),
-                      );
-                    },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            l10n.viewAll,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 3),
-                        Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          size: 11,
-                          color: theme.colorScheme.primary,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-
-            // Active / Upcoming Trip Card (or Quick Start Card)
-            if (upcomingTrip != null) ...[
-              _UpcomingTripHighlightCard(
-                trip: upcomingTrip,
-                badgeText: featuredTripBadge,
-                dateFormat: dateFormat,
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => TripDetailScreen(trip: upcomingTrip),
-                    ),
-                  );
-                },
-              ),
-              if (tripState.trips.length > 1) ...[
-                const SizedBox(height: 10),
-                SizedBox(
-                  height: 38,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: tripState.trips.length,
-                    separatorBuilder: (_, _) => const SizedBox(width: 8),
-                    itemBuilder: (context, index) {
-                      final t = tripState.trips[index];
-                      final isCurrent = t.id == upcomingTrip.id;
-                      final tCountry = Country.findByCode(t.countryCode);
-                      return InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => TripDetailScreen(trip: t),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: isCurrent
-                                ? theme.colorScheme.primary.withValues(alpha: 0.15)
-                                : (isDark ? const Color(0xFF1E293B) : Colors.white),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isCurrent
-                                  ? theme.colorScheme.primary.withValues(alpha: 0.4)
-                                  : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (tCountry != null) ...[
-                                Text(tCountry.flag, style: const TextStyle(fontSize: 14)),
-                                const SizedBox(width: 5),
-                              ],
-                              Text(
-                                t.destination.isNotEmpty
-                                    ? CityLocalization.localizeDestination(
-                                        t.destination,
-                                        Localizations.localeOf(context).languageCode,
-                                      )
-                                    : t.title,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: isCurrent ? FontWeight.w800 : FontWeight.w600,
-                                  color: isCurrent
-                                      ? theme.colorScheme.primary
-                                      : (isDark ? Colors.white70 : Colors.black87),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ] else ...[
-              _EmptyTripsPromptCard(
-                onPlanTrip: () => AddTripSheet.show(context),
-              ),
-            ],
-            const SizedBox(height: 18),
-
-            // 2. Inspiring Hero Greeting Banner
-            _HeroGreetingCard(
-              greeting: _getTimeBasedGreeting(l10n),
-              title: l10n.welcome,
-              subtitle: l10n.welcomeSubtitle,
+            // =========================================================================
+            // 1. FIXED TOP: Horizontal Greeting & Live Sync Header Bar
+            // =========================================================================
+            _HorizontalGreetingBar(
+              greeting: _getTimeBasedGreeting(l10n, lang),
+              userName: authState.user?.displayName,
+              subtitle: DateFormat.yMMMMd(lang).format(now),
               syncLabel: syncLabel,
               syncIcon: syncIcon,
               syncBgColor: syncBgColor,
               syncTextColor: syncTextColor,
-              onSyncTap: () {
-                ref.read(syncEngineProvider.notifier).performSync();
-              },
-            ),
-            const SizedBox(height: 20),
-
-            // Luggage & Packing Card (Checklist progress for active trip)
-            AppCard(
-              padding: const EdgeInsets.all(16),
-              onTap: () {
-                ref.read(mainNavigationIndexProvider.notifier).state = 2;
-              },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Hero(
-                        tag: 'checklist-hero-badge',
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: checklistStatusColor.withValues(alpha: 0.15),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.luggage_rounded,
-                            color: checklistStatusColor,
-                            size: 20,
-                          ),
-                        ),
+              isSyncing: syncState.status == SyncStatus.syncing,
+              onSyncTap: () async {
+                final messenger = ScaffoldMessenger.of(context);
+                messenger.clearSnackBars();
+                final notifier = ref.read(syncEngineProvider.notifier);
+                await notifier.performSync();
+                if (!mounted) return;
+                final sync = ref.read(syncEngineProvider);
+                if (sync.status == SyncStatus.upToDate) {
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                          const SizedBox(width: 8),
+                          Text(l10n.syncUpToDate),
+                        ],
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            FittedBox(
-                              fit: BoxFit.scaleDown,
-                              alignment: Alignment.centerLeft,
-                              child: Hero(
-                                tag: 'checklist-hero-title',
-                                child: Material(
-                                  type: MaterialType.transparency,
-                                  child: Text(
-                                    l10n.baggageAndChecklist,
-                                    style: theme.textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: -0.2,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Text(
-                              checklistState.totalCount == 0
-                                  ? l10n.noItemsYet
-                                  : '${checklistState.packedCount}/${checklistState.totalCount} ${l10n.itemsReady} (%${(checklistCompletionRatio * 100).toInt()})',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: theme.colorScheme.onSurfaceVariant,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Status Badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: checklistStatusColor.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: checklistStatusColor.withValues(alpha: 0.4), width: 1),
-                        ),
-                        child: Text(
-                          checklistState.totalCount == 0
-                              ? l10n.listEmpty.toUpperCase()
-                              : (checklistCompletionRatio >= 1.0 ? l10n.completed.toUpperCase() : l10n.preparing.toUpperCase()),
-                          style: TextStyle(
-                            color: checklistStatusColor,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Icon(Icons.arrow_forward_ios_rounded, size: 12, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  // Animated Progress Bar with subtle glow and easeOutCubic curve
-                  AppAnimatedProgressBar(
-                    progress: checklistCompletionRatio,
-                    height: 7,
-                    backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
-                    foregroundColor: checklistStatusColor,
-                    duration: const Duration(milliseconds: 450),
-                  ),
-                  const SizedBox(height: 10),
-                  // Airline Limits & Responsibility Note (Completely overflow safe)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4)
-                          : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
-                      borderRadius: BorderRadius.circular(10),
+                      backgroundColor: AppColors.successPastel,
+                      behavior: SnackBarBehavior.floating,
+                      duration: const Duration(seconds: 2),
                     ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.flight_takeoff_rounded, size: 14, color: theme.colorScheme.primary),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            checklistState.selectedAirline != null
-                                ? '${checklistState.selectedAirline!.countryFlag} ${checklistState.selectedAirline!.airlineName} • ${l10n.cabinBaggage} ${checklistState.selectedAirline!.cabinLimitKg.toInt()} kg'
-                                : l10n.standardBaggageLimitNote,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 10.5,
-                              fontWeight: FontWeight.w600,
-                              color: theme.colorScheme.onSurface,
+                  );
+                } else if (sync.status == SyncStatus.failed) {
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.error_outline_rounded, color: Colors.white, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              sync.errorMessage != null && sync.errorMessage!.isNotEmpty
+                                  ? '${l10n.syncFailed}: ${sync.errorMessage}'
+                                  : l10n.syncFailed,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                      backgroundColor: AppColors.errorPastel,
+                      behavior: SnackBarBehavior.floating,
+                      action: SnackBarAction(
+                        label: l10n.syncNow,
+                        textColor: Colors.white,
+                        onPressed: () => notifier.performSync(),
+                      ),
+                      duration: const Duration(seconds: 4),
                     ),
-                  ),
-                ],
-              ),
+                  );
+                }
+              },
+              onCustomizeTap: _openCustomizeSheet,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 14),
 
-            // Bento Grid for Discovery & Travel Features
-            BentoHubGrid(
-              tripCount: tripCount,
+            // =========================================================================
+            // 2+. REORDERABLE SECTIONS (With graceful fallback sliding)
+            // =========================================================================
+            ..._buildDynamicSections(
+              order: _sectionOrder,
+              hidden: _hiddenSections,
+              upcomingTrip: upcomingTrip,
+              featuredTripBadge: featuredTripBadge,
+              tripState: tripState,
+              checklistState: checklistState,
+              checklistCompletionRatio: checklistCompletionRatio,
+              checklistStatusColor: checklistStatusColor,
+              travelMapState: travelMapState,
               docCount: docCount,
-              visitedCountriesCount: travelMapState.visitedCount,
-              wishlistCount: travelMapState.wishlistCount,
-              worldPercentage: travelMapState.worldPercentage,
-              onOpenMap: () {
-                ref.read(mainNavigationIndexProvider.notifier).state = 1;
-              },
-              onOpenTrips: () {
-                Navigator.of(context).push(
-                  _createSmoothRoute(const TripsScreen()),
-                );
-              },
-              onOpenCurrency: () => CurrencyConverterCard.showAsModal(context),
-              onOpenComparison: () {
-                Navigator.of(context).push(
-                  _createSmoothRoute(const TripComparisonScreen()),
-                );
-              },
-              onOpenVault: () {
-                Navigator.of(context).push(
-                  _createSmoothRoute(const VaultScreen()),
-                );
-              },
+              tripCount: tripCount,
+              dateFormat: dateFormat,
+              theme: theme,
+              isDark: isDark,
+              l10n: l10n,
             ),
-            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
+
+  /// Evaluates user order, filters hidden/empty sections, and pairs consecutive mini cards
+  List<Widget> _buildDynamicSections({
+    required List<String> order,
+    required Set<String> hidden,
+    required Trip? upcomingTrip,
+    required String featuredTripBadge,
+    required dynamic tripState,
+    required dynamic checklistState,
+    required double checklistCompletionRatio,
+    required Color checklistStatusColor,
+    required dynamic travelMapState,
+    required int docCount,
+    required int tripCount,
+    required DateFormat dateFormat,
+    required ThemeData theme,
+    required bool isDark,
+    required AppLocalizations l10n,
+  }) {
+    // 1. Identify which sections are eligible to display
+    final List<String> activeIds = [];
+
+    for (final id in order) {
+      if (hidden.contains(id)) continue;
+
+      // Condition: Active trip only renders if an upcoming/active trip exists.
+      // If none, it is omitted, sliding up the next section!
+      if (id == 'active_trip' && upcomingTrip == null) {
+        continue;
+      }
+
+      activeIds.add(id);
+    }
+
+    final List<Widget> widgets = [];
+    int i = 0;
+
+    while (i < activeIds.length) {
+      final currentId = activeIds[i];
+
+      if (_isMiniCard(currentId)) {
+        // Check if next is also a mini card -> pair them side by side in a 2-column Row
+        if (i + 1 < activeIds.length && _isMiniCard(activeIds[i + 1])) {
+          final nextId = activeIds[i + 1];
+          widgets.add(
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: _renderSectionById(
+                        id: currentId,
+                        isMini: true,
+                        upcomingTrip: upcomingTrip,
+                        featuredTripBadge: featuredTripBadge,
+                        tripState: tripState,
+                        checklistState: checklistState,
+                        checklistCompletionRatio: checklistCompletionRatio,
+                        checklistStatusColor: checklistStatusColor,
+                        travelMapState: travelMapState,
+                        docCount: docCount,
+                        tripCount: tripCount,
+                        dateFormat: dateFormat,
+                        theme: theme,
+                        isDark: isDark,
+                        l10n: l10n,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _renderSectionById(
+                        id: nextId,
+                        isMini: true,
+                        upcomingTrip: upcomingTrip,
+                        featuredTripBadge: featuredTripBadge,
+                        tripState: tripState,
+                        checklistState: checklistState,
+                        checklistCompletionRatio: checklistCompletionRatio,
+                        checklistStatusColor: checklistStatusColor,
+                        travelMapState: travelMapState,
+                        docCount: docCount,
+                        tripCount: tripCount,
+                        dateFormat: dateFormat,
+                        theme: theme,
+                        isDark: isDark,
+                        l10n: l10n,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+          i += 2;
+        } else {
+          // Single standalone mini card
+          widgets.add(
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _renderSectionById(
+                id: currentId,
+                isMini: false,
+                upcomingTrip: upcomingTrip,
+                featuredTripBadge: featuredTripBadge,
+                tripState: tripState,
+                checklistState: checklistState,
+                checklistCompletionRatio: checklistCompletionRatio,
+                checklistStatusColor: checklistStatusColor,
+                travelMapState: travelMapState,
+                docCount: docCount,
+                tripCount: tripCount,
+                dateFormat: dateFormat,
+                theme: theme,
+                isDark: isDark,
+                l10n: l10n,
+              ),
+            ),
+          );
+          i += 1;
+        }
+      } else {
+        // Full width section (Active Trip, Luggage Checklist, Live Currency Converter)
+        widgets.add(
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: _renderSectionById(
+              id: currentId,
+              isMini: false,
+              upcomingTrip: upcomingTrip,
+              featuredTripBadge: featuredTripBadge,
+              tripState: tripState,
+              checklistState: checklistState,
+              checklistCompletionRatio: checklistCompletionRatio,
+              checklistStatusColor: checklistStatusColor,
+              travelMapState: travelMapState,
+              docCount: docCount,
+              tripCount: tripCount,
+              dateFormat: dateFormat,
+              theme: theme,
+              isDark: isDark,
+              l10n: l10n,
+            ),
+          ),
+        );
+        i += 1;
+      }
+    }
+
+    return widgets;
+  }
+
+  Widget _renderSectionById({
+    required String id,
+    required bool isMini,
+    required Trip? upcomingTrip,
+    required String featuredTripBadge,
+    required dynamic tripState,
+    required dynamic checklistState,
+    required double checklistCompletionRatio,
+    required Color checklistStatusColor,
+    required dynamic travelMapState,
+    required int docCount,
+    required int tripCount,
+    required DateFormat dateFormat,
+    required ThemeData theme,
+    required bool isDark,
+    required AppLocalizations l10n,
+  }) {
+    switch (id) {
+      case 'active_trip':
+        if (upcomingTrip == null) return const SizedBox.shrink();
+        return _UpcomingTripHighlightCard(
+          trip: upcomingTrip,
+          badgeText: featuredTripBadge,
+          dateFormat: dateFormat,
+          allTrips: tripState.trips,
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => TripDetailScreen(trip: upcomingTrip),
+              ),
+            );
+          },
+        );
+
+      case 'luggage_checklist':
+        return _LuggageChecklistCard(
+          checklistState: checklistState,
+          checklistCompletionRatio: checklistCompletionRatio,
+          checklistStatusColor: checklistStatusColor,
+          isDark: isDark,
+          l10n: l10n,
+          onTap: () {
+            ref.read(mainNavigationIndexProvider.notifier).state = 2;
+          },
+        );
+
+      case 'currency_converter':
+        return const HorizontalCurrencyConverterCard();
+
+      case 'mini_travel_map':
+        return DashboardMiniTravelMap(
+          visitedCountriesCount: travelMapState.visitedCount,
+          wishlistCount: travelMapState.wishlistCount,
+          worldPercentage: travelMapState.worldPercentage,
+          isFullWidth: !isMini,
+          onTap: () {
+            ref.read(mainNavigationIndexProvider.notifier).state = 1;
+          },
+        );
+
+      case 'mini_vault':
+        return DashboardMiniVault(
+          docCount: docCount,
+          isFullWidth: !isMini,
+          onTap: () {
+            Navigator.of(context).push(
+              _createSmoothRoute(const VaultScreen()),
+            );
+          },
+        );
+
+      case 'mini_all_trips':
+        return DashboardMiniAllTrips(
+          tripCount: tripCount,
+          isFullWidth: !isMini,
+          onTap: () {
+            Navigator.of(context).push(
+              _createSmoothRoute(const TripsScreen()),
+            );
+          },
+        );
+
+      case 'mini_trip_comparison':
+        return DashboardMiniTripComparison(
+          isFullWidth: !isMini,
+          onTap: () {
+            Navigator.of(context).push(
+              _createSmoothRoute(const TripComparisonScreen()),
+            );
+          },
+        );
+
+      default:
+        return const SizedBox.shrink();
+    }
+  }
 }
 
-/// Cinematic Hero Greeting Banner
-class _HeroGreetingCard extends StatelessWidget {
+/// Horizontal Greeting and Live Sync Header Bar placed permanently at the top
+class _HorizontalGreetingBar extends StatelessWidget {
   final String greeting;
-  final String title;
+  final String? userName;
   final String subtitle;
   final String syncLabel;
   final IconData syncIcon;
   final Color syncBgColor;
   final Color syncTextColor;
+  final bool isSyncing;
   final VoidCallback onSyncTap;
+  final VoidCallback onCustomizeTap;
 
-  const _HeroGreetingCard({
+  const _HorizontalGreetingBar({
     required this.greeting,
-    required this.title,
+    this.userName,
     required this.subtitle,
     required this.syncLabel,
     required this.syncIcon,
     required this.syncBgColor,
     required this.syncTextColor,
+    this.isSyncing = false,
     required this.onSyncTap,
+    required this.onCustomizeTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final lang = Localizations.localeOf(context).languageCode;
+    final hour = DateTime.now().hour;
+    final timeIcon = DashboardLocalization.timeIcon(hour);
+    final cleanGreeting = DashboardLocalization.timeGreetingClean(lang, hour);
+    final travelerTitle = DashboardLocalization.travelerTitle(lang);
+
+    final displayName = (userName != null && userName!.trim().isNotEmpty)
+        ? userName!.trim()
+        : travelerTitle;
 
     return AppCard(
-      padding: const EdgeInsets.all(22),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
+          // Row 1: Time Greeting with Emoji (Left) & Sync Status + Customize (Right)
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
-                child: Text(
-                  greeting,
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: theme.colorScheme.primary,
-                    letterSpacing: 0.2,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      timeIcon,
+                      style: const TextStyle(fontSize: 13.5),
+                    ),
+                    const SizedBox(width: 5),
+                    Flexible(
+                      child: Text(
+                        cleanGreeting,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: theme.colorScheme.primary,
+                          letterSpacing: 0.15,
+                          fontSize: 12,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
+
+              // Cloud Sync Status Pill
               InkWell(
                 onTap: onSyncTap,
                 borderRadius: BorderRadius.circular(14),
@@ -827,25 +883,66 @@ class _HeroGreetingCard extends StatelessWidget {
                   icon: syncIcon,
                   backgroundColor: syncBgColor,
                   textColor: syncTextColor,
+                  isSpinning: isSyncing,
+                  maxWidth: 140,
+                ),
+              ),
+              const SizedBox(width: 5),
+
+              // Customize Home Layout Button
+              InkWell(
+                onTap: onCustomizeTap,
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(9),
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                      width: 0.8,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.tune_rounded,
+                    size: 16,
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          Text(
-            title,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.6,
-            ),
-          ),
           const SizedBox(height: 6),
-          Text(
-            subtitle,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              height: 1.4,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+
+          // Row 2: User Name (Left, full width available) + Formatted Date (Right)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Expanded(
+                child: Text(
+                  displayName,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.4,
+                    fontSize: 16,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                subtitle,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.75),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 11.5,
+                  letterSpacing: -0.1,
+                ),
+                maxLines: 1,
+              ),
+            ],
           ),
         ],
       ),
@@ -853,17 +950,19 @@ class _HeroGreetingCard extends StatelessWidget {
   }
 }
 
-/// Highlight Card for the Next/Active Trip
+/// Highlight Card for the Next/Active Trip with Boarding Pass Aesthetic
 class _UpcomingTripHighlightCard extends StatelessWidget {
   final dynamic trip;
   final String badgeText;
   final DateFormat dateFormat;
+  final List<Trip> allTrips;
   final VoidCallback onTap;
 
   const _UpcomingTripHighlightCard({
     required this.trip,
     required this.badgeText,
     required this.dateFormat,
+    required this.allTrips,
     required this.onTap,
   });
 
@@ -873,10 +972,30 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final country = Country.findByCode(trip.countryCode);
     final transportIcon = TripsScreen.getTransportIcon(trip.transportMode);
+    final l10n = AppLocalizations.of(context)!;
+    final lang = Localizations.localeOf(context).languageCode;
+
+    // Remaining Days calculation
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final tripStart = DateTime(trip.startDate.year, trip.startDate.month, trip.startDate.day);
+    final tripEnd = DateTime(trip.endDate.year, trip.endDate.month, trip.endDate.day, 23, 59, 59);
+
+    String countdownPill;
+    if (now.isAfter(tripStart) && now.isBefore(tripEnd)) {
+      countdownPill = l10n.ongoingTrip;
+    } else {
+      final diff = tripStart.difference(today).inDays;
+      if (diff <= 0) {
+        countdownPill = l10n.today;
+      } else {
+        countdownPill = l10n.daysRemaining(diff);
+      }
+    }
 
     return AppCard(
       onTap: onTap,
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -890,10 +1009,17 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                   height: 44,
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(13),
+                    boxShadow: [
+                      BoxShadow(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.28),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
                   child: Center(
-                    child: Icon(transportIcon, color: Colors.white, size: 20),
+                    child: Icon(transportIcon, color: Colors.white, size: 21),
                   ),
                 ),
               ),
@@ -910,14 +1036,15 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                             style: theme.textTheme.labelSmall?.copyWith(
                               fontWeight: FontWeight.w800,
                               color: theme.colorScheme.primary,
-                              letterSpacing: 0.8,
+                              letterSpacing: 0.6,
+                              fontSize: 10,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         if (country != null) ...[
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 5),
                           Text(country.flag, style: const TextStyle(fontSize: 12)),
                         ],
                       ],
@@ -930,7 +1057,8 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                         child: Text(
                           trip.title,
                           style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.2,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -940,19 +1068,82 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+              // Countdown Pill & View All (Vertically stacked and constrained for zero horizontal overflow)
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 105),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        countdownPill,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w800,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    InkWell(
+                      borderRadius: BorderRadius.circular(6),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const TripsScreen()),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                l10n.viewAll,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 2),
+                            Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 8.5,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
+
+          // Destination & Date Strip
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: isDark
                   ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
-                  : theme.colorScheme.surface,
+                  : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: theme.colorScheme.outline.withValues(alpha: 0.5),
+                color: theme.colorScheme.outline.withValues(alpha: 0.4),
               ),
             ),
             child: Row(
@@ -972,7 +1163,7 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                         child: Text(
                           CityLocalization.localizeDestination(
                             trip.destination,
-                            Localizations.localeOf(context).languageCode,
+                            lang,
                           ),
                           style: theme.textTheme.bodySmall?.copyWith(
                             fontWeight: FontWeight.w600,
@@ -984,14 +1175,14 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 Flexible(
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
                         Icons.calendar_today_rounded,
-                        size: 13,
+                        size: 12,
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
                       const SizedBox(width: 4),
@@ -1000,7 +1191,7 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                           AppDateFormatter.formatDateRange(
                             trip.startDate,
                             trip.endDate,
-                            locale: Localizations.localeOf(context).languageCode,
+                            locale: lang,
                           ),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
@@ -1016,134 +1207,224 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
               ],
             ),
           ),
+
+          // Secondary Trips horizontal chips (if user has > 1 trip)
+          if (allTrips.length > 1) ...[
+            const SizedBox(height: 10),
+            SizedBox(
+              height: 32,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                itemCount: allTrips.length,
+                separatorBuilder: (_, _) => const SizedBox(width: 6),
+                itemBuilder: (context, index) {
+                  final t = allTrips[index];
+                  final isCurrent = t.id == trip.id;
+                  final tCountry = Country.findByCode(t.countryCode);
+                  return InkWell(
+                    borderRadius: BorderRadius.circular(10),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => TripDetailScreen(trip: t),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isCurrent
+                            ? theme.colorScheme.primary.withValues(alpha: 0.15)
+                            : (isDark ? const Color(0xFF1E293B) : Colors.white),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: isCurrent
+                              ? theme.colorScheme.primary.withValues(alpha: 0.4)
+                              : theme.colorScheme.outline.withValues(alpha: 0.3),
+                          width: 0.8,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (tCountry != null) ...[
+                            Text(tCountry.flag, style: const TextStyle(fontSize: 12)),
+                            const SizedBox(width: 4),
+                          ],
+                          Text(
+                            t.destination.isNotEmpty
+                                ? CityLocalization.localizeDestination(t.destination, lang)
+                                : t.title,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: isCurrent ? FontWeight.w800 : FontWeight.w600,
+                              color: isCurrent
+                                  ? theme.colorScheme.primary
+                                  : (isDark ? Colors.white70 : Colors.black87),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
 }
 
-/// Prompt card when no trips are scheduled yet
-class _EmptyTripsPromptCard extends StatelessWidget {
-  final VoidCallback onPlanTrip;
+/// Luggage and Packing Checklist Status Card
+class _LuggageChecklistCard extends StatelessWidget {
+  final dynamic checklistState;
+  final double checklistCompletionRatio;
+  final Color checklistStatusColor;
+  final bool isDark;
+  final AppLocalizations l10n;
+  final VoidCallback onTap;
 
-  const _EmptyTripsPromptCard({required this.onPlanTrip});
+  const _LuggageChecklistCard({
+    required this.checklistState,
+    required this.checklistCompletionRatio,
+    required this.checklistStatusColor,
+    required this.isDark,
+    required this.l10n,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final l10n = AppLocalizations.of(context)!;
 
     return AppCard(
-      onTap: onPlanTrip,
       padding: const EdgeInsets.all(16),
+      onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
+              Hero(
+                tag: 'checklist-hero-badge',
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: checklistStatusColor.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
                   child: Icon(
-                    Icons.flight_takeoff_rounded,
-                    color: theme.colorScheme.primary,
+                    Icons.luggage_rounded,
+                    color: checklistStatusColor,
                     size: 20,
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      l10n.noTripsYet.toUpperCase(),
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: theme.colorScheme.primary,
-                        letterSpacing: 0.8,
+                    Hero(
+                      tag: 'checklist-hero-title',
+                      child: Material(
+                        type: MaterialType.transparency,
+                        child: Text(
+                          l10n.baggageAndChecklist,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.2,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 1),
                     Text(
-                      l10n.createFirstTrip,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
+                      checklistState.totalCount == 0
+                          ? l10n.noItemsYet
+                          : '${checklistState.packedCount}/${checklistState.totalCount} ${l10n.itemsReady} (%${(checklistCompletionRatio * 100).toInt()})',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w500,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
-              FilledButton(
-                onPressed: onPlanTrip,
-                style: FilledButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  minimumSize: const Size(60, 34),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  visualDensity: VisualDensity.compact,
+              // Status Badge
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: checklistStatusColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: checklistStatusColor.withValues(alpha: 0.4), width: 1),
                 ),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    l10n.plan,
-                    maxLines: 1,
-                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                child: Text(
+                  checklistState.totalCount == 0
+                      ? l10n.listEmpty.toUpperCase()
+                      : (checklistCompletionRatio >= 1.0
+                          ? l10n.completed.toUpperCase()
+                          : l10n.preparing.toUpperCase()),
+                  style: TextStyle(
+                    color: checklistStatusColor,
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
+              ),
+              const SizedBox(width: 4),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 12,
+                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
+
+          // Animated Progress Bar
+          AppAnimatedProgressBar(
+            progress: checklistCompletionRatio,
+            height: 6.5,
+            backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+            foregroundColor: checklistStatusColor,
+            duration: const Duration(milliseconds: 450),
+          ),
+          const SizedBox(height: 10),
+
+          // Airline Baggage Limit / Responsibility Note
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
             decoration: BoxDecoration(
               color: isDark
-                  ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
-                  : theme.colorScheme.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: theme.colorScheme.outline.withValues(alpha: 0.5),
-              ),
+                  ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4)
+                  : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.explore_outlined,
-                  size: 14,
-                  color: theme.colorScheme.primary,
-                ),
+                Icon(Icons.flight_takeoff_rounded, size: 14, color: theme.colorScheme.primary),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    l10n.noTripsSubtitle,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    checklistState.selectedAirline != null
+                        ? '${checklistState.selectedAirline!.countryFlag} ${checklistState.selectedAirline!.airlineName} • ${l10n.cabinBaggage} ${checklistState.selectedAirline!.cabinLimitKg.toInt()} kg'
+                        : l10n.standardBaggageLimitNote,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Icon(
-                  Icons.arrow_forward_rounded,
-                  size: 14,
-                  color: theme.colorScheme.primary,
                 ),
               ],
             ),
@@ -1153,9 +1434,3 @@ class _EmptyTripsPromptCard extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
-

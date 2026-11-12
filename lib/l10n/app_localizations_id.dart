@@ -27,7 +27,7 @@ class AppLocalizationsId extends AppLocalizations {
       'Pelacakan pengeluaran perjalanan multi-mata uang';
 
   @override
-  String get vault => 'Brankas Dokumen';
+  String get vault => 'Brankas Aman';
 
   @override
   String get vaultDescription => 'Paspor, tiket, dan voucher reservasi';
@@ -212,7 +212,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get proFeature1 => 'Perjalanan & pelacakan pengeluaran tanpa batas';
 
   @override
-  String get proFeature2 => 'Penyimpanan brankas dokumen tanpa batas';
+  String get proFeature2 => 'Penyimpanan brankas aman tanpa batas';
 
   @override
   String get proFeature3 => 'Sinkronisasi cloud dua arah otomatis';
@@ -2132,4 +2132,115 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get countryLabel => 'Negara';
+
+  @override
+  String get privatePhotos => 'Foto Pribadi';
+
+  @override
+  String get privatePhotosSubtitle => 'Dilindungi PIN & Biometrik';
+
+  @override
+  String get privatePhotosReason =>
+      'Verifikasi sidik jari atau Face ID untuk melihat foto pribadi';
+
+  @override
+  String get addPrivatePhoto => 'Tambah Foto Pribadi';
+
+  @override
+  String get noPrivatePhotosYet => 'Belum ada foto pribadi';
+
+  @override
+  String get noPrivatePhotosDesc =>
+      'Foto yang ditambahkan di sini disembunyikan dari brankas utama dan dienkripsi ekstra.';
+
+  @override
+  String get lockAndExit => 'Kunci & Keluar';
+
+  @override
+  String get setPinFirstForPrivatePhotos =>
+      'Harap atur PIN terlebih dahulu untuk melindungi foto pribadi Anda';
+
+  @override
+  String get secureVaultBannerTitle => 'Brankas Aman Tidak Terlindungi';
+
+  @override
+  String get secureVaultBannerDesc =>
+      'Atur 4 digit PIN untuk melindungi brankas dan foto Anda.';
+
+  @override
+  String get privateVault => 'Brankas Pribadi';
+
+  @override
+  String get lockedBadge => 'TERKUNCI';
+
+  @override
+  String get unlockedBadge => 'TERBUKA';
+
+  @override
+  String get forgotPin => 'Lupa PIN?';
+
+  @override
+  String get resetVaultPinTitle => 'Atur Ulang PIN Brankas';
+
+  @override
+  String get resetVaultPinEmailDesc =>
+      'Kode verifikasi 6 digit akan dikirim ke email akun Anda:';
+
+  @override
+  String get sendVerificationCode => 'Kirim Kode Verifikasi';
+
+  @override
+  String get enterVerificationCode => 'Masukkan Kode Verifikasi';
+
+  @override
+  String get enterVerificationCodeDesc =>
+      'Masukkan kode 6 digit yang dikirim ke email Anda:';
+
+  @override
+  String get verificationCode => 'Kode Verifikasi';
+
+  @override
+  String get verifyAndContinue => 'Verifikasi & Lanjutkan';
+
+  @override
+  String get invalidVerificationCode =>
+      'Kode verifikasi tidak valid. Silakan coba lagi.';
+
+  @override
+  String get resendCode => 'Kirim Ulang Kode';
+
+  @override
+  String get codeResent => 'Kode verifikasi telah dikirim ulang.';
+
+  @override
+  String get setNewVaultPin => 'Atur PIN Brankas Baru';
+
+  @override
+  String get newPin => 'PIN 4 Digit Baru';
+
+  @override
+  String get confirmNewPin => 'Konfirmasi PIN Baru';
+
+  @override
+  String get pinsDoNotMatch => 'Kode PIN tidak cocok.';
+
+  @override
+  String get saveNewPinAndUnlock => 'Simpan PIN & Buka Kunci';
+
+  @override
+  String get vaultPinResetSuccess =>
+      'PIN brankas berhasil diatur ulang dan brankas terbuka.';
+
+  @override
+  String get vaultPinRequiredTitle => 'PIN Brankas Wajib';
+
+  @override
+  String get vaultPinRequiredDesc =>
+      'PIN 4 digit wajib dibuat untuk melindungi dokumen perjalanan dan foto pribadi Anda.';
+
+  @override
+  String get enterYourEmail => 'Masukkan Email Anda';
+
+  @override
+  String get invalidEmail => 'Silakan masukkan alamat email yang valid.';
 }

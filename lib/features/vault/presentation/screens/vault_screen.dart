@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/gestures.dart';
@@ -8,6 +9,7 @@ import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/features/dashboard/presentation/dashboard_localization.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import '../controllers/vault_controller.dart';
@@ -16,10 +18,14 @@ import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'document_viewer_screen.dart';
 import 'widgets/add_document_sheet.dart';
 import 'widgets/vault_lock_view.dart';
+import 'widgets/vault_pin_recovery_sheet.dart';
 import 'widgets/vault_thumbnail_widget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:packbuddy/features/dashboard/presentation/navigation_provider.dart';
+import 'package:flutter/services.dart';
+import 'package:packbuddy/core/services/biometric_service.dart';
 import '../../../../core/services/security_service.dart';
+import 'package:packbuddy/shared/widgets/quick_actions_sheet.dart';
 
 /// Redesigned Document Vault screen with pinned passport hero slot, trip filters, and format-specific windows
 class VaultScreen extends ConsumerStatefulWidget {
@@ -58,6 +64,13 @@ class VaultScreen extends ConsumerStatefulWidget {
       case 'health & insurance':
       case 'sağlık & sigorta':
         return l10n.healthAndInsurance;
+      case 'privatephotos':
+      case 'private photos':
+      case 'özel resimler':
+      case 'özel resim':
+      case 'özel fotoğraflar':
+      case 'özel':
+        return l10n.privatePhotos;
       case 'other':
       case 'diğer':
       case 'other documents':
@@ -76,6 +89,9 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
   String? _selectedTripFilter; // null = all, or trip.id
   String? _selectedCategoryFilter; // null = all, or category name
   String? _selectedSubCategoryFilter; // null = all, or subcategory name for Biletler
+  bool _isPrivatePhotosUnlocked = false;
+
+  bool _isPrivate(Document d) => d.isPrivate;
 
   bool get _isTabActive {
     if (!widget.isTabMode) return true;
@@ -103,13 +119,19 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
   @override
   void deactivate() {
     ScaffoldMessenger.maybeOf(context)?.clearSnackBars();
-    // Lock vault when screen is deactivated / popped
-    try {
-      final vaultState = ref.read(vaultControllerProvider);
-      if (vaultState.hasPin && !vaultState.isLocked) {
-        ref.read(vaultControllerProvider.notifier).lockVault();
-      }
-    } catch (_) {}
+    _isPrivatePhotosUnlocked = false;
+    if (_selectedCategoryFilter == 'Özel Resimler') {
+      _selectedCategoryFilter = null;
+    }
+    // Lock vault when screen is deactivated / popped (deferred to avoid mutating during element deactivation)
+    Future.microtask(() {
+      try {
+        final vaultState = ref.read(vaultControllerProvider);
+        if (vaultState.hasPin && !vaultState.isLocked) {
+          ref.read(vaultControllerProvider.notifier).lockVault();
+        }
+      } catch (_) {}
+    });
     super.deactivate();
   }
 
@@ -121,10 +143,19 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState lifecycleState) {
+    // If system biometric prompt is actively presented, Android transitions to inactive.
+    // We MUST NOT lock the vault or abort private safe while the biometric prompt is visible!
+    if (BiometricService.instance.isAuthenticating) {
+      return;
+    }
+
     if (lifecycleState == AppLifecycleState.paused ||
-        lifecycleState == AppLifecycleState.inactive ||
         lifecycleState == AppLifecycleState.hidden) {
       // Immediately lock vault whenever app is backgrounded or minimized
+      _isPrivatePhotosUnlocked = false;
+      if (_selectedCategoryFilter == 'Özel Resimler') {
+        _selectedCategoryFilter = null;
+      }
       final vaultState = ref.read(vaultControllerProvider);
       if (vaultState.hasPin && !vaultState.isLocked) {
         ref.read(vaultControllerProvider.notifier).lockVault();
@@ -134,7 +165,9 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
 
   Color _getCategoryColor(String category) {
     final cat = category.toLowerCase();
-    if (cat.contains('pasaport') || cat.contains('passport') || cat.contains('kimlik') || cat.contains('vize')) {
+    if (cat.contains('özel') || cat.contains('private')) {
+      return const Color(0xFFE11D48); // Rose / Crimson
+    } else if (cat.contains('pasaport') || cat.contains('passport') || cat.contains('kimlik') || cat.contains('vize')) {
       return const Color(0xFF1E3A8A); // Deep Royal Navy
     } else if (cat.contains('bilet') || cat.contains('ticket') || cat.contains('transit')) {
       return const Color(0xFF0284C7); // Sky Blue
@@ -156,7 +189,9 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
       if (sub.contains('tren') || sub.contains('train')) return Icons.train_rounded;
     }
     final cat = category.toLowerCase();
-    if (cat.contains('pasaport') || cat.contains('passport') || cat.contains('kimlik') || cat.contains('vize')) {
+    if (cat.contains('özel') || cat.contains('private')) {
+      return Icons.lock_person_rounded;
+    } else if (cat.contains('pasaport') || cat.contains('passport') || cat.contains('kimlik') || cat.contains('vize')) {
       return Icons.menu_book_rounded;
     } else if (cat.contains('bilet') || cat.contains('ticket') || cat.contains('transit')) {
       return Icons.confirmation_number_rounded;
@@ -170,7 +205,17 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
   }
 
   bool _matchesCategory(Document doc, String? categoryFilter) {
-    if (categoryFilter == null) return true;
+    final isDocPrivate = _isPrivate(doc);
+    if (categoryFilter == null) {
+      // Main Safe Page: strictly hide all private photos from the default view
+      return !isDocPrivate;
+    }
+    if (categoryFilter == 'Özel Resimler') {
+      return isDocPrivate;
+    }
+    // Any other category: strictly hide private photos
+    if (isDocPrivate) return false;
+
     final cat = doc.category.toLowerCase();
     switch (categoryFilter) {
       case 'Biletler':
@@ -215,18 +260,20 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
 
 
   void _openPdfSafely(BuildContext context, Document doc) async {
-    final l10n = AppLocalizations.of(context)!;
     final file = File(doc.localImagePath);
     if (!file.existsSync()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.fileNotFoundLocally)),
-      );
+      // If local file is missing, open DocumentViewerScreen which auto-fetches from cloud/chunks
+      if (context.mounted) {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => DocumentViewerScreen(document: doc)),
+        );
+      }
       return;
     }
     try {
       final rawBytes = await file.readAsBytes();
       if (SecurityService.instance.isEncrypted(rawBytes)) {
-        final decryptedBytes = await SecurityService.instance.decryptBytes(rawBytes);
+        final decryptedBytes = await SecurityService.instance.decryptBytes(rawBytes, userId: doc.userId);
         final tempDir = await getTemporaryDirectory();
         final tempFile = File('${tempDir.path}/pb_vault_preview_${doc.id}.pdf');
         await tempFile.writeAsBytes(decryptedBytes);
@@ -306,6 +353,153 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
     );
   }
 
+  void _showSetPinDialog() {
+    final l10n = AppLocalizations.of(context)!;
+    final pinController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.setVaultPin),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.setPinDescription,
+              style: const TextStyle(fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: pinController,
+              keyboardType: TextInputType.number,
+              maxLength: 4,
+              obscureText: true,
+              autofocus: true,
+              decoration: InputDecoration(
+                labelText: l10n.fourDigitPin,
+                prefixIcon: const Icon(Icons.pin_rounded),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final pin = pinController.text.trim();
+              if (pin.length == 4) {
+                await ref.read(vaultControllerProvider.notifier).setPin(pin);
+                if (await BiometricService.instance.isBiometricsAvailable()) {
+                  await ref.read(vaultControllerProvider.notifier).setBiometricEnabled(true);
+                }
+                if (ctx.mounted) {
+                  Navigator.of(ctx).pop();
+                }
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.check_circle_outline_rounded, color: Colors.white, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(child: Text(l10n.pinProtectionActive)),
+                        ],
+                      ),
+                      backgroundColor: AppColors.successPastel,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  );
+                }
+              }
+            },
+            child: Text(l10n.saveAndOpen),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _unlockPrivatePhotos() async {
+    final vaultState = ref.read(vaultControllerProvider);
+    final l10n = AppLocalizations.of(context)!;
+
+    if (!vaultState.hasPin) {
+      _showSetPinForPrivatePhotosPrompt();
+      return;
+    }
+
+    final biometricsAvailable = await BiometricService.instance.isBiometricsAvailable();
+    if (biometricsAvailable && vaultState.isBiometricEnabled) {
+      final authenticated = await BiometricService.instance.authenticate(
+        localizedReason: l10n.privatePhotosReason,
+      );
+      if (authenticated && mounted) {
+        setState(() {
+          _isPrivatePhotosUnlocked = true;
+          _selectedCategoryFilter = 'Özel Resimler';
+          _selectedSubCategoryFilter = null;
+        });
+        return;
+      }
+    }
+
+    if (mounted) {
+      _showVerifyPinSheetForPrivatePhotos();
+    }
+  }
+
+  void _showSetPinForPrivatePhotosPrompt() {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.lock_rounded, color: Color(0xFFE11D48)),
+            const SizedBox(width: 8),
+            Text(l10n.privatePhotos),
+          ],
+        ),
+        content: Text(l10n.setPinFirstForPrivatePhotos),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              _showSetPinDialog();
+            },
+            child: Text(l10n.setup),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showVerifyPinSheetForPrivatePhotos() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _PrivatePhotosPinSheet(
+        onSuccess: () {
+          if (mounted) {
+            setState(() {
+              _isPrivatePhotosUnlocked = true;
+              _selectedCategoryFilter = 'Özel Resimler';
+              _selectedSubCategoryFilter = null;
+            });
+          }
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -338,21 +532,33 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
 
     // Enforce biometric/PIN re-auth whenever user leaves or returns to Vault tab
     ref.listen<int>(mainNavigationIndexProvider, (previous, next) {
-      final currentVaultState = ref.read(vaultControllerProvider);
-      if (!currentVaultState.hasPin) return;
-
       if (previous == 3 && next != 3) {
-        // Leaving Vault tab -> lock immediately
+        // Leaving Vault tab -> lock immediately and relock private photos
+        _isPrivatePhotosUnlocked = false;
+        if (_selectedCategoryFilter == 'Özel Resimler') {
+          Future.microtask(() {
+            if (mounted) setState(() => _selectedCategoryFilter = null);
+          });
+        }
         ref.read(vaultControllerProvider.notifier).lockVault();
       } else if (next == 3 && previous != 3) {
         // Entering Vault tab -> lock to enforce re-auth
+        _isPrivatePhotosUnlocked = false;
+        if (_selectedCategoryFilter == 'Özel Resimler') {
+          Future.microtask(() {
+            if (mounted) setState(() => _selectedCategoryFilter = null);
+          });
+        }
         ref.read(vaultControllerProvider.notifier).lockVault();
       }
     });
 
-    // Find the latest uploaded passport document if any
+    final publicDocsCount = vaultState.documents.where((d) => !_isPrivate(d)).length;
+    final privateDocsCount = vaultState.documents.where((d) => _isPrivate(d)).length;
+
+    // Find the latest uploaded passport document if any (must NOT be a private photo)
     final passportDoc = vaultState.documents.cast<Document?>().firstWhere(
-          (d) => d?.category.toLowerCase() == 'passport' || d?.category.toLowerCase() == 'pasaport',
+          (d) => d != null && !_isPrivate(d) && (d.category.toLowerCase() == 'passport' || d.category.toLowerCase() == 'pasaport'),
           orElse: () => null,
         );
 
@@ -377,15 +583,26 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
     }
 
     return PopScope(
-      canPop: true,
+      canPop: false,
       onPopInvokedWithResult: (didPop, result) {
-        if (!didPop && Navigator.of(context).canPop()) {
+        if (didPop) return;
+        if (_selectedCategoryFilter == 'Özel Resimler') {
+          setState(() {
+            _selectedCategoryFilter = null;
+            _isPrivatePhotosUnlocked = false;
+          });
+          return;
+        }
+        if (Navigator.of(context).canPop()) {
           Navigator.of(context).pop();
+        } else {
+          ref.read(mainNavigationIndexProvider.notifier).state = 0;
         }
       },
       child: Scaffold(
         appBar: AppBar(
-          titleSpacing: 8,
+          automaticallyImplyLeading: false,
+          titleSpacing: 16,
           title: FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
@@ -422,16 +639,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
               ],
             ),
           ),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded),
-            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-            onPressed: () {
-              if (Navigator.of(context).canPop()) {
-                Navigator.of(context).pop();
-              }
-            },
-          ),
           actions: [
+            if (!vaultState.hasPin)
+              IconButton(
+                icon: const Icon(Icons.shield_outlined),
+                tooltip: l10n.setVaultPin,
+                onPressed: _showSetPinDialog,
+              ),
             if (vaultState.hasPin && !vaultState.isLocked)
               IconButton(
                 icon: const Icon(Icons.lock_open_rounded),
@@ -447,19 +661,21 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
               ),
           ],
         ),
-        floatingActionButton: vaultState.isLocked
+        floatingActionButton: (vaultState.isLocked || filteredDocuments.isEmpty)
             ? null
-            : FloatingActionButton.extended(
+            : FloatingActionButton(
                 heroTag: null,
-                onPressed: () => AddDocumentSheet.show(
+                onPressed: () => QuickActionsSheet.showForVault(
                   context,
-                  initialTripId: _selectedTripFilter,
+                  selectedTripId: _selectedTripFilter,
+                  selectedCategory: _selectedCategoryFilter,
                 ),
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
+                backgroundColor: _selectedCategoryFilter == 'Özel Resimler'
+                    ? const Color(0xFFE11D48)
+                    : theme.colorScheme.primary,
+                foregroundColor: Colors.white,
                 elevation: 3,
-                icon: const Icon(Icons.add_rounded),
-                label: Text(l10n.addDocument, style: const TextStyle(fontWeight: FontWeight.w600)),
+                child: const Icon(Icons.add_rounded, size: 26),
               ),
       body: vaultState.isLocked
           ? VaultLockView(isTabMode: widget.isTabMode)
@@ -476,99 +692,149 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          // Left: Vault Status Window
+                          // Left: Özel Kasa (Private Safe) Gateway Card
                           Expanded(
                             flex: 1,
-                            child: Container(
-                              constraints: const BoxConstraints(minHeight: 155),
-                              padding: const EdgeInsets.all(14),
-                              decoration: BoxDecoration(
-                                color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
-                                  width: 1,
-                                ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Icon(
-                                          Icons.shield_outlined,
-                                          size: 20,
-                                          color: theme.colorScheme.primary,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Expanded(
-                                        child: Align(
-                                          alignment: Alignment.centerRight,
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.successPastel.withValues(alpha: 0.2),
-                                              borderRadius: BorderRadius.circular(6),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                key: const Key('private_photos_chip'),
+                                borderRadius: BorderRadius.circular(18),
+                                onTap: () {
+                                  if (_selectedCategoryFilter == 'Özel Resimler') {
+                                    setState(() {
+                                      _selectedCategoryFilter = null;
+                                      _isPrivatePhotosUnlocked = false;
+                                    });
+                                  } else {
+                                    if (_isPrivatePhotosUnlocked) {
+                                      setState(() {
+                                        _selectedCategoryFilter = 'Özel Resimler';
+                                        _selectedSubCategoryFilter = null;
+                                      });
+                                    } else {
+                                      _unlockPrivatePhotos();
+                                    }
+                                  }
+                                },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: _selectedCategoryFilter == 'Özel Resimler'
+                                        ? const Color(0xFFE11D48).withValues(alpha: isDark ? 0.2 : 0.08)
+                                        : (isDark ? AppColors.surfaceDark : AppColors.surfaceLight),
+                                    borderRadius: BorderRadius.circular(18),
+                                    border: Border.all(
+                                      color: _selectedCategoryFilter == 'Özel Resimler'
+                                          ? const Color(0xFFE11D48)
+                                          : (_isPrivatePhotosUnlocked
+                                              ? const Color(0xFFE11D48).withValues(alpha: 0.5)
+                                              : (isDark ? AppColors.outlineDark : AppColors.outlineLight)),
+                                      width: _selectedCategoryFilter == 'Özel Resimler' ? 1.5 : 1,
+                                    ),
+                                    boxShadow: _selectedCategoryFilter == 'Özel Resimler'
+                                        ? [
+                                            BoxShadow(
+                                              color: const Color(0xFFE11D48).withValues(alpha: 0.15),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 3),
                                             ),
-                                            child: Text(
-                                              l10n.secureBadge,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                fontSize: 9,
-                                                fontWeight: FontWeight.bold,
-                                                color: AppColors.successPastel,
+                                          ]
+                                        : null,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(7),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFE11D48).withValues(alpha: 0.15),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Icon(
+                                              _isPrivatePhotosUnlocked ? Icons.lock_open_rounded : Icons.lock_rounded,
+                                              size: 16,
+                                              color: const Color(0xFFE11D48),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Expanded(
+                                            child: Align(
+                                              alignment: Alignment.centerRight,
+                                              child: Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                decoration: BoxDecoration(
+                                                  color: _isPrivatePhotosUnlocked
+                                                      ? AppColors.successPastel.withValues(alpha: 0.2)
+                                                      : const Color(0xFFE11D48).withValues(alpha: 0.12),
+                                                  borderRadius: BorderRadius.circular(6),
+                                                ),
+                                                child: Text(
+                                                  _isPrivatePhotosUnlocked ? l10n.unlockedBadge : l10n.lockedBadge,
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    fontSize: 9,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: _isPrivatePhotosUnlocked
+                                                        ? AppColors.successPastel
+                                                        : const Color(0xFFE11D48),
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        alignment: Alignment.centerLeft,
-                                        child: Text(
-                                          '${vaultState.documents.length}',
-                                          style: theme.textTheme.headlineSmall?.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                            color: theme.colorScheme.primary,
-                                          ),
-                                        ),
-                                      ),
+                                      const SizedBox(height: 8),
                                       Text(
-                                        l10n.savedDocument,
+                                        l10n.privateVault,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
-                                        style: theme.textTheme.bodySmall?.copyWith(
-                                          color: theme.colorScheme.onSurfaceVariant,
-                                          fontWeight: FontWeight.w600,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                          color: _selectedCategoryFilter == 'Özel Resimler'
+                                              ? const Color(0xFFE11D48)
+                                              : theme.colorScheme.onSurface,
                                         ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            _isPrivatePhotosUnlocked ? Icons.photo_library_outlined : Icons.shield_outlined,
+                                            size: 12,
+                                            color: _selectedCategoryFilter == 'Özel Resimler'
+                                                ? const Color(0xFFE11D48)
+                                                : theme.colorScheme.onSurfaceVariant,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Expanded(
+                                            child: Text(
+                                              _isPrivatePhotosUnlocked
+                                                  ? '$privateDocsCount ${l10n.privatePhotos}'
+                                                  : l10n.tapToView,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w500,
+                                                color: _selectedCategoryFilter == 'Özel Resimler'
+                                                    ? const Color(0xFFE11D48)
+                                                    : theme.colorScheme.onSurfaceVariant,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                  Text(
-                                    l10n.offlineAndEncrypted,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
@@ -577,164 +843,151 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                           // Right: Pinned Passport Window (Always on the Top Right)
                           Expanded(
                             flex: 1,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(20),
-                              onTap: () {
-                                if (passportDoc != null) {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) => DocumentViewerScreen(document: passportDoc),
-                                    ),
-                                  );
-                                } else {
-                                  AddDocumentSheet.show(context, initialCategory: 'Passport');
-                                }
-                              },
-                              child: Container(
-                                constraints: const BoxConstraints(minHeight: 155),
-                                padding: const EdgeInsets.all(14),
-                                decoration: BoxDecoration(
-                                  color: passportDoc != null
-                                      ? null
-                                      : (isDark ? AppColors.surfaceDark : AppColors.surfaceLight),
-                                  gradient: passportDoc != null
-                                      ? const LinearGradient(
-                                          colors: [
-                                            Color(0xFF1E3A8A),
-                                            Color(0xFF172554),
-                                          ],
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                        )
-                                      : null,
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(
-                                    color: passportDoc != null
-                                        ? const Color(0xFFF59E0B).withValues(alpha: 0.5)
-                                        : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
-                                    width: 1,
-                                  ),
-                                  boxShadow: passportDoc != null
-                                      ? [
-                                          BoxShadow(
-                                            color: const Color(0xFF1E3A8A).withValues(alpha: 0.25),
-                                            blurRadius: 10,
-                                            offset: const Offset(0, 4),
-                                          ),
-                                        ]
-                                      : null,
-                                ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color: passportDoc != null
-                                              ? const Color(0xFFF59E0B).withValues(alpha: 0.2)
-                                              : theme.colorScheme.secondary.withValues(alpha: 0.15),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Icon(
-                                          Icons.menu_book_rounded,
-                                          size: 20,
-                                          color: passportDoc != null
-                                              ? const Color(0xFFF59E0B)
-                                              : theme.colorScheme.secondary,
-                                        ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(18),
+                                onTap: () {
+                                  if (passportDoc != null) {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) => DocumentViewerScreen(document: passportDoc),
                                       ),
-                                      const SizedBox(width: 4),
-                                      Expanded(
-                                        child: Align(
-                                          alignment: Alignment.centerRight,
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    );
+                                  } else {
+                                    AddDocumentSheet.show(context, initialCategory: 'Passport');
+                                  }
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: passportDoc != null
+                                        ? null
+                                        : (isDark ? AppColors.surfaceDark : AppColors.surfaceLight),
+                                    gradient: passportDoc != null
+                                        ? const LinearGradient(
+                                            colors: [
+                                              Color(0xFF1E3A8A),
+                                              Color(0xFF172554),
+                                            ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          )
+                                        : null,
+                                    borderRadius: BorderRadius.circular(18),
+                                    border: Border.all(
+                                      color: passportDoc != null
+                                          ? const Color(0xFFF59E0B).withValues(alpha: 0.5)
+                                          : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
+                                      width: 1,
+                                    ),
+                                    boxShadow: passportDoc != null
+                                        ? [
+                                            BoxShadow(
+                                              color: const Color(0xFF1E3A8A).withValues(alpha: 0.25),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ]
+                                        : null,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(7),
                                             decoration: BoxDecoration(
                                               color: passportDoc != null
-                                                  ? const Color(0xFFF59E0B).withValues(alpha: 0.25)
-                                                  : theme.colorScheme.primaryContainer,
-                                              borderRadius: BorderRadius.circular(6),
+                                                  ? const Color(0xFFF59E0B).withValues(alpha: 0.2)
+                                                  : theme.colorScheme.secondary.withValues(alpha: 0.15),
+                                              shape: BoxShape.circle,
                                             ),
-                                            child: Text(
-                                              passportDoc != null ? l10n.readyBadge : l10n.pinnedBadge,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                fontSize: 9,
-                                                fontWeight: FontWeight.bold,
-                                                color: passportDoc != null
-                                                    ? const Color(0xFFF59E0B)
-                                                    : theme.colorScheme.primary,
+                                            child: Icon(
+                                              Icons.menu_book_rounded,
+                                              size: 16,
+                                              color: passportDoc != null
+                                                  ? const Color(0xFFF59E0B)
+                                                  : theme.colorScheme.secondary,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Expanded(
+                                            child: Align(
+                                              alignment: Alignment.centerRight,
+                                              child: Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                decoration: BoxDecoration(
+                                                  color: passportDoc != null
+                                                      ? const Color(0xFFF59E0B).withValues(alpha: 0.25)
+                                                      : theme.colorScheme.primaryContainer,
+                                                  borderRadius: BorderRadius.circular(6),
+                                                ),
+                                                child: Text(
+                                                  passportDoc != null ? l10n.readyBadge : l10n.pinnedBadge,
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    fontSize: 9,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: passportDoc != null
+                                                        ? const Color(0xFFF59E0B)
+                                                        : theme.colorScheme.primary,
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
+                                      const SizedBox(height: 8),
                                       Text(
                                         passportDoc != null ? passportDoc.title : l10n.passportSlot,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 14,
+                                          fontSize: 13,
                                           color: passportDoc != null ? Colors.white : theme.colorScheme.onSurface,
                                         ),
                                       ),
                                       const SizedBox(height: 2),
-                                      Text(
-                                        passportDoc != null
-                                            ? dateFormat.format(passportDoc.createdAt)
-                                            : l10n.saveYourPassport,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: passportDoc != null
-                                              ? Colors.white.withValues(alpha: 0.8)
-                                              : theme.colorScheme.primary,
-                                          fontWeight: passportDoc != null ? FontWeight.normal : FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        passportDoc != null ? Icons.visibility_rounded : Icons.add_circle_outline_rounded,
-                                        size: 13,
-                                        color: passportDoc != null
-                                            ? const Color(0xFFF59E0B)
-                                            : theme.colorScheme.primary,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Expanded(
-                                        child: Text(
-                                          passportDoc != null ? l10n.tapToView : l10n.quickUpload,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            fontSize: 9,
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            passportDoc != null ? Icons.visibility_rounded : Icons.add_circle_outline_rounded,
+                                            size: 12,
                                             color: passportDoc != null
-                                                ? Colors.white.withValues(alpha: 0.7)
-                                                : theme.colorScheme.onSurfaceVariant,
+                                                ? const Color(0xFFF59E0B)
+                                                : theme.colorScheme.primary,
                                           ),
-                                        ),
+                                          const SizedBox(width: 4),
+                                          Expanded(
+                                            child: Text(
+                                              passportDoc != null
+                                                  ? dateFormat.format(passportDoc.createdAt)
+                                                  : l10n.saveYourPassport,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w500,
+                                                color: passportDoc != null
+                                                    ? Colors.white.withValues(alpha: 0.8)
+                                                    : theme.colorScheme.primary,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -754,7 +1007,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                           child: Row(
                             children: [
                               ChoiceChip(
-                                label: Text('${l10n.allDocuments} (${vaultState.documents.length})'),
+                                label: Text('${l10n.allDocuments} ($publicDocsCount)'),
                                 selected: _selectedCategoryFilter == null,
                                 selectedColor: theme.colorScheme.primary,
                                 labelStyle: TextStyle(
@@ -769,6 +1022,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                     setState(() {
                                       _selectedCategoryFilter = null;
                                       _selectedSubCategoryFilter = null;
+                                      _isPrivatePhotosUnlocked = false;
                                     });
                                   }
                                 },
@@ -790,6 +1044,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   setState(() {
                                     _selectedCategoryFilter = val ? 'Biletler' : null;
                                     _selectedSubCategoryFilter = null;
+                                    _isPrivatePhotosUnlocked = false;
                                   });
                                 },
                               ),
@@ -810,6 +1065,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   setState(() {
                                     _selectedCategoryFilter = val ? 'Konaklama' : null;
                                     _selectedSubCategoryFilter = null;
+                                    _isPrivatePhotosUnlocked = false;
                                   });
                                 },
                               ),
@@ -830,6 +1086,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   setState(() {
                                     _selectedCategoryFilter = val ? 'Kimlik & Pasaport' : null;
                                     _selectedSubCategoryFilter = null;
+                                    _isPrivatePhotosUnlocked = false;
                                   });
                                 },
                               ),
@@ -850,6 +1107,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   setState(() {
                                     _selectedCategoryFilter = val ? 'Sağlık & Sigorta' : null;
                                     _selectedSubCategoryFilter = null;
+                                    _isPrivatePhotosUnlocked = false;
                                   });
                                 },
                               ),
@@ -870,6 +1128,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   setState(() {
                                     _selectedCategoryFilter = val ? 'Diğer Belgeler' : null;
                                     _selectedSubCategoryFilter = null;
+                                    _isPrivatePhotosUnlocked = false;
                                   });
                                 },
                               ),
@@ -1041,8 +1300,80 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                   ),
                 ),
 
+                // If currently viewing Özel Resimler, show sleek security status bar
+                if (_selectedCategoryFilter == 'Özel Resimler')
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE11D48).withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: const Color(0xFFE11D48).withValues(alpha: 0.2)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.privacy_tip_outlined, color: Color(0xFFE11D48), size: 18),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                l10n.privatePhotosSubtitle,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                  color: theme.colorScheme.onSurface,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            InkWell(
+                              key: const Key('lock_and_exit_button'),
+                              onTap: () {
+                                setState(() {
+                                  _isPrivatePhotosUnlocked = false;
+                                  _selectedCategoryFilter = null;
+                                });
+                              },
+                              borderRadius: BorderRadius.circular(8),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE11D48).withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.lock_rounded, size: 13, color: Color(0xFFE11D48)),
+                                    const SizedBox(width: 4),
+                                    ConstrainedBox(
+                                      constraints: const BoxConstraints(maxWidth: 90),
+                                      child: Text(
+                                        l10n.lockAndExit,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: Color(0xFFE11D48),
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
                 // Documents Grid
-                if (vaultState.documents.isEmpty)
+                if (filteredDocuments.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
                     child: SingleChildScrollView(
@@ -1054,20 +1385,30 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
-                                padding: const EdgeInsets.all(24),
+                                padding: const EdgeInsets.all(22),
                                 decoration: BoxDecoration(
-                                  color: theme.colorScheme.secondaryContainer.withValues(alpha: 0.5),
+                                  color: (_selectedCategoryFilter == 'Özel Resimler'
+                                          ? const Color(0xFFE11D48)
+                                          : theme.colorScheme.secondaryContainer)
+                                      .withValues(alpha: 0.15),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
-                                  Icons.shield_outlined,
-                                  size: 44,
-                                  color: theme.colorScheme.secondary,
+                                  _selectedCategoryFilter == 'Özel Resimler'
+                                      ? Icons.photo_library_outlined
+                                      : Icons.shield_outlined,
+                                  size: 40,
+                                  color: _selectedCategoryFilter == 'Özel Resimler'
+                                      ? const Color(0xFFE11D48)
+                                      : theme.colorScheme.secondary,
                                 ),
                               ),
-                              const SizedBox(height: 20),
+                              const SizedBox(height: 18),
                               Text(
-                                l10n.noDocumentsYet,
+                                _selectedCategoryFilter == 'Özel Resimler'
+                                    ? l10n.noPrivatePhotosYet
+                                    : (vaultState.documents.isEmpty ? l10n.noDocumentsYet : l10n.noDocumentsForFilter),
+                                textAlign: TextAlign.center,
                                 style: theme.textTheme.titleLarge?.copyWith(
                                   fontWeight: FontWeight.w700,
                                   letterSpacing: -0.4,
@@ -1075,40 +1416,40 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                l10n.noDocumentsSubtitle,
+                                _selectedCategoryFilter == 'Özel Resimler'
+                                    ? l10n.noPrivatePhotosDesc
+                                    : (vaultState.documents.isEmpty ? l10n.noDocumentsSubtitle : ''),
                                 textAlign: TextAlign.center,
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: theme.colorScheme.onSurfaceVariant,
                                 ),
                               ),
+                              const SizedBox(height: 20),
+                              FilledButton.icon(
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: _selectedCategoryFilter == 'Özel Resimler'
+                                      ? const Color(0xFFE11D48)
+                                      : theme.colorScheme.primary,
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                ),
+                                onPressed: () => AddDocumentSheet.show(
+                                  context,
+                                  initialTripId: _selectedTripFilter,
+                                  initialCategory: _selectedCategoryFilter == 'Özel Resimler' ? 'PrivatePhotos' : null,
+                                ),
+                                icon: Icon(_selectedCategoryFilter == 'Özel Resimler'
+                                    ? Icons.add_a_photo_rounded
+                                    : Icons.add_rounded),
+                                label: Text(
+                                  _selectedCategoryFilter == 'Özel Resimler'
+                                      ? l10n.addPrivatePhoto
+                                      : l10n.addDocument,
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
                             ],
                           ),
-                        ),
-                      ),
-                    ),
-                  )
-                else if (filteredDocuments.isEmpty)
-                  SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: SingleChildScrollView(
-                      physics: const NeverScrollableScrollPhysics(),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.filter_list_off_rounded,
-                              size: 40,
-                              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              l10n.noDocumentsForFilter,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
                         ),
                       ),
                     ),
@@ -1352,6 +1693,407 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                   ),
               ],
             ),
+      ),
+    );
+  }
+}
+
+/// Secure PIN Verification Sheet specifically designed for Private Vault / Private Photos
+/// Provides real-time failed attempt limit visibility (out of 5),
+/// security lockout countdown, and email PIN recovery integration.
+class _PrivatePhotosPinSheet extends ConsumerStatefulWidget {
+  final VoidCallback onSuccess;
+
+  const _PrivatePhotosPinSheet({required this.onSuccess});
+
+  @override
+  ConsumerState<_PrivatePhotosPinSheet> createState() => _PrivatePhotosPinSheetState();
+}
+
+class _PrivatePhotosPinSheetState extends ConsumerState<_PrivatePhotosPinSheet> {
+  String _entered = '';
+  bool _isError = false;
+  int _remainingAttempts = 5;
+  int _lockoutSeconds = 0;
+  Timer? _lockoutTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _remainingAttempts = ref.read(vaultControllerProvider.notifier).getRemainingPinAttempts();
+    _checkLockout();
+  }
+
+  @override
+  void dispose() {
+    _lockoutTimer?.cancel();
+    super.dispose();
+  }
+
+  void _checkLockout() {
+    final controller = ref.read(vaultControllerProvider.notifier);
+    if (controller.isPinLockedOut()) {
+      _lockoutSeconds = controller.getPinLockoutRemainingSeconds();
+      _startLockoutCountdown();
+    }
+  }
+
+  void _startLockoutCountdown() {
+    _lockoutTimer?.cancel();
+    _lockoutTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      final remaining = ref.read(vaultControllerProvider.notifier).getPinLockoutRemainingSeconds();
+      if (remaining <= 0) {
+        timer.cancel();
+        setState(() {
+          _lockoutSeconds = 0;
+          _isError = false;
+        });
+      } else {
+        setState(() {
+          _lockoutSeconds = remaining;
+        });
+      }
+    });
+  }
+
+  String _formatLockoutTime(int totalSeconds) {
+    final minutes = totalSeconds ~/ 60;
+    final seconds = totalSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  void _onDigitPressed(String d) {
+    if (_lockoutSeconds > 0) {
+      HapticFeedback.heavyImpact();
+      return;
+    }
+    if (_entered.length < 4) {
+      HapticFeedback.lightImpact();
+      setState(() {
+        _isError = false;
+        _entered += d;
+      });
+
+      if (_entered.length == 4) {
+        _verifyPin();
+      }
+    }
+  }
+
+  void _onBackspace() {
+    if (_lockoutSeconds > 0) return;
+    if (_entered.isNotEmpty) {
+      HapticFeedback.selectionClick();
+      setState(() {
+        _isError = false;
+        _entered = _entered.substring(0, _entered.length - 1);
+      });
+    }
+  }
+
+  void _verifyPin() {
+    final controller = ref.read(vaultControllerProvider.notifier);
+    if (controller.isPinLockedOut()) {
+      _checkLockout();
+      return;
+    }
+
+    final success = controller.unlockVault(_entered);
+    if (success) {
+      _lockoutTimer?.cancel();
+      Navigator.of(context).pop();
+      widget.onSuccess();
+    } else {
+      HapticFeedback.heavyImpact();
+      final remaining = controller.getRemainingPinAttempts();
+      setState(() {
+        _isError = true;
+        _entered = '';
+        _remainingAttempts = remaining;
+      });
+
+      final lang = Localizations.localeOf(context).languageCode;
+      if (controller.isPinLockedOut()) {
+        _checkLockout();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.lock_clock_rounded, color: Colors.white, size: 20),
+                const SizedBox(width: 10),
+                Expanded(child: Text(DashboardLocalization.vaultLockedSnackbar(lang))),
+              ],
+            ),
+            backgroundColor: AppColors.errorPastel,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 4),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      } else {
+        final errorMsg = DashboardLocalization.vaultIncorrectPinBanner(lang, remaining, 5);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline_rounded, color: Colors.white, size: 20),
+                const SizedBox(width: 10),
+                Expanded(child: Text(errorMsg, style: const TextStyle(fontWeight: FontWeight.w600))),
+              ],
+            ),
+            backgroundColor: AppColors.errorPastel,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 3),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    }
+  }
+
+  Widget _buildNumpadButton(String digit) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDisabled = _lockoutSeconds > 0;
+    return InkWell(
+      onTap: isDisabled ? null : () => _onDigitPressed(digit),
+      borderRadius: BorderRadius.circular(32),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 64,
+        height: 64,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: isDisabled
+              ? (isDark ? const Color(0xFF1E1E26) : const Color(0xFFE5E7EB))
+              : (isDark ? const Color(0xFF2A2A36) : const Color(0xFFF3F4F6)),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          digit,
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: isDisabled
+                ? Theme.of(context).disabledColor
+                : Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final isDark = theme.brightness == Brightness.dark;
+    final lang = Localizations.localeOf(context).languageCode;
+
+    return SafeArea(
+      top: false,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE11D48).withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.lock_rounded, color: Color(0xFFE11D48), size: 28),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                l10n.privatePhotos,
+                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                l10n.enterPinToUnlockVault,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              ),
+              const SizedBox(height: 18),
+
+              // Lockout Warning Container if locked out
+              if (_lockoutSeconds > 0) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  margin: const EdgeInsets.only(bottom: 18),
+                  decoration: BoxDecoration(
+                    color: AppColors.errorPastel.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: AppColors.errorPastel.withValues(alpha: 0.4),
+                      width: 1.2,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.timer_rounded, color: AppColors.errorPastel, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            DashboardLocalization.vaultLockedTitle(lang, _formatLockoutTime(_lockoutSeconds)),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.errorPastel,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        DashboardLocalization.vaultLockedDesc(lang),
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontSize: 11.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              // PIN Dots
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(4, (index) {
+                  final isFilled = index < _entered.length;
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    margin: const EdgeInsets.symmetric(horizontal: 8),
+                    width: 15,
+                    height: 15,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isFilled
+                          ? (_isError ? AppColors.errorPastel : const Color(0xFFE11D48))
+                          : Colors.transparent,
+                      border: Border.all(
+                        color: _isError ? AppColors.errorPastel : const Color(0xFFE11D48),
+                        width: 2,
+                      ),
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(height: 12),
+
+              // Prominently Visible In-Place Warning Banner & Remaining Attempt Counter
+              if (_lockoutSeconds <= 0 && (_isError || _remainingAttempts < 5)) ...[
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE11D48).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: const Color(0xFFE11D48).withValues(alpha: 0.35),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.error_outline_rounded,
+                        color: Color(0xFFE11D48),
+                        size: 16,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        DashboardLocalization.vaultIncorrectPinBanner(lang, _remainingAttempts, 5),
+                        style: const TextStyle(
+                          color: Color(0xFFE11D48),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ] else ...[
+                const SizedBox(height: 24),
+              ],
+
+              // Number Pad
+              for (var row in [
+                ['1', '2', '3'],
+                ['4', '5', '6'],
+                ['7', '8', '9']
+              ])
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: row.map((d) => _buildNumpadButton(d)).toList(),
+                  ),
+                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  const SizedBox(width: 64, height: 64),
+                  _buildNumpadButton('0'),
+                  InkWell(
+                    onTap: _lockoutSeconds > 0 ? null : _onBackspace,
+                    borderRadius: BorderRadius.circular(32),
+                    child: Container(
+                      width: 64,
+                      height: 64,
+                      alignment: Alignment.center,
+                      child: Icon(
+                        Icons.backspace_outlined,
+                        size: 22,
+                        color: _lockoutSeconds > 0
+                            ? theme.disabledColor
+                            : theme.colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+
+              TextButton.icon(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  VaultPinRecoverySheet.show(context);
+                },
+                icon: const Icon(Icons.help_outline_rounded, size: 16),
+                label: Text(
+                  l10n.forgotPin,
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -11,6 +11,18 @@ class FakeVaultController extends StateNotifier<VaultState> implements VaultCont
   FakeVaultController([VaultState? state]) : super(state ?? const VaultState(isLoading: false, documents: []));
 
   @override
+  bool isPinLockedOut() => false;
+
+  @override
+  int getPinLockoutRemainingSeconds() => 0;
+
+  @override
+  int getRemainingPinAttempts() => 5;
+
+  @override
+  Future<void> resetFailedPinAttempts() async {}
+
+  @override
   void resetState() {}
 
   @override
@@ -39,7 +51,7 @@ class FakeVaultController extends StateNotifier<VaultState> implements VaultCont
   Future<Document?> addDocument(Document doc) async => doc;
 
   @override
-  Future<String?> encodeFileForCloud(String filePath) async => null;
+  Future<String?> encodeFileForCloud(String filePath, {String? userId}) async => null;
 
   @override
   Future<Document?> updateDocument(Document updated) async => updated;
@@ -156,7 +168,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify title and empty state text are present
-      expect(find.text('Belge Kasası'), findsWidgets);
+      expect(find.text('Güvenli Kasa'), findsWidgets);
       expect(find.text('Henüz kaydedilmiş belge yok'), findsOneWidget);
       expect(find.text('Belge Ekle'), findsWidgets);
       expect(find.text('Pasaport Slotu'), findsOneWidget);

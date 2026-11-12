@@ -68,8 +68,75 @@ class CurrencyFormatter {
     'QAR': 'Qatari Riyal (QAR)',
   };
 
-  /// List of all supported ISO currency codes
-  static List<String> get supportedCurrencies => currencySymbols.keys.toList();
+  static final Map<String, String> currencyFlags = {
+    'AED': '🇦🇪',
+    'AUD': '🇦🇺',
+    'BRL': '🇧🇷',
+    'CAD': '🇨🇦',
+    'CHF': '🇨🇭',
+    'CNY': '🇨🇳',
+    'CZK': '🇨🇿',
+    'DKK': '🇩🇰',
+    'EGP': '🇪🇬',
+    'EUR': '🇪🇺',
+    'GBP': '🇬🇧',
+    'HUF': '🇭🇺',
+    'IDR': '🇮🇩',
+    'ILS': '🇮🇱',
+    'INR': '🇮🇳',
+    'JPY': '🇯🇵',
+    'KRW': '🇰🇷',
+    'MXN': '🇲🇽',
+    'NOK': '🇳🇴',
+    'NZD': '🇳🇿',
+    'PLN': '🇵🇱',
+    'QAR': '🇶🇦',
+    'SAR': '🇸🇦',
+    'SEK': '🇸🇪',
+    'SGD': '🇸🇬',
+    'THB': '🇹🇭',
+    'TRY': '🇹🇷',
+    'USD': '🇺🇸',
+    'VND': '🇻🇳',
+    'ZAR': '🇿🇦',
+  };
+
+  static final Map<String, String> cleanCurrencyNames = {
+    'AED': 'UAE Dirham',
+    'AUD': 'Australian Dollar',
+    'BRL': 'Brazilian Real',
+    'CAD': 'Canadian Dollar',
+    'CHF': 'Swiss Franc',
+    'CNY': 'Chinese Yuan',
+    'CZK': 'Czech Koruna',
+    'DKK': 'Danish Krone',
+    'EGP': 'Egyptian Pound',
+    'EUR': 'Euro',
+    'GBP': 'British Pound',
+    'HUF': 'Hungarian Forint',
+    'IDR': 'Indonesian Rupiah',
+    'ILS': 'Israeli Shekel',
+    'INR': 'Indian Rupee',
+    'JPY': 'Japanese Yen',
+    'KRW': 'South Korean Won',
+    'MXN': 'Mexican Peso',
+    'NOK': 'Norwegian Krone',
+    'NZD': 'New Zealand Dollar',
+    'PLN': 'Polish Zloty',
+    'QAR': 'Qatari Riyal',
+    'SAR': 'Saudi Riyal',
+    'SEK': 'Swedish Krona',
+    'SGD': 'Singapore Dollar',
+    'THB': 'Thai Baht',
+    'TRY': 'Turkish Lira',
+    'USD': 'US Dollar',
+    'VND': 'Vietnamese Dong',
+    'ZAR': 'South African Rand',
+  };
+
+  /// List of all supported ISO currency codes sorted alphabetically (A-Z)
+  static List<String> get supportedCurrencies =>
+      (List<String>.from(currencySymbols.keys)..sort());
 
   /// Formats an amount with the corresponding currency symbol and locale formatting
   static String format(double amount, {String currency = 'USD', String locale = 'en'}) {
@@ -95,10 +162,22 @@ class CurrencyFormatter {
     return currencyNames[code] ?? code;
   }
 
+  /// Returns flag emoji for given ISO currency code
+  static String getFlag(String code) {
+    return currencyFlags[code.toUpperCase().trim()] ?? '🌐';
+  }
+
+  /// Returns clean human-readable currency name without code suffix
+  static String getCleanName(String code) {
+    return cleanCurrencyNames[code.toUpperCase().trim()] ??
+        (currencyNames[code.toUpperCase().trim()] ?? code);
+  }
+
   /// Returns descriptive label with symbol and name
   static String getCurrencyLabel(String code) {
+    final flag = getFlag(code);
     final symbol = getSymbol(code);
-    final name = currencyNames[code] ?? code;
-    return '$symbol  $name';
+    final name = cleanCurrencyNames[code.toUpperCase().trim()] ?? (currencyNames[code] ?? code);
+    return '$flag $code ($symbol) · $name';
   }
 }

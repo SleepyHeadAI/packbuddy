@@ -55,6 +55,7 @@ class DatabaseHelper {
 
   /// Verifies critical table columns exist and dynamically creates them if missing
   static Future<void> _ensureSchemaIntegrity(Database db) async {
+    // 1. Checklist Items table integrity
     try {
       final info = await db.rawQuery('PRAGMA table_info(${AppConstants.tableChecklistItems})');
       final cols = info.map((row) => (row['name'] as String?)?.toLowerCase()).toSet();
@@ -66,6 +67,72 @@ class DatabaseHelper {
       }
       if (!cols.contains('user_id')) {
         await db.execute("ALTER TABLE ${AppConstants.tableChecklistItems} ADD COLUMN user_id TEXT NOT NULL DEFAULT ''");
+      }
+    } catch (_) {}
+
+    // 2. Documents table integrity (crucial for is_private column and cloud sync resilience)
+    try {
+      final docInfo = await db.rawQuery('PRAGMA table_info(${AppConstants.tableDocuments})');
+      final docCols = docInfo.map((row) => (row['name'] as String?)?.toLowerCase()).toSet();
+      if (!docCols.contains('is_private')) {
+        await db.execute('ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN is_private INTEGER NOT NULL DEFAULT 0');
+      }
+      if (!docCols.contains('cloud_data_base64')) {
+        await db.execute('ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN cloud_data_base64 TEXT');
+      }
+      if (!docCols.contains('file_extension')) {
+        await db.execute('ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN file_extension TEXT');
+      }
+      if (!docCols.contains('file_size_bytes')) {
+        await db.execute('ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN file_size_bytes INTEGER NOT NULL DEFAULT 0');
+      }
+      if (!docCols.contains('sub_category')) {
+        await db.execute('ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN sub_category TEXT');
+      }
+      if (!docCols.contains('trip_id')) {
+        await db.execute('ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN trip_id TEXT');
+      }
+      if (!docCols.contains('file_type')) {
+        await db.execute('ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN file_type TEXT');
+      }
+      if (!docCols.contains('notes')) {
+        await db.execute('ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN notes TEXT');
+      }
+      if (!docCols.contains('user_id')) {
+        await db.execute("ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN user_id TEXT NOT NULL DEFAULT ''");
+      }
+    } catch (_) {}
+
+    // 3. Trips table integrity
+    try {
+      final tripInfo = await db.rawQuery('PRAGMA table_info(${AppConstants.tableTrips})');
+      final tripCols = tripInfo.map((row) => (row['name'] as String?)?.toLowerCase()).toSet();
+      if (!tripCols.contains('country_code')) {
+        await db.execute('ALTER TABLE ${AppConstants.tableTrips} ADD COLUMN country_code TEXT');
+      }
+      if (!tripCols.contains('transport_mode')) {
+        await db.execute('ALTER TABLE ${AppConstants.tableTrips} ADD COLUMN transport_mode TEXT');
+      }
+      if (!tripCols.contains('notes')) {
+        await db.execute('ALTER TABLE ${AppConstants.tableTrips} ADD COLUMN notes TEXT');
+      }
+      if (!tripCols.contains('user_id')) {
+        await db.execute("ALTER TABLE ${AppConstants.tableTrips} ADD COLUMN user_id TEXT NOT NULL DEFAULT ''");
+      }
+    } catch (_) {}
+
+    // 4. Expenses table integrity
+    try {
+      final expInfo = await db.rawQuery('PRAGMA table_info(${AppConstants.tableExpenses})');
+      final expCols = expInfo.map((row) => (row['name'] as String?)?.toLowerCase()).toSet();
+      if (!expCols.contains('payment_method')) {
+        await db.execute('ALTER TABLE ${AppConstants.tableExpenses} ADD COLUMN payment_method TEXT');
+      }
+      if (!expCols.contains('notes')) {
+        await db.execute('ALTER TABLE ${AppConstants.tableExpenses} ADD COLUMN notes TEXT');
+      }
+      if (!expCols.contains('user_id')) {
+        await db.execute("ALTER TABLE ${AppConstants.tableExpenses} ADD COLUMN user_id TEXT NOT NULL DEFAULT ''");
       }
     } catch (_) {}
   }
@@ -126,6 +193,7 @@ class DatabaseHelper {
         file_size_bytes INTEGER NOT NULL DEFAULT 0,
         cloud_data_base64 TEXT,
         file_extension TEXT,
+        is_private INTEGER NOT NULL DEFAULT 0,
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
         is_deleted INTEGER NOT NULL DEFAULT 0
@@ -292,6 +360,13 @@ class DatabaseHelper {
             PRIMARY KEY (user_id, code)
           )
         ''');
+      } catch (_) {}
+    }
+
+    // Version 12: Add is_private column to documents table for vault privacy isolation
+    if (oldVersion < 12) {
+      try {
+        await db.execute('ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN is_private INTEGER NOT NULL DEFAULT 0');
       } catch (_) {}
     }
   }

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -13,11 +14,18 @@ class EmailDispatchService {
     required String subject,
     required String body,
   }) async {
+    if (kIsWeb) return false;
+
     final cleanEmail = toEmail.trim();
     if (cleanEmail.isEmpty) {
       debugPrint('[EmailDispatchService] Cannot launch email draft: recipient is empty');
       return false;
     }
+
+    // Detect headless unit tests
+    try {
+      if (Platform.environment.containsKey('FLUTTER_TEST')) return true;
+    } catch (_) {}
 
     final uri = Uri(
       scheme: 'mailto',

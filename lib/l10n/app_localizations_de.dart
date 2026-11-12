@@ -27,7 +27,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Reiseausgaben in mehreren Währungen erfassen';
 
   @override
-  String get vault => 'Dokumentensafe';
+  String get vault => 'Sicherer Tresor';
 
   @override
   String get vaultDescription => 'Reisepässe, Tickets und Buchungen';
@@ -210,7 +210,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get proFeature1 => 'Unbegrenzte Reisen und Ausgaben';
 
   @override
-  String get proFeature2 => 'Unbegrenzter Dokumentensafe';
+  String get proFeature2 => 'Unbegrenzter sicherer Tresorspeicher';
 
   @override
   String get proFeature3 => 'Automatische Cloud-Synchronisation';
@@ -2141,4 +2141,115 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get countryLabel => 'Land';
+
+  @override
+  String get privatePhotos => 'Private Fotos';
+
+  @override
+  String get privatePhotosSubtitle => 'Geschützt durch PIN & Biometrie';
+
+  @override
+  String get privatePhotosReason =>
+      'Bestätigen Sie Ihren Fingerabdruck oder Face ID, um private Fotos anzuzeigen';
+
+  @override
+  String get addPrivatePhoto => 'Privates Foto hinzufügen';
+
+  @override
+  String get noPrivatePhotosYet => 'Noch keine privaten Fotos';
+
+  @override
+  String get noPrivatePhotosDesc =>
+      'Hier hinzugefügte Fotos werden im Haupttresor ausgeblendet und zusätzlich verschlüsselt.';
+
+  @override
+  String get lockAndExit => 'Sperren & Beenden';
+
+  @override
+  String get setPinFirstForPrivatePhotos =>
+      'Bitte legen Sie zuerst eine PIN fest, um Ihre privaten Fotos zu schützen';
+
+  @override
+  String get secureVaultBannerTitle => 'Sicherer Tresor ungeschützt';
+
+  @override
+  String get secureVaultBannerDesc =>
+      'Legen Sie eine 4-stellige PIN fest, um Ihren Tresor und Ihre Fotos zu schützen.';
+
+  @override
+  String get privateVault => 'Privater Tresor';
+
+  @override
+  String get lockedBadge => 'GESPERRT';
+
+  @override
+  String get unlockedBadge => 'ENTSPERRT';
+
+  @override
+  String get forgotPin => 'PIN vergessen?';
+
+  @override
+  String get resetVaultPinTitle => 'Tresor-PIN zurücksetzen';
+
+  @override
+  String get resetVaultPinEmailDesc =>
+      'Ein 6-stelliger Bestätigungscode wird an Ihre E-Mail-Adresse gesendet:';
+
+  @override
+  String get sendVerificationCode => 'Bestätigungscode senden';
+
+  @override
+  String get enterVerificationCode => 'Bestätigungscode eingeben';
+
+  @override
+  String get enterVerificationCodeDesc =>
+      'Bitte geben Sie den 6-stelligen Code ein, der an Ihre E-Mail gesendet wurde:';
+
+  @override
+  String get verificationCode => 'Bestätigungscode';
+
+  @override
+  String get verifyAndContinue => 'Bestätigen & Weiter';
+
+  @override
+  String get invalidVerificationCode =>
+      'Ungültiger Bestätigungscode. Bitte versuchen Sie es erneut.';
+
+  @override
+  String get resendCode => 'Code erneut senden';
+
+  @override
+  String get codeResent => 'Neuer Bestätigungscode wurde gesendet.';
+
+  @override
+  String get setNewVaultPin => 'Neue Tresor-PIN festlegen';
+
+  @override
+  String get newPin => 'Neue 4-stellige PIN';
+
+  @override
+  String get confirmNewPin => 'Neue PIN bestätigen';
+
+  @override
+  String get pinsDoNotMatch => 'Die PIN-Codes stimmen nicht überein.';
+
+  @override
+  String get saveNewPinAndUnlock => 'PIN speichern & Entsperren';
+
+  @override
+  String get vaultPinResetSuccess =>
+      'Tresor-PIN erfolgreich zurückgesetzt und Tresor entsperrt.';
+
+  @override
+  String get vaultPinRequiredTitle => 'Tresor-PIN erforderlich';
+
+  @override
+  String get vaultPinRequiredDesc =>
+      'Eine 4-stellige PIN ist erforderlich, um Ihre Dokumente und privaten Fotos zu schützen.';
+
+  @override
+  String get enterYourEmail => 'E-Mail-Adresse eingeben';
+
+  @override
+  String get invalidEmail => 'Bitte geben Sie eine gültige E-Mail-Adresse ein.';
 }

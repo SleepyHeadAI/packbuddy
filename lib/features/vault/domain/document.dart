@@ -40,6 +40,31 @@ class Document {
       (fileExtension?.toLowerCase() == 'pdf') ||
       localImagePath.toLowerCase().endsWith('.pdf');
 
+  /// Helper boolean to check if document belongs to Private Safe / Private Photos
+  bool get isPrivate {
+    final cat = category.toLowerCase().trim();
+    final t = title.toLowerCase().trim();
+    final sub = (subCategory ?? '').toLowerCase().trim();
+
+    if (cat == 'privatephotos' || cat == 'private photos' || cat == 'private' || cat == 'özel') {
+      return true;
+    }
+
+    const privateKeywords = [
+      'private', 'özel', 'ozel', 'الصور الخاصة', 'private fotos', 'προσωπικ',
+      'fotos privadas', 'foto privada', 'photos privées', 'photo privée',
+      'निजी', 'foto pribadi', 'foto private', 'プライベート', '비공개',
+      'privéfoto', 'prywatne', 'личные', 'privata foton', 'ส่วนตัว', 'riêng tư', '隐私'
+    ];
+
+    for (final kw in privateKeywords) {
+      if (cat.contains(kw) || sub.contains(kw) || t.contains(kw)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /// Helper alias for fileSizeBytes
   int get fileSize => fileSizeBytes;
 
@@ -116,6 +141,8 @@ class Document {
       'updated_at': updatedAt.millisecondsSinceEpoch,
       'isDeleted': isDeleted,
       'is_deleted': isDeleted ? 1 : 0,
+      'isPrivate': isPrivate,
+      'is_private': isPrivate ? 1 : 0,
     };
   }
 
@@ -130,16 +157,24 @@ class Document {
       return DateTime.now();
     }
 
-    final localPath = (json['localImagePath'] ?? '') as String;
+    final localPath = (json['localImagePath'] ?? json['local_image_path'] ?? json['filePath'] ?? json['file_path'] ?? '') as String;
     final ext = (json['fileExtension'] ?? json['file_extension']) as String?;
     final fType = (json['fileType'] as String?) ??
         (ext == 'pdf' || localPath.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image');
+
+    var cat = json['category'] as String? ?? 'Other';
+    final isExplicitlyPrivate = json['isPrivate'] == true ||
+        json['is_private'] == true ||
+        json['is_private'] == 1;
+    if (isExplicitlyPrivate && !cat.toLowerCase().contains('private') && !cat.toLowerCase().contains('özel')) {
+      cat = 'PrivatePhotos';
+    }
 
     return Document(
       id: (json['id'] ?? '') as String,
       userId: (json['user_id'] ?? json['userId'] ?? '') as String,
       title: (json['title'] ?? '') as String,
-      category: json['category'] as String? ?? 'Other',
+      category: cat,
       subCategory: (json['subCategory'] ?? json['sub_category']) as String?,
       localImagePath: localPath,
       tripId: json['tripId'] as String?,
@@ -176,6 +211,7 @@ class Document {
       'created_at': createdAt.millisecondsSinceEpoch,
       'updated_at': updatedAt.millisecondsSinceEpoch,
       'is_deleted': isDeleted ? 1 : 0,
+      'is_private': isPrivate ? 1 : 0,
     };
   }
 
@@ -195,11 +231,17 @@ class Document {
     final fType = (map['file_type'] ?? map['fileType'] as String?) ??
         (ext == 'pdf' || localPath.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image');
 
+    var cat = map['category'] as String? ?? 'Other';
+    final isExplicitlyPrivate = map['is_private'] == 1 || map['isPrivate'] == true;
+    if (isExplicitlyPrivate && !cat.toLowerCase().contains('private') && !cat.toLowerCase().contains('özel')) {
+      cat = 'PrivatePhotos';
+    }
+
     return Document(
       id: map['id'] as String,
       userId: (map['user_id'] ?? map['userId'] ?? '') as String,
       title: map['title'] as String,
-      category: map['category'] as String? ?? 'Other',
+      category: cat,
       subCategory: (map['sub_category'] ?? map['subCategory']) as String?,
       localImagePath: localPath,
       tripId: (map['trip_id'] ?? map['tripId']) as String?,

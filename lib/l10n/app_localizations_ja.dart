@@ -25,7 +25,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get budgetDescription => '複数通貨対応の旅行支出トラッカー';
 
   @override
-  String get vault => '書類保管庫';
+  String get vault => '安全な保管庫';
 
   @override
   String get vaultDescription => 'パスポート、チケット、予約確認書';
@@ -205,7 +205,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get proFeature1 => '旅行と支出記録が無制限';
 
   @override
-  String get proFeature2 => '書類保管庫の無制限ストレージ';
+  String get proFeature2 => '安全な保管庫の無制限ストレージ';
 
   @override
   String get proFeature3 => '自動クラウド双方向同期';
@@ -2053,4 +2053,106 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get countryLabel => '国';
+
+  @override
+  String get privatePhotos => 'プライベート写真';
+
+  @override
+  String get privatePhotosSubtitle => 'PINと生体認証で保護されています';
+
+  @override
+  String get privatePhotosReason => 'プライベート写真を表示するには指紋またはFace IDを認証してください';
+
+  @override
+  String get addPrivatePhoto => 'プライベート写真を追加';
+
+  @override
+  String get noPrivatePhotosYet => 'プライベート写真はまだありません';
+
+  @override
+  String get noPrivatePhotosDesc => 'ここに追加された写真はメイン保管庫には表示されず、さらに暗号化されます。';
+
+  @override
+  String get lockAndExit => 'ロックして終了';
+
+  @override
+  String get setPinFirstForPrivatePhotos => 'プライベート写真を保護するために最初にPINを設定してください';
+
+  @override
+  String get secureVaultBannerTitle => '保管庫が保護されていません';
+
+  @override
+  String get secureVaultBannerDesc => '保管庫と写真を保護するために4桁のPINを設定してください。';
+
+  @override
+  String get privateVault => 'プライベート金庫';
+
+  @override
+  String get lockedBadge => 'ロック中';
+
+  @override
+  String get unlockedBadge => 'ロック解除';
+
+  @override
+  String get forgotPin => 'PINをお忘れですか？';
+
+  @override
+  String get resetVaultPinTitle => '金庫PINのリセット';
+
+  @override
+  String get resetVaultPinEmailDesc => 'ご登録のメールアドレスに6桁の認証コードが送信されます：';
+
+  @override
+  String get sendVerificationCode => '認証コードを送信';
+
+  @override
+  String get enterVerificationCode => '認証コードを入力';
+
+  @override
+  String get enterVerificationCodeDesc => 'メールに送信された6桁の認証コードを入力してください：';
+
+  @override
+  String get verificationCode => '認証コード';
+
+  @override
+  String get verifyAndContinue => '確認して続行';
+
+  @override
+  String get invalidVerificationCode => '認証コードが無効です。もう一度お試しください。';
+
+  @override
+  String get resendCode => 'コードを再送信';
+
+  @override
+  String get codeResent => '認証コードが再送信されました。';
+
+  @override
+  String get setNewVaultPin => '新しい金庫PINを設定';
+
+  @override
+  String get newPin => '新しい4桁のPIN';
+
+  @override
+  String get confirmNewPin => '新しいPINを確認';
+
+  @override
+  String get pinsDoNotMatch => '入力されたPINが一致しません。';
+
+  @override
+  String get saveNewPinAndUnlock => 'PINを保存してロック解除';
+
+  @override
+  String get vaultPinResetSuccess => '金庫PINが正常にリセットされ、金庫が開きました。';
+
+  @override
+  String get vaultPinRequiredTitle => '金庫PINの設定が必須です';
+
+  @override
+  String get vaultPinRequiredDesc => '旅行書類や個人写真を保護するために4桁のPINの作成が必要です。';
+
+  @override
+  String get enterYourEmail => 'メールアドレスを入力';
+
+  @override
+  String get invalidEmail => '有効なメールアドレスを入力してください。';
 }

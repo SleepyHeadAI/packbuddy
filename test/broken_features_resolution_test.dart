@@ -15,6 +15,38 @@ import 'package:packbuddy/l10n/app_localizations.dart';
 class FakeVaultController extends StateNotifier<VaultState> implements VaultController {
   FakeVaultController([VaultState? state]) : super(state ?? const VaultState(isLoading: false, documents: []));
 
+  int _failedAttempts = 0;
+
+  @override
+  void lockVault() {
+    state = state.copyWith(isLocked: true);
+  }
+
+  @override
+  bool unlockVault(String pin) {
+    if (pin == '1234') {
+      state = state.copyWith(isLocked: false);
+      _failedAttempts = 0;
+      return true;
+    }
+    _failedAttempts++;
+    return false;
+  }
+
+  @override
+  bool isPinLockedOut() => _failedAttempts >= 5;
+
+  @override
+  int getPinLockoutRemainingSeconds() => _failedAttempts >= 5 ? 600 : 0;
+
+  @override
+  int getRemainingPinAttempts() => (5 - _failedAttempts).clamp(0, 5);
+
+  @override
+  Future<void> resetFailedPinAttempts() async {
+    _failedAttempts = 0;
+  }
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

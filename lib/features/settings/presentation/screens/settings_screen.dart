@@ -23,6 +23,9 @@ import 'package:packbuddy/core/l10n/language_selector_sheet.dart';
 import 'package:packbuddy/features/feedback/domain/feedback_localization.dart';
 import 'package:packbuddy/features/feedback/presentation/widgets/feedback_sheet.dart';
 import 'package:packbuddy/shared/widgets/app_logo.dart';
+import 'package:packbuddy/core/services/preferences_service.dart';
+import 'package:packbuddy/core/services/legal_consent_localization.dart';
+import 'package:packbuddy/features/auth/presentation/screens/legal_consent_screen.dart';
 
 /// Complete Settings screen handling Language, Theme, Sync, and PackBuddy Pro
 class SettingsScreen extends ConsumerWidget {
@@ -50,7 +53,8 @@ class SettingsScreen extends ConsumerWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          titleSpacing: 8,
+          automaticallyImplyLeading: false,
+          titleSpacing: 16,
           title: FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
@@ -86,15 +90,6 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ],
             ),
-          ),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_rounded),
-            tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-            onPressed: () {
-              if (Navigator.of(context).canPop()) {
-                Navigator.of(context).pop();
-              }
-            },
           ),
         ),
       body: ListView(
@@ -594,7 +589,59 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 28),
 
-          // 8. Clean App Version Footer with Logo
+          // 8. Legal, User Agreement & Privacy Policy Section
+          _SectionHeader(title: LegalConsentLocalization.getTitle(currentLocale.languageCode)),
+          const SizedBox(height: 8),
+          AppCard(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Material(
+              color: Colors.transparent,
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: (isDark ? AppColors.primaryDark : AppColors.primaryLight).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.gavel_rounded,
+                    color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+                  ),
+                ),
+                title: Text(
+                  LegalConsentLocalization.getTitle(currentLocale.languageCode),
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  LegalConsentLocalization.getAcceptedStatus(
+                    currentLocale.languageCode,
+                    PreferencesService.instance.getLegalConsentVersion(),
+                    PreferencesService.instance.getLegalConsentDate(),
+                  ),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const LegalConsentScreen(
+                        isMandatoryGate: false,
+                        isReviewMode: true,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // 9. Clean App Version Footer with Logo
           Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,

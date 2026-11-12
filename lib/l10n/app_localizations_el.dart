@@ -27,7 +27,7 @@ class AppLocalizationsEl extends AppLocalizations {
       'Παρακολούθηση ταξιδιωτικών εξόδων πολλαπλών νομισμάτων';
 
   @override
-  String get vault => 'Θησαυροφυλάκιο Εγγράφων';
+  String get vault => 'Ασφαλές Θησαυροφυλάκιο';
 
   @override
   String get vaultDescription => 'Διαβατήρια, εισιτήρια και κρατήσεις';
@@ -213,7 +213,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get proFeature1 => 'Απεριόριστα ταξίδια και καταγραφή εξόδων';
 
   @override
-  String get proFeature2 => 'Απεριόριστος χώρος εγγράφων';
+  String get proFeature2 => 'Απεριόριστος χώρος ασφαλούς θησαυροφυλακίου';
 
   @override
   String get proFeature3 => 'Αυτόματος αμφίδρομος συγχρονισμός';
@@ -2156,4 +2156,115 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get countryLabel => 'Χώρα';
+
+  @override
+  String get privatePhotos => 'Προσωπικές Φωτογραφίες';
+
+  @override
+  String get privatePhotosSubtitle => 'Προστατεύεται με PIN & Βιομετρικά';
+
+  @override
+  String get privatePhotosReason =>
+      'Επαληθεύστε το δακτυλικό αποτύπωμα ή το Face ID για προβολή προσωπικών φωτογραφιών';
+
+  @override
+  String get addPrivatePhoto => 'Προσθήκη Προσωπικής Φωτογραφίας';
+
+  @override
+  String get noPrivatePhotosYet => 'Δεν υπάρχουν ακόμη προσωπικές φωτογραφίες';
+
+  @override
+  String get noPrivatePhotosDesc =>
+      'Οι φωτογραφίες που προστίθενται εδώ αποκρύπτονται από το κύριο θησαυροφυλάκιο και κρυπτογραφούνται επιπλέον.';
+
+  @override
+  String get lockAndExit => 'Κλείδωμα & Έξοδος';
+
+  @override
+  String get setPinFirstForPrivatePhotos =>
+      'Ορίστε πρώτα ένα PIN για να προστατεύσετε τις προσωπικές σας φωτογραφίες';
+
+  @override
+  String get secureVaultBannerTitle => 'Ασφαλές Θησαυροφυλάκιο Χωρίς Προστασία';
+
+  @override
+  String get secureVaultBannerDesc =>
+      'Ορίστε ένα 4ψήφιο PIN για να προστατεύσετε το θησαυροφυλάκιο και τις φωτογραφίες σας.';
+
+  @override
+  String get privateVault => 'Ιδιωτικό Θησαυροφυλάκιο';
+
+  @override
+  String get lockedBadge => 'ΚΛΕΙΔΩΜΕΝΟ';
+
+  @override
+  String get unlockedBadge => 'ΞΕΚΛΕΙΔΩΜΕΝΟ';
+
+  @override
+  String get forgotPin => 'Ξεχάσατε το PIN;';
+
+  @override
+  String get resetVaultPinTitle => 'Επαναφορά PIN θησαυροφυλακίου';
+
+  @override
+  String get resetVaultPinEmailDesc =>
+      'Ένας 6ψήφιος κωδικός επαλήθευσης θα σταλεί στο email σας:';
+
+  @override
+  String get sendVerificationCode => 'Αποστολή κωδικού επαλήθευσης';
+
+  @override
+  String get enterVerificationCode => 'Εισαγάγετε τον κωδικό επαλήθευσης';
+
+  @override
+  String get enterVerificationCodeDesc =>
+      'Εισαγάγετε τον 6ψήφιο κωδικό που στάλθηκε στο email σας:';
+
+  @override
+  String get verificationCode => 'Κωδικός επαλήθευσης';
+
+  @override
+  String get verifyAndContinue => 'Επαλήθευση & Συνέχεια';
+
+  @override
+  String get invalidVerificationCode =>
+      'Μη έγκυρος κωδικός επαλήθευσης. Δοκιμάστε ξανά.';
+
+  @override
+  String get resendCode => 'Επανεκπομπή κωδικού';
+
+  @override
+  String get codeResent => 'Ο κωδικός επαλήθευσης στάλθηκε ξανά.';
+
+  @override
+  String get setNewVaultPin => 'Ορισμός νέου PIN θησαυροφυλακίου';
+
+  @override
+  String get newPin => 'Νέο 4ψήφιο PIN';
+
+  @override
+  String get confirmNewPin => 'Επιβεβαίωση νέου PIN';
+
+  @override
+  String get pinsDoNotMatch => 'Οι κωδικοί PIN δεν ταιριάζουν.';
+
+  @override
+  String get saveNewPinAndUnlock => 'Αποθήκευση PIN & Ξεκλείδωμα';
+
+  @override
+  String get vaultPinResetSuccess =>
+      'Το PIN επαναφέρθηκε επιτυχώς και το θησαυροφυλάκιο ξεκλείδωσε.';
+
+  @override
+  String get vaultPinRequiredTitle => 'Απαιτείται PIN θησαυροφυλακίου';
+
+  @override
+  String get vaultPinRequiredDesc =>
+      'Απαιτείται η δημιουργία 4ψήφιου PIN για την προστασία των εγγράφων και των ιδιωτικών φωτογραφιών σας.';
+
+  @override
+  String get enterYourEmail => 'Εισαγάγετε το email σας';
+
+  @override
+  String get invalidEmail => 'Εισαγάγετε μια έγκυρη διεύθυνση email.';
 }

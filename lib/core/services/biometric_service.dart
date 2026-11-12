@@ -9,6 +9,10 @@ class BiometricService {
   static final BiometricService instance = BiometricService._();
 
   final LocalAuthentication _localAuth = LocalAuthentication();
+  bool _isAuthenticating = false;
+
+  /// Whether a biometric prompt is actively presented on screen
+  bool get isAuthenticating => _isAuthenticating;
 
   /// Whether biometric authentication is supported and enrolled on this device.
   Future<bool> isBiometricsAvailable() async {
@@ -45,12 +49,21 @@ class BiometricService {
       if (Platform.environment.containsKey('FLUTTER_TEST')) return false;
     } catch (_) {}
 
+    if (_isAuthenticating) {
+      debugPrint('[BiometricService] Authentication already in flight, avoiding collision');
+      return false;
+    }
+
+    _isAuthenticating = true;
     try {
       final available = await isBiometricsAvailable();
       if (!available) return false;
 
       return await _localAuth.authenticate(
         localizedReason: localizedReason,
+        biometricOnly: true,
+        persistAcrossBackgrounding: true,
+        sensitiveTransaction: false,
       );
     } on PlatformException catch (e) {
       debugPrint('[BiometricService] authenticate platform exception: $e');
@@ -58,6 +71,8 @@ class BiometricService {
     } catch (e) {
       debugPrint('[BiometricService] authenticate error: $e');
       return false;
+    } finally {
+      _isAuthenticating = false;
     }
   }
 }

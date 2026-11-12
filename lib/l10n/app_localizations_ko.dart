@@ -25,7 +25,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get budgetDescription => '다중 통화 여행 지출 추적';
 
   @override
-  String get vault => '문서 보관함';
+  String get vault => '안전 보관함';
 
   @override
   String get vaultDescription => '여권, 티켓 및 예약 바우처';
@@ -205,7 +205,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get proFeature1 => '무제한 여행 및 지출 관리';
 
   @override
-  String get proFeature2 => '무제한 문서 보관함 저장공간';
+  String get proFeature2 => '안전 보관함 무제한 저장공간';
 
   @override
   String get proFeature3 => '자동 클라우드 양방향 동기화';
@@ -2054,4 +2054,107 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get countryLabel => '국가';
+
+  @override
+  String get privatePhotos => '비공개 사진';
+
+  @override
+  String get privatePhotosSubtitle => 'PIN 및 생체 인식으로 보호됨';
+
+  @override
+  String get privatePhotosReason => '비공개 사진을 보려면 지문 또는 Face ID를 인증하세요';
+
+  @override
+  String get addPrivatePhoto => '비공개 사진 추가';
+
+  @override
+  String get noPrivatePhotosYet => '아직 비공개 사진이 없습니다';
+
+  @override
+  String get noPrivatePhotosDesc => '여기에 추가된 사진은 메인 보관함에서 숨겨지며 추가로 암호화됩니다.';
+
+  @override
+  String get lockAndExit => '잠그고 나가기';
+
+  @override
+  String get setPinFirstForPrivatePhotos => '비공개 사진을 보호하려면 먼저 PIN을 설정하세요';
+
+  @override
+  String get secureVaultBannerTitle => '보관함이 보호되지 않음';
+
+  @override
+  String get secureVaultBannerDesc => '보관함과 사진을 보호하려면 4자리 PIN을 설정하세요.';
+
+  @override
+  String get privateVault => '비공개 금고';
+
+  @override
+  String get lockedBadge => '잠김';
+
+  @override
+  String get unlockedBadge => '잠금해제';
+
+  @override
+  String get forgotPin => 'PIN을 잊으셨나요?';
+
+  @override
+  String get resetVaultPinTitle => '금고 PIN 재설정';
+
+  @override
+  String get resetVaultPinEmailDesc =>
+      '금고 PIN을 재설정하기 위해 이메일로 6자리 인증 코드가 전송됩니다:';
+
+  @override
+  String get sendVerificationCode => '인증 코드 전송';
+
+  @override
+  String get enterVerificationCode => '인증 코드 입력';
+
+  @override
+  String get enterVerificationCodeDesc => '이메일로 전송된 6자리 인증 코드를 입력하세요:';
+
+  @override
+  String get verificationCode => '인증 코드';
+
+  @override
+  String get verifyAndContinue => '인증하고 계속하기';
+
+  @override
+  String get invalidVerificationCode => '인증 코드가 올바르지 않습니다. 다시 시도해 주세요.';
+
+  @override
+  String get resendCode => '코드 재전송';
+
+  @override
+  String get codeResent => '인증 코드가 재전송되었습니다.';
+
+  @override
+  String get setNewVaultPin => '새 금고 PIN 설정';
+
+  @override
+  String get newPin => '새 4자리 PIN';
+
+  @override
+  String get confirmNewPin => '새 PIN 확인';
+
+  @override
+  String get pinsDoNotMatch => 'PIN 번호가 일치하지 않습니다.';
+
+  @override
+  String get saveNewPinAndUnlock => 'PIN 저장 및 잠금 해제';
+
+  @override
+  String get vaultPinResetSuccess => '금고 PIN이 성공적으로 재설정되고 금고가 열렸습니다.';
+
+  @override
+  String get vaultPinRequiredTitle => '금고 PIN 설정 필수';
+
+  @override
+  String get vaultPinRequiredDesc => '여행 서류 및 개인 사진을 보호하려면 4자리 PIN 생성이 필수입니다.';
+
+  @override
+  String get enterYourEmail => '이메일 주소 입력';
+
+  @override
+  String get invalidEmail => '유효한 이메일 주소를 입력해 주세요.';
 }

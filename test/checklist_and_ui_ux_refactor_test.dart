@@ -427,8 +427,8 @@ void main() {
 
       await tester.pump();
 
-      // Verify aligned top bar elements
-      expect(find.byIcon(Icons.settings_outlined), findsOneWidget);
+      // Verify top bar elements: settings icon removed, notifications bell present
+      expect(find.byIcon(Icons.settings_outlined), findsNothing);
       expect(find.byIcon(Icons.notifications_none_rounded), findsOneWidget);
 
       // Verify luggage bento card renders

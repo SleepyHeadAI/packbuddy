@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/l10n/locale_provider.dart';
+import '../../core/services/legal_consent_localization.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/bouncy_pressable.dart';
 import '../../shared/widgets/app_logo.dart';
 import 'auth_controller.dart';
+import 'legal_consent_provider.dart';
+import 'presentation/screens/legal_consent_screen.dart';
 
 /// Authentication Screen Mode (Sign In vs Sign Up)
 enum AuthMode {
@@ -30,6 +34,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   AuthMode _mode = AuthMode.signIn;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _acceptedTermsCheckbox = false;
+  bool _showConsentValidationError = false;
 
   @override
   void initState() {
@@ -56,15 +62,39 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     if (_mode == mode) return;
     setState(() {
       _mode = mode;
+      _showConsentValidationError = false;
       _formKey.currentState?.reset();
     });
     ref.read(authControllerProvider.notifier).clearError();
+  }
+
+  Future<void> _openLegalConsentScreen() async {
+    final accepted = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => const LegalConsentScreen(
+          isMandatoryGate: false,
+        ),
+      ),
+    );
+    if (accepted == true && mounted) {
+      setState(() {
+        _acceptedTermsCheckbox = true;
+        _showConsentValidationError = false;
+      });
+    }
   }
 
   Future<void> _handleSubmit() async {
     ref.read(authControllerProvider.notifier).clearError();
 
     if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (_mode == AuthMode.signUp && !_acceptedTermsCheckbox) {
+      setState(() {
+        _showConsentValidationError = true;
+      });
       return;
     }
 
@@ -75,7 +105,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     if (_mode == AuthMode.signIn) {
       await controller.signInWithEmail(email: email, password: password);
     } else {
-      await controller.signUpWithEmail(email: email, password: password);
+      final success = await controller.signUpWithEmail(email: email, password: password);
+      if (success) {
+        await ref.read(legalConsentProvider.notifier).acceptConsent();
+      }
     }
   }
 
@@ -211,6 +244,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final isDark = theme.brightness == Brightness.dark;
     final authState = ref.watch(authControllerProvider);
     final l10n = AppLocalizations.of(context)!;
+    final locale = ref.watch(localeProvider);
+    final lang = locale.languageCode;
 
     const titleText = 'PackBuddy';
     final subtitleText = _mode == AuthMode.signIn
@@ -249,7 +284,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
                     // 4. Input Fields Card Container
                     _buildFormCard(context, isDark, l10n),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
+
+                    // 4.5 Mandatory Sign Up Consent Checkbox & Review Trigger
+                    if (_mode == AuthMode.signUp) ...[
+                      _buildSignUpConsentSection(isDark, lang),
+                      const SizedBox(height: 16),
+                    ],
 
                     // 5. Primary Submit Button
                     _buildSubmitButton(authState.isLoading, isDark, l10n),
@@ -264,7 +305,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     const SizedBox(height: 28),
 
                     // 8. Terms & Privacy Notice
-                    _buildFooterTerms(isDark, l10n),
+                    _buildFooterTerms(isDark, l10n, lang),
                     const SizedBox(height: 12),
                   ],
                 ),
@@ -1121,8 +1162,146 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     );
   }
 
+  /// Sign-Up Mandatory Consent Agreement Checkbox and Review Section
+  Widget _buildSignUpConsentSection(bool isDark, String lang) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: _showConsentValidationError
+              ? const Color(0xFFE11D48)
+              : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
+          width: _showConsentValidationError ? 1.5 : 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 22,
+                height: 22,
+                child: Checkbox(
+                  value: _acceptedTermsCheckbox,
+                  onChanged: (val) {
+                    setState(() {
+                      _acceptedTermsCheckbox = val ?? false;
+                      if (_acceptedTermsCheckbox) {
+                        _showConsentValidationError = false;
+                      }
+                    });
+                  },
+                  activeColor:
+                      isDark ? AppColors.primaryDark : AppColors.primaryLight,
+                  checkColor: isDark ? AppColors.onPrimaryDark : Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5)),
+                  side: BorderSide(
+                    color: _showConsentValidationError
+                        ? const Color(0xFFE11D48)
+                        : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
+                    width: 1.5,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _acceptedTermsCheckbox = !_acceptedTermsCheckbox;
+                      if (_acceptedTermsCheckbox) {
+                        _showConsentValidationError = false;
+                      }
+                    });
+                  },
+                  child: Text(
+                    LegalConsentLocalization.getMandatoryTermsCheckbox(lang),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      height: 1.35,
+                      color: isDark
+                          ? AppColors.onSurfaceDark
+                          : const Color(0xFF1E293B),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Flexible(
+                child: GestureDetector(
+                  onTap: _openLegalConsentScreen,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: (isDark
+                              ? AppColors.primaryDark
+                              : AppColors.primaryLight)
+                          .withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.menu_book_rounded,
+                          size: 13,
+                          color: isDark
+                              ? AppColors.primaryDark
+                              : AppColors.primaryLight,
+                        ),
+                        const SizedBox(width: 5),
+                        Flexible(
+                          child: Text(
+                            LegalConsentLocalization.getReviewButtonLabel(lang),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: isDark
+                                  ? AppColors.primaryDark
+                                  : AppColors.primaryLight,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (_showConsentValidationError) ...[
+            const SizedBox(height: 6),
+            Text(
+              LegalConsentLocalization.getValidationMustAccept(lang),
+              style: const TextStyle(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFFE11D48),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   /// Terms and Privacy Policy Footer
-  Widget _buildFooterTerms(bool isDark, AppLocalizations l10n) {
+  Widget _buildFooterTerms(
+      bool isDark, AppLocalizations l10n, String lang) {
     return Column(
       children: [
         Text(
@@ -1137,6 +1316,23 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 6),
+        TextButton.icon(
+          onPressed: _openLegalConsentScreen,
+          icon: Icon(
+            Icons.gavel_rounded,
+            size: 14,
+            color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+          ),
+          label: Text(
+            LegalConsentLocalization.getTitle(lang),
+            style: TextStyle(
+              fontSize: 11.5,
+              fontWeight: FontWeight.w700,
+              color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
         Text(
           l10n.vaultCloudBackupNotice,
           style: TextStyle(

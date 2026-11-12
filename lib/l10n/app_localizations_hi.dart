@@ -25,7 +25,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get budgetDescription => 'बहु-मुद्रा यात्रा खर्च ट्रैकिंग';
 
   @override
-  String get vault => 'दस्तावेज़ वॉल्ट';
+  String get vault => 'सुरक्षित वॉल्ट';
 
   @override
   String get vaultDescription => 'पासपोर्ट, टिकट और बुकिंग वाउचर';
@@ -206,7 +206,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get proFeature1 => 'असीमित यात्रा और खर्च ट्रैकिंग';
 
   @override
-  String get proFeature2 => 'असीमित दस्तावेज़ भंडारण';
+  String get proFeature2 => 'असीमित सुरक्षित वॉल्ट भंडारण';
 
   @override
   String get proFeature3 => 'स्वचालित क्लाउड सिंक';
@@ -2118,4 +2118,115 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get countryLabel => 'देश';
+
+  @override
+  String get privatePhotos => 'निजी तस्वीरें';
+
+  @override
+  String get privatePhotosSubtitle => 'पिन और बायोमेट्रिक्स द्वारा सुरक्षित';
+
+  @override
+  String get privatePhotosReason =>
+      'निजी तस्वीरें देखने के लिए फिंगरप्रिंट या फेस आईडी सत्यापित करें';
+
+  @override
+  String get addPrivatePhoto => 'निजी तस्वीर जोड़ें';
+
+  @override
+  String get noPrivatePhotosYet => 'अभी तक कोई निजी तस्वीर नहीं';
+
+  @override
+  String get noPrivatePhotosDesc =>
+      'यहां जोड़ी गई तस्वीरें मुख्य वॉल्ट से छिपी रहती हैं और अतिरिक्त एन्क्रिप्टेड होती हैं।';
+
+  @override
+  String get lockAndExit => 'लॉक करें और बाहर निकलें';
+
+  @override
+  String get setPinFirstForPrivatePhotos =>
+      'कृपया अपनी निजी तस्वीरों की सुरक्षा के लिए पहले एक पिन सेट करें';
+
+  @override
+  String get secureVaultBannerTitle => 'सुरक्षित वॉल्ट असुरक्षित है';
+
+  @override
+  String get secureVaultBannerDesc =>
+      'अपने वॉल्ट और तस्वीरों की सुरक्षा के लिए 4 अंकों का पिन सेट करें।';
+
+  @override
+  String get privateVault => 'निजी तिजोरी';
+
+  @override
+  String get lockedBadge => 'लॉक';
+
+  @override
+  String get unlockedBadge => 'अनलॉक';
+
+  @override
+  String get forgotPin => 'पिन भूल गए?';
+
+  @override
+  String get resetVaultPinTitle => 'वॉल्ट पिन रीसेट करें';
+
+  @override
+  String get resetVaultPinEmailDesc =>
+      'आपके वॉल्ट पिन को रीसेट करने के लिए आपके ईमेल पर 6 अंकों का कोड भेजा जाएगा:';
+
+  @override
+  String get sendVerificationCode => 'सत्यापन कोड भेजें';
+
+  @override
+  String get enterVerificationCode => 'सत्यापन कोड दर्ज करें';
+
+  @override
+  String get enterVerificationCodeDesc =>
+      'कृपया अपने ईमेल पर भेजा गया 6 अंकों का कोड दर्ज करें:';
+
+  @override
+  String get verificationCode => 'सत्यापन कोड';
+
+  @override
+  String get verifyAndContinue => 'सत्यापित करें और जारी रखें';
+
+  @override
+  String get invalidVerificationCode =>
+      'अमान्य सत्यापन कोड। कृपया पुनः प्रयास करें।';
+
+  @override
+  String get resendCode => 'कोड पुनः भेजें';
+
+  @override
+  String get codeResent => 'सत्यापन कोड पुनः भेज दिया गया है।';
+
+  @override
+  String get setNewVaultPin => 'नया वॉल्ट पिन सेट करें';
+
+  @override
+  String get newPin => 'नया 4 अंकों का पिन';
+
+  @override
+  String get confirmNewPin => 'नए पिन की पुष्टि करें';
+
+  @override
+  String get pinsDoNotMatch => 'दर्ज किए गए पिन मेल नहीं खाते।';
+
+  @override
+  String get saveNewPinAndUnlock => 'पिन सहेजें और अनलॉक करें';
+
+  @override
+  String get vaultPinResetSuccess =>
+      'वॉल्ट पिन सफलतापूर्वक रीसेट हो गया और वॉल्ट खुल गया।';
+
+  @override
+  String get vaultPinRequiredTitle => 'वॉल्ट पिन अनिवार्य है';
+
+  @override
+  String get vaultPinRequiredDesc =>
+      'अपने यात्रा दस्तावेजों और निजी तस्वीरों की सुरक्षा के लिए 4 अंकों का पिन बनाना अनिवार्य है।';
+
+  @override
+  String get enterYourEmail => 'अपना ईमेल दर्ज करें';
+
+  @override
+  String get invalidEmail => 'कृपया एक मान्य ईमेल पता दर्ज करें।';
 }

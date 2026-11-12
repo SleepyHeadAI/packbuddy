@@ -26,7 +26,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get budgetDescription => 'Monitoraggio spese di viaggio multivaluta';
 
   @override
-  String get vault => 'Cassaforte Documenti';
+  String get vault => 'Cassaforte Sicura';
 
   @override
   String get vaultDescription => 'Passaporti, biglietti e prenotazioni';
@@ -211,7 +211,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get proFeature1 => 'Viaggi e monitoraggio spese illimitati';
 
   @override
-  String get proFeature2 => 'Archiviazione documenti illimitata';
+  String get proFeature2 => 'Archiviazione illimitata cassaforte sicura';
 
   @override
   String get proFeature3 => 'Sincronizzazione cloud automatica';
@@ -2141,4 +2141,115 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get countryLabel => 'Paese';
+
+  @override
+  String get privatePhotos => 'Foto Private';
+
+  @override
+  String get privatePhotosSubtitle => 'Protetto da PIN e biometria';
+
+  @override
+  String get privatePhotosReason =>
+      'Verifica la tua impronta digitale o Face ID per visualizzare le foto private';
+
+  @override
+  String get addPrivatePhoto => 'Aggiungi Foto Privata';
+
+  @override
+  String get noPrivatePhotosYet => 'Nessuna foto privata';
+
+  @override
+  String get noPrivatePhotosDesc =>
+      'Le foto aggiunte qui sono nascoste dalla cassaforte principale e protette con crittografia avanzata.';
+
+  @override
+  String get lockAndExit => 'Blocca ed Esci';
+
+  @override
+  String get setPinFirstForPrivatePhotos =>
+      'Imposta prima un PIN per proteggere le tue foto private';
+
+  @override
+  String get secureVaultBannerTitle => 'Cassaforte Sicura Non Protetta';
+
+  @override
+  String get secureVaultBannerDesc =>
+      'Imposta un PIN a 4 cifre per proteggere la tua cassaforte e le tue foto.';
+
+  @override
+  String get privateVault => 'Cassaforte Privata';
+
+  @override
+  String get lockedBadge => 'BLOCCATO';
+
+  @override
+  String get unlockedBadge => 'SBLOCCATO';
+
+  @override
+  String get forgotPin => 'PIN dimenticato?';
+
+  @override
+  String get resetVaultPinTitle => 'Reimposta il PIN della cassaforte';
+
+  @override
+  String get resetVaultPinEmailDesc =>
+      'Un codice di verifica a 6 cifre verrà inviato alla tua email:';
+
+  @override
+  String get sendVerificationCode => 'Invia codice di verifica';
+
+  @override
+  String get enterVerificationCode => 'Inserisci il codice di verifica';
+
+  @override
+  String get enterVerificationCodeDesc =>
+      'Inserisci il codice a 6 cifre inviato alla tua email:';
+
+  @override
+  String get verificationCode => 'Codice di verifica';
+
+  @override
+  String get verifyAndContinue => 'Verifica e continua';
+
+  @override
+  String get invalidVerificationCode =>
+      'Codice di verifica non valido. Riprova.';
+
+  @override
+  String get resendCode => 'Reinvia codice';
+
+  @override
+  String get codeResent => 'Il codice di verifica è stato reinviato.';
+
+  @override
+  String get setNewVaultPin => 'Imposta nuovo PIN della cassaforte';
+
+  @override
+  String get newPin => 'Nuovo PIN a 4 cifre';
+
+  @override
+  String get confirmNewPin => 'Conferma nuovo PIN';
+
+  @override
+  String get pinsDoNotMatch => 'I codici PIN non corrispondono.';
+
+  @override
+  String get saveNewPinAndUnlock => 'Salva PIN e sblocca';
+
+  @override
+  String get vaultPinResetSuccess =>
+      'PIN reimpostato con successo e cassaforte sbloccata.';
+
+  @override
+  String get vaultPinRequiredTitle => 'PIN della cassaforte obbligatorio';
+
+  @override
+  String get vaultPinRequiredDesc =>
+      'È necessario un PIN a 4 cifre per proteggere i documenti e le foto private.';
+
+  @override
+  String get enterYourEmail => 'Inserisci la tua email';
+
+  @override
+  String get invalidEmail => 'Inserisci un indirizzo email valido.';
 }

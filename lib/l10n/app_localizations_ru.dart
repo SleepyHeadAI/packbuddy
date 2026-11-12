@@ -26,7 +26,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get budgetDescription => 'Мультивалютный учет расходов в поездках';
 
   @override
-  String get vault => 'Сейф документов';
+  String get vault => 'Безопасный сейф';
 
   @override
   String get vaultDescription => 'Паспорта, билеты и бронирования';
@@ -210,7 +210,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get proFeature1 => 'Неограниченное число поездок и расходов';
 
   @override
-  String get proFeature2 => 'Неограниченное хранилище документов';
+  String get proFeature2 => 'Неограниченное хранилище безопасного сейфа';
 
   @override
   String get proFeature3 => 'Автоматическая двусторонняя синхронизация';
@@ -2134,4 +2134,116 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get countryLabel => 'Страна';
+
+  @override
+  String get privatePhotos => 'Личные фото';
+
+  @override
+  String get privatePhotosSubtitle => 'Защищено PIN-кодом и биометрией';
+
+  @override
+  String get privatePhotosReason =>
+      'Подтвердите отпечаток пальца или Face ID для просмотра личных фото';
+
+  @override
+  String get addPrivatePhoto => 'Добавить личное фото';
+
+  @override
+  String get noPrivatePhotosYet => 'Пока нет личных фото';
+
+  @override
+  String get noPrivatePhotosDesc =>
+      'Добавленные сюда фотографии скрыты из основного сейфа и надежно зашифрованы.';
+
+  @override
+  String get lockAndExit => 'Заблокировать и выйти';
+
+  @override
+  String get setPinFirstForPrivatePhotos =>
+      'Сначала установите PIN-код для защиты личных фото';
+
+  @override
+  String get secureVaultBannerTitle => 'Сейф не защищен';
+
+  @override
+  String get secureVaultBannerDesc =>
+      'Установите 4-значный PIN-код для защиты сейфа и фотографий.';
+
+  @override
+  String get privateVault => 'Личный Сейф';
+
+  @override
+  String get lockedBadge => 'ЗАКРЫТО';
+
+  @override
+  String get unlockedBadge => 'ОТКРЫТО';
+
+  @override
+  String get forgotPin => 'Забыли PIN-код?';
+
+  @override
+  String get resetVaultPinTitle => 'Сброс PIN-кода сейфа';
+
+  @override
+  String get resetVaultPinEmailDesc =>
+      'На вашу электронную почту будет отправлен 6-значный проверочный код:';
+
+  @override
+  String get sendVerificationCode => 'Отправить код проверки';
+
+  @override
+  String get enterVerificationCode => 'Введите проверочный код';
+
+  @override
+  String get enterVerificationCodeDesc =>
+      'Пожалуйста, введите 6-значный код, отправленный на вашу почту:';
+
+  @override
+  String get verificationCode => 'Код подтверждения';
+
+  @override
+  String get verifyAndContinue => 'Подтвердить и продолжить';
+
+  @override
+  String get invalidVerificationCode =>
+      'Неверный проверочный код. Пожалуйста, попробуйте еще раз.';
+
+  @override
+  String get resendCode => 'Отправить код повторно';
+
+  @override
+  String get codeResent => 'Проверочный код отправлен повторно.';
+
+  @override
+  String get setNewVaultPin => 'Установите новый PIN-код сейфа';
+
+  @override
+  String get newPin => 'Новый 4-значный PIN-код';
+
+  @override
+  String get confirmNewPin => 'Подтвердите новый PIN-код';
+
+  @override
+  String get pinsDoNotMatch => 'Введенные PIN-коды не совпадают.';
+
+  @override
+  String get saveNewPinAndUnlock => 'Сохранить PIN и открыть';
+
+  @override
+  String get vaultPinResetSuccess =>
+      'PIN-код успешно сброшен, сейф разблокирован.';
+
+  @override
+  String get vaultPinRequiredTitle => 'PIN-код сейфа обязателен';
+
+  @override
+  String get vaultPinRequiredDesc =>
+      'Для защиты ваших документов и личных фото требуется создать 4-значный PIN-код.';
+
+  @override
+  String get enterYourEmail => 'Введите адрес эл. почты';
+
+  @override
+  String get invalidEmail =>
+      'Пожалуйста, введите действительный адрес эл. почты.';
 }

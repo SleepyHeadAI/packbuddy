@@ -41,6 +41,10 @@ class PreferencesService {
   static const String keyBanStatus = 'packbuddy_ban_status';
   static const String keyBanExpiresAt = 'packbuddy_ban_expires_at';
   static const String keyBanReason = 'packbuddy_ban_reason';
+  static const String keyLegalConsentAccepted = 'packbuddy_legal_consent_accepted_v1';
+  static const String keyLegalConsentVersion = 'packbuddy_legal_consent_version';
+  static const String keyLegalConsentDate = 'packbuddy_legal_consent_date';
+  static const String keyLegalAnalyticsConsent = 'packbuddy_legal_analytics_consent';
 
   static PreferencesService? _instance;
   final SharedPreferences? _prefs;
@@ -380,16 +384,82 @@ class PreferencesService {
   }
 
   bool isVaultLocked({String? uid}) {
-    // If PIN is set, vault is locked by default on launch
-    final hasPin = getVaultPin(uid: uid) != null;
-    final key = _vaultLockedKey(uid);
-    return _prefs?.getBool(key) ?? _prefs?.getBool(keyVaultLocked) ?? hasPin;
+    // PIN is strictly mandatory for Document Vault access.
+    // The vault is always locked by default on launch / restart until unlocked in-session.
+    return true;
   }
 
   Future<void> setVaultLocked(bool locked, {String? uid}) async {
     final key = _vaultLockedKey(uid);
-    await _prefs?.setBool(key, locked);
-    await _prefs?.setBool(keyVaultLocked, locked);
+    if (locked) {
+      await _prefs?.setBool(key, true);
+      await _prefs?.setBool(keyVaultLocked, true);
+    } else {
+      await _prefs?.remove(key);
+      await _prefs?.remove(keyVaultLocked);
+    }
+  }
+
+  // --- Vault PIN Security: 5 Failed Attempts in 10 Minutes Lockout ---
+  static const String keyVaultFailedPinAttempts = 'packbuddy_vault_failed_pin_attempts';
+  static const int vaultMaxFailedPinAttempts = 5;
+  static const int vaultLockoutWindowMs = 10 * 60 * 1000; // 10 minutes in ms
+
+  String _vaultFailedAttemptsKey(String? uid) {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    if (effectiveUid != null) {
+      return '${keyVaultFailedPinAttempts}_$effectiveUid';
+    }
+    return keyVaultFailedPinAttempts;
+  }
+
+  List<int> getRecentVaultFailedPinAttempts({String? uid}) {
+    final key = _vaultFailedAttemptsKey(uid);
+    final rawList = _prefs?.getStringList(key) ?? [];
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final validAttempts = <int>[];
+
+    for (final item in rawList) {
+      final ts = int.tryParse(item);
+      if (ts != null && (now - ts) < vaultLockoutWindowMs && ts <= now) {
+        validAttempts.add(ts);
+      }
+    }
+    return validAttempts;
+  }
+
+  Future<void> recordVaultFailedPinAttempt({String? uid}) async {
+    final key = _vaultFailedAttemptsKey(uid);
+    final attempts = getRecentVaultFailedPinAttempts(uid: uid);
+    attempts.add(DateTime.now().millisecondsSinceEpoch);
+    await _prefs?.setStringList(key, attempts.map((t) => t.toString()).toList());
+  }
+
+  int getRecentVaultFailedPinAttemptsCount({String? uid}) {
+    return getRecentVaultFailedPinAttempts(uid: uid).length;
+  }
+
+  bool isVaultPinLockedOut({String? uid}) {
+    return getRecentVaultFailedPinAttempts(uid: uid).length >= vaultMaxFailedPinAttempts;
+  }
+
+  int getVaultPinLockoutRemainingSeconds({String? uid}) {
+    final attempts = getRecentVaultFailedPinAttempts(uid: uid);
+    if (attempts.length < vaultMaxFailedPinAttempts) {
+      return 0;
+    }
+    attempts.sort();
+    final triggerAttempt = attempts[attempts.length - vaultMaxFailedPinAttempts];
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final expiresAt = triggerAttempt + vaultLockoutWindowMs;
+    final remainingMs = expiresAt - now;
+    if (remainingMs <= 0) return 0;
+    return (remainingMs / 1000).ceil();
+  }
+
+  Future<void> resetVaultFailedPinAttempts({String? uid}) async {
+    final key = _vaultFailedAttemptsKey(uid);
+    await _prefs?.remove(key);
   }
 
   // --- Vault AES-256 At-Rest Encryption ---
@@ -421,7 +491,114 @@ class PreferencesService {
     await _prefs?.setBool(keyOnboardingCompleted, completed);
   }
 
+  // --- Legal Consent & Data Protection Agreement ---
+  static const String currentLegalConsentVersion = '1.0.0';
+
+  bool hasAcceptedLegalConsent({String? uid}) {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    if (effectiveUid != null) {
+      final userVal = _prefs?.getBool('${keyLegalConsentAccepted}_$effectiveUid');
+      if (userVal != null) return userVal;
+    }
+    return _prefs?.getBool(keyLegalConsentAccepted) ?? false;
+  }
+
+  Future<void> setLegalConsentAccepted(
+    bool accepted, {
+    String? uid,
+    String version = currentLegalConsentVersion,
+    bool analyticsConsent = true,
+  }) async {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    final now = DateTime.now().toIso8601String();
+
+    await _prefs?.setBool(keyLegalConsentAccepted, accepted);
+    await _prefs?.setString(keyLegalConsentVersion, version);
+    await _prefs?.setString(keyLegalConsentDate, now);
+    await _prefs?.setBool(keyLegalAnalyticsConsent, analyticsConsent);
+
+    if (effectiveUid != null) {
+      await _prefs?.setBool('${keyLegalConsentAccepted}_$effectiveUid', accepted);
+      await _prefs?.setString('${keyLegalConsentVersion}_$effectiveUid', version);
+      await _prefs?.setString('${keyLegalConsentDate}_$effectiveUid', now);
+      await _prefs?.setBool('${keyLegalAnalyticsConsent}_$effectiveUid', analyticsConsent);
+    }
+  }
+
+  String? getLegalConsentDate({String? uid}) {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    if (effectiveUid != null) {
+      final val = _prefs?.getString('${keyLegalConsentDate}_$effectiveUid');
+      if (val != null) return val;
+    }
+    return _prefs?.getString(keyLegalConsentDate);
+  }
+
+  String getLegalConsentVersion({String? uid}) {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    if (effectiveUid != null) {
+      final val = _prefs?.getString('${keyLegalConsentVersion}_$effectiveUid');
+      if (val != null) return val;
+    }
+    return _prefs?.getString(keyLegalConsentVersion) ?? currentLegalConsentVersion;
+  }
+
+  bool isAnalyticsConsentGiven({String? uid}) {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    if (effectiveUid != null) {
+      final val = _prefs?.getBool('${keyLegalAnalyticsConsent}_$effectiveUid');
+      if (val != null) return val;
+    }
+    return _prefs?.getBool(keyLegalAnalyticsConsent) ?? true;
+  }
+
   // --- Home Screen Widget Preferences ---
+  static const String keyDashboardSectionOrder = 'packbuddy_dashboard_section_order_v2';
+  static const String keyDashboardHiddenSections = 'packbuddy_dashboard_hidden_sections_v2';
+
+  static const List<String> defaultDashboardSectionOrder = [
+    'active_trip',
+    'luggage_checklist',
+    'currency_converter',
+    'mini_travel_map',
+    'mini_vault',
+    'mini_all_trips',
+    'mini_trip_comparison',
+  ];
+
+  List<String> getDashboardSectionOrder() {
+    final list = _prefs?.getStringList(keyDashboardSectionOrder);
+    if (list != null && list.isNotEmpty) {
+      final set = list.toSet();
+      final merged = List<String>.from(list);
+      for (final sec in defaultDashboardSectionOrder) {
+        if (!set.contains(sec)) {
+          merged.add(sec);
+        }
+      }
+      return merged;
+    }
+    return List<String>.from(defaultDashboardSectionOrder);
+  }
+
+  Future<void> setDashboardSectionOrder(List<String> order) async {
+    await _prefs?.setStringList(keyDashboardSectionOrder, order);
+  }
+
+  Set<String> getDashboardHiddenSections() {
+    final list = _prefs?.getStringList(keyDashboardHiddenSections);
+    return list?.toSet() ?? <String>{};
+  }
+
+  Future<void> setDashboardHiddenSections(Set<String> hidden) async {
+    await _prefs?.setStringList(keyDashboardHiddenSections, hidden.toList());
+  }
+
+  Future<void> resetDashboardCustomization() async {
+    await _prefs?.remove(keyDashboardSectionOrder);
+    await _prefs?.remove(keyDashboardHiddenSections);
+  }
+
   bool isWidgetShowCountdown() => _prefs?.getBool(keyWidgetShowCountdown) ?? true;
   Future<void> setWidgetShowCountdown(bool show) async => _prefs?.setBool(keyWidgetShowCountdown, show);
 

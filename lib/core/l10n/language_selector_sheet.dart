@@ -54,13 +54,17 @@ void showLanguageSelectorSheet(BuildContext context, WidgetRef ref, Locale curre
                       child: Icon(Icons.translate_rounded, size: 20, color: theme.colorScheme.primary),
                     ),
                     const SizedBox(width: 12),
-                    Text(
-                      l10n?.language ?? 'Dil / Language',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
+                    Expanded(
+                      child: Text(
+                        l10n?.language ?? 'Dil / Language',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const Spacer(),
+                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(

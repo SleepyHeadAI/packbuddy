@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -80,8 +81,26 @@ class _VaultThumbnailWidgetState extends State<VaultThumbnailWidget> {
       return;
     }
 
+    Uint8List? rawBytes;
     final file = File(widget.document.localImagePath);
-    if (!file.existsSync()) {
+    if (file.existsSync()) {
+      try {
+        rawBytes = await file.readAsBytes();
+      } catch (_) {}
+    }
+
+    // Cloud payload fallback if local file missing, unreadable, or was not saved yet
+    if (rawBytes == null || rawBytes.isEmpty) {
+      if (widget.document.cloudDataBase64 != null && widget.document.cloudDataBase64!.isNotEmpty) {
+        try {
+          var clean = widget.document.cloudDataBase64!.trim();
+          if (clean.contains(',')) clean = clean.split(',').last;
+          rawBytes = base64Decode(clean);
+        } catch (_) {}
+      }
+    }
+
+    if (rawBytes == null || rawBytes.isEmpty) {
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -92,10 +111,13 @@ class _VaultThumbnailWidgetState extends State<VaultThumbnailWidget> {
     }
 
     try {
-      final rawBytes = await file.readAsBytes();
-      final decrypted = await SecurityService.instance.decryptBytes(rawBytes);
+      final decrypted = await SecurityService.instance.decryptBytes(
+        rawBytes,
+        userId: widget.document.userId,
+      );
+      final isPdf = SecurityService.isPdfBytes(decrypted) || widget.document.isPdf;
 
-      if (widget.document.isPdf) {
+      if (isPdf) {
         // Render first page of PDF document as thumbnail
         Uint8List? renderedPdfBytes;
         try {

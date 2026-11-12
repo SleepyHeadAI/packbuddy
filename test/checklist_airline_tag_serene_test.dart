@@ -8,7 +8,7 @@ void main() {
   group('PackingTagHelper Serene Voyage Localization & Styling', () {
     test('localizes standard tags to Turkish correctly', () {
       expect(PackingTagHelper.getLocalizedTag('CARRY-ON', 'tr'), 'Kabin Bagajı');
-      expect(PackingTagHelper.getLocalizedTag('CABIN ONLY', 'tr'), 'Kişisel Eşya (Sırt Çantası)');
+      expect(PackingTagHelper.getLocalizedTag('CABIN ONLY', 'tr'), 'Kişisel Eşya');
       expect(PackingTagHelper.getLocalizedTag('CHECK-IN', 'tr'), 'Uçak Altı (Kargo Bagajı)');
       expect(PackingTagHelper.getLocalizedTag('ESSENTIAL', 'tr'), 'Önemli / Yanına Al');
     });

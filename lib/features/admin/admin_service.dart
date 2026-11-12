@@ -1527,6 +1527,10 @@ class FirebaseAdminService implements AdminService {
       'identity': 'Kimlik Kartı',
       'health': 'Sağlık & Aşı',
       'vehicle': 'Araç & Ehliyet',
+      'privatephotos': 'Özel Kasa / Resimler',
+      'private photos': 'Özel Kasa / Resimler',
+      'özel resimler': 'Özel Kasa / Resimler',
+      'özel kasa': 'Özel Kasa / Resimler',
       'other': 'Diğer Belgeler',
     };
 
@@ -1699,19 +1703,33 @@ class FirebaseAdminService implements AdminService {
 
     if (firestore != null) {
       try {
-        var snapshot = await firestore
-            .collection('documents')
-            .where('user_id', isEqualTo: uid)
-            .get();
-        if (snapshot.docs.isEmpty) {
-          snapshot = await firestore
+        final queryResults = <String, QueryDocumentSnapshot<Map<String, dynamic>>>{};
+        try {
+          final s1 = await firestore
+              .collection('documents')
+              .where('user_id', isEqualTo: uid)
+              .get();
+          for (final d in s1.docs) {
+            queryResults[d.id] = d;
+          }
+        } catch (_) {}
+        try {
+          final s2 = await firestore
               .collection('documents')
               .where('userId', isEqualTo: uid)
               .get();
-        }
-        for (final d in snapshot.docs) {
+          for (final d in s2.docs) {
+            queryResults[d.id] = d;
+          }
+        } catch (_) {}
+
+        for (final d in queryResults.values) {
           try {
-            final doc = VaultDocument.fromJson(d.data());
+            final data = Map<String, dynamic>.from(d.data());
+            data['id'] = (data['id'] != null && data['id'].toString().isNotEmpty) ? data['id'] : d.id;
+            data['user_id'] = data['user_id'] ?? data['userId'] ?? uid;
+            data['userId'] = data['userId'] ?? data['user_id'] ?? uid;
+            final doc = VaultDocument.fromJson(data);
             if (!doc.isDeleted) {
               docs.add(doc);
             }
@@ -1722,17 +1740,17 @@ class FirebaseAdminService implements AdminService {
       }
     }
 
-    if (docs.isEmpty) {
-      try {
-        final localDocs = await DatabaseHelper.instance.getDocuments(userId: uid);
-        for (final d in localDocs) {
-          if (!d.isDeleted) {
-            docs.add(d);
-          }
+    // Always merge local documents for this user (if on same device or local testing)
+    try {
+      final localDocs = await DatabaseHelper.instance.getDocuments(userId: uid);
+      final existingIds = docs.map((d) => d.id).toSet();
+      for (final d in localDocs) {
+        if (!d.isDeleted && !existingIds.contains(d.id)) {
+          docs.add(d);
         }
-      } catch (e) {
-        debugPrint('[AdminService] fetchUserDocuments local error: $e');
       }
+    } catch (e) {
+      debugPrint('[AdminService] fetchUserDocuments local merge notice: $e');
     }
 
     docs.sort((a, b) => b.createdAt.compareTo(a.createdAt));

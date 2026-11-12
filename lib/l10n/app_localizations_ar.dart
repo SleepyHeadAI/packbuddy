@@ -26,7 +26,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get budgetDescription => 'تتبع نفقات السفر متعدد العملات';
 
   @override
-  String get vault => 'خزينة المستندات';
+  String get vault => 'الخزينة الآمنة';
 
   @override
   String get vaultDescription => 'جوازات السفر والتذاكر والحجوزات';
@@ -206,7 +206,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get proFeature1 => 'رحلات ونفقات غير محدودة';
 
   @override
-  String get proFeature2 => 'تخزين مستندات غير محدود';
+  String get proFeature2 => 'تخزين غير محدود في الخزينة الآمنة';
 
   @override
   String get proFeature3 => 'مزامنة سحابية تلقائية';
@@ -2111,4 +2111,115 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get countryLabel => 'بلد';
+
+  @override
+  String get privatePhotos => 'الصور الخاصة';
+
+  @override
+  String get privatePhotosSubtitle => 'محمية برمز PIN والقياسات الحيوية';
+
+  @override
+  String get privatePhotosReason =>
+      'يرجى تأكيد بصمة الإصبع أو Face ID لعرض الصور الخاصة';
+
+  @override
+  String get addPrivatePhoto => 'إضافة صورة خاصة';
+
+  @override
+  String get noPrivatePhotosYet => 'لا توجد صور خاصة بعد';
+
+  @override
+  String get noPrivatePhotosDesc =>
+      'الصور المضافة هنا تكون مخفية عن الخزينة الرئيسية ومشفرة بأمان إضافي.';
+
+  @override
+  String get lockAndExit => 'قفل وخروج';
+
+  @override
+  String get setPinFirstForPrivatePhotos =>
+      'يرجى تعيين رمز PIN أولاً لحماية صورك الخاصة';
+
+  @override
+  String get secureVaultBannerTitle => 'الخزينة الآمنة غير محمية';
+
+  @override
+  String get secureVaultBannerDesc =>
+      'قم بتعيين رمز PIN مكون من 4 أرقام لحماية خزنتك وصورك.';
+
+  @override
+  String get privateVault => 'الخزنة الخاصة';
+
+  @override
+  String get lockedBadge => 'مقفل';
+
+  @override
+  String get unlockedBadge => 'مفتوح';
+
+  @override
+  String get forgotPin => 'هل نسيت رمز PIN؟';
+
+  @override
+  String get resetVaultPinTitle => 'إعادة تعيين رمز PIN للخزنة';
+
+  @override
+  String get resetVaultPinEmailDesc =>
+      'سيتم إرسال رمز تحقق مكون من 6 أرقام إلى بريدك الإلكتروني:';
+
+  @override
+  String get sendVerificationCode => 'إرسال رمز التحقق';
+
+  @override
+  String get enterVerificationCode => 'أدخل رمز التحقق';
+
+  @override
+  String get enterVerificationCodeDesc =>
+      'يرجى إدخال رمز التحقق المكون من 6 أرقام المرسل إلى بريدك:';
+
+  @override
+  String get verificationCode => 'رمز التحقق';
+
+  @override
+  String get verifyAndContinue => 'تحقق ومتابعة';
+
+  @override
+  String get invalidVerificationCode =>
+      'رمز التحقق غير صالح. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get resendCode => 'إعادة إرسال الرمز';
+
+  @override
+  String get codeResent => 'تمت إعادة إرسال رمز التحقق.';
+
+  @override
+  String get setNewVaultPin => 'تعيين رمز PIN جديد للخزنة';
+
+  @override
+  String get newPin => 'رمز PIN جديد من 4 أرقام';
+
+  @override
+  String get confirmNewPin => 'تأكيد رمز PIN الجديد';
+
+  @override
+  String get pinsDoNotMatch => 'رمزا PIN غير متطابقين.';
+
+  @override
+  String get saveNewPinAndUnlock => 'حفظ الرمز وفتح الخزنة';
+
+  @override
+  String get vaultPinResetSuccess =>
+      'تمت إعادة تعيين رمز PIN بنجاح وإلغاء قفل الخزنة.';
+
+  @override
+  String get vaultPinRequiredTitle => 'رمز PIN للخزنة مطلوب';
+
+  @override
+  String get vaultPinRequiredDesc =>
+      'يلزم إنشاء رمز PIN مكون من 4 أرقام لحماية مستنداتك وصورك الخاصة.';
+
+  @override
+  String get enterYourEmail => 'أدخل بريدك الإلكتروني';
+
+  @override
+  String get invalidEmail => 'يرجى إدخال عنوان بريد إلكتروني صالح.';
 }

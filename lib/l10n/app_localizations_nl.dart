@@ -27,7 +27,7 @@ class AppLocalizationsNl extends AppLocalizations {
       'Reisuitgaven bijhouden in meerdere valuta\'s';
 
   @override
-  String get vault => 'Documentenkluis';
+  String get vault => 'Veilige Kluis';
 
   @override
   String get vaultDescription => 'Paspoorten, tickets en boekingen';
@@ -209,7 +209,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get proFeature1 => 'Onbeperkte reizen en uitgaven';
 
   @override
-  String get proFeature2 => 'Onbeperkte documentenkluis';
+  String get proFeature2 => 'Onbeperkte opslag veilige kluis';
 
   @override
   String get proFeature3 => 'Automatische tweerichtingssynchronisatie';
@@ -2133,4 +2133,115 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get countryLabel => 'Land';
+
+  @override
+  String get privatePhotos => 'Privéfoto\'s';
+
+  @override
+  String get privatePhotosSubtitle => 'Beveiligd met pincode en biometrie';
+
+  @override
+  String get privatePhotosReason =>
+      'Verifieer uw vingerafdruk of Face ID om privéfoto\'s te bekijken';
+
+  @override
+  String get addPrivatePhoto => 'Privéfoto toevoegen';
+
+  @override
+  String get noPrivatePhotosYet => 'Nog geen privéfoto\'s';
+
+  @override
+  String get noPrivatePhotosDesc =>
+      'Hier toegevoegde foto\'s worden verborgen in de hoofdkluis en extra versleuteld.';
+
+  @override
+  String get lockAndExit => 'Vergrendelen & Afsluiten';
+
+  @override
+  String get setPinFirstForPrivatePhotos =>
+      'Stel eerst een pincode in om uw privéfoto\'s te beveiligen';
+
+  @override
+  String get secureVaultBannerTitle => 'Veilige Kluis Niet Beveiligd';
+
+  @override
+  String get secureVaultBannerDesc =>
+      'Stel een 4-cijferige pincode in om uw kluis en foto\'s te beveiligen.';
+
+  @override
+  String get privateVault => 'Privékluis';
+
+  @override
+  String get lockedBadge => 'VERGRENDELD';
+
+  @override
+  String get unlockedBadge => 'ONTGRENDELD';
+
+  @override
+  String get forgotPin => 'PIN vergeten?';
+
+  @override
+  String get resetVaultPinTitle => 'Kluis-PIN resetten';
+
+  @override
+  String get resetVaultPinEmailDesc =>
+      'Er wordt een 6-cijferige verificatiecode naar uw e-mailadres gestuurd:';
+
+  @override
+  String get sendVerificationCode => 'Verificatiecode verzenden';
+
+  @override
+  String get enterVerificationCode => 'Verificatiecode invoeren';
+
+  @override
+  String get enterVerificationCodeDesc =>
+      'Voer de 6-cijferige code in die naar uw e-mail is verzonden:';
+
+  @override
+  String get verificationCode => 'Verificatiecode';
+
+  @override
+  String get verifyAndContinue => 'Verifiëren en doorgaan';
+
+  @override
+  String get invalidVerificationCode =>
+      'Ongeldige verificatiecode. Probeer het opnieuw.';
+
+  @override
+  String get resendCode => 'Code opnieuw verzenden';
+
+  @override
+  String get codeResent => 'Nieuwe verificatiecode is verzonden.';
+
+  @override
+  String get setNewVaultPin => 'Nieuwe kluis-PIN instellen';
+
+  @override
+  String get newPin => 'Nieuwe 4-cijferige PIN';
+
+  @override
+  String get confirmNewPin => 'Bevestig nieuwe PIN';
+
+  @override
+  String get pinsDoNotMatch => 'PIN-codes komen niet overeen.';
+
+  @override
+  String get saveNewPinAndUnlock => 'PIN opslaan & Ontgrendelen';
+
+  @override
+  String get vaultPinResetSuccess =>
+      'Kluis-PIN succesvol gereset en kluis ontgrendeld.';
+
+  @override
+  String get vaultPinRequiredTitle => 'Kluis-PIN verplicht';
+
+  @override
+  String get vaultPinRequiredDesc =>
+      'Een 4-cijferige PIN is verplicht om uw reisdocumenten en privéfoto\'s te beschermen.';
+
+  @override
+  String get enterYourEmail => 'Voer uw e-mailadres in';
+
+  @override
+  String get invalidEmail => 'Voer een geldig e-mailadres in.';
 }

@@ -100,8 +100,7 @@ class _MainShellScaffoldState extends ConsumerState<MainShellScaffold> {
                 if (index != selectedIndex) {
                   // If transitioning away from or into Vault tab (index 3),
                   // immediately lock the vault to enforce security verification
-                  final vaultState = ref.read(vaultControllerProvider);
-                  if (vaultState.hasPin && (selectedIndex == 3 || index == 3)) {
+                  if (selectedIndex == 3 || index == 3) {
                     ref.read(vaultControllerProvider.notifier).lockVault();
                   }
                   ref.read(mainNavigationIndexProvider.notifier).state = index;

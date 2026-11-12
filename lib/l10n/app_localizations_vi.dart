@@ -26,7 +26,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get budgetDescription => 'Theo dõi chi tiêu du lịch đa tiền tệ';
 
   @override
-  String get vault => 'Kho Tài Liệu';
+  String get vault => 'Két An Toàn';
 
   @override
   String get vaultDescription => 'Hộ chiếu, vé và đặt chỗ';
@@ -207,7 +207,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get proFeature1 => 'Không giới hạn chuyến đi và chi tiêu';
 
   @override
-  String get proFeature2 => 'Lưu trữ tài liệu không giới hạn';
+  String get proFeature2 => 'Lưu trữ két an toàn không giới hạn';
 
   @override
   String get proFeature3 => 'Đồng bộ hai chiều tự động';
@@ -2129,4 +2129,115 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get countryLabel => 'Quốc gia';
+
+  @override
+  String get privatePhotos => 'Ảnh Riêng Tư';
+
+  @override
+  String get privatePhotosSubtitle => 'Được bảo vệ bằng mã PIN & Sinh trắc học';
+
+  @override
+  String get privatePhotosReason =>
+      'Xác thực vân tay hoặc Face ID để xem ảnh riêng tư';
+
+  @override
+  String get addPrivatePhoto => 'Thêm Ảnh Riêng Tư';
+
+  @override
+  String get noPrivatePhotosYet => 'Chưa có ảnh riêng tư nào';
+
+  @override
+  String get noPrivatePhotosDesc =>
+      'Ảnh thêm vào đây sẽ được ẩn khỏi két chính và mã hóa tăng cường.';
+
+  @override
+  String get lockAndExit => 'Khóa & Thoát';
+
+  @override
+  String get setPinFirstForPrivatePhotos =>
+      'Vui lòng đặt mã PIN trước để bảo vệ ảnh riêng tư của bạn';
+
+  @override
+  String get secureVaultBannerTitle => 'Két An Toàn Chưa Được Bảo Vệ';
+
+  @override
+  String get secureVaultBannerDesc =>
+      'Đặt mã PIN 4 chữ số để bảo vệ két và ảnh của bạn.';
+
+  @override
+  String get privateVault => 'Két Riêng Tư';
+
+  @override
+  String get lockedBadge => 'ĐÃ KHÓA';
+
+  @override
+  String get unlockedBadge => 'ĐÃ MỞ';
+
+  @override
+  String get forgotPin => 'Quên mã PIN?';
+
+  @override
+  String get resetVaultPinTitle => 'Đặt lại mã PIN kho lưu trữ';
+
+  @override
+  String get resetVaultPinEmailDesc =>
+      'Mã xác minh 6 chữ số sẽ được gửi đến email của bạn:';
+
+  @override
+  String get sendVerificationCode => 'Gửi mã xác minh';
+
+  @override
+  String get enterVerificationCode => 'Nhập mã xác minh';
+
+  @override
+  String get enterVerificationCodeDesc =>
+      'Vui lòng nhập mã 6 chữ số đã được gửi đến email của bạn:';
+
+  @override
+  String get verificationCode => 'Mã xác minh';
+
+  @override
+  String get verifyAndContinue => 'Xác minh & Tiếp tục';
+
+  @override
+  String get invalidVerificationCode =>
+      'Mã xác minh không hợp lệ. Vui lòng thử lại.';
+
+  @override
+  String get resendCode => 'Gửi lại mã';
+
+  @override
+  String get codeResent => 'Mã xác minh đã được gửi lại.';
+
+  @override
+  String get setNewVaultPin => 'Đặt mã PIN kho lưu trữ mới';
+
+  @override
+  String get newPin => 'Mã PIN 4 chữ số mới';
+
+  @override
+  String get confirmNewPin => 'Xác nhận mã PIN mới';
+
+  @override
+  String get pinsDoNotMatch => 'Mã PIN không khớp.';
+
+  @override
+  String get saveNewPinAndUnlock => 'Lưu PIN & Mở khóa';
+
+  @override
+  String get vaultPinResetSuccess =>
+      'Đặt lại mã PIN thành công và kho lưu trữ đã được mở khóa.';
+
+  @override
+  String get vaultPinRequiredTitle => 'Bắt buộc có mã PIN kho lưu trữ';
+
+  @override
+  String get vaultPinRequiredDesc =>
+      'Cần tạo mã PIN 4 chữ số để bảo vệ tài liệu du lịch và ảnh riêng tư của bạn.';
+
+  @override
+  String get enterYourEmail => 'Nhập email của bạn';
+
+  @override
+  String get invalidEmail => 'Vui lòng nhập địa chỉ email hợp lệ.';
 }

@@ -25,7 +25,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get budgetDescription => '多币种旅行支出追踪';
 
   @override
-  String get vault => '证件保险库';
+  String get vault => '安全保险库';
 
   @override
   String get vaultDescription => '护照、机票与预订凭证';
@@ -205,7 +205,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get proFeature1 => '无限制旅行与支出记录';
 
   @override
-  String get proFeature2 => '无限制证件保险库存储';
+  String get proFeature2 => '无限制安全保险库存储';
 
   @override
   String get proFeature3 => '自动云端双向同步';
@@ -2047,4 +2047,106 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get countryLabel => '国家';
+
+  @override
+  String get privatePhotos => '隐私照片';
+
+  @override
+  String get privatePhotosSubtitle => '受 PIN 码与生物识别保护';
+
+  @override
+  String get privatePhotosReason => '请验证指纹或面容 ID 以查看隐私照片';
+
+  @override
+  String get addPrivatePhoto => '添加隐私照片';
+
+  @override
+  String get noPrivatePhotosYet => '尚无隐私照片';
+
+  @override
+  String get noPrivatePhotosDesc => '此处添加的照片在主保险库中隐藏，并进行额外加密保护。';
+
+  @override
+  String get lockAndExit => '锁定并退出';
+
+  @override
+  String get setPinFirstForPrivatePhotos => '请先设置 PIN 码以保护您的隐私照片';
+
+  @override
+  String get secureVaultBannerTitle => '安全保险库未受保护';
+
+  @override
+  String get secureVaultBannerDesc => '设置 4 位 PIN 码以保护您的保险库与照片。';
+
+  @override
+  String get privateVault => '私密保险库';
+
+  @override
+  String get lockedBadge => '已锁定';
+
+  @override
+  String get unlockedBadge => '已解锁';
+
+  @override
+  String get forgotPin => '忘记PIN码？';
+
+  @override
+  String get resetVaultPinTitle => '重置保险箱PIN码';
+
+  @override
+  String get resetVaultPinEmailDesc => '6位验证码将发送到您的绑定邮箱：';
+
+  @override
+  String get sendVerificationCode => '发送验证码';
+
+  @override
+  String get enterVerificationCode => '输入验证码';
+
+  @override
+  String get enterVerificationCodeDesc => '请输入发送至您邮箱的6位验证码：';
+
+  @override
+  String get verificationCode => '验证码';
+
+  @override
+  String get verifyAndContinue => '验证并继续';
+
+  @override
+  String get invalidVerificationCode => '验证码无效，请重试。';
+
+  @override
+  String get resendCode => '重新发送验证码';
+
+  @override
+  String get codeResent => '验证码已重新发送。';
+
+  @override
+  String get setNewVaultPin => '设置新保险箱PIN码';
+
+  @override
+  String get newPin => '新的4位PIN码';
+
+  @override
+  String get confirmNewPin => '确认新PIN码';
+
+  @override
+  String get pinsDoNotMatch => '两次输入的PIN码不一致。';
+
+  @override
+  String get saveNewPinAndUnlock => '保存PIN码并解锁';
+
+  @override
+  String get vaultPinResetSuccess => '保险箱PIN码已成功重置并解锁。';
+
+  @override
+  String get vaultPinRequiredTitle => '必须设置保险箱PIN码';
+
+  @override
+  String get vaultPinRequiredDesc => '必须创建4位PIN码以保护您的旅行凭证和私密照片。';
+
+  @override
+  String get enterYourEmail => '输入您的电子邮箱';
+
+  @override
+  String get invalidEmail => '请输入有效的电子邮箱地址。';
 }

@@ -747,14 +747,18 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
     );
   }
 
-  /// Sets or clears selected airline rule for informational guidance
+  /// Sets or clears selected airline rule and fare package for informational guidance
   void selectAirline(
     AirlineBaggageRule? airline, {
+    String? packageId,
     BaggageAllowanceMode mode = BaggageAllowanceMode.all,
   }) {
     if (airline != null && mode != BaggageAllowanceMode.none) {
+      final effectiveAirline = packageId != null
+          ? airline.copyWith(selectedPackageId: packageId)
+          : airline;
       state = state.copyWith(
-        selectedAirline: airline,
+        selectedAirline: effectiveAirline,
         baggageAllowanceMode: mode,
       );
     } else {
@@ -762,6 +766,14 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
         clearSelectedAirline: true,
         baggageAllowanceMode: BaggageAllowanceMode.none,
       );
+    }
+  }
+
+  /// Selects a fare package for the active airline (e.g. EcoFly, ExtraFly, Süper Eko, Avantaj, Saver, Flexi)
+  void selectPackage(String packageId) {
+    if (state.selectedAirline != null) {
+      final updated = state.selectedAirline!.copyWith(selectedPackageId: packageId);
+      state = state.copyWith(selectedAirline: updated);
     }
   }
 

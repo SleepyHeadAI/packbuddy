@@ -77,6 +77,7 @@ void main() {
   });
 
   testWidgets('PackBuddy smoke test - authenticated and verified user accesses Dashboard', (WidgetTester tester) async {
+    await PreferencesService.instance.setLegalConsentAccepted(true, uid: 'test-smoke-uid');
     await tester.pumpWidget(
       ProviderScope(
         overrides: [

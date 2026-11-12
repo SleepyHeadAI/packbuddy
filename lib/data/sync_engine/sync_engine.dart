@@ -520,20 +520,29 @@ class SyncEngine extends StateNotifier<SyncState> {
 
   bool _isSyncing = false;
   Future<void>? _activeSyncFuture;
+  bool _hasPendingSyncRequest = false;
 
   /// Returns true if a synchronization process is actively executing
   bool get isSyncing => _isSyncing;
 
   /// Executes two-way bidirectional sync between local SQLite and Cloud Firestore.
-  /// Uses Future Memoization: multiple concurrent callers await the single active synchronization.
+  /// Uses Future Memoization with pending request queueing so concurrent callers trigger a follow-up sync.
   Future<void> performSync() {
+    _retryCount = 0;
+    _retryTimer?.cancel();
     if (_activeSyncFuture != null) {
-      debugPrint('[SyncEngine] Sync already in progress, awaiting active sync Future');
+      debugPrint('[SyncEngine] Sync already in progress, queuing follow-up sync');
+      _hasPendingSyncRequest = true;
       return _activeSyncFuture!;
     }
 
-    _activeSyncFuture = _executeSync().whenComplete(() {
+    _activeSyncFuture = _executeSync().whenComplete(() async {
       _activeSyncFuture = null;
+      if (_hasPendingSyncRequest) {
+        _hasPendingSyncRequest = false;
+        debugPrint('[SyncEngine] Executing queued follow-up sync');
+        await performSync();
+      }
     });
 
     return _activeSyncFuture!;
@@ -654,12 +663,22 @@ class SyncEngine extends StateNotifier<SyncState> {
       WriteBatch batch = firestore.batch();
       int batchOpCount = 0;
 
+      Future<void> commitPendingBatch() async {
+        if (batchOpCount == 0) return;
+        try {
+          await batch.commit();
+        } catch (e) {
+          debugPrint('[SyncEngine] Batch commit notice: $e');
+        } finally {
+          batch = firestore.batch();
+          batchOpCount = 0;
+        }
+      }
+
       Future<void> queueBatchOp() async {
         batchOpCount++;
         if (batchOpCount >= 450) {
-          await batch.commit();
-          batch = firestore.batch();
-          batchOpCount = 0;
+          await commitPendingBatch();
         }
       }
 
@@ -709,9 +728,9 @@ class SyncEngine extends StateNotifier<SyncState> {
             } catch (e) {
               debugPrint('[SyncEngine] parse remote trip notice: $e');
             }
+            batch.delete(firestore.collection('trips').doc(trip.id));
+            await queueBatchOp();
           }
-          batch.delete(firestore.collection('trips').doc(trip.id));
-          await queueBatchOp();
           tripIdsToHardDelete.add(trip.id);
           processedItems++;
         }
@@ -744,9 +763,9 @@ class SyncEngine extends StateNotifier<SyncState> {
             } catch (e) {
               debugPrint('[SyncEngine] parse remote expense notice: $e');
             }
+            batch.delete(firestore.collection('expenses').doc(expense.id));
+            await queueBatchOp();
           }
-          batch.delete(firestore.collection('expenses').doc(expense.id));
-          await queueBatchOp();
           expenseIdsToHardDelete.add(expense.id);
           processedItems++;
         }
@@ -779,18 +798,18 @@ class SyncEngine extends StateNotifier<SyncState> {
             } catch (e) {
               debugPrint('[SyncEngine] parse remote doc notice: $e');
             }
-          }
-          // Delete any chunks subcollection in Firestore to keep database clean
-          try {
-            final chunksSnap = await firestore.collection('documents').doc(doc.id).collection('chunks').get();
-            for (final c in chunksSnap.docs) {
-              batch.delete(c.reference);
-              await queueBatchOp();
-            }
-          } catch (_) {}
+            // Delete any chunks subcollection in Firestore to keep database clean
+            try {
+              final chunksSnap = await firestore.collection('documents').doc(doc.id).collection('chunks').get();
+              for (final c in chunksSnap.docs) {
+                batch.delete(c.reference);
+                await queueBatchOp();
+              }
+            } catch (_) {}
 
-          batch.delete(firestore.collection('documents').doc(doc.id));
-          await queueBatchOp();
+            batch.delete(firestore.collection('documents').doc(doc.id));
+            await queueBatchOp();
+          }
           docIdsToHardDelete.add(doc.id);
           processedItems++;
         }
@@ -829,20 +848,16 @@ class SyncEngine extends StateNotifier<SyncState> {
             } catch (e) {
               debugPrint('[SyncEngine] parse remote item notice: $e');
             }
+            batch.delete(firestore.collection('checklist_items').doc(item.id));
+            await queueBatchOp();
           }
-          batch.delete(firestore.collection('checklist_items').doc(item.id));
-          await queueBatchOp();
           itemIdsToHardDelete.add(item.id);
           processedItems++;
         }
       }
 
       // Commit pending deletions immediately to Firestore before Step 2 reconciliation
-      if (batchOpCount > 0) {
-        await batch.commit();
-        batch = firestore.batch();
-        batchOpCount = 0;
-      }
+      await commitPendingBatch();
 
       // ===================================================================
       // ALGORITHM STEP 2: Bidirectional Reconciliation with Last-Write-Wins (LWW)
@@ -1053,8 +1068,11 @@ class SyncEngine extends StateNotifier<SyncState> {
           try {
             final f = File(docToPush.localImagePath);
             if (f.existsSync()) {
-              final bytes = f.readAsBytesSync();
-              const maxDirectBytes = 700 * 1024;
+              var bytes = f.readAsBytesSync();
+              if (SecurityService.instance.isEncrypted(bytes)) {
+                bytes = await SecurityService.instance.decryptBytes(bytes, userId: docToPush.userId);
+              }
+              const maxDirectBytes = 500 * 1024;
               final ext = p.extension(docToPush.localImagePath).replaceAll('.', '').toLowerCase();
               if (bytes.length <= maxDirectBytes) {
                 final payload = base64Encode(bytes);
@@ -1072,6 +1090,7 @@ class SyncEngine extends StateNotifier<SyncState> {
                   fileExtension: ext.isNotEmpty ? ext : (docToPush.isPdf ? 'pdf' : 'jpg'),
                   cloudDataBase64: '',
                 );
+                docsToUpsertLocal.add(docToPush);
                 if (bytes.length <= 10 * 1024 * 1024) {
                   const chunkSize = 400 * 1024;
                   final totalChunks = (payload.length / chunkSize).ceil();
@@ -1098,8 +1117,15 @@ class SyncEngine extends StateNotifier<SyncState> {
         }
 
         final remoteDoc = remoteDocsMap[docToPush.id];
-        if (remoteDoc == null) {
-          if (lastSyncedAt == 0 || docToPush.updatedAt.millisecondsSinceEpoch > lastSyncedAt) {
+        final bool remoteMissingPayload = remoteDoc != null &&
+            (remoteDoc.cloudDataBase64 == null || remoteDoc.cloudDataBase64!.isEmpty) &&
+            ((docToPush.cloudDataBase64 != null && docToPush.cloudDataBase64!.isNotEmpty) ||
+                docToPush.localImagePath.isNotEmpty);
+
+        if (remoteDoc == null || remoteMissingPayload) {
+          if (lastSyncedAt == 0 ||
+              docToPush.updatedAt.millisecondsSinceEpoch > lastSyncedAt ||
+              remoteMissingPayload) {
             batch.set(
               firestore.collection('documents').doc(docToPush.id),
               docToPush.copyWith(userId: uid).toJson(),
@@ -1272,9 +1298,7 @@ class SyncEngine extends StateNotifier<SyncState> {
       }
 
       // Commit any pending Firestore WriteBatch operations
-      if (batchOpCount > 0) {
-        await batch.commit();
-      }
+      await commitPendingBatch();
 
       // Restore missing files for documents pulled from cloud vault
       final resolvedDocsToUpsert = <VaultDocument>[];
@@ -1299,19 +1323,41 @@ class SyncEngine extends StateNotifier<SyncState> {
             } else if (doc.fileSizeBytes > 0) {
               // Try restoring from chunks subcollection in Firestore
               try {
-                final chunksSnap = await firestore
-                    .collection('documents')
-                    .doc(doc.id)
-                    .collection('chunks')
-                    .orderBy('index')
-                    .get();
+                QuerySnapshot<Map<String, dynamic>>? chunksSnap;
+                try {
+                  chunksSnap = await firestore
+                      .collection('documents')
+                      .doc(doc.id)
+                      .collection('chunks')
+                      .orderBy('index')
+                      .get();
+                } catch (e) {
+                  debugPrint('[SyncEngine] ordered chunks query notice, trying unindexed get: $e');
+                  chunksSnap = await firestore
+                      .collection('documents')
+                      .doc(doc.id)
+                      .collection('chunks')
+                      .get();
+                }
+
                 if (chunksSnap.docs.isNotEmpty) {
+                  final sortedDocs = chunksSnap.docs.toList()
+                    ..sort((a, b) {
+                      final idxA = (a.data()['index'] as num?)?.toInt() ?? 0;
+                      final idxB = (b.data()['index'] as num?)?.toInt() ?? 0;
+                      return idxA.compareTo(idxB);
+                    });
                   final buffer = StringBuffer();
-                  for (final c in chunksSnap.docs) {
+                  for (final c in sortedDocs) {
                     final piece = c.data()['chunk'] as String?;
-                    if (piece != null) buffer.write(piece);
+                    if (piece != null && piece.isNotEmpty) buffer.write(piece);
                   }
-                  fileBytes = base64Decode(buffer.toString());
+                  final chunkedStr = buffer.toString().trim();
+                  if (chunkedStr.isNotEmpty) {
+                    var cleanChunked = chunkedStr;
+                    if (cleanChunked.contains(',')) cleanChunked = cleanChunked.split(',').last;
+                    fileBytes = base64Decode(cleanChunked);
+                  }
                 }
               } catch (e) {
                 debugPrint('[SyncEngine] Error restoring chunked document: $e');
@@ -1323,7 +1369,7 @@ class SyncEngine extends StateNotifier<SyncState> {
                 final ext = doc.fileExtension ?? (doc.filePath.split('.').length > 1 ? doc.filePath.split('.').last : 'bin');
                 final restoredPath = p.join(vaultDir.path, '${doc.id}_restored.$ext');
                 final restoredFile = File(restoredPath);
-                final encryptedBytes = await SecurityService.instance.encryptBytes(fileBytes);
+                final encryptedBytes = await SecurityService.instance.encryptBytes(fileBytes, userId: doc.userId);
                 await restoredFile.writeAsBytes(encryptedBytes);
                 updatedDoc = doc.copyWith(filePath: restoredPath);
               } catch (e) {
@@ -1379,32 +1425,48 @@ class SyncEngine extends StateNotifier<SyncState> {
 
         // 2. Execute queued local upserts (LWW remote wins & new remote items)
         for (final trip in tripsToUpsertLocal) {
-          await txn.insert(
-            AppConstants.tableTrips,
-            trip.copyWith(userId: uid).toMap(),
-            conflictAlgorithm: ConflictAlgorithm.replace,
-          );
+          try {
+            await txn.insert(
+              AppConstants.tableTrips,
+              trip.copyWith(userId: uid).toMap(),
+              conflictAlgorithm: ConflictAlgorithm.replace,
+            );
+          } catch (e) {
+            debugPrint('[SyncEngine] Local trip upsert error: $e');
+          }
         }
         for (final expense in expensesToUpsertLocal) {
-          await txn.insert(
-            AppConstants.tableExpenses,
-            expense.copyWith(userId: uid).toMap(),
-            conflictAlgorithm: ConflictAlgorithm.replace,
-          );
+          try {
+            await txn.insert(
+              AppConstants.tableExpenses,
+              expense.copyWith(userId: uid).toMap(),
+              conflictAlgorithm: ConflictAlgorithm.replace,
+            );
+          } catch (e) {
+            debugPrint('[SyncEngine] Local expense upsert error: $e');
+          }
         }
         for (final doc in resolvedDocsToUpsert) {
-          await txn.insert(
-            AppConstants.tableDocuments,
-            doc.copyWith(userId: uid).toMap(),
-            conflictAlgorithm: ConflictAlgorithm.replace,
-          );
+          try {
+            await txn.insert(
+              AppConstants.tableDocuments,
+              doc.copyWith(userId: uid).toMap(),
+              conflictAlgorithm: ConflictAlgorithm.replace,
+            );
+          } catch (e) {
+            debugPrint('[SyncEngine] Local document upsert error: $e');
+          }
         }
         for (final item in itemsToUpsertLocal) {
-          await txn.insert(
-            AppConstants.tableChecklistItems,
-            item.copyWith(userId: uid).toMap(),
-            conflictAlgorithm: ConflictAlgorithm.replace,
-          );
+          try {
+            await txn.insert(
+              AppConstants.tableChecklistItems,
+              item.copyWith(userId: uid).toMap(),
+              conflictAlgorithm: ConflictAlgorithm.replace,
+            );
+          } catch (e) {
+            debugPrint('[SyncEngine] Local checklist item upsert error: $e');
+          }
         }
 
         // Deduplicate checklist items atomically in SQLite after sync upsert

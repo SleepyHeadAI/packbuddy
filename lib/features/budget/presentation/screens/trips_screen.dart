@@ -17,6 +17,7 @@ import 'package:packbuddy/features/budget/presentation/screens/widgets/add_trip_
 import 'package:packbuddy/features/budget/presentation/screens/widgets/share_trip_sheet.dart';
 import 'package:packbuddy/features/travel_map/presentation/screens/travel_map_screen.dart';
 import 'package:packbuddy/shared/widgets/app_animations.dart';
+import 'package:packbuddy/shared/widgets/quick_actions_sheet.dart';
 
 /// Modern, intuitive Trips Overview Screen listing upcoming, active, and past trips
 class TripsScreen extends ConsumerStatefulWidget {
@@ -253,14 +254,13 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton.extended(
+        floatingActionButton: FloatingActionButton(
           heroTag: null,
-          onPressed: () => AddTripSheet.show(context),
+          onPressed: () => QuickActionsSheet.showForTrips(context),
           backgroundColor: theme.colorScheme.primary,
           foregroundColor: theme.colorScheme.onPrimary,
           elevation: 3,
-          icon: const Icon(Icons.add_rounded),
-          label: Text(l10n.addTrip, style: const TextStyle(fontWeight: FontWeight.w600)),
+          child: const Icon(Icons.add_rounded, size: 26),
         ),
         body: tripState.isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -686,14 +686,19 @@ class _ModernTripCard extends ConsumerWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                '${CurrencyFormatter.format(spent, currency: trip.defaultCurrency)} / ${CurrencyFormatter.format(limit, currency: trip.defaultCurrency)}',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  color: isOverBudget ? AppColors.errorPastel : theme.colorScheme.onSurface,
+                              Expanded(
+                                child: Text(
+                                  '${CurrencyFormatter.format(spent, currency: trip.defaultCurrency)} / ${CurrencyFormatter.format(limit, currency: trip.defaultCurrency)}',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: isOverBudget ? AppColors.errorPastel : theme.colorScheme.onSurface,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
+                              const SizedBox(width: 8),
                               Text(
                                 '${(spent / limit * 100).toInt()}%',
                                 style: TextStyle(

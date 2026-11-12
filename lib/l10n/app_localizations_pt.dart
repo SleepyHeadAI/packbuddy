@@ -27,7 +27,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Rastreamento de despesas de viagem multimoedas';
 
   @override
-  String get vault => 'Cofre de Documentos';
+  String get vault => 'Cofre Seguro';
 
   @override
   String get vaultDescription => 'Passaportes, passagens e reservas';
@@ -212,7 +212,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get proFeature1 => 'Viagens e controle de gastos ilimitados';
 
   @override
-  String get proFeature2 => 'Armazenamento ilimitado de documentos';
+  String get proFeature2 => 'Armazenamento ilimitado no cofre seguro';
 
   @override
   String get proFeature3 => 'Sincronização bidirecional na nuvem';
@@ -2148,4 +2148,115 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get countryLabel => 'País';
+
+  @override
+  String get privatePhotos => 'Fotos Privadas';
+
+  @override
+  String get privatePhotosSubtitle => 'Protegido por PIN e biometria';
+
+  @override
+  String get privatePhotosReason =>
+      'Verifique sua impressão digital ou Face ID para ver fotos privadas';
+
+  @override
+  String get addPrivatePhoto => 'Adicionar Foto Privada';
+
+  @override
+  String get noPrivatePhotosYet => 'Nenhuma foto privada ainda';
+
+  @override
+  String get noPrivatePhotosDesc =>
+      'As fotos adicionadas aqui ficam ocultas do cofre principal e contam com criptografia reforçada.';
+
+  @override
+  String get lockAndExit => 'Bloquear e Sair';
+
+  @override
+  String get setPinFirstForPrivatePhotos =>
+      'Defina primeiro um PIN para proteger suas fotos privadas';
+
+  @override
+  String get secureVaultBannerTitle => 'Cofre Seguro Desprotegido';
+
+  @override
+  String get secureVaultBannerDesc =>
+      'Defina um PIN de 4 dígitos para proteger seu cofre e suas fotos.';
+
+  @override
+  String get privateVault => 'Cofre Privado';
+
+  @override
+  String get lockedBadge => 'BLOQUEADO';
+
+  @override
+  String get unlockedBadge => 'DESBLOQUEADO';
+
+  @override
+  String get forgotPin => 'Esqueceu o PIN?';
+
+  @override
+  String get resetVaultPinTitle => 'Redefinir PIN do Cofre';
+
+  @override
+  String get resetVaultPinEmailDesc =>
+      'Um código de verificação de 6 dígitos será enviado para o seu e-mail:';
+
+  @override
+  String get sendVerificationCode => 'Enviar código de verificação';
+
+  @override
+  String get enterVerificationCode => 'Digite o código de verificação';
+
+  @override
+  String get enterVerificationCodeDesc =>
+      'Digite o código de 6 dígitos enviado para o seu e-mail:';
+
+  @override
+  String get verificationCode => 'Código de verificação';
+
+  @override
+  String get verifyAndContinue => 'Verificar e continuar';
+
+  @override
+  String get invalidVerificationCode =>
+      'Código de verificação inválido. Tente novamente.';
+
+  @override
+  String get resendCode => 'Reenviar código';
+
+  @override
+  String get codeResent => 'O código de verificação foi reenviado.';
+
+  @override
+  String get setNewVaultPin => 'Definir novo PIN do cofre';
+
+  @override
+  String get newPin => 'Novo PIN de 4 dígitos';
+
+  @override
+  String get confirmNewPin => 'Confirmar novo PIN';
+
+  @override
+  String get pinsDoNotMatch => 'Os códigos PIN não coincidem.';
+
+  @override
+  String get saveNewPinAndUnlock => 'Salvar PIN e desbloquear';
+
+  @override
+  String get vaultPinResetSuccess =>
+      'PIN do cofre redefinido com sucesso e cofre desbloqueado.';
+
+  @override
+  String get vaultPinRequiredTitle => 'PIN do cofre obrigatório';
+
+  @override
+  String get vaultPinRequiredDesc =>
+      'É obrigatório criar um PIN de 4 dígitos para proteger os seus documentos e fotos privadas.';
+
+  @override
+  String get enterYourEmail => 'Digite o seu e-mail';
+
+  @override
+  String get invalidEmail => 'Digite um endereço de e-mail válido.';
 }
