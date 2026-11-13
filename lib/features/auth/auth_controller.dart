@@ -14,6 +14,7 @@ import '../checklist/presentation/controllers/checklist_controller.dart';
 import '../vault/presentation/controllers/vault_controller.dart';
 import '../travel_map/presentation/controllers/travel_map_controller.dart';
 import '../admin/user_moderation_provider.dart';
+import '../profile/presentation/controllers/profile_controller.dart';
 
 /// State representation for Authentication operations
 class AuthState {
@@ -152,6 +153,7 @@ class AuthController extends StateNotifier<AuthState> {
               r.read(travelMapControllerProvider.notifier).loadCountries(userId: user.uid);
               r.read(currencyProvider.notifier).loadForUser(uid: user.uid);
               r.read(proSubscriptionProvider.notifier).reloadForUser(uid: user.uid);
+              r.read(profileControllerProvider.notifier).loadProfile(user.uid);
 
               // 2. Immediate two-way Cloud Sync upon login:
               // Pulls all remote trips, expenses, documents, checklist items, and travel map countries
@@ -161,6 +163,7 @@ class AuthController extends StateNotifier<AuthState> {
                 r.read(checklistControllerProvider.notifier).loadItems(userId: user.uid);
                 r.read(vaultControllerProvider.notifier).loadDocuments(userId: user.uid);
                 r.read(travelMapControllerProvider.notifier).loadCountries(userId: user.uid);
+                r.read(profileControllerProvider.notifier).loadProfile(user.uid);
               }).catchError((_) {});
             } catch (_) {}
           }
@@ -175,6 +178,7 @@ class AuthController extends StateNotifier<AuthState> {
               r.read(proSubscriptionProvider.notifier).resetProStatus();
               r.read(currencyProvider.notifier).resetToDefault();
               r.read(userModerationProvider.notifier).reset();
+              r.read(profileControllerProvider.notifier).resetState();
             } catch (_) {}
           }
         }
@@ -373,6 +377,7 @@ class AuthController extends StateNotifier<AuthState> {
           r.read(proSubscriptionProvider.notifier).resetProStatus();
           r.read(currencyProvider.notifier).resetToDefault();
           r.read(userModerationProvider.notifier).reset();
+          r.read(profileControllerProvider.notifier).resetState();
         } catch (_) {}
       }
 
@@ -412,6 +417,7 @@ class AuthController extends StateNotifier<AuthState> {
           r.read(proSubscriptionProvider.notifier).resetProStatus();
           r.read(currencyProvider.notifier).resetToDefault();
           r.read(userModerationProvider.notifier).reset();
+          r.read(profileControllerProvider.notifier).resetState();
         } catch (_) {}
       }
 

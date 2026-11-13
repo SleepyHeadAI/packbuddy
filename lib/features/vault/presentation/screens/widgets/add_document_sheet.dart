@@ -12,12 +12,16 @@ class AddDocumentSheet extends ConsumerStatefulWidget {
   final String? initialTripId;
   final String? initialCategory;
   final String? initialSubCategory;
+  final bool isCategoryLocked;
+  final String? oldDocumentIdToReplace;
 
   const AddDocumentSheet({
     super.key,
     this.initialTripId,
     this.initialCategory,
     this.initialSubCategory,
+    this.isCategoryLocked = false,
+    this.oldDocumentIdToReplace,
   });
 
   static Future<void> show(
@@ -25,6 +29,8 @@ class AddDocumentSheet extends ConsumerStatefulWidget {
     String? initialTripId,
     String? initialCategory,
     String? initialSubCategory,
+    bool isCategoryLocked = false,
+    String? oldDocumentIdToReplace,
   }) {
     if (PreferencesService.instance.getRestrictedFeatures().contains('vault_upload')) {
       final l10n = AppLocalizations.of(context);
@@ -55,6 +61,8 @@ class AddDocumentSheet extends ConsumerStatefulWidget {
           initialTripId: initialTripId,
           initialCategory: initialCategory,
           initialSubCategory: initialSubCategory,
+          isCategoryLocked: isCategoryLocked,
+          oldDocumentIdToReplace: oldDocumentIdToReplace,
         ),
       ),
     );
@@ -180,10 +188,56 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
   @override
   void initState() {
     super.initState();
-    _selectedCategory = widget.initialCategory ?? 'Ticket';
+    _selectedCategory = widget.initialCategory ?? (widget.isCategoryLocked ? 'Passport' : 'Ticket');
     _selectedSubCategory = widget.initialSubCategory;
     _isSubCategoryExpanded = widget.initialSubCategory != null;
     _selectedTripId = widget.initialTripId;
+  }
+
+  bool _isDefaultCategoryTitle(String text, AppLocalizations l10n) {
+    final t = text.trim().toLowerCase();
+    if (t.isEmpty) return true;
+    final defaultTitles = [
+      l10n.tickets.toLowerCase(),
+      l10n.myPassport.toLowerCase(),
+      l10n.hotelBooking.toLowerCase(),
+      l10n.healthAndInsurance.toLowerCase(),
+      l10n.privatePhotos.toLowerCase(),
+      l10n.otherDocuments.toLowerCase(),
+      l10n.flightTicket.toLowerCase(),
+      l10n.busTicket.toLowerCase(),
+      l10n.ferryTicket.toLowerCase(),
+      l10n.trainTicket.toLowerCase(),
+      l10n.otherTransport.toLowerCase(),
+      'tickets', 'ticket', 'biletler', 'bilet',
+      'passport', 'my passport', 'pasaport', 'pasaportum',
+      'hotel booking', 'booking', 'otel rezervasyonu', 'rezervasyon', 'accommodation', 'konaklama',
+      'health & insurance', 'insurance', 'sağlık & sigorta', 'sigorta', 'sağlık',
+      'private photos', 'private photo', 'private', 'özel resimler', 'özel resim', 'özel fotoğraflar',
+      'other documents', 'other document', 'other', 'diğer belgeler', 'diğer',
+    ];
+    return defaultTitles.contains(t);
+  }
+
+  String _getDefaultTitleForCategory(String category, AppLocalizations l10n, {String? subCategory}) {
+    switch (category) {
+      case 'Passport':
+        return l10n.myPassport;
+      case 'Booking':
+        return l10n.hotelBooking;
+      case 'Insurance':
+        return l10n.healthAndInsurance;
+      case 'PrivatePhotos':
+        return l10n.privatePhotos;
+      case 'Other':
+        return l10n.otherDocuments;
+      case 'Ticket':
+      default:
+        if (subCategory != null) {
+          return _getSubCategoryLabel(subCategory, l10n);
+        }
+        return l10n.tickets;
+    }
   }
 
   @override
@@ -193,19 +247,11 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
       _initializedTitles = true;
       final l10n = AppLocalizations.of(context)!;
       if (_titleController.text.isEmpty) {
-        if (_selectedCategory == 'Passport') {
-          _titleController.text = l10n.myPassport;
-        } else if (_selectedCategory == 'Ticket') {
-          if (_selectedSubCategory != null) {
-            _titleController.text = _getSubCategoryLabel(_selectedSubCategory!, l10n);
-          } else {
-            _titleController.text = l10n.tickets;
-          }
-        } else if (_selectedCategory == 'Booking') {
-          _titleController.text = l10n.hotelBooking;
-        } else if (_selectedCategory == 'PrivatePhotos') {
-          _titleController.text = l10n.privatePhotos;
-        }
+        _titleController.text = _getDefaultTitleForCategory(
+          _selectedCategory,
+          l10n,
+          subCategory: _selectedSubCategory,
+        );
       }
     }
   }
@@ -235,8 +281,10 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
   void _pickAndSaveImage(ImageSource source) {
     if (_formKey.currentState?.validate() ?? false) {
       final title = _titleController.text.trim();
-      var category = _selectedCategory;
-      if (category == 'Ticket' && _isPrivateTitle(title)) {
+      var category = widget.isCategoryLocked
+          ? (widget.initialCategory ?? 'Passport')
+          : _selectedCategory;
+      if (!widget.isCategoryLocked && category == 'Ticket' && _isPrivateTitle(title)) {
         category = 'PrivatePhotos';
       }
       final subCategory = category == 'Ticket' ? _selectedSubCategory : null;
@@ -245,6 +293,10 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
           : null;
 
       Navigator.of(context).pop();
+
+      if (widget.oldDocumentIdToReplace != null) {
+        ref.read(vaultControllerProvider.notifier).deleteDocument(widget.oldDocumentIdToReplace!);
+      }
 
       ref.read(vaultControllerProvider.notifier).pickAndAddDocument(
             source: source,
@@ -260,8 +312,10 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
   void _pickAndSaveFile() {
     if (_formKey.currentState?.validate() ?? false) {
       final title = _titleController.text.trim();
-      var category = _selectedCategory;
-      if (category == 'Ticket' && _isPrivateTitle(title)) {
+      var category = widget.isCategoryLocked
+          ? (widget.initialCategory ?? 'Passport')
+          : _selectedCategory;
+      if (!widget.isCategoryLocked && category == 'Ticket' && _isPrivateTitle(title)) {
         category = 'PrivatePhotos';
       }
       final subCategory = category == 'Ticket' ? _selectedSubCategory : null;
@@ -270,6 +324,10 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
           : null;
 
       Navigator.of(context).pop();
+
+      if (widget.oldDocumentIdToReplace != null) {
+        ref.read(vaultControllerProvider.notifier).deleteDocument(widget.oldDocumentIdToReplace!);
+      }
 
       ref.read(vaultControllerProvider.notifier).pickAndAddFileDocument(
             title: title,
@@ -350,16 +408,28 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
                       color: theme.colorScheme.primary.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(Icons.shield_outlined, color: theme.colorScheme.primary, size: 20),
+                    child: Icon(
+                      widget.isCategoryLocked && (widget.initialCategory == 'Passport' || widget.initialCategory == null)
+                          ? Icons.menu_book_rounded
+                          : Icons.shield_outlined,
+                      color: theme.colorScheme.primary,
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      l10n.addDocument,
+                      widget.isCategoryLocked && (widget.initialCategory == 'Passport' || widget.initialCategory == null)
+                          ? (widget.oldDocumentIdToReplace != null
+                              ? '${l10n.passport} ${l10n.change}'
+                              : l10n.saveYourPassport)
+                          : l10n.addDocument,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w800,
                         letterSpacing: -0.3,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   IconButton(
@@ -377,7 +447,7 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
                 textCapitalization: TextCapitalization.words,
                 autofocus: false,
                 onChanged: (val) {
-                  if (_selectedCategory == 'Ticket' && _isPrivateTitle(val)) {
+                  if (!widget.isCategoryLocked && _selectedCategory == 'Ticket' && _isPrivateTitle(val)) {
                     setState(() {
                       _selectedCategory = 'PrivatePhotos';
                       _selectedSubCategory = null;
@@ -405,64 +475,123 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
                 ),
               ),
               const SizedBox(height: 8),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                child: Row(
-                  children: categories.map((cat) {
-                    final isSelected = _selectedCategory == cat['key'];
-                    final color = cat['color'] as Color;
-
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: FilterChip(
-                        selected: isSelected,
-                        avatar: Icon(
-                          cat['icon'] as IconData,
-                          size: 16,
-                          color: isSelected ? Colors.white : color,
-                        ),
-                        label: Text(cat['label'] as String),
-                        selectedColor: color,
-                        checkmarkColor: Colors.white,
-                        labelStyle: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: isSelected ? Colors.white : theme.colorScheme.onSurface,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          side: BorderSide(
-                            color: isSelected
-                                ? Colors.transparent
-                                : theme.colorScheme.outlineVariant,
-                          ),
-                        ),
-                        onSelected: (selected) {
-                          if (selected) {
-                            setState(() {
-                              _selectedCategory = cat['key'] as String;
-                              if (_selectedCategory != 'Ticket') {
-                                _selectedSubCategory = null;
-                                _isSubCategoryExpanded = false;
-                              }
-                              if (_selectedCategory == 'PrivatePhotos' &&
-                                  (_titleController.text.isEmpty ||
-                                   _titleController.text == l10n.tickets)) {
-                                _titleController.text = l10n.privatePhotos;
-                              }
-                            });
-                          }
-                        },
+              if (widget.isCategoryLocked)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: isDark ? 0.15 : 0.08),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.35),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.badge_outlined,
+                        size: 18,
+                        color: theme.colorScheme.primary,
                       ),
-                    );
-                  }).toList(),
+                      const SizedBox(width: 8),
+                      Text(
+                        l10n.idAndPassport,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.lock_rounded, size: 10, color: theme.colorScheme.primary),
+                            const SizedBox(width: 3),
+                            Text(
+                              l10n.pinnedBadge,
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: Row(
+                    children: categories.map((cat) {
+                      final isSelected = _selectedCategory == cat['key'];
+                      final color = cat['color'] as Color;
+
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: FilterChip(
+                          selected: isSelected,
+                          avatar: Icon(
+                            cat['icon'] as IconData,
+                            size: 16,
+                            color: isSelected ? Colors.white : color,
+                          ),
+                          label: Text(cat['label'] as String),
+                          selectedColor: color,
+                          checkmarkColor: Colors.white,
+                          labelStyle: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: isSelected ? Colors.white : theme.colorScheme.onSurface,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            side: BorderSide(
+                              color: isSelected
+                                  ? Colors.transparent
+                                  : theme.colorScheme.outlineVariant,
+                            ),
+                          ),
+                          onSelected: (selected) {
+                            if (selected) {
+                              setState(() {
+                                final newCat = cat['key'] as String;
+                                final shouldUpdateTitle = _isDefaultCategoryTitle(_titleController.text, l10n);
+                                _selectedCategory = newCat;
+                                if (_selectedCategory != 'Ticket') {
+                                  _selectedSubCategory = null;
+                                  _isSubCategoryExpanded = false;
+                                }
+                                if (shouldUpdateTitle) {
+                                  _titleController.text = _getDefaultTitleForCategory(
+                                    newCat,
+                                    l10n,
+                                    subCategory: _selectedSubCategory,
+                                  );
+                                }
+                              });
+                            }
+                          },
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ),
-              ),
               const SizedBox(height: 12),
 
               // Sub-category selector (Only shown for Biletler / Ticket category, compact & collapsible)
-              if (_selectedCategory == 'Ticket') ...[
+              if (!widget.isCategoryLocked && _selectedCategory == 'Ticket') ...[
                 _buildSubCategorySection(
                   theme: theme,
                   isDark: isDark,
@@ -815,7 +944,11 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
                               behavior: HitTestBehavior.opaque,
                               onTap: () {
                                 setState(() {
+                                  final shouldUpdateTitle = _isDefaultCategoryTitle(_titleController.text, l10n);
                                   _selectedSubCategory = null;
+                                  if (shouldUpdateTitle) {
+                                    _titleController.text = l10n.tickets;
+                                  }
                                 });
                               },
                               child: Icon(
@@ -882,7 +1015,11 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
                                 onSelected: (val) {
                                   if (val) {
                                     setState(() {
+                                      final shouldUpdateTitle = _isDefaultCategoryTitle(_titleController.text, l10n);
                                       _selectedSubCategory = null;
+                                      if (shouldUpdateTitle) {
+                                        _titleController.text = l10n.tickets;
+                                      }
                                     });
                                   }
                                 },
@@ -908,11 +1045,12 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
                                   onSelected: (val) {
                                     setState(() {
                                       _selectedSubCategory = val ? sub : null;
-                                      if (val) {
-                                        if (_titleController.text.isEmpty ||
-                                            _titleController.text == l10n.tickets ||
-                                            _ticketSubCategories.any((k) => _titleController.text == _getSubCategoryLabel(k, l10n))) {
+                                      final shouldUpdateTitle = _isDefaultCategoryTitle(_titleController.text, l10n);
+                                      if (shouldUpdateTitle) {
+                                        if (val) {
                                           _titleController.text = _getSubCategoryLabel(sub, l10n);
+                                        } else {
+                                          _titleController.text = l10n.tickets;
                                         }
                                       }
                                     });

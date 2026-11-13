@@ -117,7 +117,7 @@ class Country {
       name: 'Argentina',
       localName: 'Arjantin',
       flag: '🇦🇷',
-      defaultCurrency: 'USD',
+      defaultCurrency: 'ARS',
       popularDestinations: ['Buenos Aires', 'Bariloche', 'Mendoza', 'Iguazu'],
     ),
     Country(
@@ -165,7 +165,7 @@ class Country {
       name: 'Bahrain',
       localName: 'Bahreyn',
       flag: '🇧🇭',
-      defaultCurrency: 'USD',
+      defaultCurrency: 'BHD',
       popularDestinations: ['Manama', 'Muharrak', 'Riffa'],
     ),
     Country(
@@ -277,7 +277,7 @@ class Country {
       name: 'Bulgaria',
       localName: 'Bulgaristan',
       flag: '🇧🇬',
-      defaultCurrency: 'EUR',
+      defaultCurrency: 'BGN',
       popularDestinations: ['Sofya', 'Plovdiv', 'Varna', 'Burgas', 'Bansko'],
     ),
     Country(
@@ -469,7 +469,7 @@ class Country {
       name: 'Morocco',
       localName: 'Fas',
       flag: '🇲🇦',
-      defaultCurrency: 'EUR',
+      defaultCurrency: 'MAD',
       popularDestinations: ['Marakeş', 'Kazablanka', 'Fes', 'Şafşavan (Chefchaouen)', 'Rabat', 'Tanca'],
     ),
     Country(
@@ -493,7 +493,7 @@ class Country {
       name: 'Philippines',
       localName: 'Filipinler',
       flag: '🇵🇭',
-      defaultCurrency: 'USD',
+      defaultCurrency: 'PHP',
       popularDestinations: ['Manila', 'Boracay', 'Cebu', 'Palawan (El Nido)', 'Siargao'],
     ),
     Country(
@@ -613,7 +613,7 @@ class Country {
       name: 'Georgia',
       localName: 'Gürcistan',
       flag: '🇬🇪',
-      defaultCurrency: 'USD',
+      defaultCurrency: 'GEL',
       popularDestinations: ['Tiflis', 'Batum', 'Kazbegi', 'Sighnaghi', 'Kutaisi'],
     ),
     Country(
@@ -725,7 +725,7 @@ class Country {
       name: 'Iceland',
       localName: 'İzlanda',
       flag: '🇮🇸',
-      defaultCurrency: 'EUR',
+      defaultCurrency: 'ISK',
       popularDestinations: ['Reykjavik', 'Vik', 'Akureyri', 'Mavi Lagün (Blue Lagoon)'],
     ),
     Country(
@@ -789,7 +789,7 @@ class Country {
       name: 'Kazakhstan',
       localName: 'Kazakistan',
       flag: '🇰🇿',
-      defaultCurrency: 'USD',
+      defaultCurrency: 'KZT',
       popularDestinations: ['Almatı', 'Astana', 'Çimkent', 'Aktau'],
     ),
     Country(
@@ -829,7 +829,7 @@ class Country {
       name: 'Colombia',
       localName: 'Kolombiya',
       flag: '🇨🇴',
-      defaultCurrency: 'USD',
+      defaultCurrency: 'COP',
       popularDestinations: ['Bogota', 'Medellin', 'Cartagena', 'Cali', 'Santa Marta'],
     ),
     Country(
@@ -861,7 +861,7 @@ class Country {
       name: 'Kuwait',
       localName: 'Kuveyt',
       flag: '🇰🇼',
-      defaultCurrency: 'USD',
+      defaultCurrency: 'KWD',
       popularDestinations: ['Kuveyt Şehri', 'Salmiya', 'Hawalli'],
     ),
     Country(
@@ -989,7 +989,7 @@ class Country {
       name: 'Malaysia',
       localName: 'Malezya',
       flag: '🇲🇾',
-      defaultCurrency: 'USD',
+      defaultCurrency: 'MYR',
       popularDestinations: ['Kuala Lumpur', 'Penang', 'Langkawi', 'Malakka', 'Kota Kinabalu'],
     ),
     Country(
@@ -1173,7 +1173,7 @@ class Country {
       name: 'Pakistan',
       localName: 'Pakistan',
       flag: '🇵🇰',
-      defaultCurrency: 'USD',
+      defaultCurrency: 'PKR',
       popularDestinations: ['İslamabad', 'Lahor', 'Karaçi', 'Hunza Vadisi'],
     ),
     Country(
@@ -1213,7 +1213,7 @@ class Country {
       name: 'Peru',
       localName: 'Peru',
       flag: '🇵🇪',
-      defaultCurrency: 'USD',
+      defaultCurrency: 'PEN',
       popularDestinations: ['Cusco', 'Machu Picchu', 'Lima', 'Arequipa', 'Titicaca Gölü'],
     ),
     Country(
@@ -1237,7 +1237,7 @@ class Country {
       name: 'Romania',
       localName: 'Romanya',
       flag: '🇷🇴',
-      defaultCurrency: 'EUR',
+      defaultCurrency: 'RON',
       popularDestinations: ['Bükreş', 'Braşov', 'Sibiu', 'Köstence', 'Cluj-Napoca'],
     ),
     Country(
@@ -1325,7 +1325,7 @@ class Country {
       name: 'Serbia',
       localName: 'Sırbistan',
       flag: '🇷🇸',
-      defaultCurrency: 'EUR',
+      defaultCurrency: 'RSD',
       popularDestinations: ['Belgrad', 'Novi Sad', 'Niş', 'Subotica', 'Zlatibor'],
     ),
     Country(
@@ -1421,7 +1421,7 @@ class Country {
       name: 'Chile',
       localName: 'Şili',
       flag: '🇨🇱',
-      defaultCurrency: 'USD',
+      defaultCurrency: 'CLP',
       popularDestinations: ['Santiago', 'Valparaiso', 'Atacama Çölü', 'Torres del Paine'],
     ),
     Country(
@@ -1517,7 +1517,7 @@ class Country {
       name: 'Oman',
       localName: 'Umman',
       flag: '🇴🇲',
-      defaultCurrency: 'USD',
+      defaultCurrency: 'OMR',
       popularDestinations: ['Maskat', 'Salalah', 'Nizwa', 'Wahiba Sands'],
     ),
     Country(
@@ -1533,7 +1533,7 @@ class Country {
       name: 'Jordan',
       localName: 'Ürdün',
       flag: '🇯🇴',
-      defaultCurrency: 'USD',
+      defaultCurrency: 'JOD',
       popularDestinations: ['Petra', 'Amman', 'Wadi Rum', 'Akabe', 'Ölü Deniz'],
     ),
     Country(
@@ -1607,6 +1607,22 @@ class Country {
       flag: '🇿🇼',
       defaultCurrency: 'USD',
       popularDestinations: ['Harare', 'Victoria Şelaleleri', 'Bulawayo'],
+    ),
+    Country(
+      code: 'HK',
+      name: 'Hong Kong',
+      localName: 'Hong Kong',
+      flag: '🇭🇰',
+      defaultCurrency: 'HKD',
+      popularDestinations: ['Victoria Harbour', 'Tsim Sha Tsui', 'Central', 'Lantau Island'],
+    ),
+    Country(
+      code: 'TW',
+      name: 'Taiwan',
+      localName: 'Tayvan',
+      flag: '🇹🇼',
+      defaultCurrency: 'TWD',
+      popularDestinations: ['Taipei', 'Kaohsiung', 'Taichung', 'Jiufen', 'Tainan'],
     ),
   ];
 

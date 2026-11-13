@@ -671,6 +671,44 @@ class PreferencesService {
     await saveNotificationHistory(list);
   }
 
+  // --- Two-Way Cloud Sync Diagnostic History Logs ---
+  static const String keySyncHistoryList = 'sync_history_json_list';
+  List<String> getSyncHistory() => _prefs?.getStringList(keySyncHistoryList) ?? [];
+  Future<void> saveSyncHistory(List<String> items) async => _prefs?.setStringList(keySyncHistoryList, items);
+  Future<void> clearSyncHistory() async => _prefs?.remove(keySyncHistoryList);
+
+  Future<void> addSyncHistoryItem(String jsonItem) async {
+    final list = List<String>.from(getSyncHistory());
+    list.insert(0, jsonItem);
+    if (list.length > 30) list.removeLast();
+    await saveSyncHistory(list);
+  }
+
+  // --- User Profile Offline Cache ---
+  static const String keyUserProfileCachePrefix = 'user_profile_cached_';
+  String? getCachedUserProfile(String uid) => _prefs?.getString('${keyUserProfileCachePrefix}_$uid');
+  Future<void> setCachedUserProfile(String uid, String jsonStr) async =>
+      _prefs?.setString('${keyUserProfileCachePrefix}_$uid', jsonStr);
+
+  // --- Recent Searches History ---
+  static const String keyRecentSearches = 'packbuddy_recent_searches';
+  List<String> getRecentSearches() => _prefs?.getStringList(keyRecentSearches) ?? [];
+  Future<void> addRecentSearch(String query) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) return;
+    final list = List<String>.from(getRecentSearches());
+    list.removeWhere((item) => item.toLowerCase() == trimmed.toLowerCase());
+    list.insert(0, trimmed);
+    if (list.length > 10) list.removeLast();
+    await _prefs?.setStringList(keyRecentSearches, list);
+  }
+  Future<void> removeRecentSearch(String query) async {
+    final list = List<String>.from(getRecentSearches());
+    list.removeWhere((item) => item.toLowerCase() == query.trim().toLowerCase());
+    await _prefs?.setStringList(keyRecentSearches, list);
+  }
+  Future<void> clearRecentSearches() async => _prefs?.remove(keyRecentSearches);
+
   static const String keyLastSeenAdminWarningAt = 'last_seen_admin_warning_timestamp';
   int getLastSeenAdminWarningAt({String? uid}) {
     final key = uid != null && uid.isNotEmpty ? '${keyLastSeenAdminWarningAt}_$uid' : keyLastSeenAdminWarningAt;

@@ -257,6 +257,7 @@ class AdminUserModel {
   final List<String> restrictedFeatures;
   final String countryCode;
   final String countryName;
+  final String homeCity;
   final String currencyCode;
   final String liveCountryCode;
   final String liveCountryName;
@@ -291,6 +292,7 @@ class AdminUserModel {
     this.restrictedFeatures = const [],
     this.countryCode = 'US',
     this.countryName = 'United States',
+    this.homeCity = '',
     this.currencyCode = 'USD',
     this.liveCountryCode = '',
     this.liveCountryName = '',
@@ -381,11 +383,14 @@ class AdminUserModel {
               ?.map((e) => e.toString())
               .toList() ??
           const [],
-      countryCode: (data['countryCode'] ?? data['country_code']) as String? ?? 'US',
-      countryName: (data['countryName'] ?? data['country_name']) as String? ?? 'United States',
+      countryCode: (data['homeCountryCode'] ?? data['countryCode'] ?? data['country_code']) as String? ?? 'US',
+      countryName: (data['countryName'] ?? data['country_name'] ??
+          Country.findByCode((data['homeCountryCode'] ?? data['countryCode'] ?? data['country_code'] ?? 'US').toString())?.name) as String? ?? 'United States',
+      homeCity: ((data['homeCity'] ?? data['home_city']) as String? ?? '').trim(),
       currencyCode: (data['currencyCode'] ?? data['currency_code']) as String? ?? 'USD',
-      liveCountryCode: ((data['liveCountryCode'] ?? data['live_country_code'] ?? data['countryCode'] ?? data['country_code']) as String? ?? 'US').toUpperCase().trim(),
-      liveCountryName: ((data['liveCountryName'] ?? data['live_country_name'] ?? data['countryName'] ?? data['country_name']) as String? ?? 'United States').trim(),
+      liveCountryCode: ((data['liveCountryCode'] ?? data['live_country_code']) as String? ?? '').toUpperCase().trim(),
+      liveCountryName: ((data['liveCountryName'] ?? data['live_country_name'] ??
+          (data['liveCountryCode'] != null ? Country.findByCode(data['liveCountryCode'].toString())?.name : '')) as String? ?? '').trim(),
       liveCity: ((data['liveCity'] ?? data['live_city']) as String? ?? '').trim(),
       appThemeMode: ((data['appThemeMode'] ?? data['app_theme_mode'] ?? data['themeMode'] ?? data['theme_mode']) as String? ?? 'light').toLowerCase().trim(),
       appLanguage: ((data['appLanguage'] ?? data['app_language'] ?? data['languageCode'] ?? data['language_code']) as String? ?? 'tr').toLowerCase().trim(),
@@ -406,11 +411,22 @@ class AdminUserModel {
   double get averageSessionMinutes =>
       sessionCount > 0 ? (totalSessionSeconds / sessionCount / 60) : 0.0;
 
+  String get effectiveHomeCountryCode => countryCode.isNotEmpty ? countryCode : 'US';
+
+  String get effectiveHomeCountryName => countryName.isNotEmpty ? countryName : 'United States';
+
+  String get effectiveHomeCity => homeCity.isNotEmpty ? homeCity : '';
+
   String get effectiveLiveCountryCode =>
-      liveCountryCode.isNotEmpty ? liveCountryCode : (countryCode.isNotEmpty ? countryCode : 'US');
+      liveCountryCode.isNotEmpty ? liveCountryCode : effectiveHomeCountryCode;
 
   String get effectiveLiveCountryName =>
-      liveCountryName.isNotEmpty ? liveCountryName : (countryName.isNotEmpty ? countryName : 'United States');
+      liveCountryName.isNotEmpty ? liveCountryName : effectiveHomeCountryName;
+
+  bool get hasDistinctLiveLocation =>
+      liveCountryCode.isNotEmpty &&
+      (liveCountryCode.toUpperCase() != effectiveHomeCountryCode.toUpperCase() ||
+          (liveCity.isNotEmpty && liveCity.toLowerCase() != effectiveHomeCity.toLowerCase()));
 
   int get visitedWorldMapCount => travelMapCountries.values.where((v) {
         String status = '';

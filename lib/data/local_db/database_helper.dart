@@ -135,6 +135,31 @@ class DatabaseHelper {
         await db.execute("ALTER TABLE ${AppConstants.tableExpenses} ADD COLUMN user_id TEXT NOT NULL DEFAULT ''");
       }
     } catch (_) {}
+
+    // 5. Itinerary Items table integrity
+    try {
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS ${AppConstants.tableItineraryItems} (
+          id TEXT PRIMARY KEY NOT NULL,
+          user_id TEXT NOT NULL,
+          trip_id TEXT NOT NULL,
+          day_number INTEGER NOT NULL,
+          date TEXT NOT NULL,
+          time TEXT,
+          title TEXT NOT NULL,
+          description TEXT,
+          location TEXT,
+          category TEXT NOT NULL DEFAULT 'sightseeing',
+          cost REAL,
+          currency TEXT,
+          is_completed INTEGER NOT NULL DEFAULT 0,
+          created_at INTEGER NOT NULL,
+          updated_at INTEGER NOT NULL,
+          is_deleted INTEGER NOT NULL DEFAULT 0,
+          FOREIGN KEY (trip_id) REFERENCES ${AppConstants.tableTrips}(id) ON DELETE CASCADE
+        )
+      ''');
+    } catch (_) {}
   }
 
   Future<void> _createDB(Database db, int version) async {
@@ -241,6 +266,29 @@ class DatabaseHelper {
         updated_at INTEGER NOT NULL,
         is_deleted INTEGER NOT NULL DEFAULT 0,
         PRIMARY KEY (user_id, code)
+      )
+    ''');
+
+    // 7. Itinerary Items Table (Multi-tenant with user_id)
+    await db.execute('''
+      CREATE TABLE ${AppConstants.tableItineraryItems} (
+        id TEXT PRIMARY KEY NOT NULL,
+        user_id TEXT NOT NULL,
+        trip_id TEXT NOT NULL,
+        day_number INTEGER NOT NULL,
+        date TEXT NOT NULL,
+        time TEXT,
+        title TEXT NOT NULL,
+        description TEXT,
+        location TEXT,
+        category TEXT NOT NULL DEFAULT 'sightseeing',
+        cost REAL,
+        currency TEXT,
+        is_completed INTEGER NOT NULL DEFAULT 0,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        is_deleted INTEGER NOT NULL DEFAULT 0,
+        FOREIGN KEY (trip_id) REFERENCES ${AppConstants.tableTrips}(id) ON DELETE CASCADE
       )
     ''');
   }
@@ -369,6 +417,33 @@ class DatabaseHelper {
         await db.execute('ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN is_private INTEGER NOT NULL DEFAULT 0');
       } catch (_) {}
     }
+
+    // Version 13: Add itinerary_items table for day-by-day activity planning
+    if (oldVersion < 13) {
+      try {
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS ${AppConstants.tableItineraryItems} (
+            id TEXT PRIMARY KEY NOT NULL,
+            user_id TEXT NOT NULL,
+            trip_id TEXT NOT NULL,
+            day_number INTEGER NOT NULL,
+            date TEXT NOT NULL,
+            time TEXT,
+            title TEXT NOT NULL,
+            description TEXT,
+            location TEXT,
+            category TEXT NOT NULL DEFAULT 'sightseeing',
+            cost REAL,
+            currency TEXT,
+            is_completed INTEGER NOT NULL DEFAULT 0,
+            created_at INTEGER NOT NULL,
+            updated_at INTEGER NOT NULL,
+            is_deleted INTEGER NOT NULL DEFAULT 0,
+            FOREIGN KEY (trip_id) REFERENCES ${AppConstants.tableTrips}(id) ON DELETE CASCADE
+          )
+        ''');
+      } catch (_) {}
+    }
   }
 
   /// Completely wipes all local SQLite tables (useful for sign-outs)
@@ -388,6 +463,7 @@ class DatabaseHelper {
       await txn.delete(AppConstants.tableDocuments);
       await txn.delete(AppConstants.tableTrips);
       await txn.delete(AppConstants.tableTravelMap);
+      await txn.delete(AppConstants.tableItineraryItems);
       await txn.delete(AppConstants.tableSyncMetadata);
     });
 
@@ -431,6 +507,53 @@ class DatabaseHelper {
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+  }
+
+  /// Calculates count of local records that have been modified or created
+  /// since the last successful cloud synchronization.
+  Future<Map<String, int>> getPendingChangesBreakdown({String? userId}) async {
+    final uid = userId ?? _currentUserId;
+    if (uid.isEmpty) {
+      return {'trips': 0, 'checklist': 0, 'expenses': 0, 'documents': 0, 'total': 0};
+    }
+
+    final lastSynced = await getLastSyncedAt() ?? 0;
+    final db = await database;
+
+    final tripsCount = Sqflite.firstIntValue(await db.rawQuery(
+      'SELECT COUNT(*) FROM ${AppConstants.tableTrips} WHERE user_id = ? AND updated_at > ?',
+      [uid, lastSynced],
+    )) ?? 0;
+
+    final checklistCount = Sqflite.firstIntValue(await db.rawQuery(
+      'SELECT COUNT(*) FROM ${AppConstants.tableChecklistItems} WHERE user_id = ? AND updated_at > ?',
+      [uid, lastSynced],
+    )) ?? 0;
+
+    final expensesCount = Sqflite.firstIntValue(await db.rawQuery(
+      'SELECT COUNT(*) FROM ${AppConstants.tableExpenses} WHERE user_id = ? AND updated_at > ?',
+      [uid, lastSynced],
+    )) ?? 0;
+
+    final documentsCount = Sqflite.firstIntValue(await db.rawQuery(
+      'SELECT COUNT(*) FROM ${AppConstants.tableDocuments} WHERE user_id = ? AND updated_at > ?',
+      [uid, lastSynced],
+    )) ?? 0;
+
+    final itineraryCount = Sqflite.firstIntValue(await db.rawQuery(
+      'SELECT COUNT(*) FROM ${AppConstants.tableItineraryItems} WHERE user_id = ? AND updated_at > ?',
+      [uid, lastSynced],
+    )) ?? 0;
+
+    final total = tripsCount + checklistCount + expensesCount + documentsCount + itineraryCount;
+    return {
+      'trips': tripsCount,
+      'checklist': checklistCount,
+      'expenses': expensesCount,
+      'documents': documentsCount,
+      'itinerary': itineraryCount,
+      'total': total,
+    };
   }
 
   // ==========================================
@@ -1312,6 +1435,228 @@ class DatabaseHelper {
       AppConstants.tableTravelMap,
       where: '(user_id = "" OR user_id IS NULL) AND is_deleted = 0',
     );
+  }
+
+  // ==========================================
+  // ITINERARY CRUD OPERATIONS (DAY-BY-DAY)
+  // ==========================================
+
+  /// Inserts a new itinerary activity in local SQLite
+  Future<int> insertItineraryItem(Map<String, dynamic> row) async {
+    final db = await database;
+    final rowCopy = Map<String, dynamic>.from(row);
+    if (!rowCopy.containsKey('user_id') || (rowCopy['user_id'] as String).isEmpty) {
+      rowCopy['user_id'] = _currentUserId;
+    }
+    final now = DateTime.now().millisecondsSinceEpoch;
+    rowCopy['created_at'] = rowCopy['created_at'] ?? now;
+    rowCopy['updated_at'] = now;
+    rowCopy['is_deleted'] = 0;
+    return await db.insert(
+      AppConstants.tableItineraryItems,
+      rowCopy,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  /// Retrieves itinerary activities for a trip, sorted by day_number, time, and created_at
+  Future<List<Map<String, dynamic>>> getItineraryItemsByTrip(
+    String tripId, {
+    String? userId,
+    bool includeDeleted = false,
+  }) async {
+    final db = await database;
+    final effectiveUid = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
+
+    if (effectiveUid.isNotEmpty) {
+      if (includeDeleted) {
+        return await db.query(
+          AppConstants.tableItineraryItems,
+          where: 'trip_id = ? AND (user_id = ? OR user_id = "")',
+          whereArgs: [tripId, effectiveUid],
+          orderBy: 'day_number ASC, time ASC, created_at ASC',
+        );
+      }
+      return await db.query(
+        AppConstants.tableItineraryItems,
+        where: 'trip_id = ? AND (user_id = ? OR user_id = "") AND is_deleted = 0',
+        whereArgs: [tripId, effectiveUid],
+        orderBy: 'day_number ASC, time ASC, created_at ASC',
+      );
+    }
+
+    if (includeDeleted) {
+      return await db.query(
+        AppConstants.tableItineraryItems,
+        where: 'trip_id = ? AND (user_id = "" OR user_id IS NULL)',
+        whereArgs: [tripId],
+        orderBy: 'day_number ASC, time ASC, created_at ASC',
+      );
+    }
+    return await db.query(
+      AppConstants.tableItineraryItems,
+      where: 'trip_id = ? AND (user_id = "" OR user_id IS NULL) AND is_deleted = 0',
+      whereArgs: [tripId],
+      orderBy: 'day_number ASC, time ASC, created_at ASC',
+    );
+  }
+
+  /// Updates an existing itinerary activity
+  Future<int> updateItineraryItem(Map<String, dynamic> row) async {
+    final db = await database;
+    final rowCopy = Map<String, dynamic>.from(row);
+    rowCopy['updated_at'] = DateTime.now().millisecondsSinceEpoch;
+    final id = rowCopy['id'] as String;
+    return await db.update(
+      AppConstants.tableItineraryItems,
+      rowCopy,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  /// Toggles an itinerary activity's completed status
+  Future<int> toggleItineraryItemCompletion(String id, bool isCompleted) async {
+    final db = await database;
+    return await db.update(
+      AppConstants.tableItineraryItems,
+      {
+        'is_completed': isCompleted ? 1 : 0,
+        'updated_at': DateTime.now().millisecondsSinceEpoch,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  /// Soft deletes an itinerary activity
+  Future<int> deleteItineraryItem(String id) async {
+    final db = await database;
+    return await db.update(
+      AppConstants.tableItineraryItems,
+      {
+        'is_deleted': 1,
+        'updated_at': DateTime.now().millisecondsSinceEpoch,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  /// Hard deletes an itinerary activity (permanent)
+  Future<int> hardDeleteItineraryItem(String id) async {
+    final db = await database;
+    return await db.delete(
+      AppConstants.tableItineraryItems,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  /// Multi-table unified search across Trips, Checklist Items, Vault Documents, and Expenses
+  Future<List<Map<String, dynamic>>> globalSearch({
+    required String query,
+    String? userId,
+    int limit = 50,
+  }) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) return [];
+
+    final db = await database;
+    final term = '%$trimmed%';
+    final effectiveUid = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
+    final results = <Map<String, dynamic>>[];
+
+    final bool hasUid = effectiveUid.isNotEmpty;
+
+    // 1. Trips
+    final tripWhere = hasUid
+        ? '(user_id = ? OR user_id = "") AND is_deleted = 0 AND (title LIKE ? OR destination LIKE ? OR notes LIKE ?)'
+        : '(user_id = "" OR user_id IS NULL) AND is_deleted = 0 AND (title LIKE ? OR destination LIKE ? OR notes LIKE ?)';
+    final tripArgs = hasUid ? [effectiveUid, term, term, term] : [term, term, term];
+
+    final trips = await db.query(
+      AppConstants.tableTrips,
+      columns: ['id', 'title', 'destination', 'country_code', 'start_date', 'end_date', 'transport_mode', 'updated_at'],
+      where: tripWhere,
+      whereArgs: tripArgs,
+      orderBy: 'updated_at DESC',
+      limit: limit,
+    );
+    for (final row in trips) {
+      final map = Map<String, dynamic>.from(row);
+      map['search_type'] = 'trip';
+      results.add(map);
+    }
+
+    // 2. Checklist Items
+    final itemWhere = hasUid
+        ? '(user_id = ? OR user_id = "") AND is_deleted = 0 AND (name LIKE ? OR category LIKE ?)'
+        : '(user_id = "" OR user_id IS NULL) AND is_deleted = 0 AND (name LIKE ? OR category LIKE ?)';
+    final itemArgs = hasUid ? [effectiveUid, term, term] : [term, term];
+
+    final items = await db.query(
+      AppConstants.tableChecklistItems,
+      columns: ['id', 'trip_id', 'name', 'category', 'quantity', 'is_packed', 'tag', 'updated_at'],
+      where: itemWhere,
+      whereArgs: itemArgs,
+      orderBy: 'updated_at DESC',
+      limit: limit,
+    );
+    for (final row in items) {
+      final map = Map<String, dynamic>.from(row);
+      map['search_type'] = 'packingItem';
+      results.add(map);
+    }
+
+    // 3. Documents
+    final docWhere = hasUid
+        ? '(user_id = ? OR user_id = "") AND is_deleted = 0 AND (title LIKE ? OR category LIKE ? OR notes LIKE ?)'
+        : '(user_id = "" OR user_id IS NULL) AND is_deleted = 0 AND (title LIKE ? OR category LIKE ? OR notes LIKE ?)';
+    final docArgs = hasUid ? [effectiveUid, term, term, term] : [term, term, term];
+
+    final docs = await db.query(
+      AppConstants.tableDocuments,
+      columns: ['id', 'trip_id', 'title', 'category', 'sub_category', 'file_type', 'local_image_path', 'updated_at'],
+      where: docWhere,
+      whereArgs: docArgs,
+      orderBy: 'updated_at DESC',
+      limit: limit,
+    );
+    for (final row in docs) {
+      final map = Map<String, dynamic>.from(row);
+      map['search_type'] = 'document';
+      results.add(map);
+    }
+
+    // 4. Expenses
+    final expWhere = hasUid
+        ? '(user_id = ? OR user_id = "") AND is_deleted = 0 AND (title LIKE ? OR category LIKE ? OR notes LIKE ?)'
+        : '(user_id = "" OR user_id IS NULL) AND is_deleted = 0 AND (title LIKE ? OR category LIKE ? OR notes LIKE ?)';
+    final expArgs = hasUid ? [effectiveUid, term, term, term] : [term, term, term];
+
+    final expenses = await db.query(
+      AppConstants.tableExpenses,
+      columns: ['id', 'trip_id', 'title', 'amount', 'currency', 'category', 'date', 'updated_at'],
+      where: expWhere,
+      whereArgs: expArgs,
+      orderBy: 'updated_at DESC',
+      limit: limit,
+    );
+    for (final row in expenses) {
+      final map = Map<String, dynamic>.from(row);
+      map['search_type'] = 'expense';
+      results.add(map);
+    }
+
+    // Sort combined results by updated_at descending
+    results.sort((a, b) {
+      final aTime = (a['updated_at'] as num?)?.toInt() ?? 0;
+      final bTime = (b['updated_at'] as num?)?.toInt() ?? 0;
+      return bTime.compareTo(aTime);
+    });
+
+    return results;
   }
 
   Future<void> close() async {

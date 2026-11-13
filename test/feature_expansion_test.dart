@@ -53,9 +53,9 @@ void main() {
     });
   });
 
-  group('4: Multi-Currency Expansion (30 Currencies)', () {
-    test('CurrencyFormatter supports 30 world currencies', () {
-      expect(CurrencyFormatter.supportedCurrencies.length, 30);
+  group('4: Multi-Currency Expansion (50 Currencies)', () {
+    test('CurrencyFormatter supports 50 world currencies', () {
+      expect(CurrencyFormatter.supportedCurrencies.length, 50);
 
       // Verify major and regional currencies
       final testCases = {

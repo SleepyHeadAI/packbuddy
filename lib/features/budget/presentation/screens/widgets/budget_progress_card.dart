@@ -9,12 +9,16 @@ class BudgetProgressCard extends StatelessWidget {
   final double? budgetLimit;
   final double totalSpent;
   final String currency;
+  final String? originalCurrency;
+  final double? originalTotalSpent;
 
   const BudgetProgressCard({
     super.key,
     required this.budgetLimit,
     required this.totalSpent,
     required this.currency,
+    this.originalCurrency,
+    this.originalTotalSpent,
   });
 
   @override
@@ -173,6 +177,23 @@ class BudgetProgressCard extends StatelessWidget {
                           ),
                         ),
                       ),
+                      if (originalCurrency != null &&
+                          originalTotalSpent != null &&
+                          originalCurrency != currency) ...[
+                        const SizedBox(height: 2),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            '≈ ${CurrencyFormatter.format(originalTotalSpent!, currency: originalCurrency!)}',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: theme.colorScheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),

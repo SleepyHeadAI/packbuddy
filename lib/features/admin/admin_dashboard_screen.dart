@@ -3128,8 +3128,18 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
     final lastActiveStr =
         AppDateFormatter.formatDateTime(user.effectiveLastActiveAt);
 
-    final effectiveCountry = user.effectiveLiveCountryCode;
-    final flagEmoji = countryCodeToFlagEmoji(effectiveCountry);
+    final homeCountry = user.effectiveHomeCountryCode;
+    final homeFlag = countryCodeToFlagEmoji(homeCountry);
+    final homeDisplay = user.effectiveHomeCity.isNotEmpty
+        ? '$homeFlag ${user.effectiveHomeCity}'
+        : '$homeFlag $homeCountry';
+
+    final liveCountry = user.effectiveLiveCountryCode;
+    final liveFlag = countryCodeToFlagEmoji(liveCountry);
+    final liveDisplay = user.liveCity.isNotEmpty
+        ? '$liveFlag ${user.liveCity}'
+        : '$liveFlag $liveCountry';
+
     final isBanned = user.isCurrentlyBanned;
     final isRestricted = user.restrictedFeatures.isNotEmpty;
 
@@ -3293,14 +3303,21 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               runSpacing: 6,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                // Location Badge (Live Country & City)
+                // 1. İkametgah / Yaşadığı Yer (Profil Seçimi)
                 StatusBadge(
-                  label: user.liveCity.isNotEmpty
-                      ? '$flagEmoji ${user.liveCity}, $effectiveCountry'
-                      : '$flagEmoji $effectiveCountry',
-                  icon: Icons.place_outlined,
-                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                  textColor: theme.colorScheme.onSurface,
+                  label: homeDisplay,
+                  icon: Icons.home_rounded,
+                  backgroundColor: const Color(0xFF8B5CF6).withValues(alpha: 0.12),
+                  textColor: const Color(0xFF7C3AED),
+                  maxWidth: 130,
+                ),
+
+                // 2. Anlık Canlı Konum (Ağ / IP)
+                StatusBadge(
+                  label: liveDisplay,
+                  icon: Icons.my_location_rounded,
+                  backgroundColor: const Color(0xFF10B981).withValues(alpha: 0.12),
+                  textColor: const Color(0xFF059669),
                   maxWidth: 130,
                 ),
 
@@ -4604,6 +4621,7 @@ class _UserModerationBottomSheetState
   /// Live Identity, Live Location & Preferences Card
   Widget _buildUserIdentityCard(BuildContext context, AdminUserModel user, bool isTr) {
     final theme = Theme.of(context);
+    final homeFlag = countryCodeToFlagEmoji(user.effectiveHomeCountryCode);
     final liveFlag = countryCodeToFlagEmoji(user.effectiveLiveCountryCode);
 
     String themeLabel;
@@ -4687,21 +4705,83 @@ class _UserModerationBottomSheetState
             ],
           ),
           const SizedBox(height: 12),
+          // 1. Row: İkametgah (Profil) vs Anlık Canlı Konum (IP)
           Row(
             children: [
+              // İkametgah / Yaşadığı Yer
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFF8B5CF6).withValues(alpha: 0.2)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        isTr ? 'Canlı Konum' : 'Live Location',
-                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant),
+                      Row(
+                        children: [
+                          const Icon(Icons.home_work_rounded, size: 12, color: Color(0xFF8B5CF6)),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              isTr ? 'İkametgah (Profil)' : 'Home Residence',
+                              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF8B5CF6)),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Text(homeFlag, style: const TextStyle(fontSize: 16)),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              user.effectiveHomeCity.isNotEmpty
+                                  ? '${user.effectiveHomeCountryName} (${user.effectiveHomeCity})'
+                                  : user.effectiveHomeCountryName,
+                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+
+              // Anlık Canlı Konum (Ağ / IP)
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981).withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.2)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.my_location_rounded, size: 12, color: Color(0xFF059669)),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              isTr ? 'Canlı Konum (Ağ/IP)' : 'Live Location (IP)',
+                              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF059669)),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 4),
                       Row(
@@ -4724,33 +4804,37 @@ class _UserModerationBottomSheetState
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        isTr ? 'Para Birimi & Tercihler' : 'Currency & Style',
-                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${user.currencyCode} • $themeIcon $themeLabel • $langFlag $langLabel',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+            ],
+          ),
+          const SizedBox(height: 8),
+
+          // 2. Row: Para Birimi & Tercihler
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.tune_rounded, size: 14, color: theme.colorScheme.onSurfaceVariant),
+                const SizedBox(width: 6),
+                Text(
+                  isTr ? 'Tercihler:' : 'Preferences:',
+                  style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    '${user.currencyCode} • $themeIcon $themeLabel • $langFlag $langLabel',
+                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -4856,25 +4940,25 @@ class _UserModerationBottomSheetState
                       spacing: 6,
                       runSpacing: 6,
                       children: [
-                        // Live / Detected Home Country
+                        // Home Residence from Profile
                         Chip(
                           backgroundColor: theme.colorScheme.surface,
                           side: BorderSide(color: const Color(0xFF8B5CF6).withValues(alpha: 0.3)),
                           labelPadding: const EdgeInsets.symmetric(horizontal: 4),
                           visualDensity: VisualDensity.compact,
                           avatar: Text(
-                            countryCodeToFlagEmoji(user.effectiveLiveCountryCode),
+                            countryCodeToFlagEmoji(user.effectiveHomeCountryCode),
                             style: const TextStyle(fontSize: 14),
                           ),
                           label: Text(
-                            user.liveCity.isNotEmpty
-                                ? '${user.effectiveLiveCountryName} (${user.liveCity})'
-                                : user.effectiveLiveCountryName,
+                            user.effectiveHomeCity.isNotEmpty
+                                ? '${user.effectiveHomeCountryName} (${user.effectiveHomeCity})'
+                                : user.effectiveHomeCountryName,
                             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                           ),
                         ),
                         // Additional countries marked as lived
-                        ...lived.where((c) => c.code.toUpperCase() != user.effectiveLiveCountryCode.toUpperCase()).map((c) {
+                        ...lived.where((c) => c.code.toUpperCase() != user.effectiveHomeCountryCode.toUpperCase()).map((c) {
                           return Chip(
                             backgroundColor: theme.colorScheme.surface,
                             side: BorderSide(color: const Color(0xFF8B5CF6).withValues(alpha: 0.3)),

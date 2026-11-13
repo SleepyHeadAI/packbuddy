@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
 import 'package:packbuddy/features/vault/presentation/controllers/vault_controller.dart';
 import 'package:packbuddy/features/vault/presentation/screens/vault_screen.dart';
+import 'package:packbuddy/features/vault/presentation/screens/widgets/add_document_sheet.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 class FakeVaultController extends StateNotifier<VaultState> implements VaultController {
@@ -198,6 +199,175 @@ void main() {
       // Verify redundant "General" trip filter chip is removed
       expect(find.text('General'), findsNothing);
       expect(find.text('All Trips'), findsNothing);
+    });
+
+    testWidgets('VaultScreen passport slot preserves Passport identity even if document is titled Tickets', (tester) async {
+      final doc = Document(
+        id: 'doc-pass-1',
+        title: 'Tickets', // Reproducing the issue reported by the user
+        category: 'Passport',
+        localImagePath: '/vault/pass.jpg',
+        createdAt: DateTime(2026, 11, 12),
+        updatedAt: DateTime(2026, 11, 12),
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            vaultControllerProvider.overrideWith(
+              (ref) => FakeVaultController(VaultState(isLoading: false, documents: [doc])),
+            ),
+          ],
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
+            home: VaultScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Top right slot should still retain 'Passport Slot' identity
+      expect(find.text('Passport Slot'), findsOneWidget);
+      // And show the document title in subtitle
+      expect(find.textContaining('Tickets'), findsWidgets);
+    });
+
+    testWidgets('VaultScreen passport slot shows document title when title contains Passport', (tester) async {
+      final doc = Document(
+        id: 'doc-pass-2',
+        title: 'My Passport',
+        category: 'Passport',
+        localImagePath: '/vault/pass.jpg',
+        createdAt: DateTime(2026, 11, 12),
+        updatedAt: DateTime(2026, 11, 12),
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            vaultControllerProvider.overrideWith(
+              (ref) => FakeVaultController(VaultState(isLoading: false, documents: [doc])),
+            ),
+          ],
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
+            home: VaultScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Should show 'My Passport' directly as title
+      expect(find.text('My Passport'), findsWidgets);
+    });
+
+    testWidgets('AddDocumentSheet with isCategoryLocked: true locks category to Passport and does not allow selecting others', (tester) async {
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('en'),
+            home: Scaffold(
+              body: AddDocumentSheet(
+                initialCategory: 'Passport',
+                isCategoryLocked: true,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Category is locked to ID & Passport
+      expect(find.text('ID & Passport'), findsWidgets);
+      // Other categories are not selectable/present
+      expect(find.text('Accommodation'), findsNothing);
+      expect(find.text('Health & Insurance'), findsNothing);
+      // Title defaults to My Passport
+      expect(find.text('My Passport'), findsOneWidget);
+    });
+
+    testWidgets('Tapping passport slot when document exists opens options sheet without overflow on small screens', (tester) async {
+      tester.view.physicalSize = const Size(320 * 2.0, 568 * 2.0);
+      tester.view.devicePixelRatio = 2.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final doc = Document(
+        id: 'doc-pass-1',
+        title: 'Brezilya Pasaportu',
+        category: 'Passport',
+        localImagePath: '/vault/pass.jpg',
+        createdAt: DateTime(2026, 11, 12),
+        updatedAt: DateTime(2026, 11, 12),
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            vaultControllerProvider.overrideWith(
+              (ref) => FakeVaultController(VaultState(isLoading: false, documents: [doc])),
+            ),
+          ],
+          child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale('tr'),
+            home: VaultScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Tap on the passport slot (showing its title 'Brezilya Pasaportu')
+      await tester.tap(find.text('Brezilya Pasaportu').first);
+      await tester.pumpAndSettle();
+
+      // Options sheet should appear
+      expect(find.text('Belgeyi Görüntüle'), findsOneWidget);
+      expect(find.textContaining('Değiştir'), findsOneWidget);
+      expect(find.text('Belgeyi Sil'), findsOneWidget);
+    });
+
+    testWidgets('VaultScreen renders cleanly without overflows in German and Arabic (RTL) on 320x568', (tester) async {
+      tester.view.physicalSize = const Size(320 * 2.0, 568 * 2.0);
+      tester.view.devicePixelRatio = 2.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      for (final locale in [const Locale('de'), const Locale('ar')]) {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              vaultControllerProvider.overrideWith(
+                (ref) => FakeVaultController(const VaultState(isLoading: false, documents: [])),
+              ),
+            ],
+            child: MaterialApp(
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: locale,
+              home: const VaultScreen(),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull);
+      }
     });
   });
 }

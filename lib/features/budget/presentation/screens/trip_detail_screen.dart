@@ -21,6 +21,10 @@ import 'package:packbuddy/features/budget/presentation/screens/trips_screen.dart
 import 'package:packbuddy/features/budget/presentation/screens/widgets/share_trip_sheet.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/emergency_guide_sheet.dart';
 import 'package:packbuddy/shared/widgets/quick_actions_sheet.dart';
+import 'package:packbuddy/features/itinerary/presentation/screens/itinerary_screen.dart';
+import 'package:packbuddy/features/itinerary/domain/itinerary_localization.dart';
+import 'package:packbuddy/features/itinerary/presentation/controllers/itinerary_controller.dart';
+import 'package:packbuddy/shared/widgets/app_card.dart';
 
 /// Modern, intuitive Trip Management Hub & Budget Screen
 class TripDetailScreen extends ConsumerStatefulWidget {
@@ -33,9 +37,11 @@ class TripDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
+  final GlobalKey _fabKey = GlobalKey();
   int _viewMode = 0; // 0: All, 1: Category, 2: Payment Method
   String? _selectedCategoryFilter;
   String? _selectedPaymentMethodFilter;
+  String? _selectedBudgetCurrency;
   final Set<String> _collapsedCategories = <String>{};
   final Set<String> _collapsedPaymentMethods = <String>{};
 
@@ -195,6 +201,75 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
               Navigator.of(context).pop();
             },
             child: Text(l10n.deleteTrip),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildItineraryCard(Trip currentTrip, ThemeData theme, String lang) {
+    final itineraryState = ref.watch(itineraryControllerFamily(currentTrip.id));
+    final count = itineraryState.totalCount;
+    final completed = itineraryState.completedCount;
+    final isDark = theme.brightness == Brightness.dark;
+
+    return AppCard(
+      borderRadius: 18,
+      padding: const EdgeInsets.all(16),
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => ItineraryScreen(trip: currentTrip),
+          ),
+        );
+      },
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: const Color(0xFF0284C7).withValues(alpha: isDark ? 0.22 : 0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Center(
+              child: Icon(
+                Icons.event_note_rounded,
+                size: 22,
+                color: Color(0xFF0284C7),
+              ),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  ItineraryLocalization.getItineraryTitle(lang),
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 14.5,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  count == 0
+                      ? (lang == 'tr' ? 'Gün gün aktiviteleri planlayın' : 'Plan activities day by day')
+                      : '$count ${lang == "tr" ? "aktivite planlandı" : "activities planned"} ($completed ${lang == "tr" ? "tamamlandı" : "done"})',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Icon(
+            Icons.chevron_right_rounded,
+            size: 20,
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
           ),
         ],
       ),
@@ -1051,11 +1126,29 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final lang = Localizations.localeOf(context).languageCode;
     final trips = ref.watch(tripControllerProvider).trips;
     final currentTrip = trips.firstWhere((t) => t.id == widget.trip.id, orElse: () => widget.trip);
     final expenseState = ref.watch(expenseControllerProvider(currentTrip.id));
     final country = Country.findByCode(currentTrip.countryCode);
     final transportIcon = TripsScreen.getTransportIcon(currentTrip.transportMode);
+
+    final activeBudgetCurrency = _selectedBudgetCurrency ?? currentTrip.defaultCurrency;
+    final isCustomBudgetCurrency = activeBudgetCurrency.toUpperCase() != currentTrip.defaultCurrency.toUpperCase();
+    final displayTotalSpent = isCustomBudgetCurrency
+        ? CurrencyService.convert(
+            amount: expenseState.totalSpent,
+            fromCurrency: currentTrip.defaultCurrency,
+            toCurrency: activeBudgetCurrency,
+          )
+        : expenseState.totalSpent;
+    final displayBudgetLimit = (isCustomBudgetCurrency && currentTrip.budgetLimit != null)
+        ? CurrencyService.convert(
+            amount: currentTrip.budgetLimit!,
+            fromCurrency: currentTrip.defaultCurrency,
+            toCurrency: activeBudgetCurrency,
+          )
+        : currentTrip.budgetLimit;
 
     // Grouping by Category
     final Map<String, List<Expense>> categoryGroups = {};
@@ -1174,6 +1267,17 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
           ),
           actions: [
             IconButton(
+              icon: const Icon(Icons.event_note_rounded),
+              tooltip: ItineraryLocalization.getItineraryTitle(lang),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ItineraryScreen(trip: currentTrip),
+                  ),
+                );
+              },
+            ),
+            IconButton(
               icon: const Icon(Icons.sos_rounded, color: AppColors.errorPastel),
               tooltip: l10n.emergencyGuideTitle,
               onPressed: () => EmergencyGuideSheet.show(context, currentTrip),
@@ -1198,10 +1302,13 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
           ],
         ),
         floatingActionButton: FloatingActionButton(
+          key: _fabKey,
           heroTag: null,
-          onPressed: () => QuickActionsSheet.showForTripDetail(context, trip: currentTrip),
-          backgroundColor: theme.colorScheme.primary,
-          foregroundColor: theme.colorScheme.onPrimary,
+          onPressed: () => QuickActionsSheet.showForTripDetail(
+            context,
+            trip: currentTrip,
+            fabKey: _fabKey,
+          ),
           elevation: 3,
           child: const Icon(Icons.add_rounded, size: 26),
         ),
@@ -1231,17 +1338,29 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                       ),
                       const SizedBox(height: 16),
 
+                      // 1.5. ITINERARY / DAY-BY-DAY PLANNER CARD
+                      _buildItineraryCard(currentTrip, theme, lang),
+                      const SizedBox(height: 16),
+
                       // 2. BUDGET & ANALYTICS SECTION
                       BudgetProgressCard(
-                        budgetLimit: currentTrip.budgetLimit,
-                        totalSpent: expenseState.totalSpent,
-                        currency: currentTrip.defaultCurrency,
+                        budgetLimit: displayBudgetLimit,
+                        totalSpent: displayTotalSpent,
+                        currency: activeBudgetCurrency,
+                        originalCurrency: isCustomBudgetCurrency ? currentTrip.defaultCurrency : null,
+                        originalTotalSpent: isCustomBudgetCurrency ? expenseState.totalSpent : null,
                       ),
                       if (expenseState.expenses.isNotEmpty) ...[
                         const SizedBox(height: 16),
                         BudgetAnalyticsCard(
                           expenses: expenseState.expenses,
                           tripCurrency: currentTrip.defaultCurrency,
+                          selectedCurrency: activeBudgetCurrency,
+                          onCurrencyChanged: (newCurrency) {
+                            setState(() {
+                              _selectedBudgetCurrency = newCurrency;
+                            });
+                          },
                           totalSpent: expenseState.totalSpent,
                           trip: currentTrip,
                         ),

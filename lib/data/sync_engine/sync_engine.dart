@@ -30,6 +30,7 @@ import '../../features/travel_map/presentation/controllers/travel_map_controller
 import '../../features/budget/presentation/controllers/trip_controller.dart';
 import '../../features/budget/presentation/controllers/expense_controller.dart';
 import '../../features/checklist/presentation/controllers/checklist_controller.dart';
+import '../../features/connectivity/domain/sync_log_entry.dart';
 
 /// Sync Status enumeration for UI and State Management
 enum SyncStatus {
@@ -556,6 +557,7 @@ class SyncEngine extends StateNotifier<SyncState> {
       final isOnline = await hasInternetConnection();
       if (!isOnline) {
         state = state.copyWith(status: SyncStatus.noInternet);
+        _recordSyncLog(status: 'noInternet', itemsSynced: 0, errorMessage: 'No internet connection');
         _scheduleRetry();
         return;
       }
@@ -1504,6 +1506,11 @@ class SyncEngine extends StateNotifier<SyncState> {
         lastSyncTime: DateTime.fromMillisecondsSinceEpoch(syncStartTime),
         syncedCount: processedItems,
       );
+      _recordSyncLog(
+        status: 'upToDate',
+        itemsSynced: processedItems,
+        timestamp: DateTime.fromMillisecondsSinceEpoch(syncStartTime),
+      );
 
       // Reset retry count on successful sync
       _retryCount = 0;
@@ -1537,9 +1544,38 @@ class SyncEngine extends StateNotifier<SyncState> {
         status: SyncStatus.failed,
         errorMessage: e.toString(),
       );
+      _recordSyncLog(
+        status: 'failed',
+        itemsSynced: 0,
+        errorMessage: e.toString(),
+      );
       _scheduleRetry();
     } finally {
       _isSyncing = false;
+    }
+  }
+
+  /// Appends diagnostic sync attempt log into persistent local preferences
+  void _recordSyncLog({
+    required String status,
+    int itemsSynced = 0,
+    int conflictsResolved = 0,
+    String? errorMessage,
+    DateTime? timestamp,
+  }) {
+    try {
+      final now = timestamp ?? DateTime.now();
+      final entry = SyncLogEntry(
+        id: 'sync_${now.millisecondsSinceEpoch}',
+        timestamp: now,
+        status: status,
+        itemsSynced: itemsSynced,
+        conflictsResolved: conflictsResolved,
+        errorMessage: errorMessage,
+      );
+      PreferencesService.instance.addSyncHistoryItem(entry.toJson());
+    } catch (e) {
+      debugPrint('[SyncEngine] Log record notice: $e');
     }
   }
 }

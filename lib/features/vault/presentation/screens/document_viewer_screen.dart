@@ -13,6 +13,7 @@ import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/services/security_service.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
 import '../controllers/vault_controller.dart';
+import 'widgets/add_document_sheet.dart';
 
 /// Fullscreen zoomable document viewer screen supporting images and full in-app PDF viewing with FLAG_SECURE protection
 class DocumentViewerScreen extends ConsumerStatefulWidget {
@@ -25,6 +26,7 @@ class DocumentViewerScreen extends ConsumerStatefulWidget {
 }
 
 class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
+  late Document _currentDoc;
   PdfControllerPinch? _pdfController;
   int _pdfPagesCount = 0;
   int _pdfCurrentPage = 1;
@@ -36,6 +38,7 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
   @override
   void initState() {
     super.initState();
+    _currentDoc = widget.document;
     SecurityService.instance.enableSecureScreen();
     _loadFileBytes();
   }
@@ -229,6 +232,96 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
     );
   }
 
+  void _showEditDialog(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final titleController = TextEditingController(text: _currentDoc.title);
+    String selectedCat = _currentDoc.category;
+
+    final categories = [
+      {'key': 'Ticket', 'label': l10n.tickets},
+      {'key': 'Booking', 'label': l10n.accommodation},
+      {'key': 'Passport', 'label': l10n.idAndPassport},
+      {'key': 'Insurance', 'label': l10n.healthAndInsurance},
+      {'key': 'Other', 'label': l10n.otherDocuments},
+    ];
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: Text(l10n.edit),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: InputDecoration(
+                  labelText: l10n.documentName,
+                  prefixIcon: const Icon(Icons.title_rounded),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                l10n.mainCategory,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                initialValue: categories.any((c) => c['key']?.toLowerCase() == selectedCat.toLowerCase())
+                    ? categories.firstWhere((c) => c['key']?.toLowerCase() == selectedCat.toLowerCase())['key']
+                    : 'Passport',
+                items: categories
+                    .map((c) => DropdownMenuItem(
+                          value: c['key'],
+                          child: Text(c['label']!),
+                        ))
+                    .toList(),
+                onChanged: (val) {
+                  if (val != null) {
+                    setDialogState(() => selectedCat = val);
+                  }
+                },
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: () async {
+                final newTitle = titleController.text.trim();
+                if (newTitle.isNotEmpty) {
+                  final updatedDoc = _currentDoc.copyWith(
+                    title: newTitle,
+                    category: selectedCat,
+                    updatedAt: DateTime.now(),
+                  );
+                  await ref.read(vaultControllerProvider.notifier).updateDocument(updatedDoc);
+                  if (mounted) {
+                    setState(() {
+                      _currentDoc = updatedDoc;
+                    });
+                  }
+                  if (ctx.mounted) {
+                    Navigator.of(ctx).pop();
+                  }
+                }
+              },
+              child: Text(l10n.save),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   String _getCategoryLabel(String cat, AppLocalizations l10n) {
     switch (cat.toLowerCase()) {
       case 'passport':
@@ -322,7 +415,7 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              widget.document.title,
+              _currentDoc.title,
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -332,7 +425,7 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
               overflow: TextOverflow.ellipsis,
             ),
             Text(
-              '${_getCategoryLabel(widget.document.category, l10n)} • ${dateFormat.format(widget.document.createdAt)}',
+              '${_getCategoryLabel(_currentDoc.category, l10n)} • ${dateFormat.format(_currentDoc.createdAt)}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -343,6 +436,25 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
           ],
         ),
         actions: [
+          if (_currentDoc.category.toLowerCase().contains('pasaport') ||
+              _currentDoc.category.toLowerCase().contains('passport'))
+            IconButton(
+              icon: const Icon(Icons.published_with_changes_rounded, color: Colors.white),
+              tooltip: '${l10n.passport} ${l10n.change}',
+              onPressed: () {
+                AddDocumentSheet.show(
+                  context,
+                  initialCategory: 'Passport',
+                  isCategoryLocked: true,
+                  oldDocumentIdToReplace: _currentDoc.id,
+                );
+              },
+            ),
+          IconButton(
+            icon: const Icon(Icons.edit_outlined, color: Colors.white),
+            tooltip: l10n.edit,
+            onPressed: () => _showEditDialog(context, ref),
+          ),
           IconButton(
             icon: const Icon(Icons.open_in_new_rounded, color: Colors.white),
             tooltip: l10n.openInExternalApp,

@@ -12,14 +12,16 @@ void main() {
   });
 
   group('CurrencyService Offline-First & Online Auto-Sync Suite', () {
-    test('1. Default rates are loaded offline with 30 currencies', () {
-      expect(CurrencyService.supportedCurrencies.length, 30);
+    test('1. Default rates are loaded offline with 50 currencies', () {
+      expect(CurrencyService.supportedCurrencies.length, 50);
       expect(CurrencyService.isUsingLiveRates, isFalse);
       expect(CurrencyService.lastUpdatedAt, isNull);
 
       expect(CurrencyService.ratesAgainstUsd['USD'], 1.0);
       expect(CurrencyService.ratesAgainstUsd['GBP'], 0.77);
       expect(CurrencyService.ratesAgainstUsd['VND'], 25300.0);
+      expect(CurrencyService.ratesAgainstUsd['HKD'], 7.78);
+      expect(CurrencyService.ratesAgainstUsd['ARS'], 995.0);
     });
 
     test('2. Vietnam (VND) to UK (GBP) cross-currency conversion is accurate', () {

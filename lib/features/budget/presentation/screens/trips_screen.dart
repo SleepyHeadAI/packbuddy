@@ -90,6 +90,7 @@ class TripsScreen extends ConsumerStatefulWidget {
 }
 
 class _TripsScreenState extends ConsumerState<TripsScreen> {
+  final GlobalKey _fabKey = GlobalKey();
   // Filter tab: 'all' | 'active' | 'past'
   String _selectedFilter = 'all';
 
@@ -255,10 +256,9 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
           ],
         ),
         floatingActionButton: FloatingActionButton(
+          key: _fabKey,
           heroTag: null,
-          onPressed: () => QuickActionsSheet.showForTrips(context),
-          backgroundColor: theme.colorScheme.primary,
-          foregroundColor: theme.colorScheme.onPrimary,
+          onPressed: () => QuickActionsSheet.showForTrips(context, fabKey: _fabKey),
           elevation: 3,
           child: const Icon(Icons.add_rounded, size: 26),
         ),

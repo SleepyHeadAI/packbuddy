@@ -10,6 +10,7 @@ import 'package:packbuddy/features/budget/presentation/controllers/expense_contr
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/core/services/app_widget_service.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
+import 'currency_picker_sheet.dart';
 
 /// Modal bottom sheet to add or edit an expense with multi-currency, payment method, dynamic category, and notes
 class AddExpenseSheet extends ConsumerStatefulWidget {
@@ -147,74 +148,15 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
     super.dispose();
   }
 
-  void _showCurrencyPicker() {
-    final l10n = AppLocalizations.of(context)!;
-    showModalBottomSheet(
-      context: context,
-      sheetAnimationStyle: const AnimationStyle(
-        duration: Duration(milliseconds: 250),
-        curve: Curves.easeOutCubic,
-        reverseDuration: Duration(milliseconds: 200),
-        reverseCurve: Curves.easeInCubic,
-      ),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (ctx) {
-        return RepaintBoundary(
-          child: SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: 12),
-                Center(
-                  child: Container(
-                    width: 44,
-                    height: 4.5,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-                  child: Text(
-                    l10n.changeCurrency,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                ),
-                const Divider(height: 1),
-              Expanded(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: CurrencyFormatter.supportedCurrencies.length,
-                  itemBuilder: (context, index) {
-                    final curr = CurrencyFormatter.supportedCurrencies[index];
-                    final isSelected = curr == _selectedCurrency;
-                    return ListTile(
-                      leading: Text(
-                        CurrencyFormatter.getSymbol(curr),
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      title: Text(CurrencyFormatter.getCurrencyName(curr)),
-                      trailing: isSelected ? const Icon(Icons.check, color: Colors.blue) : null,
-                      onTap: () {
-                        setState(() => _selectedCurrency = curr);
-                        Navigator.of(ctx).pop();
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    },
-  );
+  Future<void> _showCurrencyPicker() async {
+    final picked = await CurrencyPickerSheet.show(
+      context,
+      selectedCurrency: _selectedCurrency,
+      defaultCurrency: widget.defaultCurrency,
+    );
+    if (picked != null && picked != _selectedCurrency) {
+      setState(() => _selectedCurrency = picked);
+    }
   }
 
   Future<void> _pickDate() async {

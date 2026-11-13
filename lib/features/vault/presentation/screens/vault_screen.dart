@@ -86,6 +86,7 @@ class VaultScreen extends ConsumerStatefulWidget {
 }
 
 class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingObserver {
+  final GlobalKey _fabKey = GlobalKey();
   String? _selectedTripFilter; // null = all, or trip.id
   String? _selectedCategoryFilter; // null = all, or category name
   String? _selectedSubCategoryFilter; // null = all, or subcategory name for Biletler
@@ -163,20 +164,20 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
     }
   }
 
-  Color _getCategoryColor(String category) {
+  Color _getCategoryColor(String category, {bool isDark = false}) {
     final cat = category.toLowerCase();
     if (cat.contains('özel') || cat.contains('private')) {
-      return const Color(0xFFE11D48); // Rose / Crimson
+      return isDark ? const Color(0xFFFB7185) : const Color(0xFFE11D48); // Rose / Crimson
     } else if (cat.contains('pasaport') || cat.contains('passport') || cat.contains('kimlik') || cat.contains('vize')) {
-      return const Color(0xFF1E3A8A); // Deep Royal Navy
+      return isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB); // Royal / Sky Blue
     } else if (cat.contains('bilet') || cat.contains('ticket') || cat.contains('transit')) {
-      return const Color(0xFF0284C7); // Sky Blue
+      return isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7); // Sky Blue
     } else if (cat.contains('konaklama') || cat.contains('booking') || cat.contains('rezervasyon') || cat.contains('hotel')) {
-      return const Color(0xFF059669); // Emerald
+      return isDark ? const Color(0xFF34D399) : const Color(0xFF059669); // Emerald
     } else if (cat.contains('sağlık') || cat.contains('sigorta') || cat.contains('insurance')) {
-      return const Color(0xFFE11D48); // Rose
+      return isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626); // Rose / Red
     } else {
-      return const Color(0xFF7C3AED); // Purple
+      return isDark ? const Color(0xFFA78BFA) : const Color(0xFF7C3AED); // Purple
     }
   }
 
@@ -352,6 +353,198 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
       ),
     );
   }
+
+  void _showPassportSlotOptions(BuildContext context, Document passportDoc) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (ctx) => SafeArea(
+        top: false,
+        child: Material(
+          color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          clipBehavior: Clip.antiAlias,
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 14,
+              bottom: MediaQuery.viewInsetsOf(ctx).bottom + 24,
+            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Handle
+              Center(
+                child: Container(
+                  width: 44,
+                  height: 4.5,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Passport Header
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.menu_book_rounded,
+                      size: 22,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.passportSlot,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.2,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          passportDoc.title,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, size: 20),
+                    visualDensity: VisualDensity.compact,
+                    onPressed: () => Navigator.of(ctx).pop(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+
+              // Option 1: View Passport
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(Icons.visibility_rounded, color: theme.colorScheme.primary, size: 20),
+                ),
+                title: Text(
+                  l10n.viewDocument,
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => DocumentViewerScreen(document: passportDoc),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 6),
+
+              // Option 2: Replace / Change Passport (LOCKED to Passport category!)
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.warningPastel.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.published_with_changes_rounded, color: AppColors.warningPastel, size: 20),
+                ),
+                title: Text(
+                  '${l10n.passport} ${l10n.change}',
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                subtitle: Text(
+                  l10n.saveYourPassport,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  AddDocumentSheet.show(
+                    context,
+                    initialCategory: 'Passport',
+                    isCategoryLocked: true,
+                    oldDocumentIdToReplace: passportDoc.id,
+                  );
+                },
+              ),
+              const SizedBox(height: 6),
+
+              // Option 3: Delete
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.errorPastel.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.delete_outline_rounded, color: AppColors.errorPastel, size: 20),
+                ),
+                title: Text(
+                  l10n.deleteDocument,
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppColors.errorPastel),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  _showDeleteDialog(context, passportDoc);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
 
   void _showSetPinDialog() {
     final l10n = AppLocalizations.of(context)!;
@@ -558,7 +751,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
 
     // Find the latest uploaded passport document if any (must NOT be a private photo)
     final passportDoc = vaultState.documents.cast<Document?>().firstWhere(
-          (d) => d != null && !_isPrivate(d) && (d.category.toLowerCase() == 'passport' || d.category.toLowerCase() == 'pasaport'),
+          (d) => d != null && !_isPrivate(d) && (
+            d.category.toLowerCase() == 'passport' ||
+            d.category.toLowerCase() == 'pasaport' ||
+            d.category.toLowerCase() == 'kimlik & pasaport' ||
+            d.category.toLowerCase() == 'id & passport'
+          ),
           orElse: () => null,
         );
 
@@ -664,16 +862,26 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
         floatingActionButton: (vaultState.isLocked || filteredDocuments.isEmpty)
             ? null
             : FloatingActionButton(
+                key: _fabKey,
                 heroTag: null,
                 onPressed: () => QuickActionsSheet.showForVault(
                   context,
                   selectedTripId: _selectedTripFilter,
                   selectedCategory: _selectedCategoryFilter,
+                  fabKey: _fabKey,
+                  fabColor: _selectedCategoryFilter == 'Özel Resimler'
+                      ? const Color(0xFFE11D48)
+                      : null,
+                  fabIconColor: _selectedCategoryFilter == 'Özel Resimler'
+                      ? Colors.white
+                      : null,
                 ),
                 backgroundColor: _selectedCategoryFilter == 'Özel Resimler'
                     ? const Color(0xFFE11D48)
-                    : theme.colorScheme.primary,
-                foregroundColor: Colors.white,
+                    : null,
+                foregroundColor: _selectedCategoryFilter == 'Özel Resimler'
+                    ? Colors.white
+                    : null,
                 elevation: 3,
                 child: const Icon(Icons.add_rounded, size: 26),
               ),
@@ -849,42 +1057,34 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                 borderRadius: BorderRadius.circular(18),
                                 onTap: () {
                                   if (passportDoc != null) {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (_) => DocumentViewerScreen(document: passportDoc),
-                                      ),
-                                    );
+                                    _showPassportSlotOptions(context, passportDoc);
                                   } else {
-                                    AddDocumentSheet.show(context, initialCategory: 'Passport');
+                                    AddDocumentSheet.show(
+                                      context,
+                                      initialCategory: 'Passport',
+                                      isCategoryLocked: true,
+                                    );
                                   }
                                 },
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                                   decoration: BoxDecoration(
                                     color: passportDoc != null
-                                        ? null
+                                        ? (isDark
+                                            ? Color.alphaBlend(theme.colorScheme.primary.withValues(alpha: 0.08), AppColors.surfaceDark)
+                                            : Color.alphaBlend(theme.colorScheme.primary.withValues(alpha: 0.05), AppColors.surfaceLight))
                                         : (isDark ? AppColors.surfaceDark : AppColors.surfaceLight),
-                                    gradient: passportDoc != null
-                                        ? const LinearGradient(
-                                            colors: [
-                                              Color(0xFF1E3A8A),
-                                              Color(0xFF172554),
-                                            ],
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                          )
-                                        : null,
                                     borderRadius: BorderRadius.circular(18),
                                     border: Border.all(
                                       color: passportDoc != null
-                                          ? const Color(0xFFF59E0B).withValues(alpha: 0.5)
+                                          ? theme.colorScheme.primary.withValues(alpha: isDark ? 0.45 : 0.35)
                                           : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
-                                      width: 1,
+                                      width: passportDoc != null ? 1.5 : 1,
                                     ),
                                     boxShadow: passportDoc != null
                                         ? [
                                             BoxShadow(
-                                              color: const Color(0xFF1E3A8A).withValues(alpha: 0.25),
+                                              color: theme.colorScheme.primary.withValues(alpha: isDark ? 0.12 : 0.06),
                                               blurRadius: 8,
                                               offset: const Offset(0, 3),
                                             ),
@@ -900,17 +1100,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                           Container(
                                             padding: const EdgeInsets.all(7),
                                             decoration: BoxDecoration(
-                                              color: passportDoc != null
-                                                  ? const Color(0xFFF59E0B).withValues(alpha: 0.2)
-                                                  : theme.colorScheme.secondary.withValues(alpha: 0.15),
+                                              color: theme.colorScheme.primary.withValues(alpha: 0.15),
                                               shape: BoxShape.circle,
                                             ),
                                             child: Icon(
                                               Icons.menu_book_rounded,
                                               size: 16,
-                                              color: passportDoc != null
-                                                  ? const Color(0xFFF59E0B)
-                                                  : theme.colorScheme.secondary,
+                                              color: theme.colorScheme.primary,
                                             ),
                                           ),
                                           const SizedBox(width: 4),
@@ -921,8 +1117,8 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                                 decoration: BoxDecoration(
                                                   color: passportDoc != null
-                                                      ? const Color(0xFFF59E0B).withValues(alpha: 0.25)
-                                                      : theme.colorScheme.primaryContainer,
+                                                      ? AppColors.successPastel.withValues(alpha: isDark ? 0.25 : 0.15)
+                                                      : theme.colorScheme.primaryContainer.withValues(alpha: 0.8),
                                                   borderRadius: BorderRadius.circular(6),
                                                 ),
                                                 child: Text(
@@ -933,8 +1129,8 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                                     fontSize: 9,
                                                     fontWeight: FontWeight.bold,
                                                     color: passportDoc != null
-                                                        ? const Color(0xFFF59E0B)
-                                                        : theme.colorScheme.primary,
+                                                        ? AppColors.successPastel
+                                                        : (isDark ? theme.colorScheme.onPrimaryContainer : theme.colorScheme.primary),
                                                   ),
                                                 ),
                                               ),
@@ -944,13 +1140,18 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                       ),
                                       const SizedBox(height: 8),
                                       Text(
-                                        passportDoc != null ? passportDoc.title : l10n.passportSlot,
+                                        passportDoc != null
+                                            ? (passportDoc.title.toLowerCase().contains('pasaport') ||
+                                                    passportDoc.title.toLowerCase().contains('passport')
+                                                ? passportDoc.title
+                                                : l10n.passportSlot)
+                                            : l10n.passportSlot,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 13,
-                                          color: passportDoc != null ? Colors.white : theme.colorScheme.onSurface,
+                                          color: theme.colorScheme.onSurface,
                                         ),
                                       ),
                                       const SizedBox(height: 2),
@@ -959,15 +1160,16 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                           Icon(
                                             passportDoc != null ? Icons.visibility_rounded : Icons.add_circle_outline_rounded,
                                             size: 12,
-                                            color: passportDoc != null
-                                                ? const Color(0xFFF59E0B)
-                                                : theme.colorScheme.primary,
+                                            color: theme.colorScheme.primary,
                                           ),
                                           const SizedBox(width: 4),
                                           Expanded(
                                             child: Text(
                                               passportDoc != null
-                                                  ? dateFormat.format(passportDoc.createdAt)
+                                                  ? (passportDoc.title.toLowerCase().contains('pasaport') ||
+                                                          passportDoc.title.toLowerCase().contains('passport')
+                                                      ? dateFormat.format(passportDoc.createdAt)
+                                                      : '${passportDoc.title} • ${dateFormat.format(passportDoc.createdAt)}')
                                                   : l10n.saveYourPassport,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
@@ -975,7 +1177,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                                 fontSize: 10,
                                                 fontWeight: FontWeight.w500,
                                                 color: passportDoc != null
-                                                    ? Colors.white.withValues(alpha: 0.8)
+                                                    ? theme.colorScheme.onSurfaceVariant
                                                     : theme.colorScheme.primary,
                                               ),
                                             ),
@@ -1074,7 +1276,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                 avatar: const Icon(Icons.assignment_ind_rounded, size: 15),
                                 label: Text(l10n.idAndPassport),
                                 selected: _selectedCategoryFilter == 'Kimlik & Pasaport',
-                                selectedColor: const Color(0xFF1E3A8A),
+                                selectedColor: isDark ? const Color(0xFF2563EB) : const Color(0xFF1D4ED8),
                                 labelStyle: TextStyle(
                                   color: _selectedCategoryFilter == 'Kimlik & Pasaport'
                                       ? Colors.white
@@ -1467,7 +1669,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
                           final doc = filteredDocuments[index];
-                          final categoryColor = _getCategoryColor(doc.category);
+                          final categoryColor = _getCategoryColor(doc.category, isDark: isDark);
                           final categoryIcon = _getCategoryIcon(doc.category, doc.subCategory);
                           final isPdf = doc.isPdf;
 
@@ -1602,7 +1804,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                               child: Container(
                                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                                 decoration: BoxDecoration(
-                                                  color: categoryColor.withValues(alpha: 0.15),
+                                                  color: categoryColor.withValues(alpha: isDark ? 0.22 : 0.12),
                                                   borderRadius: BorderRadius.circular(6),
                                                 ),
                                                 child: Row(

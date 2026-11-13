@@ -493,6 +493,7 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
       child: DropdownButton<String>(
         value: value,
         isExpanded: true,
+        menuMaxHeight: 360,
         icon: const Icon(Icons.arrow_drop_down_rounded, size: 20),
         borderRadius: BorderRadius.circular(16),
         selectedItemBuilder: (context) {

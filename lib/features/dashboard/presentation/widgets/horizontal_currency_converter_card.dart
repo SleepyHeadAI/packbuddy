@@ -427,6 +427,7 @@ class _HorizontalCurrencyConverterCardState
         value: value,
         isDense: true,
         isExpanded: true,
+        menuMaxHeight: 360,
         icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 14),
         borderRadius: BorderRadius.circular(14),
         selectedItemBuilder: (context) {

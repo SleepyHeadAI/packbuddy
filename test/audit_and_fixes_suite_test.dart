@@ -20,10 +20,10 @@ import 'package:packbuddy/l10n/app_localizations.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('Audit Fix 1: CurrencyService & CurrencyFormatter 30 Currencies Synchrony', () {
-    test('CurrencyService supports all 30 currencies defined in CurrencyFormatter', () {
-      expect(CurrencyService.supportedCurrencies.length, 30);
-      expect(CurrencyFormatter.supportedCurrencies.length, 30);
+  group('Audit Fix 1: CurrencyService & CurrencyFormatter 50 Currencies Synchrony', () {
+    test('CurrencyService supports all 50 currencies defined in CurrencyFormatter', () {
+      expect(CurrencyService.supportedCurrencies.length, 50);
+      expect(CurrencyFormatter.supportedCurrencies.length, 50);
       for (final code in CurrencyFormatter.supportedCurrencies) {
         expect(CurrencyService.supportedCurrencies.contains(code), isTrue,
             reason: 'CurrencyService should support $code');

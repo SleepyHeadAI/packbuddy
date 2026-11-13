@@ -26,6 +26,13 @@ import 'package:packbuddy/shared/widgets/app_logo.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/services/legal_consent_localization.dart';
 import 'package:packbuddy/features/auth/presentation/screens/legal_consent_screen.dart';
+import 'package:packbuddy/features/help/presentation/screens/help_screen.dart';
+import 'package:packbuddy/features/help/domain/help_localization.dart';
+import 'package:packbuddy/features/connectivity/presentation/screens/sync_status_screen.dart';
+import 'package:packbuddy/features/connectivity/domain/connectivity_localization.dart';
+import 'package:packbuddy/features/profile/presentation/screens/profile_screen.dart';
+import 'package:packbuddy/features/profile/domain/profile_localization.dart';
+import 'package:packbuddy/features/profile/presentation/controllers/profile_controller.dart';
 
 /// Complete Settings screen handling Language, Theme, Sync, and PackBuddy Pro
 class SettingsScreen extends ConsumerWidget {
@@ -41,6 +48,8 @@ class SettingsScreen extends ConsumerWidget {
     final vaultState = ref.watch(vaultControllerProvider);
     final packingRemindersEnabled = ref.watch(packingRemindersProvider);
     final isAdmin = ref.watch(isAdminProvider);
+    final authUser = ref.watch(authUserProvider);
+    final profileState = ref.watch(profileControllerProvider);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -108,6 +117,69 @@ class SettingsScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 20),
           ],
+
+          // 0.1 User Profile Card
+          AppCard(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            borderRadius: 20,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const ProfileScreen()),
+              );
+            },
+            child: Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: isDark
+                          ? [theme.colorScheme.primary, theme.colorScheme.tertiary]
+                          : [theme.colorScheme.primary, theme.colorScheme.primaryContainer],
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      (profileState.profile?.displayName?.isNotEmpty == true
+                              ? profileState.profile!.displayName![0]
+                              : (authUser?.email?.isNotEmpty == true ? authUser!.email![0] : 'P'))
+                          .toUpperCase(),
+                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 20, color: Colors.white),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        profileState.profile?.displayName?.isNotEmpty == true
+                            ? profileState.profile!.displayName!
+                            : (authUser?.displayName?.isNotEmpty == true
+                                ? authUser!.displayName!
+                                : ProfileLocalization.getTitle(currentLocale.languageCode)),
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        authUser?.email ?? '',
+                        style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurfaceVariant),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
 
           // 1. PackBuddy Pro Banner
           _ProBanner(
@@ -275,6 +347,23 @@ class SettingsScreen extends ConsumerWidget {
                           )
                         : const Icon(Icons.sync_rounded, size: 18),
                     label: Text(l10n.syncNow),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  height: 40,
+                  child: TextButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const SyncStatusScreen()),
+                      );
+                    },
+                    icon: const Icon(Icons.history_rounded, size: 16),
+                    label: Text(
+                      ConnectivityLocalization.getSyncStatusTitle(Localizations.localeOf(context).languageCode),
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                    ),
                   ),
                 ),
               ],
@@ -575,6 +664,78 @@ class SettingsScreen extends ConsumerWidget {
                       icon: const Icon(Icons.edit_note_rounded, size: 18),
                       label: Text(
                         FeedbackL10n.getTitle(Localizations.localeOf(context).languageCode),
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // 7.1 Help & FAQ Section
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: AppCard(
+              padding: const EdgeInsets.all(16),
+              borderRadius: 20,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withValues(alpha: 0.14),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          Icons.help_center_rounded,
+                          size: 18,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              HelpLocalization.getTitle(Localizations.localeOf(context).languageCode),
+                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5),
+                            ),
+                            Text(
+                              HelpLocalization.getSubtitle(Localizations.localeOf(context).languageCode),
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const HelpScreen()),
+                        );
+                      },
+                      icon: const Icon(Icons.menu_book_rounded, size: 18),
+                      label: Text(
+                        HelpLocalization.getTitle(Localizations.localeOf(context).languageCode),
                         style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
                       ),
                       style: OutlinedButton.styleFrom(

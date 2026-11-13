@@ -7,6 +7,7 @@ import '../../settings/presentation/screens/settings_screen.dart';
 import '../../travel_map/presentation/screens/travel_map_screen.dart';
 import '../../vault/presentation/screens/vault_screen.dart';
 import '../../vault/presentation/controllers/vault_controller.dart';
+import '../../connectivity/presentation/widgets/connectivity_banner.dart';
 import 'dashboard_screen.dart';
 import 'navigation_provider.dart';
 
@@ -62,9 +63,16 @@ class _MainShellScaffoldState extends ConsumerState<MainShellScaffold> {
         }
       },
       child: Scaffold(
-        body: FadeIndexedStack(
-          index: selectedIndex.clamp(0, _screens.length - 1),
-          children: _screens,
+        body: Column(
+          children: [
+            const ConnectivityBanner(),
+            Expanded(
+              child: FadeIndexedStack(
+                index: selectedIndex.clamp(0, _screens.length - 1),
+                children: _screens,
+              ),
+            ),
+          ],
         ),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(

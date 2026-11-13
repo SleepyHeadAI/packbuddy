@@ -19,38 +19,58 @@ class CurrencyService {
   static const String liveApiEndpoint = 'https://open.er-api.com/v6/latest/USD';
 
   /// Offline default exchange rates against USD base (1.0 USD = X Currency)
-  /// Serves as the guaranteed resilient offline fallback for all 30 supported currencies.
+  /// Serves as the guaranteed resilient offline fallback for all 50 supported currencies.
   static const Map<String, double> defaultRatesAgainstUsd = {
-    'USD': 1.0,
+    'AED': 3.6725,
+    'ARS': 995.0,
+    'AUD': 1.51,
+    'BGN': 1.80,
+    'BHD': 0.376,
+    'BRL': 5.72,
+    'CAD': 1.38,
+    'CHF': 0.87,
+    'CLP': 955.0,
+    'CNY': 7.15,
+    'COP': 4380.0,
+    'CZK': 23.4,
+    'DKK': 6.88,
+    'EGP': 49.0,
     'EUR': 0.92,
     'GBP': 0.77,
-    'TRY': 34.25,
-    'JPY': 152.5,
-    'CHF': 0.87,
-    'CAD': 1.38,
-    'AUD': 1.51,
-    'AED': 3.6725,
-    'SAR': 3.75,
-    'THB': 33.8,
-    'SGD': 1.32,
-    'KRW': 1385.0,
-    'CNY': 7.15,
-    'INR': 84.1,
-    'BRL': 5.72,
-    'MXN': 19.85,
-    'SEK': 10.6,
-    'NOK': 10.8,
-    'DKK': 6.88,
-    'PLN': 4.02,
-    'IDR': 15650.0,
-    'VND': 25300.0,
-    'EGP': 49.0,
-    'NZD': 1.66,
-    'CZK': 23.4,
+    'GEL': 2.74,
+    'HKD': 7.78,
     'HUF': 371.0,
+    'IDR': 15650.0,
     'ILS': 3.75,
-    'ZAR': 17.65,
+    'INR': 84.1,
+    'ISK': 137.0,
+    'JOD': 0.709,
+    'JPY': 152.5,
+    'KRW': 1385.0,
+    'KWD': 0.307,
+    'KZT': 490.0,
+    'MAD': 9.85,
+    'MXN': 19.85,
+    'MYR': 4.40,
+    'NOK': 10.8,
+    'NZD': 1.66,
+    'OMR': 0.384,
+    'PEN': 3.76,
+    'PHP': 58.50,
+    'PKR': 278.0,
+    'PLN': 4.02,
     'QAR': 3.64,
+    'RON': 4.58,
+    'RSD': 108.0,
+    'SAR': 3.75,
+    'SEK': 10.6,
+    'SGD': 1.32,
+    'THB': 33.8,
+    'TRY': 34.25,
+    'TWD': 32.10,
+    'USD': 1.0,
+    'VND': 25300.0,
+    'ZAR': 17.65,
   };
 
   /// Current active rates in memory (initialized with offline defaults)
@@ -69,7 +89,7 @@ class CurrencyService {
   /// Returns true if live rates have been loaded or synchronized
   static bool get isUsingLiveRates => _lastUpdatedAt != null;
 
-  /// Supported currency codes sorted alphabetically (all 30 canonical travel currencies)
+  /// Supported currency codes sorted alphabetically (all 50 canonical travel currencies)
   static List<String> get supportedCurrencies =>
       (List<String>.from(defaultRatesAgainstUsd.keys)..sort());
 

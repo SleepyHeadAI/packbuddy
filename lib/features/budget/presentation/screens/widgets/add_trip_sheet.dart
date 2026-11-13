@@ -868,7 +868,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                     child: DropdownButtonFormField<String>(
                       initialValue: _selectedCurrency,
                       isExpanded: true,
-                      menuMaxHeight: 280,
+                      menuMaxHeight: 360,
                       borderRadius: BorderRadius.circular(16),
                       decoration: const InputDecoration(
                         contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 14),
@@ -877,7 +877,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                         return DropdownMenuItem(
                           value: curr,
                           child: Text(
-                            '$curr (${CurrencyFormatter.getSymbol(curr)})',
+                            '${CurrencyFormatter.getFlag(curr)} $curr (${CurrencyFormatter.getSymbol(curr)})',
                             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                           ),
                         );

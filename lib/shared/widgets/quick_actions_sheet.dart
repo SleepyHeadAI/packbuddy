@@ -1,5 +1,9 @@
+import 'dart:math' as math;
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/theme/app_colors.dart';
 import '../../l10n/app_localizations.dart';
 import '../widgets/app_card.dart';
 import '../../features/budget/domain/trip.dart';
@@ -43,43 +47,58 @@ class QuickActionsSheet extends StatelessWidget {
     required this.items,
   });
 
-  /// Displays the QuickActionsSheet in a sleek modal
+  /// Displays the QuickActions floating overlay with blurred background and floating bubbles
   static Future<void> show(
     BuildContext context, {
     required String title,
     String? subtitle,
     required List<QuickActionItem> items,
+    GlobalKey? fabKey,
+    Color? fabColor,
+    Color? fabIconColor,
   }) {
-    return showModalBottomSheet(
+    Rect? fabRect;
+    if (fabKey != null && fabKey.currentContext != null) {
+      try {
+        final renderBox = fabKey.currentContext!.findRenderObject() as RenderBox?;
+        if (renderBox != null && renderBox.hasSize) {
+          final origin = renderBox.localToGlobal(Offset.zero);
+          fabRect = Rect.fromLTWH(origin.dx, origin.dy, renderBox.size.width, renderBox.size.height);
+        }
+      } catch (_) {}
+    }
+
+    if (fabRect == null) {
+      final mediaQuery = MediaQuery.of(context);
+      const size = 56.0;
+      final right = 16.0;
+      final bottom = 16.0 + mediaQuery.padding.bottom;
+      fabRect = Rect.fromLTWH(
+        mediaQuery.size.width - right - size,
+        mediaQuery.size.height - bottom - size,
+        size,
+        size,
+      );
+    }
+
+    return showGeneralDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      sheetAnimationStyle: const AnimationStyle(
-        duration: Duration(milliseconds: 250),
-        curve: Curves.easeOutCubic,
-        reverseDuration: Duration(milliseconds: 200),
-        reverseCurve: Curves.easeInCubic,
-      ),
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(ctx).viewInsets.bottom,
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(ctx).scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-          ),
-          padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
-          child: SafeArea(
-            top: false,
-            child: QuickActionsSheet(
-              title: title,
-              subtitle: subtitle,
-              items: items,
-            ),
-          ),
-        ),
-      ),
+      barrierDismissible: true,
+      barrierLabel: 'QuickActionsOverlay',
+      barrierColor: Colors.transparent,
+      transitionDuration: const Duration(milliseconds: 260),
+      pageBuilder: (dialogContext, animation, secondaryAnimation) {
+        return _FloatingQuickActionsOverlay(
+          items: items,
+          fabRect: fabRect!,
+          animation: animation,
+          fabColor: fabColor,
+          fabIconColor: fabIconColor,
+        );
+      },
+      transitionBuilder: (dialogContext, animation, secondaryAnimation, child) {
+        return child;
+      },
     );
   }
 
@@ -88,6 +107,7 @@ class QuickActionsSheet extends StatelessWidget {
     BuildContext context, {
     required WidgetRef ref,
     Trip? activeTrip,
+    GlobalKey? fabKey,
   }) {
     final l10n = AppLocalizations.of(context)!;
     final lang = Localizations.localeOf(context).languageCode;
@@ -168,11 +188,15 @@ class QuickActionsSheet extends StatelessWidget {
       title: l10n.quickActions,
       subtitle: _QuickActionL10n.selectAction(lang),
       items: items,
+      fabKey: fabKey,
     );
   }
 
   /// Preset: Quick Actions for Trips List Screen
-  static Future<void> showForTrips(BuildContext context) {
+  static Future<void> showForTrips(
+    BuildContext context, {
+    GlobalKey? fabKey,
+  }) {
     final l10n = AppLocalizations.of(context)!;
     final lang = Localizations.localeOf(context).languageCode;
     final theme = Theme.of(context);
@@ -201,6 +225,7 @@ class QuickActionsSheet extends StatelessWidget {
       title: l10n.quickActions,
       subtitle: _QuickActionL10n.selectAction(lang),
       items: items,
+      fabKey: fabKey,
     );
   }
 
@@ -208,6 +233,7 @@ class QuickActionsSheet extends StatelessWidget {
   static Future<void> showForTripDetail(
     BuildContext context, {
     required Trip trip,
+    GlobalKey? fabKey,
   }) {
     final l10n = AppLocalizations.of(context)!;
     final lang = Localizations.localeOf(context).languageCode;
@@ -248,6 +274,7 @@ class QuickActionsSheet extends StatelessWidget {
       title: l10n.quickActions,
       subtitle: _QuickActionL10n.selectAction(lang),
       items: items,
+      fabKey: fabKey,
     );
   }
 
@@ -256,6 +283,9 @@ class QuickActionsSheet extends StatelessWidget {
     BuildContext context, {
     String? selectedTripId,
     String? selectedCategory,
+    GlobalKey? fabKey,
+    Color? fabColor,
+    Color? fabIconColor,
   }) {
     final l10n = AppLocalizations.of(context)!;
     final lang = Localizations.localeOf(context).languageCode;
@@ -291,6 +321,9 @@ class QuickActionsSheet extends StatelessWidget {
       title: l10n.quickActions,
       subtitle: _QuickActionL10n.selectAction(lang),
       items: items,
+      fabKey: fabKey,
+      fabColor: fabColor,
+      fabIconColor: fabIconColor,
     );
   }
 
@@ -637,5 +670,272 @@ class _QuickActionL10n {
       default:
         return 'Store encrypted private photos';
     }
+  }
+}
+
+/// Modern minimalist floating action overlay with blurred backdrop and animated bubbles
+class _FloatingQuickActionsOverlay extends StatelessWidget {
+  final List<QuickActionItem> items;
+  final Rect fabRect;
+  final Animation<double> animation;
+  final Color? fabColor;
+  final Color? fabIconColor;
+
+  const _FloatingQuickActionsOverlay({
+    required this.items,
+    required this.fabRect,
+    required this.animation,
+    this.fabColor,
+    this.fabIconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+
+    final rightMargin = math.max(16.0, screenWidth - fabRect.right);
+    final bottomMargin = screenHeight - fabRect.top + 14.0;
+    final availableHeight = math.max(120.0, fabRect.top - mediaQuery.padding.top - 16.0);
+
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, _) {
+        final progress = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeOutCubic,
+          reverseCurve: Curves.easeInCubic,
+        ).value;
+
+        final blurAmount = (16.0 * progress).clamp(0.001, 16.0);
+
+        return Stack(
+          children: [
+            // 1. Fullscreen Blurred Backdrop & Tap-to-Dismiss
+            Positioned.fill(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => Navigator.of(context).pop(),
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(
+                    sigmaX: blurAmount,
+                    sigmaY: blurAmount,
+                  ),
+                  child: Container(
+                    color: (isDark ? const Color(0xFF0F172A) : const Color(0xFF0F172A))
+                        .withValues(alpha: 0.35 * progress),
+                  ),
+                ),
+              ),
+            ),
+
+            // 2. Floating Action Bubbles (Yüzen Minik Yazı Kutucukları)
+            Positioned(
+              right: rightMargin,
+              bottom: bottomMargin,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: screenWidth - 32.0,
+                  maxHeight: availableHeight,
+                ),
+                child: SingleChildScrollView(
+                  reverse: true,
+                  physics: const BouncingScrollPhysics(),
+                  clipBehavior: Clip.none,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      for (int i = 0; i < items.length; i++) ...[
+                        if (i > 0) const SizedBox(height: 12),
+                        _FloatingActionBubble(
+                          item: items[i],
+                          index: i,
+                          totalCount: items.length,
+                          animation: animation,
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            items[i].onTap();
+                          },
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // 3. Yellow Action Button (Smooth 45-degree rotation to '×')
+            Positioned(
+              left: fabRect.left,
+              top: fabRect.top,
+              width: fabRect.width,
+              height: fabRect.height,
+              child: Semantics(
+                button: true,
+                label: 'Close quick actions',
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    key: const Key('quick_actions_fab_close'),
+                    onTap: () => Navigator.of(context).pop(),
+                    borderRadius: BorderRadius.circular(22),
+                    child: Ink(
+                      decoration: BoxDecoration(
+                        color: fabColor ?? (isDark ? AppColors.primaryDark : AppColors.primaryAmber),
+                        borderRadius: BorderRadius.circular(22),
+                        boxShadow: [
+                          BoxShadow(
+                            color: (fabColor ?? (isDark ? AppColors.primaryDark : AppColors.primaryAmber))
+                                .withValues(alpha: 0.4),
+                            blurRadius: 16,
+                            offset: const Offset(0, 4),
+                          ),
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.15),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Transform.rotate(
+                          angle: progress * (math.pi / 4), // 45 degrees
+                          child: Icon(
+                            Icons.add_rounded,
+                            size: 28,
+                            color: fabIconColor ??
+                                (isDark ? AppColors.onPrimaryDark : const Color(0xFF281C00)),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// Single floating action bubble with playful spring entrance and tactile feedback
+class _FloatingActionBubble extends StatefulWidget {
+  final QuickActionItem item;
+  final int index;
+  final int totalCount;
+  final Animation<double> animation;
+  final VoidCallback onTap;
+
+  const _FloatingActionBubble({
+    required this.item,
+    required this.index,
+    required this.totalCount,
+    required this.animation,
+    required this.onTap,
+  });
+
+  @override
+  State<_FloatingActionBubble> createState() => _FloatingActionBubbleState();
+}
+
+class _FloatingActionBubbleState extends State<_FloatingActionBubble> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final distanceFromFab = (widget.totalCount - 1) - widget.index;
+    final startInterval = (distanceFromFab * 0.08).clamp(0.0, 0.5);
+    final endInterval = (startInterval + 0.5).clamp(0.0, 1.0);
+    final curvedProgress = CurvedAnimation(
+      parent: widget.animation,
+      curve: Interval(startInterval, endInterval, curve: Curves.easeOutBack),
+    ).value;
+
+    return Transform.translate(
+      offset: Offset(0, 18.0 * (1.0 - curvedProgress)),
+      child: Transform.scale(
+        scale: (0.75 + 0.25 * curvedProgress).clamp(0.0, 1.05),
+        child: Opacity(
+          opacity: curvedProgress.clamp(0.0, 1.0),
+          child: AnimatedScale(
+            scale: _isPressed ? 0.94 : 1.0,
+            duration: const Duration(milliseconds: 100),
+            curve: Curves.easeOutCubic,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTapDown: (_) => setState(() => _isPressed = true),
+              onTapUp: (_) => setState(() => _isPressed = false),
+              onTapCancel: () => setState(() => _isPressed = false),
+              onTap: () {
+                HapticFeedback.lightImpact();
+                widget.onTap();
+              },
+              child: Container(
+                key: Key('quick_action_${widget.item.title}'),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF1E293B).withValues(alpha: 0.94)
+                      : Colors.white.withValues(alpha: 0.96),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.12)
+                        : Colors.black.withValues(alpha: 0.07),
+                    width: 1.0,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
+                      blurRadius: 14,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: widget.item.iconBgColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          widget.item.icon,
+                          color: widget.item.iconColor,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      widget.item.title,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13.5,
+                        letterSpacing: -0.2,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
