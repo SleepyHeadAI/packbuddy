@@ -33,6 +33,7 @@ import 'package:packbuddy/features/connectivity/domain/connectivity_localization
 import 'package:packbuddy/features/profile/presentation/screens/profile_screen.dart';
 import 'package:packbuddy/features/profile/domain/profile_localization.dart';
 import 'package:packbuddy/features/profile/presentation/controllers/profile_controller.dart';
+import 'package:packbuddy/features/profile/presentation/widgets/user_avatar.dart';
 
 /// Complete Settings screen handling Language, Theme, Sync, and PackBuddy Pro
 class SettingsScreen extends ConsumerWidget {
@@ -129,26 +130,12 @@ class SettingsScreen extends ConsumerWidget {
             },
             child: Row(
               children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: isDark
-                          ? [theme.colorScheme.primary, theme.colorScheme.tertiary]
-                          : [theme.colorScheme.primary, theme.colorScheme.primaryContainer],
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      (profileState.profile?.displayName?.isNotEmpty == true
-                              ? profileState.profile!.displayName![0]
-                              : (authUser?.email?.isNotEmpty == true ? authUser!.email![0] : 'P'))
-                          .toUpperCase(),
-                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 20, color: Colors.white),
-                    ),
-                  ),
+                UserAvatar(
+                  photoUrl: profileState.profile?.photoUrl,
+                  displayName: profileState.profile?.displayName,
+                  email: authUser?.email,
+                  size: 48,
+                  isAnimated: true,
                 ),
                 const SizedBox(width: 14),
                 Expanded(

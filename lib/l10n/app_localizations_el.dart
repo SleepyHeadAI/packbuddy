@@ -2267,4 +2267,9 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get invalidEmail => 'Εισαγάγετε μια έγκυρη διεύθυνση email.';
+
+  @override
+  String revertToCurrency(String currency) {
+    return 'Επιστροφή σε $currency';
+  }
 }

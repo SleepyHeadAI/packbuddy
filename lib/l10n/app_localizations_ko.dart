@@ -2157,4 +2157,9 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get invalidEmail => '유효한 이메일 주소를 입력해 주세요.';
+
+  @override
+  String revertToCurrency(String currency) {
+    return '$currency(으)로 돌아가기';
+  }
 }

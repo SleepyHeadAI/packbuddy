@@ -2155,4 +2155,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get invalidEmail => '有効なメールアドレスを入力してください。';
+
+  @override
+  String revertToCurrency(String currency) {
+    return '$currency に戻す';
+  }
 }

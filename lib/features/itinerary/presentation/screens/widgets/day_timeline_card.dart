@@ -8,6 +8,7 @@ class DayTimelineCard extends StatelessWidget {
   final ItineraryItem item;
   final String languageCode;
   final VoidCallback onToggleCompleted;
+  final VoidCallback? onEdit;
   final VoidCallback onDelete;
 
   const DayTimelineCard({
@@ -15,6 +16,7 @@ class DayTimelineCard extends StatelessWidget {
     required this.item,
     required this.languageCode,
     required this.onToggleCompleted,
+    this.onEdit,
     required this.onDelete,
   });
 
@@ -23,6 +25,7 @@ class DayTimelineCard extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final categoryColor = item.color;
+    final displayTime = item.formattedTimeRange ?? item.time;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -67,95 +70,122 @@ class DayTimelineCard extends StatelessWidget {
             child: AppCard(
               borderRadius: 16,
               padding: const EdgeInsets.all(12),
+              onTap: onEdit,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Row 1: Time, Category Pill, Completion & Delete Action
+                  // Row 1: Badges (Time, Category) & Actions (Complete, Edit, Delete)
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      if (item.time != null && item.time!.isNotEmpty) ...[
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.access_time_rounded,
-                                size: 12,
-                                color: theme.colorScheme.primary,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                item.time!,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  color: theme.colorScheme.primary,
+                      // Badges on left: Time and Category
+                      Expanded(
+                        child: Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            if (displayTime != null && displayTime.isNotEmpty)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.access_time_rounded,
+                                      size: 12,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      displayTime,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                      ],
 
-                      // Category Pill
-                      Flexible(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: categoryColor.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            ItineraryLocalization.getCategoryLabel(item.category, languageCode),
-                            style: TextStyle(
-                              fontSize: 10.5,
-                              fontWeight: FontWeight.w700,
-                              color: categoryColor,
+                            // Category Pill
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                              decoration: BoxDecoration(
+                                color: categoryColor.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                ItineraryLocalization.getCategoryLabel(item.category, languageCode),
+                                style: TextStyle(
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: categoryColor,
+                                ),
+                              ),
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 6),
 
-                      // Checkbox Button
-                      InkWell(
-                        onTap: onToggleCompleted,
-                        borderRadius: BorderRadius.circular(12),
-                        child: Padding(
-                          padding: const EdgeInsets.all(2),
-                          child: Icon(
-                            item.isCompleted
-                                ? Icons.check_box_rounded
-                                : Icons.check_box_outline_blank_rounded,
-                            size: 20,
-                            color: item.isCompleted
-                                ? const Color(0xFF10B981)
-                                : theme.colorScheme.onSurfaceVariant,
+                      // Action buttons on right (aligned to trailing edge)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Checkbox Button
+                          InkWell(
+                            onTap: onToggleCompleted,
+                            borderRadius: BorderRadius.circular(8),
+                            child: Padding(
+                              padding: const EdgeInsets.all(4),
+                              child: Icon(
+                                item.isCompleted
+                                    ? Icons.check_box_rounded
+                                    : Icons.check_box_outline_blank_rounded,
+                                size: 20,
+                                color: item.isCompleted
+                                    ? const Color(0xFF10B981)
+                                    : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-
-                      // Delete Button
-                      InkWell(
-                        onTap: onDelete,
-                        borderRadius: BorderRadius.circular(12),
-                        child: Padding(
-                          padding: const EdgeInsets.all(2),
-                          child: Icon(
-                            Icons.delete_outline_rounded,
-                            size: 18,
-                            color: theme.colorScheme.error.withValues(alpha: 0.7),
+                          if (onEdit != null) ...[
+                            const SizedBox(width: 2),
+                            // Edit Button
+                            InkWell(
+                              onTap: onEdit,
+                              borderRadius: BorderRadius.circular(8),
+                              child: Padding(
+                                padding: const EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.edit_outlined,
+                                  size: 18,
+                                  color: theme.colorScheme.primary.withValues(alpha: 0.85),
+                                ),
+                              ),
+                            ),
+                          ],
+                          const SizedBox(width: 2),
+                          // Delete Button
+                          InkWell(
+                            onTap: onDelete,
+                            borderRadius: BorderRadius.circular(8),
+                            child: Padding(
+                              padding: const EdgeInsets.all(4),
+                              child: Icon(
+                                Icons.delete_outline_rounded,
+                                size: 18,
+                                color: theme.colorScheme.error.withValues(alpha: 0.75),
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ],
                   ),

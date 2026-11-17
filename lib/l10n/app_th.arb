@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "th",
   "appName": "PackBuddy",
   "welcome": "ยินดีต้อนรับสู่ PackBuddy",
@@ -700,5 +700,6 @@
   "setNewVaultPin": "ตั้งรหัส PIN ตู้นิรภัยใหม่",
   "verifyAndContinue": "ยืนยันและดำเนินการต่อ",
   "vaultPinRequiredTitle": "จำเป็นต้องตั้งรหัส PIN ตู้นิรภัย",
-  "invalidEmail": "โปรดป้อนที่อยู่อีเมลที่ถูกต้อง"
+  "invalidEmail": "โปรดป้อนที่อยู่อีเมลที่ถูกต้อง",
+  "revertToCurrency": "กลับไปที่ {currency}"
 }

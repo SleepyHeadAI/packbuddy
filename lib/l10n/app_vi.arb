@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "vi",
   "appName": "PackBuddy",
   "welcome": "Chào mừng đến với PackBuddy",
@@ -700,5 +700,6 @@
   "setNewVaultPin": "Đặt mã PIN kho lưu trữ mới",
   "verifyAndContinue": "Xác minh & Tiếp tục",
   "vaultPinRequiredTitle": "Bắt buộc có mã PIN kho lưu trữ",
-  "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ."
+  "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ.",
+  "revertToCurrency": "Quay lại {currency}"
 }

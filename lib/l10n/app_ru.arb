@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "ru",
   "appName": "PackBuddy",
   "welcome": "Добро пожаловать в PackBuddy",
@@ -700,5 +700,6 @@
   "setNewVaultPin": "Установите новый PIN-код сейфа",
   "verifyAndContinue": "Подтвердить и продолжить",
   "vaultPinRequiredTitle": "PIN-код сейфа обязателен",
-  "invalidEmail": "Пожалуйста, введите действительный адрес эл. почты."
+  "invalidEmail": "Пожалуйста, введите действительный адрес эл. почты.",
+  "revertToCurrency": "Вернуться к {currency}"
 }

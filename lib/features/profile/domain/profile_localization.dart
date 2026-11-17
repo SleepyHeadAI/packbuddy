@@ -695,5 +695,995 @@ class ProfileLocalization {
         return 'Profile updated successfully ✨';
     }
   }
+
+  static String getChangePhoto(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'Fotoğrafı Değiştir';
+      case 'de':
+        return 'Foto ändern';
+      case 'es':
+        return 'Cambiar Foto';
+      case 'fr':
+        return 'Changer de photo';
+      case 'it':
+        return 'Cambia Foto';
+      case 'pt':
+        return 'Mudar Foto';
+      case 'ru':
+        return 'Изменить фото';
+      case 'zh':
+        return '更换头像';
+      case 'ja':
+        return '写真を変更';
+      case 'ko':
+        return '사진 변경';
+      case 'hi':
+        return 'फ़ोटो बदलें';
+      case 'ar':
+        return 'تغيير الصورة';
+      case 'nl':
+        return 'Foto wijzigen';
+      case 'el':
+        return 'Αλλαγή φωτογραφίας';
+      case 'sv':
+        return 'Ändra foto';
+      case 'pl':
+        return 'Zmień zdjęcie';
+      case 'id':
+        return 'Ubah Foto';
+      case 'th':
+        return 'เปลี่ยนรูปภาพ';
+      case 'vi':
+        return 'Đổi ảnh';
+      case 'en':
+      default:
+        return 'Change Photo';
+    }
+  }
+
+  static String getChooseFromGallery(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'Galeriden Fotoğraf Seç';
+      case 'de':
+        return 'Aus Galerie wählen';
+      case 'es':
+        return 'Elegir de la Galería';
+      case 'fr':
+        return 'Choisir dans la galerie';
+      case 'it':
+        return 'Scegli dalla galleria';
+      case 'pt':
+        return 'Escolher da Galeria';
+      case 'ru':
+        return 'Выбрать из галереи';
+      case 'zh':
+        return '从相册选择';
+      case 'ja':
+        return 'ギャラリーから選択';
+      case 'ko':
+        return '갤러리에서 선택';
+      case 'hi':
+        return 'गैलरी से चुनें';
+      case 'ar':
+        return 'اختر من المعرض';
+      case 'nl':
+        return 'Kies uit galerij';
+      case 'el':
+        return 'Επιλογή από τη συλλογή';
+      case 'sv':
+        return 'Välj från galleri';
+      case 'pl':
+        return 'Wybierz z galerii';
+      case 'id':
+        return 'Pilih dari Galeri';
+      case 'th':
+        return 'เลือกจากแกลเลอรี';
+      case 'vi':
+        return 'Chọn từ thư viện';
+      case 'en':
+      default:
+        return 'Choose from Gallery';
+    }
+  }
+
+  static String getRemovePhoto(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'Fotoğrafı Kaldır';
+      case 'de':
+        return 'Foto entfernen';
+      case 'es':
+        return 'Eliminar Foto';
+      case 'fr':
+        return 'Supprimer la photo';
+      case 'it':
+        return 'Rimuovi Foto';
+      case 'pt':
+        return 'Remover Foto';
+      case 'ru':
+        return 'Удалить фото';
+      case 'zh':
+        return '移除头像';
+      case 'ja':
+        return '写真を削除';
+      case 'ko':
+        return '사진 제거';
+      case 'hi':
+        return 'फ़ोटो हटाएं';
+      case 'ar':
+        return 'إزالة الصورة';
+      case 'nl':
+        return 'Foto verwijderen';
+      case 'el':
+        return 'Αφαίρεση φωτογραφίας';
+      case 'sv':
+        return 'Ta bort foto';
+      case 'pl':
+        return 'Usuń zdjęcie';
+      case 'id':
+        return 'Hapus Foto';
+      case 'th':
+        return 'ลบรูปภาพ';
+      case 'vi':
+        return 'Xóa ảnh';
+      case 'en':
+      default:
+        return 'Remove Photo';
+    }
+  }
+
+  static String getCuteAnimalAvatars(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'Tatlı Hayvan Avatarları (20 Karakter)';
+      case 'de':
+        return 'Süße Tier-Avatare (20 Charaktere)';
+      case 'es':
+        return 'Lindos Avatares de Animales (20 Personajes)';
+      case 'fr':
+        return 'Avatars d\'animaux mignons (20 Personnages)';
+      case 'it':
+        return 'Avatar di Animali Carini (20 Personaggi)';
+      case 'pt':
+        return 'Avatares de Animais Fofos (20 Personagens)';
+      case 'ru':
+        return 'Милые аватары животных (20 персонажей)';
+      case 'zh':
+        return '萌宠动物头像 (20款)';
+      case 'ja':
+        return 'かわいい動物アバター (20種類)';
+      case 'ko':
+        return '귀여운 동물 아바타 (20종)';
+      case 'hi':
+        return 'प्यारे पशु अवतार (20 पात्र)';
+      case 'ar':
+        return 'صور رمزية لحيوانات لطيفة (20 شخصية)';
+      case 'nl':
+        return 'Schattige Dierenavatars (20 Karakters)';
+      case 'el':
+        return 'Χαριτωμένα Avatars Ζώων (20 Χαρακτήρες)';
+      case 'sv':
+        return 'Gulliga djuravatarer (20 Karaktärer)';
+      case 'pl':
+        return 'Słodkie awatary zwierząt (20 Postaci)';
+      case 'id':
+        return 'Avatar Hewan Lucu (20 Karakter)';
+      case 'th':
+        return 'อวาตาร์สัตว์น่ารัก (20 ตัวละคร)';
+      case 'vi':
+        return 'Ảnh đại diện thú cưng đáng yêu (20 Nhân vật)';
+      case 'en':
+      default:
+        return 'Cute Animal Avatars (20 Characters)';
+    }
+  }
+
+  static String getSelectAvatar(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'Profil Fotoğrafı Seç';
+      case 'de':
+        return 'Profilfoto auswählen';
+      case 'es':
+        return 'Seleccionar Foto de Perfil';
+      case 'fr':
+        return 'Choisir une photo de profil';
+      case 'it':
+        return 'Seleziona Foto Profilo';
+      case 'pt':
+        return 'Selecionar Foto de Perfil';
+      case 'ru':
+        return 'Выбрать фото профиля';
+      case 'zh':
+        return '选择头像';
+      case 'ja':
+        return 'プロフィール写真を選択';
+      case 'ko':
+        return '프로필 사진 선택';
+      case 'hi':
+        return 'प्रोफ़ाइल फ़ोटो चुनें';
+      case 'ar':
+        return 'اختر صورة الملف الشخصي';
+      case 'nl':
+        return 'Kies Profielfoto';
+      case 'el':
+        return 'Επιλέξτε φωτογραφία προφίλ';
+      case 'sv':
+        return 'Välj profilfoto';
+      case 'pl':
+        return 'Wybierz zdjęcie profilowe';
+      case 'id':
+        return 'Pilih Foto Profil';
+      case 'th':
+        return 'เลือกรูปโปรไฟล์';
+      case 'vi':
+        return 'Chọn ảnh đại diện';
+      case 'en':
+      default:
+        return 'Choose Profile Photo';
+    }
+  }
+
+  static String getPhotoUpdated(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'Profil fotoğrafı güncellendi ✨';
+      case 'de':
+        return 'Profilfoto aktualisiert ✨';
+      case 'es':
+        return 'Foto de perfil actualizada ✨';
+      case 'fr':
+        return 'Photo de profil mise à jour ✨';
+      case 'it':
+        return 'Foto del profilo aggiornata ✨';
+      case 'pt':
+        return 'Foto de perfil atualizada ✨';
+      case 'ru':
+        return 'Фото профиля обновлено ✨';
+      case 'zh':
+        return '头像已更新 ✨';
+      case 'ja':
+        return 'プロフィール写真を更新しました ✨';
+      case 'ko':
+        return '프로필 사진이 업데이트되었습니다 ✨';
+      case 'hi':
+        return 'प्रोफ़ाइल फ़ोटो अपडेट हो गई ✨';
+      case 'ar':
+        return 'تم تحديث صورة الملف الشخصي ✨';
+      case 'nl':
+        return 'Profielfoto bijgewerkt ✨';
+      case 'el':
+        return 'Η φωτογραφία προφίλ ενημερώθηκε ✨';
+      case 'sv':
+        return 'Profilfoto har uppdaterats ✨';
+      case 'pl':
+        return 'Zdjęcie profilowe zostało zaktualizowane ✨';
+      case 'id':
+        return 'Foto profil berhasil diperbarui ✨';
+      case 'th':
+        return 'อัปเดตรูปโปรไฟล์แล้ว ✨';
+      case 'vi':
+        return 'Đã cập nhật ảnh đại diện ✨';
+      case 'en':
+      default:
+        return 'Profile photo updated ✨';
+    }
+  }
+
+  static String getAll(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'Tümü';
+      case 'de':
+        return 'Alle';
+      case 'es':
+        return 'Todos';
+      case 'fr':
+        return 'Tous';
+      case 'it':
+        return 'Tutti';
+      case 'pt':
+        return 'Todos';
+      case 'ru':
+        return 'Все';
+      case 'zh':
+        return '全部';
+      case 'ja':
+        return 'すべて';
+      case 'ko':
+        return '전체';
+      case 'hi':
+        return 'सभी';
+      case 'ar':
+        return 'الكل';
+      case 'nl':
+        return 'Alle';
+      case 'el':
+        return 'Όλα';
+      case 'sv':
+        return 'Alla';
+      case 'pl':
+        return 'Wszystkie';
+      case 'id':
+        return 'Semua';
+      case 'th':
+        return 'ทั้งหมด';
+      case 'vi':
+        return 'Tất cả';
+      case 'en':
+      default:
+        return 'All';
+    }
+  }
+
+  static String getPets(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'Evcil';
+      case 'de':
+        return 'Haustiere';
+      case 'es':
+        return 'Mascotas';
+      case 'fr':
+        return 'Domestiques';
+      case 'it':
+        return 'Domestici';
+      case 'pt':
+        return 'Animais';
+      case 'ru':
+        return 'Питомцы';
+      case 'zh':
+        return '宠物';
+      case 'ja':
+        return 'ペット';
+      case 'ko':
+        return '반려동물';
+      case 'hi':
+        return 'पालतू';
+      case 'ar':
+        return 'أليفة';
+      case 'nl':
+        return 'Huisdieren';
+      case 'el':
+        return 'Κατοικίδια';
+      case 'sv':
+        return 'Husdjur';
+      case 'pl':
+        return 'Domowe';
+      case 'id':
+        return 'Peliharaan';
+      case 'th':
+        return 'สัตว์เลี้ยง';
+      case 'vi':
+        return 'Thú cưng';
+      case 'en':
+      default:
+        return 'Pets';
+    }
+  }
+
+  static String getForest(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'Orman';
+      case 'de':
+        return 'Wald';
+      case 'es':
+        return 'Bosque';
+      case 'fr':
+        return 'Forêt';
+      case 'it':
+        return 'Foresta';
+      case 'pt':
+        return 'Floresta';
+      case 'ru':
+        return 'Лес';
+      case 'zh':
+        return '森林';
+      case 'ja':
+        return '森';
+      case 'ko':
+        return '숲';
+      case 'hi':
+        return 'जंगल';
+      case 'ar':
+        return 'الغابة';
+      case 'nl':
+        return 'Bos';
+      case 'el':
+        return 'Δάσος';
+      case 'sv':
+        return 'Skog';
+      case 'pl':
+        return 'Las';
+      case 'id':
+        return 'Hutan';
+      case 'th':
+        return 'ป่า';
+      case 'vi':
+        return 'Rừng';
+      case 'en':
+      default:
+        return 'Forest';
+    }
+  }
+
+  static String getWild(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'Vahşi';
+      case 'de':
+        return 'Wildtiere';
+      case 'es':
+        return 'Salvajes';
+      case 'fr':
+        return 'Sauvages';
+      case 'it':
+        return 'Selvatici';
+      case 'pt':
+        return 'Selvagens';
+      case 'ru':
+        return 'Дикие';
+      case 'zh':
+        return '野生';
+      case 'ja':
+        return '野生';
+      case 'ko':
+        return '야생';
+      case 'hi':
+        return 'वन्य';
+      case 'ar':
+        return 'برية';
+      case 'nl':
+        return 'Wild';
+      case 'el':
+        return 'Άγρια';
+      case 'sv':
+        return 'Vilda';
+      case 'pl':
+        return 'Dzikie';
+      case 'id':
+        return 'Liar';
+      case 'th':
+        return 'สัตว์ป่า';
+      case 'vi':
+        return 'Hoang dã';
+      case 'en':
+      default:
+        return 'Wild';
+    }
+  }
+
+  static String getSpecial(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'Sevimli & Su';
+      case 'de':
+        return 'Wasser & Süß';
+      case 'es':
+        return 'Agua y Tiernos';
+      case 'fr':
+        return 'Aquatique & Mignon';
+      case 'it':
+        return 'Acquatici e Carini';
+      case 'pt':
+        return 'Aquático & Fofo';
+      case 'ru':
+        return 'Водные и милые';
+      case 'zh':
+        return '水生与萌趣';
+      case 'ja':
+        return '水生＆キュート';
+      case 'ko':
+        return '수생 & 귀여움';
+      case 'hi':
+        return 'जलीय और प्यारा';
+      case 'ar':
+        return 'مائية ولطيفة';
+      case 'nl':
+        return 'Water & Schattig';
+      case 'el':
+        return 'Υδρόβια & Γλυκά';
+      case 'sv':
+        return 'Vatten & Söta';
+      case 'pl':
+        return 'Wodne i urocze';
+      case 'id':
+        return 'Air & Lucu';
+      case 'th':
+        return 'น้ำและน่ารัก';
+      case 'vi':
+        return 'Thủy sinh & Dễ thương';
+      case 'en':
+      default:
+        return 'Cute & Aquatic';
+    }
+  }
+
+  static String getDefaultTravelerName(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'PackBuddy Gezgini';
+      case 'de':
+        return 'PackBuddy Reisender';
+      case 'es':
+        return 'Viajero de PackBuddy';
+      case 'fr':
+        return 'Voyageur PackBuddy';
+      case 'it':
+        return 'Viaggiatore PackBuddy';
+      case 'pt':
+        return 'Viajante PackBuddy';
+      case 'ru':
+        return 'Путешественник PackBuddy';
+      case 'zh':
+        return 'PackBuddy 旅行者';
+      case 'ja':
+        return 'PackBuddy 旅行者';
+      case 'ko':
+        return 'PackBuddy 여행자';
+      case 'hi':
+        return 'PackBuddy यात्री';
+      case 'ar':
+        return 'مسافر PackBuddy';
+      case 'nl':
+        return 'PackBuddy Reiziger';
+      case 'el':
+        return 'Ταξιδιώτης PackBuddy';
+      case 'sv':
+        return 'PackBuddy Resenär';
+      case 'pl':
+        return 'Podróżnik PackBuddy';
+      case 'id':
+        return 'Penjelajah PackBuddy';
+      case 'th':
+        return 'นักเดินทาง PackBuddy';
+      case 'vi':
+        return 'Lữ khách PackBuddy';
+      case 'en':
+      default:
+        return 'PackBuddy Traveler';
+    }
+  }
+
+  static String getSelectCountry(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'Ülke seçin';
+      case 'de':
+        return 'Land auswählen';
+      case 'es':
+        return 'Seleccionar país';
+      case 'fr':
+        return 'Sélectionner un pays';
+      case 'it':
+        return 'Seleziona paese';
+      case 'pt':
+        return 'Selecionar país';
+      case 'ru':
+        return 'Выберите страну';
+      case 'zh':
+        return '选择国家/地区';
+      case 'ja':
+        return '国を選択';
+      case 'ko':
+        return '국가 선택';
+      case 'hi':
+        return 'देश चुनें';
+      case 'ar':
+        return 'اختر الدولة';
+      case 'nl':
+        return 'Land selecteren';
+      case 'el':
+        return 'Επιλέξτε χώρα';
+      case 'sv':
+        return 'Välj land';
+      case 'pl':
+        return 'Wybierz kraj';
+      case 'id':
+        return 'Pilih negara';
+      case 'th':
+        return 'เลือกประเทศ';
+      case 'vi':
+        return 'Chọn quốc gia';
+      case 'en':
+      default:
+        return 'Select country';
+    }
+  }
+
+  static String getEmailStatus(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'E-posta Durumu';
+      case 'de':
+        return 'E-Mail-Status';
+      case 'es':
+        return 'Estado del Correo';
+      case 'fr':
+        return 'Statut de l\'e-mail';
+      case 'it':
+        return 'Stato Email';
+      case 'pt':
+        return 'Status do E-mail';
+      case 'ru':
+        return 'Статус эл. почты';
+      case 'zh':
+        return '邮箱状态';
+      case 'ja':
+        return 'メールステータス';
+      case 'ko':
+        return '이메일 상태';
+      case 'hi':
+        return 'ईमेल स्थिति';
+      case 'ar':
+        return 'حالة البريد الإلكتروني';
+      case 'nl':
+        return 'E-mailstatus';
+      case 'el':
+        return 'Κατάσταση Email';
+      case 'sv':
+        return 'E-poststatus';
+      case 'pl':
+        return 'Status e-mail';
+      case 'id':
+        return 'Status Email';
+      case 'th':
+        return 'สถานะอีเมล';
+      case 'vi':
+        return 'Trạng thái email';
+      case 'en':
+      default:
+        return 'Email Status';
+    }
+  }
+
+  static String getVerified(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'Doğrulandı';
+      case 'de':
+        return 'Verifiziert';
+      case 'es':
+        return 'Verificado';
+      case 'fr':
+        return 'Vérifié';
+      case 'it':
+        return 'Verificato';
+      case 'pt':
+        return 'Verificado';
+      case 'ru':
+        return 'Подтверждён';
+      case 'zh':
+        return '已验证';
+      case 'ja':
+        return '認証済み';
+      case 'ko':
+        return '인증됨';
+      case 'hi':
+        return 'सत्यापित';
+      case 'ar':
+        return 'موثق';
+      case 'nl':
+        return 'Geverifieerd';
+      case 'el':
+        return 'Επαληθευμένο';
+      case 'sv':
+        return 'Verifierad';
+      case 'pl':
+        return 'Zweryfikowano';
+      case 'id':
+        return 'Terverifikasi';
+      case 'th':
+        return 'ยืนยันแล้ว';
+      case 'vi':
+        return 'Đã xác minh';
+      case 'en':
+      default:
+        return 'Verified';
+    }
+  }
+
+  static String getUnverified(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'Doğrulanmadı';
+      case 'de':
+        return 'Nicht verifiziert';
+      case 'es':
+        return 'No verificado';
+      case 'fr':
+        return 'Non vérifié';
+      case 'it':
+        return 'Non verificato';
+      case 'pt':
+        return 'Não verificado';
+      case 'ru':
+        return 'Не подтверждён';
+      case 'zh':
+        return '未验证';
+      case 'ja':
+        return '未認証';
+      case 'ko':
+        return '인증되지 않음';
+      case 'hi':
+        return 'असत्यापित';
+      case 'ar':
+        return 'غير موثق';
+      case 'nl':
+        return 'Niet geverifieerd';
+      case 'el':
+        return 'Μη επαληθευμένο';
+      case 'sv':
+        return 'Ej verifierad';
+      case 'pl':
+        return 'Niezweryfikowany';
+      case 'id':
+        return 'Belum diverifikasi';
+      case 'th':
+        return 'ยังไม่ยืนยัน';
+      case 'vi':
+        return 'Chưa xác minh';
+      case 'en':
+      default:
+        return 'Unverified';
+    }
+  }
+
+  static String getSignInMethod(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'Giriş Yöntemi';
+      case 'de':
+        return 'Anmeldemethode';
+      case 'es':
+        return 'Método de Inicio de Sesión';
+      case 'fr':
+        return 'Méthode de connexion';
+      case 'it':
+        return 'Metodo di Accesso';
+      case 'pt':
+        return 'Método de Entrada';
+      case 'ru':
+        return 'Способ входа';
+      case 'zh':
+        return '登录方式';
+      case 'ja':
+        return 'ログイン方法';
+      case 'ko':
+        return '로그인 방식';
+      case 'hi':
+        return 'लॉग-इन विधि';
+      case 'ar':
+        return 'طريقة تسجيل الدخول';
+      case 'nl':
+        return 'Inlogmethode';
+      case 'el':
+        return 'Μέθοδος Σύνδεσης';
+      case 'sv':
+        return 'Inloggningsmetod';
+      case 'pl':
+        return 'Metoda logowania';
+      case 'id':
+        return 'Metode Masuk';
+      case 'th':
+        return 'วิธีเข้าสู่ระบบ';
+      case 'vi':
+        return 'Phương thức đăng nhập';
+      case 'en':
+      default:
+        return 'Sign-in Method';
+    }
+  }
+
+  static String getEmailAndPassword(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'E-posta ve Şifre';
+      case 'de':
+        return 'E-Mail & Passwort';
+      case 'es':
+        return 'Correo y Contraseña';
+      case 'fr':
+        return 'E-mail et mot de passe';
+      case 'it':
+        return 'Email e Password';
+      case 'pt':
+        return 'E-mail e Senha';
+      case 'ru':
+        return 'Эл. почта и пароль';
+      case 'zh':
+        return '邮箱与密码';
+      case 'ja':
+        return 'メールとパスワード';
+      case 'ko':
+        return '이메일 및 비밀번호';
+      case 'hi':
+        return 'ईमेल और पासवर्ड';
+      case 'ar':
+        return 'البريد الإلكتروني وكلمة المرور';
+      case 'nl':
+        return 'E-mail & Wachtwoord';
+      case 'el':
+        return 'Email & Κωδικός';
+      case 'sv':
+        return 'E-post & Lösenord';
+      case 'pl':
+        return 'E-mail i hasło';
+      case 'id':
+        return 'Email & Kata Sandi';
+      case 'th':
+        return 'อีเมลและรหัสผ่าน';
+      case 'vi':
+        return 'Email & Mật khẩu';
+      case 'en':
+      default:
+        return 'Email & Password';
+    }
+  }
+
+  static String getPlannedRoutesSubtitle(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'planlanan rota';
+      case 'de':
+        return 'geplante Routen';
+      case 'es':
+        return 'rutas planificadas';
+      case 'fr':
+        return 'itinéraires prévus';
+      case 'it':
+        return 'rotte pianificate';
+      case 'pt':
+        return 'rotas planejadas';
+      case 'ru':
+        return 'запланир. маршруты';
+      case 'zh':
+        return '计划行程';
+      case 'ja':
+        return '予定ルート';
+      case 'ko':
+        return '계획된 일정';
+      case 'hi':
+        return 'नियोजित मार्ग';
+      case 'ar':
+        return 'مسارات مخططة';
+      case 'nl':
+        return 'geplande routes';
+      case 'el':
+        return 'σχεδιασμένες διαδρομές';
+      case 'sv':
+        return 'planerade rutter';
+      case 'pl':
+        return 'zaplanowane trasy';
+      case 'id':
+        return 'rute terencana';
+      case 'th':
+        return 'เส้นทางที่วางแผน';
+      case 'vi':
+        return 'lộ trình dự kiến';
+      case 'en':
+      default:
+        return 'planned routes';
+    }
+  }
+
+  static String getWorldShareSubtitle(String lang, String percent) {
+    final clean = _cleanLang(lang);
+    if (clean == 'tr') return '%$percent (dünya)';
+    if (clean == 'de') return '$percent% (Welt)';
+    if (clean == 'es') return '$percent% (mundo)';
+    if (clean == 'fr') return '$percent% (monde)';
+    if (clean == 'it') return '$percent% (mondo)';
+    if (clean == 'pt') return '$percent% (mundo)';
+    if (clean == 'ru') return '$percent% (мир)';
+    if (clean == 'zh') return '$percent% (全球)';
+    if (clean == 'ja') return '$percent% (世界)';
+    if (clean == 'ko') return '$percent% (전 세계)';
+    if (clean == 'hi') return '$percent% (विश्व)';
+    if (clean == 'ar') return '$percent% (العالم)';
+    if (clean == 'nl') return '$percent% (wereld)';
+    if (clean == 'el') return '$percent% (κόσμος)';
+    if (clean == 'sv') return '$percent% (världen)';
+    if (clean == 'pl') return '$percent% (świat)';
+    if (clean == 'id') return '$percent% (dunia)';
+    if (clean == 'th') return '$percent% (ทั่วโลก)';
+    if (clean == 'vi') return '$percent% (thế giới)';
+    return '$percent% (world)';
+  }
+
+  static String getLuggageItemsSubtitle(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'bavul eşyası';
+      case 'de':
+        return 'Gepäckstücke';
+      case 'es':
+        return 'artículos de equipaje';
+      case 'fr':
+        return 'articles de valise';
+      case 'it':
+        return 'oggetti in valigia';
+      case 'pt':
+        return 'itens na mala';
+      case 'ru':
+        return 'предметы багажа';
+      case 'zh':
+        return '行李物品';
+      case 'ja':
+        return '荷物アイテム';
+      case 'ko':
+        return '짐 꾸리기 품목';
+      case 'hi':
+        return 'सामान की वस्तुएं';
+      case 'ar':
+        return 'أمتعة محزومة';
+      case 'nl':
+        return 'bagagestukken';
+      case 'el':
+        return 'είδη αποσκευών';
+      case 'sv':
+        return 'bagageartiklar';
+      case 'pl':
+        return 'przedmioty w bagażu';
+      case 'id':
+        return 'barang koper';
+      case 'th':
+        return 'ของในกระเป๋า';
+      case 'vi':
+        return 'đồ trong hành lý';
+      case 'en':
+      default:
+        return 'luggage items';
+    }
+  }
+
+  static String getEncryptedDocsSubtitle(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'şifreli belge';
+      case 'de':
+        return 'verschlüsselte Dateien';
+      case 'es':
+        return 'archivos cifrados';
+      case 'fr':
+        return 'fichiers chiffrés';
+      case 'it':
+        return 'file crittografati';
+      case 'pt':
+        return 'arquivos criptografados';
+      case 'ru':
+        return 'зашифр. файлы';
+      case 'zh':
+        return '加密文件';
+      case 'ja':
+        return '暗号化ファイル';
+      case 'ko':
+        return '암호화된 문서';
+      case 'hi':
+        return 'एन्क्रिप्टेड दस्तावेज़';
+      case 'ar':
+        return 'ملفات مشفرة';
+      case 'nl':
+        return 'versleutelde bestanden';
+      case 'el':
+        return 'κρυπτογραφημένα αρχεία';
+      case 'sv':
+        return 'krypterade filer';
+      case 'pl':
+        return 'zaszyfrowane pliki';
+      case 'id':
+        return 'berkas terenkripsi';
+      case 'th':
+        return 'ไฟล์ที่เข้ารหัส';
+      case 'vi':
+        return 'tài liệu mã hóa';
+      case 'en':
+      default:
+        return 'encrypted files';
+    }
+  }
 }
 

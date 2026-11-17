@@ -9,6 +9,7 @@ class ItineraryItem {
   final int dayNumber;
   final String date;
   final String? time;
+  final String? endTime;
   final String title;
   final String? description;
   final String? location;
@@ -27,6 +28,7 @@ class ItineraryItem {
     required this.dayNumber,
     required this.date,
     this.time,
+    this.endTime,
     required this.title,
     this.description,
     this.location,
@@ -39,6 +41,17 @@ class ItineraryItem {
     this.isDeleted = false,
   });
 
+  /// Formats the single time or time range (e.g. "08:13 - 09:37" or "08:13")
+  String? get formattedTimeRange {
+    final start = time?.trim();
+    if (start == null || start.isEmpty) return null;
+    final end = endTime?.trim();
+    if (end != null && end.isNotEmpty) {
+      return '$start - $end';
+    }
+    return start;
+  }
+
   ItineraryItem copyWith({
     String? id,
     String? userId,
@@ -46,6 +59,9 @@ class ItineraryItem {
     int? dayNumber,
     String? date,
     String? time,
+    String? endTime,
+    bool clearTime = false,
+    bool clearEndTime = false,
     String? title,
     String? description,
     String? location,
@@ -63,7 +79,8 @@ class ItineraryItem {
       tripId: tripId ?? this.tripId,
       dayNumber: dayNumber ?? this.dayNumber,
       date: date ?? this.date,
-      time: time ?? this.time,
+      time: clearTime ? null : (time ?? this.time),
+      endTime: clearEndTime ? null : (endTime ?? this.endTime),
       title: title ?? this.title,
       description: description ?? this.description,
       location: location ?? this.location,
@@ -85,6 +102,7 @@ class ItineraryItem {
       'day_number': dayNumber,
       'date': date,
       'time': time,
+      'end_time': endTime,
       'title': title,
       'description': description,
       'location': location,
@@ -106,6 +124,7 @@ class ItineraryItem {
       dayNumber: (map['day_number'] as num?)?.toInt() ?? 1,
       date: map['date'] as String? ?? '',
       time: map['time'] as String?,
+      endTime: map['end_time'] as String?,
       title: map['title'] as String? ?? '',
       description: map['description'] as String?,
       location: map['location'] as String?,

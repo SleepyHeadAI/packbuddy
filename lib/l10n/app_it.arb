@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "it",
   "appName": "PackBuddy",
   "welcome": "Benvenuto su PackBuddy",
@@ -700,5 +700,6 @@
   "setNewVaultPin": "Imposta nuovo PIN della cassaforte",
   "verifyAndContinue": "Verifica e continua",
   "vaultPinRequiredTitle": "PIN della cassaforte obbligatorio",
-  "invalidEmail": "Inserisci un indirizzo email valido."
+  "invalidEmail": "Inserisci un indirizzo email valido.",
+  "revertToCurrency": "Torna a {currency}"
 }

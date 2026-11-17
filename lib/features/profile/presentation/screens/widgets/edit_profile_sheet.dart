@@ -5,6 +5,8 @@ import 'package:packbuddy/features/budget/presentation/screens/widgets/country_p
 import 'package:packbuddy/features/profile/presentation/controllers/profile_controller.dart';
 import 'package:packbuddy/features/profile/domain/profile_localization.dart';
 import 'package:packbuddy/features/profile/domain/user_profile.dart';
+import 'package:packbuddy/features/profile/presentation/widgets/avatar_picker_sheet.dart';
+import 'package:packbuddy/features/profile/presentation/widgets/user_avatar.dart';
 
 /// Modal bottom sheet allowing users to customize their display name, bio, and home country
 class EditProfileSheet extends ConsumerStatefulWidget {
@@ -107,7 +109,7 @@ class _EditProfileSheetState extends ConsumerState<EditProfileSheet> {
     final isDark = theme.brightness == Brightness.dark;
     final lang = widget.languageCode;
 
-    String countryText = lang == 'tr' ? 'Ülke seçin' : 'Select country';
+    String countryText = ProfileLocalization.getSelectCountry(lang);
     if (_selectedCountryCode != null && _selectedCountryCode!.isNotEmpty) {
       final c = Country.findByCode(_selectedCountryCode!);
       if (c != null) {
@@ -119,6 +121,9 @@ class _EditProfileSheetState extends ConsumerState<EditProfileSheet> {
     }
 
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.90,
+      ),
       padding: EdgeInsets.only(
         left: 20,
         right: 20,
@@ -151,7 +156,52 @@ class _EditProfileSheetState extends ConsumerState<EditProfileSheet> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
+
+            // Profile Photo & Change Button
+            Center(
+              child: Builder(
+                builder: (context) {
+                  final activeProfile =
+                      ref.watch(profileControllerProvider).profile ?? widget.profile;
+                  return Column(
+                    children: [
+                      UserAvatar(
+                        photoUrl: activeProfile.photoUrl,
+                        displayName: activeProfile.displayName,
+                        email: activeProfile.email,
+                        size: 76,
+                        isAnimated: true,
+                        showEditBadge: true,
+                        onTap: () {
+                          AvatarPickerSheet.show(
+                            context,
+                            profile: activeProfile,
+                            languageCode: lang,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 6),
+                      TextButton.icon(
+                        onPressed: () {
+                          AvatarPickerSheet.show(
+                            context,
+                            profile: activeProfile,
+                            languageCode: lang,
+                          );
+                        },
+                        icon: const Icon(Icons.photo_camera_rounded, size: 15),
+                        label: Text(
+                          ProfileLocalization.getChangePhoto(lang),
+                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 12),
 
             // Display Name Field
             Text(

@@ -45,7 +45,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final authUser = ref.watch(authUserProvider);
     final theme = Theme.of(context);
     final langCode = Localizations.localeOf(context).languageCode;
-    final isTr = langCode == 'tr';
 
     final effectiveProfile = profileState.profile ??
         UserProfile(
@@ -80,7 +79,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           children: [
             Container(
               padding: const EdgeInsets.all(6),
-              margin: const EdgeInsets.only(right: 8),
+              margin: const EdgeInsetsDirectional.only(end: 8),
               decoration: BoxDecoration(
                 color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
                 shape: BoxShape.circle,
@@ -160,20 +159,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   _buildAccountRow(
                     icon: isEmailVerified ? Icons.mark_email_read_rounded : Icons.mark_email_unread_rounded,
                     iconColor: isEmailVerified ? const Color(0xFF10B981) : const Color(0xFFF59E0B),
-                    label: isTr ? 'E-posta Durumu' : 'Email Status',
+                    label: ProfileLocalization.getEmailStatus(langCode),
                     value: isEmailVerified
-                        ? (isTr ? 'Doğrulandı' : 'Verified')
-                        : (isTr ? 'Doğrulanmadı' : 'Unverified'),
+                        ? ProfileLocalization.getVerified(langCode)
+                        : ProfileLocalization.getUnverified(langCode),
                     theme: theme,
                   ),
                   const Divider(height: 20),
                   _buildAccountRow(
                     icon: Icons.lock_outline_rounded,
-                    label: isTr ? 'Giriş Yöntemi' : 'Sign-in Method',
+                    label: ProfileLocalization.getSignInMethod(langCode),
                     value: authUser?.providerData.isNotEmpty == true &&
                             authUser!.providerData.any((p) => p.providerId.contains('google'))
-                        ? 'Google OAuth'
-                        : 'Email & Password',
+                        ? 'Google'
+                        : ProfileLocalization.getEmailAndPassword(langCode),
                     theme: theme,
                   ),
                 ],
@@ -201,14 +200,22 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           child: Text(
             label,
             style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            color: theme.colorScheme.onSurface,
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.onSurface,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.end,
           ),
         ),
       ],

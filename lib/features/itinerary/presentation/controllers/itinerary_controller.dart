@@ -111,6 +111,7 @@ class ItineraryController extends StateNotifier<ItineraryState> {
     required int dayNumber,
     required String date,
     String? time,
+    String? endTime,
     String? description,
     String? location,
     String category = 'sightseeing',
@@ -129,6 +130,7 @@ class ItineraryController extends StateNotifier<ItineraryState> {
         dayNumber: dayNumber,
         date: date,
         time: time,
+        endTime: endTime,
         title: title,
         description: description,
         location: location,
@@ -145,6 +147,64 @@ class ItineraryController extends StateNotifier<ItineraryState> {
       updatedList.sort((a, b) {
         if (a.dayNumber != b.dayNumber) return a.dayNumber.compareTo(b.dayNumber);
         if (a.time != null && b.time != null) return a.time!.compareTo(b.time!);
+        if (a.time != null) return -1;
+        if (b.time != null) return 1;
+        return a.createdAt.compareTo(b.createdAt);
+      });
+
+      state = state.copyWith(items: updatedList);
+      return true;
+    } catch (e) {
+      state = state.copyWith(errorMessage: e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> updateActivity({
+    required String id,
+    required String title,
+    required int dayNumber,
+    required String date,
+    String? time,
+    String? endTime,
+    String? description,
+    String? location,
+    String category = 'sightseeing',
+    double? cost,
+    String? currency,
+  }) async {
+    try {
+      final index = state.items.indexWhere((i) => i.id == id);
+      if (index == -1) return false;
+
+      final existing = state.items[index];
+      final now = DateTime.now();
+
+      final updatedItem = existing.copyWith(
+        dayNumber: dayNumber,
+        date: date,
+        time: time,
+        endTime: endTime,
+        clearTime: time == null,
+        clearEndTime: endTime == null,
+        title: title,
+        description: description,
+        location: location,
+        category: category,
+        cost: cost,
+        currency: currency,
+        updatedAt: now,
+      );
+
+      await _dbHelper.updateItineraryItem(updatedItem.toMap());
+      final updatedList = List<ItineraryItem>.from(state.items);
+      updatedList[index] = updatedItem;
+      // Sort
+      updatedList.sort((a, b) {
+        if (a.dayNumber != b.dayNumber) return a.dayNumber.compareTo(b.dayNumber);
+        if (a.time != null && b.time != null) return a.time!.compareTo(b.time!);
+        if (a.time != null) return -1;
+        if (b.time != null) return 1;
         return a.createdAt.compareTo(b.createdAt);
       });
 

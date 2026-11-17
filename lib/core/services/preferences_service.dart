@@ -30,6 +30,9 @@ class PreferencesService {
   // Per-User Scoped Keys
   static const String keyDefaultCurrency = 'packbuddy_default_currency';
   static const String keyUserSelectedCurrency = 'packbuddy_user_selected_currency';
+  static const String keyLastConverterFromCurrency = 'packbuddy_last_converter_from_currency';
+  static const String keyLastConverterToCurrency = 'packbuddy_last_converter_to_currency';
+  static const String keyLastConverterAmount = 'packbuddy_last_converter_amount';
   static const String keyCountryCode = 'packbuddy_detected_country_code';
   static const String keyCountryName = 'packbuddy_detected_country_name';
   static const String keyLiveCity = 'packbuddy_detected_city';
@@ -211,6 +214,61 @@ class PreferencesService {
     } else {
       await _prefs?.setBool(keyUserSelectedCurrency, value);
     }
+  }
+
+  String getLastConverterFromCurrency({String? uid}) {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    if (effectiveUid != null) {
+      final val = _prefs?.getString('${keyLastConverterFromCurrency}_$effectiveUid');
+      if (val != null && val.isNotEmpty) return val;
+    }
+    final val = _prefs?.getString(keyLastConverterFromCurrency);
+    return (val != null && val.isNotEmpty) ? val : 'USD';
+  }
+
+  Future<void> setLastConverterFromCurrency(String currency, {String? uid}) async {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    if (effectiveUid != null) {
+      await _prefs?.setString('${keyLastConverterFromCurrency}_$effectiveUid', currency);
+    }
+    await _prefs?.setString(keyLastConverterFromCurrency, currency);
+  }
+
+  String getLastConverterToCurrency({String? uid}) {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    if (effectiveUid != null) {
+      final val = _prefs?.getString('${keyLastConverterToCurrency}_$effectiveUid');
+      if (val != null && val.isNotEmpty) return val;
+    }
+    final val = _prefs?.getString(keyLastConverterToCurrency);
+    if (val != null && val.isNotEmpty) return val;
+    return getDefaultCurrency(uid: uid) ?? 'EUR';
+  }
+
+  Future<void> setLastConverterToCurrency(String currency, {String? uid}) async {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    if (effectiveUid != null) {
+      await _prefs?.setString('${keyLastConverterToCurrency}_$effectiveUid', currency);
+    }
+    await _prefs?.setString(keyLastConverterToCurrency, currency);
+  }
+
+  double getLastConverterAmount({String? uid}) {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    if (effectiveUid != null) {
+      final val = _prefs?.getDouble('${keyLastConverterAmount}_$effectiveUid');
+      if (val != null && val > 0) return val;
+    }
+    final val = _prefs?.getDouble(keyLastConverterAmount);
+    return (val != null && val > 0) ? val : 100.0;
+  }
+
+  Future<void> setLastConverterAmount(double amount, {String? uid}) async {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    if (effectiveUid != null) {
+      await _prefs?.setDouble('${keyLastConverterAmount}_$effectiveUid', amount);
+    }
+    await _prefs?.setDouble(keyLastConverterAmount, amount);
   }
 
   String? getCountryCode({String? uid}) {
@@ -684,11 +742,47 @@ class PreferencesService {
     await saveSyncHistory(list);
   }
 
-  // --- User Profile Offline Cache ---
+  // --- User Profile Offline Cache & Dedicated Avatar Safety Net ---
   static const String keyUserProfileCachePrefix = 'user_profile_cached_';
-  String? getCachedUserProfile(String uid) => _prefs?.getString('${keyUserProfileCachePrefix}_$uid');
-  Future<void> setCachedUserProfile(String uid, String jsonStr) async =>
-      _prefs?.setString('${keyUserProfileCachePrefix}_$uid', jsonStr);
+  static const String keyUserAvatarPrefix = 'user_avatar_';
+  static const String keyDeviceUserAvatar = 'packbuddy_device_user_avatar';
+
+  String? getCachedUserProfile(String uid) {
+    if (uid.trim().isEmpty) return null;
+    return _prefs?.getString('${keyUserProfileCachePrefix}_${uid.trim()}');
+  }
+
+  Future<void> setCachedUserProfile(String uid, String jsonStr) async {
+    if (uid.trim().isEmpty) return;
+    await _prefs?.setString('${keyUserProfileCachePrefix}_${uid.trim()}', jsonStr);
+  }
+
+  String _userAvatarKey(String? uid) {
+    if (uid != null && uid.trim().isNotEmpty) {
+      return '${keyUserAvatarPrefix}_${uid.trim()}';
+    }
+    return keyDeviceUserAvatar;
+  }
+
+  String? getUserAvatar({String? uid}) {
+    final key = _userAvatarKey(uid);
+    final val = _prefs?.getString(key);
+    if (val != null && val.trim().isNotEmpty) return val.trim();
+    final fallback = _prefs?.getString(keyDeviceUserAvatar);
+    if (fallback != null && fallback.trim().isNotEmpty) return fallback.trim();
+    return null;
+  }
+
+  Future<void> setUserAvatar(String? avatarUri, {String? uid}) async {
+    final key = _userAvatarKey(uid);
+    if (avatarUri == null || avatarUri.trim().isEmpty) {
+      await _prefs?.remove(key);
+      await _prefs?.remove(keyDeviceUserAvatar);
+    } else {
+      await _prefs?.setString(key, avatarUri.trim());
+      await _prefs?.setString(keyDeviceUserAvatar, avatarUri.trim());
+    }
+  }
 
   // --- Recent Searches History ---
   static const String keyRecentSearches = 'packbuddy_recent_searches';

@@ -2240,4 +2240,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get invalidEmail => 'Vui lòng nhập địa chỉ email hợp lệ.';
+
+  @override
+  String revertToCurrency(String currency) {
+    return 'Quay lại $currency';
+  }
 }

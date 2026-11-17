@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "ja",
   "appName": "PackBuddy",
   "welcome": "PackBuddyへようこそ",
@@ -700,5 +700,6 @@
   "setNewVaultPin": "新しい金庫PINを設定",
   "verifyAndContinue": "確認して続行",
   "vaultPinRequiredTitle": "金庫PINの設定が必須です",
-  "invalidEmail": "有効なメールアドレスを入力してください。"
+  "invalidEmail": "有効なメールアドレスを入力してください。",
+  "revertToCurrency": "{currency} に戻す"
 }

@@ -2246,4 +2246,9 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get invalidEmail =>
       'Пожалуйста, введите действительный адрес эл. почты.';
+
+  @override
+  String revertToCurrency(String currency) {
+    return 'Вернуться к $currency';
+  }
 }

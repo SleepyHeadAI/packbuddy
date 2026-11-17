@@ -42,6 +42,12 @@ class AppWidgetData {
   final String? remainingBudget;
   final String? lastExpenseText;
   final String? userCurrency;
+  final String? converterFromCurrency;
+  final String? converterToCurrency;
+  final double? converterAmount;
+  final String? converterResult;
+  final String? converterRate;
+  final String? converterReverseRate;
   final DateTime updatedAt;
 
   const AppWidgetData({
@@ -64,6 +70,12 @@ class AppWidgetData {
     this.remainingBudget,
     this.lastExpenseText,
     this.userCurrency,
+    this.converterFromCurrency,
+    this.converterToCurrency,
+    this.converterAmount,
+    this.converterResult,
+    this.converterRate,
+    this.converterReverseRate,
     required this.updatedAt,
   });
 
@@ -87,6 +99,12 @@ class AppWidgetData {
         'remainingBudget': remainingBudget,
         'lastExpenseText': lastExpenseText,
         'userCurrency': userCurrency,
+        'converterFromCurrency': converterFromCurrency,
+        'converterToCurrency': converterToCurrency,
+        'converterAmount': converterAmount,
+        'converterResult': converterResult,
+        'converterRate': converterRate,
+        'converterReverseRate': converterReverseRate,
         'updatedAt': updatedAt.millisecondsSinceEpoch,
       };
 
@@ -110,6 +128,12 @@ class AppWidgetData {
         remainingBudget: json['remainingBudget'] as String?,
         lastExpenseText: json['lastExpenseText'] as String?,
         userCurrency: json['userCurrency'] as String?,
+        converterFromCurrency: json['converterFromCurrency'] as String?,
+        converterToCurrency: json['converterToCurrency'] as String?,
+        converterAmount: (json['converterAmount'] as num?)?.toDouble(),
+        converterResult: json['converterResult'] as String?,
+        converterRate: json['converterRate'] as String?,
+        converterReverseRate: json['converterReverseRate'] as String?,
         updatedAt: json['updatedAt'] != null
             ? DateTime.fromMillisecondsSinceEpoch(json['updatedAt'] as int)
             : DateTime.now(),
@@ -181,7 +205,15 @@ class AppWidgetService {
       } else if (host == 'currency' || uri.toString().contains('currency')) {
         final curCtx = navigatorKey.currentContext;
         if (curCtx != null && curCtx.mounted) {
-          CurrencyConverterCard.showAsModal(curCtx);
+          final lastFrom = PreferencesService.instance.getLastConverterFromCurrency();
+          final lastTo = PreferencesService.instance.getLastConverterToCurrency();
+          final lastAmt = PreferencesService.instance.getLastConverterAmount();
+          CurrencyConverterCard.showAsModal(
+            curCtx,
+            initialFromCurrency: lastFrom,
+            initialToCurrency: lastTo,
+            initialAmount: lastAmt,
+          );
         }
       } else if (host == 'map' || uri.toString().contains('map')) {
         final curCtx = navigatorKey.currentContext;
@@ -302,6 +334,16 @@ class AppWidgetService {
       final String rateUsdStr = CurrencyFormatter.format(rateUsd, currency: userCurrency);
       final String rateEurStr = CurrencyFormatter.format(rateEur, currency: userCurrency);
 
+      final String lastFrom = PreferencesService.instance.getLastConverterFromCurrency();
+      final String lastTo = PreferencesService.instance.getLastConverterToCurrency();
+      final double lastAmount = PreferencesService.instance.getLastConverterAmount();
+      final double convertedAmount = CurrencyService.convert(amount: lastAmount, fromCurrency: lastFrom, toCurrency: lastTo);
+      final double unitRate = CurrencyService.convert(amount: 1.0, fromCurrency: lastFrom, toCurrency: lastTo);
+      final double reverseRate = unitRate > 0 ? (1.0 / unitRate) : 0.0;
+      final String convertedResultStr = CurrencyFormatter.format(convertedAmount, currency: lastTo);
+      final String unitRateStr = CurrencyFormatter.format(unitRate, currency: lastTo);
+      final String reverseRateStr = CurrencyFormatter.format(reverseRate, currency: lastFrom);
+
       final payload = AppWidgetData(
         tripTitle: upcomingTrip != null
             ? (upcomingTrip.title.isNotEmpty ? upcomingTrip.title : upcomingTrip.destination)
@@ -324,6 +366,12 @@ class AppWidgetService {
         remainingBudget: remainingBudgetStr,
         lastExpenseText: lastExpenseText,
         userCurrency: userCurrency,
+        converterFromCurrency: lastFrom,
+        converterToCurrency: lastTo,
+        converterAmount: lastAmount,
+        converterResult: convertedResultStr,
+        converterRate: unitRateStr,
+        converterReverseRate: reverseRateStr,
         updatedAt: DateTime.now(),
       );
 
@@ -406,18 +454,18 @@ class AppWidgetService {
 
         // 2. Currency Converter
         final currencyAppName = AppWidgetLocalization.getCurrencyHeader(lang);
-        final currencyDays = userCurrency;
-        final currencyTitle = '1 USD = $rateUsdStr';
-        final currencySubtitle = '1 EUR = $rateEurStr';
-        final currencyStat1 = '💵 $rateUsdStr';
-        final currencyStat2 = '💶 $rateEurStr';
-        final reverseRate = rateUsd > 0 ? (1.0 / rateUsd) : 0.0;
-        final currencyStat3 = '1 $userCurrency ≈ \$${reverseRate.toStringAsFixed(2)}';
+        final currencyDays = lastTo;
+        final currencyAmtFmt = lastAmount.truncateToDouble() == lastAmount ? lastAmount.toInt().toString() : lastAmount.toStringAsFixed(2);
+        final currencyTitle = '$currencyAmtFmt $lastFrom = $convertedResultStr';
+        final currencySubtitle = '1 $lastFrom = $unitRateStr';
+        final currencyStat1 = '$lastFrom: ${CurrencyFormatter.format(lastAmount, currency: lastFrom)}';
+        final currencyStat2 = '$lastTo: $convertedResultStr';
+        final currencyStat3 = '1 $lastTo ≈ $reverseRateStr';
         final currencyTheme = PreferencesService.instance.getWidgetThemeForMode('currency_converter');
 
-        final conv1 = '\$10 ≈ ${(10 * rateUsd).toStringAsFixed(1)} $userCurrency';
-        final conv2 = '\$50 ≈ ${(50 * rateUsd).toStringAsFixed(1)} $userCurrency';
-        final conv3 = '\$100 ≈ ${(100 * rateUsd).toStringAsFixed(0)} $userCurrency';
+        final conv1 = '${CurrencyFormatter.getSymbol(lastFrom)}10 ≈ ${CurrencyFormatter.format(CurrencyService.convert(amount: 10, fromCurrency: lastFrom, toCurrency: lastTo), currency: lastTo)}';
+        final conv2 = '${CurrencyFormatter.getSymbol(lastFrom)}50 ≈ ${CurrencyFormatter.format(CurrencyService.convert(amount: 50, fromCurrency: lastFrom, toCurrency: lastTo), currency: lastTo)}';
+        final conv3 = '${CurrencyFormatter.getSymbol(lastFrom)}100 ≈ ${CurrencyFormatter.format(CurrencyService.convert(amount: 100, fromCurrency: lastFrom, toCurrency: lastTo), currency: lastTo)}';
 
         final showLiveRate = PreferencesService.instance.isWidgetShowLiveRate();
         final showReverseRate = PreferencesService.instance.isWidgetShowReverseRate();
@@ -440,6 +488,12 @@ class AppWidgetService {
         await HomeWidget.saveWidgetData<String>('currency_conv_3', conv3);
         await HomeWidget.saveWidgetData<String>('currency_usd_label', '1 USD');
         await HomeWidget.saveWidgetData<String>('currency_eur_label', '1 EUR');
+        await HomeWidget.saveWidgetData<String>('currency_from', lastFrom);
+        await HomeWidget.saveWidgetData<String>('currency_to', lastTo);
+        await HomeWidget.saveWidgetData<double>('currency_amount', lastAmount);
+        await HomeWidget.saveWidgetData<String>('currency_converted_result', convertedResultStr);
+        await HomeWidget.saveWidgetData<String>('currency_unit_rate', unitRateStr);
+        await HomeWidget.saveWidgetData<String>('currency_reverse_rate', reverseRateStr);
 
         // 3. Quick Expense
         final expenseAppName = AppWidgetLocalization.getExpenseHeader(lang);

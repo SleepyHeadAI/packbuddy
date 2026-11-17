@@ -35,31 +35,64 @@ enum class WidgetLayoutSize {
 
 object CurrencyHelper {
     val supportedCurrencies = listOf(
-        "TRY", "USD", "EUR", "GBP", "JPY", "CHF", "CAD", "AUD", "AED", "SAR"
+        "AED", "ARS", "AUD", "BGN", "BHD", "BRL", "CAD", "CHF", "CLP", "CNY",
+        "COP", "CZK", "DKK", "EGP", "EUR", "GBP", "GEL", "HKD", "HUF", "IDR",
+        "ILS", "INR", "ISK", "JOD", "JPY", "KRW", "KWD", "KZT", "MAD", "MXN",
+        "MYR", "NOK", "NZD", "OMR", "PEN", "PHP", "PKR", "PLN", "QAR", "RON",
+        "RSD", "SAR", "SEK", "SGD", "THB", "TRY", "TWD", "USD", "VND", "ZAR"
     )
 
     val defaultRatesAgainstUsd = mapOf(
-        "USD" to 1.0,
+        "AED" to 3.6725,
+        "ARS" to 995.0,
+        "AUD" to 1.51,
+        "BGN" to 1.80,
+        "BHD" to 0.376,
+        "BRL" to 5.72,
+        "CAD" to 1.38,
+        "CHF" to 0.87,
+        "CLP" to 955.0,
+        "CNY" to 7.15,
+        "COP" to 4380.0,
+        "CZK" to 23.4,
+        "DKK" to 6.88,
+        "EGP" to 49.0,
         "EUR" to 0.92,
         "GBP" to 0.77,
-        "TRY" to 34.25,
-        "JPY" to 152.5,
-        "CHF" to 0.87,
-        "CAD" to 1.38,
-        "AUD" to 1.51,
-        "AED" to 3.6725,
-        "SAR" to 3.75,
-        "THB" to 33.8,
-        "SGD" to 1.32,
-        "KRW" to 1385.0,
-        "CNY" to 7.15,
+        "GEL" to 2.74,
+        "HKD" to 7.78,
+        "HUF" to 371.0,
+        "IDR" to 15650.0,
+        "ILS" to 3.75,
         "INR" to 84.1,
-        "BRL" to 5.72,
+        "ISK" to 137.0,
+        "JOD" to 0.709,
+        "JPY" to 152.5,
+        "KRW" to 1385.0,
+        "KWD" to 0.307,
+        "KZT" to 490.0,
+        "MAD" to 9.85,
         "MXN" to 19.85,
-        "SEK" to 10.6,
+        "MYR" to 4.40,
         "NOK" to 10.8,
-        "DKK" to 6.88,
-        "PLN" to 4.02
+        "NZD" to 1.66,
+        "OMR" to 0.384,
+        "PEN" to 3.76,
+        "PHP" to 58.50,
+        "PKR" to 278.0,
+        "PLN" to 4.02,
+        "QAR" to 3.64,
+        "RON" to 4.58,
+        "RSD" to 108.0,
+        "SAR" to 3.75,
+        "SEK" to 10.6,
+        "SGD" to 1.32,
+        "THB" to 33.8,
+        "TRY" to 34.25,
+        "TWD" to 32.10,
+        "USD" to 1.0,
+        "VND" to 25300.0,
+        "ZAR" to 17.65
     )
 
     fun getRates(widgetData: SharedPreferences): Map<String, Double> {
@@ -92,12 +125,25 @@ object CurrencyHelper {
             "USD" -> "$"
             "EUR" -> "€"
             "GBP" -> "£"
-            "JPY" -> "¥"
-            "CHF" -> "CHF "
+            "JPY", "CNY" -> "¥"
+            "CHF" -> "CHF"
             "CAD" -> "CA$"
             "AUD" -> "A$"
-            "AED" -> "AED "
-            "SAR" -> "SAR "
+            "AED" -> "د.إ"
+            "SAR" -> "﷼"
+            "INR" -> "₹"
+            "KRW" -> "₩"
+            "BRL" -> "R$"
+            "MXN" -> "MX$"
+            "PLN" -> "zł"
+            "THB" -> "฿"
+            "SGD" -> "S$"
+            "NZD" -> "NZ$"
+            "HKD" -> "HK$"
+            "ILS" -> "₪"
+            "VND" -> "₫"
+            "PHP" -> "₱"
+            "SEK", "NOK", "DKK", "ISK" -> "kr"
             else -> "$currency "
         }
     }
@@ -657,7 +703,12 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     setBgRes(views, R.id.widget_container, theme.bgResId)
                     views.setTextColor(R.id.widget_app_name, theme.accentColor)
 
+                    val savedFrom = widgetData.getString("currency_from", null)
+                    val savedTo = widgetData.getString("currency_to", null)
+                    val savedAmount = safeGetDouble(widgetData, "currency_amount", 100.0)
+
                     val targetCurrency = widgetData.getString("widget_${widgetId}_currency", null)
+                        ?: savedTo
                         ?: widgetData.getString("user_currency", "TRY")
                         ?: "TRY"
                     val rates = CurrencyHelper.getRates(widgetData)
@@ -669,10 +720,10 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     val usdAmt = usdAmounts[usdIdx]
                     val eurAmt = eurAmounts[eurIdx]
 
-                    val primarySrc = if (targetCurrency == "USD") "EUR" else "USD"
+                    val primarySrc = savedFrom ?: (if (targetCurrency == "USD") "EUR" else "USD")
                     val secondarySrc = if (targetCurrency == "EUR") "GBP" else if (targetCurrency == "USD") "TRY" else "EUR"
 
-                    val primarySrcAmt = if (primarySrc == "USD") usdAmt else eurAmt
+                    val primarySrcAmt = if (savedFrom != null) (if (savedAmount % 1.0 == 0.0) savedAmount.toInt() else savedAmount.toInt()) else (if (primarySrc == "USD") usdAmt else eurAmt)
                     val secondarySrcAmt = if (secondarySrc == "EUR") eurAmt else if (secondarySrc == "USD") usdAmt else if (secondarySrc == "TRY") 100 else eurAmt
 
                     val primaryConverted = CurrencyHelper.convert(primarySrcAmt.toDouble(), primarySrc, targetCurrency, rates)
@@ -681,14 +732,16 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     val primaryLabelText = "$primarySrcAmt $primarySrc"
                     val primaryValText = CurrencyHelper.format(primaryConverted, targetCurrency)
 
-                    val secondaryLabelText = "$secondarySrcAmt $secondarySrc"
-                    val secondaryValText = CurrencyHelper.format(secondaryConverted, targetCurrency)
+                    val secondaryLabelText = if (savedFrom != null) "1 $primarySrc" else "$secondarySrcAmt $secondarySrc"
+                    val secondaryValText = if (savedFrom != null) CurrencyHelper.format(CurrencyHelper.convert(1.0, primarySrc, targetCurrency, rates), targetCurrency) else CurrencyHelper.format(secondaryConverted, targetCurrency)
 
-                    val appName = widgetData.getString("currency_converter_app_name", "PackBuddy • Kur") ?: "PackBuddy • Kur"
-                    val convTitle = widgetData.getString("currency_converter_conversions_title", "Hızlı Çevrimler") ?: "Hızlı Çevrimler"
-                    val liveStatus = widgetData.getString("currency_converter_live_status", "● Canlı Kurlar") ?: "● Canlı Kurlar"
-                    val syncStatus = widgetData.getString("currency_converter_sync_status", "✓ Otomatik Çift Yönlü Senkron") ?: "✓ Otomatik Çift Yönlü Senkron"
-                    val offlineStatus = widgetData.getString("currency_converter_offline_status", "Çevrim Çevrimdışı Hazır") ?: "Çevrim Çevrimdışı Hazır"
+                    val appName = widgetData.getString("currency_converter_app_name", "PackBuddy • Rates") ?: "PackBuddy • Rates"
+                    val convTitle = widgetData.getString("currency_converter_conversions_title", "Quick Conversions") ?: "Quick Conversions"
+                    val rawLiveStatus = widgetData.getString("currency_converter_live_status", "Live Rates") ?: "Live Rates"
+                    val cleanLiveStatus = rawLiveStatus.replace("●", "").trim()
+                    val liveStatus = "● $cleanLiveStatus"
+                    val syncStatus = widgetData.getString("currency_converter_sync_status", "✓ Auto-Sync") ?: "✓ Auto-Sync"
+                    val offlineStatus = widgetData.getString("currency_converter_offline_status", "Offline Ready") ?: "Offline Ready"
                     val showLiveRate = safeGetBoolean(
                         widgetData,
                         if (widgetId > 0) "widget_${widgetId}_currency_show_live_rate" else "pending_pin_currency_show_live_rate",

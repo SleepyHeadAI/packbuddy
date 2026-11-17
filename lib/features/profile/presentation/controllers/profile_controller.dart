@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
@@ -55,8 +56,55 @@ class ProfileController extends StateNotifier<ProfileState> {
 
   ProfileController(this._ref, {ProfileService? service})
       : _profileService = service ?? ProfileService(),
-        super(const ProfileState()) {
+        super(_initialState(_ref)) {
     _init();
+  }
+
+  static ProfileState _initialState(Ref ref) {
+    try {
+      final user = ref.read(authUserProvider);
+      final uid = user?.uid;
+      if (uid != null && uid.isNotEmpty) {
+        final cachedJson = PreferencesService.instance.getCachedUserProfile(uid);
+        UserProfile? cached;
+        if (cachedJson != null && cachedJson.isNotEmpty) {
+          try {
+            cached = UserProfile.fromJson(cachedJson, fallbackUid: uid);
+          } catch (_) {}
+        }
+        final dedicatedAvatar = PreferencesService.instance.getUserAvatar(uid: uid);
+        if (cached != null) {
+          if ((cached.photoUrl == null || cached.photoUrl!.isEmpty) &&
+              dedicatedAvatar != null &&
+              dedicatedAvatar.isNotEmpty) {
+            cached = cached.copyWith(photoUrl: dedicatedAvatar);
+          }
+          return ProfileState(profile: cached);
+        } else if (dedicatedAvatar != null && dedicatedAvatar.isNotEmpty) {
+          return ProfileState(
+            profile: UserProfile(
+              uid: uid,
+              displayName: user?.displayName,
+              email: user?.email,
+              photoUrl: dedicatedAvatar,
+              createdAt: user?.metadata.creationTime ?? DateTime.now(),
+            ),
+          );
+        }
+      } else {
+        final deviceAvatar = PreferencesService.instance.getUserAvatar();
+        if (deviceAvatar != null && deviceAvatar.isNotEmpty) {
+          return ProfileState(
+            profile: UserProfile(
+              uid: '',
+              photoUrl: deviceAvatar,
+              createdAt: DateTime.now(),
+            ),
+          );
+        }
+      }
+    } catch (_) {}
+    return const ProfileState();
   }
 
   void _init() {
@@ -107,6 +155,8 @@ class ProfileController extends StateNotifier<ProfileState> {
     String? bio,
     String? homeCountryCode,
     String? homeCity,
+    String? photoUrl,
+    bool clearPhoto = false,
   }) async {
     final uid = state.profile?.uid ?? _ref.read(authUserProvider)?.uid;
     if (uid == null || uid.isEmpty) return false;
@@ -119,6 +169,8 @@ class ProfileController extends StateNotifier<ProfileState> {
         bio: bio,
         homeCountryCode: homeCountryCode,
         homeCity: homeCity,
+        photoUrl: photoUrl,
+        clearPhoto: clearPhoto,
       );
       state = state.copyWith(
         profile: updated,
@@ -132,6 +184,11 @@ class ProfileController extends StateNotifier<ProfileState> {
       );
       return false;
     }
+  }
+
+  /// Convenience method to update or remove the user's avatar or gallery photo
+  Future<bool> updatePhotoUrl(String? photoUrl, {bool clearPhoto = false}) {
+    return updateProfile(photoUrl: photoUrl, clearPhoto: clearPhoto);
   }
 
   /// Resets state on sign out

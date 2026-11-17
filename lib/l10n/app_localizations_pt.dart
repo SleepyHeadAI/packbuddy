@@ -2259,4 +2259,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get invalidEmail => 'Digite um endereço de e-mail válido.';
+
+  @override
+  String revertToCurrency(String currency) {
+    return 'Voltar para $currency';
+  }
 }

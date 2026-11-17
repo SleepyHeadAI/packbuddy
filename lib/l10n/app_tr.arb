@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "tr",
   "appName": "PackBuddy",
   "welcome": "PackBuddy'ye Hoş Geldiniz",
@@ -700,5 +700,6 @@
   "setNewVaultPin": "Yeni Kasa PIN Kodu Belirleyin",
   "verifyAndContinue": "Doğrula ve Devam Et",
   "vaultPinRequiredTitle": "Kasa PIN Kodu Zorunludur",
-  "invalidEmail": "Lütfen geçerli bir e-posta adresi girin."
+  "invalidEmail": "Lütfen geçerli bir e-posta adresi girin.",
+  "revertToCurrency": "{currency} para birimine dön"
 }

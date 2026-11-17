@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "nl",
   "appName": "PackBuddy",
   "welcome": "Welkom bij PackBuddy",
@@ -700,5 +700,6 @@
   "setNewVaultPin": "Nieuwe kluis-PIN instellen",
   "verifyAndContinue": "Verifiëren en doorgaan",
   "vaultPinRequiredTitle": "Kluis-PIN verplicht",
-  "invalidEmail": "Voer een geldig e-mailadres in."
+  "invalidEmail": "Voer een geldig e-mailadres in.",
+  "revertToCurrency": "Terug naar {currency}"
 }

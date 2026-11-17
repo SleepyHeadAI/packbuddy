@@ -2222,4 +2222,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get invalidEmail => 'يرجى إدخال عنوان بريد إلكتروني صالح.';
+
+  @override
+  String revertToCurrency(String currency) {
+    return 'العودة إلى $currency';
+  }
 }

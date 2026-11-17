@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "ar",
   "appName": "PackBuddy",
   "welcome": "مرحباً بك في PackBuddy",
@@ -700,5 +700,6 @@
   "setNewVaultPin": "تعيين رمز PIN جديد للخزنة",
   "verifyAndContinue": "تحقق ومتابعة",
   "vaultPinRequiredTitle": "رمز PIN للخزنة مطلوب",
-  "invalidEmail": "يرجى إدخال عنوان بريد إلكتروني صالح."
+  "invalidEmail": "يرجى إدخال عنوان بريد إلكتروني صالح.",
+  "revertToCurrency": "العودة إلى {currency}"
 }

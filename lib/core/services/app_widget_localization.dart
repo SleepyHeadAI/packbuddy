@@ -2557,29 +2557,29 @@ class AppWidgetLocalization {
     }
   }
 
-  /// Resolves "● Canlı Kurlar" (Live Rates) label across 20 languages
+  /// Resolves "Canlı Kurlar" (Live Rates) label across 20 languages
   static String getLiveRatesLabel(String lang) {
     switch (lang) {
-      case 'tr': return '● Canlı Kurlar';
-      case 'es': return '● Tasas en vivo';
-      case 'fr': return '● Taux en direct';
-      case 'de': return '● Live-Kurse';
-      case 'it': return '● Tassi in tempo reale';
-      case 'pt': return '● Taxas ao vivo';
-      case 'ru': return '● Текущие курсы';
-      case 'zh': return '● 实时汇率';
-      case 'ja': return '● リアルタイム為替レート';
-      case 'ko': return '● 실시간 환율';
-      case 'hi': return '● लाइव दरें';
-      case 'ar': return '● أسعار مباشرة';
-      case 'nl': return '● Live koersen';
-      case 'el': return '● Ζωντανές ισοτιμίες';
-      case 'sv': return '● Livekurser';
-      case 'pl': return '● Kursy na żywo';
-      case 'id': return '● Kurs Langsung';
-      case 'th': return '● อัตราแลกเปลี่ยนสด';
-      case 'vi': return '● Tỷ giá trực tiếp';
-      default: return '● Live Rates';
+      case 'tr': return 'Canlı Kurlar';
+      case 'es': return 'Tasas en vivo';
+      case 'fr': return 'Taux en direct';
+      case 'de': return 'Live-Kurse';
+      case 'it': return 'Tassi in tempo reale';
+      case 'pt': return 'Taxas ao vivo';
+      case 'ru': return 'Текущие курсы';
+      case 'zh': return '实时汇率';
+      case 'ja': return 'リアルタイム為替レート';
+      case 'ko': return '실시간 환율';
+      case 'hi': return 'लाइव दरें';
+      case 'ar': return 'أسعار مباشرة';
+      case 'nl': return 'Live koersen';
+      case 'el': return 'Ζωντανές ισοτιμίες';
+      case 'sv': return 'Livekurser';
+      case 'pl': return 'Kursy na żywo';
+      case 'id': return 'Kurs Langsung';
+      case 'th': return 'อัตราแลกเปลี่ยนสด';
+      case 'vi': return 'Tỷ giá trực tiếp';
+      default: return 'Live Rates';
     }
   }
 

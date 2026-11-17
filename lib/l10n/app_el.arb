@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "el",
   "appName": "PackBuddy",
   "welcome": "Καλώς ορίσατε στο PackBuddy",
@@ -700,5 +700,6 @@
   "setNewVaultPin": "Ορισμός νέου PIN θησαυροφυλακίου",
   "verifyAndContinue": "Επαλήθευση & Συνέχεια",
   "vaultPinRequiredTitle": "Απαιτείται PIN θησαυροφυλακίου",
-  "invalidEmail": "Εισαγάγετε μια έγκυρη διεύθυνση email."
+  "invalidEmail": "Εισαγάγετε μια έγκυρη διεύθυνση email.",
+  "revertToCurrency": "Επιστροφή σε {currency}"
 }

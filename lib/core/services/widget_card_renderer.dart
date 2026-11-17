@@ -4,8 +4,10 @@ import 'package:countries_world_map/countries_world_map.dart';
 import 'package:countries_world_map/data/maps/world_map.dart';
 import '../../features/travel_map/domain/travel_country.dart';
 import '../../l10n/app_localizations.dart';
+import '../utils/currency_formatter.dart';
 import 'app_widget_localization.dart';
 import 'app_widget_service.dart';
+import 'currency_service.dart';
 import 'preferences_service.dart';
 import 'widget_map_renderer.dart';
 import '../theme/app_theme.dart';
@@ -1426,8 +1428,20 @@ class WidgetCardRenderer {
   }) {
     final currencyHeader = AppWidgetLocalization.getCurrencyHeader(lang);
     final userCurrency = widgetData?.userCurrency ?? 'TRY';
-    final usdRate = widgetData?.currencyRateUSD ?? '34.25';
-    final eurRate = widgetData?.currencyRateEUR ?? '37.10';
+    final fromCurr = widgetData?.converterFromCurrency ?? 'USD';
+    final toCurr = widgetData?.converterToCurrency ?? userCurrency;
+    final amt = widgetData?.converterAmount ?? 100.0;
+    final amtStr = (amt % 1 == 0) ? amt.toInt().toString() : amt.toStringAsFixed(2);
+    final resultStr = widgetData?.converterResult ??
+        CurrencyFormatter.format(
+          CurrencyService.convert(amount: amt, fromCurrency: fromCurr, toCurrency: toCurr),
+          currency: toCurr,
+        );
+    final unitRateStr = widgetData?.converterRate ??
+        CurrencyFormatter.format(
+          CurrencyService.convert(amount: 1.0, fromCurrency: fromCurr, toCurrency: toCurr),
+          currency: toCurr,
+        );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1468,9 +1482,9 @@ class WidgetCardRenderer {
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
-                userCurrency,
+                '${CurrencyFormatter.getFlag(toCurr)} $toCurr',
                 style: const TextStyle(
-                  fontSize: 9,
+                  fontSize: 8.5,
                   fontWeight: FontWeight.w800,
                   color: Colors.white,
                 ),
@@ -1479,7 +1493,7 @@ class WidgetCardRenderer {
           ],
         ),
 
-        // Primary USD Rate Box
+        // Primary Converted Search Box
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
@@ -1491,15 +1505,19 @@ class WidgetCardRenderer {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '1 USD',
-                style: TextStyle(fontSize: 10, color: themeConfig.subtitleTextColor),
+                '${CurrencyFormatter.getFlag(fromCurr)} $amtStr $fromCurr',
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: themeConfig.subtitleTextColor),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
+              const SizedBox(height: 1),
               Text(
-                usdRate,
+                resultStr,
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 16.5,
                   fontWeight: FontWeight.w900,
-                  color: themeConfig.titleTextColor,
+                  color: themeConfig.accentColor,
+                  letterSpacing: -0.3,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -1508,7 +1526,7 @@ class WidgetCardRenderer {
           ),
         ),
 
-        // Secondary EUR Rate Row
+        // Secondary Unit Rate Row
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -1520,11 +1538,11 @@ class WidgetCardRenderer {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '1 EUR',
+                '1 $fromCurr',
                 style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: themeConfig.subtitleTextColor),
               ),
               Text(
-                eurRate,
+                unitRateStr,
                 style: TextStyle(
                   fontSize: 9.5,
                   fontWeight: FontWeight.w800,
@@ -1548,158 +1566,255 @@ class WidgetCardRenderer {
   }) {
     final currencyHeader = AppWidgetLocalization.getCurrencyHeader(lang);
     final userCurrency = widgetData?.userCurrency ?? 'TRY';
-    final usdRate = widgetData?.currencyRateUSD ?? '34.25';
-    final eurRate = widgetData?.currencyRateEUR ?? '37.10';
+    final fromCurr = widgetData?.converterFromCurrency ?? 'USD';
+    final toCurr = widgetData?.converterToCurrency ?? userCurrency;
+    final amt = widgetData?.converterAmount ?? 100.0;
+    final amtStr = (amt % 1 == 0) ? amt.toInt().toString() : amt.toStringAsFixed(2);
+    final resultStr = widgetData?.converterResult ??
+        CurrencyFormatter.format(
+          CurrencyService.convert(amount: amt, fromCurrency: fromCurr, toCurrency: toCurr),
+          currency: toCurr,
+        );
+    final unitRateStr = widgetData?.converterRate ??
+        CurrencyFormatter.format(
+          CurrencyService.convert(amount: 1.0, fromCurrency: fromCurr, toCurrency: toCurr),
+          currency: toCurr,
+        );
+    final reverseRateStr = widgetData?.converterReverseRate ??
+        CurrencyFormatter.format(
+          CurrencyService.convert(amount: 1.0, fromCurrency: toCurr, toCurrency: fromCurr),
+          currency: fromCurr,
+        );
 
-    return Row(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Left Column: Rates
-        Expanded(
-          flex: 3,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                currencyHeader,
-                style: TextStyle(
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w800,
+        // Top Header Row with Title and Live Rate indicator
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: themeConfig.accentColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Icon(
+                      Icons.currency_exchange_rounded,
+                      size: 13,
+                      color: themeConfig.accentColor,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      currencyHeader,
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w800,
+                        color: themeConfig.accentColor,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (showLiveRate) ...[
+              const SizedBox(width: 6),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 6,
+                    height: 6,
+                    margin: const EdgeInsets.only(right: 4),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF10B981),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  Text(
+                    AppWidgetLocalization.getLiveRatesLabel(lang),
+                    style: const TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF10B981),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+
+        // 1:1 Horizontal Conversion Row (From Box <-> Swap <-> To Box)
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // From Box
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                decoration: BoxDecoration(
+                  color: themeConfig.statBgColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: themeConfig.cardBorderColor.withValues(alpha: 0.35),
+                    width: 0.8,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          CurrencyFormatter.getFlag(fromCurr),
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          fromCurr,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            color: themeConfig.titleTextColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        '${CurrencyFormatter.getSymbol(fromCurr)} $amtStr',
+                        style: TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w900,
+                          color: themeConfig.titleTextColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Swap Button in between
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: themeConfig.accentColor.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.swap_horiz_rounded,
+                  size: 15,
                   color: themeConfig.accentColor,
+                ),
+              ),
+            ),
+
+            // To Box (Result)
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                decoration: BoxDecoration(
+                  color: themeConfig.statBgColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: themeConfig.cardBorderColor.withValues(alpha: 0.35),
+                    width: 0.8,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          CurrencyFormatter.getFlag(toCurr),
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          toCurr,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            color: themeConfig.titleTextColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        resultStr,
+                        style: TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w900,
+                          color: themeConfig.accentColor,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        // Bottom status & unit rates
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(
+              child: Text(
+                '1 $fromCurr = $unitRateStr',
+                style: TextStyle(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w600,
+                  color: themeConfig.subtitleTextColor,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-
-              // Rates Row
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: themeConfig.statBgColor,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('1 USD', style: TextStyle(fontSize: 9, color: themeConfig.subtitleTextColor)),
-                          const SizedBox(height: 2),
-                          Text(
-                            usdRate,
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w900,
-                              color: themeConfig.titleTextColor,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
+            ),
+            if (showReverseRate) ...[
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  '1 $toCurr ≈ $reverseRateStr',
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w600,
+                    color: themeConfig.subtitleTextColor,
                   ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: themeConfig.statBgColor,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('1 EUR', style: TextStyle(fontSize: 9, color: themeConfig.subtitleTextColor)),
-                          const SizedBox(height: 2),
-                          Text(
-                            eurRate,
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w900,
-                              color: themeConfig.titleTextColor,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              // Bottom status
-              Row(
-                children: [
-                  if (showLiveRate) ...[
-                    Container(
-                      width: 6,
-                      height: 6,
-                      margin: const EdgeInsets.only(right: 4),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF10B981),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        AppWidgetLocalization.getLiveRatesLabel(lang),
-                        style: const TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF10B981),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ],
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.end,
+                ),
               ),
             ],
-          ),
-        ),
-
-        const SizedBox(width: 10),
-
-        // Right Column: Badge Card
-        SizedBox(
-          width: 85,
-          child: Container(
-            decoration: BoxDecoration(
-              color: themeConfig.statBgColor,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: themeConfig.accentColor.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Icon(Icons.currency_exchange_rounded, size: 18, color: themeConfig.accentColor),
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  userCurrency,
-                  style: TextStyle(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w900,
-                    color: themeConfig.titleTextColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          ],
         ),
       ],
     );
@@ -1715,8 +1830,29 @@ class WidgetCardRenderer {
   }) {
     final currencyHeader = AppWidgetLocalization.getCurrencyHeader(lang);
     final userCurrency = widgetData?.userCurrency ?? 'TRY';
-    final usdRate = widgetData?.currencyRateUSD ?? '34.25';
-    final eurRate = widgetData?.currencyRateEUR ?? '37.10';
+    final fromCurr = widgetData?.converterFromCurrency ?? 'USD';
+    final toCurr = widgetData?.converterToCurrency ?? userCurrency;
+    final amt = widgetData?.converterAmount ?? 100.0;
+    final amtStr = (amt % 1 == 0) ? amt.toInt().toString() : amt.toStringAsFixed(2);
+    final resultStr = widgetData?.converterResult ??
+        CurrencyFormatter.format(
+          CurrencyService.convert(amount: amt, fromCurrency: fromCurr, toCurrency: toCurr),
+          currency: toCurr,
+        );
+    final unitRateStr = widgetData?.converterRate ??
+        CurrencyFormatter.format(
+          CurrencyService.convert(amount: 1.0, fromCurrency: fromCurr, toCurrency: toCurr),
+          currency: toCurr,
+        );
+    final reverseRateStr = widgetData?.converterReverseRate ??
+        CurrencyFormatter.format(
+          CurrencyService.convert(amount: 1.0, fromCurrency: toCurr, toCurrency: fromCurr),
+          currency: fromCurr,
+        );
+
+    final conv10 = CurrencyFormatter.format(CurrencyService.convert(amount: 10, fromCurrency: fromCurr, toCurrency: toCurr), currency: toCurr);
+    final conv50 = CurrencyFormatter.format(CurrencyService.convert(amount: 50, fromCurrency: fromCurr, toCurrency: toCurr), currency: toCurr);
+    final conv100 = CurrencyFormatter.format(CurrencyService.convert(amount: 100, fromCurrency: fromCurr, toCurrency: toCurr), currency: toCurr);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1724,28 +1860,66 @@ class WidgetCardRenderer {
         // Top Header
         Row(
           children: [
-            Icon(Icons.currency_exchange_rounded, size: 16, color: themeConfig.accentColor),
-            const SizedBox(width: 5),
             Expanded(
-              child: Text(
-                currencyHeader,
-                style: TextStyle(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w800,
-                  color: themeConfig.accentColor,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              child: Row(
+                children: [
+                  Icon(Icons.currency_exchange_rounded, size: 16, color: themeConfig.accentColor),
+                  const SizedBox(width: 5),
+                  Flexible(
+                    child: Text(
+                      currencyHeader,
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w800,
+                        color: themeConfig.accentColor,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
             ),
+            const SizedBox(width: 6),
+            if (showLiveRate) ...[
+              Flexible(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 6,
+                      height: 6,
+                      margin: const EdgeInsets.only(right: 5),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF10B981),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    Flexible(
+                      child: Text(
+                        AppWidgetLocalization.getLiveRatesLabel(lang),
+                        style: const TextStyle(
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF10B981),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 6),
+            ],
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
               decoration: BoxDecoration(
                 color: themeConfig.badgeBgColor,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                userCurrency,
+                '${CurrencyFormatter.getFlag(toCurr)} $toCurr',
                 style: const TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
@@ -1756,9 +1930,9 @@ class WidgetCardRenderer {
           ],
         ),
 
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
 
-        // Hero Rates Row
+        // Hero Conversion Row (1:1 with in-app horizontal converter!)
         Row(
           children: [
             Expanded(
@@ -1767,19 +1941,22 @@ class WidgetCardRenderer {
                 decoration: BoxDecoration(
                   color: themeConfig.statBgColor,
                   borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: themeConfig.cardBorderColor.withValues(alpha: 0.35), width: 0.8),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('1 USD', style: TextStyle(fontSize: 10.5, color: themeConfig.subtitleTextColor)),
-                    const SizedBox(height: 3),
+                    Row(
+                      children: [
+                        Text(CurrencyFormatter.getFlag(fromCurr), style: const TextStyle(fontSize: 13)),
+                        const SizedBox(width: 4),
+                        Text(fromCurr, style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, color: themeConfig.titleTextColor)),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
                     Text(
-                      usdRate,
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w900,
-                        color: themeConfig.titleTextColor,
-                      ),
+                      '${CurrencyFormatter.getSymbol(fromCurr)} $amtStr',
+                      style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.w900, color: themeConfig.titleTextColor),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -1787,26 +1964,39 @@ class WidgetCardRenderer {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: themeConfig.accentColor.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.swap_horiz_rounded, size: 18, color: themeConfig.accentColor),
+              ),
+            ),
             Expanded(
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: themeConfig.statBgColor,
                   borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: themeConfig.cardBorderColor.withValues(alpha: 0.35), width: 0.8),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('1 EUR', style: TextStyle(fontSize: 10.5, color: themeConfig.subtitleTextColor)),
-                    const SizedBox(height: 3),
+                    Row(
+                      children: [
+                        Text(CurrencyFormatter.getFlag(toCurr), style: const TextStyle(fontSize: 13)),
+                        const SizedBox(width: 4),
+                        Text(toCurr, style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, color: themeConfig.titleTextColor)),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
                     Text(
-                      eurRate,
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w900,
-                        color: themeConfig.titleTextColor,
-                      ),
+                      resultStr,
+                      style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.w900, color: themeConfig.accentColor),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -1817,7 +2007,82 @@ class WidgetCardRenderer {
           ],
         ),
 
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
+
+        // Unit Exchange Rates Row
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                decoration: BoxDecoration(
+                  color: themeConfig.statBgColor,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        '1 $fromCurr',
+                        style: TextStyle(fontSize: 10, color: themeConfig.subtitleTextColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        unitRateStr,
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: themeConfig.titleTextColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.end,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if (showReverseRate) ...[
+              const SizedBox(width: 8),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: themeConfig.statBgColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          '1 $toCurr',
+                          style: TextStyle(fontSize: 10, color: themeConfig.subtitleTextColor),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          reverseRateStr,
+                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: themeConfig.titleTextColor),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.end,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+
+        const SizedBox(height: 10),
 
         // Quick Conversions Box
         Container(
@@ -1831,7 +2096,7 @@ class WidgetCardRenderer {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                AppWidgetLocalization.getQuickConversionsLabel(lang),
+                '${AppWidgetLocalization.getQuickConversionsLabel(lang)} ($fromCurr)',
                 style: TextStyle(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w800,
@@ -1842,9 +2107,32 @@ class WidgetCardRenderer {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('\$10 ≈ 342.5', style: TextStyle(fontSize: 9.5, color: themeConfig.subtitleTextColor)),
-                  Text('\$50 ≈ 1,712.5', style: TextStyle(fontSize: 9.5, color: themeConfig.subtitleTextColor)),
-                  Text('\$100 ≈ 3,425.0', style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: themeConfig.accentColor)),
+                  Flexible(
+                    child: Text(
+                      '${CurrencyFormatter.getSymbol(fromCurr)}10 ≈ $conv10',
+                      style: TextStyle(fontSize: 9.5, color: themeConfig.subtitleTextColor),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      '${CurrencyFormatter.getSymbol(fromCurr)}50 ≈ $conv50',
+                      style: TextStyle(fontSize: 9.5, color: themeConfig.subtitleTextColor),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      '${CurrencyFormatter.getSymbol(fromCurr)}100 ≈ $conv100',
+                      style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: themeConfig.accentColor),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -1857,13 +2145,23 @@ class WidgetCardRenderer {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              AppWidgetLocalization.getAutoSyncLabel(lang),
-              style: TextStyle(fontSize: 9, color: themeConfig.subtitleTextColor),
+            Flexible(
+              child: Text(
+                AppWidgetLocalization.getAutoSyncLabel(lang),
+                style: TextStyle(fontSize: 9, color: themeConfig.subtitleTextColor),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-            Text(
-              AppWidgetLocalization.getOfflineReadyLabel(lang),
-              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                AppWidgetLocalization.getOfflineReadyLabel(lang),
+                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.end,
+              ),
             ),
           ],
         ),

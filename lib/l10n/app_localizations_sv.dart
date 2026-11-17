@@ -2235,4 +2235,9 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get invalidEmail => 'Ange en giltig e-postadress.';
+
+  @override
+  String revertToCurrency(String currency) {
+    return 'Återgå till $currency';
+  }
 }

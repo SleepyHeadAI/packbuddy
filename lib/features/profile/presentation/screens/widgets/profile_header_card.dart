@@ -3,30 +3,28 @@ import 'package:packbuddy/features/budget/domain/country.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
 import 'package:packbuddy/features/profile/domain/profile_localization.dart';
 import 'package:packbuddy/features/profile/domain/user_profile.dart';
+import 'package:packbuddy/features/profile/presentation/widgets/avatar_picker_sheet.dart';
+import 'package:packbuddy/features/profile/presentation/widgets/user_avatar.dart';
 
 /// Serene Voyage header card displaying user avatar, name, bio, and country
 class ProfileHeaderCard extends StatelessWidget {
   final UserProfile profile;
   final String languageCode;
   final VoidCallback onEditTap;
+  final VoidCallback? onAvatarTap;
 
   const ProfileHeaderCard({
     super.key,
     required this.profile,
     required this.languageCode,
     required this.onEditTap,
+    this.onAvatarTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-
-    final initial = (profile.displayName != null && profile.displayName!.isNotEmpty)
-        ? profile.displayName![0].toUpperCase()
-        : (profile.email != null && profile.email!.isNotEmpty
-            ? profile.email![0].toUpperCase()
-            : 'P');
 
     String? countryDisplay;
     if (profile.homeCountryCode != null && profile.homeCountryCode!.isNotEmpty) {
@@ -44,56 +42,55 @@ class ProfileHeaderCard extends StatelessWidget {
       borderRadius: 24,
       child: Column(
         children: [
-          // Avatar + Pro Badge
+          // Avatar + Pro Badge + Camera Badge
           Stack(
-            alignment: Alignment.bottomRight,
+            alignment: AlignmentDirectional.bottomEnd,
             children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: isDark
-                        ? [theme.colorScheme.primary, theme.colorScheme.tertiary]
-                        : [theme.colorScheme.primary, theme.colorScheme.primaryContainer],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.25),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Text(
-                    initial,
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w800,
-                      color: isDark ? Colors.white : theme.colorScheme.onPrimary,
-                    ),
-                  ),
-                ),
+              UserAvatar(
+                photoUrl: profile.photoUrl,
+                displayName: profile.displayName,
+                email: profile.email,
+                size: 84,
+                isAnimated: true,
+                showEditBadge: true,
+                onTap: () {
+                  if (onAvatarTap != null) {
+                    onAvatarTap!();
+                  } else {
+                    AvatarPickerSheet.show(
+                      context,
+                      profile: profile,
+                      languageCode: languageCode,
+                    );
+                  }
+                },
               ),
               if (profile.isPro)
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF59E0B),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: isDark ? theme.colorScheme.surface : Colors.white,
-                      width: 2,
+                PositionedDirectional(
+                  top: 0,
+                  end: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF59E0B),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isDark ? theme.colorScheme.surface : Colors.white,
+                        width: 2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                  ),
-                  child: const Icon(
-                    Icons.workspace_premium_rounded,
-                    size: 16,
-                    color: Colors.white,
+                    child: const Icon(
+                      Icons.workspace_premium_rounded,
+                      size: 14,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
             ],
@@ -104,12 +101,14 @@ class ProfileHeaderCard extends StatelessWidget {
           Text(
             profile.displayName?.isNotEmpty == true
                 ? profile.displayName!
-                : (languageCode == 'tr' ? 'PackBuddy Gezgini' : 'PackBuddy Traveler'),
+                : ProfileLocalization.getDefaultTravelerName(languageCode),
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w800,
               letterSpacing: -0.3,
             ),
             textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
 
@@ -186,6 +185,8 @@ class ProfileHeaderCard extends StatelessWidget {
               label: Text(
                 ProfileLocalization.getEditProfile(languageCode),
                 style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 10),

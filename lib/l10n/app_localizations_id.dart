@@ -2243,4 +2243,9 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get invalidEmail => 'Silakan masukkan alamat email yang valid.';
+
+  @override
+  String revertToCurrency(String currency) {
+    return 'Kembali ke $currency';
+  }
 }

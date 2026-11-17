@@ -10,6 +10,7 @@ import '../../core/services/currency_service.dart';
 import '../../core/services/live_location_service.dart';
 import '../../data/local_db/database_helper.dart';
 import '../admin/admin_service.dart';
+import '../profile/domain/user_profile.dart';
 import '../travel_map/data/travel_map_service.dart';
 
 /// Contract defining authentication operations for PackBuddy
@@ -588,14 +589,61 @@ class FirebaseAuthService implements AuthService {
         );
       }
 
+      // AVATAR & PHOTO URL RESOLUTION & SELF-HEALING PRESERVATION:
+      // Remote Firestore document (if exists) is authoritative for custom in-app avatars (e.g. animal avatars or custom photos).
+      // If Firestore doesn't have it, check local offline profile cache or dedicated user avatar preference.
+      // Fall back to Firebase Auth / Google photoURL only for brand new profiles without any existing avatar.
+      // Under NO circumstance should user.photoURL (which is null or default Google photo) overwrite an existing chosen avatar!
+      final remotePhotoUrl = (remoteData?['photoUrl'] ?? remoteData?['photoURL']) as String?;
+      String? resolvedPhotoUrl;
+
+      if (remotePhotoUrl != null && remotePhotoUrl.trim().isNotEmpty) {
+        resolvedPhotoUrl = remotePhotoUrl.trim();
+      } else {
+        // Check local cache if cloud was missing it or if offline selection occurred
+        final cachedJson = PreferencesService.instance.getCachedUserProfile(user.uid);
+        if (cachedJson != null && cachedJson.isNotEmpty) {
+          try {
+            final cachedProfile = UserProfile.fromJson(cachedJson, fallbackUid: user.uid);
+            if (cachedProfile.photoUrl != null && cachedProfile.photoUrl!.trim().isNotEmpty) {
+              resolvedPhotoUrl = cachedProfile.photoUrl!.trim();
+            }
+          } catch (_) {}
+        }
+        // Also check dedicated avatar preference backup
+        if (resolvedPhotoUrl == null || resolvedPhotoUrl.isEmpty) {
+          final dedicatedAvatar = PreferencesService.instance.getUserAvatar(uid: user.uid);
+          if (dedicatedAvatar != null && dedicatedAvatar.trim().isNotEmpty) {
+            resolvedPhotoUrl = dedicatedAvatar.trim();
+          }
+        }
+        // Fall back to Auth photoURL only if no prior avatar exists and this is a brand new user
+        if ((resolvedPhotoUrl == null || resolvedPhotoUrl.isEmpty) && !remoteExists) {
+          resolvedPhotoUrl = photoUrl;
+        }
+      }
+
+      // If we resolved a valid photoUrl, ensure it is mirrored to dedicated storage for instant offline access
+      if (resolvedPhotoUrl != null && resolvedPhotoUrl.isNotEmpty) {
+        unawaited(PreferencesService.instance.setUserAvatar(resolvedPhotoUrl, uid: user.uid));
+      }
+
+      // DISPLAY NAME RESOLUTION:
+      // Preserve existing custom display name from Firestore if Auth user.displayName is null/empty
+      final remoteDisplayName = (remoteData?['displayName'] ?? remoteData?['name']) as String?;
+      final effectiveDisplayName = (remoteDisplayName != null && remoteDisplayName.trim().isNotEmpty)
+          ? remoteDisplayName.trim()
+          : (displayName != null && displayName.trim().isNotEmpty ? displayName.trim() : null);
+
       final activeTheme = PreferencesService.instance.getThemeMode().name;
       final activeLocale = PreferencesService.instance.getLocale()?.languageCode ?? 'tr';
 
       final updateFields = <String, dynamic>{
         'uid': user.uid,
         'email': email,
-        'displayName': displayName,
-        'photoUrl': photoUrl,
+        'displayName': effectiveDisplayName,
+        if (resolvedPhotoUrl != null && resolvedPhotoUrl.isNotEmpty)
+          'photoUrl': resolvedPhotoUrl,
         'provider': provider,
         'emailVerified': emailVerified,
         'createdAt': effectiveCreatedAt,

@@ -36,6 +36,8 @@ import 'widgets/dashboard_customize_sheet.dart';
 import 'widgets/dashboard_mini_cards.dart';
 import '../../../shared/widgets/quick_actions_sheet.dart';
 import '../../profile/presentation/screens/profile_screen.dart';
+import '../../profile/presentation/controllers/profile_controller.dart';
+import '../../profile/presentation/widgets/user_avatar.dart';
 import 'package:packbuddy/features/search/presentation/screens/global_search_screen.dart';
 
 /// Customizable, clean, and elegant Dashboard for PackBuddy with live Riverpod state integration.
@@ -253,6 +255,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     final proState = ref.watch(proSubscriptionProvider);
     final travelMapState = ref.watch(travelMapControllerProvider);
     final authState = ref.watch(authControllerProvider);
+    final profileState = ref.watch(profileControllerProvider);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final dateFormat = DateFormat.MMMd(lang);
@@ -465,6 +468,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             _HorizontalGreetingBar(
               greeting: _getTimeBasedGreeting(l10n, lang),
               userName: authState.user?.displayName,
+              photoUrl: profileState.profile?.photoUrl,
               subtitle: DateFormat.yMMMMd(lang).format(now),
               onProfileTap: () {
                 Navigator.of(context).push(
@@ -817,6 +821,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 class _HorizontalGreetingBar extends StatelessWidget {
   final String greeting;
   final String? userName;
+  final String? photoUrl;
   final String subtitle;
   final String syncLabel;
   final IconData syncIcon;
@@ -831,6 +836,7 @@ class _HorizontalGreetingBar extends StatelessWidget {
   const _HorizontalGreetingBar({
     required this.greeting,
     this.userName,
+    this.photoUrl,
     required this.subtitle,
     required this.syncLabel,
     required this.syncIcon,
@@ -958,14 +964,20 @@ class _HorizontalGreetingBar extends StatelessWidget {
           ),
           const SizedBox(height: 6),
 
-          // Row 2: User Name (Left, full width available) + Formatted Date (Right)
+          // Row 2: User Avatar + User Name (Left) + Formatted Date (Right)
           InkWell(
             onTap: onProfileTap,
             borderRadius: BorderRadius.circular(8),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                UserAvatar(
+                  photoUrl: photoUrl,
+                  displayName: displayName,
+                  size: 28,
+                  isAnimated: true,
+                ),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Row(
                     mainAxisSize: MainAxisSize.min,

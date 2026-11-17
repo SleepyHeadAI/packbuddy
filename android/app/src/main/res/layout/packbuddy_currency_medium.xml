@@ -130,7 +130,7 @@
                     android:layout_weight="1"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="● Canlı Kurlar"
+                    android:text="● Live Rates"
                     android:textColor="#10B981"
                     android:textSize="9sp"
                     android:textStyle="bold" />

@@ -2248,4 +2248,9 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get invalidEmail => 'Lütfen geçerli bir e-posta adresi girin.';
+
+  @override
+  String revertToCurrency(String currency) {
+    return '$currency para birimine dön';
+  }
 }

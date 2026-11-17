@@ -4339,6 +4339,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter a valid email address.'**
   String get invalidEmail;
+
+  /// Button label to switch back to the trip original base currency in budget analytics
+  ///
+  /// In en, this message translates to:
+  /// **'Switch back to {currency}'**
+  String revertToCurrency(String currency);
 }
 
 class _AppLocalizationsDelegate

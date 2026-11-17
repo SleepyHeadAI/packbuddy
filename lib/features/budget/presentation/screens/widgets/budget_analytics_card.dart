@@ -559,7 +559,8 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                         Icon(Icons.refresh_rounded, size: 12, color: theme.colorScheme.primary),
                         const SizedBox(width: 4),
                         Text(
-                          '${widget.tripCurrency} (${CurrencyFormatter.getSymbol(widget.tripCurrency)}) para birimine dön',
+                          l10n?.revertToCurrency('${widget.tripCurrency} (${CurrencyFormatter.getSymbol(widget.tripCurrency)})') ??
+                              'Switch back to ${widget.tripCurrency} (${CurrencyFormatter.getSymbol(widget.tripCurrency)})',
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,

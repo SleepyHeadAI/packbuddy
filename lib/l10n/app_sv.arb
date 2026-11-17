@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "sv",
   "appName": "PackBuddy",
   "welcome": "Välkommen till PackBuddy",
@@ -700,5 +700,6 @@
   "setNewVaultPin": "Ange ny valv-PIN",
   "verifyAndContinue": "Verifiera och fortsätt",
   "vaultPinRequiredTitle": "Valv-PIN krävs",
-  "invalidEmail": "Ange en giltig e-postadress."
+  "invalidEmail": "Ange en giltig e-postadress.",
+  "revertToCurrency": "Återgå till {currency}"
 }

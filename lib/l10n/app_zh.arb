@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "zh",
   "appName": "PackBuddy",
   "welcome": "欢迎使用 PackBuddy",
@@ -700,5 +700,6 @@
   "setNewVaultPin": "设置新保险箱PIN码",
   "verifyAndContinue": "验证并继续",
   "vaultPinRequiredTitle": "必须设置保险箱PIN码",
-  "invalidEmail": "请输入有效的电子邮箱地址。"
+  "invalidEmail": "请输入有效的电子邮箱地址。",
+  "revertToCurrency": "切回 {currency}"
 }

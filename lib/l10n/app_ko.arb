@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "ko",
   "appName": "PackBuddy",
   "welcome": "PackBuddy에 오신 것을 환영합니다",
@@ -700,5 +700,6 @@
   "setNewVaultPin": "새 금고 PIN 설정",
   "verifyAndContinue": "인증하고 계속하기",
   "vaultPinRequiredTitle": "금고 PIN 설정 필수",
-  "invalidEmail": "유효한 이메일 주소를 입력해 주세요."
+  "invalidEmail": "유효한 이메일 주소를 입력해 주세요.",
+  "revertToCurrency": "{currency}(으)로 돌아가기"
 }

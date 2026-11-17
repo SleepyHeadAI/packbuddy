@@ -2149,4 +2149,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get invalidEmail => '请输入有效的电子邮箱地址。';
+
+  @override
+  String revertToCurrency(String currency) {
+    return '切回 $currency';
+  }
 }

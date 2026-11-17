@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "id",
   "appName": "PackBuddy",
   "welcome": "Selamat Datang di PackBuddy",
@@ -700,5 +700,6 @@
   "setNewVaultPin": "Atur PIN Brankas Baru",
   "verifyAndContinue": "Verifikasi & Lanjutkan",
   "vaultPinRequiredTitle": "PIN Brankas Wajib",
-  "invalidEmail": "Silakan masukkan alamat email yang valid."
+  "invalidEmail": "Silakan masukkan alamat email yang valid.",
+  "revertToCurrency": "Kembali ke {currency}"
 }

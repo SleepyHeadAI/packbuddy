@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "hi",
   "appName": "PackBuddy",
   "welcome": "PackBuddy में आपका स्वागत है",
@@ -700,5 +700,6 @@
   "setNewVaultPin": "नया वॉल्ट पिन सेट करें",
   "verifyAndContinue": "सत्यापित करें और जारी रखें",
   "vaultPinRequiredTitle": "वॉल्ट पिन अनिवार्य है",
-  "invalidEmail": "कृपया एक मान्य ईमेल पता दर्ज करें।"
+  "invalidEmail": "कृपया एक मान्य ईमेल पता दर्ज करें।",
+  "revertToCurrency": "{currency} पर वापस जाएँ"
 }

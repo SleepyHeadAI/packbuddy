@@ -146,6 +146,7 @@ class DatabaseHelper {
           day_number INTEGER NOT NULL,
           date TEXT NOT NULL,
           time TEXT,
+          end_time TEXT,
           title TEXT NOT NULL,
           description TEXT,
           location TEXT,
@@ -278,6 +279,7 @@ class DatabaseHelper {
         day_number INTEGER NOT NULL,
         date TEXT NOT NULL,
         time TEXT,
+        end_time TEXT,
         title TEXT NOT NULL,
         description TEXT,
         location TEXT,
@@ -429,6 +431,7 @@ class DatabaseHelper {
             day_number INTEGER NOT NULL,
             date TEXT NOT NULL,
             time TEXT,
+            end_time TEXT,
             title TEXT NOT NULL,
             description TEXT,
             location TEXT,
@@ -442,6 +445,13 @@ class DatabaseHelper {
             FOREIGN KEY (trip_id) REFERENCES ${AppConstants.tableTrips}(id) ON DELETE CASCADE
           )
         ''');
+      } catch (_) {}
+    }
+
+    // Version 14: Add end_time column to itinerary_items table for dual time support
+    if (oldVersion < 14) {
+      try {
+        await db.execute('ALTER TABLE ${AppConstants.tableItineraryItems} ADD COLUMN end_time TEXT');
       } catch (_) {}
     }
   }

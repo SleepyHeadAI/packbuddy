@@ -218,7 +218,23 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                             languageCode: langCode,
                             onToggleCompleted: () =>
                                 itineraryNotifier.toggleCompleted(item.id),
-                            onDelete: () => itineraryNotifier.deleteActivity(item.id),
+                            onEdit: () {
+                              AddActivitySheet.show(
+                                context,
+                                tripId: widget.trip.id,
+                                initialDay: item.dayNumber,
+                                totalDays: totalDays,
+                                tripStartDate: widget.trip.startDate.toIso8601String().split('T').first,
+                                languageCode: langCode,
+                                itemToEdit: item,
+                              );
+                            },
+                            onDelete: () => _confirmDelete(
+                              context,
+                              item.id,
+                              langCode,
+                              itineraryNotifier,
+                            ),
                           );
                         },
                       ),
@@ -226,6 +242,37 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _confirmDelete(
+    BuildContext context,
+    String itemId,
+    String langCode,
+    ItineraryController notifier,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(ItineraryLocalization.getDeleteConfirmTitle(langCode)),
+        content: Text(ItineraryLocalization.getDeleteConfirmMessage(langCode)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(ItineraryLocalization.getCancel(langCode)),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(ItineraryLocalization.getDelete(langCode)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await notifier.deleteActivity(itemId);
+    }
   }
 
   Widget _buildEmptyState({

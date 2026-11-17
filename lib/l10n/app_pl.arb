@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "pl",
   "appName": "PackBuddy",
   "welcome": "Witaj w PackBuddy",
@@ -700,5 +700,6 @@
   "setNewVaultPin": "Ustaw nowy PIN sejfu",
   "verifyAndContinue": "Zweryfikuj i kontynuuj",
   "vaultPinRequiredTitle": "PIN sejfu jest wymagany",
-  "invalidEmail": "Wprowadź prawidłowy adres e-mail."
+  "invalidEmail": "Wprowadź prawidłowy adres e-mail.",
+  "revertToCurrency": "Wróć do {currency}"
 }

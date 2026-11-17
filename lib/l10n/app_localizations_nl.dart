@@ -2244,4 +2244,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get invalidEmail => 'Voer een geldig e-mailadres in.';
+
+  @override
+  String revertToCurrency(String currency) {
+    return 'Terug naar $currency';
+  }
 }

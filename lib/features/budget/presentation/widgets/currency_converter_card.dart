@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:packbuddy/core/services/app_widget_service.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
+import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
@@ -91,12 +93,16 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
   @override
   void initState() {
     super.initState();
-    _fromCurrency = widget.initialFromCurrency ?? 'USD';
-    _toCurrency = widget.initialToCurrency ?? 'EUR';
+    final savedFrom = PreferencesService.instance.getLastConverterFromCurrency();
+    final savedTo = PreferencesService.instance.getLastConverterToCurrency();
+    final savedAmt = PreferencesService.instance.getLastConverterAmount();
+
+    _fromCurrency = widget.initialFromCurrency ?? savedFrom;
+    _toCurrency = widget.initialToCurrency ?? savedTo;
     if (_fromCurrency == _toCurrency) {
       _toCurrency = _fromCurrency == 'EUR' ? 'USD' : 'EUR';
     }
-    final initialAmt = widget.initialAmount ?? 100.0;
+    final initialAmt = widget.initialAmount ?? savedAmt;
     _amountController = TextEditingController(
       text: (initialAmt % 1 == 0) ? initialAmt.toInt().toString() : initialAmt.toStringAsFixed(2),
     );
@@ -104,6 +110,13 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
       vsync: this,
       duration: const Duration(milliseconds: 250),
     );
+  }
+
+  void _persistConverterState() {
+    PreferencesService.instance.setLastConverterFromCurrency(_fromCurrency);
+    PreferencesService.instance.setLastConverterToCurrency(_toCurrency);
+    PreferencesService.instance.setLastConverterAmount(_currentAmount);
+    AppWidgetService.syncCurrentState();
   }
 
   @override
@@ -120,6 +133,7 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
       _fromCurrency = _toCurrency;
       _toCurrency = temp;
     });
+    _persistConverterState();
   }
 
   Future<void> _refreshRates() async {
@@ -247,7 +261,10 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
                 child: _buildCurrencyDropdown(
                   value: _fromCurrency,
                   onChanged: (val) {
-                    if (val != null) setState(() => _fromCurrency = val);
+                    if (val != null) {
+                      setState(() => _fromCurrency = val);
+                      _persistConverterState();
+                    }
                   },
                   theme: theme,
                 ),
@@ -271,7 +288,10 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
                 child: _buildCurrencyDropdown(
                   value: _toCurrency,
                   onChanged: (val) {
-                    if (val != null) setState(() => _toCurrency = val);
+                    if (val != null) {
+                      setState(() => _toCurrency = val);
+                      _persistConverterState();
+                    }
                   },
                   theme: theme,
                 ),
@@ -319,7 +339,10 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           ),
-          onChanged: (_) => setState(() {}),
+          onChanged: (_) {
+            setState(() {});
+            _persistConverterState();
+          },
         ),
         const SizedBox(height: 10),
 
@@ -344,6 +367,7 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
                     if (selected) {
                       _amountController.text = preset.toInt().toString();
                       setState(() {});
+                      _persistConverterState();
                     }
                   },
                   visualDensity: VisualDensity.compact,

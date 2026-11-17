@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../../core/services/app_widget_service.dart';
 import '../../../../core/services/currency_service.dart';
+import '../../../../core/services/preferences_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/currency_formatter.dart';
@@ -40,13 +42,17 @@ class _HorizontalCurrencyConverterCardState
   @override
   void initState() {
     super.initState();
-    _fromCurrency = widget.initialFrom ?? 'USD';
-    _toCurrency = widget.initialTo ?? 'TRY';
+    final savedFrom = PreferencesService.instance.getLastConverterFromCurrency();
+    final savedTo = PreferencesService.instance.getLastConverterToCurrency();
+    final savedAmt = PreferencesService.instance.getLastConverterAmount();
+
+    _fromCurrency = widget.initialFrom ?? savedFrom;
+    _toCurrency = widget.initialTo ?? savedTo;
     if (_fromCurrency == _toCurrency) {
       _toCurrency = _fromCurrency == 'TRY' ? 'EUR' : 'TRY';
     }
 
-    final initialAmt = widget.initialAmount;
+    final initialAmt = widget.initialAmount != 100.0 ? widget.initialAmount : savedAmt;
     _amountController = TextEditingController(
       text: (initialAmt % 1 == 0)
           ? initialAmt.toInt().toString()
@@ -57,6 +63,13 @@ class _HorizontalCurrencyConverterCardState
       vsync: this,
       duration: const Duration(milliseconds: 260),
     );
+  }
+
+  void _persistConverterState() {
+    PreferencesService.instance.setLastConverterFromCurrency(_fromCurrency);
+    PreferencesService.instance.setLastConverterToCurrency(_toCurrency);
+    PreferencesService.instance.setLastConverterAmount(_currentAmount);
+    AppWidgetService.syncCurrentState();
   }
 
   @override
@@ -73,6 +86,7 @@ class _HorizontalCurrencyConverterCardState
       _fromCurrency = _toCurrency;
       _toCurrency = temp;
     });
+    _persistConverterState();
   }
 
   Future<void> _refreshRates() async {
@@ -229,7 +243,10 @@ class _HorizontalCurrencyConverterCardState
                       _buildCurrencySelector(
                         value: _fromCurrency,
                         onChanged: (val) {
-                          if (val != null) setState(() => _fromCurrency = val);
+                          if (val != null) {
+                            setState(() => _fromCurrency = val);
+                            _persistConverterState();
+                          }
                         },
                         theme: theme,
                       ),
@@ -256,7 +273,10 @@ class _HorizontalCurrencyConverterCardState
                             fontSize: 13,
                           ),
                         ),
-                        onChanged: (_) => setState(() {}),
+                        onChanged: (_) {
+                          setState(() {});
+                          _persistConverterState();
+                        },
                       ),
                     ],
                   ),
@@ -303,7 +323,10 @@ class _HorizontalCurrencyConverterCardState
                       _buildCurrencySelector(
                         value: _toCurrency,
                         onChanged: (val) {
-                          if (val != null) setState(() => _toCurrency = val);
+                          if (val != null) {
+                            setState(() => _toCurrency = val);
+                            _persistConverterState();
+                          }
                         },
                         theme: theme,
                       ),
@@ -362,6 +385,7 @@ class _HorizontalCurrencyConverterCardState
                           onTap: () {
                             _amountController.text = preset.toInt().toString();
                             setState(() {});
+                            _persistConverterState();
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),

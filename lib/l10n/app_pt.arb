@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "pt",
   "appName": "PackBuddy",
   "welcome": "Bem-vindo ao PackBuddy",
@@ -700,5 +700,6 @@
   "setNewVaultPin": "Definir novo PIN do cofre",
   "verifyAndContinue": "Verificar e continuar",
   "vaultPinRequiredTitle": "PIN do cofre obrigatório",
-  "invalidEmail": "Digite um endereço de e-mail válido."
+  "invalidEmail": "Digite um endereço de e-mail válido.",
+  "revertToCurrency": "Voltar para {currency}"
 }

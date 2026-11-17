@@ -2229,4 +2229,9 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get invalidEmail => 'कृपया एक मान्य ईमेल पता दर्ज करें।';
+
+  @override
+  String revertToCurrency(String currency) {
+    return '$currency पर वापस जाएँ';
+  }
 }

@@ -162,6 +162,214 @@ class ItineraryLocalization {
     }
   }
 
+  static String getStartTime(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Başlangıç / Gidiş';
+      case 'de': return 'Startzeit';
+      case 'es': return 'Inicio';
+      case 'fr': return 'Début';
+      case 'it': return 'Inizio';
+      case 'pt': return 'Início';
+      case 'ru': return 'Начало';
+      case 'zh': return '开始时间';
+      case 'ja': return '開始';
+      case 'ko': return '시작';
+      case 'hi': return 'प्रारंभ';
+      case 'ar': return 'البدء';
+      case 'nl': return 'Start';
+      case 'el': return 'Έναρξη';
+      case 'sv': return 'Start';
+      case 'pl': return 'Początek';
+      case 'id': return 'Mulai';
+      case 'th': return 'เวลาเริ่ม';
+      case 'vi': return 'Bắt đầu';
+      case 'en':
+      default: return 'Start Time';
+    }
+  }
+
+  static String getEndTime(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Bitiş / Dönüş';
+      case 'de': return 'Ende / Rückkehr';
+      case 'es': return 'Fin / Regreso';
+      case 'fr': return 'Fin / Retour';
+      case 'it': return 'Fine / Ritorno';
+      case 'pt': return 'Fim / Retorno';
+      case 'ru': return 'Окончание';
+      case 'zh': return '结束 / 返程';
+      case 'ja': return '終了・帰着';
+      case 'ko': return '종료 / 복귀';
+      case 'hi': return 'समाप्ति';
+      case 'ar': return 'الانتهاء / العودة';
+      case 'nl': return 'Einde / Terugkeer';
+      case 'el': return 'Λήξη / Επιστροφή';
+      case 'sv': return 'Slut / Återresa';
+      case 'pl': return 'Koniec / Powrót';
+      case 'id': return 'Selesai / Pulang';
+      case 'th': return 'สิ้นสุด / กลับ';
+      case 'vi': return 'Kết thúc / Về';
+      case 'en':
+      default: return 'End / Return';
+    }
+  }
+
+  static String getFlexible(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Esnek';
+      case 'de': return 'Flexibel';
+      case 'es': return 'Flexible';
+      case 'fr': return 'Flexible';
+      case 'it': return 'Flessibile';
+      case 'pt': return 'Flexível';
+      case 'ru': return 'Гибко';
+      case 'zh': return '灵活';
+      case 'ja': return '自由';
+      case 'ko': return '자율';
+      case 'hi': return 'लचीला';
+      case 'ar': return 'مرن';
+      case 'nl': return 'Flexibel';
+      case 'el': return 'Ευέλικτο';
+      case 'sv': return 'Flexibel';
+      case 'pl': return 'Elastycznie';
+      case 'id': return 'Fleksibel';
+      case 'th': return 'ยืดหยุ่น';
+      case 'vi': return 'Linh hoạt';
+      case 'en':
+      default: return 'Flexible';
+    }
+  }
+
+  static String getOptional(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Opsiyonel';
+      case 'de': return 'Optional';
+      case 'es': return 'Opcional';
+      case 'fr': return 'Optionnel';
+      case 'it': return 'Opzionale';
+      case 'pt': return 'Opcional';
+      case 'ru': return 'Опционально';
+      case 'zh': return '可选';
+      case 'ja': return '任意';
+      case 'ko': return '선택';
+      case 'hi': return 'वैकल्पिक';
+      case 'ar': return 'اختياري';
+      case 'nl': return 'Optioneel';
+      case 'el': return 'Προαιρετικό';
+      case 'sv': return 'Valfritt';
+      case 'pl': return 'Opcjonalnie';
+      case 'id': return 'Opsional';
+      case 'th': return 'ไม่บังคับ';
+      case 'vi': return 'Tùy chọn';
+      case 'en':
+      default: return 'Optional';
+    }
+  }
+
+  static String getCost(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Masraf / Bütçe';
+      case 'de': return 'Kosten';
+      case 'es': return 'Costo';
+      case 'fr': return 'Coût';
+      case 'it': return 'Costo';
+      case 'pt': return 'Custo';
+      case 'ru': return 'Стоимость';
+      case 'zh': return '费用';
+      case 'ja': return '費用';
+      case 'ko': return '비용';
+      case 'hi': return 'लागत';
+      case 'ar': return 'التكلفة';
+      case 'nl': return 'Kosten';
+      case 'el': return 'Κόστος';
+      case 'sv': return 'Kostnad';
+      case 'pl': return 'Koszt';
+      case 'id': return 'Biaya';
+      case 'th': return 'ค่าใช้จ่าย';
+      case 'vi': return 'Chi phí';
+      case 'en':
+      default: return 'Cost / Budget';
+    }
+  }
+
+  static String getDeleteConfirmTitle(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Aktiviteyi Sil';
+      case 'de': return 'Aktivität löschen';
+      case 'es': return 'Eliminar actividad';
+      case 'fr': return 'Supprimer l\'activité';
+      case 'it': return 'Elimina attività';
+      case 'pt': return 'Excluir atividade';
+      case 'ru': return 'Удалить активность';
+      case 'zh': return '删除活动';
+      case 'ja': return 'アクティビティを削除';
+      case 'ko': return '활동 삭제';
+      case 'hi': return 'गतिविधि हटाएं';
+      case 'ar': return 'حذف النشاط';
+      case 'nl': return 'Activiteit verwijderen';
+      case 'el': return 'Διαγραφή δραστηριότητας';
+      case 'sv': return 'Ta bort aktivitet';
+      case 'pl': return 'Usuń aktywność';
+      case 'id': return 'Hapus Aktivitas';
+      case 'th': return 'ลบกิจกรรม';
+      case 'vi': return 'Xóa hoạt động';
+      case 'en':
+      default: return 'Delete Activity';
+    }
+  }
+
+  static String getDeleteConfirmMessage(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Bu aktiviteyi silmek istediğinize emin misiniz?';
+      case 'de': return 'Möchten Sie diese Aktivität wirklich löschen?';
+      case 'es': return '¿Estás seguro de que deseas eliminar esta actividad?';
+      case 'fr': return 'Êtes-vous sûr de vouloir supprimer cette activité ?';
+      case 'it': return 'Sei sicuro di voler eliminare questa attività?';
+      case 'pt': return 'Tem certeza de que deseja excluir esta atividade?';
+      case 'ru': return 'Вы уверены, что хотите удалить эту активность?';
+      case 'zh': return '您确定要删除此活动吗？';
+      case 'ja': return 'このアクティビティを削除してもよろしいですか？';
+      case 'ko': return '이 활동을 삭제하시겠습니까?';
+      case 'hi': return 'क्या आप वाकई इस गतिविधि को हटाना चाहते हैं?';
+      case 'ar': return 'هل أنت متأكد أنك تريد حذف هذا النشاط؟';
+      case 'nl': return 'Weet je zeker dat je deze activiteit wilt verwijderen?';
+      case 'el': return 'Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτήν τη δραστηριότητα;';
+      case 'sv': return 'Är du säker på att du vill ta bort denna aktivitet?';
+      case 'pl': return 'Czy na pewno chcesz usunąć tę aktywność?';
+      case 'id': return 'Apakah Anda yakin ingin menghapus aktivitas ini?';
+      case 'th': return 'คุณแน่ใจหรือไม่ว่าต้องการลบกิจกรรมนี้?';
+      case 'vi': return 'Bạn có chắc chắn muốn xóa hoạt động này không?';
+      case 'en':
+      default: return 'Are you sure you want to delete this activity?';
+    }
+  }
+
+  static String getCancel(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'İptal';
+      case 'de': return 'Abbrechen';
+      case 'es': return 'Cancelar';
+      case 'fr': return 'Annuler';
+      case 'it': return 'Annulla';
+      case 'pt': return 'Cancelar';
+      case 'ru': return 'Отмена';
+      case 'zh': return '取消';
+      case 'ja': return 'キャンセル';
+      case 'ko': return '취소';
+      case 'hi': return 'रद्द करें';
+      case 'ar': return 'إلغاء';
+      case 'nl': return 'Annuleren';
+      case 'el': return 'Άκυρο';
+      case 'sv': return 'Avbryt';
+      case 'pl': return 'Anuluj';
+      case 'id': return 'Batal';
+      case 'th': return 'ยกเลิก';
+      case 'vi': return 'Hủy';
+      case 'en':
+      default: return 'Cancel';
+    }
+  }
+
   static String getLocation(String lang) {
     switch (_cleanLang(lang)) {
       case 'tr': return 'Konum / Mekan';

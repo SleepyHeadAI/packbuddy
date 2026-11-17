@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "en",
   "appName": "PackBuddy",
   "@appName": {
@@ -2437,45 +2437,97 @@
     "description": "Badge indicating that private vault is unlocked"
   },
   "forgotPin": "Forgot PIN?",
-  "@forgotPin": { "description": "Forgot PIN button text" },
+  "@forgotPin": {
+    "description": "Forgot PIN button text"
+  },
   "resetVaultPinTitle": "Reset Vault PIN",
-  "@resetVaultPinTitle": { "description": "Title for vault PIN reset" },
+  "@resetVaultPinTitle": {
+    "description": "Title for vault PIN reset"
+  },
   "resetVaultPinEmailDesc": "A 6-digit verification code will be sent to your account email to reset your vault PIN:",
-  "@resetVaultPinEmailDesc": { "description": "Description for vault PIN reset email" },
+  "@resetVaultPinEmailDesc": {
+    "description": "Description for vault PIN reset email"
+  },
   "sendVerificationCode": "Send Verification Code",
-  "@sendVerificationCode": { "description": "Send verification code button" },
+  "@sendVerificationCode": {
+    "description": "Send verification code button"
+  },
   "enterVerificationCode": "Enter Verification Code",
-  "@enterVerificationCode": { "description": "Enter verification code header" },
+  "@enterVerificationCode": {
+    "description": "Enter verification code header"
+  },
   "enterVerificationCodeDesc": "Please enter the 6-digit verification code sent to your email:",
-  "@enterVerificationCodeDesc": { "description": "Verification code input prompt" },
+  "@enterVerificationCodeDesc": {
+    "description": "Verification code input prompt"
+  },
   "verificationCode": "Verification Code",
-  "@verificationCode": { "description": "Verification code label" },
+  "@verificationCode": {
+    "description": "Verification code label"
+  },
   "verifyAndContinue": "Verify & Continue",
-  "@verifyAndContinue": { "description": "Verify code button" },
+  "@verifyAndContinue": {
+    "description": "Verify code button"
+  },
   "invalidVerificationCode": "Invalid verification code. Please check and try again.",
-  "@invalidVerificationCode": { "description": "Invalid code error message" },
+  "@invalidVerificationCode": {
+    "description": "Invalid code error message"
+  },
   "resendCode": "Resend Code",
-  "@resendCode": { "description": "Resend code button" },
+  "@resendCode": {
+    "description": "Resend code button"
+  },
   "codeResent": "Verification code has been resent.",
-  "@codeResent": { "description": "Code resent snackbar" },
+  "@codeResent": {
+    "description": "Code resent snackbar"
+  },
   "setNewVaultPin": "Set New Vault PIN",
-  "@setNewVaultPin": { "description": "Set new vault PIN header" },
+  "@setNewVaultPin": {
+    "description": "Set new vault PIN header"
+  },
   "newPin": "New 4-Digit PIN",
-  "@newPin": { "description": "New PIN input label" },
+  "@newPin": {
+    "description": "New PIN input label"
+  },
   "confirmNewPin": "Confirm New PIN",
-  "@confirmNewPin": { "description": "Confirm PIN input label" },
+  "@confirmNewPin": {
+    "description": "Confirm PIN input label"
+  },
   "pinsDoNotMatch": "PIN codes do not match.",
-  "@pinsDoNotMatch": { "description": "PIN mismatch error" },
+  "@pinsDoNotMatch": {
+    "description": "PIN mismatch error"
+  },
   "saveNewPinAndUnlock": "Save PIN & Unlock",
-  "@saveNewPinAndUnlock": { "description": "Save PIN and unlock button" },
+  "@saveNewPinAndUnlock": {
+    "description": "Save PIN and unlock button"
+  },
   "vaultPinResetSuccess": "Vault PIN successfully reset and vault unlocked.",
-  "@vaultPinResetSuccess": { "description": "PIN reset success snackbar" },
+  "@vaultPinResetSuccess": {
+    "description": "PIN reset success snackbar"
+  },
   "vaultPinRequiredTitle": "Vault PIN Required",
-  "@vaultPinRequiredTitle": { "description": "Mandatory PIN screen title" },
+  "@vaultPinRequiredTitle": {
+    "description": "Mandatory PIN screen title"
+  },
   "vaultPinRequiredDesc": "A 4-digit PIN is required to protect your travel documents and private photos.",
-  "@vaultPinRequiredDesc": { "description": "Mandatory PIN screen description" },
+  "@vaultPinRequiredDesc": {
+    "description": "Mandatory PIN screen description"
+  },
   "enterYourEmail": "Enter Your Email",
-  "@enterYourEmail": { "description": "Email input label" },
+  "@enterYourEmail": {
+    "description": "Email input label"
+  },
   "invalidEmail": "Please enter a valid email address.",
-  "@invalidEmail": { "description": "Invalid email error" }
+  "@invalidEmail": {
+    "description": "Invalid email error"
+  },
+  "revertToCurrency": "Switch back to {currency}",
+  "@revertToCurrency": {
+    "description": "Button label to switch back to the trip original base currency in budget analytics",
+    "placeholders": {
+      "currency": {
+        "type": "String",
+        "example": "AUD (A$)"
+      }
+    }
+  }
 }

@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:packbuddy/features/itinerary/domain/itinerary_item.dart';
 import 'package:packbuddy/features/itinerary/domain/itinerary_localization.dart';
 import 'package:packbuddy/features/itinerary/presentation/controllers/itinerary_controller.dart';
 
-/// Modal bottom sheet for scheduling a new activity in the day planner
+/// Modal bottom sheet for scheduling or editing an activity in the day planner
 class AddActivitySheet extends ConsumerStatefulWidget {
   final String tripId;
   final int initialDay;
   final int totalDays;
   final String tripStartDate;
   final String languageCode;
+  final ItineraryItem? itemToEdit;
 
   const AddActivitySheet({
     super.key,
@@ -18,6 +20,7 @@ class AddActivitySheet extends ConsumerStatefulWidget {
     required this.totalDays,
     required this.tripStartDate,
     required this.languageCode,
+    this.itemToEdit,
   });
 
   static Future<void> show(
@@ -27,6 +30,7 @@ class AddActivitySheet extends ConsumerStatefulWidget {
     required int totalDays,
     required String tripStartDate,
     required String languageCode,
+    ItineraryItem? itemToEdit,
   }) {
     return showModalBottomSheet(
       context: context,
@@ -38,6 +42,7 @@ class AddActivitySheet extends ConsumerStatefulWidget {
         totalDays: totalDays,
         tripStartDate: tripStartDate,
         languageCode: languageCode,
+        itemToEdit: itemToEdit,
       ),
     );
   }
@@ -53,17 +58,48 @@ class _AddActivitySheetState extends ConsumerState<AddActivitySheet> {
   late final TextEditingController _costController;
   late int _selectedDay;
   String _selectedCategory = 'sightseeing';
-  TimeOfDay? _selectedTime;
+  TimeOfDay? _selectedStartTime;
+  TimeOfDay? _selectedEndTime;
   bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController();
-    _locationController = TextEditingController();
-    _notesController = TextEditingController();
-    _costController = TextEditingController();
-    _selectedDay = widget.initialDay;
+    if (widget.itemToEdit != null) {
+      final item = widget.itemToEdit!;
+      _titleController = TextEditingController(text: item.title);
+      _locationController = TextEditingController(text: item.location ?? '');
+      _notesController = TextEditingController(text: item.description ?? '');
+      _costController = TextEditingController(
+        text: item.cost != null && item.cost! > 0
+            ? (item.cost! % 1 == 0
+                ? item.cost!.toInt().toString()
+                : item.cost!.toString())
+            : '',
+      );
+      _selectedDay = item.dayNumber;
+      _selectedCategory = item.category;
+
+      if (item.time != null && item.time!.isNotEmpty) {
+        if (item.time!.contains(' - ')) {
+          final parts = item.time!.split(' - ');
+          _selectedStartTime = _parseTimeOfDay(parts[0]);
+          _selectedEndTime = _parseTimeOfDay(parts[1]);
+        } else {
+          _selectedStartTime = _parseTimeOfDay(item.time!);
+        }
+      }
+      if (item.endTime != null && item.endTime!.isNotEmpty) {
+        _selectedEndTime = _parseTimeOfDay(item.endTime!);
+      }
+    } else {
+      _titleController = TextEditingController();
+      _locationController = TextEditingController();
+      _notesController = TextEditingController();
+      _costController = TextEditingController();
+      _selectedDay = widget.initialDay;
+      _selectedCategory = 'sightseeing';
+    }
   }
 
   @override
@@ -75,14 +111,53 @@ class _AddActivitySheetState extends ConsumerState<AddActivitySheet> {
     super.dispose();
   }
 
-  Future<void> _pickTime() async {
+  TimeOfDay? _parseTimeOfDay(String? timeStr) {
+    if (timeStr == null || timeStr.isEmpty) return null;
+    try {
+      final clean = timeStr.trim();
+      final parts = clean.split(':');
+      if (parts.length >= 2) {
+        final h = int.parse(parts[0].trim());
+        final m = int.parse(parts[1].trim());
+        return TimeOfDay(hour: h, minute: m);
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  String _formatTimeOfDay(TimeOfDay tod) {
+    final h = tod.hour.toString().padLeft(2, '0');
+    final m = tod.minute.toString().padLeft(2, '0');
+    return '$h:$m';
+  }
+
+  Future<void> _pickStartTime() async {
     final picked = await showTimePicker(
       context: context,
-      initialTime: _selectedTime ?? const TimeOfDay(hour: 10, minute: 0),
+      initialTime: _selectedStartTime ?? const TimeOfDay(hour: 9, minute: 0),
     );
     if (picked != null) {
       setState(() {
-        _selectedTime = picked;
+        _selectedStartTime = picked;
+      });
+    }
+  }
+
+  Future<void> _pickEndTime() async {
+    final initial = _selectedEndTime ??
+        (_selectedStartTime != null
+            ? TimeOfDay(
+                hour: (_selectedStartTime!.hour + 1) % 24,
+                minute: _selectedStartTime!.minute,
+              )
+            : const TimeOfDay(hour: 10, minute: 30));
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: initial,
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedEndTime = picked;
       });
     }
   }
@@ -108,32 +183,55 @@ class _AddActivitySheetState extends ConsumerState<AddActivitySheet> {
       _isSaving = true;
     });
 
-    String? formattedTime;
-    if (_selectedTime != null) {
-      final h = _selectedTime!.hour.toString().padLeft(2, '0');
-      final m = _selectedTime!.minute.toString().padLeft(2, '0');
-      formattedTime = '$h:$m';
-    }
+    final formattedStartTime = _selectedStartTime != null
+        ? _formatTimeOfDay(_selectedStartTime!)
+        : null;
+    final formattedEndTime = _selectedEndTime != null
+        ? _formatTimeOfDay(_selectedEndTime!)
+        : null;
 
-    final cost = double.tryParse(_costController.text.trim());
+    final cost = double.tryParse(_costController.text.trim().replaceAll(',', '.'));
     final date = _calculateDateForDay(_selectedDay);
 
-    final success = await ref
-        .read(itineraryControllerFamily(widget.tripId).notifier)
-        .addActivity(
-          title: title,
-          dayNumber: _selectedDay,
-          date: date,
-          time: formattedTime,
-          location: _locationController.text.trim().isNotEmpty
-              ? _locationController.text.trim()
-              : null,
-          description: _notesController.text.trim().isNotEmpty
-              ? _notesController.text.trim()
-              : null,
-          category: _selectedCategory,
-          cost: cost,
-        );
+    final bool success;
+    if (widget.itemToEdit != null) {
+      success = await ref
+          .read(itineraryControllerFamily(widget.tripId).notifier)
+          .updateActivity(
+            id: widget.itemToEdit!.id,
+            title: title,
+            dayNumber: _selectedDay,
+            date: date,
+            time: formattedStartTime,
+            endTime: formattedEndTime,
+            location: _locationController.text.trim().isNotEmpty
+                ? _locationController.text.trim()
+                : null,
+            description: _notesController.text.trim().isNotEmpty
+                ? _notesController.text.trim()
+                : null,
+            category: _selectedCategory,
+            cost: cost,
+          );
+    } else {
+      success = await ref
+          .read(itineraryControllerFamily(widget.tripId).notifier)
+          .addActivity(
+            title: title,
+            dayNumber: _selectedDay,
+            date: date,
+            time: formattedStartTime,
+            endTime: formattedEndTime,
+            location: _locationController.text.trim().isNotEmpty
+                ? _locationController.text.trim()
+                : null,
+            description: _notesController.text.trim().isNotEmpty
+                ? _notesController.text.trim()
+                : null,
+            category: _selectedCategory,
+            cost: cost,
+          );
+    }
 
     if (mounted) {
       setState(() {
@@ -150,6 +248,7 @@ class _AddActivitySheetState extends ConsumerState<AddActivitySheet> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final lang = widget.languageCode;
+    final isEditing = widget.itemToEdit != null;
 
     final categories = ['sightseeing', 'food', 'transit', 'activity', 'lodging', 'shopping'];
 
@@ -174,7 +273,9 @@ class _AddActivitySheetState extends ConsumerState<AddActivitySheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  ItineraryLocalization.getAddActivity(lang),
+                  isEditing
+                      ? ItineraryLocalization.getEditActivity(lang)
+                      : ItineraryLocalization.getAddActivity(lang),
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                     fontSize: 17,
@@ -232,7 +333,7 @@ class _AddActivitySheetState extends ConsumerState<AddActivitySheet> {
             const SizedBox(height: 6),
             TextField(
               controller: _titleController,
-              autofocus: true,
+              autofocus: !isEditing,
               decoration: InputDecoration(
                 hintText: lang == 'tr' ? 'örn. Eyfel Kulesi Ziyareti' : 'e.g. Visit Eiffel Tower',
                 prefixIcon: const Icon(Icons.event_note_rounded, size: 20),
@@ -248,57 +349,193 @@ class _AddActivitySheetState extends ConsumerState<AddActivitySheet> {
             ),
             const SizedBox(height: 14),
 
-            // Time & Location Row
+            // Dual Time (Start Time & Optional End Time) Row
             Row(
               children: [
-                // Time Picker Trigger
+                Text(
+                  ItineraryLocalization.getTime(lang),
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  '(${ItineraryLocalization.getOptional(lang)})',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                // Start Time Card (Gidiş / Başlangıç)
                 Expanded(
                   child: InkWell(
-                    onTap: _pickTime,
+                    onTap: _pickStartTime,
                     borderRadius: BorderRadius.circular(14),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 11),
                       decoration: BoxDecoration(
                         color: isDark
                             ? theme.colorScheme.surfaceContainer
                             : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
                         borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: _selectedStartTime != null
+                              ? theme.colorScheme.primary.withValues(alpha: 0.45)
+                              : Colors.transparent,
+                          width: 1,
+                        ),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.access_time_rounded, size: 18, color: theme.colorScheme.primary),
-                          const SizedBox(width: 8),
-                          Text(
-                            _selectedTime != null
-                                ? '${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}'
-                                : ItineraryLocalization.getTime(lang),
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: _selectedTime != null ? FontWeight.w700 : FontWeight.w400,
+                          Icon(
+                            Icons.access_time_rounded,
+                            size: 17,
+                            color: _selectedStartTime != null
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  ItineraryLocalization.getStartTime(lang),
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 1),
+                                Text(
+                                  _selectedStartTime != null
+                                      ? _formatTimeOfDay(_selectedStartTime!)
+                                      : '--:--',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: _selectedStartTime != null
+                                        ? FontWeight.w800
+                                        : FontWeight.w400,
+                                    color: _selectedStartTime != null
+                                        ? theme.colorScheme.onSurface
+                                        : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
+                          if (_selectedStartTime != null)
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _selectedStartTime = null;
+                                });
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Icon(
+                                  Icons.cancel_rounded,
+                                  size: 16,
+                                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                                ),
+                              ),
+                            ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
 
-                // Cost Field
+                // End Time Card (Dönüş / Bitiş - Optional / Flexible)
                 Expanded(
-                  child: TextField(
-                    controller: _costController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: InputDecoration(
-                      hintText: lang == 'tr' ? 'Masraf' : 'Cost',
-                      prefixIcon: const Icon(Icons.attach_money_rounded, size: 18),
-                      filled: true,
-                      fillColor: isDark
-                          ? theme.colorScheme.surfaceContainer
-                          : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
-                      border: OutlineInputBorder(
+                  child: InkWell(
+                    onTap: _pickEndTime,
+                    borderRadius: BorderRadius.circular(14),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 11),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? theme.colorScheme.surfaceContainer
+                            : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
                         borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide.none,
+                        border: Border.all(
+                          color: _selectedEndTime != null
+                              ? theme.colorScheme.primary.withValues(alpha: 0.45)
+                              : Colors.transparent,
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.update_rounded,
+                            size: 17,
+                            color: _selectedEndTime != null
+                                ? theme.colorScheme.primary
+                                : theme.colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  ItineraryLocalization.getEndTime(lang),
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 1),
+                                Text(
+                                  _selectedEndTime != null
+                                      ? _formatTimeOfDay(_selectedEndTime!)
+                                      : ItineraryLocalization.getFlexible(lang),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: _selectedEndTime != null
+                                        ? FontWeight.w800
+                                        : FontWeight.w500,
+                                    color: _selectedEndTime != null
+                                        ? theme.colorScheme.onSurface
+                                        : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (_selectedEndTime != null)
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _selectedEndTime = null;
+                                });
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Icon(
+                                  Icons.cancel_rounded,
+                                  size: 16,
+                                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ),
@@ -318,6 +555,30 @@ class _AddActivitySheetState extends ConsumerState<AddActivitySheet> {
               decoration: InputDecoration(
                 hintText: lang == 'tr' ? 'Mekan / Adres' : 'Venue / Address',
                 prefixIcon: const Icon(Icons.location_on_outlined, size: 20),
+                filled: true,
+                fillColor: isDark
+                    ? theme.colorScheme.surfaceContainer
+                    : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+
+            // Cost Field
+            Text(
+              ItineraryLocalization.getCost(lang),
+              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+            ),
+            const SizedBox(height: 6),
+            TextField(
+              controller: _costController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                hintText: lang == 'tr' ? 'Tahmini Tutar (örn. 25)' : 'Estimated amount (e.g. 25)',
+                prefixIcon: const Icon(Icons.attach_money_rounded, size: 20),
                 filled: true,
                 fillColor: isDark
                     ? theme.colorScheme.surfaceContainer
@@ -409,4 +670,3 @@ class _AddActivitySheetState extends ConsumerState<AddActivitySheet> {
     );
   }
 }
-
