@@ -38,7 +38,11 @@ class Country {
         localName.toLowerCase() == q) {
       return true;
     }
-    for (final lang in ['en', 'tr', 'de', 'fr', 'es', 'it', 'ru']) {
+    const supportedLanguages = [
+      'en', 'tr', 'de', 'fr', 'es', 'it', 'ru', 'ar', 'el', 'hi',
+      'id', 'ja', 'ko', 'nl', 'pl', 'pt', 'sv', 'th', 'vi', 'zh',
+    ];
+    for (final lang in supportedLanguages) {
       if (CountryLocalization.getCountryName(code, lang)?.toLowerCase() == q) {
         return true;
       }
@@ -1638,6 +1642,106 @@ class Country {
   }
 
   static Country? fromCode(String? code) => findByCode(code);
+
+  /// Finds a Country by its emoji flag (e.g. '🇹🇷' -> Turkey, '🇩🇪' -> Germany)
+  static Country? findByFlag(String? flag) {
+    if (flag == null || flag.trim().isEmpty) return null;
+    final clean = flag.trim();
+    for (final c in allCountries) {
+      if (c.flag == clean) return c;
+    }
+    return null;
+  }
+
+  /// Resolves the Country object corresponding to a given itinerary stop string.
+  /// Handles emoji flags, localized country names across all 20 languages,
+  /// city names, country codes, and multi-segment strings (e.g. "🇹🇷 Türkiye", "Berlin, Almanya").
+  static Country? resolveFromStop(String stop, {String? languageCode}) {
+    final trimmed = stop.trim();
+    if (trimmed.isEmpty) return null;
+    if (trimmed.startsWith('📍')) {
+      final withoutPin = trimmed.replaceFirst('📍', '').trim();
+      if (withoutPin.isEmpty) return null;
+      // Only resolve if custom location explicitly includes a comma-separated country name
+      if (withoutPin.contains(',')) {
+        final countryPart = withoutPin.split(',').last.trim();
+        for (final c in allCountries) {
+          if (c.matchesSearch(countryPart)) return c;
+        }
+      }
+      return null;
+    }
+
+    // 1. Check for leading flag emoji (Unicode Regional Indicator symbols)
+    final runes = trimmed.runes.toList();
+    if (runes.length >= 2 &&
+        runes[0] >= 0x1F1E6 && runes[0] <= 0x1F1FF &&
+        runes[1] >= 0x1F1E6 && runes[1] <= 0x1F1FF) {
+      final flagEmoji = String.fromCharCodes([runes[0], runes[1]]);
+      final matched = findByFlag(flagEmoji);
+      if (matched != null) return matched;
+    }
+
+    // 2. Remove any leading emoji/icons to isolate the text
+    String textOnly = trimmed;
+    if (runes.length >= 2 &&
+        runes[0] >= 0x1F1E6 && runes[0] <= 0x1F1FF &&
+        runes[1] >= 0x1F1E6 && runes[1] <= 0x1F1FF) {
+      textOnly = String.fromCharCodes(runes.sublist(2)).trim();
+    } else if (runes.isNotEmpty &&
+        (runes[0] == 0x2708 || runes[0] == 0x1F30D || runes[0] == 0x1F30E || runes[0] == 0x1F30F)) {
+      textOnly = String.fromCharCodes(runes.sublist(1)).trim();
+    }
+
+    if (textOnly.isEmpty) return null;
+
+    // 3. Check exact country or city using findLocationExact
+    final exact = findLocationExact(textOnly, languageCode: languageCode ?? 'en');
+    if (exact != null) return exact.country;
+
+    // 4. If text contains a comma (e.g. "Berlin, Germany" or "Berlin, Almanya")
+    if (textOnly.contains(',')) {
+      final parts = textOnly.split(',');
+      final cityPart = parts[0].trim();
+      final countryPart = parts.sublist(1).join(',').trim();
+
+      // Check country part first
+      final countryExact = findLocationExact(countryPart, languageCode: languageCode ?? 'en');
+      if (countryExact != null) return countryExact.country;
+
+      for (final c in allCountries) {
+        if (c.matchesSearch(countryPart)) return c;
+      }
+
+      // Check city part
+      final cityObj = CityLocalization.findCityExact(cityPart);
+      if (cityObj != null) {
+        final c = findByCode(cityObj.countryCode);
+        if (c != null) return c;
+      }
+    }
+
+    // 5. Check matchesSearch across all countries and languages
+    for (final c in allCountries) {
+      if (c.matchesSearch(textOnly)) return c;
+    }
+
+    // 6. Check city search
+    final cityObj = CityLocalization.findCityExact(textOnly);
+    if (cityObj != null) {
+      return findByCode(cityObj.countryCode);
+    }
+
+    // 7. Check popular destinations (exact match only, preventing false positives on custom phrases)
+    final lower = textOnly.toLowerCase();
+    for (final c in allCountries) {
+      if (c.popularDestinations.any((p) => p.toLowerCase() == lower)) {
+        return c;
+      }
+    }
+
+    return null;
+  }
 
   /// Searches for real countries and cities matching the query with prefix-first priority.
   static List<LocationSearchResult> searchLocations(

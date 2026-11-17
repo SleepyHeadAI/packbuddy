@@ -103,7 +103,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 110),
         children: [
           // 0. Executive Admin Dashboard Entry (Strictly visible for authorized admin)
           if (isAdmin) ...[

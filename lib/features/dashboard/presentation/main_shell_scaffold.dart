@@ -1,7 +1,9 @@
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/bouncy_pressable.dart';
 import '../../checklist/presentation/screens/checklist_screen.dart';
 import '../../settings/presentation/screens/settings_screen.dart';
 import '../../travel_map/presentation/screens/travel_map_screen.dart';
@@ -63,6 +65,7 @@ class _MainShellScaffoldState extends ConsumerState<MainShellScaffold> {
         }
       },
       child: Scaffold(
+        extendBody: true,
         body: Column(
           children: [
             const ConnectivityBanner(),
@@ -74,36 +77,13 @@ class _MainShellScaffoldState extends ConsumerState<MainShellScaffold> {
             ),
           ],
         ),
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-            border: Border(
-              top: BorderSide(
-                color: isDark
-                    ? theme.colorScheme.outlineVariant.withValues(alpha: 0.15)
-                    : AppColors.outlineLight,
-                width: 1,
-              ),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.04),
-                blurRadius: 16,
-                offset: const Offset(0, -4),
-              ),
-            ],
-          ),
-          child: SafeArea(
-            top: false,
-            child: NavigationBar(
-              height: 66,
-              elevation: 0,
-              backgroundColor: Colors.transparent,
-              indicatorColor: isDark
-                  ? theme.colorScheme.primary.withValues(alpha: 0.28)
-                  : theme.colorScheme.primaryContainer,
+        bottomNavigationBar: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: _FloatingGlassNavigationBar(
               selectedIndex: selectedIndex.clamp(0, 4),
-              labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+              isDark: isDark,
               onDestinationSelected: (index) {
                 if (index != selectedIndex) {
                   // If transitioning away from or into Vault tab (index 3),
@@ -114,51 +94,216 @@ class _MainShellScaffoldState extends ConsumerState<MainShellScaffold> {
                   ref.read(mainNavigationIndexProvider.notifier).state = index;
                 }
               },
-              destinations: [
-                NavigationDestination(
-                  icon: const Icon(Icons.home_outlined, size: 22),
-                  selectedIcon: Icon(
-                    Icons.home_rounded,
-                    size: 22,
-                    color: theme.colorScheme.primary,
-                  ),
+              items: [
+                _FloatingNavItemData(
                   label: navHome,
+                  icon: Icons.home_outlined,
+                  selectedIcon: Icons.home_rounded,
                 ),
-                NavigationDestination(
-                  icon: const Icon(Icons.public_outlined, size: 22),
-                  selectedIcon: Icon(
-                    Icons.public_rounded,
-                    size: 22,
-                    color: theme.colorScheme.primary,
-                  ),
+                _FloatingNavItemData(
                   label: navMap,
+                  icon: Icons.public_outlined,
+                  selectedIcon: Icons.public_rounded,
                 ),
-                NavigationDestination(
-                  icon: const Icon(Icons.checklist_rounded, size: 22),
-                  selectedIcon: Icon(
-                    Icons.checklist_rtl_rounded,
-                    size: 22,
-                    color: theme.colorScheme.primary,
-                  ),
+                _FloatingNavItemData(
                   label: navBaggage,
+                  icon: Icons.checklist_rounded,
+                  selectedIcon: Icons.checklist_rtl_rounded,
                 ),
-                NavigationDestination(
-                  icon: const Icon(Icons.folder_shared_outlined, size: 22),
-                  selectedIcon: Icon(
-                    Icons.folder_shared_rounded,
-                    size: 22,
-                    color: theme.colorScheme.primary,
-                  ),
+                _FloatingNavItemData(
                   label: navVault,
+                  icon: Icons.folder_shared_outlined,
+                  selectedIcon: Icons.folder_shared_rounded,
                 ),
-                NavigationDestination(
-                  icon: const Icon(Icons.tune_outlined, size: 22),
-                  selectedIcon: Icon(
-                    Icons.tune_rounded,
-                    size: 22,
-                    color: theme.colorScheme.primary,
-                  ),
+                _FloatingNavItemData(
                   label: navSettings,
+                  icon: Icons.tune_outlined,
+                  selectedIcon: Icons.tune_rounded,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FloatingNavItemData {
+  final String label;
+  final IconData icon;
+  final IconData selectedIcon;
+
+  const _FloatingNavItemData({
+    required this.label,
+    required this.icon,
+    required this.selectedIcon,
+  });
+}
+
+class _FloatingGlassNavigationBar extends StatelessWidget {
+  final int selectedIndex;
+  final bool isDark;
+  final ValueChanged<int> onDestinationSelected;
+  final List<_FloatingNavItemData> items;
+
+  const _FloatingGlassNavigationBar({
+    required this.selectedIndex,
+    required this.isDark,
+    required this.onDestinationSelected,
+    required this.items,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: isDark
+                ? Colors.black.withValues(alpha: 0.50)
+                : const Color(0xFF0F172A).withValues(alpha: 0.12),
+            blurRadius: 26,
+            spreadRadius: 0,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: isDark
+                ? Colors.black.withValues(alpha: 0.30)
+                : const Color(0xFF0F172A).withValues(alpha: 0.04),
+            blurRadius: 8,
+            spreadRadius: 0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            height: 66,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: isDark
+                    ? [
+                        const Color(0xFF1E2632).withValues(alpha: 0.88),
+                        const Color(0xFF141A22).withValues(alpha: 0.82),
+                      ]
+                    : [
+                        Colors.white.withValues(alpha: 0.90),
+                        Colors.white.withValues(alpha: 0.76),
+                      ],
+              ),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.13)
+                    : Colors.white.withValues(alpha: 0.90),
+                width: 1.2,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(items.length, (index) {
+                final item = items[index];
+                final isSelected = index == selectedIndex;
+                return Expanded(
+                  child: _FloatingNavItem(
+                    item: item,
+                    isSelected: isSelected,
+                    isDark: isDark,
+                    theme: theme,
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      onDestinationSelected(index);
+                    },
+                  ),
+                );
+              }),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FloatingNavItem extends StatelessWidget {
+  final _FloatingNavItemData item;
+  final bool isSelected;
+  final bool isDark;
+  final ThemeData theme;
+  final VoidCallback onTap;
+
+  const _FloatingNavItem({
+    required this.item,
+    required this.isSelected,
+    required this.isDark,
+    required this.theme,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final activeColor = theme.colorScheme.primary;
+    final inactiveColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+
+    return Semantics(
+      selected: isSelected,
+      label: item.label,
+      button: true,
+      child: BouncyPressable(
+        scaleFactor: 0.92,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 240),
+            curve: Curves.easeOutCubic,
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? activeColor.withValues(alpha: isDark ? 0.22 : 0.13)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(18),
+              border: isSelected
+                  ? Border.all(
+                      color: activeColor.withValues(alpha: 0.30),
+                      width: 1,
+                    )
+                  : null,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                AnimatedScale(
+                  scale: isSelected ? 1.08 : 1.0,
+                  duration: const Duration(milliseconds: 240),
+                  curve: Curves.easeOutBack,
+                  child: Icon(
+                    isSelected ? item.selectedIcon : item.icon,
+                    size: 21,
+                    color: isSelected ? activeColor : inactiveColor,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    item.label,
+                    maxLines: 1,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                      color: isSelected ? activeColor : inactiveColor,
+                      letterSpacing: -0.15,
+                    ),
+                  ),
                 ),
               ],
             ),

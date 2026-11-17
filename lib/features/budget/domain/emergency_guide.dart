@@ -51,53 +51,15 @@ class EmergencyGuide {
       list.add(forCountry(upper, name));
     }
 
-    if (trip.countryCode != null && trip.countryCode!.isNotEmpty) {
-      addGuide(trip.countryCode);
+    // 1. Iterate through all countries active on the trip in route order
+    final activeCountries = trip.countries;
+    for (final c in activeCountries) {
+      addGuide(c.code, c.name);
     }
 
-    if (trip.destination.isNotEmpty) {
-      final parts = trip.destination.split(RegExp(r'\s*(?:➔|-|,|/|&|\+)\s*'));
-      for (final part in parts) {
-        final clean = part.trim();
-        if (clean.isEmpty) continue;
-        final cleanLower = clean.toLowerCase();
-        final cleanUpper = clean.toUpperCase();
-
-        Country? matched;
-        // 1. Exact match on code, name, localName, or flag
-        for (final c in Country.allCountries) {
-          if (cleanUpper == c.code ||
-              cleanLower == c.name.toLowerCase() ||
-              cleanLower == c.localName.toLowerCase() ||
-              clean.contains(c.flag)) {
-            matched = c;
-            break;
-          }
-        }
-        // 2. Substring match for cities or longer phrases (e.g., "Munich, Germany" or "Berlin, Almanya")
-        if (matched == null) {
-          for (final c in Country.allCountries) {
-            if (cleanLower.contains(c.name.toLowerCase()) ||
-                cleanLower.contains(c.localName.toLowerCase())) {
-              matched = c;
-              break;
-            }
-          }
-        }
-        // 3. Match by popular destinations/cities (e.g. "Priştine", "Berlin")
-        if (matched == null) {
-          for (final c in Country.allCountries) {
-            if (c.popularDestinations.any((p) => cleanLower.contains(p.toLowerCase()))) {
-              matched = c;
-              break;
-            }
-          }
-        }
-
-        if (matched != null) {
-          addGuide(matched.code, matched.name);
-        }
-      }
+    // 2. If no countries were resolved from destination, fallback to trip.countryCode
+    if (list.isEmpty && trip.countryCode != null && trip.countryCode!.isNotEmpty) {
+      addGuide(trip.countryCode);
     }
 
     if (list.isEmpty) {

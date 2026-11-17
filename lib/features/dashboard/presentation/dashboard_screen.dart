@@ -460,7 +460,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       body: SafeArea(
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-          padding: const EdgeInsets.fromLTRB(18, 10, 18, 96),
+          padding: const EdgeInsets.fromLTRB(18, 10, 18, 110),
           children: [
             // =========================================================================
             // 1. FIXED TOP: Horizontal Greeting & Live Sync Header Bar
@@ -1044,6 +1044,7 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final country = Country.findByCode(trip.countryCode);
+    final tripCountries = (trip is Trip) ? (trip as Trip).countries : <Country>[];
     final transportIcon = TripsScreen.getTransportIcon(trip.transportMode);
     final l10n = AppLocalizations.of(context)!;
     final lang = Localizations.localeOf(context).languageCode;
@@ -1116,7 +1117,15 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        if (country != null) ...[
+                        if (tripCountries.isNotEmpty) ...[
+                          const SizedBox(width: 5),
+                          Wrap(
+                            spacing: 2,
+                            children: tripCountries
+                                .map((c) => Text(c.flag, style: const TextStyle(fontSize: 12)))
+                                .toList(),
+                          ),
+                        ] else if (country != null) ...[
                           const SizedBox(width: 5),
                           Text(country.flag, style: const TextStyle(fontSize: 12)),
                         ],
@@ -1321,7 +1330,15 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          if (tCountry != null) ...[
+                          if (t.countries.isNotEmpty) ...[
+                            Wrap(
+                              spacing: 2,
+                              children: t.countries
+                                  .map((c) => Text(c.flag, style: const TextStyle(fontSize: 12)))
+                                  .toList(),
+                            ),
+                            const SizedBox(width: 4),
+                          ] else if (tCountry != null) ...[
                             Text(tCountry.flag, style: const TextStyle(fontSize: 12)),
                             const SizedBox(width: 4),
                           ],

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
+import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
@@ -9,7 +10,14 @@ import 'package:packbuddy/features/budget/domain/budget_localization.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'currency_picker_sheet.dart';
 
-/// Donut Chart Painter for category spending distribution
+/// Available chart views in the Budget Analytics Card
+enum AnalyticsChartType {
+  category,
+  paymentMethod,
+  dailyTrend,
+}
+
+/// Donut Chart Painter for category & payment spending distribution
 class DonutChartPainter extends CustomPainter {
   final List<double> values;
   final List<Color> colors;
@@ -67,8 +75,10 @@ class DonutChartPainter extends CustomPainter {
   }
 }
 
-/// Interactive Category Breakdown, Donut Chart & Budget Trend Analytics Card (Feature F-4)
-/// Supports real-time multi-currency viewing with top-right currency selector.
+/// Interactive Category Breakdown, Payment Method Analytics, Daily Spend Timeline
+/// & Deep Insights Card (Feature F-4 & Advanced Analytics Suite).
+/// Default view is minimalist and focused; detail-oriented users can toggle optional
+/// payment method donut, daily timeline bars, and deep statistical cards.
 class BudgetAnalyticsCard extends StatefulWidget {
   final List<Expense> expenses;
   final String tripCurrency;
@@ -140,12 +150,83 @@ class BudgetAnalyticsCard extends StatefulWidget {
     }
   }
 
+  static String canonicalPaymentMethodKey(String? method) {
+    if (method == null || method.trim().isEmpty) return 'Other';
+    final m = method.toLowerCase().replaceAll(' ', '');
+    if (m.contains('credit') || m.contains('kredi')) return 'CreditCard';
+    if (m.contains('cash') || m.contains('nakit')) return 'Cash';
+    if (m.contains('debit') || m.contains('banka')) return 'DebitCard';
+    if (m.contains('wallet') || m.contains('cüzdan')) return 'DigitalWallet';
+    if (m.contains('online')) return 'Online';
+    if (m == 'other' || m == 'diğer') return 'Other';
+    return method;
+  }
+
+  static Color getPaymentMethodColor(String? method) {
+    final key = canonicalPaymentMethodKey(method);
+    switch (key) {
+      case 'CreditCard':
+        return const Color(0xFF0EA5E9); // Sky blue
+      case 'Cash':
+        return AppColors.primaryAmber; // Amber
+      case 'DebitCard':
+        return const Color(0xFF10B981); // Emerald
+      case 'DigitalWallet':
+        return const Color(0xFF8B5CF6); // Purple
+      case 'Online':
+        return const Color(0xFF06B6D4); // Cyan
+      case 'Other':
+      default:
+        return const Color(0xFF64748B); // Slate
+    }
+  }
+
+  static IconData getPaymentMethodIcon(String? method) {
+    final key = canonicalPaymentMethodKey(method);
+    switch (key) {
+      case 'CreditCard':
+        return Icons.credit_card_rounded;
+      case 'Cash':
+        return Icons.payments_outlined;
+      case 'DebitCard':
+        return Icons.account_balance_wallet_outlined;
+      case 'DigitalWallet':
+        return Icons.contactless_outlined;
+      case 'Online':
+        return Icons.language_rounded;
+      case 'Other':
+      default:
+        return Icons.payment_rounded;
+    }
+  }
+
+  static String getPaymentMethodDisplayName(String? method, [AppLocalizations? l10n]) {
+    final key = canonicalPaymentMethodKey(method);
+    switch (key) {
+      case 'CreditCard':
+        return l10n?.creditCard ?? 'Credit Card';
+      case 'Cash':
+        return l10n?.cash ?? 'Cash';
+      case 'DebitCard':
+        return l10n?.debitCard ?? 'Debit Card';
+      case 'DigitalWallet':
+        return l10n?.digitalWallet ?? 'Digital Wallet';
+      case 'Online':
+        return l10n?.onlinePayment ?? 'Online';
+      case 'Other':
+      default:
+        return l10n?.other ?? 'Other';
+    }
+  }
+
   @override
   State<BudgetAnalyticsCard> createState() => _BudgetAnalyticsCardState();
 }
 
 class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
   late String _currentCurrency;
+  AnalyticsChartType _chartType = AnalyticsChartType.category;
+  bool _isDeepStatsExpanded = false;
 
   @override
   void initState() {
@@ -189,7 +270,7 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
     final activeCurrency = _currentCurrency;
     final isCustomCurrency = activeCurrency.toUpperCase() != widget.tripCurrency.toUpperCase();
 
-    // Group expenses by standard category and convert amount to activeCurrency
+    // 1. Group expenses by standard category and convert amount to activeCurrency
     final categoryTotals = <String, double>{};
     final categoryCounts = <String, int>{};
     double convertedTotalSpent = 0.0;
@@ -206,20 +287,79 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
       categoryCounts[key] = (categoryCounts[key] ?? 0) + 1;
     }
 
-    // Sort categories descending by amount
-    final sortedEntries = categoryTotals.entries.toList()
+    final sortedCategoryEntries = categoryTotals.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
-    final topCategory = sortedEntries.isNotEmpty ? sortedEntries.first : null;
-    final topPercentage = (topCategory != null && convertedTotalSpent > 0)
+    final topCategory = sortedCategoryEntries.isNotEmpty ? sortedCategoryEntries.first : null;
+    final topCategoryPercentage = (topCategory != null && convertedTotalSpent > 0)
         ? ((topCategory.value / convertedTotalSpent) * 100).toStringAsFixed(0)
         : '0';
 
-    // Donut chart lists
-    final chartValues = sortedEntries.map((e) => e.value).toList();
-    final chartColors = sortedEntries.map((e) => BudgetAnalyticsCard.getCategoryColor(e.key)).toList();
+    final categoryChartValues = sortedCategoryEntries.map((e) => e.value).toList();
+    final categoryChartColors = sortedCategoryEntries.map((e) => BudgetAnalyticsCard.getCategoryColor(e.key)).toList();
 
-    // Trend analysis & burn rate in activeCurrency
+    // 2. Group expenses by payment method
+    final paymentTotals = <String, double>{};
+    final paymentCounts = <String, int>{};
+    double cashTotal = 0.0;
+
+    for (final exp in widget.expenses) {
+      final key = BudgetAnalyticsCard.canonicalPaymentMethodKey(exp.paymentMethod);
+      final converted = CurrencyService.convert(
+        amount: exp.amount,
+        fromCurrency: exp.currency,
+        toCurrency: activeCurrency,
+      );
+      paymentTotals[key] = (paymentTotals[key] ?? 0.0) + converted;
+      paymentCounts[key] = (paymentCounts[key] ?? 0) + 1;
+      if (key == 'Cash') {
+        cashTotal += converted;
+      }
+    }
+
+    final sortedPaymentEntries = paymentTotals.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
+    final topPayment = sortedPaymentEntries.isNotEmpty ? sortedPaymentEntries.first : null;
+    final topPaymentName = topPayment != null
+        ? BudgetAnalyticsCard.getPaymentMethodDisplayName(topPayment.key, l10n)
+        : '';
+    final topPaymentPercentage = (topPayment != null && convertedTotalSpent > 0)
+        ? ((topPayment.value / convertedTotalSpent) * 100).toStringAsFixed(0)
+        : '0';
+
+    final paymentChartValues = sortedPaymentEntries.map((e) => e.value).toList();
+    final paymentChartColors = sortedPaymentEntries.map((e) => BudgetAnalyticsCard.getPaymentMethodColor(e.key)).toList();
+
+    final cardAndDigitalTotal = convertedTotalSpent - cashTotal;
+    final cashPct = convertedTotalSpent > 0 ? ((cashTotal / convertedTotalSpent) * 100).round() : 0;
+    final cardPct = 100 - cashPct;
+
+    // 3. Group expenses by date for Daily Timeline Trend
+    final dailySpends = <DateTime, double>{};
+    for (final exp in widget.expenses) {
+      final dateKey = DateTime(exp.date.year, exp.date.month, exp.date.day);
+      final converted = CurrencyService.convert(
+        amount: exp.amount,
+        fromCurrency: exp.currency,
+        toCurrency: activeCurrency,
+      );
+      dailySpends[dateKey] = (dailySpends[dateKey] ?? 0.0) + converted;
+    }
+
+    final sortedDailyEntries = dailySpends.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
+
+    DateTime? peakDay;
+    double peakDayAmount = 0.0;
+    for (final entry in sortedDailyEntries) {
+      if (entry.value > peakDayAmount) {
+        peakDayAmount = entry.value;
+        peakDay = entry.key;
+      }
+    }
+
+    // 4. Trend analysis & burn rate in activeCurrency
     double? dailyBurnRate;
     double? plannedDailyBudget;
     double? projectedTotal;
@@ -302,6 +442,48 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
         : 0.0;
     final budgetRatio = hasBudget && convertedLimit > 0 ? (convertedTotalSpent / convertedLimit) : 0.0;
 
+    // Deep Analytics Metrics
+    final avgTransaction = widget.expenses.isNotEmpty
+        ? convertedTotalSpent / widget.expenses.length
+        : 0.0;
+
+    Expense? highestExp;
+    Expense? lowestExp;
+    for (final exp in widget.expenses) {
+      if (highestExp == null || exp.amount > highestExp.amount) {
+        highestExp = exp;
+      }
+      if (lowestExp == null || exp.amount < lowestExp.amount) {
+        lowestExp = exp;
+      }
+    }
+
+    final highestExpConverted = highestExp != null
+        ? CurrencyService.convert(
+            amount: highestExp.amount,
+            fromCurrency: highestExp.currency,
+            toCurrency: activeCurrency,
+          )
+        : 0.0;
+
+    final lowestExpConverted = lowestExp != null
+        ? CurrencyService.convert(
+            amount: lowestExp.amount,
+            fromCurrency: lowestExp.currency,
+            toCurrency: activeCurrency,
+          )
+        : 0.0;
+
+    // Safe remaining daily budget calculation
+    double? safeDailySpendAmount;
+    if (hasBudget && convertedLimit > convertedTotalSpent) {
+      final remainingBudget = convertedLimit - convertedTotalSpent;
+      final remainingDays = widget.trip != null
+          ? math.max(1, widget.trip!.endDate.difference(DateTime.now()).inDays + 1)
+          : tripDays;
+      safeDailySpendAmount = remainingBudget / remainingDays;
+    }
+
     return RepaintBoundary(
       child: Container(
         width: double.infinity,
@@ -338,7 +520,11 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                   ),
                   child: Center(
                     child: Icon(
-                      Icons.pie_chart_rounded,
+                      _chartType == AnalyticsChartType.category
+                          ? Icons.pie_chart_rounded
+                          : (_chartType == AnalyticsChartType.paymentMethod
+                              ? Icons.credit_card_rounded
+                              : Icons.bar_chart_rounded),
                       size: 22,
                       color: theme.colorScheme.primary,
                     ),
@@ -349,18 +535,44 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        l10n?.budgetAnalytics ?? 'Budget Analytics',
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.2,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 6,
+                        runSpacing: 2,
+                        children: [
+                          Text(
+                            l10n?.budgetAnalytics ?? 'Budget Analytics',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.2,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              l10n?.expenseCount(widget.expenses.length) ?? '${widget.expenses.length} Harcama',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       if (topCategory != null && convertedTotalSpent > 0) ...[
                         Text(
-                          '${l10n?.topSpendingCategory(topCategory.key, topPercentage) ?? 'Top: ${topCategory.key} (%$topPercentage)'} · ${widget.expenses.length}',
+                          _chartType == AnalyticsChartType.category
+                              ? (l10n?.topSpendingCategory(topCategory.key, topCategoryPercentage) ?? 'Top: ${topCategory.key} (%$topCategoryPercentage)')
+                              : (_chartType == AnalyticsChartType.paymentMethod
+                                  ? '$topPaymentName (%$topPaymentPercentage)'
+                                  : '${BudgetLocalization.peakSpendDay(lang)}: ${peakDay != null ? AppDateFormatter.formatMMMd(peakDay, locale: lang) : ''}'),
                           style: TextStyle(
                             fontSize: 11,
                             color: theme.colorScheme.onSurfaceVariant,
@@ -429,6 +641,7 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                 ),
               ],
             ),
+
             if (hasBudget && budgetRatio >= 0.85) ...[
               const SizedBox(height: 14),
               Container(
@@ -469,409 +682,1353 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                 ),
               ),
             ],
-            const SizedBox(height: 18),
 
-            // Donut Chart & Center Summary
-            Center(
-              child: SizedBox(
-                width: 140,
-                height: 140,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    TweenAnimationBuilder<double>(
-                      tween: Tween<double>(begin: 0.0, end: 1.0),
-                      duration: const Duration(milliseconds: 650),
-                      curve: Curves.easeOutCubic,
-                      builder: (context, progress, child) {
-                        return CustomPaint(
-                          size: const Size(140, 140),
-                          painter: DonutChartPainter(
-                            values: chartValues,
-                            colors: chartColors,
-                            strokeWidth: 14,
-                            progress: progress,
-                          ),
-                        );
-                      },
-                    ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          l10n?.total ?? 'Total',
-                          style: TextStyle(
-                            fontSize: 10.5,
-                            color: theme.colorScheme.onSurfaceVariant,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            CurrencyFormatter.format(convertedTotalSpent, currency: activeCurrency),
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w900,
-                              color: theme.colorScheme.onSurface,
-                              letterSpacing: -0.3,
-                            ),
-                          ),
-                        ),
-                        if (isCustomCurrency) ...[
-                          const SizedBox(height: 2),
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              '≈ ${CurrencyFormatter.format(widget.totalSpent, currency: widget.tripCurrency)}',
-                              style: TextStyle(
-                                fontSize: 9.5,
-                                color: theme.colorScheme.onSurfaceVariant,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ],
+            const SizedBox(height: 14),
+
+            // Minimalist Chart Type Switcher Pills
+            Container(
+              padding: const EdgeInsets.all(3),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4)
+                    : const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
                 ),
+              ),
+              child: Row(
+                children: [
+                  _buildChartTabItem(
+                    type: AnalyticsChartType.category,
+                    icon: Icons.pie_chart_outline_rounded,
+                    label: BudgetLocalization.chartTypeCategory(lang),
+                    theme: theme,
+                    isDark: isDark,
+                  ),
+                  _buildChartTabItem(
+                    type: AnalyticsChartType.paymentMethod,
+                    icon: Icons.payment_rounded,
+                    label: BudgetLocalization.chartTypePayment(lang),
+                    theme: theme,
+                    isDark: isDark,
+                  ),
+                  _buildChartTabItem(
+                    type: AnalyticsChartType.dailyTrend,
+                    icon: Icons.bar_chart_rounded,
+                    label: BudgetLocalization.chartTypeTimeline(lang),
+                    theme: theme,
+                    isDark: isDark,
+                  ),
+                ],
               ),
             ),
 
-            if (isCustomCurrency) ...[
-              const SizedBox(height: 12),
-              Center(
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    if (widget.onSetAsBaseCurrency != null)
-                      InkWell(
-                        key: const Key('set_as_base_currency_button'),
-                        onTap: widget.onSetAsBaseCurrency,
-                        borderRadius: BorderRadius.circular(10),
-                        child: Container(
-                          constraints: BoxConstraints(maxWidth: math.max(120, MediaQuery.of(context).size.width - 64)),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: theme.colorScheme.primary.withValues(alpha: 0.35),
-                              width: 1,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.check_circle_outline_rounded, size: 13, color: theme.colorScheme.primary),
-                              const SizedBox(width: 4),
-                              Flexible(
-                                child: Text(
-                                  BudgetLocalization.makeTripCurrency(lang, activeCurrency),
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    color: theme.colorScheme.primary,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    InkWell(
-                      key: const Key('revert_to_trip_currency_button'),
-                      onTap: () {
-                        setState(() {
-                          _currentCurrency = widget.tripCurrency;
-                        });
-                        widget.onCurrencyChanged?.call(widget.tripCurrency);
-                      },
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        constraints: BoxConstraints(maxWidth: math.max(120, MediaQuery.of(context).size.width - 64)),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35)
-                              : const Color(0xFFF1F5F9),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.refresh_rounded, size: 12, color: theme.colorScheme.onSurfaceVariant),
-                            const SizedBox(width: 4),
-                            Flexible(
-                              child: Text(
-                                l10n?.revertToCurrency('${widget.tripCurrency} (${CurrencyFormatter.getSymbol(widget.tripCurrency)})') ??
-                                    'Switch back to ${widget.tripCurrency} (${CurrencyFormatter.getSymbol(widget.tripCurrency)})',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+            const SizedBox(height: 16),
+
+            // Main Visual View according to selected _chartType
+            if (_chartType == AnalyticsChartType.category) ...[
+              _buildCategoryChartView(
+                context,
+                theme,
+                isDark,
+                l10n,
+                lang,
+                activeCurrency,
+                isCustomCurrency,
+                convertedTotalSpent,
+                sortedCategoryEntries,
+                categoryCounts,
+                categoryChartValues,
+                categoryChartColors,
+                dailyBurnRate,
+                plannedDailyBudget,
+                pacingStatus,
+              ),
+            ] else if (_chartType == AnalyticsChartType.paymentMethod) ...[
+              _buildPaymentMethodChartView(
+                context,
+                theme,
+                isDark,
+                l10n,
+                lang,
+                activeCurrency,
+                isCustomCurrency,
+                convertedTotalSpent,
+                sortedPaymentEntries,
+                paymentCounts,
+                paymentChartValues,
+                paymentChartColors,
+                topPaymentName,
+                topPaymentPercentage,
+                cashPct,
+                cardPct,
+                cashTotal,
+                cardAndDigitalTotal,
+              ),
+            ] else ...[
+              _buildDailyTimelineChartView(
+                context,
+                theme,
+                isDark,
+                l10n,
+                lang,
+                activeCurrency,
+                convertedTotalSpent,
+                sortedDailyEntries,
+                peakDay,
+                peakDayAmount,
+                tripDays,
               ),
             ],
 
             const SizedBox(height: 18),
 
-            // Trend & Burn Rate Statistics (if trip available)
-            if (dailyBurnRate != null) ...[
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+            // Collapsible "Detaylı İstatistikler & Analiz" Accordion for Power Users
+            _buildDeepAnalyticsAccordion(
+              context,
+              theme,
+              isDark,
+              l10n,
+              lang,
+              activeCurrency,
+              convertedTotalSpent,
+              avgTransaction,
+              highestExp,
+              highestExpConverted,
+              lowestExp,
+              lowestExpConverted,
+              peakDay,
+              peakDayAmount,
+              cashPct,
+              cardPct,
+              categoryTotals.length,
+              topCategory?.key,
+              dailyBurnRate,
+              tripDays,
+              safeDailySpendAmount,
+              pacingStatus,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Minimalist Segment Tab Pill
+  Widget _buildChartTabItem({
+    required AnalyticsChartType type,
+    required IconData icon,
+    required String label,
+    required ThemeData theme,
+    required bool isDark,
+  }) {
+    final isSelected = _chartType == type;
+
+    return Expanded(
+      child: InkWell(
+        onTap: () {
+          if (!isSelected) {
+            setState(() {
+              _chartType = type;
+            });
+          }
+        },
+        borderRadius: BorderRadius.circular(11),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? (isDark ? theme.colorScheme.primaryContainer : Colors.white)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(11),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 14,
+                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                    color: isSelected ? theme.colorScheme.onSurface : theme.colorScheme.onSurfaceVariant,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                child: Row(
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 1. Category Chart View (Default)
+  Widget _buildCategoryChartView(
+    BuildContext context,
+    ThemeData theme,
+    bool isDark,
+    AppLocalizations? l10n,
+    String lang,
+    String activeCurrency,
+    bool isCustomCurrency,
+    double convertedTotalSpent,
+    List<MapEntry<String, double>> sortedEntries,
+    Map<String, int> categoryCounts,
+    List<double> chartValues,
+    List<Color> chartColors,
+    double? dailyBurnRate,
+    double? plannedDailyBudget,
+    String pacingStatus,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Donut Chart & Center Summary
+        Center(
+          child: SizedBox(
+            width: 140,
+            height: 140,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0.0, end: 1.0),
+                  duration: const Duration(milliseconds: 650),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, progress, child) {
+                    return CustomPaint(
+                      size: const Size(140, 140),
+                      painter: DonutChartPainter(
+                        values: chartValues,
+                        colors: chartColors,
+                        strokeWidth: 14,
+                        progress: progress,
+                      ),
+                    );
+                  },
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n?.dailyBurnRate ?? 'Daily Spend Rate',
-                            style: TextStyle(
-                              fontSize: 10.5,
-                              color: theme.colorScheme.onSurfaceVariant,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              CurrencyFormatter.format(dailyBurnRate, currency: activeCurrency),
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ),
-                        ],
+                    Text(
+                      l10n?.total ?? 'Total',
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    if (plannedDailyBudget != null) ...[
-                      Container(
-                        width: 1,
-                        height: 28,
-                        color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                    const SizedBox(height: 2),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        CurrencyFormatter.format(convertedTotalSpent, currency: activeCurrency),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w900,
+                          color: theme.colorScheme.onSurface,
+                          letterSpacing: -0.3,
+                        ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l10n?.budgetEfficiency ?? 'Pacing Status',
-                              style: TextStyle(
-                                fontSize: 10.5,
-                                color: theme.colorScheme.onSurfaceVariant,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Row(
-                              children: [
-                                Icon(
-                                  pacingStatus == 'onTrack'
-                                      ? Icons.check_circle_rounded
-                                      : (pacingStatus == 'warning'
-                                          ? Icons.warning_amber_rounded
-                                          : Icons.error_rounded),
-                                  size: 14,
-                                  color: pacingStatus == 'onTrack'
-                                      ? AppColors.successPastel
-                                      : (pacingStatus == 'warning'
-                                          ? AppColors.warningPastel
-                                          : AppColors.errorPastel),
-                                ),
-                                const SizedBox(width: 4),
-                                Expanded(
-                                  child: Text(
-                                    pacingStatus == 'onTrack'
-                                        ? (l10n?.budgetStatusOnTrack ?? 'On Track')
-                                        : (pacingStatus == 'warning'
-                                            ? (l10n?.budgetStatusWarning ?? 'Pacing High')
-                                            : (l10n?.budgetStatusOver ?? 'Over Budget')),
-                                    style: TextStyle(
-                                      fontSize: 11.5,
-                                      fontWeight: FontWeight.w700,
-                                      color: pacingStatus == 'onTrack'
-                                          ? AppColors.successPastel
-                                          : (pacingStatus == 'warning'
-                                              ? AppColors.warningPastel
-                                              : AppColors.errorPastel),
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                    ),
+                    if (isCustomCurrency) ...[
+                      const SizedBox(height: 2),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          '≈ ${CurrencyFormatter.format(widget.totalSpent, currency: widget.tripCurrency)}',
+                          style: TextStyle(
+                            fontSize: 9.5,
+                            color: theme.colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ],
                   ],
                 ),
-              ),
-              const SizedBox(height: 16),
-            ],
-
-            // Multi-segmented colored distribution bar with smooth opening animation
-            TweenAnimationBuilder<double>(
-              tween: Tween<double>(begin: 0.0, end: 1.0),
-              duration: const Duration(milliseconds: 600),
-              curve: Curves.easeOutCubic,
-              builder: (context, factor, child) {
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: SizedBox(
-                    height: 8,
-                    child: Row(
-                      children: sortedEntries.map((entry) {
-                        final ratio = convertedTotalSpent > 0 ? (entry.value / convertedTotalSpent).clamp(0.01, 1.0) : 0.0;
-                        final color = BudgetAnalyticsCard.getCategoryColor(entry.key);
-                        final flexVal = ((ratio * 1000) * factor).toInt();
-                        return Flexible(
-                          flex: flexVal > 0 ? flexVal : 1,
-                          child: Container(
-                            color: color,
-                            margin: const EdgeInsets.symmetric(horizontal: 0.5),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                );
-              },
+              ],
             ),
-            const SizedBox(height: 16),
+          ),
+        ),
 
-            // Breakdown List by Category
-            ...sortedEntries.map((entry) {
-              final catName = entry.key;
-              final catAmount = entry.value;
-              final catCount = categoryCounts[catName] ?? 0;
-              final color = BudgetAnalyticsCard.getCategoryColor(catName);
-              final icon = BudgetAnalyticsCard.getCategoryIcon(catName);
-              final percentage = convertedTotalSpent > 0 ? (catAmount / convertedTotalSpent) * 100 : 0.0;
+        if (isCustomCurrency) ...[
+          const SizedBox(height: 12),
+          _buildCurrencyActionChips(context, theme, isDark, lang, activeCurrency, l10n),
+        ],
 
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        const SizedBox(height: 16),
+
+        // Trend & Burn Rate Statistics (if trip available)
+        if (dailyBurnRate != null) ...[
+          _buildBurnRateBar(theme, isDark, l10n, activeCurrency, dailyBurnRate, plannedDailyBudget, pacingStatus),
+          const SizedBox(height: 16),
+        ],
+
+        // Multi-segmented colored distribution bar
+        TweenAnimationBuilder<double>(
+          tween: Tween<double>(begin: 0.0, end: 1.0),
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeOutCubic,
+          builder: (context, factor, child) {
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: SizedBox(
+                height: 8,
+                child: Row(
+                  children: sortedEntries.map((entry) {
+                    final ratio = convertedTotalSpent > 0 ? (entry.value / convertedTotalSpent).clamp(0.01, 1.0) : 0.0;
+                    final color = BudgetAnalyticsCard.getCategoryColor(entry.key);
+                    final flexVal = ((ratio * 1000) * factor).toInt();
+                    return Flexible(
+                      flex: flexVal > 0 ? flexVal : 1,
+                      child: Container(
+                        color: color,
+                        margin: const EdgeInsets.symmetric(horizontal: 0.5),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 16),
+
+        // Breakdown List by Category
+        ...sortedEntries.map((entry) {
+          final catName = entry.key;
+          final catAmount = entry.value;
+          final catCount = categoryCounts[catName] ?? 0;
+          final color = BudgetAnalyticsCard.getCategoryColor(catName);
+          final icon = BudgetAnalyticsCard.getCategoryIcon(catName);
+          final percentage = convertedTotalSpent > 0 ? (catAmount / convertedTotalSpent) * 100 : 0.0;
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 30,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: color.withValues(alpha: 0.15),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(child: Icon(icon, size: 15, color: color)),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Row(
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  catName,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 13,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                '($catCount)',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Flexible(
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerRight,
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(child: Icon(icon, size: 15, color: color)),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Flexible(
                             child: Text(
-                              CurrencyFormatter.format(catAmount, currency: activeCurrency),
-                              style: TextStyle(
+                              catName,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
                                 fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: theme.colorScheme.onSurface,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        SizedBox(
-                          width: 36,
-                          child: Text(
-                            '%${percentage.toStringAsFixed(0)}',
-                            textAlign: TextAlign.right,
+                          const SizedBox(width: 6),
+                          Text(
+                            '($catCount)',
                             style: TextStyle(
                               fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: color,
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 6),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(3),
-                      child: LinearProgressIndicator(
-                        value: convertedTotalSpent > 0 ? (catAmount / convertedTotalSpent).clamp(0.0, 1.0) : 0.0,
-                        backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.25),
-                        valueColor: AlwaysStoppedAnimation<Color>(color),
-                        minHeight: 4,
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          CurrencyFormatter.format(catAmount, currency: activeCurrency),
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: theme.colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      width: 36,
+                      child: Text(
+                        '%${percentage.toStringAsFixed(0)}',
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: color,
+                        ),
                       ),
                     ),
                   ],
                 ),
-              );
-            }),
-          ],
+                const SizedBox(height: 6),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(3),
+                  child: LinearProgressIndicator(
+                    value: convertedTotalSpent > 0 ? (catAmount / convertedTotalSpent).clamp(0.0, 1.0) : 0.0,
+                    backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.25),
+                    valueColor: AlwaysStoppedAnimation<Color>(color),
+                    minHeight: 4,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  /// 2. Payment Method Chart View (Optional / Extra)
+  Widget _buildPaymentMethodChartView(
+    BuildContext context,
+    ThemeData theme,
+    bool isDark,
+    AppLocalizations? l10n,
+    String lang,
+    String activeCurrency,
+    bool isCustomCurrency,
+    double convertedTotalSpent,
+    List<MapEntry<String, double>> sortedEntries,
+    Map<String, int> paymentCounts,
+    List<double> chartValues,
+    List<Color> chartColors,
+    String topPaymentName,
+    String topPaymentPercentage,
+    int cashPct,
+    int cardPct,
+    double cashTotal,
+    double cardAndDigitalTotal,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Donut Chart & Center Payment Highlight
+        Center(
+          child: SizedBox(
+            width: 140,
+            height: 140,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0.0, end: 1.0),
+                  duration: const Duration(milliseconds: 650),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, progress, child) {
+                    return CustomPaint(
+                      size: const Size(140, 140),
+                      painter: DonutChartPainter(
+                        values: chartValues,
+                        colors: chartColors,
+                        strokeWidth: 14,
+                        progress: progress,
+                      ),
+                    );
+                  },
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.account_balance_wallet_rounded,
+                      size: 16,
+                      color: theme.colorScheme.primary,
+                    ),
+                    const SizedBox(height: 2),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        CurrencyFormatter.format(convertedTotalSpent, currency: activeCurrency),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w900,
+                          color: theme.colorScheme.onSurface,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                    ),
+                    if (topPaymentName.isNotEmpty) ...[
+                      const SizedBox(height: 1),
+                      Text(
+                        '%$topPaymentPercentage $topPaymentName',
+                        style: TextStyle(
+                          fontSize: 9.5,
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
+
+        const SizedBox(height: 14),
+
+        // Cash vs Card Balance Summary Pill
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: isDark ? AppColors.outlineDark : AppColors.outlineLight),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.credit_card_rounded, size: 15, color: Color(0xFF0EA5E9)),
+                  const SizedBox(width: 6),
+                  Text(
+                    '${BudgetLocalization.cashVsCard(lang).split('/').last.trim()}: %$cardPct',
+                    style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+              Container(width: 1, height: 16, color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4)),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.payments_outlined, size: 15, color: AppColors.primaryAmber),
+                  const SizedBox(width: 6),
+                  Text(
+                    '${BudgetLocalization.cashVsCard(lang).split('/').first.trim()}: %$cashPct',
+                    style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 14),
+
+        // Multi-segmented colored distribution bar for payment methods
+        TweenAnimationBuilder<double>(
+          tween: Tween<double>(begin: 0.0, end: 1.0),
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeOutCubic,
+          builder: (context, factor, child) {
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: SizedBox(
+                height: 8,
+                child: Row(
+                  children: sortedEntries.map((entry) {
+                    final ratio = convertedTotalSpent > 0 ? (entry.value / convertedTotalSpent).clamp(0.01, 1.0) : 0.0;
+                    final color = BudgetAnalyticsCard.getPaymentMethodColor(entry.key);
+                    final flexVal = ((ratio * 1000) * factor).toInt();
+                    return Flexible(
+                      flex: flexVal > 0 ? flexVal : 1,
+                      child: Container(
+                        color: color,
+                        margin: const EdgeInsets.symmetric(horizontal: 0.5),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            );
+          },
+        ),
+
+        const SizedBox(height: 16),
+
+        // Payment Methods Breakdown List
+        ...sortedEntries.map((entry) {
+          final methodKey = entry.key;
+          final methodAmount = entry.value;
+          final methodCount = paymentCounts[methodKey] ?? 0;
+          final methodName = BudgetAnalyticsCard.getPaymentMethodDisplayName(methodKey, l10n);
+          final color = BudgetAnalyticsCard.getPaymentMethodColor(methodKey);
+          final icon = BudgetAnalyticsCard.getPaymentMethodIcon(methodKey);
+          final percentage = convertedTotalSpent > 0 ? (methodAmount / convertedTotalSpent) * 100 : 0.0;
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(child: Icon(icon, size: 15, color: color)),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              methodName,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '($methodCount)',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          CurrencyFormatter.format(methodAmount, currency: activeCurrency),
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: theme.colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      width: 36,
+                      child: Text(
+                        '%${percentage.toStringAsFixed(0)}',
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: color,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(3),
+                  child: LinearProgressIndicator(
+                    value: convertedTotalSpent > 0 ? (methodAmount / convertedTotalSpent).clamp(0.0, 1.0) : 0.0,
+                    backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.25),
+                    valueColor: AlwaysStoppedAnimation<Color>(color),
+                    minHeight: 4,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  /// 3. Daily Timeline Trend Bar Chart View
+  Widget _buildDailyTimelineChartView(
+    BuildContext context,
+    ThemeData theme,
+    bool isDark,
+    AppLocalizations? l10n,
+    String lang,
+    String activeCurrency,
+    double convertedTotalSpent,
+    List<MapEntry<DateTime, double>> sortedDailyEntries,
+    DateTime? peakDay,
+    double peakDayAmount,
+    int tripDays,
+  ) {
+    if (sortedDailyEntries.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text(l10n?.noExpensesYet ?? 'No expenses yet'),
+        ),
+      );
+    }
+
+    final maxVal = peakDayAmount > 0 ? peakDayAmount : 1.0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Daily Spend Bar Visualizer
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: isDark ? AppColors.outlineDark : AppColors.outlineLight),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${BudgetLocalization.chartTypeTimeline(lang)} (${sortedDailyEntries.length} gün)',
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  if (peakDay != null)
+                    Text(
+                      'Zirve: ${CurrencyFormatter.format(peakDayAmount, currency: activeCurrency)}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primaryAmber,
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Interactive Bar Chart
+              SizedBox(
+                height: 110,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: sortedDailyEntries.map((entry) {
+                    final dayDate = entry.key;
+                    final amount = entry.value;
+                    final heightFactor = (amount / maxVal).clamp(0.08, 1.0);
+                    final isPeak = dayDate == peakDay;
+                    final dateLabel = AppDateFormatter.formatMMMd(dayDate, locale: lang);
+
+                    return Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2.5),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                CurrencyFormatter.format(amount, currency: activeCurrency).split(' ').first,
+                                style: TextStyle(
+                                  fontSize: 8.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: isPeak ? AppColors.primaryAmber : theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Container(
+                                  width: double.infinity,
+                                  height: 65 * heightFactor,
+                                  decoration: BoxDecoration(
+                                    color: isPeak
+                                        ? AppColors.primaryAmber
+                                        : theme.colorScheme.primary.withValues(alpha: 0.7),
+                                    borderRadius: const BorderRadius.vertical(top: Radius.circular(5)),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                dateLabel,
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: isPeak ? FontWeight.w800 : FontWeight.w500,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 14),
+
+        // List of days
+        ...sortedDailyEntries.reversed.map((entry) {
+          final isPeak = entry.key == peakDay;
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              children: [
+                Icon(
+                  isPeak ? Icons.star_rounded : Icons.calendar_today_rounded,
+                  size: 14,
+                  color: isPeak ? AppColors.primaryAmber : theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    AppDateFormatter.formatMMMd(entry.key, locale: lang),
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: isPeak ? FontWeight.w800 : FontWeight.w600,
+                      color: isPeak ? AppColors.primaryAmber : theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+                Text(
+                  CurrencyFormatter.format(entry.value, currency: activeCurrency),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: isPeak ? AppColors.primaryAmber : theme.colorScheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  /// 4. Collapsible Deep Statistics & Insights Accordion
+  Widget _buildDeepAnalyticsAccordion(
+    BuildContext context,
+    ThemeData theme,
+    bool isDark,
+    AppLocalizations? l10n,
+    String lang,
+    String activeCurrency,
+    double convertedTotalSpent,
+    double avgTransaction,
+    Expense? highestExp,
+    double highestExpConverted,
+    Expense? lowestExp,
+    double lowestExpConverted,
+    DateTime? peakDay,
+    double peakDayAmount,
+    int cashPct,
+    int cardPct,
+    int categoryDiversityCount,
+    String? topCategoryName,
+    double? dailyBurnRate,
+    int tripDays,
+    double? safeDailySpendAmount,
+    String pacingStatus,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark
+            ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.25)
+            : const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Accordion Header Bar
+          InkWell(
+            onTap: () {
+              setState(() {
+                _isDeepStatsExpanded = !_isDeepStatsExpanded;
+              });
+            },
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.insights_rounded, size: 16, color: theme.colorScheme.primary),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          BudgetLocalization.deepStatsTitle(lang),
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        Text(
+                          _isDeepStatsExpanded
+                              ? ((l10n?.localeName.startsWith('tr') ?? false) ? 'Daraltmak için dokunun' : 'Tap to collapse')
+                              : ((l10n?.localeName.startsWith('tr') ?? false) ? 'Detaylı analizleri keşfedin' : 'Explore detailed analytics'),
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    _isDeepStatsExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                    color: theme.colorScheme.primary,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          if (_isDeepStatsExpanded) ...[
+            const Divider(height: 1),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildMetricTile(
+                          icon: Icons.receipt_long_rounded,
+                          color: const Color(0xFF0EA5E9),
+                          title: BudgetLocalization.averageTransaction(lang),
+                          value: CurrencyFormatter.format(avgTransaction, currency: activeCurrency),
+                          subtitle: '${widget.expenses.length} ${l10n?.expenseCount(widget.expenses.length) ?? 'harcama'}',
+                          theme: theme,
+                          isDark: isDark,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildMetricTile(
+                          icon: Icons.trending_up_rounded,
+                          color: AppColors.errorPastel,
+                          title: BudgetLocalization.highestExpense(lang),
+                          value: CurrencyFormatter.format(highestExpConverted, currency: activeCurrency),
+                          subtitle: highestExp?.title ?? '',
+                          theme: theme,
+                          isDark: isDark,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildMetricTile(
+                          icon: Icons.star_rounded,
+                          color: AppColors.primaryAmber,
+                          title: BudgetLocalization.peakSpendDay(lang),
+                          value: CurrencyFormatter.format(peakDayAmount, currency: activeCurrency),
+                          subtitle: peakDay != null ? AppDateFormatter.formatMMMd(peakDay, locale: lang) : '',
+                          theme: theme,
+                          isDark: isDark,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildMetricTile(
+                          icon: Icons.balance_rounded,
+                          color: const Color(0xFF10B981),
+                          title: BudgetLocalization.cashVsCard(lang),
+                          value: '%$cardPct / %$cashPct',
+                          subtitle: 'Kart / Nakit',
+                          theme: theme,
+                          isDark: isDark,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildMetricTile(
+                          icon: Icons.category_rounded,
+                          color: const Color(0xFF8B5CF6),
+                          title: BudgetLocalization.categoryDiversity(lang),
+                          value: '$categoryDiversityCount ${l10n?.categorySpendingAnalysis.split(' ').first ?? 'Kategori'}',
+                          subtitle: topCategoryName != null && topCategoryName.isNotEmpty ? 'Zirve: $topCategoryName' : '',
+                          theme: theme,
+                          isDark: isDark,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildMetricTile(
+                          icon: Icons.speed_rounded,
+                          color: pacingStatus == 'onTrack'
+                              ? AppColors.successPastel
+                              : (pacingStatus == 'warning' ? AppColors.warningPastel : AppColors.errorPastel),
+                          title: safeDailySpendAmount != null
+                              ? BudgetLocalization.safeDailySpend(lang)
+                              : (l10n?.dailyBurnRate ?? 'Daily Spend'),
+                          value: CurrencyFormatter.format(
+                            safeDailySpendAmount ?? (dailyBurnRate ?? (convertedTotalSpent / tripDays)),
+                            currency: activeCurrency,
+                          ),
+                          subtitle: safeDailySpendAmount != null
+                              ? 'Kalan gün başına'
+                              : 'Günlük ortalama',
+                          theme: theme,
+                          isDark: isDark,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMetricTile({
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String value,
+    required String subtitle,
+    required ThemeData theme,
+    required bool isDark,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+          width: 0.8,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 14, color: color),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+          ),
+          if (subtitle.isNotEmpty) ...[
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 9.5,
+                color: theme.colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w500,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// Currency switch actions
+  Widget _buildCurrencyActionChips(
+    BuildContext context,
+    ThemeData theme,
+    bool isDark,
+    String lang,
+    String activeCurrency,
+    AppLocalizations? l10n,
+  ) {
+    return Center(
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          if (widget.onSetAsBaseCurrency != null)
+            InkWell(
+              key: const Key('set_as_base_currency_button'),
+              onTap: widget.onSetAsBaseCurrency,
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                constraints: BoxConstraints(maxWidth: math.max(120, MediaQuery.of(context).size.width - 64)),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.35),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.check_circle_outline_rounded, size: 13, color: theme.colorScheme.primary),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        BudgetLocalization.makeTripCurrency(lang, activeCurrency),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.primary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          InkWell(
+            key: const Key('revert_to_trip_currency_button'),
+            onTap: () {
+              setState(() {
+                _currentCurrency = widget.tripCurrency;
+              });
+              widget.onCurrencyChanged?.call(widget.tripCurrency);
+            },
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              constraints: BoxConstraints(maxWidth: math.max(120, MediaQuery.of(context).size.width - 64)),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35)
+                    : const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.refresh_rounded, size: 12, color: theme.colorScheme.onSurfaceVariant),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      l10n?.revertToCurrency('${widget.tripCurrency} (${CurrencyFormatter.getSymbol(widget.tripCurrency)})') ??
+                          'Switch back to ${widget.tripCurrency} (${CurrencyFormatter.getSymbol(widget.tripCurrency)})',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Burn Rate and Pacing Bar
+  Widget _buildBurnRateBar(
+    ThemeData theme,
+    bool isDark,
+    AppLocalizations? l10n,
+    String activeCurrency,
+    double dailyBurnRate,
+    double? plannedDailyBudget,
+    String pacingStatus,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n?.dailyBurnRate ?? 'Daily Spend Rate',
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    CurrencyFormatter.format(dailyBurnRate, currency: activeCurrency),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (plannedDailyBudget != null) ...[
+            Container(
+              width: 1,
+              height: 28,
+              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n?.budgetEfficiency ?? 'Pacing Status',
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      color: theme.colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Row(
+                    children: [
+                      Icon(
+                        pacingStatus == 'onTrack'
+                            ? Icons.check_circle_rounded
+                            : (pacingStatus == 'warning'
+                                ? Icons.warning_amber_rounded
+                                : Icons.error_rounded),
+                        size: 14,
+                        color: pacingStatus == 'onTrack'
+                            ? AppColors.successPastel
+                            : (pacingStatus == 'warning'
+                                ? AppColors.warningPastel
+                                : AppColors.errorPastel),
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          pacingStatus == 'onTrack'
+                              ? (l10n?.budgetStatusOnTrack ?? 'On Track')
+                              : (pacingStatus == 'warning'
+                                  ? (l10n?.budgetStatusWarning ?? 'Pacing High')
+                                  : (l10n?.budgetStatusOver ?? 'Over Budget')),
+                          style: TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w700,
+                            color: pacingStatus == 'onTrack'
+                                ? AppColors.successPastel
+                                : (pacingStatus == 'warning'
+                                    ? AppColors.warningPastel
+                                    : AppColors.errorPastel),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

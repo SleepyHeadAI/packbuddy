@@ -140,17 +140,17 @@ class PackingItemTile extends StatelessWidget {
           decoration: BoxDecoration(
             color: isDark
                 ? (item.isPacked
-                    ? theme.colorScheme.surfaceContainerLowest.withValues(alpha: 0.6)
+                    ? const Color(0xFF0A1D1A).withValues(alpha: 0.5)
                     : theme.colorScheme.surface)
                 : (item.isPacked
-                    ? AppColors.surfaceVariantLight.withValues(alpha: 0.5)
+                    ? const Color(0xFFF2FBF7)
                     : AppColors.surfaceLight),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: item.isPacked
                   ? (isDark
-                      ? AppColors.outlineDark.withValues(alpha: 0.5)
-                      : AppColors.outlineLight.withValues(alpha: 0.6))
+                      ? const Color(0xFF0F766E).withValues(alpha: 0.3)
+                      : const Color(0xFF10B981).withValues(alpha: 0.3))
                   : (isDark
                       ? AppColors.outlineDark
                       : AppColors.outlineLight),
@@ -180,23 +180,34 @@ class PackingItemTile extends StatelessWidget {
                       label: item.isPacked ? l10n.markedAsPacked : l10n.notPacked,
                       child: IconButton(
                         icon: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 220),
+                          duration: const Duration(milliseconds: 260),
                           transitionBuilder: (child, animation) => ScaleTransition(
-                            scale: CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
+                            scale: CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.elasticOut,
+                            ),
                             child: child,
                           ),
                           child: item.isPacked
                               ? Container(
                                   key: const ValueKey('packed'),
-                                  width: 24,
-                                  height: 24,
+                                  width: 25,
+                                  height: 25,
                                   decoration: BoxDecoration(
-                                    color: AppColors.successPastel,
+                                    gradient: const LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Color(0xFF2DD4BF),
+                                        Color(0xFF0F766E),
+                                      ],
+                                    ),
                                     shape: BoxShape.circle,
                                     boxShadow: [
                                       BoxShadow(
-                                        color: AppColors.successPastel.withValues(alpha: 0.35),
-                                        blurRadius: 6,
+                                        color: AppColors.successPastel.withValues(alpha: 0.45),
+                                        blurRadius: 8,
+                                        spreadRadius: 1,
                                         offset: const Offset(0, 2),
                                       ),
                                     ],
@@ -204,7 +215,7 @@ class PackingItemTile extends StatelessWidget {
                                   child: const Icon(
                                     Icons.check_rounded,
                                     color: Colors.white,
-                                    size: 15,
+                                    size: 16,
                                   ),
                                 )
                               : Container(
@@ -227,7 +238,11 @@ class PackingItemTile extends StatelessWidget {
                                 ),
                         ),
                         onPressed: () {
-                          HapticFeedback.selectionClick();
+                          if (!item.isPacked) {
+                            HapticFeedback.lightImpact();
+                          } else {
+                            HapticFeedback.selectionClick();
+                          }
                           onTogglePacked();
                         },
                         visualDensity: VisualDensity.compact,

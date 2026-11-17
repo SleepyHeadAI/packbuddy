@@ -1658,7 +1658,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                   )
                 else
                   SliverPadding(
-                    padding: const EdgeInsets.only(left: 20, right: 20, top: 8, bottom: 90),
+                    padding: const EdgeInsets.only(left: 20, right: 20, top: 8, bottom: 110),
                     sliver: SliverGrid(
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,

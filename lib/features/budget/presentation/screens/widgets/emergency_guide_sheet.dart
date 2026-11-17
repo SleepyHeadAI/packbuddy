@@ -41,15 +41,18 @@ class _EmergencyGuideSheetState extends State<EmergencyGuideSheet> {
     );
   }
 
-  String _getCountryDisplayName(EmergencyGuide guide, AppLocalizations l10n) {
+  String _getCountryDisplayName(EmergencyGuide guide, BuildContext context, AppLocalizations l10n) {
     final c = Country.findByCode(guide.countryCode);
     if (c != null) {
-      if (l10n.localeName.startsWith('tr')) {
-        return c.localName;
-      }
-      return c.name;
+      final lang = Localizations.localeOf(context).languageCode;
+      return c.getLocalizedName(lang);
     }
     return guide.countryName;
+  }
+
+  String _getCountryFlag(EmergencyGuide guide) {
+    final c = Country.findByCode(guide.countryCode);
+    return c?.flag ?? '🌐';
   }
 
   String _getPhraseLabel(String key, AppLocalizations l10n) {
@@ -128,7 +131,9 @@ class _EmergencyGuideSheetState extends State<EmergencyGuideSheet> {
                         ),
                       ),
                       Text(
-                        '${_getCountryDisplayName(guide, l10n)} (${guide.countryCode})',
+                        allGuides.length > 1
+                            ? '${_getCountryFlag(guide)} ${_getCountryDisplayName(guide, context, l10n)} (${guide.countryCode}) · ${allGuides.length} ${l10n.localeName.startsWith('tr') ? 'Ülke Kapsanıyor' : 'Countries'}'
+                            : '${_getCountryFlag(guide)} ${_getCountryDisplayName(guide, context, l10n)} (${guide.countryCode})',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -147,7 +152,7 @@ class _EmergencyGuideSheetState extends State<EmergencyGuideSheet> {
           // Multi-country selector tabs if trip spans multiple countries
           if (allGuides.length > 1) ...[
             Container(
-              height: 42,
+              height: 44,
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
@@ -156,17 +161,23 @@ class _EmergencyGuideSheetState extends State<EmergencyGuideSheet> {
                 itemBuilder: (ctx, idx) {
                   final g = allGuides[idx];
                   final isSelected = idx == selectedIndex;
+                  final flag = _getCountryFlag(g);
+                  final name = _getCountryDisplayName(g, context, l10n);
                   return ChoiceChip(
+                    avatar: Text(flag, style: const TextStyle(fontSize: 14)),
                     label: Text(
-                      '${_getCountryDisplayName(g, l10n)} (${g.countryCode})',
+                      '$name (${g.countryCode})',
                       style: TextStyle(
                         fontSize: 12,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
                         color: isSelected ? Colors.white : theme.colorScheme.onSurface,
                       ),
                     ),
                     selected: isSelected,
                     selectedColor: AppColors.errorPastel,
+                    backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     onSelected: (val) {
                       if (val) setState(() => _selectedCountryIndex = idx);
                     },
@@ -371,10 +382,130 @@ class _EmergencyGuideSheetState extends State<EmergencyGuideSheet> {
                     ),
                   );
                 }),
+                if (allGuides.length > 1) ...[
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Icon(Icons.public_rounded, size: 18, color: theme.colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Text(
+                        l10n.localeName.startsWith('tr')
+                            ? 'Tüm Seyahat Ülkeleri (${allGuides.length})'
+                            : 'All Trip Destinations (${allGuides.length})',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  ...allGuides.asMap().entries.map((entry) {
+                    final idx = entry.key;
+                    final g = entry.value;
+                    final isCurrent = idx == selectedIndex;
+                    final flag = _getCountryFlag(g);
+                    final name = _getCountryDisplayName(g, context, l10n);
+
+                    return InkWell(
+                      onTap: () {
+                        setState(() => _selectedCountryIndex = idx);
+                      },
+                      borderRadius: BorderRadius.circular(14),
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: isCurrent
+                              ? AppColors.errorPastel.withValues(alpha: 0.12)
+                              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: isCurrent
+                                ? AppColors.errorPastel.withValues(alpha: 0.5)
+                                : theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                            width: isCurrent ? 1.5 : 1.0,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(flag, style: const TextStyle(fontSize: 18)),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    '$name (${g.countryCode})',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13.5,
+                                      color: isCurrent ? AppColors.errorPastel : theme.colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ),
+                                if (isCurrent)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.errorPastel,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Text(
+                                      l10n.localeName.startsWith('tr') ? 'Aktif' : 'Active',
+                                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 6,
+                              children: [
+                                _buildQuickSosChip(context, l10n.emergencyGeneralSos, g.generalSos, AppColors.errorPastel),
+                                _buildQuickSosChip(context, l10n.emergencyPolice, g.police, const Color(0xFF1976D2)),
+                                _buildQuickSosChip(context, l10n.emergencyAmbulance, g.ambulance, const Color(0xFF388E3C)),
+                                _buildQuickSosChip(context, l10n.emergencyFire, g.fire, const Color(0xFFF57C00)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+                ],
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildQuickSosChip(BuildContext context, String label, String number, Color color) {
+    return InkWell(
+      onTap: () => _copyToClipboard(context, number, label),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '$label: ',
+              style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w500, color: color),
+            ),
+            Text(
+              number,
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: color),
+            ),
+          ],
+        ),
       ),
     );
   }

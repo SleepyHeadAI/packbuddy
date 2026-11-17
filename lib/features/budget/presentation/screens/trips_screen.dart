@@ -6,7 +6,6 @@ import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
-import 'package:packbuddy/features/budget/domain/country.dart';
 import 'package:packbuddy/features/budget/domain/city_localization.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
@@ -512,7 +511,6 @@ class _ModernTripCard extends ConsumerWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
-    final country = Country.findByCode(trip.countryCode);
     final transportIcon = TripsScreen.getTransportIcon(trip.transportMode);
     final expenseState = ref.watch(expenseControllerProvider(trip.id));
 
@@ -536,8 +534,14 @@ class _ModernTripCard extends ConsumerWidget {
             ),
             child: Row(
               children: [
-                if (country != null) ...[
-                  Text(country.flag, style: const TextStyle(fontSize: 15)),
+                if (trip.countries.isNotEmpty) ...[
+                  Wrap(
+                    spacing: 3,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: trip.countries
+                        .map((c) => Text(c.flag, style: const TextStyle(fontSize: 15)))
+                        .toList(),
+                  ),
                   const SizedBox(width: 6),
                 ] else ...[
                   Icon(Icons.place_outlined, size: 15, color: theme.colorScheme.primary),

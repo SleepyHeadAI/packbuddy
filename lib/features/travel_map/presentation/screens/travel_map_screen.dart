@@ -1508,7 +1508,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                   builder: (context) {
                     final displayCountries = mapState.getFilteredCountries(currentLang);
                     return SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 40),
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 110),
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {

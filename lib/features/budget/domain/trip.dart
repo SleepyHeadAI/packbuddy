@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'country.dart';
 
 /// Domain entity representing a travel Trip with soft-delete, two-way sync,
 /// and collaborative shared travel list support (Feature F-1).
@@ -56,6 +57,7 @@ class Trip {
     String? defaultCurrency,
     double? budgetLimit,
     String? countryCode,
+    bool clearCountryCode = false,
     String? transportMode,
     String? notes,
     DateTime? createdAt,
@@ -75,7 +77,7 @@ class Trip {
       endDate: endDate ?? this.endDate,
       defaultCurrency: defaultCurrency ?? this.defaultCurrency,
       budgetLimit: budgetLimit ?? this.budgetLimit,
-      countryCode: countryCode ?? this.countryCode,
+      countryCode: clearCountryCode ? null : (countryCode ?? this.countryCode),
       transportMode: transportMode ?? this.transportMode,
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
@@ -86,6 +88,56 @@ class Trip {
       collaborators: collaborators ?? this.collaborators,
       sharedRole: sharedRole ?? this.sharedRole,
     );
+  }
+
+  /// Extracts all active unique countries belonging to this trip in route order.
+  /// Seamlessly parses destinations in all 20 languages and extracts flags.
+  /// If a country was removed from the itinerary, it will NOT be included here.
+  List<Country> get countries {
+    final list = <Country>[];
+    final seenCodes = <String>{};
+
+    if (destination.trim().isNotEmpty) {
+      final stops = destination.split(RegExp(r'\s*➔\s*'));
+      for (final stop in stops) {
+        final c = Country.resolveFromStop(stop);
+        if (c != null && !seenCodes.contains(c.code.toUpperCase())) {
+          seenCodes.add(c.code.toUpperCase());
+          list.add(c);
+        }
+      }
+    }
+
+    // Fallback: ONLY if destination is completely empty and countryCode is set
+    // (for legacy trips that didn't have destination text)
+    if (list.isEmpty && destination.trim().isEmpty && countryCode != null && countryCode!.trim().isNotEmpty) {
+      final c = Country.findByCode(countryCode);
+      if (c != null) {
+        list.add(c);
+      }
+    }
+
+    return list;
+  }
+
+  /// Extracts all unique country flags for the trip (e.g. ['🇹🇷', '🇩🇪']).
+  List<String> get countryFlags {
+    return countries.map((c) => c.flag).toList();
+  }
+
+  /// Primary country object for the trip (first stop's country or countryCode).
+  Country? get primaryCountry {
+    final cList = countries;
+    if (cList.isNotEmpty) return cList.first;
+    if (destination.trim().isEmpty && countryCode != null) {
+      return Country.findByCode(countryCode);
+    }
+    return null;
+  }
+
+  /// Primary country code for the trip.
+  String? get primaryCountryCode {
+    return primaryCountry?.code ?? (destination.trim().isEmpty ? countryCode : null);
   }
 
   /// Helper to encode collaboration metadata into SQLite notes column safely

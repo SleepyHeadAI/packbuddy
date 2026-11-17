@@ -1768,8 +1768,14 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
           // Top Row: Destination + Status Badge
           Row(
             children: [
-              if (country != null) ...[
-                Text(country.flag, style: const TextStyle(fontSize: 16)),
+              if (currentTrip.countries.isNotEmpty) ...[
+                Wrap(
+                  spacing: 4,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: currentTrip.countries
+                      .map((c) => Text(c.flag, style: const TextStyle(fontSize: 16)))
+                      .toList(),
+                ),
                 const SizedBox(width: 6),
               ] else ...[
                 Icon(Icons.place_outlined, size: 16, color: theme.colorScheme.primary),

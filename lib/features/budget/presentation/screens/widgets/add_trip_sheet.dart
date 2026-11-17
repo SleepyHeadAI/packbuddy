@@ -99,6 +99,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
             _itineraryStops.add(trimmed);
           }
         }
+        _syncSelectedCountry();
       }
     } else {
       _selectedCurrency = PreferencesService.instance.getDefaultCurrency() ??
@@ -132,16 +133,29 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
     });
   }
 
+  void _syncSelectedCountry() {
+    Country? firstCountry;
+    for (final stop in _itineraryStops) {
+      final matched = Country.resolveFromStop(stop);
+      if (matched != null) {
+        firstCountry = matched;
+        break;
+      }
+    }
+    _selectedCountry = firstCountry;
+    if (!_isCurrencyManuallySelected &&
+        firstCountry != null &&
+        CurrencyFormatter.supportedCurrencies.contains(firstCountry.defaultCurrency)) {
+      _selectedCurrency = firstCountry.defaultCurrency;
+    }
+  }
+
   void _selectLocationSuggestion(LocationSearchResult suggestion) {
     setState(() {
       if (!_itineraryStops.contains(suggestion.formattedStop)) {
         _itineraryStops.add(suggestion.formattedStop);
       }
-      _selectedCountry = suggestion.country;
-      if (!_isCurrencyManuallySelected &&
-          CurrencyFormatter.supportedCurrencies.contains(suggestion.country.defaultCurrency)) {
-        _selectedCurrency = suggestion.country.defaultCurrency;
-      }
+      _syncSelectedCountry();
       _stopInputController.clear();
       _locationSuggestions = [];
     });
@@ -341,16 +355,12 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
     final result = await CountryPickerSheet.show(context);
     if (result != null) {
       setState(() {
-        _selectedCountry = result.country;
         final langCode = Localizations.localeOf(context).languageCode;
         final label = result.getLocalizedLabel(langCode);
         if (!_itineraryStops.contains(label)) {
           _itineraryStops.add(label);
         }
-        if (!_isCurrencyManuallySelected &&
-            CurrencyFormatter.supportedCurrencies.contains(result.country.defaultCurrency)) {
-          _selectedCurrency = result.country.defaultCurrency;
-        }
+        _syncSelectedCountry();
       });
     }
   }
@@ -382,6 +392,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
   void _removeStop(int index) {
     setState(() {
       _itineraryStops.removeAt(index);
+      _syncSelectedCountry();
     });
   }
 
@@ -393,11 +404,12 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
       final exact = Country.findLocationExact(textStop, languageCode: langCode);
       if (exact != null && !_itineraryStops.contains(exact.formattedStop)) {
         _itineraryStops.add(exact.formattedStop);
-        _selectedCountry = exact.country;
       }
       _stopInputController.clear();
       _locationSuggestions = [];
     }
+
+    _syncSelectedCountry();
 
     if (_itineraryStops.isEmpty) {
       ScaffoldMessenger.of(context).clearSnackBars();
