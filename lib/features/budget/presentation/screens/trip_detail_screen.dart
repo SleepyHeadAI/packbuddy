@@ -6,6 +6,9 @@ import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
+import 'package:packbuddy/core/services/preferences_service.dart';
+import 'package:packbuddy/features/budget/domain/budget_localization.dart';
+import 'package:packbuddy/features/budget/presentation/screens/widgets/currency_picker_sheet.dart';
 import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
 import 'package:packbuddy/features/budget/domain/city_localization.dart';
@@ -44,6 +47,83 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
   String? _selectedBudgetCurrency;
   final Set<String> _collapsedCategories = <String>{};
   final Set<String> _collapsedPaymentMethods = <String>{};
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPersistedBudgetCurrency();
+  }
+
+  void _loadPersistedBudgetCurrency() {
+    final saved = PreferencesService.instance.getTripBudgetCurrency(widget.trip.id);
+    if (saved != null && saved.isNotEmpty) {
+      _selectedBudgetCurrency = saved;
+    }
+  }
+
+  Future<void> _handleCurrencyChanged(String newCurrency, Trip currentTrip) async {
+    final code = newCurrency.toUpperCase().trim();
+    if (code == currentTrip.defaultCurrency.toUpperCase()) {
+      setState(() {
+        _selectedBudgetCurrency = null;
+      });
+      await PreferencesService.instance.setTripBudgetCurrency(currentTrip.id, null);
+    } else {
+      setState(() {
+        _selectedBudgetCurrency = code;
+      });
+      await PreferencesService.instance.setTripBudgetCurrency(currentTrip.id, code);
+      await PreferencesService.instance.setDefaultCurrency(code);
+    }
+  }
+
+  Future<void> _handleSetAsBaseCurrency(String newBaseCurrency, Trip currentTrip) async {
+    final code = newBaseCurrency.toUpperCase().trim();
+    final updatedTrip = currentTrip.copyWith(
+      defaultCurrency: code,
+      updatedAt: DateTime.now(),
+    );
+    await ref.read(tripControllerProvider.notifier).updateTrip(updatedTrip);
+    await PreferencesService.instance.setTripBudgetCurrency(currentTrip.id, null);
+    await PreferencesService.instance.setDefaultCurrency(code);
+    if (mounted) {
+      setState(() {
+        _selectedBudgetCurrency = null;
+      });
+      final lang = Localizations.localeOf(context).languageCode;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          backgroundColor: AppColors.successPastel,
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  BudgetLocalization.tripCurrencyUpdated(lang, '$code (${CurrencyFormatter.getSymbol(code)})'),
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
+          ),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+  Future<void> _pickCurrencyForBudget(BuildContext context, Trip currentTrip, String activeCurrency) async {
+    final picked = await CurrencyPickerSheet.show(
+      context,
+      selectedCurrency: activeCurrency,
+      defaultCurrency: currentTrip.defaultCurrency,
+    );
+    if (picked != null && picked != activeCurrency) {
+      await _handleCurrencyChanged(picked, currentTrip);
+    }
+  }
 
   Color _getCategoryColor(String category) {
     return BudgetAnalyticsCard.getCategoryColor(category);
@@ -541,18 +621,20 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     required Trip currentTrip,
     required ThemeData theme,
     required AppLocalizations l10n,
+    String? activeCurrency,
   }) {
     final isDark = theme.brightness == Brightness.dark;
     final categoryColor = _getCategoryColor(categoryKey);
     final categoryIcon = _getCategoryIcon(categoryKey);
     final categoryName = BudgetAnalyticsCard.getCategoryDisplayName(categoryKey, l10n);
+    final targetCurrency = activeCurrency ?? currentTrip.defaultCurrency;
 
     final categoryTotal = expenses.fold<double>(
       0.0,
       (sum, e) => sum + CurrencyService.convert(
         amount: e.amount,
         fromCurrency: e.currency,
-        toCurrency: currentTrip.defaultCurrency,
+        toCurrency: targetCurrency,
       ),
     );
 
@@ -659,7 +741,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                       Text(
                         CurrencyFormatter.format(
                           categoryTotal,
-                          currency: currentTrip.defaultCurrency,
+                          currency: targetCurrency,
                         ),
                         style: const TextStyle(
                           fontWeight: FontWeight.w800,
@@ -692,6 +774,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                   l10n: l10n,
                   secondaryBadge: _formatPaymentMethod(expense.paymentMethod, l10n),
                   secondaryIcon: _getPaymentIcon(expense.paymentMethod),
+                  activeCurrency: activeCurrency,
                 )),
           ],
         ],
@@ -706,18 +789,20 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     required Trip currentTrip,
     required ThemeData theme,
     required AppLocalizations l10n,
+    String? activeCurrency,
   }) {
     final isDark = theme.brightness == Brightness.dark;
     final methodColor = _getPaymentColor(methodKey);
     final methodIcon = _getPaymentIcon(methodKey);
     final methodName = _formatPaymentMethod(methodKey, l10n);
+    final targetCurrency = activeCurrency ?? currentTrip.defaultCurrency;
 
     final methodTotal = expenses.fold<double>(
       0.0,
       (sum, e) => sum + CurrencyService.convert(
         amount: e.amount,
         fromCurrency: e.currency,
-        toCurrency: currentTrip.defaultCurrency,
+        toCurrency: targetCurrency,
       ),
     );
 
@@ -824,7 +909,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                       Text(
                         CurrencyFormatter.format(
                           methodTotal,
-                          currency: currentTrip.defaultCurrency,
+                          currency: targetCurrency,
                         ),
                         style: const TextStyle(
                           fontWeight: FontWeight.w800,
@@ -857,6 +942,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                   l10n: l10n,
                   secondaryBadge: BudgetAnalyticsCard.getCategoryDisplayName(expense.category, l10n),
                   secondaryIcon: _getCategoryIcon(expense.category),
+                  activeCurrency: activeCurrency,
                 )),
           ],
         ],
@@ -871,9 +957,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     required AppLocalizations l10n,
     String? secondaryBadge,
     IconData? secondaryIcon,
+    String? activeCurrency,
   }) {
     final categoryColor = _getCategoryColor(expense.category);
     final categoryIcon = _getCategoryIcon(expense.category);
+    final targetCurrency = activeCurrency ?? currentTrip.defaultCurrency;
 
     return Dismissible(
       key: Key('exp-tile-${expense.id}'),
@@ -977,10 +1065,10 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                       fontSize: 13.5,
                     ),
                   ),
-                  if (expense.currency.toUpperCase() != currentTrip.defaultCurrency.toUpperCase()) ...[
+                  if (expense.currency.toUpperCase() != targetCurrency.toUpperCase()) ...[
                     const SizedBox(height: 2),
                     Text(
-                      '≈ ${CurrencyFormatter.format(CurrencyService.convert(amount: expense.amount, fromCurrency: expense.currency, toCurrency: currentTrip.defaultCurrency), currency: currentTrip.defaultCurrency)}',
+                      '≈ ${CurrencyFormatter.format(CurrencyService.convert(amount: expense.amount, fromCurrency: expense.currency, toCurrency: targetCurrency), currency: targetCurrency)}',
                       style: TextStyle(
                         fontSize: 10,
                         color: theme.colorScheme.onSurfaceVariant,
@@ -1001,10 +1089,12 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     required Trip currentTrip,
     required ThemeData theme,
     required AppLocalizations l10n,
+    String? activeCurrency,
   }) {
     final categoryColor = _getCategoryColor(expense.category);
     final categoryIcon = _getCategoryIcon(expense.category);
     final paymentIcon = _getPaymentIcon(expense.paymentMethod);
+    final targetCurrency = activeCurrency ?? currentTrip.defaultCurrency;
 
     return Dismissible(
       key: Key(expense.id),
@@ -1103,10 +1193,10 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                   fontSize: 14,
                 ),
               ),
-              if (expense.currency.toUpperCase() != currentTrip.defaultCurrency.toUpperCase()) ...[
+              if (expense.currency.toUpperCase() != targetCurrency.toUpperCase()) ...[
                 const SizedBox(height: 2),
                 Text(
-                  '≈ ${CurrencyFormatter.format(CurrencyService.convert(amount: expense.amount, fromCurrency: expense.currency, toCurrency: currentTrip.defaultCurrency), currency: currentTrip.defaultCurrency)}',
+                  '≈ ${CurrencyFormatter.format(CurrencyService.convert(amount: expense.amount, fromCurrency: expense.currency, toCurrency: targetCurrency), currency: targetCurrency)}',
                   style: TextStyle(
                     fontSize: 10,
                     color: theme.colorScheme.onSurfaceVariant,
@@ -1129,6 +1219,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     final lang = Localizations.localeOf(context).languageCode;
     final trips = ref.watch(tripControllerProvider).trips;
     final currentTrip = trips.firstWhere((t) => t.id == widget.trip.id, orElse: () => widget.trip);
+    if (_selectedBudgetCurrency != null &&
+        _selectedBudgetCurrency!.toUpperCase() == currentTrip.defaultCurrency.toUpperCase()) {
+      _selectedBudgetCurrency = null;
+      PreferencesService.instance.setTripBudgetCurrency(currentTrip.id, null);
+    }
     final expenseState = ref.watch(expenseControllerProvider(currentTrip.id));
     final country = Country.findByCode(currentTrip.countryCode);
     final transportIcon = TripsScreen.getTransportIcon(currentTrip.transportMode);
@@ -1349,6 +1444,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                         currency: activeBudgetCurrency,
                         originalCurrency: isCustomBudgetCurrency ? currentTrip.defaultCurrency : null,
                         originalTotalSpent: isCustomBudgetCurrency ? expenseState.totalSpent : null,
+                        onCurrencyTap: () => _pickCurrencyForBudget(context, currentTrip, activeBudgetCurrency),
                       ),
                       if (expenseState.expenses.isNotEmpty) ...[
                         const SizedBox(height: 16),
@@ -1356,11 +1452,10 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                           expenses: expenseState.expenses,
                           tripCurrency: currentTrip.defaultCurrency,
                           selectedCurrency: activeBudgetCurrency,
-                          onCurrencyChanged: (newCurrency) {
-                            setState(() {
-                              _selectedBudgetCurrency = newCurrency;
-                            });
-                          },
+                          onCurrencyChanged: (newCurrency) => _handleCurrencyChanged(newCurrency, currentTrip),
+                          onSetAsBaseCurrency: isCustomBudgetCurrency
+                              ? () => _handleSetAsBaseCurrency(activeBudgetCurrency, currentTrip)
+                              : null,
                           totalSpent: expenseState.totalSpent,
                           trip: currentTrip,
                         ),
@@ -1512,6 +1607,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                           currentTrip: currentTrip,
                           theme: theme,
                           l10n: l10n,
+                          activeCurrency: activeBudgetCurrency,
                         );
                       },
                       childCount: expenseState.expenses.length,
@@ -1548,6 +1644,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                             currentTrip: currentTrip,
                             theme: theme,
                             l10n: l10n,
+                            activeCurrency: activeBudgetCurrency,
                           );
                         },
                         childCount: filteredCategoryEntries.length,
@@ -1584,6 +1681,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                             currentTrip: currentTrip,
                             theme: theme,
                             l10n: l10n,
+                            activeCurrency: activeBudgetCurrency,
                           );
                         },
                         childCount: filteredPaymentEntries.length,

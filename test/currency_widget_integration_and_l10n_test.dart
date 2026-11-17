@@ -7,12 +7,9 @@ import 'package:packbuddy/core/services/currency_service.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/services/widget_card_renderer.dart';
 import 'package:packbuddy/core/services/widget_map_renderer.dart';
-import 'package:packbuddy/core/theme/app_theme.dart';
-import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/budget_analytics_card.dart';
-import 'package:packbuddy/features/budget/presentation/widgets/currency_converter_card.dart';
 import 'package:packbuddy/features/dashboard/presentation/widgets/horizontal_currency_converter_card.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 

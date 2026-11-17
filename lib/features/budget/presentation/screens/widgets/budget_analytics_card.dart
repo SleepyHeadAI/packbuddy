@@ -5,6 +5,7 @@ import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
+import 'package:packbuddy/features/budget/domain/budget_localization.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'currency_picker_sheet.dart';
 
@@ -75,6 +76,7 @@ class BudgetAnalyticsCard extends StatefulWidget {
   final Trip? trip;
   final String? selectedCurrency;
   final ValueChanged<String>? onCurrencyChanged;
+  final VoidCallback? onSetAsBaseCurrency;
 
   const BudgetAnalyticsCard({
     super.key,
@@ -84,6 +86,7 @@ class BudgetAnalyticsCard extends StatefulWidget {
     this.trip,
     this.selectedCurrency,
     this.onCurrencyChanged,
+    this.onSetAsBaseCurrency,
   });
 
   static Color getCategoryColor(String category) {
@@ -177,6 +180,7 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
+    final lang = Localizations.localeOf(context).languageCode;
 
     if (widget.expenses.isEmpty) {
       return const SizedBox.shrink();
@@ -537,39 +541,96 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
             ),
 
             if (isCustomCurrency) ...[
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               Center(
-                child: InkWell(
-                  onTap: () {
-                    setState(() {
-                      _currentCurrency = widget.tripCurrency;
-                    });
-                    widget.onCurrencyChanged?.call(widget.tripCurrency);
-                  },
-                  borderRadius: BorderRadius.circular(10),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.refresh_rounded, size: 12, color: theme.colorScheme.primary),
-                        const SizedBox(width: 4),
-                        Text(
-                          l10n?.revertToCurrency('${widget.tripCurrency} (${CurrencyFormatter.getSymbol(widget.tripCurrency)})') ??
-                              'Switch back to ${widget.tripCurrency} (${CurrencyFormatter.getSymbol(widget.tripCurrency)})',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: theme.colorScheme.primary,
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    if (widget.onSetAsBaseCurrency != null)
+                      InkWell(
+                        key: const Key('set_as_base_currency_button'),
+                        onTap: widget.onSetAsBaseCurrency,
+                        borderRadius: BorderRadius.circular(10),
+                        child: Container(
+                          constraints: BoxConstraints(maxWidth: math.max(120, MediaQuery.of(context).size.width - 64)),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.35),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.check_circle_outline_rounded, size: 13, color: theme.colorScheme.primary),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  BudgetLocalization.makeTripCurrency(lang, activeCurrency),
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
+                      ),
+                    InkWell(
+                      key: const Key('revert_to_trip_currency_button'),
+                      onTap: () {
+                        setState(() {
+                          _currentCurrency = widget.tripCurrency;
+                        });
+                        widget.onCurrencyChanged?.call(widget.tripCurrency);
+                      },
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        constraints: BoxConstraints(maxWidth: math.max(120, MediaQuery.of(context).size.width - 64)),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35)
+                              : const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.refresh_rounded, size: 12, color: theme.colorScheme.onSurfaceVariant),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                l10n?.revertToCurrency('${widget.tripCurrency} (${CurrencyFormatter.getSymbol(widget.tripCurrency)})') ??
+                                    'Switch back to ${widget.tripCurrency} (${CurrencyFormatter.getSymbol(widget.tripCurrency)})',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ],

@@ -64,6 +64,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
   DateTime _startDate = DateTime.now();
   DateTime _endDate = DateTime.now().add(const Duration(days: 5));
   String _selectedCurrency = 'TRY';
+  bool _isCurrencyManuallySelected = false;
   Country? _selectedCountry;
 
   // Multi-destination list of stops / cities / countries
@@ -80,6 +81,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
       _startDate = t.startDate;
       _endDate = t.endDate;
       _selectedCurrency = t.defaultCurrency;
+      _isCurrencyManuallySelected = true;
       if (t.budgetLimit != null) {
         _budgetController.text = t.budgetLimit.toString();
       }
@@ -136,7 +138,8 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
         _itineraryStops.add(suggestion.formattedStop);
       }
       _selectedCountry = suggestion.country;
-      if (CurrencyFormatter.supportedCurrencies.contains(suggestion.country.defaultCurrency)) {
+      if (!_isCurrencyManuallySelected &&
+          CurrencyFormatter.supportedCurrencies.contains(suggestion.country.defaultCurrency)) {
         _selectedCurrency = suggestion.country.defaultCurrency;
       }
       _stopInputController.clear();
@@ -344,7 +347,8 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
         if (!_itineraryStops.contains(label)) {
           _itineraryStops.add(label);
         }
-        if (CurrencyFormatter.supportedCurrencies.contains(result.country.defaultCurrency)) {
+        if (!_isCurrencyManuallySelected &&
+            CurrencyFormatter.supportedCurrencies.contains(result.country.defaultCurrency)) {
           _selectedCurrency = result.country.defaultCurrency;
         }
       });
@@ -441,6 +445,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
         );
 
         ref.read(tripControllerProvider.notifier).updateTrip(updated);
+        PreferencesService.instance.setDefaultCurrency(_selectedCurrency);
         Navigator.of(context).pop();
         return;
       }
@@ -455,6 +460,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
             countryCode: _selectedCountry?.code,
             notes: notes,
           );
+      PreferencesService.instance.setDefaultCurrency(_selectedCurrency);
 
       Navigator.of(context).pop();
     }
@@ -884,7 +890,10 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                       }).toList(),
                       onChanged: (val) {
                         if (val != null) {
-                          setState(() => _selectedCurrency = val);
+                          setState(() {
+                            _selectedCurrency = val;
+                            _isCurrencyManuallySelected = true;
+                          });
                         }
                       },
                     ),

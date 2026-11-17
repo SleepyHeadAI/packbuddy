@@ -30,6 +30,7 @@ class PreferencesService {
   // Per-User Scoped Keys
   static const String keyDefaultCurrency = 'packbuddy_default_currency';
   static const String keyUserSelectedCurrency = 'packbuddy_user_selected_currency';
+  static const String keyTripBudgetCurrencyPrefix = 'packbuddy_trip_currency_';
   static const String keyLastConverterFromCurrency = 'packbuddy_last_converter_from_currency';
   static const String keyLastConverterToCurrency = 'packbuddy_last_converter_to_currency';
   static const String keyLastConverterAmount = 'packbuddy_last_converter_amount';
@@ -185,17 +186,52 @@ class PreferencesService {
   String? getDefaultCurrency({String? uid}) {
     final effectiveUid = _resolveEffectiveUid(uid);
     if (effectiveUid != null) {
-      return _prefs?.getString('${keyDefaultCurrency}_$effectiveUid');
+      final saved = _prefs?.getString('${keyDefaultCurrency}_$effectiveUid');
+      if (saved != null && saved.isNotEmpty) return saved;
     }
-    return _prefs?.getString(keyDefaultCurrency);
+    final saved = _prefs?.getString(keyDefaultCurrency);
+    if (saved != null && saved.isNotEmpty) return saved;
+
+    // Fallback: If user has actively used the converter, honor their selected currency
+    final conv = _prefs?.getString(keyLastConverterFromCurrency);
+    if (conv != null && conv.isNotEmpty) return conv;
+
+    return null;
   }
 
   Future<void> setDefaultCurrency(String currency, {String? uid}) async {
     final effectiveUid = _resolveEffectiveUid(uid);
     if (effectiveUid != null) {
       await _prefs?.setString('${keyDefaultCurrency}_$effectiveUid', currency);
+    }
+    await _prefs?.setString(keyDefaultCurrency, currency);
+  }
+
+  /// Retrieves user-selected viewing currency for a specific trip, or null if using trip default
+  String? getTripBudgetCurrency(String tripId, {String? uid}) {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    if (effectiveUid != null) {
+      final val = _prefs?.getString('$keyTripBudgetCurrencyPrefix${tripId}_$effectiveUid');
+      if (val != null && val.isNotEmpty) return val;
+    }
+    final val = _prefs?.getString('$keyTripBudgetCurrencyPrefix$tripId');
+    return (val != null && val.isNotEmpty) ? val : null;
+  }
+
+  /// Persists user-selected viewing currency for a specific trip (pass null to revert to base)
+  Future<void> setTripBudgetCurrency(String tripId, String? currency, {String? uid}) async {
+    final effectiveUid = _resolveEffectiveUid(uid);
+    final scopedKey = effectiveUid != null
+        ? '$keyTripBudgetCurrencyPrefix${tripId}_$effectiveUid'
+        : null;
+    final globalKey = '$keyTripBudgetCurrencyPrefix$tripId';
+
+    if (currency == null) {
+      if (scopedKey != null) await _prefs?.remove(scopedKey);
+      await _prefs?.remove(globalKey);
     } else {
-      await _prefs?.setString(keyDefaultCurrency, currency);
+      if (scopedKey != null) await _prefs?.setString(scopedKey, currency);
+      await _prefs?.setString(globalKey, currency);
     }
   }
 

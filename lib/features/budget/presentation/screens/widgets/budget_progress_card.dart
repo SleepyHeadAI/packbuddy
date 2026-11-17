@@ -11,6 +11,7 @@ class BudgetProgressCard extends StatelessWidget {
   final String currency;
   final String? originalCurrency;
   final double? originalTotalSpent;
+  final VoidCallback? onCurrencyTap;
 
   const BudgetProgressCard({
     super.key,
@@ -19,6 +20,7 @@ class BudgetProgressCard extends StatelessWidget {
     required this.currency,
     this.originalCurrency,
     this.originalTotalSpent,
+    this.onCurrencyTap,
   });
 
   @override
@@ -51,14 +53,64 @@ class BudgetProgressCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Flexible(
-                  child: Text(
-                    l10n.budget,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.3,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          l10n.budget,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.3,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (onCurrencyTap != null) ...[
+                        const SizedBox(width: 8),
+                        InkWell(
+                          key: const Key('budget_card_currency_chip'),
+                          onTap: onCurrencyTap,
+                          borderRadius: BorderRadius.circular(10),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  CurrencyFormatter.getFlag(currency),
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  currency,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                ),
+                                const SizedBox(width: 1),
+                                Icon(
+                                  Icons.keyboard_arrow_down_rounded,
+                                  size: 14,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
                 if (hasBudget) ...[
