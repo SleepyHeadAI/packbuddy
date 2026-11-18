@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,12 +13,12 @@ import '../../vault/presentation/controllers/vault_controller.dart';
 import '../../connectivity/presentation/widgets/connectivity_banner.dart';
 import 'dashboard_screen.dart';
 import 'navigation_provider.dart';
+export '../../../shared/widgets/floating_action_button_location.dart';
 
 /// Permanent Shell Scaffold hosting the persistent bottom navigation bar.
 ///
-/// Keeps tab states alive across tab transitions via [IndexedStack] and
-/// ensures the bottom navigation bar is always visible and interactive across
-/// the primary application tabs (Home, Map, Baggage, Vault, Settings).
+/// Keeps tab states alive across tab transitions via [FadeIndexedStack] and
+/// displays a true floating frosted-glass island capsule navigation bar.
 class MainShellScaffold extends ConsumerStatefulWidget {
   const MainShellScaffold({super.key});
 
@@ -47,6 +48,7 @@ class _MainShellScaffoldState extends ConsumerState<MainShellScaffold> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
+    final mediaQuery = MediaQuery.of(context);
 
     // Default localized strings fallback if l10n is initializing
     final navHome = l10n?.navHome ?? 'Home';
@@ -54,6 +56,15 @@ class _MainShellScaffoldState extends ConsumerState<MainShellScaffold> {
     final navBaggage = l10n?.navBaggage ?? 'Baggage';
     final navVault = l10n?.navVault ?? 'Vault';
     final navSettings = l10n?.navSettings ?? 'Settings';
+
+    // Responsiveness & Floating Geometry:
+    // When keyboard is visible, softly hide the floating bottom navigation bar
+    final isKeyboardVisible = mediaQuery.viewInsets.bottom > 0;
+    // Calculate generous floating clearance above physical bottom system insets
+    final bottomInset = mediaQuery.padding.bottom;
+    final floatingBottomMargin = math.max(14.0, bottomInset + 8.0);
+    final screenWidth = mediaQuery.size.width;
+    final horizontalMargin = screenWidth > 600 ? 32.0 : 20.0;
 
     return PopScope(
       canPop: selectedIndex == 0,
@@ -65,64 +76,87 @@ class _MainShellScaffoldState extends ConsumerState<MainShellScaffold> {
         }
       },
       child: Scaffold(
-        extendBody: true,
-        body: Column(
+        resizeToAvoidBottomInset: false,
+        body: Stack(
+          alignment: Alignment.bottomCenter,
           children: [
-            const ConnectivityBanner(),
-            Expanded(
-              child: FadeIndexedStack(
-                index: selectedIndex.clamp(0, _screens.length - 1),
-                children: _screens,
+            // 1. Primary Screen Viewport (Scrollable content glides seamlessly beneath the floating bar)
+            Positioned.fill(
+              child: Column(
+                children: [
+                  const ConnectivityBanner(),
+                  Expanded(
+                    child: FadeIndexedStack(
+                      index: selectedIndex.clamp(0, _screens.length - 1),
+                      children: _screens,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // 2. True Floating Frosted Glass Island Capsule Navigation Bar
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              left: 0,
+              right: 0,
+              bottom: isKeyboardVisible ? -100.0 : floatingBottomMargin,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 180),
+                opacity: isKeyboardVisible ? 0.0 : 1.0,
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 520),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: horizontalMargin),
+                      child: _FloatingGlassNavigationBar(
+                        selectedIndex: selectedIndex.clamp(0, 4),
+                        isDark: isDark,
+                        onDestinationSelected: (index) {
+                          if (index != selectedIndex) {
+                            // If transitioning away from or into Vault tab (index 3),
+                            // immediately lock the vault to enforce security verification
+                            if (selectedIndex == 3 || index == 3) {
+                              ref.read(vaultControllerProvider.notifier).lockVault();
+                            }
+                            ref.read(mainNavigationIndexProvider.notifier).state = index;
+                          }
+                        },
+                        items: [
+                          _FloatingNavItemData(
+                            label: navHome,
+                            icon: Icons.home_outlined,
+                            selectedIcon: Icons.home_rounded,
+                          ),
+                          _FloatingNavItemData(
+                            label: navMap,
+                            icon: Icons.public_outlined,
+                            selectedIcon: Icons.public_rounded,
+                          ),
+                          _FloatingNavItemData(
+                            label: navBaggage,
+                            icon: Icons.checklist_rounded,
+                            selectedIcon: Icons.checklist_rtl_rounded,
+                          ),
+                          _FloatingNavItemData(
+                            label: navVault,
+                            icon: Icons.folder_shared_outlined,
+                            selectedIcon: Icons.folder_shared_rounded,
+                          ),
+                          _FloatingNavItemData(
+                            label: navSettings,
+                            icon: Icons.tune_outlined,
+                            selectedIcon: Icons.tune_rounded,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
-        ),
-        bottomNavigationBar: SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-            child: _FloatingGlassNavigationBar(
-              selectedIndex: selectedIndex.clamp(0, 4),
-              isDark: isDark,
-              onDestinationSelected: (index) {
-                if (index != selectedIndex) {
-                  // If transitioning away from or into Vault tab (index 3),
-                  // immediately lock the vault to enforce security verification
-                  if (selectedIndex == 3 || index == 3) {
-                    ref.read(vaultControllerProvider.notifier).lockVault();
-                  }
-                  ref.read(mainNavigationIndexProvider.notifier).state = index;
-                }
-              },
-              items: [
-                _FloatingNavItemData(
-                  label: navHome,
-                  icon: Icons.home_outlined,
-                  selectedIcon: Icons.home_rounded,
-                ),
-                _FloatingNavItemData(
-                  label: navMap,
-                  icon: Icons.public_outlined,
-                  selectedIcon: Icons.public_rounded,
-                ),
-                _FloatingNavItemData(
-                  label: navBaggage,
-                  icon: Icons.checklist_rounded,
-                  selectedIcon: Icons.checklist_rtl_rounded,
-                ),
-                _FloatingNavItemData(
-                  label: navVault,
-                  icon: Icons.folder_shared_outlined,
-                  selectedIcon: Icons.folder_shared_rounded,
-                ),
-                _FloatingNavItemData(
-                  label: navSettings,
-                  icon: Icons.tune_outlined,
-                  selectedIcon: Icons.tune_rounded,
-                ),
-              ],
-            ),
-          ),
         ),
       ),
     );
@@ -160,52 +194,63 @@ class _FloatingGlassNavigationBar extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(32),
         boxShadow: [
+          // 1. Ambient soft omni elevation glow (spreads in all directions)
           BoxShadow(
             color: isDark
-                ? Colors.black.withValues(alpha: 0.50)
-                : const Color(0xFF0F172A).withValues(alpha: 0.12),
-            blurRadius: 26,
+                ? Colors.black.withValues(alpha: 0.45)
+                : const Color(0xFF0F172A).withValues(alpha: 0.08),
+            blurRadius: 28,
             spreadRadius: 0,
-            offset: const Offset(0, 8),
+            offset: const Offset(0, 4),
           ),
+          // 2. Upward elevation shadow (casts shadow UPWARDS onto the scrolling content)
           BoxShadow(
             color: isDark
                 ? Colors.black.withValues(alpha: 0.30)
                 : const Color(0xFF0F172A).withValues(alpha: 0.04),
-            blurRadius: 8,
+            blurRadius: 10,
             spreadRadius: 0,
-            offset: const Offset(0, 2),
+            offset: const Offset(0, -2),
+          ),
+          // 3. Subtle crisp contact shadow
+          BoxShadow(
+            color: isDark
+                ? Colors.black.withValues(alpha: 0.20)
+                : const Color(0xFF0F172A).withValues(alpha: 0.02),
+            blurRadius: 4,
+            spreadRadius: 0,
+            offset: const Offset(0, 1),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(32),
         child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
           child: Container(
-            height: 66,
+            height: 64,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: isDark
                     ? [
-                        const Color(0xFF1E2632).withValues(alpha: 0.88),
-                        const Color(0xFF141A22).withValues(alpha: 0.82),
+                        const Color(0xFF1E2632).withValues(alpha: 0.78),
+                        const Color(0xFF141A22).withValues(alpha: 0.72),
                       ]
                     : [
-                        Colors.white.withValues(alpha: 0.90),
-                        Colors.white.withValues(alpha: 0.76),
+                        Colors.white.withValues(alpha: 0.78),
+                        Colors.white.withValues(alpha: 0.62),
                       ],
               ),
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: BorderRadius.circular(32),
               border: Border.all(
                 color: isDark
-                    ? Colors.white.withValues(alpha: 0.13)
-                    : Colors.white.withValues(alpha: 0.90),
-                width: 1.2,
+                    ? Colors.white.withValues(alpha: 0.12)
+                    : Colors.white.withValues(alpha: 0.70),
+                width: 1.0,
               ),
             ),
             child: Row(
@@ -262,27 +307,29 @@ class _FloatingNavItem extends StatelessWidget {
         scaleFactor: 0.92,
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 240),
             curve: Curves.easeOutCubic,
             decoration: BoxDecoration(
               color: isSelected
-                  ? activeColor.withValues(alpha: isDark ? 0.22 : 0.13)
+                  ? activeColor.withValues(alpha: isDark ? 0.20 : 0.11)
                   : Colors.transparent,
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(16),
               border: isSelected
                   ? Border.all(
-                      color: activeColor.withValues(alpha: 0.30),
-                      width: 1,
+                      color: activeColor.withValues(alpha: 0.24),
+                      width: 1.0,
                     )
                   : null,
             ),
+            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 AnimatedScale(
-                  scale: isSelected ? 1.08 : 1.0,
+                  scale: isSelected ? 1.06 : 1.0,
                   duration: const Duration(milliseconds: 240),
                   curve: Curves.easeOutBack,
                   child: Icon(
@@ -291,17 +338,23 @@ class _FloatingNavItem extends StatelessWidget {
                     color: isSelected ? activeColor : inactiveColor,
                   ),
                 ),
-                const SizedBox(height: 3),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    item.label,
-                    maxLines: 1,
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                      color: isSelected ? activeColor : inactiveColor,
-                      letterSpacing: -0.15,
+                const SizedBox(height: 2),
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: Text(
+                        item.label,
+                        maxLines: 1,
+                        softWrap: false,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                          color: isSelected ? activeColor : inactiveColor,
+                          letterSpacing: -0.2,
+                        ),
+                      ),
                     ),
                   ),
                 ),

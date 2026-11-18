@@ -11,6 +11,10 @@ import '../../features/budget/presentation/controllers/trip_controller.dart';
 import '../../features/budget/presentation/screens/widgets/add_trip_sheet.dart';
 import '../../features/budget/presentation/screens/widgets/add_expense_sheet.dart';
 import '../../features/checklist/presentation/screens/widgets/add_packing_item_sheet.dart';
+import '../../features/checklist/presentation/screens/widgets/smart_templates_sheet.dart';
+import '../../features/checklist/presentation/screens/widgets/airline_guide_sheet.dart';
+import '../../features/checklist/presentation/controllers/checklist_controller.dart';
+import '../../core/services/share_service.dart';
 import '../../features/vault/presentation/screens/widgets/add_document_sheet.dart';
 import '../../features/budget/presentation/screens/widgets/share_trip_sheet.dart';
 
@@ -56,6 +60,7 @@ class QuickActionsSheet extends StatelessWidget {
     GlobalKey? fabKey,
     Color? fabColor,
     Color? fabIconColor,
+    double? fallbackBottomOffset,
   }) {
     Rect? fabRect;
     if (fabKey != null && fabKey.currentContext != null) {
@@ -72,7 +77,7 @@ class QuickActionsSheet extends StatelessWidget {
       final mediaQuery = MediaQuery.of(context);
       const size = 56.0;
       final right = 16.0;
-      final bottom = 16.0 + mediaQuery.padding.bottom;
+      final bottom = (fallbackBottomOffset ?? 16.0) + mediaQuery.padding.bottom;
       fabRect = Rect.fromLTWH(
         mediaQuery.size.width - right - size,
         mediaQuery.size.height - bottom - size,
@@ -189,6 +194,7 @@ class QuickActionsSheet extends StatelessWidget {
       subtitle: _QuickActionL10n.selectAction(lang),
       items: items,
       fabKey: fabKey,
+      fallbackBottomOffset: 120.0,
     );
   }
 
@@ -324,6 +330,83 @@ class QuickActionsSheet extends StatelessWidget {
       fabKey: fabKey,
       fabColor: fabColor,
       fabIconColor: fabIconColor,
+      fallbackBottomOffset: 120.0,
+    );
+  }
+
+  /// Preset: Quick Actions for Checklist / Baggage Screen
+  static Future<void> showForChecklist(
+    BuildContext context, {
+    String? tripId,
+    String? tripTitle,
+    GlobalKey? fabKey,
+  }) {
+    final l10n = AppLocalizations.of(context)!;
+    final lang = Localizations.localeOf(context).languageCode;
+
+    final items = [
+      // 1. Add Packing Item
+      QuickActionItem(
+        icon: Icons.playlist_add_rounded,
+        iconColor: const Color(0xFF3B82F6),
+        iconBgColor: const Color(0xFF3B82F6).withValues(alpha: 0.15),
+        title: l10n.addItem,
+        subtitle: _QuickActionL10n.addItemDesc(lang),
+        onTap: () => AddPackingItemSheet.show(context, tripId: tripId),
+      ),
+      // 2. Ready Smart Templates
+      QuickActionItem(
+        icon: Icons.auto_awesome_rounded,
+        iconColor: const Color(0xFF8B5CF6),
+        iconBgColor: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+        title: l10n.readyTemplates,
+        subtitle: _QuickActionL10n.templatesDesc(lang),
+        onTap: () => SmartTemplatesSheet.show(context, tripId: tripId),
+      ),
+      // 3. Airline Baggage Guide
+      QuickActionItem(
+        icon: Icons.luggage_rounded,
+        iconColor: const Color(0xFF10B981),
+        iconBgColor: const Color(0xFF10B981).withValues(alpha: 0.15),
+        title: l10n.airlineBaggageGuide,
+        subtitle: _QuickActionL10n.airlineGuideDesc(lang),
+        onTap: () => AirlineGuideSheet.show(context),
+      ),
+      // 4. Share Checklist
+      QuickActionItem(
+        icon: Icons.share_rounded,
+        iconColor: const Color(0xFF0D9488),
+        iconBgColor: const Color(0xFF0D9488).withValues(alpha: 0.15),
+        title: l10n.shareChecklist,
+        subtitle: _QuickActionL10n.shareChecklistDesc(lang),
+        onTap: () {
+          try {
+            final itemsList = ProviderScope.containerOf(context, listen: false)
+                .read(checklistControllerProvider)
+                .items;
+            ShareService.shareChecklist(
+              tripTitle: tripTitle ?? 'PackBuddy',
+              items: itemsList,
+              l10n: l10n,
+            );
+          } catch (_) {
+            ShareService.shareChecklist(
+              tripTitle: tripTitle ?? 'PackBuddy',
+              items: const [],
+              l10n: l10n,
+            );
+          }
+        },
+      ),
+    ];
+
+    return show(
+      context,
+      title: l10n.baggageAndChecklist,
+      subtitle: _QuickActionL10n.selectAction(lang),
+      items: items,
+      fabKey: fabKey,
+      fallbackBottomOffset: 120.0,
     );
   }
 
@@ -671,6 +754,87 @@ class _QuickActionL10n {
         return 'Store encrypted private photos';
     }
   }
+
+  static String templatesDesc(String lang) {
+    switch (lang) {
+      case 'tr': return 'Hazır akıllı bavul listesi yükleyin';
+      case 'es': return 'Carga listas de equipaje inteligentes';
+      case 'fr': return 'Chargez une liste de bagages intelligente';
+      case 'de': return 'Intelligente Packliste laden';
+      case 'it': return 'Carica liste bagagli intelligenti';
+      case 'pt': return 'Carregue listas de bagagem inteligentes';
+      case 'ru': return 'Загрузить готовый список вещей';
+      case 'zh': return '加载智能行李清单模板';
+      case 'ja': return 'スマートパッキングリストを読み込む';
+      case 'ko': return '스마트 짐 싸기 템플릿 불러오기';
+      case 'ar': return 'تحميل قوائم التعبئة الذكية الجاهزة';
+      case 'nl': return 'Slimme inpaklijstsjablonen laden';
+      case 'el': return 'Φορτώστε έτοιμες έξυπνες λίστες πακεταρίσματος';
+      case 'sv': return 'Ladda smarta färdiga packlistor';
+      case 'pl': return 'Wczytaj gotowe listy pakowania';
+      case 'id': return 'Muat templat daftar bawaan pintar';
+      case 'th': return 'โหลดเทมเพลตรายการจัดกระเป๋าอัจฉริยะ';
+      case 'vi': return 'Tải danh sách đóng gói hành lý thông minh';
+      case 'hi': return 'स्मार्ट पैकिंग सूची लोड करें';
+      case 'en':
+      default:
+        return 'Load smart packing list templates';
+    }
+  }
+
+  static String airlineGuideDesc(String lang) {
+    switch (lang) {
+      case 'tr': return 'Kabin ve uçak altı bagaj hakları rehberi';
+      case 'es': return 'Guía de equipaje de cabina y bodega';
+      case 'fr': return 'Guide des franchises bagages cabine et soute';
+      case 'de': return 'Leitfaden für Handgepäck und Aufgabegepäck';
+      case 'it': return 'Guida alle franchigie per bagagli da cabina e da stiva';
+      case 'pt': return 'Guia de franquia de bagagem de mão e porão';
+      case 'ru': return 'Нормы провоза ручной клади и багажа';
+      case 'zh': return '各大航空公司随身与托运行李额度指南';
+      case 'ja': return '機内持ち込み・預け入れ手荷物制限ガイド';
+      case 'ko': return '기내 및 위탁 수하물 허용 한도 가이드';
+      case 'ar': return 'دليل أوزان الأمتعة في المقصورة والشحن';
+      case 'nl': return 'Gids voor handbagage en ruimbagage';
+      case 'el': return 'Οδηγός ορίων αποσκευών καμπίνας & παραδοτέων';
+      case 'sv': return 'Guide för kabin- och incheckat bagage';
+      case 'pl': return 'Przewodnik po limitach bagażu podręcznego i rejestrowanego';
+      case 'id': return 'Panduan batas bagasi kabin dan bagasi terdaftar';
+      case 'th': return 'คู่มือน้ำหนักสัมภาระถือขึ้นเครื่องและโหลดใต้เครื่อง';
+      case 'vi': return 'Hướng dẫn giới hạn hành lý xách tay và ký gửi';
+      case 'hi': return 'केबिन और चेक-इन सामान सीमा गाइड';
+      case 'en':
+      default:
+        return 'Cabin & checked baggage allowance guide';
+    }
+  }
+
+  static String shareChecklistDesc(String lang) {
+    switch (lang) {
+      case 'tr': return 'Bavul listenizi seyahat arkadaşlarınızla paylaşın';
+      case 'es': return 'Comparte tu lista de equipaje con compañeros';
+      case 'fr': return 'Partagez votre liste de bagages';
+      case 'de': return 'Packliste mit Mitreisenden teilen';
+      case 'it': return 'Condividi la tua lista bagagli con i compagni';
+      case 'pt': return 'Compartilhe sua lista com companheiros';
+      case 'ru': return 'Поделитесь списком вещей с попутчиками';
+      case 'zh': return '与同行旅伴分享您的行李清单';
+      case 'ja': return '旅行仲間とチェックリストを共有';
+      case 'ko': return '동행자와 짐 목록 공유하기';
+      case 'ar': return 'شارك قائمة الحقائب مع رفقاء السفر';
+      case 'nl': return 'Deel je paklijst met reisgenoten';
+      case 'el': return 'Μοιραστείτε τη λίστα σας με συνταξιδιώτες';
+      case 'sv': return 'Dela din packlista med reskamrater';
+      case 'pl': return 'Udostępnij listę współtowarzyszom podróży';
+      case 'id': return 'Bagikan daftar bawaan dengan teman perjalanan';
+      case 'th': return 'แชร์รายการสัมภาระกับเพื่อนร่วมเดินทาง';
+      case 'vi': return 'Chia sẻ danh sách hành lý với bạn đồng hành';
+      case 'hi': return 'साथी यात्रियों के साथ पैकिंग सूची साझा करें';
+      case 'en':
+      default:
+        return 'Share your packing list with companions';
+    }
+  }
 }
 
 /// Modern minimalist floating action overlay with blurred backdrop and animated bubbles
@@ -697,7 +861,10 @@ class _FloatingQuickActionsOverlay extends StatelessWidget {
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
 
-    final rightMargin = math.max(16.0, screenWidth - fabRect.right);
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
+    final horizontalMargin = isRtl
+        ? math.max(16.0, fabRect.left)
+        : math.max(16.0, screenWidth - fabRect.right);
     final bottomMargin = screenHeight - fabRect.top + 14.0;
     final availableHeight = math.max(120.0, fabRect.top - mediaQuery.padding.top - 16.0);
 
@@ -734,7 +901,8 @@ class _FloatingQuickActionsOverlay extends StatelessWidget {
 
             // 2. Floating Action Bubbles (Yüzen Minik Yazı Kutucukları)
             Positioned(
-              right: rightMargin,
+              left: isRtl ? horizontalMargin : null,
+              right: isRtl ? null : horizontalMargin,
               bottom: bottomMargin,
               child: ConstrainedBox(
                 constraints: BoxConstraints(
@@ -747,7 +915,7 @@ class _FloatingQuickActionsOverlay extends StatelessWidget {
                   clipBehavior: Clip.none,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                    crossAxisAlignment: isRtl ? CrossAxisAlignment.start : CrossAxisAlignment.end,
                     children: [
                       for (int i = 0; i < items.length; i++) ...[
                         if (i > 0) const SizedBox(height: 12),

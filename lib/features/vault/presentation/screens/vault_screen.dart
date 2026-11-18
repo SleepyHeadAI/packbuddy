@@ -26,6 +26,7 @@ import 'package:flutter/services.dart';
 import 'package:packbuddy/core/services/biometric_service.dart';
 import '../../../../core/services/security_service.dart';
 import 'package:packbuddy/shared/widgets/quick_actions_sheet.dart';
+import 'package:packbuddy/shared/widgets/floating_action_button_location.dart';
 
 /// Redesigned Document Vault screen with pinned passport hero slot, trip filters, and format-specific windows
 class VaultScreen extends ConsumerStatefulWidget {
@@ -885,6 +886,9 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                 elevation: 3,
                 child: const Icon(Icons.add_rounded, size: 26),
               ),
+        floatingActionButtonLocation: widget.isTabMode
+            ? kFloatingActionButtonAboveFloatingBar
+            : FloatingActionButtonLocation.endFloat,
       body: vaultState.isLocked
           ? VaultLockView(isTabMode: widget.isTabMode)
           : vaultState.isLoading

@@ -17,16 +17,20 @@ import 'package:packbuddy/features/checklist/presentation/screens/widgets/airlin
 import 'package:packbuddy/features/checklist/presentation/screens/widgets/checklist_confetti_celebration.dart';
 import 'package:packbuddy/features/checklist/domain/canonical_packing_catalog.dart';
 import 'package:packbuddy/core/services/share_service.dart';
+import 'package:packbuddy/shared/widgets/floating_action_button_location.dart';
+import 'package:packbuddy/shared/widgets/quick_actions_sheet.dart';
 
 /// Principal Flutter UI/UX Checklist & Item Completion Tracking Screen
 class ChecklistScreen extends ConsumerStatefulWidget {
   final String? tripId;
   final String? tripTitle;
+  final bool isTabMode;
 
   const ChecklistScreen({
     super.key,
     this.tripId,
     this.tripTitle,
+    this.isTabMode = true,
   });
 
   @override
@@ -34,6 +38,7 @@ class ChecklistScreen extends ConsumerStatefulWidget {
 }
 
 class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
+  final GlobalKey _fabKey = GlobalKey();
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   final ChecklistConfettiController _confettiController = ChecklistConfettiController();
@@ -283,13 +288,20 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
           ],
         ),
         floatingActionButton: FloatingActionButton(
+          key: _fabKey,
           heroTag: null,
-          onPressed: () => AddPackingItemSheet.show(context, tripId: widget.tripId),
-          backgroundColor: theme.colorScheme.primary,
-          foregroundColor: theme.colorScheme.onPrimary,
           elevation: 3,
+          onPressed: () => QuickActionsSheet.showForChecklist(
+            context,
+            tripId: widget.tripId,
+            tripTitle: widget.tripTitle,
+            fabKey: _fabKey,
+          ),
           child: const Icon(Icons.add_rounded, size: 26),
         ),
+        floatingActionButtonLocation: widget.isTabMode
+            ? kFloatingActionButtonAboveFloatingBar
+            : FloatingActionButtonLocation.endFloat,
         body: ChecklistConfettiCelebration(
           controller: _confettiController,
           child: SafeArea(

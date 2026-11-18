@@ -35,6 +35,7 @@ import 'widgets/horizontal_currency_converter_card.dart';
 import 'widgets/dashboard_customize_sheet.dart';
 import 'widgets/dashboard_mini_cards.dart';
 import '../../../shared/widgets/quick_actions_sheet.dart';
+import '../../../shared/widgets/floating_action_button_location.dart';
 import '../../profile/presentation/screens/profile_screen.dart';
 import '../../profile/presentation/controllers/profile_controller.dart';
 import '../../profile/presentation/widgets/user_avatar.dart';
@@ -457,6 +458,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         ),
         child: const Icon(Icons.add_rounded, size: 26),
       ),
+      floatingActionButtonLocation: kFloatingActionButtonAboveFloatingBar,
       body: SafeArea(
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
