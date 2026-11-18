@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:packbuddy/features/itinerary/domain/itinerary_item.dart';
 import 'package:packbuddy/features/itinerary/domain/itinerary_localization.dart';
+import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
 
 /// Serene Voyage vertical timeline card for an itinerary activity
@@ -32,10 +33,12 @@ class DayTimelineCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Timeline indicator (Icon node)
+          // 1. Timeline indicator (Icon node with smooth animated state transition)
           Column(
             children: [
-              Container(
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 280),
+                curve: Curves.easeOutCubic,
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
@@ -49,10 +52,16 @@ class DayTimelineCard extends StatelessWidget {
                   ),
                 ),
                 child: Center(
-                  child: Icon(
-                    item.isCompleted ? Icons.check_rounded : item.icon,
-                    size: 18,
-                    color: item.isCompleted ? Colors.white : categoryColor,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 220),
+                    transitionBuilder: (child, animation) =>
+                        ScaleTransition(scale: animation, child: child),
+                    child: Icon(
+                      item.isCompleted ? Icons.check_rounded : item.icon,
+                      key: ValueKey('itinerary_icon_${item.id}_${item.isCompleted}'),
+                      size: 18,
+                      color: item.isCompleted ? Colors.white : categoryColor,
+                    ),
                   ),
                 ),
               ),
@@ -191,17 +200,21 @@ class DayTimelineCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
 
-                  // Title
-                  Text(
-                    item.title,
+                  // Title with smooth animated strikethrough
+                  AnimatedStrikethroughText(
+                    text: item.title,
+                    isCrossed: item.isCompleted,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w700,
                       fontSize: 14.5,
-                      decoration: item.isCompleted ? TextDecoration.lineThrough : null,
-                      color: item.isCompleted
-                          ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6)
-                          : theme.colorScheme.onSurface,
+                      color: theme.colorScheme.onSurface,
                     ),
+                    strikethroughColor: isDark
+                        ? const Color(0xFF94A3B8)
+                        : const Color(0xFF64748B),
+                    strokeWidth: 1.8,
                   ),
 
                   // Location

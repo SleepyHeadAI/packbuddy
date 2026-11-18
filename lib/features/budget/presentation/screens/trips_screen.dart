@@ -270,16 +270,20 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(24),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.flight_takeoff_rounded,
-                              size: 44,
-                              color: theme.colorScheme.primary,
+                          AppFloatingIllustration(
+                            floatDistance: 7.0,
+                            duration: const Duration(milliseconds: 2800),
+                            child: Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.flight_takeoff_rounded,
+                                size: 44,
+                                color: theme.colorScheme.primary,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 20),

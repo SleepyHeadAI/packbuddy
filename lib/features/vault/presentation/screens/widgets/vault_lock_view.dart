@@ -9,6 +9,7 @@ import 'package:packbuddy/l10n/app_localizations.dart';
 import '../../controllers/vault_controller.dart';
 import 'vault_pin_recovery_sheet.dart';
 import 'package:packbuddy/features/dashboard/presentation/dashboard_localization.dart';
+import 'package:packbuddy/shared/widgets/app_animations.dart';
 
 /// Secure PIN and Biometric authentication gate for Document Vault
 class VaultLockView extends ConsumerStatefulWidget {
@@ -299,26 +300,30 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Glowing Shield Lock Icon
-            Container(
-              width: 88,
-              height: 88,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isDark ? AppColors.primaryContainerDark : AppColors.primaryContainerLight,
-                border: Border.all(
+            // Glowing Shield Lock Icon with Shake Reaction
+            AppShakeTransition(
+              shake: _isError,
+              offset: 8.0,
+              child: Container(
+                width: 88,
+                height: 88,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isDark ? AppColors.primaryContainerDark : AppColors.primaryContainerLight,
+                  border: Border.all(
+                    color: _isError
+                        ? AppColors.errorPastel
+                        : (isDark ? AppColors.primaryDark : AppColors.primaryLight),
+                    width: 2,
+                  ),
+                ),
+                child: Icon(
+                  _isError ? Icons.lock_clock_rounded : Icons.lock_outline_rounded,
+                  size: 44,
                   color: _isError
                       ? AppColors.errorPastel
-                      : (isDark ? AppColors.primaryDark : AppColors.primaryLight),
-                  width: 2,
+                      : (isDark ? AppColors.primaryAmber : AppColors.primaryLight),
                 ),
-              ),
-              child: Icon(
-                _isError ? Icons.lock_clock_rounded : Icons.lock_outline_rounded,
-                size: 44,
-                color: _isError
-                    ? AppColors.errorPastel
-                    : (isDark ? AppColors.primaryAmber : AppColors.primaryLight),
               ),
             ),
             const SizedBox(height: 20),
@@ -391,30 +396,33 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
             ],
 
             if (vaultState.hasPin) ...[
-              // PIN Dots Indicator
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(4, (index) {
-                  final isFilled = index < _enteredPin.length;
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    width: 16,
-                    height: 16,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isFilled
-                          ? (_isError ? AppColors.errorPastel : theme.colorScheme.primary)
-                          : theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
-                      border: Border.all(
-                        color: _isError
-                            ? AppColors.errorPastel
-                            : (isFilled ? theme.colorScheme.primary : theme.colorScheme.outline),
-                        width: 1.5,
+              // PIN Dots Indicator with tactile shake animation on error
+              AppShakeTransition(
+                shake: _isError,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(4, (index) {
+                    final isFilled = index < _enteredPin.length;
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                      width: 16,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isFilled
+                            ? (_isError ? AppColors.errorPastel : theme.colorScheme.primary)
+                            : theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+                        border: Border.all(
+                          color: _isError
+                              ? AppColors.errorPastel
+                              : (isFilled ? theme.colorScheme.primary : theme.colorScheme.outline),
+                          width: 1.5,
+                        ),
                       ),
-                    ),
-                  );
-                }),
+                    );
+                  }),
+                ),
               ),
               const SizedBox(height: 14),
 

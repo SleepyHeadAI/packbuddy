@@ -11,6 +11,7 @@ import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/features/dashboard/presentation/dashboard_localization.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
+import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import '../controllers/vault_controller.dart';
 import '../../domain/document.dart';
@@ -1590,23 +1591,27 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Container(
-                                padding: const EdgeInsets.all(22),
-                                decoration: BoxDecoration(
-                                  color: (_selectedCategoryFilter == 'Özel Resimler'
-                                          ? const Color(0xFFE11D48)
-                                          : theme.colorScheme.secondaryContainer)
-                                      .withValues(alpha: 0.15),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  _selectedCategoryFilter == 'Özel Resimler'
-                                      ? Icons.photo_library_outlined
-                                      : Icons.shield_outlined,
-                                  size: 40,
-                                  color: _selectedCategoryFilter == 'Özel Resimler'
-                                      ? const Color(0xFFE11D48)
-                                      : theme.colorScheme.secondary,
+                              AppFloatingIllustration(
+                                floatDistance: 6.0,
+                                duration: const Duration(milliseconds: 2700),
+                                child: Container(
+                                  padding: const EdgeInsets.all(22),
+                                  decoration: BoxDecoration(
+                                    color: (_selectedCategoryFilter == 'Özel Resimler'
+                                            ? const Color(0xFFE11D48)
+                                            : theme.colorScheme.secondaryContainer)
+                                        .withValues(alpha: 0.15),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    _selectedCategoryFilter == 'Özel Resimler'
+                                        ? Icons.photo_library_outlined
+                                        : Icons.shield_outlined,
+                                    size: 40,
+                                    color: _selectedCategoryFilter == 'Özel Resimler'
+                                        ? const Color(0xFFE11D48)
+                                        : theme.colorScheme.secondary,
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: 18),

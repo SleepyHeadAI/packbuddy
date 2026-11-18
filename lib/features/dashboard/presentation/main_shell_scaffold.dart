@@ -181,6 +181,18 @@ class _FloatingGlassNavigationBar extends StatelessWidget {
   final ValueChanged<int> onDestinationSelected;
   final List<_FloatingNavItemData> items;
 
+  // Concentric Geometric Tokens for Mathematically Proportional Curvature:
+  // Outer bar corner radius is matched symmetrically with internal padding
+  // so that the active selection indicator's outer corner forms an exact parallel concentric arc.
+  // R_inner = R_bar - padding_horizontal = 26.0 - 6.0 = 20.0 (Corner tabs).
+  // Middle tabs use a disciplined, proportional radius (12.0) that eliminates any bulbous distortion.
+  static const double barHeight = 64.0;
+  static const double barRadius = 26.0;
+  static const double horizontalPadding = 6.0;
+  static const double verticalPadding = 5.0;
+  static const double outerCornerRadius = barRadius - horizontalPadding; // 20.0
+  static const double innerCornerRadius = 12.0;
+
   const _FloatingGlassNavigationBar({
     required this.selectedIndex,
     required this.isDark,
@@ -191,10 +203,11 @@ class _FloatingGlassNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(barRadius),
         boxShadow: [
           // 1. Ambient soft omni elevation glow (spreads in all directions)
           BoxShadow(
@@ -226,26 +239,30 @@ class _FloatingGlassNavigationBar extends StatelessWidget {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(barRadius),
         child: BackdropFilter(
           filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
           child: Container(
-            height: 64,
+            height: barHeight,
+            padding: const EdgeInsets.symmetric(
+              horizontal: horizontalPadding,
+              vertical: verticalPadding,
+            ),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: isDark
                     ? [
-                        const Color(0xFF1E2632).withValues(alpha: 0.78),
-                        const Color(0xFF141A22).withValues(alpha: 0.72),
+                        const Color(0xFF1E2632).withValues(alpha: 0.82),
+                        const Color(0xFF141A22).withValues(alpha: 0.76),
                       ]
                     : [
-                        Colors.white.withValues(alpha: 0.78),
-                        Colors.white.withValues(alpha: 0.62),
+                        Colors.white.withValues(alpha: 0.82),
+                        Colors.white.withValues(alpha: 0.68),
                       ],
               ),
-              borderRadius: BorderRadius.circular(32),
+              borderRadius: BorderRadius.circular(barRadius),
               border: Border.all(
                 color: isDark
                     ? Colors.white.withValues(alpha: 0.12)
@@ -258,12 +275,20 @@ class _FloatingGlassNavigationBar extends StatelessWidget {
               children: List.generate(items.length, (index) {
                 final item = items[index];
                 final isSelected = index == selectedIndex;
+                final isFirst = index == 0;
+                final isLast = index == items.length - 1;
+
                 return Expanded(
                   child: _FloatingNavItem(
                     item: item,
                     isSelected: isSelected,
                     isDark: isDark,
                     theme: theme,
+                    isFirst: isFirst,
+                    isLast: isLast,
+                    isRtl: isRtl,
+                    outerCornerRadius: outerCornerRadius,
+                    innerCornerRadius: innerCornerRadius,
                     onTap: () {
                       HapticFeedback.selectionClick();
                       onDestinationSelected(index);
@@ -284,6 +309,11 @@ class _FloatingNavItem extends StatelessWidget {
   final bool isSelected;
   final bool isDark;
   final ThemeData theme;
+  final bool isFirst;
+  final bool isLast;
+  final bool isRtl;
+  final double outerCornerRadius;
+  final double innerCornerRadius;
   final VoidCallback onTap;
 
   const _FloatingNavItem({
@@ -291,50 +321,103 @@ class _FloatingNavItem extends StatelessWidget {
     required this.isSelected,
     required this.isDark,
     required this.theme,
+    required this.isFirst,
+    required this.isLast,
+    required this.isRtl,
+    required this.outerCornerRadius,
+    required this.innerCornerRadius,
     required this.onTap,
   });
+
+  /// Calculates mathematically concentric and proportional corner radii.
+  ///
+  /// Corner tabs ("Ana Sayfa" and "Ayarlar") curve concentrically with the outer bar
+  /// along their outer-facing side (radius = outerCornerRadius = 20.0),
+  /// while their inner-facing side matches the disciplined inner radius (12.0).
+  /// Middle tabs ("Harita", "Bavul", "Kasa") maintain a balanced 12.0 radius on all corners,
+  /// perfectly adapting to RTL layouts (such as Arabic) where outer positions mirror.
+  BorderRadius _computeProportionalBorderRadius() {
+    if (isFirst && isLast) {
+      return BorderRadius.circular(outerCornerRadius);
+    }
+    if (isFirst) {
+      return isRtl
+          ? BorderRadius.only(
+              topRight: Radius.circular(outerCornerRadius),
+              bottomRight: Radius.circular(outerCornerRadius),
+              topLeft: Radius.circular(innerCornerRadius),
+              bottomLeft: Radius.circular(innerCornerRadius),
+            )
+          : BorderRadius.only(
+              topLeft: Radius.circular(outerCornerRadius),
+              bottomLeft: Radius.circular(outerCornerRadius),
+              topRight: Radius.circular(innerCornerRadius),
+              bottomRight: Radius.circular(innerCornerRadius),
+            );
+    }
+    if (isLast) {
+      return isRtl
+          ? BorderRadius.only(
+              topLeft: Radius.circular(outerCornerRadius),
+              bottomLeft: Radius.circular(outerCornerRadius),
+              topRight: Radius.circular(innerCornerRadius),
+              bottomRight: Radius.circular(innerCornerRadius),
+            )
+          : BorderRadius.only(
+              topRight: Radius.circular(outerCornerRadius),
+              bottomRight: Radius.circular(outerCornerRadius),
+              topLeft: Radius.circular(innerCornerRadius),
+              bottomLeft: Radius.circular(innerCornerRadius),
+            );
+    }
+    return BorderRadius.circular(innerCornerRadius);
+  }
 
   @override
   Widget build(BuildContext context) {
     final activeColor = theme.colorScheme.primary;
     final inactiveColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final borderRadius = _computeProportionalBorderRadius();
 
     return Semantics(
       selected: isSelected,
       label: item.label,
       button: true,
       child: BouncyPressable(
-        scaleFactor: 0.92,
+        scaleFactor: 0.94,
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 1.5),
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 240),
+            duration: const Duration(milliseconds: 220),
             curve: Curves.easeOutCubic,
             decoration: BoxDecoration(
               color: isSelected
-                  ? activeColor.withValues(alpha: isDark ? 0.20 : 0.11)
+                  ? activeColor.withValues(alpha: isDark ? 0.18 : 0.12)
                   : Colors.transparent,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: borderRadius,
               border: isSelected
                   ? Border.all(
-                      color: activeColor.withValues(alpha: 0.24),
+                      color: activeColor.withValues(alpha: isDark ? 0.28 : 0.22),
                       width: 1.0,
                     )
-                  : null,
+                  : Border.all(
+                      color: Colors.transparent,
+                      width: 1.0,
+                    ),
             ),
-            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+            padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 2.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
                 AnimatedScale(
-                  scale: isSelected ? 1.06 : 1.0,
-                  duration: const Duration(milliseconds: 240),
+                  scale: isSelected ? 1.05 : 1.0,
+                  duration: const Duration(milliseconds: 220),
                   curve: Curves.easeOutBack,
                   child: Icon(
                     isSelected ? item.selectedIcon : item.icon,
-                    size: 21,
+                    size: 20,
                     color: isSelected ? activeColor : inactiveColor,
                   ),
                 ),
@@ -343,7 +426,7 @@ class _FloatingNavItem extends StatelessWidget {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 2.0),
                       child: Text(
                         item.label,
                         maxLines: 1,

@@ -6,6 +6,7 @@ import 'package:packbuddy/features/checklist/domain/packing_item.dart';
 import 'package:packbuddy/features/checklist/domain/packing_tag.dart';
 import 'package:packbuddy/features/checklist/domain/canonical_packing_catalog.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
+import 'package:packbuddy/shared/widgets/app_animations.dart';
 
 /// Highly refined, accessible packing list tile with non-conflicting dismissible swipe gestures,
 /// multi-line wrapping with clean trailing ellipsis, isolated title strikethrough,
@@ -258,29 +259,25 @@ class PackingItemTile extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           // Product Title: dynamically localized for catalog/seeded items, or raw custom string
-                          // Strikethrough decoration is strictly applied ONLY to this Text widget!
-                          Text(
-                            CanonicalPackingCatalog.getLocalizedItemName(
+                          // Smoothly animated strikethrough drawn across text with theme-aware styling
+                          AnimatedStrikethroughText(
+                            text: CanonicalPackingCatalog.getLocalizedItemName(
                               item.name,
                               Localizations.localeOf(context).languageCode,
                             ),
+                            isCrossed: item.isPacked,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.bodyLarge?.copyWith(
                               fontWeight: FontWeight.w600,
                               fontSize: 14.5,
                               letterSpacing: -0.2,
-                              color: item.isPacked
-                                  ? theme.colorScheme.onSurface.withValues(alpha: 0.45)
-                                  : theme.colorScheme.onSurface,
-                              decoration: item.isPacked
-                                  ? TextDecoration.lineThrough
-                                  : TextDecoration.none,
-                              decorationColor: isDark
-                                  ? const Color(0xFF94A3B8)
-                                  : const Color(0xFF64748B),
-                              decorationThickness: 1.8,
+                              color: theme.colorScheme.onSurface,
                             ),
+                            strikethroughColor: isDark
+                                ? const Color(0xFF94A3B8)
+                                : const Color(0xFF64748B),
+                            strokeWidth: 1.8,
                           ),
                           const SizedBox(height: 4),
 

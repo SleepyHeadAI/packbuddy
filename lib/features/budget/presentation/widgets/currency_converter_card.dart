@@ -108,7 +108,7 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
     );
     _swapAnimController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 320),
     );
   }
 
@@ -127,6 +127,7 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
   }
 
   void _swapCurrencies() {
+    HapticFeedback.lightImpact();
     _swapAnimController.forward(from: 0.0);
     setState(() {
       final temp = _fromCurrency;
@@ -269,9 +270,14 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
                   theme: theme,
                 ),
               ),
-              // Swap Button
+              // Swap Button with Spring Back Curve & Tactile Feedback
               RotationTransition(
-                turns: Tween(begin: 0.0, end: 0.5).animate(_swapAnimController),
+                turns: Tween(begin: 0.0, end: 0.5).animate(
+                  CurvedAnimation(
+                    parent: _swapAnimController,
+                    curve: Curves.easeOutBack,
+                  ),
+                ),
                 child: IconButton.filledTonal(
                   icon: const Icon(Icons.swap_horiz_rounded, size: 20),
                   onPressed: _swapCurrencies,

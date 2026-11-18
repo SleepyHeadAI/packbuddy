@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/shared/widgets/app_animations.dart';
-import 'package:packbuddy/shared/widgets/bouncy_pressable.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/features/checklist/domain/packing_item.dart';
 import 'package:packbuddy/features/checklist/domain/packing_tag.dart';
@@ -1078,82 +1077,86 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                           : Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // Layered Travel Suitcase Illustration with Ambient Glow
-                                Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Container(
-                                      width: 100,
-                                      height: 100,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        gradient: RadialGradient(
-                                          colors: [
-                                            theme.colorScheme.primary.withValues(alpha: isDark ? 0.28 : 0.16),
-                                            theme.colorScheme.primary.withValues(alpha: 0.0),
+                                // Layered Travel Suitcase Illustration with Ambient Floating Motion
+                                AppFloatingIllustration(
+                                  floatDistance: 6.0,
+                                  duration: const Duration(milliseconds: 2600),
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Container(
+                                        width: 100,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          gradient: RadialGradient(
+                                            colors: [
+                                              theme.colorScheme.primary.withValues(alpha: isDark ? 0.28 : 0.16),
+                                              theme.colorScheme.primary.withValues(alpha: 0.0),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 76,
+                                        height: 76,
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: isDark
+                                                ? [
+                                                    AppColors.primaryContainerDark,
+                                                    const Color(0xFF1E2632),
+                                                  ]
+                                                : [
+                                                    AppColors.primaryContainerLight,
+                                                    Colors.white,
+                                                  ],
+                                          ),
+                                          borderRadius: BorderRadius.circular(22),
+                                          border: Border.all(
+                                            color: theme.colorScheme.primary.withValues(alpha: 0.35),
+                                            width: 1.5,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: theme.colorScheme.primary.withValues(alpha: isDark ? 0.25 : 0.12),
+                                              blurRadius: 16,
+                                              offset: const Offset(0, 6),
+                                            ),
                                           ],
                                         ),
-                                      ),
-                                    ),
-                                    Container(
-                                      width: 76,
-                                      height: 76,
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                          colors: isDark
-                                              ? [
-                                                  AppColors.primaryContainerDark,
-                                                  const Color(0xFF1E2632),
-                                                ]
-                                              : [
-                                                  AppColors.primaryContainerLight,
-                                                  Colors.white,
-                                                ],
-                                        ),
-                                        borderRadius: BorderRadius.circular(22),
-                                        border: Border.all(
-                                          color: theme.colorScheme.primary.withValues(alpha: 0.35),
-                                          width: 1.5,
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: theme.colorScheme.primary.withValues(alpha: isDark ? 0.25 : 0.12),
-                                            blurRadius: 16,
-                                            offset: const Offset(0, 6),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Center(
-                                        child: Icon(
-                                          Icons.luggage_rounded,
-                                          size: 38,
-                                          color: theme.colorScheme.primary,
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      right: 4,
-                                      bottom: 4,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(5),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.secondaryLight,
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: isDark ? AppColors.surfaceDark : Colors.white,
-                                            width: 2,
+                                        child: Center(
+                                          child: Icon(
+                                            Icons.luggage_rounded,
+                                            size: 38,
+                                            color: theme.colorScheme.primary,
                                           ),
                                         ),
-                                        child: const Icon(
-                                          Icons.add_rounded,
-                                          size: 14,
-                                          color: Colors.white,
+                                      ),
+                                      Positioned(
+                                        right: 4,
+                                        bottom: 4,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(5),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.secondaryLight,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: isDark ? AppColors.surfaceDark : Colors.white,
+                                              width: 2,
+                                            ),
+                                          ),
+                                          child: const Icon(
+                                            Icons.add_rounded,
+                                            size: 14,
+                                            color: Colors.white,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                                 const SizedBox(height: 20),
                                 Text(

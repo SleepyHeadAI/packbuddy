@@ -718,7 +718,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
       }
     }
 
-    return widgets;
+    return [
+      for (int idx = 0; idx < widgets.length; idx++)
+        AppFadeSlide.staggered(
+          key: ValueKey('dash_staggered_$idx'),
+          index: idx,
+          baseDelay: const Duration(milliseconds: 35),
+          slideOffset: 12.0,
+          child: widgets[idx],
+        ),
+    ];
   }
 
   Widget _renderSectionById({

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
+import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
 
 /// Minimalist pastel card displaying budget progress, spent, and remaining amounts
@@ -221,8 +222,9 @@ class BudgetProgressCard extends StatelessWidget {
                       FittedBox(
                         fit: BoxFit.scaleDown,
                         alignment: Alignment.centerLeft,
-                        child: Text(
-                          CurrencyFormatter.format(totalSpent, currency: currency),
+                        child: AnimatedCurrencyCounter(
+                          value: totalSpent,
+                          currency: currency,
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: theme.colorScheme.onSurface,
@@ -267,8 +269,9 @@ class BudgetProgressCard extends StatelessWidget {
                         FittedBox(
                           fit: BoxFit.scaleDown,
                           alignment: Alignment.centerRight,
-                          child: Text(
-                            CurrencyFormatter.format(remaining, currency: currency),
+                          child: AnimatedCurrencyCounter(
+                            value: remaining,
+                            currency: currency,
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w700,
                               color: remaining < 0
