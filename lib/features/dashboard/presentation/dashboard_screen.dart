@@ -22,13 +22,14 @@ import '../../settings/data/mock_revenuecat_service.dart';
 import '../../vault/presentation/controllers/vault_controller.dart';
 import '../../vault/presentation/screens/vault_screen.dart';
 import '../../checklist/presentation/controllers/checklist_controller.dart';
+import '../../checklist/presentation/screens/checklist_screen.dart';
 import '../../auth/auth_controller.dart';
 import '../../../shared/widgets/app_animations.dart';
 import '../../../core/services/app_widget_service.dart';
 import '../../../core/services/preferences_service.dart';
 import '../../travel_map/presentation/controllers/travel_map_controller.dart';
+import '../../travel_map/presentation/screens/travel_map_screen.dart';
 import '../../../core/l10n/language_selector_sheet.dart';
-import 'navigation_provider.dart';
 import 'widgets/notifications_center_sheet.dart';
 import 'dashboard_localization.dart';
 import 'widgets/horizontal_currency_converter_card.dart';
@@ -39,6 +40,7 @@ import '../../../shared/widgets/floating_action_button_location.dart';
 import '../../profile/presentation/screens/profile_screen.dart';
 import '../../profile/presentation/controllers/profile_controller.dart';
 import '../../profile/presentation/widgets/user_avatar.dart';
+import '../../profile/presentation/screens/widgets/collaborator_avatar_stack.dart';
 import 'package:packbuddy/features/search/presentation/screens/global_search_screen.dart';
 
 /// Customizable, clean, and elegant Dashboard for PackBuddy with live Riverpod state integration.
@@ -58,6 +60,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
   final GlobalKey _fabKey = GlobalKey();
   late List<String> _sectionOrder;
   late Set<String> _hiddenSections;
+
+  static final Map<String, DateFormat> _mmmDateFormatCache = {};
+  static final Map<String, DateFormat> _ymmmDateFormatCache = {};
+
+  static DateFormat _getCachedMMMd(String lang) {
+    return _mmmDateFormatCache.putIfAbsent(lang, () => DateFormat.MMMd(lang));
+  }
+
+  static DateFormat _getCachedYMMMd(String lang) {
+    return _ymmmDateFormatCache.putIfAbsent(lang, () => DateFormat.yMMMMd(lang));
+  }
 
   @override
   void initState() {
@@ -259,7 +272,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     final profileState = ref.watch(profileControllerProvider);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final dateFormat = DateFormat.MMMd(lang);
+    final dateFormat = _getCachedMMMd(lang);
 
     // Sync Badge Styling with concise banner labels
     String syncLabel;
@@ -471,10 +484,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               greeting: _getTimeBasedGreeting(l10n, lang),
               userName: authState.user?.displayName,
               photoUrl: profileState.profile?.photoUrl,
-              subtitle: DateFormat.yMMMMd(lang).format(now),
+              subtitle: _getCachedYMMMd(lang).format(now),
               onProfileTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                  _createSmoothRoute(const ProfileScreen(avatarHeroTag: 'dashboard-profile-avatar')),
                 );
               },
               onSearchTap: () {
@@ -772,7 +785,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           isDark: isDark,
           l10n: l10n,
           onTap: () {
-            ref.read(mainNavigationIndexProvider.notifier).state = 2;
+            Navigator.of(context).push(
+              _createSmoothRoute(const ChecklistScreen(isTabMode: false)),
+            );
           },
         );
 
@@ -786,7 +801,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           worldPercentage: travelMapState.worldPercentage,
           isFullWidth: !isMini,
           onTap: () {
-            ref.read(mainNavigationIndexProvider.notifier).state = 1;
+            Navigator.of(context).push(
+              _createSmoothRoute(const TravelMapScreen(isTabMode: false)),
+            );
           },
         );
 
@@ -796,7 +813,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           isFullWidth: !isMini,
           onTap: () {
             Navigator.of(context).push(
-              _createSmoothRoute(const VaultScreen()),
+              _createSmoothRoute(const VaultScreen(isTabMode: false)),
             );
           },
         );
@@ -911,16 +928,18 @@ class _HorizontalGreetingBar extends StatelessWidget {
               const SizedBox(width: 6),
 
               // Cloud Sync Status Pill
-              InkWell(
-                onTap: onSyncTap,
-                borderRadius: BorderRadius.circular(14),
-                child: StatusBadge(
-                  label: syncLabel,
-                  icon: syncIcon,
-                  backgroundColor: syncBgColor,
-                  textColor: syncTextColor,
-                  isSpinning: isSyncing,
-                  maxWidth: 140,
+              Flexible(
+                child: InkWell(
+                  onTap: onSyncTap,
+                  borderRadius: BorderRadius.circular(14),
+                  child: StatusBadge(
+                    label: syncLabel,
+                    icon: syncIcon,
+                    backgroundColor: syncBgColor,
+                    textColor: syncTextColor,
+                    isSpinning: isSyncing,
+                    maxWidth: 115,
+                  ),
                 ),
               ),
               const SizedBox(width: 5),
@@ -982,11 +1001,14 @@ class _HorizontalGreetingBar extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                UserAvatar(
-                  photoUrl: photoUrl,
-                  displayName: displayName,
-                  size: 28,
-                  isAnimated: true,
+                Hero(
+                  tag: 'dashboard-profile-avatar',
+                  child: UserAvatar(
+                    photoUrl: photoUrl,
+                    displayName: displayName,
+                    size: 28,
+                    isAnimated: true,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -1253,16 +1275,22 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Expanded(
-                        child: Text(
-                          CityLocalization.localizeDestination(
-                            trip.destination,
-                            lang,
+                        child: Hero(
+                          tag: 'trip-destination-${trip.id}',
+                          child: Material(
+                            type: MaterialType.transparency,
+                            child: Text(
+                              CityLocalization.localizeDestination(
+                                trip.destination,
+                                lang,
+                              ),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -1300,6 +1328,33 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
               ],
             ),
           ),
+
+          if (trip.collaborators.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(
+                  Icons.people_alt_rounded,
+                  size: 13,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  l10n.sharedTrip,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                CollaboratorAvatarStack(
+                  collaborators: trip.collaborators,
+                  size: 20,
+                ),
+              ],
+            ),
+          ],
 
           // Secondary Trips horizontal chips (if user has > 1 trip)
           if (allTrips.length > 1) ...[

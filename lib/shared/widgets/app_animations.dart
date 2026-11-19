@@ -80,6 +80,7 @@ class _AppFadeSlideState extends State<AppFadeSlide>
   late final AnimationController _controller;
   late final Animation<double> _fadeAnimation;
   late final Animation<Offset> _slideAnimation;
+  var _isAnimationCompleted = false;
 
   @override
   void initState() {
@@ -101,6 +102,14 @@ class _AppFadeSlideState extends State<AppFadeSlide>
       parent: _controller,
       curve: widget.curve,
     ));
+
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed && mounted) {
+        setState(() {
+          _isAnimationCompleted = true;
+        });
+      }
+    });
 
     final isTestEnvironment = (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) ||
         WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test');
@@ -124,19 +133,24 @@ class _AppFadeSlideState extends State<AppFadeSlide>
 
   @override
   Widget build(BuildContext context) {
+    // 120 FPS Optimization: Once the entrance transition completes, eliminate all Layer & Transition overhead
+    if (_isAnimationCompleted) {
+      return widget.child;
+    }
+
     return RepaintBoundary(
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return Opacity(
-            opacity: _fadeAnimation.value.clamp(0.0, 1.0),
-            child: Transform.translate(
+      child: FadeTransition(
+        opacity: _fadeAnimation,
+        child: AnimatedBuilder(
+          animation: _slideAnimation,
+          builder: (context, child) {
+            return Transform.translate(
               offset: _slideAnimation.value,
               child: child,
-            ),
-          );
-        },
-        child: widget.child,
+            );
+          },
+          child: widget.child,
+        ),
       ),
     );
   }

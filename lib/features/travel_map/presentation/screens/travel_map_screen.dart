@@ -18,7 +18,12 @@ import 'package:packbuddy/l10n/app_localizations.dart';
 
 /// Full-screen interactive world travel map and country tracker
 class TravelMapScreen extends ConsumerStatefulWidget {
-  const TravelMapScreen({super.key});
+  final bool isTabMode;
+
+  const TravelMapScreen({
+    super.key,
+    this.isTabMode = false,
+  });
 
   @override
   ConsumerState<TravelMapScreen> createState() => _TravelMapScreenState();
@@ -979,16 +984,39 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        titleSpacing: 8,
+        automaticallyImplyLeading: !widget.isTabMode,
+        titleSpacing: (!widget.isTabMode && Navigator.of(context).canPop()) ? 0 : 16,
+        leading: !widget.isTabMode && Navigator.of(context).canPop()
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+                onPressed: () => Navigator.of(context).pop(),
+              )
+            : null,
         title: FittedBox(
           fit: BoxFit.scaleDown,
           alignment: Alignment.centerLeft,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Hero(
-                tag: 'travel-map-hero-badge',
-                child: Container(
+              if (!widget.isTabMode)
+                Hero(
+                  tag: 'travel-map-hero-badge',
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.public_rounded,
+                      color: Color(0xFF10B981),
+                      size: 18,
+                    ),
+                  ),
+                )
+              else
+                Container(
                   padding: const EdgeInsets.all(6),
                   margin: const EdgeInsets.only(right: 8),
                   decoration: BoxDecoration(
@@ -1001,10 +1029,20 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                     size: 18,
                   ),
                 ),
-              ),
-              Hero(
-                tag: 'travel-map-hero-title',
-                child: Material(
+              if (!widget.isTabMode)
+                Hero(
+                  tag: 'travel-map-hero-title',
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: Text(
+                      l10n.worldTravelMapTitle,
+                      style: theme.appBarTheme.titleTextStyle ??
+                          theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                )
+              else
+                Material(
                   type: MaterialType.transparency,
                   child: Text(
                     l10n.worldTravelMapTitle,
@@ -1012,7 +1050,6 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                         theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                   ),
                 ),
-              ),
             ],
           ),
         ),

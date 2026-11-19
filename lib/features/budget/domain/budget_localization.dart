@@ -410,4 +410,309 @@ class BudgetLocalization {
       default: return 'Category Diversity';
     }
   }
+
+  /// Timeline days count formatting
+  static String timelineDays(String lang, int count) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return '($count gün)';
+      case 'de': return '($count ${count == 1 ? "Tag" : "Tage"})';
+      case 'fr': return '($count ${count == 1 ? "jour" : "jours"})';
+      case 'es': return '($count ${count == 1 ? "día" : "días"})';
+      case 'it': return '($count ${count == 1 ? "giorno" : "giorni"})';
+      case 'pt': return '($count ${count == 1 ? "dia" : "dias"})';
+      case 'ru': return '($count дн.)';
+      case 'zh': return '($count天)';
+      case 'ja': return '($count日間)';
+      case 'ko': return '($count일)';
+      case 'ar': return '($count أيام)';
+      case 'hi': return '($count दिन)';
+      case 'nl': return '($count ${count == 1 ? "dag" : "dagen"})';
+      case 'el': return '($count ${count == 1 ? "ημέρα" : "ημέρες"})';
+      case 'sv': return '($count ${count == 1 ? "dag" : "dagar"})';
+      case 'pl': return '($count ${count == 1 ? "dzień" : "dni"})';
+      case 'id': return '($count hari)';
+      case 'th': return '($count วัน)';
+      case 'vi': return '($count ngày)';
+      case 'en':
+      default: return '($count ${count == 1 ? "day" : "days"})';
+    }
+  }
+
+  /// Peak amount header in daily spend chart
+  static String peakLabel(String lang, String formattedAmount) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Zirve: $formattedAmount';
+      case 'de': return 'Spitze: $formattedAmount';
+      case 'fr': return 'Pic : $formattedAmount';
+      case 'es': return 'Pico: $formattedAmount';
+      case 'it': return 'Picco: $formattedAmount';
+      case 'pt': return 'Pico: $formattedAmount';
+      case 'ru': return 'Пик: $formattedAmount';
+      case 'zh': return '最高: $formattedAmount';
+      case 'ja': return 'ピーク: $formattedAmount';
+      case 'ko': return '최고: $formattedAmount';
+      case 'ar': return 'الذروة: $formattedAmount';
+      case 'hi': return 'शिखर: $formattedAmount';
+      case 'nl': return 'Piek: $formattedAmount';
+      case 'el': return 'Κορυφή: $formattedAmount';
+      case 'sv': return 'Topp: $formattedAmount';
+      case 'pl': return 'Szczyt: $formattedAmount';
+      case 'id': return 'Puncak: $formattedAmount';
+      case 'th': return 'สูงสุด: $formattedAmount';
+      case 'vi': return 'Đỉnh điểm: $formattedAmount';
+      case 'en':
+      default: return 'Peak: $formattedAmount';
+    }
+  }
+
+  /// Deep stats accordion collapse hint
+  static String deepStatsCollapse(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Daraltmak için dokunun';
+      case 'de': return 'Zum Einklappen tippen';
+      case 'fr': return 'Toucher pour réduire';
+      case 'es': return 'Toca para contraer';
+      case 'it': return 'Tocca per comprimere';
+      case 'pt': return 'Toque para recolher';
+      case 'ru': return 'Нажмите, чтобы свернуть';
+      case 'zh': return '点击收起';
+      case 'ja': return 'タップして折りたたむ';
+      case 'ko': return '탭하여 접기';
+      case 'ar': return 'اضغط للطي';
+      case 'hi': return 'छोटा करने के लिए टैप करें';
+      case 'nl': return 'Tik om samen te vouwen';
+      case 'el': return 'Πατήστε για σύμπτυξη';
+      case 'sv': return 'Tryck för att fälla ihop';
+      case 'pl': return 'Dotknij, aby zwinąć';
+      case 'id': return 'Ketuk untuk menutup';
+      case 'th': return 'แตะเพื่อย่อ';
+      case 'vi': return 'Chạm để thu gọn';
+      case 'en':
+      default: return 'Tap to collapse';
+    }
+  }
+
+  /// Deep stats accordion explore hint
+  static String deepStatsExplore(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Detaylı analizleri keşfedin';
+      case 'de': return 'Detaillierte Analysen entdecken';
+      case 'fr': return 'Explorer les analyses détaillées';
+      case 'es': return 'Explorar análisis detallado';
+      case 'it': return 'Esplora analisi dettagliate';
+      case 'pt': return 'Explorar análises detalhadas';
+      case 'ru': return 'Подробный анализ расходов';
+      case 'zh': return '探索详细财务分析';
+      case 'ja': return '詳細な分析を確認';
+      case 'ko': return '상세 분석 살펴보기';
+      case 'ar': return 'استكشاف التحليلات التفصيلية';
+      case 'hi': return 'विस्तृत विश्लेषण देखें';
+      case 'nl': return 'Bekijk gedetailleerde analyses';
+      case 'el': return 'Εξερευνήστε αναλυτικά στατιστικά';
+      case 'sv': return 'Utforska detaljerade analyser';
+      case 'pl': return 'Odkryj szczegółowe analizy';
+      case 'id': return 'Jelajahi analisis terperinci';
+      case 'th': return 'สำรวจการวิเคราะห์โดยละเอียด';
+      case 'vi': return 'Khám phá phân tích chi tiết';
+      case 'en':
+      default: return 'Explore detailed analytics';
+    }
+  }
+
+  /// Card vs Cash percentage formatting
+  static String formatRatioPercent(String lang, int cardPct, int cashPct) {
+    if (_cleanLang(lang) == 'tr') {
+      return '%$cardPct / %$cashPct';
+    }
+    return '$cardPct% / $cashPct%';
+  }
+
+  /// Card vs Cash subtitle label
+  static String cardVsCashSubtitle(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Kart / Nakit';
+      case 'de': return 'Karte / Bargeld';
+      case 'fr': return 'Carte / Espèces';
+      case 'es': return 'Tarjeta / Efectivo';
+      case 'it': return 'Carta / Contanti';
+      case 'pt': return 'Cartão / Dinheiro';
+      case 'ru': return 'Карта / Наличные';
+      case 'zh': return '刷卡 / 现金';
+      case 'ja': return 'カード / 現金';
+      case 'ko': return '카드 / 현금';
+      case 'ar': return 'بطاقة / نقود';
+      case 'hi': return 'कार्ड / नकद';
+      case 'nl': return 'Kaart / Contant';
+      case 'el': return 'Κάρτα / Μετρητά';
+      case 'sv': return 'Kort / Kontant';
+      case 'pl': return 'Karta / Gotówka';
+      case 'id': return 'Kartu / Tunai';
+      case 'th': return 'บัตร / เงินสด';
+      case 'vi': return 'Thẻ / Tiền mặt';
+      case 'en':
+      default: return 'Card / Cash';
+    }
+  }
+
+  /// Category count display (e.g. 2 Categories / 2 Categorias)
+  static String formatCategoryCount(String lang, int count) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return '$count Kategori';
+      case 'de': return '$count ${count == 1 ? "Kategorie" : "Kategorien"}';
+      case 'fr': return '$count ${count == 1 ? "catégorie" : "catégories"}';
+      case 'es': return '$count ${count == 1 ? "categoría" : "categorías"}';
+      case 'it': return '$count ${count == 1 ? "categoria" : "categorie"}';
+      case 'pt': return '$count ${count == 1 ? "categoria" : "categorias"}';
+      case 'ru': return '$count категорий';
+      case 'zh': return '$count 个类别';
+      case 'ja': return '$count カテゴリ';
+      case 'ko': return '$count개 카테고리';
+      case 'ar': return '$count فئات';
+      case 'hi': return '$count श्रेणियां';
+      case 'nl': return '$count ${count == 1 ? "categorie" : "categorieën"}';
+      case 'el': return '$count ${count == 1 ? "κατηγορία" : "κατηγορίες"}';
+      case 'sv': return '$count ${count == 1 ? "kategori" : "kategorier"}';
+      case 'pl': return '$count ${count == 1 ? "kategoria" : "kategorie"}';
+      case 'id': return '$count Kategori';
+      case 'th': return '$count หมวดหมู่';
+      case 'vi': return '$count hạng mục';
+      case 'en':
+      default: return '$count ${count == 1 ? "Category" : "Categories"}';
+    }
+  }
+
+  /// Top category subtitle (e.g. Peak: Food / Pico: Alimentação)
+  static String formatTopCategory(String lang, String categoryName) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Zirve: $categoryName';
+      case 'de': return 'Spitze: $categoryName';
+      case 'fr': return 'Top : $categoryName';
+      case 'es': return 'Pico: $categoryName';
+      case 'it': return 'Picco: $categoryName';
+      case 'pt': return 'Pico: $categoryName';
+      case 'ru': return 'Топ: $categoryName';
+      case 'zh': return '最高: $categoryName';
+      case 'ja': return '最多: $categoryName';
+      case 'ko': return '최대: $categoryName';
+      case 'ar': return 'الذروة: $categoryName';
+      case 'hi': return 'शीर्ष: $categoryName';
+      case 'nl': return 'Top: $categoryName';
+      case 'el': return 'Κορυφή: $categoryName';
+      case 'sv': return 'Topp: $categoryName';
+      case 'pl': return 'Główna: $categoryName';
+      case 'id': return 'Puncak: $categoryName';
+      case 'th': return 'สูงสุด: $categoryName';
+      case 'vi': return 'Cao nhất: $categoryName';
+      case 'en':
+      default: return 'Top: $categoryName';
+    }
+  }
+
+  /// Safe daily spend subtitle per remaining day
+  static String perRemainingDay(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Kalan gün başına';
+      case 'de': return 'Pro verbleibendem Tag';
+      case 'fr': return 'Par jour restant';
+      case 'es': return 'Por día restante';
+      case 'it': return 'Per giorno rimanente';
+      case 'pt': return 'Por dia restante';
+      case 'ru': return 'В день (на ост. дни)';
+      case 'zh': return '剩余每日预算';
+      case 'ja': return '残りの1日あたり';
+      case 'ko': return '남은 일수 일일 기준';
+      case 'ar': return 'لكل يوم متبقي';
+      case 'hi': return 'प्रति शेष दिन';
+      case 'nl': return 'Per resterende dag';
+      case 'el': return 'Ανά ημέρα που απομένει';
+      case 'sv': return 'Per återstående dag';
+      case 'pl': return 'Na pozostały dzień';
+      case 'id': return 'Per sisa hari';
+      case 'th': return 'ต่อวันที่เหลือ';
+      case 'vi': return 'Mỗi ngày còn lại';
+      case 'en':
+      default: return 'Per remaining day';
+    }
+  }
+
+  /// Daily average subtitle
+  static String dailyAverage(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Günlük ortalama';
+      case 'de': return 'Täglicher Durchschnitt';
+      case 'fr': return 'Moyenne quotidienne';
+      case 'es': return 'Promedio diario';
+      case 'it': return 'Media giornaliera';
+      case 'pt': return 'Média diária';
+      case 'ru': return 'Среднесуточный расход';
+      case 'zh': return '日均消费';
+      case 'ja': return '1日の平均';
+      case 'ko': return '일일 평균';
+      case 'ar': return 'المعدل اليومي';
+      case 'hi': return 'दैनिक औसत';
+      case 'nl': return 'Dagelijks gemiddelde';
+      case 'el': return 'Ημερήσιος μέσος όρος';
+      case 'sv': return 'Dagsgenomsnitt';
+      case 'pl': return 'Średnia dzienna';
+      case 'id': return 'Rata-rata harian';
+      case 'th': return 'เฉลี่ยรายวัน';
+      case 'vi': return 'Trung bình ngày';
+      case 'en':
+      default: return 'Daily average';
+    }
+  }
+
+  /// Emergency guide countries covered count label
+  static String countriesCovered(String lang, int count) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return '$count Ülke Kapsanıyor';
+      case 'de': return '$count Länder abgedeckt';
+      case 'fr': return '$count pays couverts';
+      case 'es': return '$count países cubiertos';
+      case 'it': return '$count paesi coperti';
+      case 'pt': return '$count países cobertos';
+      case 'ru': return 'Охватывает $count стран';
+      case 'zh': return '涵盖 $count 个国家/地区';
+      case 'ja': return '$countカ国をカバー';
+      case 'ko': return '$count개국 지원';
+      case 'ar': return 'يشمل $count دول';
+      case 'hi': return '$count देश शामिल';
+      case 'nl': return '$count landen gedekt';
+      case 'el': return 'Καλύπτονται $count χώρες';
+      case 'sv': return '$count länder omfattas';
+      case 'pl': return 'Objęte kraje: $count';
+      case 'id': return '$count Negara Dicakup';
+      case 'th': return 'ครอบคลุม $count ประเทศ';
+      case 'vi': return 'Bao gồm $count quốc gia';
+      case 'en':
+      default: return '$count Countries Covered';
+    }
+  }
+
+  /// Emergency guide all trip destinations label
+  static String allTripDestinations(String lang, int count) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Tüm Seyahat Ülkeleri ($count)';
+      case 'de': return 'Alle Reiseziele ($count)';
+      case 'fr': return 'Toutes les destinations ($count)';
+      case 'es': return 'Todos los destinos del viaje ($count)';
+      case 'it': return 'Tutte le destinazioni ($count)';
+      case 'pt': return 'Todos os destinos da viagem ($count)';
+      case 'ru': return 'Все страны поездки ($count)';
+      case 'zh': return '所有旅行目的地 ($count)';
+      case 'ja': return 'すべての旅行先 ($count)';
+      case 'ko': return '모든 여행 목적지 ($count)';
+      case 'ar': return 'جميع وجهات الرحلة ($count)';
+      case 'hi': return 'यात्रा के सभी गंतव्य ($count)';
+      case 'nl': return 'Alle reisbestemmingen ($count)';
+      case 'el': return 'Όλοι οι προορισμοί ταξιδιού ($count)';
+      case 'sv': return 'Alla resmål ($count)';
+      case 'pl': return 'Wszystkie cele podróży ($count)';
+      case 'id': return 'Semua Destinasi Perjalanan ($count)';
+      case 'th': return 'จุดหมายปลายทางทั้งหมด ($count)';
+      case 'vi': return 'Tất cả điểm đến ($count)';
+      case 'en':
+      default: return 'All Trip Destinations ($count)';
+    }
+  }
 }

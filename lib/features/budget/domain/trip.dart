@@ -90,6 +90,9 @@ class Trip {
     );
   }
 
+  /// Whether this trip is currently collaborative (actively shared with other travelers)
+  bool get isCollaborative => isShared || collaborators.isNotEmpty;
+
   /// Extracts all active unique countries belonging to this trip in route order.
   /// Seamlessly parses destinations in all 20 languages and extracts flags.
   /// If a country was removed from the itinerary, it will NOT be included here.

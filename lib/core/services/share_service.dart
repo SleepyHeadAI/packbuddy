@@ -99,6 +99,11 @@ class ShareService {
     return await _shareText(text, subject: 'PackBuddy Trip Invite: $title');
   }
 
+  /// Public helper to share arbitrary text across channels with clipboard fallback
+  static Future<bool> shareText({required String text, String? subject}) async {
+    return _shareText(text, subject: subject);
+  }
+
   static Future<bool> _shareText(String text, {String? subject}) async {
     try {
       final result = await SharePlus.instance.share(

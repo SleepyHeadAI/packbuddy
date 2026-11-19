@@ -19,7 +19,6 @@ class PendingChangesCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final isTr = languageCode == 'tr';
 
     final trips = breakdown['trips'] ?? 0;
     final checklist = breakdown['checklist'] ?? 0;
@@ -57,13 +56,7 @@ class PendingChangesCard extends StatelessWidget {
                       style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
                     ),
                     Text(
-                      totalPending > 0
-                          ? (isTr
-                              ? '$totalPending yerel kayıt eşitlenmeyi bekliyor'
-                              : '$totalPending local changes waiting to sync')
-                          : (isTr
-                              ? 'Tüm yerel verileriniz bulut ile güncel'
-                              : 'All local changes are fully synchronized'),
+                      ConnectivityLocalization.getPendingChangesSummary(languageCode, totalPending),
                       style: TextStyle(
                         fontSize: 11.5,
                         color: theme.colorScheme.onSurfaceVariant,
@@ -83,28 +76,28 @@ class PendingChangesCard extends StatelessWidget {
                 if (trips > 0)
                   _buildChip(
                     icon: Icons.flight_takeoff_rounded,
-                    label: isTr ? '$trips Seyahat' : '$trips Trips',
+                    label: ConnectivityLocalization.tripsCountLabel(languageCode, trips),
                     theme: theme,
                     isDark: isDark,
                   ),
                 if (checklist > 0)
                   _buildChip(
                     icon: Icons.checklist_rounded,
-                    label: isTr ? '$checklist Eşya' : '$checklist Items',
+                    label: ConnectivityLocalization.itemsCountLabel(languageCode, checklist),
                     theme: theme,
                     isDark: isDark,
                   ),
                 if (expenses > 0)
                   _buildChip(
                     icon: Icons.receipt_long_rounded,
-                    label: isTr ? '$expenses Harcama' : '$expenses Expenses',
+                    label: ConnectivityLocalization.expensesCountLabel(languageCode, expenses),
                     theme: theme,
                     isDark: isDark,
                   ),
                 if (documents > 0)
                   _buildChip(
                     icon: Icons.description_rounded,
-                    label: isTr ? '$documents Belge' : '$documents Documents',
+                    label: ConnectivityLocalization.documentsCountLabel(languageCode, documents),
                     theme: theme,
                     isDark: isDark,
                   ),

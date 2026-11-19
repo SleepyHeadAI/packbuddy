@@ -12,6 +12,9 @@ class UserProfile {
   final DateTime createdAt;
   final DateTime? lastActiveAt;
   final bool isPro;
+  final String? username;
+  final String? travelStatus;
+  final List<String> travelStyles;
 
   const UserProfile({
     required this.uid,
@@ -24,6 +27,9 @@ class UserProfile {
     required this.createdAt,
     this.lastActiveAt,
     this.isPro = false,
+    this.username,
+    this.travelStatus,
+    this.travelStyles = const [],
   });
 
   UserProfile copyWith({
@@ -38,6 +44,11 @@ class UserProfile {
     DateTime? createdAt,
     DateTime? lastActiveAt,
     bool? isPro,
+    String? username,
+    bool clearUsername = false,
+    String? travelStatus,
+    bool clearTravelStatus = false,
+    List<String>? travelStyles,
   }) {
     return UserProfile(
       uid: uid ?? this.uid,
@@ -50,6 +61,9 @@ class UserProfile {
       createdAt: createdAt ?? this.createdAt,
       lastActiveAt: lastActiveAt ?? this.lastActiveAt,
       isPro: isPro ?? this.isPro,
+      username: clearUsername ? null : (username ?? this.username),
+      travelStatus: clearTravelStatus ? null : (travelStatus ?? this.travelStatus),
+      travelStyles: travelStyles ?? this.travelStyles,
     );
   }
 
@@ -65,6 +79,9 @@ class UserProfile {
       'createdAt': createdAt.toIso8601String(),
       'lastActiveAt': lastActiveAt?.toIso8601String(),
       'isPro': isPro,
+      'username': username,
+      'travelStatus': travelStatus,
+      'travelStyles': travelStyles,
     };
   }
 
@@ -83,6 +100,11 @@ class UserProfile {
         map['isPro'] == true ||
         map['pro'] == true;
 
+    final stylesRaw = map['travelStyles'] ?? map['travelStyle'];
+    final List<String> parsedStyles = stylesRaw is List
+        ? stylesRaw.map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList()
+        : const [];
+
     return UserProfile(
       uid: (map['uid'] ?? map['id'] ?? fallbackUid ?? '').toString(),
       displayName: (map['displayName'] ?? map['name']) as String?,
@@ -94,6 +116,9 @@ class UserProfile {
       createdAt: map['createdAt'] != null ? parseDate(map['createdAt']) : DateTime.now(),
       lastActiveAt: map['lastActiveAt'] != null ? parseDate(map['lastActiveAt']) : null,
       isPro: isPremium,
+      username: (map['username'] ?? map['userName'] ?? map['buddyId']) as String?,
+      travelStatus: (map['travelStatus'] ?? map['status']) as String?,
+      travelStyles: parsedStyles,
     );
   }
 

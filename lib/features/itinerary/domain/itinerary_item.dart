@@ -20,6 +20,7 @@ class ItineraryItem {
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isDeleted;
+  final String? createdByName;
 
   const ItineraryItem({
     required this.id,
@@ -39,6 +40,7 @@ class ItineraryItem {
     required this.createdAt,
     required this.updatedAt,
     this.isDeleted = false,
+    this.createdByName,
   });
 
   /// Formats the single time or time range (e.g. "08:13 - 09:37" or "08:13")
@@ -72,6 +74,7 @@ class ItineraryItem {
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isDeleted,
+    String? createdByName,
   }) {
     return ItineraryItem(
       id: id ?? this.id,
@@ -91,6 +94,7 @@ class ItineraryItem {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isDeleted: isDeleted ?? this.isDeleted,
+      createdByName: createdByName ?? this.createdByName,
     );
   }
 
@@ -113,34 +117,54 @@ class ItineraryItem {
       'created_at': createdAt.millisecondsSinceEpoch,
       'updated_at': updatedAt.millisecondsSinceEpoch,
       'is_deleted': isDeleted ? 1 : 0,
+      'created_by_name': createdByName,
+      'createdByName': createdByName,
     };
   }
 
   factory ItineraryItem.fromMap(Map<String, dynamic> map) {
+    DateTime parseDate(dynamic val) {
+      if (val is int) return DateTime.fromMillisecondsSinceEpoch(val);
+      if (val is String) {
+        final parsed = DateTime.tryParse(val);
+        if (parsed != null) return parsed;
+      }
+      return DateTime.now();
+    }
+
     return ItineraryItem(
-      id: map['id'] as String? ?? '',
-      userId: map['user_id'] as String? ?? '',
-      tripId: map['trip_id'] as String? ?? '',
-      dayNumber: (map['day_number'] as num?)?.toInt() ?? 1,
-      date: map['date'] as String? ?? '',
+      id: (map['id'] ?? '') as String? ?? '',
+      userId: (map['user_id'] ?? map['userId'] ?? '') as String? ?? '',
+      tripId: (map['trip_id'] ?? map['tripId'] ?? '') as String? ?? '',
+      dayNumber: (map['day_number'] ?? map['dayNumber'] as num?)?.toInt() ?? 1,
+      date: (map['date'] ?? '') as String? ?? '',
       time: map['time'] as String?,
-      endTime: map['end_time'] as String?,
-      title: map['title'] as String? ?? '',
+      endTime: (map['end_time'] ?? map['endTime']) as String?,
+      title: (map['title'] ?? '') as String? ?? '',
       description: map['description'] as String?,
       location: map['location'] as String?,
-      category: map['category'] as String? ?? 'sightseeing',
+      category: (map['category'] ?? 'sightseeing') as String? ?? 'sightseeing',
       cost: (map['cost'] as num?)?.toDouble(),
       currency: map['currency'] as String?,
-      isCompleted: (map['is_completed'] as num?)?.toInt() == 1,
-      createdAt: map['created_at'] != null
-          ? DateTime.fromMillisecondsSinceEpoch((map['created_at'] as num).toInt())
+      isCompleted: (map['is_completed'] ?? map['isCompleted'] as num?)?.toInt() == 1 ||
+          map['is_completed'] == true ||
+          map['isCompleted'] == true,
+      createdAt: map['created_at'] != null || map['createdAt'] != null
+          ? parseDate(map['created_at'] ?? map['createdAt'])
           : DateTime.now(),
-      updatedAt: map['updated_at'] != null
-          ? DateTime.fromMillisecondsSinceEpoch((map['updated_at'] as num).toInt())
+      updatedAt: map['updated_at'] != null || map['updatedAt'] != null
+          ? parseDate(map['updated_at'] ?? map['updatedAt'])
           : DateTime.now(),
-      isDeleted: (map['is_deleted'] as num?)?.toInt() == 1,
+      isDeleted: (map['is_deleted'] ?? map['isDeleted'] as num?)?.toInt() == 1 ||
+          map['is_deleted'] == true ||
+          map['isDeleted'] == true,
+      createdByName: (map['created_by_name'] ?? map['createdByName']) as String?,
     );
   }
+
+  Map<String, dynamic> toJsonMap() => toMap();
+
+  factory ItineraryItem.fromJsonMap(Map<String, dynamic> map) => ItineraryItem.fromMap(map);
 
   String toJson() => jsonEncode(toMap());
 

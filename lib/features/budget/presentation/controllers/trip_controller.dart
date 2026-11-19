@@ -11,6 +11,9 @@ import '../../../../data/local_db/database_helper.dart';
 import '../../../../data/sync_engine/sync_engine.dart';
 import '../../domain/trip.dart';
 import '../../domain/expense.dart';
+import 'expense_controller.dart';
+import '../../../itinerary/domain/itinerary_item.dart';
+import '../../../itinerary/presentation/controllers/itinerary_controller.dart';
 import '../../../checklist/domain/packing_item.dart';
 import '../../../auth/auth_controller.dart';
 
@@ -382,6 +385,19 @@ class TripController extends StateNotifier<TripState> {
             await _dbHelper.insertChecklistItem(PackingItem.fromJson(d.data()));
           } catch (_) {}
         }
+
+        // Pull itinerary activities for this shared trip into local SQLite
+        final itinSnap = await firestore
+            .collection('itinerary_items')
+            .where('trip_id', isEqualTo: joinedTrip.id)
+            .get();
+        for (final d in itinSnap.docs) {
+          try {
+            final data = Map<String, dynamic>.from(d.data());
+            data['id'] = d.id;
+            await _dbHelper.insertItineraryItem(ItineraryItem.fromMap(data).toMap());
+          } catch (_) {}
+        }
       } catch (_) {}
     }
 
@@ -394,6 +410,12 @@ class TripController extends StateNotifier<TripState> {
       updatedList.insert(0, joinedTrip);
     }
     state = state.copyWith(trips: updatedList);
+
+    // Refresh sub-controllers so newly joined trip details show immediately
+    try {
+      _ref.read(expenseControllerProvider(joinedTrip.id).notifier).loadExpenses();
+      _ref.read(itineraryControllerFamily(joinedTrip.id).notifier).loadItinerary();
+    } catch (_) {}
 
     // Start real-time live listener for this newly joined shared trip
     try {
@@ -414,6 +436,10 @@ class TripController extends StateNotifier<TripState> {
       updatedList.add(collaborator.trim());
       final updated = trip.copyWith(isShared: true, collaborators: updatedList);
       await updateTrip(updated);
+      try {
+        await _ref.read(syncEngineProvider.notifier).pushTrip(updated);
+        _ref.read(syncEngineProvider.notifier).listenToSharedTrip(updated.id);
+      } catch (_) {}
       return true;
     }
     return false;
@@ -429,6 +455,9 @@ class TripController extends StateNotifier<TripState> {
     if (updatedList.remove(collaborator.trim())) {
       final updated = trip.copyWith(collaborators: updatedList);
       await updateTrip(updated);
+      try {
+        await _ref.read(syncEngineProvider.notifier).pushTrip(updated);
+      } catch (_) {}
       return true;
     }
     return false;

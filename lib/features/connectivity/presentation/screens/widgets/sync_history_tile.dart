@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:packbuddy/features/connectivity/domain/connectivity_localization.dart';
 import 'package:packbuddy/features/connectivity/domain/sync_log_entry.dart';
 
 /// Single log tile representing a historical sync attempt
@@ -27,18 +28,18 @@ class SyncHistoryTile extends StatelessWidget {
       case 'upToDate':
         statusColor = const Color(0xFF10B981);
         statusIcon = Icons.check_circle_outline_rounded;
-        statusTitle = languageCode == 'tr' ? 'Eşleme Başarılı' : 'Sync Succeeded';
+        statusTitle = ConnectivityLocalization.syncStatusTitle(languageCode, 'upToDate');
         break;
       case 'noInternet':
         statusColor = const Color(0xFFF59E0B);
         statusIcon = Icons.wifi_off_rounded;
-        statusTitle = languageCode == 'tr' ? 'İnternet Yok' : 'No Internet';
+        statusTitle = ConnectivityLocalization.syncStatusTitle(languageCode, 'noInternet');
         break;
       case 'failed':
       default:
         statusColor = const Color(0xFFEF4444);
         statusIcon = Icons.error_outline_rounded;
-        statusTitle = languageCode == 'tr' ? 'Eşleme Hatası' : 'Sync Error';
+        statusTitle = ConnectivityLocalization.syncStatusTitle(languageCode, 'failed');
         break;
     }
 
@@ -101,9 +102,7 @@ class SyncHistoryTile extends StatelessWidget {
                   const SizedBox(height: 2),
                   if (entry.itemsSynced > 0)
                     Text(
-                      languageCode == 'tr'
-                          ? '${entry.itemsSynced} kayıt bulutla eşitlendi'
-                          : '${entry.itemsSynced} items synchronized with cloud',
+                      ConnectivityLocalization.itemsSyncedSuccess(languageCode, entry.itemsSynced),
                       style: TextStyle(
                         fontSize: 11.5,
                         color: theme.colorScheme.onSurface,

@@ -2021,7 +2021,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get passportOfficialDocument => 'Officiellt resepass';
 
   @override
-  String get storyLayoutMinimal => 'Minimal';
+  String get storyLayoutMinimal => 'Minimalistisk';
 
   @override
   String get passportWorldCitizen => 'Världsmedborgare';

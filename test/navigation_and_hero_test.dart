@@ -148,11 +148,11 @@ void main() {
 
       // Navigate to VaultScreen via Bento card
       await tester.scrollUntilVisible(
-        find.text('Belge Kasası'),
+        find.text('Güvenli Kasa'),
         200.0,
         scrollable: find.byType(Scrollable).first,
       );
-      final vaultCard = find.text('Belge Kasası');
+      final vaultCard = find.text('Güvenli Kasa');
       expect(vaultCard, findsWidgets);
       await tester.tap(vaultCard.first);
       await tester.pumpAndSettle();

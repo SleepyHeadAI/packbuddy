@@ -40,7 +40,7 @@ class PackingTagHelper {
 
     final normalized = rawTag.trim().toUpperCase();
 
-    if (normalized == tagCarryOn || normalized == 'CABIN' || normalized == 'KABIN') {
+    if (normalized == tagCarryOn || normalized == 'CARRY_ON' || normalized == 'CABIN' || normalized == 'KABIN') {
       if (isTr) return 'Kabin Bagajı';
       if (isDe) return 'Handgepäck';
       if (isFr) return 'Bagage Cabine';
@@ -86,13 +86,26 @@ class PackingTagHelper {
       return 'Personal Item';
     }
 
-    if (normalized == tagCheckIn || normalized == 'CHECKED' || normalized == 'CARGO' || normalized == 'UÇAK ALTI') {
+    if (normalized == tagCheckIn || normalized == 'CHECK_IN' || normalized == 'CHECKED' || normalized == 'CARGO' || normalized == 'UÇAK ALTI') {
       if (isTr) return 'Uçak Altı (Kargo Bagajı)';
       if (isDe) return 'Aufgabegepäck (Kargo)';
       if (isFr) return 'Bagage en Soute';
       if (isEs) return 'Equipaje Facturado';
       if (isIt) return 'Bagaglio da Stiva';
       if (isRu) return 'Регистрируемый багаж';
+      if (isPt) return 'Bagagem de Porão';
+      if (isNl) return 'Ruimbagage (Inchecken)';
+      if (isPl) return 'Bagaż Rejestrowany';
+      if (isSv) return 'Incheckat bagage';
+      if (isAr) return 'أمتعة مسجلة (شحن)';
+      if (isJa) return '受託手荷物（預け入れ）';
+      if (isKo) return '위탁 수하물 (화물)';
+      if (isZh) return '托运行李';
+      if (isHi) return 'चेक-इन सामान';
+      if (isId) return 'Bagasi Terdaftar (Kargo)';
+      if (isTh) return 'สัมภาระโหลดใต้เครื่อง';
+      if (isVi) return 'Hành lý ký gửi';
+      if (isEl) return 'Παραδοτέα Αποσκευή';
       return 'Checked Baggage (Cargo)';
     }
 
@@ -101,8 +114,21 @@ class PackingTagHelper {
       if (isDe) return 'Wichtig / Immer dabei';
       if (isFr) return 'Essentiel / Sur soi';
       if (isEs) return 'Esencial / Conmigo';
-      if (isIt) return 'Essenziale';
+      if (isIt) return 'Essenziale / Con sé';
       if (isRu) return 'Важное / С собой';
+      if (isPt) return 'Essencial / Sempre comigo';
+      if (isNl) return 'Belangrijk / Bij de hand';
+      if (isPl) return 'Niezbędne / Przy sobie';
+      if (isSv) return 'Viktigt / Alltid med';
+      if (isAr) return 'مهم / دائمًا معي';
+      if (isJa) return '重要 / 常時携帯';
+      if (isKo) return '중요 / 필수 소지';
+      if (isZh) return '重要 / 随身携带';
+      if (isHi) return 'महत्वपूर्ण / हमेशा साथ रखें';
+      if (isId) return 'Penting / Selalu Dibawa';
+      if (isTh) return 'จำเป็น / พกติดตัวเสมอ';
+      if (isVi) return 'Quan trọng / Luôn mang theo';
+      if (isEl) return 'Σημαντικό / Πάντα μαζί';
       return 'Essential / Always With Me';
     }
 
@@ -134,7 +160,7 @@ class PackingTagHelper {
 
     final normalized = rawTag.trim().toUpperCase();
 
-    if (normalized == tagCarryOn || normalized == 'CABIN' || normalized == 'KABIN') {
+    if (normalized == tagCarryOn || normalized == 'CARRY_ON' || normalized == 'CABIN' || normalized == 'KABIN') {
       if (isTr) return 'Kabin';
       if (isDe) return 'Kabine';
       if (isFr) return 'Cabine';
@@ -180,7 +206,7 @@ class PackingTagHelper {
       return 'Personal';
     }
 
-    if (normalized == tagCheckIn || normalized == 'CHECKED' || normalized == 'CARGO' || normalized == 'UÇAK ALTI') {
+    if (normalized == tagCheckIn || normalized == 'CHECK_IN' || normalized == 'CHECKED' || normalized == 'CARGO' || normalized == 'UÇAK ALTI') {
       if (isTr) return 'Uçak Altı';
       if (isDe) return 'Aufgabe';
       if (isFr) return 'En Soute';
@@ -231,13 +257,13 @@ class PackingTagHelper {
 
   static IconData getTagIcon(String rawTag) {
     final normalized = rawTag.trim().toUpperCase();
-    if (normalized == tagCarryOn || normalized == 'CABIN' || normalized == 'KABIN') {
+    if (normalized == tagCarryOn || normalized == 'CARRY_ON' || normalized == 'CABIN' || normalized == 'KABIN') {
       return Icons.luggage_rounded;
     }
     if (normalized == tagCabinOnly || normalized == 'PERSONAL' || normalized == 'KIŞISEL' || normalized == 'KISISEL') {
       return Icons.shopping_bag_outlined;
     }
-    if (normalized == tagCheckIn || normalized == 'CHECKED' || normalized == 'CARGO' || normalized == 'UÇAK ALTI') {
+    if (normalized == tagCheckIn || normalized == 'CHECK_IN' || normalized == 'CHECKED' || normalized == 'CARGO' || normalized == 'UÇAK ALTI') {
       return Icons.work_outline_rounded;
     }
     if (normalized == tagEssential || normalized == 'ÖNEMLI' || normalized == 'ONEMLI') {
@@ -248,13 +274,13 @@ class PackingTagHelper {
 
   static Color getTagColor(String rawTag, bool isDark) {
     final normalized = rawTag.trim().toUpperCase();
-    if (normalized == tagCarryOn || normalized == 'CABIN' || normalized == 'KABIN') {
+    if (normalized == tagCarryOn || normalized == 'CARRY_ON' || normalized == 'CABIN' || normalized == 'KABIN') {
       return isDark ? AppColors.primaryAmber : AppColors.primaryLight;
     }
     if (normalized == tagCabinOnly || normalized == 'PERSONAL' || normalized == 'KIŞISEL' || normalized == 'KISISEL') {
       return isDark ? const Color(0xFF94A3B8) : AppColors.tertiaryLight;
     }
-    if (normalized == tagCheckIn || normalized == 'CHECKED' || normalized == 'CARGO' || normalized == 'UÇAK ALTI') {
+    if (normalized == tagCheckIn || normalized == 'CHECK_IN' || normalized == 'CHECKED' || normalized == 'CARGO' || normalized == 'UÇAK ALTI') {
       return isDark ? const Color(0xFF2DD4BF) : AppColors.secondaryLight;
     }
     if (normalized == tagEssential || normalized == 'ÖNEMLI' || normalized == 'ONEMLI') {
@@ -265,7 +291,7 @@ class PackingTagHelper {
 
   static Color getTagBgColor(String rawTag, bool isDark) {
     final normalized = rawTag.trim().toUpperCase();
-    if (normalized == tagCarryOn || normalized == 'CABIN' || normalized == 'KABIN') {
+    if (normalized == tagCarryOn || normalized == 'CARRY_ON' || normalized == 'CABIN' || normalized == 'KABIN') {
       return isDark
           ? AppColors.primaryContainerDark.withValues(alpha: 0.35)
           : AppColors.primaryContainerLight.withValues(alpha: 0.35);
@@ -275,7 +301,7 @@ class PackingTagHelper {
           ? Colors.white.withValues(alpha: 0.05)
           : const Color(0xFFF1F5F9);
     }
-    if (normalized == tagCheckIn || normalized == 'CHECKED' || normalized == 'CARGO' || normalized == 'UÇAK ALTI') {
+    if (normalized == tagCheckIn || normalized == 'CHECK_IN' || normalized == 'CHECKED' || normalized == 'CARGO' || normalized == 'UÇAK ALTI') {
       return isDark
           ? const Color(0xFF0F766E).withValues(alpha: 0.2)
           : const Color(0xFFCCFBF1);
@@ -290,7 +316,7 @@ class PackingTagHelper {
 
   static Color getTagBorderColor(String rawTag, bool isDark) {
     final normalized = rawTag.trim().toUpperCase();
-    if (normalized == tagCarryOn || normalized == 'CABIN' || normalized == 'KABIN') {
+    if (normalized == tagCarryOn || normalized == 'CARRY_ON' || normalized == 'CABIN' || normalized == 'KABIN') {
       return isDark
           ? AppColors.primaryDark.withValues(alpha: 0.5)
           : AppColors.primaryLight.withValues(alpha: 0.35);
@@ -300,7 +326,7 @@ class PackingTagHelper {
           ? AppColors.outlineDark
           : AppColors.outlineLight;
     }
-    if (normalized == tagCheckIn || normalized == 'CHECKED' || normalized == 'CARGO' || normalized == 'UÇAK ALTI') {
+    if (normalized == tagCheckIn || normalized == 'CHECK_IN' || normalized == 'CHECKED' || normalized == 'CARGO' || normalized == 'UÇAK ALTI') {
       return isDark
           ? const Color(0xFF0F766E).withValues(alpha: 0.6)
           : AppColors.secondaryLight.withValues(alpha: 0.45);

@@ -149,6 +149,12 @@ class ProfileController extends StateNotifier<ProfileState> {
     }
   }
 
+  /// Checks whether a given username handle is available
+  Future<bool> isUsernameAvailable(String username) async {
+    final uid = state.profile?.uid ?? _ref.read(authUserProvider)?.uid;
+    return _profileService.isUsernameAvailable(username, currentUid: uid);
+  }
+
   /// Updates profile metadata and syncs with cloud
   Future<bool> updateProfile({
     String? displayName,
@@ -157,6 +163,11 @@ class ProfileController extends StateNotifier<ProfileState> {
     String? homeCity,
     String? photoUrl,
     bool clearPhoto = false,
+    String? username,
+    bool clearUsername = false,
+    String? travelStatus,
+    bool clearTravelStatus = false,
+    List<String>? travelStyles,
   }) async {
     final uid = state.profile?.uid ?? _ref.read(authUserProvider)?.uid;
     if (uid == null || uid.isEmpty) return false;
@@ -171,6 +182,11 @@ class ProfileController extends StateNotifier<ProfileState> {
         homeCity: homeCity,
         photoUrl: photoUrl,
         clearPhoto: clearPhoto,
+        username: username,
+        clearUsername: clearUsername,
+        travelStatus: travelStatus,
+        clearTravelStatus: clearTravelStatus,
+        travelStyles: travelStyles,
       );
       state = state.copyWith(
         profile: updated,

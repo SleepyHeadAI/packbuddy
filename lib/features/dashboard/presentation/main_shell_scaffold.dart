@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,8 +34,8 @@ class _MainShellScaffoldState extends ConsumerState<MainShellScaffold> {
     super.initState();
     _screens = const [
       DashboardScreen(),
-      TravelMapScreen(),
-      ChecklistScreen(),
+      TravelMapScreen(isTabMode: true),
+      ChecklistScreen(isTabMode: true),
       VaultScreen(isTabMode: true),
       SettingsScreen(),
     ];
@@ -205,74 +204,71 @@ class _FloatingGlassNavigationBar extends StatelessWidget {
     final theme = Theme.of(context);
     final isRtl = Directionality.of(context) == TextDirection.rtl;
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(barRadius),
-        boxShadow: [
-          // 1. Ambient soft omni elevation glow (spreads in all directions)
-          BoxShadow(
-            color: isDark
-                ? Colors.black.withValues(alpha: 0.45)
-                : const Color(0xFF0F172A).withValues(alpha: 0.08),
-            blurRadius: 28,
-            spreadRadius: 0,
-            offset: const Offset(0, 4),
-          ),
-          // 2. Upward elevation shadow (casts shadow UPWARDS onto the scrolling content)
-          BoxShadow(
-            color: isDark
-                ? Colors.black.withValues(alpha: 0.30)
-                : const Color(0xFF0F172A).withValues(alpha: 0.04),
-            blurRadius: 10,
-            spreadRadius: 0,
-            offset: const Offset(0, -2),
-          ),
-          // 3. Subtle crisp contact shadow
-          BoxShadow(
-            color: isDark
-                ? Colors.black.withValues(alpha: 0.20)
-                : const Color(0xFF0F172A).withValues(alpha: 0.02),
-            blurRadius: 4,
-            spreadRadius: 0,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(barRadius),
-        child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: Container(
-            height: barHeight,
-            padding: const EdgeInsets.symmetric(
-              horizontal: horizontalPadding,
-              vertical: verticalPadding,
+    return RepaintBoundary(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(barRadius),
+          boxShadow: [
+            // 1. Ambient soft omni elevation glow (spreads in all directions)
+            BoxShadow(
+              color: isDark
+                  ? Colors.black.withValues(alpha: 0.45)
+                  : const Color(0xFF0F172A).withValues(alpha: 0.08),
+              blurRadius: 28,
+              spreadRadius: 0,
+              offset: const Offset(0, 4),
             ),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: isDark
-                    ? [
-                        const Color(0xFF1E2632).withValues(alpha: 0.82),
-                        const Color(0xFF141A22).withValues(alpha: 0.76),
-                      ]
-                    : [
-                        Colors.white.withValues(alpha: 0.82),
-                        Colors.white.withValues(alpha: 0.68),
-                      ],
-              ),
-              borderRadius: BorderRadius.circular(barRadius),
-              border: Border.all(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.12)
-                    : Colors.white.withValues(alpha: 0.70),
-                width: 1.0,
-              ),
+            // 2. Upward elevation shadow (casts shadow UPWARDS onto the scrolling content)
+            BoxShadow(
+              color: isDark
+                  ? Colors.black.withValues(alpha: 0.30)
+                  : const Color(0xFF0F172A).withValues(alpha: 0.04),
+              blurRadius: 10,
+              spreadRadius: 0,
+              offset: const Offset(0, -2),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: List.generate(items.length, (index) {
+            // 3. Subtle crisp contact shadow
+            BoxShadow(
+              color: isDark
+                  ? Colors.black.withValues(alpha: 0.20)
+                  : const Color(0xFF0F172A).withValues(alpha: 0.02),
+              blurRadius: 4,
+              spreadRadius: 0,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Container(
+          height: barHeight,
+          padding: const EdgeInsets.symmetric(
+            horizontal: horizontalPadding,
+            vertical: verticalPadding,
+          ),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: isDark
+                  ? [
+                      const Color(0xFF1E2632).withValues(alpha: 0.94),
+                      const Color(0xFF141A22).withValues(alpha: 0.92),
+                    ]
+                  : [
+                      Colors.white.withValues(alpha: 0.95),
+                      const Color(0xFFF8FAFC).withValues(alpha: 0.92),
+                    ],
+            ),
+            borderRadius: BorderRadius.circular(barRadius),
+            border: Border.all(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.14)
+                  : Colors.white.withValues(alpha: 0.85),
+              width: 1.0,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List.generate(items.length, (index) {
                 final item = items[index];
                 final isSelected = index == selectedIndex;
                 final isFirst = index == 0;
@@ -299,8 +295,7 @@ class _FloatingGlassNavigationBar extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
 

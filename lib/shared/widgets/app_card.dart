@@ -30,12 +30,18 @@ class AppCard extends StatefulWidget {
 }
 
 class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _scaleAnimation;
+  AnimationController? _controller;
+  Animation<double>? _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
+    if (widget.onTap != null) {
+      _initController();
+    }
+  }
+
+  void _initController() {
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 140),
@@ -45,7 +51,7 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
     );
     _scaleAnimation = Tween<double>(begin: 1.0, end: 0.985).animate(
       CurvedAnimation(
-        parent: _controller,
+        parent: _controller!,
         curve: Curves.easeOutCubic,
         reverseCurve: Curves.easeOutBack,
       ),
@@ -53,8 +59,20 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
   }
 
   @override
+  void didUpdateWidget(AppCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.onTap != null && _controller == null) {
+      _initController();
+    } else if (widget.onTap == null && _controller != null) {
+      _controller?.dispose();
+      _controller = null;
+      _scaleAnimation = null;
+    }
+  }
+
+  @override
   void dispose() {
-    _controller.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
@@ -105,12 +123,12 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
       child: widget.child,
     );
 
-    if (widget.onTap != null) {
+    if (widget.onTap != null && _scaleAnimation != null && _controller != null) {
       return AnimatedBuilder(
-        animation: _scaleAnimation,
+        animation: _scaleAnimation!,
         builder: (context, child) {
           return Transform.scale(
-            scale: _scaleAnimation.value,
+            scale: _scaleAnimation!.value,
             child: child,
           );
         },
@@ -127,9 +145,9 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
               onTap: widget.onTap,
               onHighlightChanged: (highlighted) {
                 if (highlighted) {
-                  _controller.forward();
+                  _controller?.forward();
                 } else {
-                  _controller.reverse();
+                  _controller?.reverse();
                 }
               },
               splashColor: theme.colorScheme.primary.withValues(alpha: 0.08),

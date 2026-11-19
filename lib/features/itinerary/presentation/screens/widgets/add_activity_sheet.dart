@@ -335,7 +335,7 @@ class _AddActivitySheetState extends ConsumerState<AddActivitySheet> {
               controller: _titleController,
               autofocus: !isEditing,
               decoration: InputDecoration(
-                hintText: lang == 'tr' ? 'örn. Eyfel Kulesi Ziyareti' : 'e.g. Visit Eiffel Tower',
+                hintText: ItineraryLocalization.getActivityTitleHint(lang),
                 prefixIcon: const Icon(Icons.event_note_rounded, size: 20),
                 filled: true,
                 fillColor: isDark
@@ -553,7 +553,7 @@ class _AddActivitySheetState extends ConsumerState<AddActivitySheet> {
             TextField(
               controller: _locationController,
               decoration: InputDecoration(
-                hintText: lang == 'tr' ? 'Mekan / Adres' : 'Venue / Address',
+                hintText: ItineraryLocalization.getLocationHint(lang),
                 prefixIcon: const Icon(Icons.location_on_outlined, size: 20),
                 filled: true,
                 fillColor: isDark
@@ -577,7 +577,7 @@ class _AddActivitySheetState extends ConsumerState<AddActivitySheet> {
               controller: _costController,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
               decoration: InputDecoration(
-                hintText: lang == 'tr' ? 'Tahmini Tutar (örn. 25)' : 'Estimated amount (e.g. 25)',
+                hintText: ItineraryLocalization.getCostHint(lang),
                 prefixIcon: const Icon(Icons.attach_money_rounded, size: 20),
                 filled: true,
                 fillColor: isDark
@@ -630,7 +630,7 @@ class _AddActivitySheetState extends ConsumerState<AddActivitySheet> {
               controller: _notesController,
               maxLines: 2,
               decoration: InputDecoration(
-                hintText: lang == 'tr' ? 'Rezervasyon no, hatırlatma...' : 'Booking ID, reminder...',
+                hintText: ItineraryLocalization.getNotesHint(lang),
                 filled: true,
                 fillColor: isDark
                     ? theme.colorScheme.surfaceContainer

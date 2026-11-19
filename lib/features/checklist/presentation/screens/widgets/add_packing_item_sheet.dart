@@ -6,6 +6,9 @@ import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/features/checklist/domain/packing_item.dart';
 import 'package:packbuddy/features/checklist/domain/packing_tag.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
+import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
+import 'package:packbuddy/features/profile/domain/friend_localization.dart';
+import 'package:packbuddy/features/profile/presentation/controllers/friends_controller.dart';
 
 /// Fast, snappy modal bottom sheet to add or edit a packing item in the checklist
 class AddPackingItemSheet extends StatefulWidget {
@@ -44,6 +47,7 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
   String _tag = 'CARRY-ON';
   String _compartment = 'Ana Bölme';
   int _quantity = 1;
+  String? _assignedTo;
 
   final List<String> _categories = [
     'Kıyafet',
@@ -83,6 +87,7 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
       }
       _compartment = item.compartment;
       _quantity = item.quantity;
+      _assignedTo = item.assignedTo;
     }
   }
 
@@ -129,6 +134,7 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
         quantity: _quantity,
         tag: _tag,
         compartment: _compartment,
+        assignedTo: _assignedTo,
       );
 
       ref.read(checklistControllerProvider.notifier).updateItem(updatedItem);
@@ -162,6 +168,7 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
       compartment: _compartment,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
+      assignedTo: _assignedTo,
     );
 
     ref.read(checklistControllerProvider.notifier).addItem(newItem);
@@ -436,7 +443,95 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
                   );
                 },
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 14),
+
+              // Collaborative Assignment Selector ("Kim Getirecek?")
+              Consumer(
+                builder: (context, ref, _) {
+                  final langCode = Localizations.localeOf(context).languageCode;
+                  final friends = ref.watch(friendsControllerProvider).friends;
+                  final trips = ref.watch(tripControllerProvider).trips;
+
+                  // Gather candidate assignees
+                  final candidates = <String>{};
+                  if (widget.tripId != null) {
+                    final currentTrip = trips.where((t) => t.id == widget.tripId).firstOrNull;
+                    if (currentTrip != null) {
+                      for (final c in currentTrip.collaborators) {
+                        candidates.add(c.startsWith('@') ? c : '@$c');
+                      }
+                    }
+                  }
+                  for (final f in friends) {
+                    if (f.username != null && f.username!.isNotEmpty) {
+                      candidates.add('@${f.username}');
+                    } else if (f.displayName != null && f.displayName!.isNotEmpty) {
+                      candidates.add(f.displayName!);
+                    }
+                  }
+                  if (_assignedTo != null && _assignedTo!.isNotEmpty) {
+                    final normalized = _assignedTo!.startsWith('@') ? _assignedTo! : '@$_assignedTo';
+                    candidates.add(normalized);
+                  }
+
+                  if (candidates.isEmpty) return const SizedBox.shrink();
+
+                  final effectiveValue = _assignedTo != null && _assignedTo!.isNotEmpty
+                      ? (_assignedTo!.startsWith('@') ? _assignedTo! : '@$_assignedTo')
+                      : null;
+
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: DropdownButtonFormField<String?>(
+                      isExpanded: true,
+                      initialValue: candidates.contains(effectiveValue) ? effectiveValue : null,
+                      menuMaxHeight: 280,
+                      borderRadius: BorderRadius.circular(16),
+                      decoration: InputDecoration(
+                        labelText: FriendLocalization.getAssignedTo(langCode),
+                        prefixIcon: Icon(Icons.person_pin_rounded, size: 20, color: theme.colorScheme.primary),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      ),
+                      items: [
+                        DropdownMenuItem<String?>(
+                          value: null,
+                          child: Text(
+                            FriendLocalization.getUnassigned(langCode),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                        ...candidates.map((handle) {
+                          return DropdownMenuItem<String?>(
+                            value: handle,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.account_circle_rounded, size: 16, color: theme.colorScheme.primary),
+                                const SizedBox(width: 6),
+                                Flexible(
+                                  child: Text(
+                                    handle,
+                                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ],
+                      onChanged: (val) {
+                        setState(() => _assignedTo = val);
+                      },
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 14),
 
               // Action Buttons
               Consumer(
@@ -487,77 +582,155 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
 }
 
   static String _getLuggageTypeLabel(String langCode) {
-    final lang = langCode.toLowerCase();
-    if (lang == 'tr') return 'Bavul / Bagaj Türü';
-    if (lang == 'de') return 'Gepäckart';
-    if (lang == 'fr') return 'Type de bagage';
-    if (lang == 'es') return 'Tipo de equipaje';
-    if (lang == 'it') return 'Tipo di bagaglio';
-    if (lang == 'ru') return 'Тип багажа';
-    if (lang == 'ar') return 'نوع الأمتعة';
-    if (lang == 'pt') return 'Tipo de bagagem';
-    if (lang == 'nl') return 'Type bagage';
-    return 'Luggage Type';
+    final lang = langCode.toLowerCase().split('_').first.split('-').first;
+    switch (lang) {
+      case 'tr': return 'Bavul / Bagaj Türü';
+      case 'de': return 'Gepäckart';
+      case 'fr': return 'Type de bagage';
+      case 'es': return 'Tipo de equipaje';
+      case 'it': return 'Tipo di bagaglio';
+      case 'ru': return 'Тип багажа';
+      case 'ar': return 'نوع الأمتعة';
+      case 'pt': return 'Tipo de bagagem';
+      case 'nl': return 'Type bagage';
+      case 'zh': return '行李类别';
+      case 'ja': return '荷物タイプ';
+      case 'ko': return '수하물 유형';
+      case 'hi': return 'सामान का प्रकार';
+      case 'el': return 'Τύπος αποσκευής';
+      case 'sv': return 'Bagagetyp';
+      case 'pl': return 'Typ bagażu';
+      case 'id': return 'Tipe Bagasi';
+      case 'th': return 'ประเภทสัมภาระ';
+      case 'vi': return 'Loại hành lý';
+      case 'en':
+      default: return 'Luggage Type';
+    }
   }
 
   static String _getLocalizedCompartment(String comp, String langCode) {
-    final lang = langCode.toLowerCase();
+    final lang = langCode.toLowerCase().split('_').first.split('-').first;
     switch (comp) {
       case 'Ana Bölme':
-        if (lang == 'tr') return 'Ana Bölme';
-        if (lang == 'de') return 'Hauptfach';
-        if (lang == 'fr') return 'Compartiment principal';
-        if (lang == 'es') return 'Compartimento principal';
-        if (lang == 'it') return 'Scomparto principale';
-        if (lang == 'ru') return 'Основное отделение';
-        if (lang == 'ar') return 'المقصورة الرئيسية';
-        if (lang == 'pt') return 'Compartimento principal';
-        if (lang == 'nl') return 'Hoofdvak';
-        return 'Main Compartment';
+        switch (lang) {
+          case 'tr': return 'Ana Bölme';
+          case 'de': return 'Hauptfach';
+          case 'fr': return 'Compartiment principal';
+          case 'es': return 'Compartimento principal';
+          case 'it': return 'Scomparto principale';
+          case 'ru': return 'Основное отделение';
+          case 'ar': return 'المقصورة الرئيسية';
+          case 'pt': return 'Compartimento principal';
+          case 'nl': return 'Hoofdvak';
+          case 'zh': return '主隔层';
+          case 'ja': return 'メイン収納';
+          case 'ko': return '메인 수납공간';
+          case 'hi': return 'मुख्य डिब्बा';
+          case 'el': return 'Κύριος χώρος';
+          case 'sv': return 'Huvudfack';
+          case 'pl': return 'Główna komora';
+          case 'id': return 'Kompartemen Utama';
+          case 'th': return 'ช่องหลัก';
+          case 'vi': return 'Ngăn chính';
+          case 'en':
+          default: return 'Main Compartment';
+        }
       case 'Ön Cep':
-        if (lang == 'tr') return 'Ön Cep';
-        if (lang == 'de') return 'Vordertasche';
-        if (lang == 'fr') return 'Poche avant';
-        if (lang == 'es') return 'Bolsillo delantero';
-        if (lang == 'it') return 'Tasca frontale';
-        if (lang == 'ru') return 'Передний карман';
-        if (lang == 'ar') return 'الجيب الأمامي';
-        if (lang == 'pt') return 'Bolso frontal';
-        if (lang == 'nl') return 'Voorvak';
-        return 'Front Pocket';
+        switch (lang) {
+          case 'tr': return 'Ön Cep';
+          case 'de': return 'Vordertasche';
+          case 'fr': return 'Poche avant';
+          case 'es': return 'Bolsillo delantero';
+          case 'it': return 'Tasca frontale';
+          case 'ru': return 'Передний карман';
+          case 'ar': return 'الجيب الأمامي';
+          case 'pt': return 'Bolso frontal';
+          case 'nl': return 'Voorvak';
+          case 'zh': return '前袋';
+          case 'ja': return 'フロントポケット';
+          case 'ko': return '앞주머니';
+          case 'hi': return 'सामने की जेब';
+          case 'el': return 'Μπροστινή τσέπη';
+          case 'sv': return 'Framficka';
+          case 'pl': return 'Przednia kieszeń';
+          case 'id': return 'Saku Depan';
+          case 'th': return 'กระเป๋าหน้า';
+          case 'vi': return 'Túi trước';
+          case 'en':
+          default: return 'Front Pocket';
+        }
       case 'Sırt Çantası':
-        if (lang == 'tr') return 'Sırt Çantası';
-        if (lang == 'de') return 'Rucksack';
-        if (lang == 'fr') return 'Sac à dos';
-        if (lang == 'es') return 'Mochila';
-        if (lang == 'it') return 'Zaino';
-        if (lang == 'ru') return 'Рюкзак';
-        if (lang == 'ar') return 'حقيبة الظهر';
-        if (lang == 'pt') return 'Mochila';
-        if (lang == 'nl') return 'Rugzak';
-        return 'Backpack';
+        switch (lang) {
+          case 'tr': return 'Sırt Çantası';
+          case 'de': return 'Rucksack';
+          case 'fr': return 'Sac à dos';
+          case 'es': return 'Mochila';
+          case 'it': return 'Zaino';
+          case 'ru': return 'Рюкзак';
+          case 'ar': return 'حقيبة الظهر';
+          case 'pt': return 'Mochila';
+          case 'nl': return 'Rugzak';
+          case 'zh': return '背包';
+          case 'ja': return 'バックパック';
+          case 'ko': return '백팩';
+          case 'hi': return 'बैकपैक';
+          case 'el': return 'Σακίδιο πλάτης';
+          case 'sv': return 'Ryggsäck';
+          case 'pl': return 'Plecak';
+          case 'id': return 'Ransel';
+          case 'th': return 'กระเป๋าเป้';
+          case 'vi': return 'Ba lô';
+          case 'en':
+          default: return 'Backpack';
+        }
       case 'Kozmetik Bölmesi':
-        if (lang == 'tr') return 'Kozmetik Bölmesi';
-        if (lang == 'de') return 'Kulturbeutel';
-        if (lang == 'fr') return 'Trousse de toilette';
-        if (lang == 'es') return 'Neceser';
-        if (lang == 'it') return 'Bustina cosmetici';
-        if (lang == 'ru') return 'Косметичка';
-        if (lang == 'ar') return 'حقيبة مستحضرات التجميل';
-        if (lang == 'pt') return 'Necessaire';
-        if (lang == 'nl') return 'Toilettas';
-        return 'Toiletry Pouch';
+        switch (lang) {
+          case 'tr': return 'Kozmetik Bölmesi';
+          case 'de': return 'Kulturbeutel';
+          case 'fr': return 'Trousse de toilette';
+          case 'es': return 'Neceser';
+          case 'it': return 'Bustina cosmetici';
+          case 'ru': return 'Косметичка';
+          case 'ar': return 'حقيبة مستحضرات التجميل';
+          case 'pt': return 'Necessaire';
+          case 'nl': return 'Toilettas';
+          case 'zh': return '洗漱包/化妆隔层';
+          case 'ja': return '洗面ポーチ';
+          case 'ko': return '세면용품 파우치';
+          case 'hi': return 'प्रसाधन पाउच';
+          case 'el': return 'Νεσεσέρ καλλυντικών';
+          case 'sv': return 'Necessär';
+          case 'pl': return 'Kosmetyczka';
+          case 'id': return 'Pouch Kosmetik';
+          case 'th': return 'กระเป๋าเครื่องแป้ง';
+          case 'vi': return 'Túi mỹ phẩm';
+          case 'en':
+          default: return 'Toiletry Pouch';
+        }
       case 'Yan Göz':
-        if (lang == 'tr') return 'Yan Göz';
-        if (lang == 'de') return 'Seitentasche';
-        if (lang == 'fr') return 'Poche latérale';
-        if (lang == 'es') return 'Bolsillo lateral';
-        if (lang == 'it') return 'Tasca laterale';
-        if (lang == 'ru') return 'Боковой карман';
-        if (lang == 'ar') return 'الجيب الجانبي';
-        if (lang == 'pt') return 'Bolso lateral';
-        if (lang == 'nl') return 'Zijvak';
-        return 'Side Pocket';
+        switch (lang) {
+          case 'tr': return 'Yan Göz';
+          case 'de': return 'Seitentasche';
+          case 'fr': return 'Poche latérale';
+          case 'es': return 'Bolsillo lateral';
+          case 'it': return 'Tasca laterale';
+          case 'ru': return 'Боковой карман';
+          case 'ar': return 'الجيب الجانبي';
+          case 'pt': return 'Bolso lateral';
+          case 'nl': return 'Zijvak';
+          case 'zh': return '侧袋';
+          case 'ja': return 'サイドポケット';
+          case 'ko': return '측면 포켓';
+          case 'hi': return 'साइड पॉकेट';
+          case 'el': return 'Πλαϊνή τσέπη';
+          case 'sv': return 'Sidofack';
+          case 'pl': return 'Kieszeń boczna';
+          case 'id': return 'Saku Samping';
+          case 'th': return 'ช่องด้านข้าง';
+          case 'vi': return 'Túi bên';
+          case 'en':
+          default: return 'Side Pocket';
+        }
       default:
         return comp;
     }

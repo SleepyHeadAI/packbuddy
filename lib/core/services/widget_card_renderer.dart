@@ -817,7 +817,7 @@ class WidgetCardRenderer {
   }) {
     final hasTrip = widgetData?.hasUpcomingTrip ?? false;
     final defaultDestination = AppWidgetLocalization.getDefaultDestination(lang);
-    final tripTitle = widgetData?.tripTitle ?? (lang == 'tr' ? 'Roma Tatili' : 'Rome Trip');
+    final tripTitle = widgetData?.tripTitle ?? AppWidgetLocalization.getDefaultTripTitle(lang);
     final destination = (widgetData?.destination != null && widgetData!.destination!.isNotEmpty)
         ? widgetData.destination!
         : defaultDestination;
@@ -980,7 +980,7 @@ class WidgetCardRenderer {
     required bool showBudget,
   }) {
     final hasTrip = widgetData?.hasUpcomingTrip ?? false;
-    final tripTitle = widgetData?.tripTitle ?? (lang == 'tr' ? 'Roma Tatili' : 'Rome Trip');
+    final tripTitle = widgetData?.tripTitle ?? AppWidgetLocalization.getDefaultTripTitle(lang);
     final defaultDestination = AppWidgetLocalization.getDefaultDestination(lang);
     final destination = (widgetData?.destination != null && widgetData!.destination!.isNotEmpty)
         ? widgetData.destination!
@@ -1189,7 +1189,7 @@ class WidgetCardRenderer {
     required bool showBudget,
   }) {
     final hasTrip = widgetData?.hasUpcomingTrip ?? false;
-    final tripTitle = widgetData?.tripTitle ?? (lang == 'tr' ? 'Roma Tatili' : 'Rome Trip');
+    final tripTitle = widgetData?.tripTitle ?? AppWidgetLocalization.getDefaultTripTitle(lang);
     final defaultDestination = AppWidgetLocalization.getDefaultDestination(lang);
     final destination = (widgetData?.destination != null && widgetData!.destination!.isNotEmpty)
         ? widgetData.destination!

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
 import 'package:packbuddy/features/budget/domain/emergency_guide.dart';
+import 'package:packbuddy/features/budget/domain/budget_localization.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/core/widgets/legal_disclaimer_card.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
@@ -132,7 +133,7 @@ class _EmergencyGuideSheetState extends State<EmergencyGuideSheet> {
                       ),
                       Text(
                         allGuides.length > 1
-                            ? '${_getCountryFlag(guide)} ${_getCountryDisplayName(guide, context, l10n)} (${guide.countryCode}) · ${allGuides.length} ${l10n.localeName.startsWith('tr') ? 'Ülke Kapsanıyor' : 'Countries'}'
+                            ? '${_getCountryFlag(guide)} ${_getCountryDisplayName(guide, context, l10n)} (${guide.countryCode}) · ${BudgetLocalization.countriesCovered(l10n.localeName, allGuides.length)}'
                             : '${_getCountryFlag(guide)} ${_getCountryDisplayName(guide, context, l10n)} (${guide.countryCode})',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
@@ -389,9 +390,7 @@ class _EmergencyGuideSheetState extends State<EmergencyGuideSheet> {
                       Icon(Icons.public_rounded, size: 18, color: theme.colorScheme.primary),
                       const SizedBox(width: 8),
                       Text(
-                        l10n.localeName.startsWith('tr')
-                            ? 'Tüm Seyahat Ülkeleri (${allGuides.length})'
-                            : 'All Trip Destinations (${allGuides.length})',
+                        BudgetLocalization.allTripDestinations(l10n.localeName, allGuides.length),
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                         ),
@@ -451,7 +450,7 @@ class _EmergencyGuideSheetState extends State<EmergencyGuideSheet> {
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Text(
-                                      l10n.localeName.startsWith('tr') ? 'Aktif' : 'Active',
+                                      l10n.activeStatus,
                                       style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                                     ),
                                   ),

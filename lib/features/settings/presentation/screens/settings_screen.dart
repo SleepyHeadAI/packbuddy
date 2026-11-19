@@ -125,17 +125,20 @@ class SettingsScreen extends ConsumerWidget {
             borderRadius: 20,
             onTap: () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                MaterialPageRoute(builder: (_) => const ProfileScreen(avatarHeroTag: 'settings-profile-avatar')),
               );
             },
             child: Row(
               children: [
-                UserAvatar(
-                  photoUrl: profileState.profile?.photoUrl,
-                  displayName: profileState.profile?.displayName,
-                  email: authUser?.email,
-                  size: 48,
-                  isAnimated: true,
+                Hero(
+                  tag: 'settings-profile-avatar',
+                  child: UserAvatar(
+                    photoUrl: profileState.profile?.photoUrl,
+                    displayName: profileState.profile?.displayName,
+                    email: authUser?.email,
+                    size: 48,
+                    isAnimated: true,
+                  ),
                 ),
                 const SizedBox(width: 14),
                 Expanded(

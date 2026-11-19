@@ -649,5 +649,293 @@ class ConnectivityLocalization {
         return 'Clear History';
     }
   }
+
+  static String getPendingChangesSummary(String lang, int count) {
+    final clean = _cleanLang(lang);
+    if (count > 0) {
+      switch (clean) {
+        case 'tr': return '$count yerel kayıt eşitlenmeyi bekliyor';
+        case 'de': return '$count lokale Änderungen warten auf Synchronisation';
+        case 'fr': return '$count modifications locales en attente de synchronisation';
+        case 'es': return '$count cambios locales pendientes de sincronizar';
+        case 'it': return '$count modifiche locali in attesa di sincronizzazione';
+        case 'pt': return '$count alterações locais aguardando sincronização';
+        case 'ru': return '$count локальных изменений ожидают синхронизации';
+        case 'zh': return '$count 条本地更改等待同步';
+        case 'ja': return '$count 件の未同期データがあります';
+        case 'ko': return '$count개의 로컬 변경사항 동기화 대기 중';
+        case 'ar': return '$count تعديلات محلية في انتظار المزامنة';
+        case 'hi': return '$count स्थानीय परिवर्तन सिंक होने की प्रतीक्षा में हैं';
+        case 'nl': return '$count lokale wijzigingen wachten op synchronisatie';
+        case 'el': return '$count τοπικές αλλαγές σε αναμονή συγχρονισμού';
+        case 'sv': return '$count lokala ändringar väntar på att synkroniseras';
+        case 'pl': return '$count lokalnych zmian oczekuje na synchronizację';
+        case 'id': return '$count perubahan lokal menunggu sinkronisasi';
+        case 'th': return '$count รายการรอการซิงค์ข้อมูล';
+        case 'vi': return '$count thay đổi cục bộ đang chờ đồng bộ';
+        case 'en':
+        default: return '$count local ${count == 1 ? "change" : "changes"} waiting to sync';
+      }
+    } else {
+      switch (clean) {
+        case 'tr': return 'Tüm yerel verileriniz bulut ile güncel';
+        case 'de': return 'Alle lokalen Daten sind vollständig synchronisiert';
+        case 'fr': return 'Toutes les données locales sont synchronisées avec le cloud';
+        case 'es': return 'Todos los datos locales están sincronizados con la nube';
+        case 'it': return 'Tutti i dati locali sono sincronizzati con il cloud';
+        case 'pt': return 'Todas as alterações locais estão sincronizadas com a nuvem';
+        case 'ru': return 'Все локальные данные синхронизированы с облаком';
+        case 'zh': return '所有本地更改均已同步至云端';
+        case 'ja': return 'すべてのローカルデータはクラウドと同期済みです';
+        case 'ko': return '모든 로컬 데이터가 클라우드와 동기화되었습니다';
+        case 'ar': return 'جميع البيانات المحلية متزامنة بالكامل مع السحابة';
+        case 'hi': return 'सभी स्थानीय डेटा क्लाउड के साथ पूरी तरह से सिंक हैं';
+        case 'nl': return 'Alle lokale gegevens zijn gesynchroniseerd met de cloud';
+        case 'el': return 'Όλα τα τοπικά δεδομένα είναι πλήρως συγχρονισμένα';
+        case 'sv': return 'Alla lokala data är synkroniserade med molnet';
+        case 'pl': return 'Wszystkie dane lokalne są w pełni zsynchronizowane';
+        case 'id': return 'Semua perubahan lokal sudah tersinkronisasi ke cloud';
+        case 'th': return 'ข้อมูลทั้งหมดซิงค์กับคลาวด์เรียบร้อยแล้ว';
+        case 'vi': return 'Tất cả dữ liệu cục bộ đã được đồng bộ với đám mây';
+        case 'en':
+        default: return 'All local changes are fully synchronized';
+      }
+    }
+  }
+
+  static String tripsCountLabel(String lang, int count) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return '$count Seyahat';
+      case 'de': return '$count Reisen';
+      case 'fr': return '$count Voyages';
+      case 'es': return '$count Viajes';
+      case 'it': return '$count Viaggi';
+      case 'pt': return '$count Viagens';
+      case 'ru': return '$count Поездок';
+      case 'zh': return '$count 个行程';
+      case 'ja': return '$count 件の旅行';
+      case 'ko': return '$count개 여행';
+      case 'ar': return '$count رحلات';
+      case 'hi': return '$count यात्राएं';
+      case 'nl': return '$count Reizen';
+      case 'el': return '$count Ταξίδια';
+      case 'sv': return '$count Resor';
+      case 'pl': return '$count Podróży';
+      case 'id': return '$count Perjalanan';
+      case 'th': return '$count การเดินทาง';
+      case 'vi': return '$count Chuyến đi';
+      case 'en':
+      default: return '$count ${count == 1 ? "Trip" : "Trips"}';
+    }
+  }
+
+  static String itemsCountLabel(String lang, int count) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return '$count Eşya';
+      case 'de': return '$count Gegenstände';
+      case 'fr': return '$count Objets';
+      case 'es': return '$count Artículos';
+      case 'it': return '$count Oggetti';
+      case 'pt': return '$count Itens';
+      case 'ru': return '$count Вещей';
+      case 'zh': return '$count 件物品';
+      case 'ja': return '$count 個のアイテム';
+      case 'ko': return '$count개 소지품';
+      case 'ar': return '$count أغراض';
+      case 'hi': return '$count वस्तुएं';
+      case 'nl': return '$count Items';
+      case 'el': return '$count Αντικείμενα';
+      case 'sv': return '$count Föremål';
+      case 'pl': return '$count Rzeczy';
+      case 'id': return '$count Barang';
+      case 'th': return '$count สิ่งของ';
+      case 'vi': return '$count Đồ dùng';
+      case 'en':
+      default: return '$count ${count == 1 ? "Item" : "Items"}';
+    }
+  }
+
+  static String expensesCountLabel(String lang, int count) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return '$count Harcama';
+      case 'de': return '$count Ausgaben';
+      case 'fr': return '$count Dépenses';
+      case 'es': return '$count Gastos';
+      case 'it': return '$count Spese';
+      case 'pt': return '$count Despesas';
+      case 'ru': return '$count Расходов';
+      case 'zh': return '$count 笔开销';
+      case 'ja': return '$count 件の支出';
+      case 'ko': return '$count개 지출';
+      case 'ar': return '$count مصاريف';
+      case 'hi': return '$count खर्च';
+      case 'nl': return '$count Uitgaven';
+      case 'el': return '$count Έξοδα';
+      case 'sv': return '$count Utgifter';
+      case 'pl': return '$count Wydatków';
+      case 'id': return '$count Pengeluaran';
+      case 'th': return '$count รายจ่าย';
+      case 'vi': return '$count Chi tiêu';
+      case 'en':
+      default: return '$count ${count == 1 ? "Expense" : "Expenses"}';
+    }
+  }
+
+  static String documentsCountLabel(String lang, int count) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return '$count Belge';
+      case 'de': return '$count Dokumente';
+      case 'fr': return '$count Documents';
+      case 'es': return '$count Documentos';
+      case 'it': return '$count Documenti';
+      case 'pt': return '$count Documentos';
+      case 'ru': return '$count Документов';
+      case 'zh': return '$count 份文件';
+      case 'ja': return '$count 件の書類';
+      case 'ko': return '$count개 문서';
+      case 'ar': return '$count وثائق';
+      case 'hi': return '$count दस्तावेज़';
+      case 'nl': return '$count Documenten';
+      case 'el': return '$count Έγγραφα';
+      case 'sv': return '$count Dokument';
+      case 'pl': return '$count Dokumentów';
+      case 'id': return '$count Dokumen';
+      case 'th': return '$count เอกสาร';
+      case 'vi': return '$count Tài liệu';
+      case 'en':
+      default: return '$count ${count == 1 ? "Document" : "Documents"}';
+    }
+  }
+
+  static String syncStatusTitle(String lang, String status) {
+    final clean = _cleanLang(lang);
+    switch (status) {
+      case 'upToDate':
+        switch (clean) {
+          case 'tr': return 'Eşleme Başarılı';
+          case 'de': return 'Synchronisation erfolgreich';
+          case 'fr': return 'Synchronisation réussie';
+          case 'es': return 'Sincronización exitosa';
+          case 'it': return 'Sincronizzazione riuscita';
+          case 'pt': return 'Sincronização bem-sucedida';
+          case 'ru': return 'Синхронизация успешна';
+          case 'zh': return '同步成功';
+          case 'ja': return '同期完了';
+          case 'ko': return '동기화 성공';
+          case 'ar': return 'تمت المزامنة بنجاح';
+          case 'hi': return 'सिंक सफल';
+          case 'nl': return 'Synchronisatie geslaagd';
+          case 'el': return 'Συγχρονισμός επιτυχής';
+          case 'sv': return 'Synkronisering slutförd';
+          case 'pl': return 'Synchronizacja udana';
+          case 'id': return 'Sinkronisasi Berhasil';
+          case 'th': return 'ซิงค์ข้อมูลสำเร็จ';
+          case 'vi': return 'Đồng bộ thành công';
+          case 'en':
+          default: return 'Sync Succeeded';
+        }
+      case 'noInternet':
+        switch (clean) {
+          case 'tr': return 'İnternet Yok';
+          case 'de': return 'Kein Internet';
+          case 'fr': return 'Pas d\'internet';
+          case 'es': return 'Sin conexión';
+          case 'it': return 'Nessuna connessione';
+          case 'pt': return 'Sem conexão';
+          case 'ru': return 'Нет интернета';
+          case 'zh': return '无网络连接';
+          case 'ja': return 'インターネット未接続';
+          case 'ko': return '인터넷 연결 없음';
+          case 'ar': return 'لا يوجد اتصال';
+          case 'hi': return 'इंटरनेट नहीं है';
+          case 'nl': return 'Geen internet';
+          case 'el': return 'Χωρίς διαδίκτυο';
+          case 'sv': return 'Inget internet';
+          case 'pl': return 'Brak internetu';
+          case 'id': return 'Tidak Ada Internet';
+          case 'th': return 'ไม่มีอินเทอร์เน็ต';
+          case 'vi': return 'Không có mạng';
+          case 'en':
+          default: return 'No Internet';
+        }
+      case 'failed':
+      default:
+        switch (clean) {
+          case 'tr': return 'Eşleme Hatası';
+          case 'de': return 'Synchronisationsfehler';
+          case 'fr': return 'Erreur de synchronisation';
+          case 'es': return 'Error de sincronización';
+          case 'it': return 'Errore di sincronizzazione';
+          case 'pt': return 'Erro de sincronização';
+          case 'ru': return 'Ошибка синхронизации';
+          case 'zh': return '同步失败';
+          case 'ja': return '同期エラー';
+          case 'ko': return '동기화 오류';
+          case 'ar': return 'خطأ في المزامنة';
+          case 'hi': return 'सिंक त्रुटि';
+          case 'nl': return 'Synchronisatiefout';
+          case 'el': return 'Σφάλμα συγχρονισμού';
+          case 'sv': return 'Synkroniseringsfel';
+          case 'pl': return 'Błąd synchronizacji';
+          case 'id': return 'Gagal Sinkronisasi';
+          case 'th': return 'เกิดข้อผิดพลาดในการซิงค์';
+          case 'vi': return 'Lỗi đồng bộ';
+          case 'en':
+          default: return 'Sync Error';
+        }
+    }
+  }
+
+  static String itemsSyncedSuccess(String lang, int count) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return '$count kayıt bulutla eşitlendi';
+      case 'de': return '$count Datensätze mit der Cloud synchronisiert';
+      case 'fr': return '$count éléments synchronisés avec le cloud';
+      case 'es': return '$count elementos sincronizados con la nube';
+      case 'it': return '$count elementi sincronizzati con il cloud';
+      case 'pt': return '$count itens sincronizados com a nuvem';
+      case 'ru': return '$count записей синхронизировано с облаком';
+      case 'zh': return '$count 条记录已同步至云端';
+      case 'ja': return '$count 件のデータをクラウドと同期しました';
+      case 'ko': return '$count개 항목이 클라우드와 동기화되었습니다';
+      case 'ar': return 'تمت مزامنة $count عنصر مع السحابة';
+      case 'hi': return '$count आइटम क्लाउड के साथ सिंक किए गए';
+      case 'nl': return '$count items gesynchroniseerd met de cloud';
+      case 'el': return '$count στοιχεία συγχρονίστηκαν με το cloud';
+      case 'sv': return '$count objekt synkroniserade med molnet';
+      case 'pl': return 'Zsynchronizowano $count elementów z chmurą';
+      case 'id': return '$count item tersinkronisasi dengan cloud';
+      case 'th': return 'ซิงค์ $count รายการกับคลาวด์เรียบร้อยแล้ว';
+      case 'vi': return 'Đã đồng bộ $count mục với đám mây';
+      case 'en':
+      default: return '$count ${count == 1 ? "item" : "items"} synchronized with cloud';
+    }
+  }
+
+  static String neverSynced(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Henüz yapılmadı';
+      case 'de': return 'Noch nie synchronisiert';
+      case 'fr': return 'Jamais synchronisé';
+      case 'es': return 'Nunca sincronizado';
+      case 'it': return 'Mai sincronizzato';
+      case 'pt': return 'Nunca sincronizado';
+      case 'ru': return 'Ни разу не синхронизировано';
+      case 'zh': return '尚未同步';
+      case 'ja': return '未同期';
+      case 'ko': return '동기화된 적 없음';
+      case 'ar': return 'لم تتم المزامنة بعد';
+      case 'hi': return 'कभी सिंक नहीं हुआ';
+      case 'nl': return 'Nog nooit gesynchroniseerd';
+      case 'el': return 'Δεν έχει συγχρονιστεί ποτέ';
+      case 'sv': return 'Aldrig synkroniserad';
+      case 'pl': return 'Nigdy nie synchronizowano';
+      case 'id': return 'Belum pernah disinkronkan';
+      case 'th': return 'ยังไม่เคยซิงค์';
+      case 'vi': return 'Chưa từng đồng bộ';
+      case 'en':
+      default: return 'Never synced';
+    }
+  }
 }
 

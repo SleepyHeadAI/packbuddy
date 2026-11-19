@@ -80,6 +80,7 @@ class ProfileService {
         }
 
         await PreferencesService.instance.setCachedUserProfile(uid, profile.toJson());
+        unawaited(updateLastActive(uid));
         return profile;
       } else if (cachedProfile != null) {
         return cachedProfile;
@@ -94,6 +95,48 @@ class ProfileService {
     }
   }
 
+  /// Records real-time user presence heartbeat to Firestore and local cache
+  Future<void> updateLastActive(String uid) async {
+    if (uid.isEmpty) return;
+    final now = DateTime.now();
+    try {
+      if (_isFirebaseReady || _firestore != null) {
+        final fs = _firestore ?? FirebaseFirestore.instance;
+        unawaited(fs.collection('users').doc(uid).set({
+          'lastActiveAt': now.toIso8601String(),
+        }, SetOptions(merge: true)).catchError((_) {}));
+      }
+    } catch (_) {}
+  }
+
+  /// Format validation for unique username handles (@handle)
+  static bool isValidUsername(String username) {
+    final clean = username.trim().toLowerCase();
+    final regex = RegExp(r'^[a-z0-9_]{3,20}$');
+    return regex.hasMatch(clean);
+  }
+
+  /// Checks whether a given username is available or belongs to currentUid
+  Future<bool> isUsernameAvailable(String username, {String? currentUid}) async {
+    final clean = username.trim().toLowerCase();
+    if (!isValidUsername(clean)) return false;
+    if (!_isFirebaseReady && _firestore == null) return true;
+
+    try {
+      final firestore = _firestore ?? FirebaseFirestore.instance;
+      final doc = await firestore.collection('usernames').doc(clean).get();
+      if (!doc.exists) return true;
+      final data = doc.data();
+      if (data != null && currentUid != null && data['uid'] == currentUid) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('[ProfileService] isUsernameAvailable notice: $e');
+      return true;
+    }
+  }
+
   /// Updates profile metadata in Firestore and local cache
   Future<UserProfile> updateProfile(
     String uid, {
@@ -103,10 +146,22 @@ class ProfileService {
     String? homeCity,
     String? photoUrl,
     bool clearPhoto = false,
+    String? username,
+    bool clearUsername = false,
+    String? travelStatus,
+    bool clearTravelStatus = false,
+    List<String>? travelStyles,
   }) async {
     final existing = await fetchProfile(uid) ?? _createDefaultProfile(uid);
 
     final resolvedPhotoUrl = clearPhoto ? null : (photoUrl ?? existing.photoUrl);
+    final resolvedUsername = clearUsername
+        ? null
+        : (username != null ? username.trim().toLowerCase() : existing.username);
+    final resolvedTravelStatus = clearTravelStatus
+        ? null
+        : (travelStatus != null ? travelStatus.trim() : existing.travelStatus);
+    final resolvedTravelStyles = travelStyles ?? existing.travelStyles;
 
     final updated = existing.copyWith(
       displayName: displayName ?? existing.displayName,
@@ -115,6 +170,11 @@ class ProfileService {
       homeCity: homeCity ?? existing.homeCity,
       photoUrl: resolvedPhotoUrl,
       clearPhoto: clearPhoto,
+      username: resolvedUsername,
+      clearUsername: clearUsername,
+      travelStatus: resolvedTravelStatus,
+      clearTravelStatus: clearTravelStatus,
+      travelStyles: resolvedTravelStyles,
       lastActiveAt: DateTime.now(),
     );
 
@@ -148,6 +208,21 @@ class ProfileService {
             ? Country.findByCode(updated.homeCountryCode!)
             : null;
 
+        // Manage unique username handle registry
+        if (resolvedUsername != null &&
+            resolvedUsername.isNotEmpty &&
+            resolvedUsername != existing.username) {
+          if (existing.username != null && existing.username!.isNotEmpty) {
+            unawaited(firestore.collection('usernames').doc(existing.username!).delete().catchError((_) {}));
+          }
+          unawaited(firestore.collection('usernames').doc(resolvedUsername).set({
+            'uid': uid,
+            'updatedAt': DateTime.now().toIso8601String(),
+          }).catchError((_) {}));
+        } else if (clearUsername && existing.username != null && existing.username!.isNotEmpty) {
+          unawaited(firestore.collection('usernames').doc(existing.username!).delete().catchError((_) {}));
+        }
+
         await firestore.collection('users').doc(uid).set({
           'displayName': updated.displayName,
           'bio': updated.bio,
@@ -156,6 +231,9 @@ class ProfileService {
           'countryCode': updated.homeCountryCode,
           'countryName': countryObj?.name,
           'photoUrl': updated.photoUrl,
+          'username': updated.username,
+          'travelStatus': updated.travelStatus,
+          'travelStyles': updated.travelStyles,
           'lastActiveAt': DateTime.now().toIso8601String(),
         }, SetOptions(merge: true));
       } catch (e) {

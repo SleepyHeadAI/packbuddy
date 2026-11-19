@@ -350,15 +350,26 @@ class PackingItemTile extends StatelessWidget {
                                         color: theme.colorScheme.primary.withValues(alpha: 0.12),
                                         borderRadius: BorderRadius.circular(4),
                                       ),
-                                      child: Text(
-                                        '@${item.assignedTo}',
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w700,
-                                          color: theme.colorScheme.primary,
-                                        ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.person_rounded, size: 10, color: theme.colorScheme.primary),
+                                          const SizedBox(width: 3),
+                                          Flexible(
+                                            child: Text(
+                                              item.assignedTo!.startsWith('@')
+                                                  ? item.assignedTo!
+                                                  : '@${item.assignedTo!}',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w700,
+                                                color: theme.colorScheme.primary,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),

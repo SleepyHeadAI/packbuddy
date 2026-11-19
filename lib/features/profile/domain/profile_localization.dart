@@ -1685,5 +1685,153 @@ class ProfileLocalization {
         return 'encrypted files';
     }
   }
+
+  static String getUsername(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Kullanıcı Adı (Buddy ID)';
+      case 'de': return 'Benutzername (Buddy-ID)';
+      case 'es': return 'Nombre de usuario';
+      case 'fr': return 'Nom d\'utilisateur';
+      case 'it': return 'Nome utente';
+      case 'pt': return 'Nome de usuário';
+      case 'ru': return 'Имя пользователя';
+      case 'zh': return '用户名 (Buddy ID)';
+      case 'ja': return 'ユーザー名 (Buddy ID)';
+      case 'ko': return '사용자 이름 (Buddy ID)';
+      case 'ar': return 'اسم المستخدم';
+      default: return 'Username (Buddy ID)';
+    }
+  }
+
+  static String getUsernameHint(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'ornek_gezgin (3-20 karakter)';
+      case 'de': return 'beispiel_reisender (3-20 Zeichen)';
+      case 'es': return 'ejemplo_viajero (3-20 caracteres)';
+      case 'fr': return 'exemple_voyageur (3-20 caractères)';
+      case 'it': return 'esempio_viaggiatore (3-20 caratteri)';
+      case 'pt': return 'exemplo_viajante (3-20 caracteres)';
+      case 'ru': return 'primer_putnik (3-20 символов)';
+      case 'zh': return 'traveler_name (3-20字符)';
+      case 'ja': return 'traveler_name (3-20文字)';
+      case 'ko': return 'traveler_name (3-20자)';
+      case 'ar': return 'traveler_name (3-20 حرف)';
+      default: return 'traveler_name (3-20 characters)';
+    }
+  }
+
+  static String getUsernameHelper(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Arkadaşlarınız sizi bu isimle arayıp ekleyebilir';
+      case 'de': return 'Freunde können dich mit diesem Namen suchen und hinzufügen';
+      case 'es': return 'Tus amigos pueden buscarte y agregarte con este nombre';
+      case 'fr': return 'Vos amis peuvent vous trouver et vous ajouter avec ce nom';
+      case 'it': return 'I tuoi amici possono cercarti e aggiungerti con questo nome';
+      case 'pt': return 'Seus amigos podem procurar e adicionar você por este nome';
+      case 'ru': return 'Друзья смогут найти вас по этому имени';
+      default: return 'Friends can find and add you with this unique handle';
+    }
+  }
+
+  static String getUsernameInvalid(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Yalnızca küçük harf, rakam ve alt çizgi (3-20 karakter)';
+      case 'de': return 'Nur Kleinbuchstaben, Zahlen und Unterstriche (3-20 Zeichen)';
+      case 'es': return 'Solo minúsculas, números y guión bajo (3-20 caracteres)';
+      case 'fr': return 'Uniquement lettres minuscules, chiffres et tirets bas';
+      default: return 'Only lowercase letters, numbers, and underscore (3-20 chars)';
+    }
+  }
+
+  static String getTravelStatus(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Anlık Seyahat Durumu';
+      case 'de': return 'Aktueller Reisestatus';
+      case 'es': return 'Estado de Viaje';
+      case 'fr': return 'Statut de voyage';
+      case 'it': return 'Stato di viaggio';
+      case 'pt': return 'Status de Viagem';
+      case 'ru': return 'Статус путешествия';
+      case 'zh': return '当前旅行状态';
+      case 'ja': return '現在の旅行ステータス';
+      case 'ko': return '현재 여행 상태';
+      case 'ar': return 'حالة السفر الحالية';
+      default: return 'Travel Status';
+    }
+  }
+
+  static String getTravelStatusHint(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Örn: Roma için bavul topluyor 🧳';
+      case 'de': return 'Z. B.: Koffer packen für Rom 🧳';
+      case 'es': return 'Ej.: Preparando maleta para Roma 🧳';
+      case 'fr': return 'Ex : En train de faire les bagages 🧳';
+      default: return 'E.g.: Packing for Rome 🧳';
+    }
+  }
+
+  static String getTravelStyles(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Seyahat Tarzım';
+      case 'de': return 'Mein Reisestil';
+      case 'es': return 'Mi Estilo de Viaje';
+      case 'fr': return 'Mon style de voyage';
+      case 'it': return 'Il mio stile di viaggio';
+      case 'pt': return 'Meu Estilo de Viagem';
+      case 'ru': return 'Мой стиль путешествий';
+      case 'zh': return '我的旅行风格';
+      case 'ja': return '旅行スタイル';
+      case 'ko': return '내 여행 스타일';
+      case 'ar': return 'أسلوب سفري';
+      default: return 'Travel Style';
+    }
+  }
+
+  static String getTravelStylesSubtitle(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Sizi en iyi tanımlayan en fazla 3 tarz seçin';
+      case 'de': return 'Wähle bis zu 3 Stile, die dich am besten beschreiben';
+      case 'es': return 'Elige hasta 3 estilos que mejor te describan';
+      case 'fr': return 'Choisissez jusqu\'à 3 styles qui vous correspondent';
+      default: return 'Select up to 3 tags that describe your travel style';
+    }
+  }
+
+  static String getBadgesAndAchievements(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Seyahat Başarıları & Rozetler';
+      case 'de': return 'Reise-Erfolge & Abzeichen';
+      case 'es': return 'Logros y Medallas de Viaje';
+      case 'fr': return 'Succès & Badges de Voyage';
+      case 'it': return 'Traguardi e Distintivi di Viaggio';
+      case 'pt': return 'Conquistas e Emblemas de Viagem';
+      case 'ru': return 'Достижения и значки';
+      case 'zh': return '旅行成就与徽章';
+      case 'ja': return '旅行の実績とバッジ';
+      case 'ko': return '여행 업적 및 뱃지';
+      case 'ar': return 'إنجازات وأوسمة السفر';
+      default: return 'Travel Badges & Achievements';
+    }
+  }
+
+  static String getLocked(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Kilitli';
+      case 'de': return 'Gesperrt';
+      case 'es': return 'Bloqueado';
+      case 'fr': return 'Verrouillé';
+      default: return 'Locked';
+    }
+  }
+
+  static String getUnlocked(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Kazanıldı ✨';
+      case 'de': return 'Freigeschaltet ✨';
+      case 'es': return 'Desbloqueado ✨';
+      case 'fr': return 'Débloqué ✨';
+      default: return 'Unlocked ✨';
+    }
+  }
 }
 

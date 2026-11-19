@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/features/profile/domain/friend_localization.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/widgets/app_card.dart';
 import '../dashboard_localization.dart';
@@ -257,16 +258,19 @@ class DashboardMiniAllTrips extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  Icons.account_balance_wallet_rounded,
-                  color: theme.colorScheme.primary,
-                  size: 19,
+              Hero(
+                tag: 'trips-hero-badge',
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.account_balance_wallet_rounded,
+                    color: theme.colorScheme.primary,
+                    size: 19,
+                  ),
                 ),
               ),
               if (tripCount > 0)
@@ -294,24 +298,35 @@ class DashboardMiniAllTrips extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  Expanded(
+                    child: Hero(
+                      tag: 'trips-hero-title',
+                      child: Material(
+                        type: MaterialType.transparency,
+                        child: Text(
+                          l10n.trips,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 12.5,
+                            letterSpacing: -0.2,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
                   Flexible(
                     child: Text(
-                      l10n.trips,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 12.5,
-                        letterSpacing: -0.2,
+                      l10n.viewAll,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.primary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  Text(
-                    l10n.viewAll,
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      color: theme.colorScheme.primary,
                     ),
                   ),
                 ],
@@ -419,6 +434,104 @@ class DashboardMiniTripComparison extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Mini Companion Card for Travel Buddies on Dashboard
+class DashboardMiniBuddies extends StatelessWidget {
+  final int friendsCount;
+  final int pendingRequestsCount;
+  final bool isFullWidth;
+  final VoidCallback onTap;
+
+  const DashboardMiniBuddies({
+    super.key,
+    required this.friendsCount,
+    required this.pendingRequestsCount,
+    this.isFullWidth = false,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final lang = Localizations.localeOf(context).languageCode;
+
+    return AppCard(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: isDark
+                        ? [const Color(0xFF6366F1), const Color(0xFF4338CA)]
+                        : [const Color(0xFF818CF8), const Color(0xFF6366F1)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.people_alt_rounded,
+                  color: Colors.white,
+                  size: 19,
+                ),
+              ),
+              if (pendingRequestsCount > 0)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEF4444),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    '+$pendingRequestsCount',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            FriendLocalization.getDashboardBuddiesCardTitle(lang),
+            style: const TextStyle(
+              fontSize: 13.5,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.2,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            friendsCount > 0
+                ? '$friendsCount ${FriendLocalization.getFriends(lang).toLowerCase()}'
+                : FriendLocalization.getAddFriend(lang),
+            style: TextStyle(
+              fontSize: 11.5,
+              color: theme.colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

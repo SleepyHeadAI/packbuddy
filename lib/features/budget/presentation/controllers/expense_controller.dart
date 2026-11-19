@@ -8,6 +8,7 @@ import '../../../../core/services/currency_service.dart';
 import '../../../../core/services/preferences_service.dart';
 import '../../../../core/services/app_widget_service.dart';
 import '../../../auth/auth_controller.dart';
+import '../../../profile/presentation/controllers/profile_controller.dart';
 
 /// State representation for expenses belonging to a specific trip
 class ExpenseState {
@@ -108,6 +109,16 @@ class ExpenseController extends StateNotifier<ExpenseState> {
       final tripCurrency = trip?.defaultCurrency ?? currency;
       final now = DateTime.now();
       final currentUid = _ref.read(authUserProvider)?.uid ?? '';
+      final profile = _ref.read(profileControllerProvider).profile;
+      final authUser = _ref.read(authUserProvider);
+      final authorName = (profile?.displayName != null && profile!.displayName!.trim().isNotEmpty)
+          ? profile.displayName!.trim()
+          : (authUser?.displayName != null && authUser!.displayName!.trim().isNotEmpty)
+              ? authUser.displayName!.trim()
+              : (authUser?.email != null && authUser!.email!.trim().isNotEmpty)
+                  ? authUser.email!.trim().split('@').first
+                  : null;
+
       final newExpense = Expense(
         id: _uuid.v4(),
         userId: currentUid,
@@ -122,9 +133,17 @@ class ExpenseController extends StateNotifier<ExpenseState> {
         createdAt: now,
         updatedAt: now,
         isDeleted: false,
+        createdByName: authorName,
       );
 
       await _dbHelper.insertExpense(newExpense);
+
+      // If collaborative trip, push immediately to Firestore for real-time collaborator view
+      if (trip != null && trip.isCollaborative) {
+        try {
+          _ref.read(syncEngineProvider.notifier).pushExpense(newExpense);
+        } catch (_) {}
+      }
 
       final updatedList = [newExpense, ...state.expenses];
       final newTotal = updatedList.fold<double>(0.0, (sum, item) {
@@ -171,9 +190,28 @@ class ExpenseController extends StateNotifier<ExpenseState> {
     try {
       final trip = await _dbHelper.getTripById(_tripId);
       final tripCurrency = trip?.defaultCurrency ?? updated.currency;
-      final expenseToSave = updated.copyWith(updatedAt: DateTime.now());
+      final profile = _ref.read(profileControllerProvider).profile;
+      final authUser = _ref.read(authUserProvider);
+      final updaterName = (profile?.displayName != null && profile!.displayName!.trim().isNotEmpty)
+          ? profile.displayName!.trim()
+          : (authUser?.displayName != null && authUser!.displayName!.trim().isNotEmpty)
+              ? authUser.displayName!.trim()
+              : (authUser?.email != null && authUser!.email!.trim().isNotEmpty)
+                  ? authUser.email!.trim().split('@').first
+                  : null;
+
+      final expenseToSave = updated.copyWith(
+        updatedAt: DateTime.now(),
+        createdByName: updaterName ?? updated.createdByName,
+      );
 
       await _dbHelper.updateExpense(expenseToSave);
+
+      if (trip != null && trip.isCollaborative) {
+        try {
+          _ref.read(syncEngineProvider.notifier).pushExpense(expenseToSave);
+        } catch (_) {}
+      }
 
       final index = state.expenses.indexWhere((e) => e.id == updated.id);
       final updatedList = List<Expense>.from(state.expenses);
@@ -274,6 +312,13 @@ class ExpenseController extends StateNotifier<ExpenseState> {
         expenses: updatedList,
         totalSpent: newTotal,
       );
+
+      // If collaborative trip, mark as deleted in Firestore immediately
+      if (trip != null && trip.isCollaborative) {
+        try {
+          _ref.read(syncEngineProvider.notifier).deleteRemoteExpense(expenseId);
+        } catch (_) {}
+      }
 
       // Trigger background two-way sync
       try {

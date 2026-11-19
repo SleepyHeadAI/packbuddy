@@ -207,6 +207,40 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
     }
   }
 
+  static bool _isPassportTitle(String title, AppLocalizations l10n) {
+    final t = title.toLowerCase().trim();
+    if (t.isEmpty) return false;
+    final keywords = [
+      'passport',
+      'pasaport',
+      'passaporte',
+      'passeport',
+      'passaporto',
+      'reisepass',
+      'paspoort',
+      'paszport',
+      'паспорт',
+      '여권',
+      'パスポート',
+      '护照',
+      '護照',
+      'جواز',
+      'पासपोर्ट',
+      'paspor',
+      'διαβατήριο',
+      'หนังสือเดินทาง',
+      'hộ chiếu',
+      'pass',
+      l10n.myPassport.toLowerCase(),
+      l10n.passport.toLowerCase(),
+      l10n.idAndPassport.toLowerCase(),
+    ];
+    for (final kw in keywords) {
+      if (t.contains(kw)) return true;
+    }
+    return false;
+  }
+
   bool _matchesCategory(Document doc, String? categoryFilter) {
     final isDocPrivate = _isPrivate(doc);
     if (categoryFilter == null) {
@@ -809,9 +843,25 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Hero(
-                  tag: 'vault-hero-badge',
-                  child: Container(
+                if (!widget.isTabMode)
+                  Hero(
+                    tag: 'vault-hero-badge',
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      margin: const EdgeInsets.only(right: 8),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.tertiary.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.shield_outlined,
+                        color: theme.colorScheme.tertiary,
+                        size: 18,
+                      ),
+                    ),
+                  )
+                else
+                  Container(
                     padding: const EdgeInsets.all(6),
                     margin: const EdgeInsets.only(right: 8),
                     decoration: BoxDecoration(
@@ -824,10 +874,20 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                       size: 18,
                     ),
                   ),
-                ),
-                Hero(
-                  tag: 'vault-hero-title',
-                  child: Material(
+                if (!widget.isTabMode)
+                  Hero(
+                    tag: 'vault-hero-title',
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: Text(
+                        l10n.vault,
+                        style: theme.appBarTheme.titleTextStyle ??
+                            theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  )
+                else
+                  Material(
                     type: MaterialType.transparency,
                     child: Text(
                       l10n.vault,
@@ -835,7 +895,6 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                           theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
                     ),
                   ),
-                ),
               ],
             ),
           ),
@@ -1146,8 +1205,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                       const SizedBox(height: 8),
                                       Text(
                                         passportDoc != null
-                                            ? (passportDoc.title.toLowerCase().contains('pasaport') ||
-                                                    passportDoc.title.toLowerCase().contains('passport')
+                                            ? (_isPassportTitle(passportDoc.title, l10n)
                                                 ? passportDoc.title
                                                 : l10n.passportSlot)
                                             : l10n.passportSlot,
@@ -1171,8 +1229,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                           Expanded(
                                             child: Text(
                                               passportDoc != null
-                                                  ? (passportDoc.title.toLowerCase().contains('pasaport') ||
-                                                          passportDoc.title.toLowerCase().contains('passport')
+                                                  ? (_isPassportTitle(passportDoc.title, l10n)
                                                       ? dateFormat.format(passportDoc.createdAt)
                                                       : '${passportDoc.title} • ${dateFormat.format(passportDoc.createdAt)}')
                                                   : l10n.saveYourPassport,
@@ -1852,13 +1909,19 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                         const SizedBox(height: 6),
 
                                         // Title
-                                        Text(
-                                          doc.title,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: theme.textTheme.titleSmall?.copyWith(
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 13,
+                                        Hero(
+                                          tag: 'doc-title-${doc.id}',
+                                          child: Material(
+                                            type: MaterialType.transparency,
+                                            child: Text(
+                                              doc.title,
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: theme.textTheme.titleSmall?.copyWith(
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 13,
+                                              ),
+                                            ),
                                           ),
                                         ),
                                         const SizedBox(height: 2),

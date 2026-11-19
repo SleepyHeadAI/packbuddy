@@ -12,6 +12,7 @@ import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/services/security_service.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
+import 'package:packbuddy/features/vault/domain/vault_localization.dart';
 import '../controllers/vault_controller.dart';
 import 'widgets/add_document_sheet.dart';
 
@@ -401,8 +402,8 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final isTr = Localizations.localeOf(context).languageCode == 'tr';
-    final dateFormat = DateFormat.yMMMd(Localizations.localeOf(context).languageCode);
+    final lang = Localizations.localeOf(context).languageCode;
+    final dateFormat = DateFormat.yMMMd(lang);
     final hasDecrypted = _decryptedBytes != null && _decryptedBytes!.isNotEmpty;
     final bool isPdf = (hasDecrypted && SecurityService.isPdfBytes(_decryptedBytes!)) || widget.document.isPdf;
 
@@ -414,15 +415,21 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              _currentDoc.title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
+            Hero(
+              tag: 'doc-title-${_currentDoc.id}',
+              child: Material(
+                type: MaterialType.transparency,
+                child: Text(
+                  _currentDoc.title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
             Text(
               '${_getCategoryLabel(_currentDoc.category, l10n)} • ${dateFormat.format(_currentDoc.createdAt)}',
@@ -513,7 +520,7 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
                           ),
                           onPressed: () => _loadFileBytes(forceCloud: true),
                           icon: const Icon(Icons.cloud_download_rounded, size: 16),
-                          label: Text(isTr ? 'Buluttan Tekrar İndir' : 'Reload from Cloud'),
+                          label: Text(VaultLocalization.reloadFromCloud(lang)),
                         ),
                       ],
                     ),
@@ -536,7 +543,7 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
                                 const Icon(Icons.broken_image_rounded, size: 48, color: Colors.white54),
                                 const SizedBox(height: 12),
                                 Text(
-                                  isTr ? 'Görsel yüklenemedi' : 'Image could not be loaded',
+                                  VaultLocalization.imageLoadFailed(lang),
                                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                                 ),
                                 const SizedBox(height: 16),
@@ -552,12 +559,12 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
                                       ),
                                       onPressed: () => _loadFileBytes(forceCloud: true),
                                       icon: const Icon(Icons.cloud_download_rounded, size: 16),
-                                      label: Text(isTr ? 'Buluttan İndir' : 'Reload Cloud'),
+                                      label: Text(VaultLocalization.reloadCloud(lang)),
                                     ),
                                     FilledButton.icon(
                                       onPressed: () => _openFileExternally(context),
                                       icon: const Icon(Icons.open_in_new_rounded, size: 16),
-                                      label: Text(isTr ? 'Cihazda Aç' : 'Open External'),
+                                      label: Text(l10n.openInExternalApp),
                                     ),
                                   ],
                                 ),

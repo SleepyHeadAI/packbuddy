@@ -13,6 +13,7 @@ class Expense {
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isDeleted;
+  final String? createdByName;
 
   const Expense({
     required this.id,
@@ -28,6 +29,7 @@ class Expense {
     required this.createdAt,
     required this.updatedAt,
     this.isDeleted = false,
+    this.createdByName,
   });
 
   /// Creates a copy with optionally modified fields
@@ -45,6 +47,7 @@ class Expense {
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isDeleted,
+    String? createdByName,
   }) {
     return Expense(
       id: id ?? this.id,
@@ -60,6 +63,7 @@ class Expense {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isDeleted: isDeleted ?? this.isDeleted,
+      createdByName: createdByName ?? this.createdByName,
     );
   }
 
@@ -85,6 +89,8 @@ class Expense {
       'updated_at': updatedAt.millisecondsSinceEpoch,
       'isDeleted': isDeleted,
       'is_deleted': isDeleted ? 1 : 0,
+      'createdByName': createdByName,
+      'created_by_name': createdByName,
     };
   }
 
@@ -117,6 +123,7 @@ class Expense {
           ? parseDate(json['updatedAt'] ?? json['updated_at'])
           : DateTime.now(),
       isDeleted: json['isDeleted'] as bool? ?? json['is_deleted'] == true || json['is_deleted'] == 1,
+      createdByName: (json['createdByName'] ?? json['created_by_name']) as String?,
     );
   }
 
@@ -136,6 +143,7 @@ class Expense {
       'created_at': createdAt.millisecondsSinceEpoch,
       'updated_at': updatedAt.millisecondsSinceEpoch,
       'is_deleted': isDeleted ? 1 : 0,
+      'created_by_name': createdByName,
     };
   }
 
@@ -161,6 +169,7 @@ class Expense {
       createdAt: parseDate(map['created_at'] ?? map['createdAt']),
       updatedAt: parseDate(map['updated_at'] ?? map['updatedAt']),
       isDeleted: map['is_deleted'] == 1 || map['isDeleted'] == 1 || map['isDeleted'] == true,
+      createdByName: (map['created_by_name'] ?? map['createdByName']) as String?,
     );
   }
 }

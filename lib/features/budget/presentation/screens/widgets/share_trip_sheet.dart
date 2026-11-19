@@ -7,6 +7,9 @@ import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/expense_controller.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
+import 'package:packbuddy/features/profile/domain/friend_localization.dart';
+import 'package:packbuddy/features/profile/presentation/controllers/friends_controller.dart';
+import 'package:packbuddy/features/profile/presentation/widgets/user_avatar.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 /// Interactive Sheet for Collaborative Trip Sharing (F-1) & Social Sharing (F-8)
@@ -240,6 +243,132 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
                 ),
               ),
               const SizedBox(height: 16),
+
+              // Feature: Quick Add from Friends
+              Builder(builder: (context) {
+                final friends = ref.watch(friendsControllerProvider).friends;
+                if (friends.isEmpty) return const SizedBox.shrink();
+                final lang = Localizations.localeOf(context).languageCode;
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          FriendLocalization.getAddFromFriends(lang),
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        Text(
+                          '${friends.length}',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 52,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: friends.length,
+                        separatorBuilder: (_, _) => const SizedBox(width: 8),
+                        itemBuilder: (context, index) {
+                          final friend = friends[index];
+                          final handle = friend.username != null && friend.username!.isNotEmpty
+                              ? '@${friend.username}'
+                              : (friend.displayName ?? friend.uid);
+                          final isAdded = currentTrip.collaborators.any((c) =>
+                              c.toLowerCase() == handle.toLowerCase() ||
+                              (friend.username != null && c.toLowerCase() == friend.username!.toLowerCase()) ||
+                              c == friend.uid);
+
+                          return InkWell(
+                            borderRadius: BorderRadius.circular(14),
+                            onTap: () async {
+                              HapticFeedback.lightImpact();
+                              if (isAdded) {
+                                final toRemove = currentTrip.collaborators.firstWhere((c) =>
+                                    c.toLowerCase() == handle.toLowerCase() ||
+                                    (friend.username != null && c.toLowerCase() == friend.username!.toLowerCase()) ||
+                                    c == friend.uid);
+                                await _removeCollaborator(toRemove);
+                              } else {
+                                await ref.read(tripControllerProvider.notifier).addCollaborator(widget.trip.id, handle);
+                                if (mounted) setState(() {});
+                              }
+                            },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: isAdded
+                                    ? theme.colorScheme.primaryContainer.withValues(alpha: 0.5)
+                                    : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: isAdded
+                                      ? theme.colorScheme.primary
+                                      : theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+                                  width: isAdded ? 1.5 : 1,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  UserAvatar(
+                                    photoUrl: friend.photoUrl,
+                                    displayName: friend.displayName,
+                                    size: 28,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        friend.displayName?.isNotEmpty == true
+                                            ? friend.displayName!
+                                            : (friend.username ?? 'Friend'),
+                                        style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        handle,
+                                        style: TextStyle(
+                                          fontSize: 9.5,
+                                          color: isAdded ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+                                          fontWeight: isAdded ? FontWeight.w700 : FontWeight.normal,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Icon(
+                                    isAdded ? Icons.check_circle_rounded : Icons.add_circle_outline_rounded,
+                                    size: 16,
+                                    color: isAdded ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                  ],
+                );
+              }),
 
               // Collaborators List
               Text(

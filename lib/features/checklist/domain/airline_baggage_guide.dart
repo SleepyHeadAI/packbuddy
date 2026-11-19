@@ -26,12 +26,114 @@ class AirlineFarePackage {
 
   String getLocalizedDescription(String langCode) {
     final code = langCode.toLowerCase();
-    final isTr = code.startsWith('tr');
-    if (isTr) return description;
+    if (code.startsWith('tr')) return description;
+
     final cabinKg = cabinLimitKg > 0 ? '${cabinLimitKg.toInt()} kg' : '0 kg';
     final checkedKg = checkedLimitKg > 0 ? '${checkedLimitKg.toInt()} kg' : '0 kg';
-    final personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} kg' : 'underseat';
-    return '$name: Personal ($personalKg) • Cabin ($cabinKg) • Checked ($checkedKg)';
+
+    final String personalKg;
+    final String personalLabel;
+    final String cabinLabel;
+    final String checkedLabel;
+
+    if (code.startsWith('de')) {
+      personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} kg' : 'unter Sitz';
+      personalLabel = 'Persönlich';
+      cabinLabel = 'Handgepäck';
+      checkedLabel = 'Aufgabegepäck';
+    } else if (code.startsWith('fr')) {
+      personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} kg' : 'sous le siège';
+      personalLabel = 'Personnel';
+      cabinLabel = 'Cabine';
+      checkedLabel = 'En soute';
+    } else if (code.startsWith('es')) {
+      personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} kg' : 'bajo asiento';
+      personalLabel = 'Personal';
+      cabinLabel = 'Cabina';
+      checkedLabel = 'Facturado';
+    } else if (code.startsWith('it')) {
+      personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} kg' : 'sotto sedile';
+      personalLabel = 'Personale';
+      cabinLabel = 'Cabina';
+      checkedLabel = 'In stiva';
+    } else if (code.startsWith('pt')) {
+      personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} kg' : 'sob o assento';
+      personalLabel = 'Pessoal';
+      cabinLabel = 'Cabine';
+      checkedLabel = 'Porão';
+    } else if (code.startsWith('ru')) {
+      personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} кг' : 'под сиденьем';
+      personalLabel = 'Личная вещь';
+      cabinLabel = 'Кабина';
+      checkedLabel = 'Багаж';
+    } else if (code.startsWith('zh')) {
+      personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} kg' : '座椅下方';
+      personalLabel = '随身小包';
+      cabinLabel = '随身行李';
+      checkedLabel = '托运行李';
+    } else if (code.startsWith('ja')) {
+      personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} kg' : '座席下';
+      personalLabel = '身の回り品';
+      cabinLabel = '機内持込';
+      checkedLabel = '受託手荷物';
+    } else if (code.startsWith('ko')) {
+      personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} kg' : '좌석 밑';
+      personalLabel = '개인 소지품';
+      cabinLabel = '기내 수하물';
+      checkedLabel = '위탁 수하물';
+    } else if (code.startsWith('ar')) {
+      personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} كجم' : 'تحت المقعد';
+      personalLabel = 'شخصي';
+      cabinLabel = 'مقصورة';
+      checkedLabel = 'مسجل';
+    } else if (code.startsWith('hi')) {
+      personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} kg' : 'सीट के नीचे';
+      personalLabel = 'व्यक्तिगत';
+      cabinLabel = 'केबिन';
+      checkedLabel = 'चेक-इन';
+    } else if (code.startsWith('nl')) {
+      personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} kg' : 'onder stoel';
+      personalLabel = 'Persoonlijk';
+      cabinLabel = 'Handbagage';
+      checkedLabel = 'Ruimbagage';
+    } else if (code.startsWith('el')) {
+      personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} kg' : 'κάτω από το κάθισμα';
+      personalLabel = 'Προσωπικό';
+      cabinLabel = 'Καμπίνα';
+      checkedLabel = 'Παραδοτέα';
+    } else if (code.startsWith('sv')) {
+      personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} kg' : 'under sätet';
+      personalLabel = 'Personlig';
+      cabinLabel = 'Kabin';
+      checkedLabel = 'Incheckat';
+    } else if (code.startsWith('pl')) {
+      personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} kg' : 'pod fotelem';
+      personalLabel = 'Osobisty';
+      cabinLabel = 'Kabinowy';
+      checkedLabel = 'Rejestrowany';
+    } else if (code.startsWith('id')) {
+      personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} kg' : 'bawah kursi';
+      personalLabel = 'Pribadi';
+      cabinLabel = 'Kabin';
+      checkedLabel = 'Bagasi';
+    } else if (code.startsWith('th')) {
+      personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} kg' : 'ใต้ที่นั่ง';
+      personalLabel = 'ของใช้ส่วนตัว';
+      cabinLabel = 'ถือขึ้นเครื่อง';
+      checkedLabel = 'โหลดใต้เครื่อง';
+    } else if (code.startsWith('vi')) {
+      personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} kg' : 'dưới ghế';
+      personalLabel = 'Cá nhân';
+      cabinLabel = 'Xách tay';
+      checkedLabel = 'Ký gửi';
+    } else {
+      personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} kg' : 'underseat';
+      personalLabel = 'Personal';
+      cabinLabel = 'Cabin';
+      checkedLabel = 'Checked';
+    }
+
+    return '$name: $personalLabel ($personalKg) • $cabinLabel ($cabinKg) • $checkedLabel ($checkedKg)';
   }
 
   Map<String, dynamic> toJson() => {
@@ -196,10 +298,6 @@ class AirlineBaggageRule {
     final isIt = code.startsWith('it');
     final isPt = code.startsWith('pt');
     final isNl = code.startsWith('nl');
-    final isZh = code.startsWith('zh');
-    final isJa = code.startsWith('ja');
-    final isKo = code.startsWith('ko');
-    final isAr = code.startsWith('ar');
 
     // Custom tiered rules for ultra-low-cost & specific carriers
     switch (iataCode) {
@@ -403,18 +501,32 @@ class AirlineBaggageRule {
       return '1 stuk handbagage ($cabinKg kg, $cabinDimensions) + 1 persoonlijk item ($personalItemDimensions). Ruimbagage $checkedKg kg.';
     } else if (isRu) {
       return '1 место ручной клади ($cabinKg кг, $cabinDimensions) + 1 личная вещь ($personalItemDimensions). Регистрируемый багаж $checkedKg кг.';
-    } else if (isZh) {
+    } else if (code.startsWith('zh')) {
       return '1件随身行李 ($cabinKg kg, $cabinDimensions) + 1件个人随身物品 ($personalItemDimensions)。标准托运行李 $checkedKg kg。';
-    } else if (isJa) {
+    } else if (code.startsWith('ja')) {
       return '機内持ち込み手荷物1個 ($cabinKg kg, $cabinDimensions) + 身の回り品1個 ($personalItemDimensions)。無料受託手荷物 $checkedKg kg。';
-    } else if (isKo) {
+    } else if (code.startsWith('ko')) {
       return '기내 수하물 1개 ($cabinKg kg, $cabinDimensions) + 개인 소지품 1개 ($personalItemDimensions). 일반 위탁 수하물 $checkedKg kg.';
-    } else if (isAr) {
+    } else if (code.startsWith('ar')) {
       return 'حقيبة مقصورة واحدة ($cabinKg كجم, $cabinDimensions) + حقيبة شخصية ($personalItemDimensions). الأمتعة المسجلة $checkedKg كجم.';
+    } else if (code.startsWith('hi')) {
+      return '1 केबिन बैग ($cabinKg kg, $cabinDimensions) + 1 व्यक्तिगत वस्तु ($personalItemDimensions)। इकोनॉमी चेक-इन बैग $checkedKg kg।';
+    } else if (code.startsWith('sv')) {
+      return '1 handbagage ($cabinKg kg, $cabinDimensions) + 1 personlig tillhörighet ($personalItemDimensions). Incheckat bagage $checkedKg kg.';
+    } else if (code.startsWith('pl')) {
+      return '1 sztuka bagażu podręcznego ($cabinKg kg, $cabinDimensions) + 1 przedmiot osobisty ($personalItemDimensions). Bagaż rejestrowany $checkedKg kg.';
+    } else if (code.startsWith('id')) {
+      return '1 tas kabin ($cabinKg kg, $cabinDimensions) + 1 barang pribadi ($personalItemDimensions). Bagasi terdaftar ekonomi $checkedKg kg.';
+    } else if (code.startsWith('th')) {
+      return 'กระเป๋าถือขึ้นเครื่อง 1 ใบ ($cabinKg kg, $cabinDimensions) + ของใช้ส่วนตัว 1 ชิ้น ($personalItemDimensions) สัมภาระโหลด $checkedKg kg';
+    } else if (code.startsWith('vi')) {
+      return '1 kiện hành lý xách tay ($cabinKg kg, $cabinDimensions) + 1 vật dụng cá nhân ($personalItemDimensions). Hành lý ký gửi $checkedKg kg.';
+    } else if (code.startsWith('el')) {
+      return '1 χειραποσκευή ($cabinKg kg, $cabinDimensions) + 1 προσωπικό αντικείμενο ($personalItemDimensions). Παραδοτέα αποσκευή $checkedKg kg.';
     }
 
     // Default clean fallback
-    return notes.isNotEmpty
+    return isTr && notes.isNotEmpty
         ? notes
         : '1 cabin bag ($cabinKg kg, $cabinDimensions) + 1 personal item ($personalItemDimensions). Economy checked bag $checkedKg kg.';
   }

@@ -80,31 +80,158 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
     super.dispose();
   }
 
-  String _getMotivationalProgressText(double ratio, AppLocalizations l10n, String lang) {
+  String _getMotivationalProgressText(double ratio, AppLocalizations l10n, String langCode) {
+    final lang = langCode.toLowerCase().split('_').first.split('-').first;
     if (ratio >= 1.0) {
-      if (lang == 'tr') return 'Bavulun tamamen hazır! Harika bir yolculuk seni bekliyor! ✈️✨';
-      if (lang == 'de') return 'Gepäck ist bereit! Gute Reise! ✈️✨';
-      if (lang == 'fr') return 'Valise prête ! Bon voyage ! ✈️✨';
-      if (lang == 'es') return '¡Equipaje listo! ¡Buen viaje! ✈️✨';
-      return 'All packed and ready! Have an amazing trip! ✈️✨';
+      switch (lang) {
+        case 'tr': return 'Bavulun tamamen hazır! Harika bir yolculuk seni bekliyor! ✈️✨';
+        case 'de': return 'Gepäck ist bereit! Gute Reise! ✈️✨';
+        case 'fr': return 'Valise prête ! Bon voyage ! ✈️✨';
+        case 'es': return '¡Equipaje listo! ¡Buen viaje! ✈️✨';
+        case 'it': return 'Valigia pronta! Buon viaggio! ✈️✨';
+        case 'pt': return 'Mala 100% pronta! Tenha uma excelente viagem! ✈️✨';
+        case 'ru': return 'Чемодан полностью собран! Отличного путешествия! ✈️✨';
+        case 'zh': return '行李已全部收拾完毕！祝您旅途愉快！✈️✨';
+        case 'ja': return '荷造り完了！素晴らしいご旅行を！✈️✨';
+        case 'ko': return '짐 싸기 완료! 즐거운 여행 되세요! ✈️✨';
+        case 'ar': return 'حقيبتك جاهزة تماماً! نتمنى لك رحلة رائعة! ✈️✨';
+        case 'hi': return 'बैग पूरी तरह तैयार है! आपकी यात्रा मंगलमय हो! ✈️✨';
+        case 'nl': return 'Koffer helemaal ingepakt! Goede reis! ✈️✨';
+        case 'el': return 'Όλα έτοιμα στη βαλίτσα! Καλό ταξίδι! ✈️✨';
+        case 'sv': return 'Väskan är helt packad! Trevlig resa! ✈️✨';
+        case 'pl': return 'Bagaż w pełni spakowany! Udanej podróży! ✈️✨';
+        case 'id': return 'Koper sudah siap! Selamat menikmati perjalanan! ✈️✨';
+        case 'th': return 'จัดกระเป๋าเสร็จสมบูรณ์แล้ว! ขอให้เดินทางโดยสวัสดิภาพ! ✈️✨';
+        case 'vi': return 'Hành lý đã sẵn sàng! Chúc bạn có chuyến đi tuyệt vời! ✈️✨';
+        case 'en':
+        default: return 'All packed and ready! Have an amazing trip! ✈️✨';
+      }
     } else if (ratio >= 0.75) {
-      if (lang == 'tr') return 'Neredeyse bitti! Son birkaç dokunuş kaldı. 🎒';
-      if (lang == 'de') return 'Fast geschafft! Nur noch ein paar Dinge. 🎒';
-      if (lang == 'fr') return 'Presque fini ! Encore quelques détails. 🎒';
-      if (lang == 'es') return '¡Casi listo! Solo faltan unos toques. 🎒';
-      return 'Almost there! Just a few last essentials. 🎒';
+      switch (lang) {
+        case 'tr': return 'Neredeyse bitti! Son birkaç dokunuş kaldı. 🎒';
+        case 'de': return 'Fast geschafft! Nur noch ein paar Dinge. 🎒';
+        case 'fr': return 'Presque fini ! Encore quelques détails. 🎒';
+        case 'es': return '¡Casi listo! Solo faltan unos toques. 🎒';
+        case 'it': return 'Quasi finito! Mancano solo gli ultimi dettagli. 🎒';
+        case 'pt': return 'Quase pronto! Faltam apenas alguns detalhes. 🎒';
+        case 'ru': return 'Почти готово! Остались последние штрихи. 🎒';
+        case 'zh': return '马上完成！只剩最后几样物品了。🎒';
+        case 'ja': return 'もうすぐ完了！あと少しで準備完了です。🎒';
+        case 'ko': return '거의 다 끝났어요! 마지막 몇 가지만 챙기면 돼요. 🎒';
+        case 'ar': return 'شارفت على الانتهاء! لم يتبق سوى القليل. 🎒';
+        case 'hi': return 'लगभग पूरा हो गया! बस कुछ आखिरी चीजें बाकी हैं। 🎒';
+        case 'nl': return 'Bijna klaar! Nog maar een paar spullen. 🎒';
+        case 'el': return 'Σχεδόν έτοιμοι! Έμειναν μόνο λίγες λεπτομέρειες. 🎒';
+        case 'sv': return 'Nästan klart! Bara några få saker kvar. 🎒';
+        case 'pl': return 'Prawie gotowe! Jeszcze tylko kilka rzeczy. 🎒';
+        case 'id': return 'Hampir selesai! Tinggal beberapa barang lagi. 🎒';
+        case 'th': return 'ใกล้เสร็จแล้ว! เหลืออีกเพียงไม่กี่ชิ้น 🎒';
+        case 'vi': return 'Gần xong rồi! Chỉ còn vài món đồ cuối cùng. 🎒';
+        case 'en':
+        default: return 'Almost there! Just a few last essentials. 🎒';
+      }
     } else if (ratio >= 0.40) {
-      if (lang == 'tr') return 'Harika gidiyorsun! Valizin yavaş yavaş doluyor. 🧳';
-      if (lang == 'de') return 'Guter Fortschritt! Koffer füllt sich. 🧳';
-      if (lang == 'fr') return 'Bonne progression ! La valise se remplit. 🧳';
-      if (lang == 'es') return '¡Buen progreso! La maleta se está llenando. 🧳';
-      return 'Great progress! Suitcase is coming together. 🧳';
+      switch (lang) {
+        case 'tr': return 'Harika gidiyorsun! Valizin yavaş yavaş doluyor. 🧳';
+        case 'de': return 'Guter Fortschritt! Koffer füllt sich. 🧳';
+        case 'fr': return 'Bonne progression ! La valise se remplit. 🧳';
+        case 'es': return '¡Buen progreso! La maleta se está llenando. 🧳';
+        case 'it': return 'Ottimo lavoro! La valigia prende forma. 🧳';
+        case 'pt': return 'Ótimo progresso! A mala está quase cheia. 🧳';
+        case 'ru': return 'Отличный прогресс! Чемодан постепенно заполняется. 🧳';
+        case 'zh': return '进展顺利！行李正逐渐准备就绪。🧳';
+        case 'ja': return '順調です！スーツケースが埋まってきました。🧳';
+        case 'ko': return '아주 잘하고 있어요! 가방이 채워지고 있습니다. 🧳';
+        case 'ar': return 'تقدم رائع! حقيبتك تمتلئ تدريجياً. 🧳';
+        case 'hi': return 'शानदार प्रगति! बैग धीरे-धीरे भर रहा है। 🧳';
+        case 'nl': return 'Goede voortgang! De koffer raakt al lekker vol. 🧳';
+        case 'el': return 'Εξαιρετική πρόοδος! Η βαλίτσα γεμίζει. 🧳';
+        case 'sv': return 'Bra framsteg! Väskan fylls på. 🧳';
+        case 'pl': return 'Świetny postęp! Walizka stopniowo się zapełnia. 🧳';
+        case 'id': return 'Kemajuan luar biasa! Koper mulai terisi. 🧳';
+        case 'th': return 'คืบหน้าไปได้ดีมาก! กระเป๋าเริ่มเต็มแล้ว 🧳';
+        case 'vi': return 'Tiến độ rất tốt! Vali đang dần đầy đủ. 🧳';
+        case 'en':
+        default: return 'Great progress! Suitcase is coming together. 🧳';
+      }
     } else {
-      if (lang == 'tr') return 'Hazırlıklar başlasın! Valizini adım adım dolduralım. 🗺️';
-      if (lang == 'de') return 'Packen wir ein! Schritt für Schritt. 🗺️';
-      if (lang == 'fr') return 'Commençons à faire nos valises ! 🗺️';
-      if (lang == 'es') return '¡A empacar! Paso a paso. 🗺️';
-      return 'Let\'s get packing! Step by step. 🗺️';
+      switch (lang) {
+        case 'tr': return 'Hazırlıklar başlasın! Valizini adım adım dolduralım. 🗺️';
+        case 'de': return 'Packen wir ein! Schritt für Schritt. 🗺️';
+        case 'fr': return 'Commençons à faire nos valises ! 🗺️';
+        case 'es': return '¡A empacar! Paso a paso. 🗺️';
+        case 'it': return 'Iniziamo a fare la valigia! Passo dopo passo. 🗺️';
+        case 'pt': return 'Hora de fazer as malas! Passo a passo. 🗺️';
+        case 'ru': return 'Начнем сборы! Шаг за шагом заполняем чемодан. 🗺️';
+        case 'zh': return '开始收拾吧！一步步装满你的行李箱。🗺️';
+        case 'ja': return '荷造りを始めましょう！一歩ずつ準備を進めます。🗺️';
+        case 'ko': return '짐 싸기를 시작해볼까요! 차근차근 담아보세요. 🗺️';
+        case 'ar': return 'لنبدأ التعبئة! خطوة بخطوة حتى تكتمل الحقيبة. 🗺️';
+        case 'hi': return 'पैकिंग शुरू करें! कदम दर कदम बैग भरें। 🗺️';
+        case 'nl': return 'Tijd om in te pakken! Stap voor stap. 🗺️';
+        case 'el': return 'Ώρα για πακετάρισμα! Βήμα-βήμα γεμίζουμε τη βαλίτσα. 🗺️';
+        case 'sv': return 'Dags att packa! Steg för steg. 🗺️';
+        case 'pl': return 'Czas się pakować! Krok po kroku uzupełniaj walizkę. 🗺️';
+        case 'id': return 'Ayo mulai berkemas! Selangkah demi selangkah. 🗺️';
+        case 'th': return 'เริ่มจัดกระเป๋ากันเลย! ทีละขั้นตอน 🗺️';
+        case 'vi': return 'Bắt đầu xếp đồ nào! Từng bước lấp đầy vali của bạn. 🗺️';
+        case 'en':
+        default: return 'Let\'s get packing! Step by step. 🗺️';
+      }
+    }
+  }
+
+  static String _getReadyTitle(String langCode) {
+    final lang = langCode.toLowerCase().split('_').first.split('-').first;
+    switch (lang) {
+      case 'tr': return 'Valizin %100 Hazır! 🎉';
+      case 'de': return 'Koffer 100% bereit! 🎉';
+      case 'fr': return 'Valise 100% prête ! 🎉';
+      case 'es': return '¡Maleta 100% lista! 🎉';
+      case 'it': return 'Valigia pronta al 100%! 🎉';
+      case 'pt': return 'Mala 100% pronta! 🎉';
+      case 'ru': return 'Чемодан готов на 100%! 🎉';
+      case 'zh': return '行李已 100% 准备就绪！🎉';
+      case 'ja': return '荷造り100%完了！🎉';
+      case 'ko': return '가방이 100% 준비되었습니다! 🎉';
+      case 'ar': return 'الحقيبة جاهزة 100%! 🎉';
+      case 'hi': return 'सूटकेस 100% तैयार है! 🎉';
+      case 'nl': return 'Koffer 100% klaar! 🎉';
+      case 'el': return 'Βαλίτσα 100% έτοιμη! 🎉';
+      case 'sv': return 'Väskan är 100% klar! 🎉';
+      case 'pl': return 'Walizka w 100% gotowa! 🎉';
+      case 'id': return 'Koper 100% Siap! 🎉';
+      case 'th': return 'กระเป๋าพร้อม 100% แล้ว! 🎉';
+      case 'vi': return 'Vali đã sẵn sàng 100%! 🎉';
+      case 'en':
+      default: return 'Suitcase 100% Ready! 🎉';
+    }
+  }
+
+  static String _getReadySubtitle(String langCode) {
+    final lang = langCode.toLowerCase().split('_').first.split('-').first;
+    switch (lang) {
+      case 'tr': return 'Tüm eşyaların valizde. Gönül rahatlığıyla yola çıkabilirsin!';
+      case 'de': return 'Alles eingepackt. Du kannst beruhigt abreisen!';
+      case 'fr': return 'Tous vos objets sont emballés. Vous pouvez partir sereinement !';
+      case 'es': return 'Todo está empacado. ¡Puedes viajar con total tranquilidad!';
+      case 'it': return 'Tutto è pronto. Puoi partire in totale serenità!';
+      case 'pt': return 'Tudo embalado. Você está pronto para viajar com tranquilidade!';
+      case 'ru': return 'Все вещи собраны. Можете отправляться в путь со спокойной душой!';
+      case 'zh': return '所有物品均已打包。您可以安心启程了！';
+      case 'ja': return '全ての荷物が揃いました。安心していってらっしゃい！';
+      case 'ko': return '모든 물품을 챙겼습니다. 편안한 마음으로 출발하세요!';
+      case 'ar': return 'جميع الأغراض جاهزة. يمكنك الانطلاق براحة بال!';
+      case 'hi': return 'सभी सामान पैक हो गया है। आप बेफिक्र होकर यात्रा कर सकते हैं!';
+      case 'nl': return 'Alles is ingepakt. Je kunt met een gerust hart vertrekken!';
+      case 'el': return 'Όλα τα αντικείμενα έχουν συσκευαστεί. Μπορείτε να ταξιδέψετε ήσυχα!';
+      case 'sv': return 'Allt är packat. Du kan resa med lugn i sinnet!';
+      case 'pl': return 'Wszystkie rzeczy są spakowane. Możesz wyruszać ze spokojną głową!';
+      case 'id': return 'Semua barang sudah dikemas. Anda siap berangkat dengan tenang!';
+      case 'th': return 'สิ่งของทั้งหมดถูกจัดลงกระเป๋าแล้ว คุณพร้อมเดินทางอย่างสบายใจ!';
+      case 'vi': return 'Mọi thứ đã được xếp gọn. Bạn có thể an tâm lên đường!';
+      case 'en':
+      default: return 'All items are packed. You are ready to travel in peace!';
     }
   }
 
@@ -195,7 +322,13 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          titleSpacing: 16,
+          leading: !widget.isTabMode && Navigator.of(context).canPop()
+              ? IconButton(
+                  icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+                  onPressed: () => Navigator.of(context).pop(),
+                )
+              : null,
+          titleSpacing: (!widget.isTabMode && Navigator.of(context).canPop()) ? 0 : 16,
           title: FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
@@ -203,9 +336,25 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (widget.tripTitle == null) ...[
-                  Hero(
-                    tag: 'checklist-hero-badge',
-                    child: Container(
+                  if (!widget.isTabMode)
+                    Hero(
+                      tag: 'checklist-hero-badge',
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        margin: const EdgeInsets.only(right: 8),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.luggage_rounded,
+                          color: theme.colorScheme.primary,
+                          size: 16,
+                        ),
+                      ),
+                    )
+                  else
+                    Container(
                       padding: const EdgeInsets.all(6),
                       margin: const EdgeInsets.only(right: 8),
                       decoration: BoxDecoration(
@@ -218,13 +367,30 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                         size: 16,
                       ),
                     ),
-                  ),
                 ],
-                Hero(
-                  tag: widget.tripTitle != null
-                      ? 'trip-checklist-title-${widget.tripId}'
-                      : 'checklist-hero-title',
-                  child: Material(
+                if (!widget.isTabMode)
+                  Hero(
+                    tag: widget.tripTitle != null
+                        ? 'trip-checklist-title-${widget.tripId}'
+                        : 'checklist-hero-title',
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: Text(
+                        widget.tripTitle != null
+                            ? '${widget.tripTitle} - ${l10n.luggageAndChecklist}'
+                            : l10n.baggageAndChecklist,
+                        style: theme.appBarTheme.titleTextStyle ??
+                            AppTheme.headlineFont(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.3,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                      ),
+                    ),
+                  )
+                else
+                  Material(
                     type: MaterialType.transparency,
                     child: Text(
                       widget.tripTitle != null
@@ -239,7 +405,6 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                           ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
@@ -372,9 +537,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    Localizations.localeOf(context).languageCode == 'tr'
-                                        ? 'Valizin %100 Hazır! 🎉'
-                                        : 'Suitcase 100% Ready! 🎉',
+                                    _getReadyTitle(Localizations.localeOf(context).languageCode),
                                     style: theme.textTheme.titleSmall?.copyWith(
                                       fontWeight: FontWeight.w900,
                                       color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF065F46),
@@ -382,9 +545,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    Localizations.localeOf(context).languageCode == 'tr'
-                                        ? 'Tüm eşyaların valizde. Gönül rahatlığıyla yola çıkabilirsin!'
-                                        : 'All items are packed. You are ready to travel in peace!',
+                                    _getReadySubtitle(Localizations.localeOf(context).languageCode),
                                     style: TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w500,
@@ -502,8 +663,8 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                       builder: (context) {
                         final langCode = Localizations.localeOf(context).languageCode;
                         final cardTitle = widget.tripTitle != null
-                            ? '${widget.tripTitle} • ${l10n.baggageAndChecklist}'
-                            : l10n.baggageAndChecklist;
+                            ? '${widget.tripTitle} • ${l10n.packingReadiness}'
+                            : l10n.packingReadiness;
 
                         String airlineTitle;
                         String airlineSubtitle;
@@ -566,14 +727,17 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        cardTitle,
-                                        style: theme.textTheme.titleSmall?.copyWith(
-                                          fontWeight: FontWeight.w800,
-                                          letterSpacing: -0.2,
+                                      FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        alignment: Alignment.centerLeft,
+                                        child: Text(
+                                          cardTitle,
+                                          style: theme.textTheme.titleSmall?.copyWith(
+                                            fontWeight: FontWeight.w800,
+                                            letterSpacing: -0.2,
+                                          ),
+                                          maxLines: 1,
                                         ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
                                       ),
                                       Text(
                                         checklistState.totalCount == 0
@@ -814,24 +978,27 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                                 width: 0.8,
                                               ),
                                             ),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                const Icon(
-                                                  Icons.auto_awesome_rounded,
-                                                  size: 11,
-                                                  color: AppColors.secondaryLight,
-                                                ),
-                                                const SizedBox(width: 4),
-                                                Text(
-                                                  l10n.readyTemplates,
-                                                  style: const TextStyle(
-                                                    fontSize: 11,
-                                                    fontWeight: FontWeight.w700,
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  const Icon(
+                                                    Icons.auto_awesome_rounded,
+                                                    size: 11,
                                                     color: AppColors.secondaryLight,
                                                   ),
-                                                ),
-                                              ],
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    l10n.readyTemplates,
+                                                    style: const TextStyle(
+                                                      fontSize: 11,
+                                                      fontWeight: FontWeight.w700,
+                                                      color: AppColors.secondaryLight,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -1160,9 +1327,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                 ),
                                 const SizedBox(height: 20),
                                 Text(
-                                  Localizations.localeOf(context).languageCode == 'tr'
-                                      ? 'Valizin henüz bomboş!'
-                                      : l10n.checklistEmpty,
+                                  l10n.checklistEmpty,
                                   style: theme.textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.w900,
                                     letterSpacing: -0.3,
@@ -1174,9 +1339,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                 Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 16),
                                   child: Text(
-                                    Localizations.localeOf(context).languageCode == 'tr'
-                                        ? 'Seyahatin için hiçbir şeyi unutmamanı sağlayalım. Hazır şablonlardan birini seçebilir veya kendi listenizi oluşturabilirsiniz.'
-                                        : l10n.addFirstItem,
+                                    l10n.addFirstItem,
                                     style: TextStyle(
                                       fontSize: 12.5,
                                       color: theme.colorScheme.onSurfaceVariant,
@@ -1187,8 +1350,10 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                 ),
                                 const SizedBox(height: 22),
                                 // Action Buttons: Smart Templates & Custom Item
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                Wrap(
+                                  alignment: WrapAlignment.center,
+                                  spacing: 10,
+                                  runSpacing: 10,
                                   children: [
                                     FilledButton.icon(
                                       onPressed: () => SmartTemplatesSheet.show(context, tripId: widget.tripId),
@@ -1205,7 +1370,6 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                         style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
                                       ),
                                     ),
-                                    const SizedBox(width: 10),
                                     OutlinedButton.icon(
                                       onPressed: () => AddPackingItemSheet.show(context, tripId: widget.tripId),
                                       style: OutlinedButton.styleFrom(

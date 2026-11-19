@@ -15,6 +15,7 @@ import 'package:packbuddy/features/budget/presentation/screens/trip_comparison_s
 import 'package:packbuddy/features/budget/presentation/screens/widgets/add_trip_sheet.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/share_trip_sheet.dart';
 import 'package:packbuddy/features/travel_map/presentation/screens/travel_map_screen.dart';
+import 'package:packbuddy/features/profile/presentation/screens/widgets/collaborator_avatar_stack.dart';
 import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:packbuddy/shared/widgets/quick_actions_sheet.dart';
 
@@ -390,27 +391,30 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
                                 itemCount: filteredTrips.length,
                                 itemBuilder: (context, index) {
                                   final trip = filteredTrips[index];
-                                  return RepaintBoundary(
-                                    child: AppFadeSlide(
-                                      delay: Duration(milliseconds: (30 * index).clamp(0, 200)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(bottom: 14),
-                                        child: _ModernTripCard(
-                                          trip: trip,
-                                          onTap: () {
-                                            Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                builder: (_) => TripDetailScreen(trip: trip),
-                                              ),
-                                            );
-                                          },
-                                          onEdit: () => AddTripSheet.show(context, tripToEdit: trip),
-                                          onShare: () => ShareTripSheet.show(context, trip),
-                                          onDelete: () => _showDeleteDialog(context, trip),
-                                        ),
-                                      ),
+                                  final cardWidget = Padding(
+                                    padding: const EdgeInsets.only(bottom: 14),
+                                    child: _ModernTripCard(
+                                      trip: trip,
+                                      onTap: () {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (_) => TripDetailScreen(trip: trip),
+                                          ),
+                                        );
+                                      },
+                                      onEdit: () => AddTripSheet.show(context, tripToEdit: trip),
+                                      onShare: () => ShareTripSheet.show(context, trip),
+                                      onDelete: () => _showDeleteDialog(context, trip),
                                     ),
                                   );
+
+                                  if (index < 6) {
+                                    return AppFadeSlide(
+                                      delay: Duration(milliseconds: 30 * index),
+                                      child: cardWidget,
+                                    );
+                                  }
+                                  return cardWidget;
                                 },
                               ),
                       ),
@@ -552,17 +556,23 @@ class _ModernTripCard extends ConsumerWidget {
                   const SizedBox(width: 4),
                 ],
                 Expanded(
-                  child: Text(
-                    CityLocalization.localizeDestination(
-                      trip.destination,
-                      Localizations.localeOf(context).languageCode,
+                  child: Hero(
+                    tag: 'trip-destination-${trip.id}',
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: Text(
+                        CityLocalization.localizeDestination(
+                          trip.destination,
+                          Localizations.localeOf(context).languageCode,
+                        ),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -581,20 +591,23 @@ class _ModernTripCard extends ConsumerWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 42,
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? AppColors.primaryContainerDark
-                            : AppColors.primaryContainerLight,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          transportIcon,
-                          color: isDark ? AppColors.primaryAmber : AppColors.primaryLight,
-                          size: 21,
+                    Hero(
+                      tag: 'trip-transport-icon-${trip.id}',
+                      child: Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? AppColors.primaryContainerDark
+                              : AppColors.primaryContainerLight,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            transportIcon,
+                            color: isDark ? AppColors.primaryAmber : AppColors.primaryLight,
+                            size: 21,
+                          ),
                         ),
                       ),
                     ),
@@ -771,28 +784,40 @@ class _ModernTripCard extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (trip.isShared) ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.people_alt_rounded, size: 12, color: theme.colorScheme.primary),
-                            const SizedBox(width: 4),
-                            Text(
-                              l10n.sharedTrip,
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                color: theme.colorScheme.primary,
-                              ),
+                    if (trip.isCollaborative) ...[
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.people_alt_rounded, size: 12, color: theme.colorScheme.primary),
+                                const SizedBox(width: 4),
+                                Text(
+                                  l10n.sharedTrip,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (trip.collaborators.isNotEmpty) ...[
+                            const SizedBox(width: 6),
+                            CollaboratorAvatarStack(
+                              collaborators: trip.collaborators,
+                              size: 20,
                             ),
                           ],
-                        ),
+                        ],
                       ),
                     ] else
                       const SizedBox.shrink(),

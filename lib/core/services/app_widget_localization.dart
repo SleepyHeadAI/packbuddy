@@ -2634,4 +2634,56 @@ class AppWidgetLocalization {
       default: return 'Offline Ready';
     }
   }
+
+  /// Resolves default trip title for preview cards across 20 languages
+  static String getDefaultTripTitle(String lang) {
+    switch (lang) {
+      case 'tr': return 'Roma Tatili';
+      case 'es': return 'Viaje a Roma';
+      case 'fr': return 'Voyage à Rome';
+      case 'de': return 'Rom-Reise';
+      case 'it': return 'Viaggio a Roma';
+      case 'pt': return 'Viagem a Roma';
+      case 'ru': return 'Поездка в Рим';
+      case 'zh': return '罗马之旅';
+      case 'ja': return 'ローマ旅行';
+      case 'ko': return '로마 여행';
+      case 'hi': return 'रोम यात्रा';
+      case 'ar': return 'رحلة روما';
+      case 'nl': return 'Rome Reis';
+      case 'el': return 'Ταξίδι στη Ρώμη';
+      case 'sv': return 'Romresa';
+      case 'pl': return 'Wycieczka do Rzymu';
+      case 'id': return 'Perjalanan ke Roma';
+      case 'th': return 'ทริปโรม';
+      case 'vi': return 'Chuyến đi Rome';
+      default: return 'Rome Trip';
+    }
+  }
+
+  /// Resolves "+ Add" button/stat label across 20 languages
+  static String getAddAction(String lang) {
+    switch (lang) {
+      case 'tr': return '+ Ekle';
+      case 'es': return '+ Añadir';
+      case 'fr': return '+ Ajouter';
+      case 'de': return '+ Hinzufügen';
+      case 'it': return '+ Aggiungi';
+      case 'pt': return '+ Adicionar';
+      case 'ru': return '+ Добавить';
+      case 'zh': return '+ 添加';
+      case 'ja': return '+ 追加';
+      case 'ko': return '+ 추가';
+      case 'hi': return '+ जोड़ें';
+      case 'ar': return '+ إضافة';
+      case 'nl': return '+ Toevoegen';
+      case 'el': return '+ Προσθήκη';
+      case 'sv': return '+ Lägg till';
+      case 'pl': return '+ Dodaj';
+      case 'id': return '+ Tambah';
+      case 'th': return '+ เพิ่ม';
+      case 'vi': return '+ Thêm';
+      default: return '+ Add';
+    }
+  }
 }

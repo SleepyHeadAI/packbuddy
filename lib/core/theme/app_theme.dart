@@ -25,6 +25,27 @@ class AppTheme {
     }
   }
 
+  /// Optimized font fallbacks covering all 18+ supported languages:
+  /// Arabic (RTL), CJK (Chinese, Japanese, Korean), Thai, Hindi, Cyrillic, Greek, etc.
+  /// Eliminates runtime system font search stalls during 120 FPS frame budget.
+  static const List<String> kFontFallbacks = [
+    'Roboto',
+    'Noto Sans',
+    'Noto Sans Arabic',
+    'Noto Sans SC',
+    'Noto Sans JP',
+    'Noto Sans KR',
+    'Noto Sans Thai',
+    'Noto Sans Devanagari',
+    'PingFang SC',
+    'Hiragino Sans',
+    'Geeza Pro',
+    'Thonburi',
+    'Kohinoor Devanagari',
+    'Segoe UI',
+    'Apple Color Emoji',
+  ];
+
   /// Headline font (Outfit) for bold, modern geometric headers, titles and displays
   static TextStyle headlineFont({
     required double fontSize,
@@ -36,6 +57,7 @@ class AppTheme {
     if (_isTesting) {
       return TextStyle(
         fontFamily: 'Outfit',
+        fontFamilyFallback: kFontFallbacks,
         fontSize: fontSize,
         fontWeight: fontWeight,
         letterSpacing: letterSpacing,
@@ -44,6 +66,7 @@ class AppTheme {
       );
     }
     return GoogleFonts.outfit(
+      textStyle: const TextStyle(fontFamilyFallback: kFontFallbacks),
       fontSize: fontSize,
       fontWeight: fontWeight,
       letterSpacing: letterSpacing,
@@ -63,6 +86,7 @@ class AppTheme {
     if (_isTesting) {
       return TextStyle(
         fontFamily: 'Plus Jakarta Sans',
+        fontFamilyFallback: kFontFallbacks,
         fontSize: fontSize,
         fontWeight: fontWeight,
         letterSpacing: letterSpacing,
@@ -71,6 +95,7 @@ class AppTheme {
       );
     }
     return GoogleFonts.plusJakartaSans(
+      textStyle: const TextStyle(fontFamilyFallback: kFontFallbacks),
       fontSize: fontSize,
       fontWeight: fontWeight,
       letterSpacing: letterSpacing,
@@ -90,6 +115,7 @@ class AppTheme {
     if (_isTesting) {
       return TextStyle(
         fontFamily: 'JetBrains Mono',
+        fontFamilyFallback: kFontFallbacks,
         fontSize: fontSize,
         fontWeight: fontWeight,
         letterSpacing: letterSpacing,
@@ -98,6 +124,7 @@ class AppTheme {
       );
     }
     return GoogleFonts.jetBrainsMono(
+      textStyle: const TextStyle(fontFamilyFallback: kFontFallbacks),
       fontSize: fontSize,
       fontWeight: fontWeight,
       letterSpacing: letterSpacing,
@@ -251,8 +278,9 @@ class AppTheme {
     },
   );
 
-  // Light Theme
-  static ThemeData get lightTheme {
+  // Light Theme (Cached Singleton for 120 FPS Zero-Allocation)
+  static final ThemeData lightTheme = _buildLightTheme();
+  static ThemeData _buildLightTheme() {
     final colorScheme = ColorScheme.light(
       primary: AppColors.primaryLight,
       onPrimary: AppColors.onPrimaryLight,
@@ -555,8 +583,9 @@ class AppTheme {
     );
   }
 
-  // Dark Theme
-  static ThemeData get darkTheme {
+  // Dark Theme (Cached Singleton for 120 FPS Zero-Allocation)
+  static final ThemeData darkTheme = _buildDarkTheme();
+  static ThemeData _buildDarkTheme() {
     final colorScheme = ColorScheme.dark(
       primary: AppColors.primaryDark,
       onPrimary: AppColors.onPrimaryDark,

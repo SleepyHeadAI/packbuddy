@@ -1,9 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/data/local_db/database_helper.dart';
+import 'package:packbuddy/data/sync_engine/sync_engine.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/itinerary/domain/itinerary_item.dart';
+import 'package:packbuddy/features/profile/presentation/controllers/profile_controller.dart';
 
 class ItineraryState {
   final String tripId;
@@ -120,6 +122,15 @@ class ItineraryController extends StateNotifier<ItineraryState> {
   }) async {
     try {
       final user = _ref.read(authUserProvider);
+      final profile = _ref.read(profileControllerProvider).profile;
+      final authorName = (profile?.displayName != null && profile!.displayName!.trim().isNotEmpty)
+          ? profile.displayName!.trim()
+          : (user?.displayName != null && user!.displayName!.trim().isNotEmpty)
+              ? user.displayName!.trim()
+              : (user?.email != null && user!.email!.trim().isNotEmpty)
+                  ? user.email!.trim().split('@').first
+                  : null;
+
       final now = DateTime.now();
       final id = 'itin_${now.millisecondsSinceEpoch}_${state.tripId}';
 
@@ -139,9 +150,20 @@ class ItineraryController extends StateNotifier<ItineraryState> {
         currency: currency,
         createdAt: now,
         updatedAt: now,
+        createdByName: authorName,
       );
 
       await _dbHelper.insertItineraryItem(newItem.toMap());
+
+      // If collaborative trip, push immediately to Firestore for real-time collaborator view
+      final trips = _ref.read(tripControllerProvider).trips;
+      final trip = trips.where((t) => t.id == state.tripId).firstOrNull;
+      if (trip != null && trip.isCollaborative) {
+        try {
+          _ref.read(syncEngineProvider.notifier).pushItineraryItem(newItem);
+        } catch (_) {}
+      }
+
       final updatedList = List<ItineraryItem>.from(state.items)..add(newItem);
       // Sort
       updatedList.sort((a, b) {
@@ -179,6 +201,13 @@ class ItineraryController extends StateNotifier<ItineraryState> {
 
       final existing = state.items[index];
       final now = DateTime.now();
+      final user = _ref.read(authUserProvider);
+      final profile = _ref.read(profileControllerProvider).profile;
+      final updaterName = (profile?.displayName != null && profile!.displayName!.trim().isNotEmpty)
+          ? profile.displayName!.trim()
+          : (user?.displayName != null && user!.displayName!.trim().isNotEmpty)
+              ? user.displayName!.trim()
+              : null;
 
       final updatedItem = existing.copyWith(
         dayNumber: dayNumber,
@@ -194,9 +223,20 @@ class ItineraryController extends StateNotifier<ItineraryState> {
         cost: cost,
         currency: currency,
         updatedAt: now,
+        createdByName: updaterName ?? existing.createdByName,
       );
 
       await _dbHelper.updateItineraryItem(updatedItem.toMap());
+
+      // If collaborative trip, push immediately to Firestore
+      final trips = _ref.read(tripControllerProvider).trips;
+      final trip = trips.where((t) => t.id == state.tripId).firstOrNull;
+      if (trip != null && trip.isCollaborative) {
+        try {
+          _ref.read(syncEngineProvider.notifier).pushItineraryItem(updatedItem);
+        } catch (_) {}
+      }
+
       final updatedList = List<ItineraryItem>.from(state.items);
       updatedList[index] = updatedItem;
       // Sort
@@ -232,6 +272,16 @@ class ItineraryController extends StateNotifier<ItineraryState> {
 
     try {
       await _dbHelper.toggleItineraryItemCompletion(itemId, updated.isCompleted);
+
+      // If collaborative trip, push update immediately
+      final trips = _ref.read(tripControllerProvider).trips;
+      final trip = trips.where((t) => t.id == state.tripId).firstOrNull;
+      if (trip != null && trip.isCollaborative) {
+        try {
+          _ref.read(syncEngineProvider.notifier).pushItineraryItem(updated);
+        } catch (_) {}
+      }
+
       return true;
     } catch (e) {
       // Rollback on error
@@ -246,6 +296,16 @@ class ItineraryController extends StateNotifier<ItineraryState> {
       await _dbHelper.deleteItineraryItem(itemId);
       final updatedList = state.items.where((i) => i.id != itemId).toList();
       state = state.copyWith(items: updatedList);
+
+      // If collaborative trip, delete immediately from Firestore
+      final trips = _ref.read(tripControllerProvider).trips;
+      final trip = trips.where((t) => t.id == state.tripId).firstOrNull;
+      if (trip != null && trip.isCollaborative) {
+        try {
+          _ref.read(syncEngineProvider.notifier).deleteRemoteItineraryItem(itemId);
+        } catch (_) {}
+      }
+
       return true;
     } catch (e) {
       state = state.copyWith(errorMessage: e.toString());

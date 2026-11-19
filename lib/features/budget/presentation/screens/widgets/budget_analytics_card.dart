@@ -1418,7 +1418,7 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '${BudgetLocalization.chartTypeTimeline(lang)} (${sortedDailyEntries.length} gün)',
+                    '${BudgetLocalization.chartTypeTimeline(lang)} ${BudgetLocalization.timelineDays(lang, sortedDailyEntries.length)}',
                     style: TextStyle(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w700,
@@ -1427,7 +1427,7 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                   ),
                   if (peakDay != null)
                     Text(
-                      'Zirve: ${CurrencyFormatter.format(peakDayAmount, currency: activeCurrency)}',
+                      BudgetLocalization.peakLabel(lang, CurrencyFormatter.format(peakDayAmount, currency: activeCurrency)),
                       style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
@@ -1619,8 +1619,8 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                         ),
                         Text(
                           _isDeepStatsExpanded
-                              ? ((l10n?.localeName.startsWith('tr') ?? false) ? 'Daraltmak için dokunun' : 'Tap to collapse')
-                              : ((l10n?.localeName.startsWith('tr') ?? false) ? 'Detaylı analizleri keşfedin' : 'Explore detailed analytics'),
+                              ? BudgetLocalization.deepStatsCollapse(lang)
+                              : BudgetLocalization.deepStatsExplore(lang),
                           style: TextStyle(
                             fontSize: 10.5,
                             color: theme.colorScheme.onSurfaceVariant,
@@ -1691,8 +1691,8 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                           icon: Icons.balance_rounded,
                           color: const Color(0xFF10B981),
                           title: BudgetLocalization.cashVsCard(lang),
-                          value: '%$cardPct / %$cashPct',
-                          subtitle: 'Kart / Nakit',
+                          value: BudgetLocalization.formatRatioPercent(lang, cardPct, cashPct),
+                          subtitle: BudgetLocalization.cardVsCashSubtitle(lang),
                           theme: theme,
                           isDark: isDark,
                         ),
@@ -1707,8 +1707,10 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                           icon: Icons.category_rounded,
                           color: const Color(0xFF8B5CF6),
                           title: BudgetLocalization.categoryDiversity(lang),
-                          value: '$categoryDiversityCount ${l10n?.categorySpendingAnalysis.split(' ').first ?? 'Kategori'}',
-                          subtitle: topCategoryName != null && topCategoryName.isNotEmpty ? 'Zirve: $topCategoryName' : '',
+                          value: BudgetLocalization.formatCategoryCount(lang, categoryDiversityCount),
+                          subtitle: topCategoryName != null && topCategoryName.isNotEmpty
+                              ? BudgetLocalization.formatTopCategory(lang, BudgetAnalyticsCard.getCategoryDisplayName(topCategoryName, l10n))
+                              : '',
                           theme: theme,
                           isDark: isDark,
                         ),
@@ -1728,8 +1730,8 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                             currency: activeCurrency,
                           ),
                           subtitle: safeDailySpendAmount != null
-                              ? 'Kalan gün başına'
-                              : 'Günlük ortalama',
+                              ? BudgetLocalization.perRemainingDay(lang)
+                              : BudgetLocalization.dailyAverage(lang),
                           theme: theme,
                           isDark: isDark,
                         ),

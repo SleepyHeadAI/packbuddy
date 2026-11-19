@@ -21,7 +21,7 @@ service cloud.firestore {
 
     // Users profile collection for Admin Dashboard & authenticated user isolation
     match /users/{userId} {
-      allow read: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
+      allow read: if isAuthenticated() || isAdmin();
       allow create: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
       allow update: if (isAuthenticated() && request.auth.uid == userId && !isUserBanned(userId)) || isAdmin();
       allow delete: if isAdmin();
@@ -31,6 +31,22 @@ service cloud.firestore {
         allow read, update, delete: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
         allow create: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
       }
+    }
+
+    // Usernames registry collection for unique handle reservation (@username)
+    match /usernames/{username} {
+      allow read: if isAuthenticated() || isAdmin();
+      allow create: if (isAuthenticated() && request.resource.data.uid == request.auth.uid) || isAdmin();
+      allow update: if (isAuthenticated() && resource.data.uid == request.auth.uid && request.resource.data.uid == request.auth.uid) || isAdmin();
+      allow delete: if (isAuthenticated() && resource.data.uid == request.auth.uid) || isAdmin();
+    }
+
+    // Friendships collection: supports bidirectional travel buddy connections & requests
+    match /friendships/{docId} {
+      allow read: if (isAuthenticated() && request.auth.uid in resource.data.users) || isAdmin();
+      allow create: if (isAuthenticated() && request.auth.uid in request.resource.data.users && request.resource.data.requesterId == request.auth.uid) || isAdmin();
+      allow update: if (isAuthenticated() && request.auth.uid in resource.data.users) || isAdmin();
+      allow delete: if (isAuthenticated() && request.auth.uid in resource.data.users) || isAdmin();
     }
 
     // Mail queue collection for Firebase Trigger Email extension

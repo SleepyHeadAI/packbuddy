@@ -28,12 +28,20 @@ class BouncyPressable extends StatefulWidget {
 
 class _BouncyPressableState extends State<BouncyPressable>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _scaleAnimation;
+  AnimationController? _controller;
+  Animation<double>? _scaleAnimation;
+
+  bool get _hasCallback => widget.onTap != null || widget.onLongPress != null;
 
   @override
   void initState() {
     super.initState();
+    if (_hasCallback) {
+      _initController();
+    }
+  }
+
+  void _initController() {
     _controller = AnimationController(
       vsync: this,
       duration: widget.duration,
@@ -46,7 +54,7 @@ class _BouncyPressableState extends State<BouncyPressable>
       end: widget.scaleFactor,
     ).animate(
       CurvedAnimation(
-        parent: _controller,
+        parent: _controller!,
         curve: Curves.easeOutCubic,
         reverseCurve: Curves.easeOutBack,
       ),
@@ -54,32 +62,44 @@ class _BouncyPressableState extends State<BouncyPressable>
   }
 
   @override
+  void didUpdateWidget(BouncyPressable oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_hasCallback && _controller == null) {
+      _initController();
+    } else if (!_hasCallback && _controller != null) {
+      _controller?.dispose();
+      _controller = null;
+      _scaleAnimation = null;
+    }
+  }
+
+  @override
   void dispose() {
-    _controller.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
   void _onTapDown(TapDownDetails details) {
-    if (widget.onTap != null || widget.onLongPress != null) {
-      _controller.forward();
+    if (_hasCallback) {
+      _controller?.forward();
     }
   }
 
   void _onTapUp(TapUpDetails details) {
-    if (widget.onTap != null || widget.onLongPress != null) {
-      _controller.reverse();
+    if (_hasCallback) {
+      _controller?.reverse();
     }
   }
 
   void _onTapCancel() {
-    if (widget.onTap != null || widget.onLongPress != null) {
-      _controller.reverse();
+    if (_hasCallback) {
+      _controller?.reverse();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.onTap == null && widget.onLongPress == null) {
+    if (!_hasCallback || _scaleAnimation == null) {
       return widget.child;
     }
 
@@ -91,10 +111,10 @@ class _BouncyPressableState extends State<BouncyPressable>
       onTap: widget.onTap,
       onLongPress: widget.onLongPress,
       child: AnimatedBuilder(
-        animation: _scaleAnimation,
+        animation: _scaleAnimation!,
         builder: (context, child) {
           return Transform.scale(
-            scale: _scaleAnimation.value,
+            scale: _scaleAnimation!.value,
             child: child,
           );
         },

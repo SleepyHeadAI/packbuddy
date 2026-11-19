@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
+import 'package:packbuddy/features/profile/domain/friend_localization.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
 import 'package:packbuddy/features/profile/domain/profile_localization.dart';
 import 'package:packbuddy/features/profile/domain/user_profile.dart';
@@ -12,6 +13,8 @@ class ProfileHeaderCard extends StatelessWidget {
   final String languageCode;
   final VoidCallback onEditTap;
   final VoidCallback? onAvatarTap;
+  final VoidCallback? onFriendsTap;
+  final String? avatarHeroTag;
 
   const ProfileHeaderCard({
     super.key,
@@ -19,6 +22,8 @@ class ProfileHeaderCard extends StatelessWidget {
     required this.languageCode,
     required this.onEditTap,
     this.onAvatarTap,
+    this.onFriendsTap,
+    this.avatarHeroTag,
   });
 
   @override
@@ -46,25 +51,48 @@ class ProfileHeaderCard extends StatelessWidget {
           Stack(
             alignment: AlignmentDirectional.bottomEnd,
             children: [
-              UserAvatar(
-                photoUrl: profile.photoUrl,
-                displayName: profile.displayName,
-                email: profile.email,
-                size: 84,
-                isAnimated: true,
-                showEditBadge: true,
-                onTap: () {
-                  if (onAvatarTap != null) {
-                    onAvatarTap!();
-                  } else {
-                    AvatarPickerSheet.show(
-                      context,
-                      profile: profile,
-                      languageCode: languageCode,
-                    );
-                  }
-                },
-              ),
+              avatarHeroTag != null
+                  ? Hero(
+                      tag: avatarHeroTag!,
+                      child: UserAvatar(
+                        photoUrl: profile.photoUrl,
+                        displayName: profile.displayName,
+                        email: profile.email,
+                        size: 84,
+                        isAnimated: true,
+                        showEditBadge: true,
+                        onTap: () {
+                          if (onAvatarTap != null) {
+                            onAvatarTap!();
+                          } else {
+                            AvatarPickerSheet.show(
+                              context,
+                              profile: profile,
+                              languageCode: languageCode,
+                            );
+                          }
+                        },
+                      ),
+                    )
+                  : UserAvatar(
+                      photoUrl: profile.photoUrl,
+                      displayName: profile.displayName,
+                      email: profile.email,
+                      size: 84,
+                      isAnimated: true,
+                      showEditBadge: true,
+                      onTap: () {
+                        if (onAvatarTap != null) {
+                          onAvatarTap!();
+                        } else {
+                          AvatarPickerSheet.show(
+                            context,
+                            profile: profile,
+                            languageCode: languageCode,
+                          );
+                        }
+                      },
+                    ),
               if (profile.isPro)
                 PositionedDirectional(
                   top: 0,
@@ -110,6 +138,27 @@ class ProfileHeaderCard extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
+
+          // Username Handle (@buddy_id)
+          if (profile.username != null && profile.username!.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2.5),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.45),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                '@${profile.username!}',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.primary,
+                  letterSpacing: -0.2,
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 4),
 
           // Email
@@ -121,6 +170,48 @@ class ProfileHeaderCard extends StatelessWidget {
                 fontSize: 12.5,
               ),
             ),
+
+          // Travel Status Badge
+          if (profile.travelStatus != null && profile.travelStatus!.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            InkWell(
+              onTap: onEditTap,
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: theme.colorScheme.outline.withValues(alpha: 0.15),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        profile.travelStatus!,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.edit_outlined,
+                      size: 12,
+                      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 8),
 
           // Home Country Pill
@@ -176,23 +267,45 @@ class ProfileHeaderCard extends StatelessWidget {
             const SizedBox(height: 14),
           ],
 
-          // Edit Profile Action
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: onEditTap,
-              icon: const Icon(Icons.edit_rounded, size: 16),
-              label: Text(
-                ProfileLocalization.getEditProfile(languageCode),
-                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+          // Action Buttons: Travel Buddies & Edit Profile
+          Row(
+            children: [
+              if (onFriendsTap != null) ...[
+                Expanded(
+                  child: FilledButton.tonalIcon(
+                    onPressed: onFriendsTap,
+                    icon: const Icon(Icons.people_alt_rounded, size: 16),
+                    label: Text(
+                      FriendLocalization.getFriends(languageCode),
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+              ],
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: onEditTap,
+                  icon: const Icon(Icons.edit_rounded, size: 16),
+                  label: Text(
+                    ProfileLocalization.getEditProfile(languageCode),
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
               ),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-            ),
+            ],
           ),
         ],
       ),

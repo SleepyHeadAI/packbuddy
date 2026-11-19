@@ -6,14 +6,19 @@ import 'package:packbuddy/shared/widgets/app_card.dart';
 import 'package:packbuddy/features/profile/presentation/controllers/profile_controller.dart';
 import 'package:packbuddy/features/profile/domain/profile_localization.dart';
 import 'package:packbuddy/features/profile/domain/user_profile.dart';
+import 'package:packbuddy/features/profile/domain/friend_localization.dart';
+import 'package:packbuddy/features/profile/presentation/screens/friends_screen.dart';
 import 'package:packbuddy/features/profile/presentation/screens/widgets/edit_profile_sheet.dart';
 import 'package:packbuddy/features/profile/presentation/screens/widgets/profile_header_card.dart';
+import 'package:packbuddy/features/profile/presentation/screens/widgets/travel_badges_card.dart';
 import 'package:packbuddy/features/profile/presentation/screens/widgets/travel_stats_card.dart';
 
 /// Serene Voyage primary Profile screen with editable traveler details,
 /// live travel analytics, and account metadata.
 class ProfileScreen extends ConsumerStatefulWidget {
-  const ProfileScreen({super.key});
+  final String? avatarHeroTag;
+
+  const ProfileScreen({super.key, this.avatarHeroTag});
 
   @override
   ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
@@ -102,6 +107,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.people_outline_rounded),
+            tooltip: FriendLocalization.getFriends(langCode),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const FriendsScreen()),
+            ),
+          ),
+          IconButton(
             icon: const Icon(Icons.edit_rounded),
             tooltip: ProfileLocalization.getEditProfile(langCode),
             onPressed: () => _openEditSheet(effectiveProfile, langCode),
@@ -121,7 +133,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ProfileHeaderCard(
               profile: effectiveProfile,
               languageCode: langCode,
+              avatarHeroTag: widget.avatarHeroTag,
               onEditTap: () => _openEditSheet(effectiveProfile, langCode),
+              onFriendsTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const FriendsScreen()),
+              ),
             ),
             const SizedBox(height: 20),
 
@@ -135,7 +151,19 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             const SizedBox(height: 20),
 
-            // 3. Account Metadata Card
+            // 3. Travel Personality Styles & Gamified Badges Card
+            TravelBadgesCard(
+              profile: effectiveProfile,
+              totalTrips: profileState.totalTrips,
+              totalCountries: profileState.totalCountriesVisited,
+              totalItems: profileState.totalPackingItems,
+              totalDocuments: profileState.totalDocuments,
+              languageCode: langCode,
+              onPickStylesTap: () => _openEditSheet(effectiveProfile, langCode),
+            ),
+            const SizedBox(height: 20),
+
+            // 4. Account Metadata Card
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
               child: Text(

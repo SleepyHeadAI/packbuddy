@@ -38,7 +38,7 @@ class _SyncStatusScreenState extends ConsumerState<SyncStatusScreen> {
     final isOnline = connState.isOnline;
     final lastSyncTimeStr = connState.lastSyncTime != null
         ? DateFormat('dd.MM.yyyy HH:mm').format(connState.lastSyncTime!)
-        : (langCode == 'tr' ? 'Henüz yapılmadı' : 'Never synced');
+        : ConnectivityLocalization.neverSynced(langCode);
 
     return Scaffold(
       appBar: AppBar(

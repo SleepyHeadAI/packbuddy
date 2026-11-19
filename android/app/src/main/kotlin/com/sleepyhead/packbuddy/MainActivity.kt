@@ -45,6 +45,13 @@ class MainActivity : FlutterFragmentActivity() {
     }
 
     private fun enableHighRefreshRate() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            try {
+                window.setPreferMinimalPostProcessing(true)
+            } catch (_: Exception) {
+                // Not supported on some OEM variants
+            }
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
                 val display: Display? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {

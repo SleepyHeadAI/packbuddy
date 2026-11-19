@@ -574,7 +574,7 @@ class DashboardLocalization {
 
   static String sectionVault(String lang) {
     switch (lang) {
-      case 'tr': return 'Belge Kasası';
+      case 'tr': return 'Güvenli Kasa';
       case 'es': return 'Bóveda de documentos';
       case 'fr': return 'Coffre de documents';
       case 'de': return 'Dokumentensafe';
@@ -894,6 +894,148 @@ class DashboardLocalization {
       case 'en':
       default:
         return 'Auto-fill Code';
+    }
+  }
+
+  static String _cleanLang(String lang) {
+    final lower = lang.toLowerCase();
+    if (lower.contains('_')) return lower.split('_')[0];
+    if (lower.contains('-')) return lower.split('-')[0];
+    return lower;
+  }
+
+  static String adminBadge(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Yönetici';
+      case 'es': return 'Administrador';
+      case 'fr': return 'Admin';
+      case 'de': return 'Admin';
+      case 'it': return 'Admin';
+      case 'pt': return 'Admin';
+      case 'ru': return 'Админ';
+      case 'zh': return '管理员';
+      case 'ja': return '管理者';
+      case 'ko': return '관리자';
+      case 'ar': return 'مشرف';
+      case 'nl': return 'Beheerder';
+      case 'el': return 'Διαχειριστής';
+      case 'sv': return 'Admin';
+      case 'pl': return 'Administrator';
+      case 'id': return 'Admin';
+      case 'th': return 'ผู้ดูแล';
+      case 'vi': return 'Quản trị';
+      case 'hi': return 'प्रशासक';
+      case 'en':
+      default:
+        return 'Admin';
+    }
+  }
+
+  static String discountBadge(String lang, int percent) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return '%$percent İNDİRİM';
+      case 'es': return '$percent% DTO.';
+      case 'fr': return '-$percent% RÉDUC';
+      case 'de': return '$percent% RABATT';
+      case 'it': return '$percent% SCONTO';
+      case 'pt': return '$percent% DESCONTO';
+      case 'ru': return 'СКИДКА $percent%';
+      case 'zh': return '$percent% 优惠';
+      case 'ja': return '$percent% 割引';
+      case 'ko': return '$percent% 할인';
+      case 'ar': return 'خصم $percent%';
+      case 'nl': return '$percent% KORTING';
+      case 'el': return '-$percent% ΕΚΠΤΩΣΗ';
+      case 'sv': return '$percent% RABATT';
+      case 'pl': return '-$percent% ZNIŻKI';
+      case 'id': return 'DISKON $percent%';
+      case 'th': return 'ลด $percent%';
+      case 'vi': return 'GIẢM $percent%';
+      case 'hi': return '$percent% छूट';
+      case 'en':
+      default:
+        return '$percent% OFF';
+    }
+  }
+
+  static String dealBadge(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Fırsat';
+      case 'es': return 'Oferta';
+      case 'fr': return 'Offre';
+      case 'de': return 'Angebot';
+      case 'it': return 'Offerta';
+      case 'pt': return 'Oferta';
+      case 'ru': return 'Акция';
+      case 'zh': return '特惠';
+      case 'ja': return 'お得';
+      case 'ko': return '특가';
+      case 'ar': return 'عرض';
+      case 'nl': return 'Aanbieding';
+      case 'el': return 'Προσφορά';
+      case 'sv': return 'Erbjudande';
+      case 'pl': return 'Okazja';
+      case 'id': return 'Promo';
+      case 'th': return 'ข้อเสนอพิเศษ';
+      case 'vi': return 'Ưu đãi';
+      case 'hi': return 'ऑफ़र';
+      case 'en':
+      default:
+        return 'Deal';
+    }
+  }
+
+  static String noticeBadge(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Duyuru';
+      case 'es': return 'Aviso';
+      case 'fr': return 'Avis';
+      case 'de': return 'Hinweis';
+      case 'it': return 'Avviso';
+      case 'pt': return 'Aviso';
+      case 'ru': return 'Объявление';
+      case 'zh': return '公告';
+      case 'ja': return 'お知らせ';
+      case 'ko': return '공지사항';
+      case 'ar': return 'إشعار';
+      case 'nl': return 'Bericht';
+      case 'el': return 'Ανακοίνωση';
+      case 'sv': return 'Meddelande';
+      case 'pl': return 'Komunikat';
+      case 'id': return 'Pengumuman';
+      case 'th': return 'ประกาศ';
+      case 'vi': return 'Thông báo';
+      case 'hi': return 'सूचना';
+      case 'en':
+      default:
+        return 'Notice';
+    }
+  }
+
+  static String viewOffer(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Fırsatı İncele →';
+      case 'es': return 'Ver oferta →';
+      case 'fr': return 'Voir l\'offre →';
+      case 'de': return 'Angebot ansehen →';
+      case 'it': return 'Vedi offerta →';
+      case 'pt': return 'Ver oferta →';
+      case 'ru': return 'Посмотреть акцию →';
+      case 'zh': return '查看特惠 →';
+      case 'ja': return '特典を見る →';
+      case 'ko': return '혜택 확인하기 →';
+      case 'ar': return 'عرض التفاصيل →';
+      case 'nl': return 'Bekijk aanbieding →';
+      case 'el': return 'Δείτε την προσφορά →';
+      case 'sv': return 'Visa erbjudande →';
+      case 'pl': return 'Zobacz ofertę →';
+      case 'id': return 'Lihat Promo →';
+      case 'th': return 'ดูข้อเสนอ →';
+      case 'vi': return 'Xem ưu đãi →';
+      case 'hi': return 'ऑफ़र देखें →';
+      case 'en':
+      default:
+        return 'View Offer →';
     }
   }
 }

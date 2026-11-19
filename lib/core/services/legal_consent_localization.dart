@@ -652,10 +652,29 @@ class LegalConsentLocalization {
 
   static String getAcceptedStatus(String? lang, String version, String? dateStr) {
     final clean = _cleanLang(lang);
-    if (clean == 'tr') {
-      return 'Sözleşme Onaylandı: Sürüm $version';
+    switch (clean) {
+      case 'tr': return 'Sözleşme Onaylandı: Sürüm $version';
+      case 'es': return 'Acuerdo aceptado: Versión $version';
+      case 'fr': return 'Contrat accepté : Version $version';
+      case 'de': return 'Vereinbarung akzeptiert: Version $version';
+      case 'it': return 'Accordo accettato: Versione $version';
+      case 'pt': return 'Termo aceito: Versão $version';
+      case 'ru': return 'Соглашение принято: Версия $version';
+      case 'zh': return '协议已同意：版本 $version';
+      case 'ja': return '規約に同意済み: バージョン $version';
+      case 'ko': return '약관 동의 완료: 버전 $version';
+      case 'hi': return 'अनुबंध स्वीकृत: संस्करण $version';
+      case 'ar': return 'تمت الموافقة على الاتفاقية: الإصدار $version';
+      case 'nl': return 'Overeenkomst geaccepteerd: Versie $version';
+      case 'el': return 'Η συμφωνία έγινε αποδεκτή: Έκδοση $version';
+      case 'sv': return 'Avtal godkänt: Version $version';
+      case 'pl': return 'Umowa zaakceptowana: Wersja $version';
+      case 'id': return 'Perjanjian Disetujui: Versi $version';
+      case 'th': return 'ยอมรับข้อตกลงแล้ว: เวอร์ชัน $version';
+      case 'vi': return 'Đã chấp nhận thỏa thuận: Phiên bản $version';
+      case 'en':
+      default: return 'Agreement Accepted: Version $version';
     }
-    return 'Agreement Accepted: Version $version';
   }
 
   static String getCloseButton(String? lang) {
@@ -683,6 +702,22 @@ class LegalConsentLocalization {
         return '닫기';
       case 'ar':
         return 'إغلاق';
+      case 'hi':
+        return 'बंद करें';
+      case 'nl':
+        return 'Sluiten';
+      case 'el':
+        return 'Κλείσιμο';
+      case 'sv':
+        return 'Stäng';
+      case 'pl':
+        return 'Zamknij';
+      case 'id':
+        return 'Tutup';
+      case 'th':
+        return 'ปิด';
+      case 'vi':
+        return 'Đóng';
       default:
         return 'Close';
     }

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
+import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/itinerary/domain/itinerary_localization.dart';
 import 'package:packbuddy/features/itinerary/presentation/controllers/itinerary_controller.dart';
 import 'package:packbuddy/features/itinerary/presentation/screens/widgets/add_activity_sheet.dart';
 import 'package:packbuddy/features/itinerary/presentation/screens/widgets/day_timeline_card.dart';
+import 'package:packbuddy/features/profile/presentation/controllers/profile_controller.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
 
 /// Serene Voyage Day-by-Day Itinerary Screen for a specific trip
@@ -26,6 +29,16 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
 
     final itineraryState = ref.watch(itineraryControllerFamily(widget.trip.id));
     final itineraryNotifier = ref.read(itineraryControllerFamily(widget.trip.id).notifier);
+
+    final trips = ref.watch(tripControllerProvider).trips;
+    final liveTrip = trips.firstWhere((t) => t.id == widget.trip.id, orElse: () => widget.trip);
+    final isCollaborative = liveTrip.isCollaborative;
+    final authState = ref.watch(authControllerProvider);
+    final profileState = ref.watch(profileControllerProvider);
+    final currentUserId = authState.user?.uid;
+    final currentUserName = profileState.profile?.displayName ??
+        authState.user?.displayName ??
+        (authState.user?.email != null ? authState.user!.email!.split('@').first : null);
 
     final selectedDay = itineraryState.selectedDay;
     final totalDays = itineraryState.totalDays;
@@ -55,15 +68,33 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            Text(
-              widget.trip.title,
-              style: TextStyle(
-                fontSize: 12,
-                color: theme.colorScheme.onSurfaceVariant,
-                fontWeight: FontWeight.w500,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: Text(
+                    liveTrip.title,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (isCollaborative) ...[
+                  const SizedBox(width: 5),
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF10B981),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ],
         ),
@@ -181,7 +212,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
-                      '$dayCompletedCount / $dayTotalCount ${langCode == "tr" ? "tamamlandı" : "completed"}',
+                      ItineraryLocalization.completedBadge(langCode, dayCompletedCount, dayTotalCount),
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
@@ -216,6 +247,9 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                           return DayTimelineCard(
                             item: item,
                             languageCode: langCode,
+                            isCollaborative: isCollaborative,
+                            currentUserId: currentUserId,
+                            currentUserName: currentUserName,
                             onToggleCompleted: () =>
                                 itineraryNotifier.toggleCompleted(item.id),
                             onEdit: () {

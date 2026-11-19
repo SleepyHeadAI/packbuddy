@@ -9,6 +9,7 @@ import 'package:packbuddy/core/services/notification_service.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
+import 'package:packbuddy/features/dashboard/presentation/dashboard_localization.dart';
 import 'package:packbuddy/features/settings/presentation/screens/widgets/paywall_sheet.dart';
 import 'package:packbuddy/core/services/push_notification_service.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
@@ -699,7 +700,7 @@ class _NotificationsCenterSheetState extends ConsumerState<NotificationsCenterSh
                 ? const Color(0xFF8B5CF6).withValues(alpha: 0.35)
                 : theme.colorScheme.outlineVariant.withValues(alpha: 0.3));
 
-        final isTr = Localizations.localeOf(context).languageCode == 'tr';
+        final lang = Localizations.localeOf(context).languageCode;
 
         return Material(
           color: Colors.transparent,
@@ -785,7 +786,7 @@ class _NotificationsCenterSheetState extends ConsumerState<NotificationsCenterSh
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(
-                                        isTr ? 'Yönetici' : 'Admin',
+                                        DashboardLocalization.adminBadge(lang),
                                         style: const TextStyle(
                                           fontSize: 9.5,
                                           fontWeight: FontWeight.w800,
@@ -802,7 +803,7 @@ class _NotificationsCenterSheetState extends ConsumerState<NotificationsCenterSh
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(
-                                        '%${item.discountPercent} ${isTr ? 'İNDİRİM' : 'OFF'}',
+                                        DashboardLocalization.discountBadge(lang, item.discountPercent!),
                                         style: const TextStyle(
                                           fontSize: 9.5,
                                           fontWeight: FontWeight.w800,
@@ -819,7 +820,7 @@ class _NotificationsCenterSheetState extends ConsumerState<NotificationsCenterSh
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(
-                                        isTr ? 'Fırsat' : 'Deal',
+                                        DashboardLocalization.dealBadge(lang),
                                         style: const TextStyle(
                                           fontSize: 9.5,
                                           fontWeight: FontWeight.w800,
@@ -836,7 +837,7 @@ class _NotificationsCenterSheetState extends ConsumerState<NotificationsCenterSh
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(
-                                        isTr ? 'Duyuru' : 'Notice',
+                                        DashboardLocalization.noticeBadge(lang),
                                         style: const TextStyle(
                                           fontSize: 9.5,
                                           fontWeight: FontWeight.w800,
@@ -871,7 +872,7 @@ class _NotificationsCenterSheetState extends ConsumerState<NotificationsCenterSh
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
-                                isTr ? 'Fırsatı İncele →' : 'View Offer →',
+                                DashboardLocalization.viewOffer(lang),
                                 style: const TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,

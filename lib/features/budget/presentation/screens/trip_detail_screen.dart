@@ -23,6 +23,9 @@ import 'package:packbuddy/features/budget/presentation/screens/widgets/add_expen
 import 'package:packbuddy/features/budget/presentation/screens/trips_screen.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/share_trip_sheet.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/emergency_guide_sheet.dart';
+import 'package:packbuddy/features/auth/auth_controller.dart';
+import 'package:packbuddy/features/budget/domain/collaboration_localization.dart';
+import 'package:packbuddy/features/profile/presentation/controllers/profile_controller.dart';
 import 'package:packbuddy/shared/widgets/quick_actions_sheet.dart';
 import 'package:packbuddy/features/itinerary/presentation/screens/itinerary_screen.dart';
 import 'package:packbuddy/features/itinerary/domain/itinerary_localization.dart';
@@ -334,9 +337,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  count == 0
-                      ? (lang == 'tr' ? 'Gün gün aktiviteleri planlayın' : 'Plan activities day by day')
-                      : '$count ${lang == "tr" ? "aktivite planlandı" : "activities planned"} ($completed ${lang == "tr" ? "tamamlandı" : "done"})',
+                  ItineraryLocalization.itinerarySubtitle(lang, count, completed),
                   style: TextStyle(
                     fontSize: 12,
                     color: theme.colorScheme.onSurfaceVariant,
@@ -962,6 +963,20 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     final categoryColor = _getCategoryColor(expense.category);
     final categoryIcon = _getCategoryIcon(expense.category);
     final targetCurrency = activeCurrency ?? currentTrip.defaultCurrency;
+    final isCollaborative = currentTrip.isCollaborative;
+    final authState = ref.watch(authControllerProvider);
+    final profileState = ref.watch(profileControllerProvider);
+    final currentUserId = authState.user?.uid;
+    final currentUserName = profileState.profile?.displayName ??
+        authState.user?.displayName ??
+        (authState.user?.email != null ? authState.user!.email!.split('@').first : null);
+    final isMe = (currentUserId != null && expense.userId != null && expense.userId == currentUserId) ||
+        (currentUserName != null && expense.createdByName != null && expense.createdByName!.trim().toLowerCase() == currentUserName.trim().toLowerCase());
+    final authorText = CollaborationLocalization.formatAddedBy(
+      expense.createdByName,
+      isMe: isMe,
+      languageCode: Localizations.localeOf(context).languageCode,
+    );
 
     return Dismissible(
       key: Key('exp-tile-${expense.id}'),
@@ -1010,30 +1025,37 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
-                    Row(
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 4,
+                      runSpacing: 2,
                       children: [
                         if (secondaryBadge != null && secondaryBadge.isNotEmpty) ...[
-                          if (secondaryIcon != null) ...[
-                            Icon(secondaryIcon, size: 11, color: theme.colorScheme.onSurfaceVariant),
-                            const SizedBox(width: 3),
-                          ],
-                          Flexible(
-                            child: Text(
-                              secondaryBadge,
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: theme.colorScheme.onSurfaceVariant,
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (secondaryIcon != null) ...[
+                                Icon(secondaryIcon, size: 11, color: theme.colorScheme.onSurfaceVariant),
+                                const SizedBox(width: 3),
+                              ],
+                              ConstrainedBox(
+                                constraints: const BoxConstraints(maxWidth: 100),
+                                child: Text(
+                                  secondaryBadge,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                            ],
                           ),
-                          const SizedBox(width: 6),
                           Text(
                             '•',
                             style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurfaceVariant),
                           ),
-                          const SizedBox(width: 6),
                         ],
                         Text(
                           AppDateFormatter.formatMMMd(
@@ -1045,6 +1067,46 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
+                        // Author badge (ONLY when currentTrip.isCollaborative is true)
+                        if (isCollaborative) ...[
+                          Text(
+                            '•',
+                            style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurfaceVariant),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                            decoration: BoxDecoration(
+                              color: isMe
+                                  ? const Color(0xFF6366F1).withValues(alpha: 0.12)
+                                  : const Color(0xFF0EA5E9).withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  isMe ? Icons.person_rounded : Icons.person_outline_rounded,
+                                  size: 10,
+                                  color: isMe ? const Color(0xFF6366F1) : const Color(0xFF0EA5E9),
+                                ),
+                                const SizedBox(width: 3),
+                                ConstrainedBox(
+                                  constraints: const BoxConstraints(maxWidth: 90),
+                                  child: Text(
+                                    authorText,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                      color: isMe ? const Color(0xFF6366F1) : const Color(0xFF0EA5E9),
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ],
@@ -1095,6 +1157,20 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     final categoryIcon = _getCategoryIcon(expense.category);
     final paymentIcon = _getPaymentIcon(expense.paymentMethod);
     final targetCurrency = activeCurrency ?? currentTrip.defaultCurrency;
+    final isCollaborative = currentTrip.isCollaborative;
+    final authState = ref.watch(authControllerProvider);
+    final profileState = ref.watch(profileControllerProvider);
+    final currentUserId = authState.user?.uid;
+    final currentUserName = profileState.profile?.displayName ??
+        authState.user?.displayName ??
+        (authState.user?.email != null ? authState.user!.email!.split('@').first : null);
+    final isMe = (currentUserId != null && expense.userId != null && expense.userId == currentUserId) ||
+        (currentUserName != null && expense.createdByName != null && expense.createdByName!.trim().toLowerCase() == currentUserName.trim().toLowerCase());
+    final authorText = CollaborationLocalization.formatAddedBy(
+      expense.createdByName,
+      isMe: isMe,
+      languageCode: Localizations.localeOf(context).languageCode,
+    );
 
     return Dismissible(
       key: Key(expense.id),
@@ -1149,23 +1225,35 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          subtitle: Row(
+          subtitle: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 6,
+            runSpacing: 2,
             children: [
               if (expense.paymentMethod != null && expense.paymentMethod!.isNotEmpty) ...[
-                Icon(paymentIcon, size: 12, color: theme.colorScheme.onSurfaceVariant),
-                const SizedBox(width: 4),
-                Flexible(
-                  child: Text(
-                    _formatPaymentMethod(expense.paymentMethod, l10n),
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: theme.colorScheme.onSurfaceVariant,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(paymentIcon, size: 12, color: theme.colorScheme.onSurfaceVariant),
+                    const SizedBox(width: 4),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 110),
+                      child: Text(
+                        _formatPaymentMethod(expense.paymentMethod, l10n),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  ],
                 ),
-                const SizedBox(width: 8),
+                Text(
+                  '•',
+                  style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurfaceVariant),
+                ),
               ],
               Text(
                 AppDateFormatter.formatMMMd(
@@ -1177,6 +1265,46 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
+              // Author attribution (ONLY when currentTrip.isCollaborative is true)
+              if (isCollaborative) ...[
+                Text(
+                  '•',
+                  style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurfaceVariant),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                  decoration: BoxDecoration(
+                    color: isMe
+                        ? const Color(0xFF6366F1).withValues(alpha: 0.12)
+                        : const Color(0xFF0EA5E9).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        isMe ? Icons.person_rounded : Icons.person_outline_rounded,
+                        size: 10,
+                        color: isMe ? const Color(0xFF6366F1) : const Color(0xFF0EA5E9),
+                      ),
+                      const SizedBox(width: 3),
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 100),
+                        child: Text(
+                          authorText,
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w600,
+                            color: isMe ? const Color(0xFF6366F1) : const Color(0xFF0EA5E9),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ],
           ),
           trailing: Column(
@@ -1782,17 +1910,23 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                 const SizedBox(width: 4),
               ],
               Expanded(
-                child: Text(
-                  CityLocalization.localizeDestination(
-                    currentTrip.destination,
-                    Localizations.localeOf(context).languageCode,
+                child: Hero(
+                  tag: 'trip-destination-${currentTrip.id}',
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: Text(
+                      CityLocalization.localizeDestination(
+                        currentTrip.destination,
+                        Localizations.localeOf(context).languageCode,
+                      ),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               const SizedBox(width: 8),
@@ -1861,6 +1995,48 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
               ),
             ],
           ),
+
+          // Collaborative Live Badge (ONLY when currentTrip.isCollaborative is true)
+          if (currentTrip.isCollaborative) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: const Color(0xFF10B981).withValues(alpha: 0.3),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF10B981),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      '${CollaborationLocalization.getLiveSharedTrip(Localizations.localeOf(context).languageCode)} • ${CollaborationLocalization.getCollaboratorsCount(Localizations.localeOf(context).languageCode, currentTrip.collaborators.length + 1)}',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF059669),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
 
           // Trip Notes Banner if present
           if (currentTrip.notes != null && currentTrip.notes!.trim().isNotEmpty) ...[

@@ -503,7 +503,7 @@ class AppWidgetService {
             ? '${AppWidgetLocalization.getShowRemainingBudgetLabel(lang)}: $remainingBudgetStr'
             : (upcomingTrip?.title ?? 'PackBuddy');
         final expenseStat1 = '💳 ${payload.budgetSpent ?? CurrencyFormatter.format(0, currency: userCurrency)}';
-        final expenseStat2 = remainingBudgetStr != null ? '💰 $remainingBudgetStr' : (lang == 'tr' ? '+ Ekle' : '+ Add');
+        final expenseStat2 = remainingBudgetStr != null ? '💰 $remainingBudgetStr' : AppWidgetLocalization.getAddAction(lang);
         final expenseStat3 = lastExpenseText ?? '';
         final expenseTheme = PreferencesService.instance.getWidgetThemeForMode('quick_expense');
 

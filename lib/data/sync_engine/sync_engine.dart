@@ -15,6 +15,8 @@ import '../local_db/database_helper.dart';
 import '../../core/constants/app_constants.dart';
 import '../../features/budget/domain/trip.dart';
 import '../../features/budget/domain/expense.dart';
+import '../../features/itinerary/domain/itinerary_item.dart';
+import '../../features/itinerary/presentation/controllers/itinerary_controller.dart';
 import '../../features/vault/domain/document.dart';
 import '../../features/checklist/domain/packing_item.dart';
 import '../../features/checklist/domain/canonical_packing_catalog.dart';
@@ -459,8 +461,143 @@ class SyncEngine extends StateNotifier<SyncState> {
     }, onError: (e) => debugPrint('[SyncEngine] Expense snapshot error: $e'));
     subs.add(expensesSub);
 
+    // 4. Listen to itinerary items for this shared trip
+    final itinSub = firestore
+        .collection('itinerary_items')
+        .where('trip_id', isEqualTo: tripId)
+        .snapshots()
+        .listen((snap) async {
+      bool changed = false;
+      for (final docChange in snap.docChanges) {
+        try {
+          final data = docChange.doc.data();
+          if (data == null) continue;
+          if (docChange.type == DocumentChangeType.removed) {
+            await _dbHelper.hardDeleteItineraryItem(docChange.doc.id);
+            changed = true;
+          } else {
+            data['id'] = docChange.doc.id;
+            final item = ItineraryItem.fromMap(data);
+            if (item.isDeleted) {
+              await _dbHelper.hardDeleteItineraryItem(docChange.doc.id);
+            } else {
+              final localDeleted = await _dbHelper.getDeletedItineraryItems();
+              final isLocallyDeleted = localDeleted.any((d) =>
+                  d['id'] == item.id &&
+                  !item.updatedAt.isAfter(DateTime.fromMillisecondsSinceEpoch((d['updated_at'] as num).toInt())));
+              if (!isLocallyDeleted) {
+                await _dbHelper.insertItineraryItem(item.toMap());
+              }
+            }
+            changed = true;
+          }
+        } catch (e) {
+          debugPrint('[SyncEngine] Real-time itinerary item sync error: $e');
+        }
+      }
+      if (changed) {
+        try {
+          ref?.read(itineraryControllerFamily(tripId).notifier).loadItinerary();
+        } catch (_) {}
+      }
+    }, onError: (e) => debugPrint('[SyncEngine] Itinerary snapshot error: $e'));
+    subs.add(itinSub);
+
     _sharedTripSubscriptions[tripId] = subs;
     debugPrint('[SyncEngine] Started real-time live stream for shared trip $tripId');
+  }
+
+  /// Immediately pushes a trip update to Cloud Firestore (for instant collaboration sync)
+  Future<void> pushTrip(Trip trip) async {
+    try {
+      bool isFirebaseReady = false;
+      try {
+        isFirebaseReady = Firebase.apps.isNotEmpty;
+      } catch (_) {}
+      if (!isFirebaseReady && _firestoreInstance == null) return;
+      final firestore = _firestoreInstance ?? FirebaseFirestore.instance;
+      await firestore
+          .collection('trips')
+          .doc(trip.id)
+          .set(trip.toJson(), SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('[SyncEngine] pushTrip error: $e');
+    }
+  }
+
+  /// Immediately pushes an expense update to Cloud Firestore (for instant collaboration sync)
+  Future<void> pushExpense(Expense expense) async {
+    try {
+      bool isFirebaseReady = false;
+      try {
+        isFirebaseReady = Firebase.apps.isNotEmpty;
+      } catch (_) {}
+      if (!isFirebaseReady && _firestoreInstance == null) return;
+      final firestore = _firestoreInstance ?? FirebaseFirestore.instance;
+      await firestore
+          .collection('expenses')
+          .doc(expense.id)
+          .set(expense.toJson(), SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('[SyncEngine] pushExpense error: $e');
+    }
+  }
+
+  /// Immediately pushes an itinerary item update to Cloud Firestore (for instant collaboration sync)
+  Future<void> pushItineraryItem(ItineraryItem item) async {
+    try {
+      bool isFirebaseReady = false;
+      try {
+        isFirebaseReady = Firebase.apps.isNotEmpty;
+      } catch (_) {}
+      if (!isFirebaseReady && _firestoreInstance == null) return;
+      final firestore = _firestoreInstance ?? FirebaseFirestore.instance;
+      await firestore
+          .collection('itinerary_items')
+          .doc(item.id)
+          .set(item.toMap(), SetOptions(merge: true));
+    } catch (e) {
+      debugPrint('[SyncEngine] pushItineraryItem error: $e');
+    }
+  }
+
+  /// Immediately marks an expense as deleted in Cloud Firestore
+  Future<void> deleteRemoteExpense(String id) async {
+    try {
+      bool isFirebaseReady = false;
+      try {
+        isFirebaseReady = Firebase.apps.isNotEmpty;
+      } catch (_) {}
+      if (!isFirebaseReady && _firestoreInstance == null) return;
+      final firestore = _firestoreInstance ?? FirebaseFirestore.instance;
+      await firestore
+          .collection('expenses')
+          .doc(id)
+          .set({
+            'is_deleted': 1,
+            'isDeleted': true,
+            'updated_at': DateTime.now().millisecondsSinceEpoch,
+          }, SetOptions(merge: true));
+    } catch (_) {}
+  }
+
+  /// Immediately marks an itinerary item as deleted in Cloud Firestore
+  Future<void> deleteRemoteItineraryItem(String id) async {
+    try {
+      bool isFirebaseReady = false;
+      try {
+        isFirebaseReady = Firebase.apps.isNotEmpty;
+      } catch (_) {}
+      if (!isFirebaseReady && _firestoreInstance == null) return;
+      final firestore = _firestoreInstance ?? FirebaseFirestore.instance;
+      await firestore
+          .collection('itinerary_items')
+          .doc(id)
+          .set({
+            'is_deleted': 1,
+            'updated_at': DateTime.now().millisecondsSinceEpoch,
+          }, SetOptions(merge: true));
+    } catch (_) {}
   }
 
   /// Cancels live listeners for a specific shared trip
@@ -697,6 +834,9 @@ class SyncEngine extends StateNotifier<SyncState> {
       final itemIdsToHardDelete = <String>[];
       final itemsToUpsertLocal = <PackingItem>[];
 
+      final itinIdsToHardDelete = <String>[];
+      final itinToUpsertLocal = <ItineraryItem>[];
+
       // ===================================================================
       // ALGORITHM STEP 1: Process Soft-Deleted Records with LWW Conflict Check
       // If a remote edit is newer than the local deletion, remote edit wins.
@@ -858,6 +998,20 @@ class SyncEngine extends StateNotifier<SyncState> {
         }
       }
 
+      // 1.5 Soft-deleted Itinerary Items
+      final deletedItin = await _dbHelper.getDeletedItineraryItems(userId: uid);
+      if (deletedItin.isNotEmpty) {
+        for (final raw in deletedItin) {
+          final id = raw['id'] as String;
+          try {
+            batch.delete(firestore.collection('itinerary_items').doc(id));
+            await queueBatchOp();
+          } catch (_) {}
+          itinIdsToHardDelete.add(id);
+          processedItems++;
+        }
+      }
+
       // Commit pending deletions immediately to Firestore before Step 2 reconciliation
       await commitPendingBatch();
 
@@ -931,8 +1085,6 @@ class SyncEngine extends StateNotifier<SyncState> {
           try {
             final data = Map<String, dynamic>.from(doc.data());
             data['id'] = (data['id'] != null && data['id'].toString().isNotEmpty) ? data['id'] : doc.id;
-            data['user_id'] = data['user_id'] ?? data['userId'] ?? uid;
-            data['userId'] = data['userId'] ?? data['user_id'] ?? uid;
             final trip = Trip.fromJson(data);
             if (trip.isDeleted || tripIdsToHardDelete.contains(trip.id)) {
               continue;
@@ -941,6 +1093,27 @@ class SyncEngine extends StateNotifier<SyncState> {
           } catch (_) {}
         }
       } catch (_) {}
+
+      final userEmail = _authInstance?.currentUser?.email ?? FirebaseAuth.instance.currentUser?.email;
+      if (userEmail != null && userEmail.isNotEmpty) {
+        try {
+          final collabEmailSnap = await firestore
+              .collection('trips')
+              .where('collaborators', arrayContains: userEmail)
+              .get();
+          for (final doc in collabEmailSnap.docs) {
+            try {
+              final data = Map<String, dynamic>.from(doc.data());
+              data['id'] = (data['id'] != null && data['id'].toString().isNotEmpty) ? data['id'] : doc.id;
+              final trip = Trip.fromJson(data);
+              if (trip.isDeleted || tripIdsToHardDelete.contains(trip.id)) {
+                continue;
+              }
+              remoteTripsMap[doc.id] = trip;
+            } catch (_) {}
+          }
+        } catch (_) {}
+      }
 
       final localTrips = await _dbHelper.getTrips(userId: uid, includeDeleted: false);
       final localTripsMap = <String, Trip>{for (final t in localTrips) t.id: t};
@@ -952,7 +1125,7 @@ class SyncEngine extends StateNotifier<SyncState> {
           if (lastSyncedAt == 0 || localTrip.updatedAt.millisecondsSinceEpoch > lastSyncedAt) {
             batch.set(
               firestore.collection('trips').doc(localTrip.id),
-              localTrip.copyWith(userId: uid).toJson(),
+              localTrip.toJson(),
               SetOptions(merge: true),
             );
             await queueBatchOp();
@@ -962,7 +1135,7 @@ class SyncEngine extends StateNotifier<SyncState> {
           // LWW: Local modification is newer -> Overwrite Firestore
           batch.set(
             firestore.collection('trips').doc(localTrip.id),
-            localTrip.copyWith(userId: uid).toJson(),
+            localTrip.toJson(),
             SetOptions(merge: true),
           );
           await queueBatchOp();
@@ -989,8 +1162,6 @@ class SyncEngine extends StateNotifier<SyncState> {
         try {
           final data = Map<String, dynamic>.from(doc.data());
           data['id'] = (data['id'] != null && data['id'].toString().isNotEmpty) ? data['id'] : doc.id;
-          data['user_id'] = data['user_id'] ?? data['userId'] ?? uid;
-          data['userId'] = data['userId'] ?? data['user_id'] ?? uid;
           final exp = Expense.fromJson(data);
           if (exp.isDeleted || expenseIdsToHardDelete.contains(exp.id)) {
             continue;
@@ -998,6 +1169,29 @@ class SyncEngine extends StateNotifier<SyncState> {
           remoteExpensesMap[doc.id] = exp;
         } catch (e) {
           debugPrint('[SyncEngine] Expense parsing notice: $e');
+        }
+      }
+
+      // Also pull expenses for active shared trips
+      for (final t in localTrips) {
+        if (t.isCollaborative) {
+          try {
+            final sharedExpSnap = await firestore
+                .collection('expenses')
+                .where('trip_id', isEqualTo: t.id)
+                .get();
+            for (final doc in sharedExpSnap.docs) {
+              try {
+                final data = Map<String, dynamic>.from(doc.data());
+                data['id'] = doc.id;
+                final exp = Expense.fromJson(data);
+                if (exp.isDeleted || expenseIdsToHardDelete.contains(exp.id)) {
+                  continue;
+                }
+                remoteExpensesMap[doc.id] = exp;
+              } catch (_) {}
+            }
+          } catch (_) {}
         }
       }
 
@@ -1010,7 +1204,7 @@ class SyncEngine extends StateNotifier<SyncState> {
           if (lastSyncedAt == 0 || localExpense.updatedAt.millisecondsSinceEpoch > lastSyncedAt) {
             batch.set(
               firestore.collection('expenses').doc(localExpense.id),
-              localExpense.copyWith(userId: uid).toJson(),
+              localExpense.toJson(),
               SetOptions(merge: true),
             );
             await queueBatchOp();
@@ -1020,7 +1214,7 @@ class SyncEngine extends StateNotifier<SyncState> {
           // LWW: Local modification is newer -> Overwrite Firestore
           batch.set(
             firestore.collection('expenses').doc(localExpense.id),
-            localExpense.copyWith(userId: uid).toJson(),
+            localExpense.toJson(),
             SetOptions(merge: true),
           );
           await queueBatchOp();
@@ -1299,6 +1493,84 @@ class SyncEngine extends StateNotifier<SyncState> {
         }
       }
 
+      // 2.5 Reconcile Itinerary Items with Delta Sync & LWW
+      final remoteItinDocs = await fetchDualDocs('itinerary_items');
+      final remoteItinMap = <String, ItineraryItem>{};
+      for (final doc in remoteItinDocs) {
+        try {
+          final data = Map<String, dynamic>.from(doc.data());
+          data['id'] = doc.id;
+          final item = ItineraryItem.fromMap(data);
+          if (item.isDeleted || itinIdsToHardDelete.contains(item.id)) {
+            continue;
+          }
+          remoteItinMap[doc.id] = item;
+        } catch (e) {
+          debugPrint('[SyncEngine] Itinerary item parsing notice: $e');
+        }
+      }
+
+      // Also pull itinerary items for active shared collaborative trips
+      for (final t in localTrips) {
+        if (t.isCollaborative) {
+          try {
+            final sharedItinSnap = await firestore
+                .collection('itinerary_items')
+                .where('trip_id', isEqualTo: t.id)
+                .get();
+            for (final doc in sharedItinSnap.docs) {
+              try {
+                final data = Map<String, dynamic>.from(doc.data());
+                data['id'] = doc.id;
+                final item = ItineraryItem.fromMap(data);
+                if (item.isDeleted || itinIdsToHardDelete.contains(item.id)) {
+                  continue;
+                }
+                remoteItinMap[doc.id] = item;
+              } catch (_) {}
+            }
+          } catch (_) {}
+        }
+      }
+
+      final rawLocalItin = await _dbHelper.getItineraryItems(userId: uid, includeDeleted: false);
+      final localItin = rawLocalItin.map((m) => ItineraryItem.fromMap(m)).toList();
+      final localItinMap = <String, ItineraryItem>{for (final i in localItin) i.id: i};
+
+      for (final localItem in localItin) {
+        final remoteItem = remoteItinMap[localItem.id];
+        if (remoteItem == null) {
+          if (lastSyncedAt == 0 || localItem.updatedAt.millisecondsSinceEpoch > lastSyncedAt) {
+            batch.set(
+              firestore.collection('itinerary_items').doc(localItem.id),
+              localItem.toMap(),
+              SetOptions(merge: true),
+            );
+            await queueBatchOp();
+            processedItems++;
+          }
+        } else if (localItem.updatedAt.isAfter(remoteItem.updatedAt)) {
+          batch.set(
+            firestore.collection('itinerary_items').doc(localItem.id),
+            localItem.toMap(),
+            SetOptions(merge: true),
+          );
+          await queueBatchOp();
+          processedItems++;
+        } else if (remoteItem.updatedAt.isAfter(localItem.updatedAt)) {
+          itinToUpsertLocal.add(remoteItem);
+          processedItems++;
+        }
+      }
+
+      for (final entry in remoteItinMap.entries) {
+        if (itinIdsToHardDelete.contains(entry.key)) continue;
+        if (!localItinMap.containsKey(entry.key)) {
+          itinToUpsertLocal.add(entry.value);
+          processedItems++;
+        }
+      }
+
       // Commit any pending Firestore WriteBatch operations
       await commitPendingBatch();
 
@@ -1424,13 +1696,21 @@ class SyncEngine extends StateNotifier<SyncState> {
             whereArgs: [id],
           );
         }
+        for (final id in itinIdsToHardDelete) {
+          await txn.delete(
+            AppConstants.tableItineraryItems,
+            where: 'id = ?',
+            whereArgs: [id],
+          );
+        }
 
         // 2. Execute queued local upserts (LWW remote wins & new remote items)
         for (final trip in tripsToUpsertLocal) {
           try {
+            final effectiveTrip = trip.userId.isNotEmpty ? trip : trip.copyWith(userId: uid);
             await txn.insert(
               AppConstants.tableTrips,
-              trip.copyWith(userId: uid).toMap(),
+              effectiveTrip.toMap(),
               conflictAlgorithm: ConflictAlgorithm.replace,
             );
           } catch (e) {
@@ -1439,9 +1719,10 @@ class SyncEngine extends StateNotifier<SyncState> {
         }
         for (final expense in expensesToUpsertLocal) {
           try {
+            final effectiveExpense = expense.userId.isNotEmpty ? expense : expense.copyWith(userId: uid);
             await txn.insert(
               AppConstants.tableExpenses,
-              expense.copyWith(userId: uid).toMap(),
+              effectiveExpense.toMap(),
               conflictAlgorithm: ConflictAlgorithm.replace,
             );
           } catch (e) {
@@ -1468,6 +1749,18 @@ class SyncEngine extends StateNotifier<SyncState> {
             );
           } catch (e) {
             debugPrint('[SyncEngine] Local checklist item upsert error: $e');
+          }
+        }
+        for (final item in itinToUpsertLocal) {
+          try {
+            final effectiveItem = item.userId.isNotEmpty ? item : item.copyWith(userId: uid);
+            await txn.insert(
+              AppConstants.tableItineraryItems,
+              effectiveItem.toMap(),
+              conflictAlgorithm: ConflictAlgorithm.replace,
+            );
+          } catch (e) {
+            debugPrint('[SyncEngine] Local itinerary upsert error: $e');
           }
         }
 
@@ -1517,8 +1810,13 @@ class SyncEngine extends StateNotifier<SyncState> {
       _retryTimer?.cancel();
 
       // Ensure real-time live listeners are active for all shared collaborative trips
+      for (final trip in localTrips) {
+        if (trip.isCollaborative) {
+          listenToSharedTrip(trip.id);
+        }
+      }
       for (final trip in tripsToUpsertLocal) {
-        if (trip.isShared || trip.collaborators.isNotEmpty) {
+        if (trip.isCollaborative) {
           listenToSharedTrip(trip.id);
         }
       }
@@ -1535,6 +1833,11 @@ class SyncEngine extends StateNotifier<SyncState> {
           }
           if (docsToUpsertLocal.isNotEmpty || docIdsToHardDelete.isNotEmpty) {
             r.read(vaultControllerProvider.notifier).loadDocuments(userId: uid);
+          }
+          if (itinToUpsertLocal.isNotEmpty || itinIdsToHardDelete.isNotEmpty) {
+            for (final t in localTrips) {
+              r.read(itineraryControllerFamily(t.id).notifier).loadItinerary();
+            }
           }
           r.read(travelMapControllerProvider.notifier).loadCountries(userId: uid);
         } catch (_) {}

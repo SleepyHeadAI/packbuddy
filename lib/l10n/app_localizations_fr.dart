@@ -2049,7 +2049,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get passportOfficialDocument => 'Passeport de voyage officiel';
 
   @override
-  String get storyLayoutMinimal => 'Minimal';
+  String get storyLayoutMinimal => 'Minimaliste';
 
   @override
   String get passportWorldCitizen => 'Citoyen du monde';

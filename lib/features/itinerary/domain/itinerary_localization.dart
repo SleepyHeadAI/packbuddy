@@ -556,18 +556,333 @@ class ItineraryLocalization {
     final clean = _cleanLang(lang);
     switch (category.toLowerCase()) {
       case 'food':
-        return clean == 'tr' ? 'Yeme & İçme' : 'Food & Dining';
+        switch (clean) {
+          case 'tr': return 'Yeme & İçme';
+          case 'de': return 'Essen & Trinken';
+          case 'fr': return 'Restauration & Gastronomie';
+          case 'es': return 'Comida y Restaurantes';
+          case 'it': return 'Cibo e Ristorazione';
+          case 'pt': return 'Alimentação & Gastronomia';
+          case 'ru': return 'Еда и напитки';
+          case 'zh': return '餐饮美食';
+          case 'ja': return '食事・グルメ';
+          case 'ko': return '식음료 및 맛집';
+          case 'ar': return 'طعام ومشروبات';
+          case 'hi': return 'खान-पान';
+          case 'nl': return 'Eten & Drinken';
+          case 'el': return 'Φαγητό & Ποτό';
+          case 'sv': return 'Mat & Dryck';
+          case 'pl': return 'Jedzenie i napoje';
+          case 'id': return 'Makanan & Kuliner';
+          case 'th': return 'อาหารและเครื่องดื่ม';
+          case 'vi': return 'Ăn uống & Ẩm thực';
+          case 'en':
+          default: return 'Food & Dining';
+        }
       case 'transit':
-        return clean == 'tr' ? 'Ulaşım' : 'Transit & Travel';
+        switch (clean) {
+          case 'tr': return 'Ulaşım';
+          case 'de': return 'Transport & Reisen';
+          case 'fr': return 'Transport & Trajet';
+          case 'es': return 'Transporte y Tránsito';
+          case 'it': return 'Trasporti e Viaggio';
+          case 'pt': return 'Transporte & Trânsito';
+          case 'ru': return 'Транспорт';
+          case 'zh': return '交通出行';
+          case 'ja': return '交通・移動';
+          case 'ko': return '교통 및 이동';
+          case 'ar': return 'المواصلات والتنقل';
+          case 'hi': return 'परिवहन और यात्रा';
+          case 'nl': return 'Vervoer & Reizen';
+          case 'el': return 'Μετακίνηση & Μεταφορές';
+          case 'sv': return 'Transport & Resor';
+          case 'pl': return 'Transport i dojazd';
+          case 'id': return 'Transportasi';
+          case 'th': return 'การเดินทางและคมนาคม';
+          case 'vi': return 'Giao thông & Di chuyển';
+          case 'en':
+          default: return 'Transit & Travel';
+        }
       case 'activity':
-        return clean == 'tr' ? 'Aktivite & Doğa' : 'Activity & Adventure';
+        switch (clean) {
+          case 'tr': return 'Aktivite & Doğa';
+          case 'de': return 'Aktivität & Natur';
+          case 'fr': return 'Activité & Aventure';
+          case 'es': return 'Actividad y Aventura';
+          case 'it': return 'Attività e Avventura';
+          case 'pt': return 'Atividade & Aventura';
+          case 'ru': return 'Активности и природа';
+          case 'zh': return '户外活动与探险';
+          case 'ja': return 'アクティビティ・自然';
+          case 'ko': return '액티비티 및 자연';
+          case 'ar': return 'أنشطة ومغامرات';
+          case 'hi': return 'गतिविधि और रोमांच';
+          case 'nl': return 'Activiteit & Natuur';
+          case 'el': return 'Δραστηριότητα & Φύση';
+          case 'sv': return 'Aktivitet & Natur';
+          case 'pl': return 'Aktywność i przygoda';
+          case 'id': return 'Aktivitas & Alam';
+          case 'th': return 'กิจกรรมและการผจญภัย';
+          case 'vi': return 'Hoạt động & Trải nghiệm';
+          case 'en':
+          default: return 'Activity & Adventure';
+        }
       case 'lodging':
-        return clean == 'tr' ? 'Konaklama' : 'Lodging & Hotel';
+        switch (clean) {
+          case 'tr': return 'Konaklama';
+          case 'de': return 'Unterkunft & Hotel';
+          case 'fr': return 'Hébergement & Hôtel';
+          case 'es': return 'Alojamiento y Hotel';
+          case 'it': return 'Alloggio e Hotel';
+          case 'pt': return 'Hospedagem & Hotel';
+          case 'ru': return 'Проживание и отель';
+          case 'zh': return '住宿酒店';
+          case 'ja': return '宿泊・ホテル';
+          case 'ko': return '숙소 및 호텔';
+          case 'ar': return 'الإقامة والفندق';
+          case 'hi': return 'आवास और होटल';
+          case 'nl': return 'Accommodatie & Hotel';
+          case 'el': return 'Διαμονή & Ξενοδοχείο';
+          case 'sv': return 'Boende & Hotell';
+          case 'pl': return 'Zakwaterowanie i hotel';
+          case 'id': return 'Akomodasi & Hotel';
+          case 'th': return 'ที่พักและโรงแรม';
+          case 'vi': return 'Lưu trú & Khách sạn';
+          case 'en':
+          default: return 'Lodging & Hotel';
+        }
       case 'shopping':
-        return clean == 'tr' ? 'Alışveriş' : 'Shopping';
+        switch (clean) {
+          case 'tr': return 'Alışveriş';
+          case 'de': return 'Einkaufen';
+          case 'fr': return 'Shopping';
+          case 'es': return 'Compras';
+          case 'it': return 'Shopping';
+          case 'pt': return 'Compras';
+          case 'ru': return 'Шопинг';
+          case 'zh': return '购物消费';
+          case 'ja': return 'ショッピング';
+          case 'ko': return '쇼핑';
+          case 'ar': return 'تسوق';
+          case 'hi': return 'खरीदारी';
+          case 'nl': return 'Winkelen';
+          case 'el': return 'Ψώνια';
+          case 'sv': return 'Shopping';
+          case 'pl': return 'Zakupy';
+          case 'id': return 'Belanja';
+          case 'th': return 'ช้อปปิ้ง';
+          case 'vi': return 'Mua sắm';
+          case 'en':
+          default: return 'Shopping';
+        }
       case 'sightseeing':
       default:
-        return clean == 'tr' ? 'Gezilecek Yer' : 'Sightseeing';
+        switch (clean) {
+          case 'tr': return 'Gezilecek Yer';
+          case 'de': return 'Sehenswürdigkeiten';
+          case 'fr': return 'Visites touristiques';
+          case 'es': return 'Turismo y Visitas';
+          case 'it': return 'Visite e Attrazioni';
+          case 'pt': return 'Ponto Turístico';
+          case 'ru': return 'Достопримечательности';
+          case 'zh': return '观光景点';
+          case 'ja': return '観光スポット';
+          case 'ko': return '관광 명소';
+          case 'ar': return 'معالم سياحية';
+          case 'hi': return 'पर्यटन स्थल';
+          case 'nl': return 'Bezienswaardigheden';
+          case 'el': return 'Αξιοθέατα';
+          case 'sv': return 'Sevärdheter';
+          case 'pl': return 'Zwiedzanie';
+          case 'id': return 'Wisata & Tempat Menarik';
+          case 'th': return 'สถานที่ท่องเที่ยว';
+          case 'vi': return 'Tham quan & Thắng cảnh';
+          case 'en':
+          default: return 'Sightseeing';
+        }
+    }
+  }
+
+  static String getActivityTitleHint(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'örn. Eyfel Kulesi Ziyareti';
+      case 'de': return 'z.B. Besuch des Eiffelturms';
+      case 'fr': return 'ex. Visite de la Tour Eiffel';
+      case 'es': return 'ej. Visita a la Torre Eiffel';
+      case 'it': return 'es. Visita alla Torre Eiffel';
+      case 'pt': return 'ex: Visita à Torre Eiffel';
+      case 'ru': return 'напр. Экскурсия на Эйфелеву башню';
+      case 'zh': return '例：参观埃菲尔铁塔';
+      case 'ja': return '例：エッフェル塔観光';
+      case 'ko': return '예: 에펠탑 방문';
+      case 'ar': return 'مثال: زيارة برج إيفل';
+      case 'hi': return 'उदा. एफिल टॉवर भ्रमण';
+      case 'nl': return 'bijv. Bezoek aan de Eiffeltoren';
+      case 'el': return 'π.χ. Επίσκεψη στον Πύργο του Άιφελ';
+      case 'sv': return 't.ex. Besök Eiffeltornet';
+      case 'pl': return 'np. Wizyta na Wieży Eiffla';
+      case 'id': return 'cth. Kunjungan Menara Eiffel';
+      case 'th': return 'เช่น ไปเที่ยวหอไอเฟล';
+      case 'vi': return 'ví dụ: Tham quan Tháp Eiffel';
+      case 'en':
+      default: return 'e.g. Visit Eiffel Tower';
+    }
+  }
+
+  static String getLocationHint(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Mekan / Adres';
+      case 'de': return 'Ort / Adresse';
+      case 'fr': return 'Lieu / Adresse';
+      case 'es': return 'Lugar / Dirección';
+      case 'it': return 'Luogo / Indirizzo';
+      case 'pt': return 'Local / Endereço';
+      case 'ru': return 'Место / Адрес';
+      case 'zh': return '地点 / 地址';
+      case 'ja': return '場所 / 住所';
+      case 'ko': return '장소 / 주소';
+      case 'ar': return 'المكان / العنوان';
+      case 'hi': return 'स्थान / पता';
+      case 'nl': return 'Locatie / Adres';
+      case 'el': return 'Τοποθεσία / Διεύθυνση';
+      case 'sv': return 'Plats / Adress';
+      case 'pl': return 'Miejsce / Adres';
+      case 'id': return 'Lokasi / Alamat';
+      case 'th': return 'สถานที่ / ที่อยู่';
+      case 'vi': return 'Địa điểm / Địa chỉ';
+      case 'en':
+      default: return 'Venue / Address';
+    }
+  }
+
+  static String getCostHint(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Tahmini Tutar (örn. 25)';
+      case 'de': return 'Geschätzter Betrag (z.B. 25)';
+      case 'fr': return 'Montant estimé (ex. 25)';
+      case 'es': return 'Monto estimado (ej. 25)';
+      case 'it': return 'Importo stimato (es. 25)';
+      case 'pt': return 'Valor estimado (ex: 25)';
+      case 'ru': return 'Примерная сумма (напр. 25)';
+      case 'zh': return '预估金额（例：25）';
+      case 'ja': return '見積金額（例：25）';
+      case 'ko': return '예상 금액 (예: 25)';
+      case 'ar': return 'المبلغ التقديري (مثال: 25)';
+      case 'hi': return 'अनुमानित राशि (उदा. 25)';
+      case 'nl': return 'Geschat bedrag (bijv. 25)';
+      case 'el': return 'Εκτιμώμενο ποσό (π.χ. 25)';
+      case 'sv': return 'Uppskattat belopp (t.ex. 25)';
+      case 'pl': return 'Szacowana kwota (np. 25)';
+      case 'id': return 'Perkiraan biaya (cth. 25)';
+      case 'th': return 'ค่าใช้จ่ายโดยประมาณ (เช่น 25)';
+      case 'vi': return 'Chi phí ước tính (ví dụ: 25)';
+      case 'en':
+      default: return 'Estimated amount (e.g. 25)';
+    }
+  }
+
+  static String getNotesHint(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Rezervasyon no, hatırlatma...';
+      case 'de': return 'Buchungs-ID, Notizen...';
+      case 'fr': return 'N° de réservation, rappel...';
+      case 'es': return 'N.º de reserva, recordatorio...';
+      case 'it': return 'ID prenotazione, promemoria...';
+      case 'pt': return 'Nº da reserva, lembrete...';
+      case 'ru': return 'Номер брони, напоминание...';
+      case 'zh': return '预订号、备忘提醒...';
+      case 'ja': return '予約番号、メモ...';
+      case 'ko': return '예약 번호, 메모...';
+      case 'ar': return 'رقم الحجز، تذكير...';
+      case 'hi': return 'बुकिंग आईडी, रिमाइंडर...';
+      case 'nl': return 'Boekingsnummer, herinnering...';
+      case 'el': return 'Αρ. κράτησης, υπενθύμιση...';
+      case 'sv': return 'Boknings-ID, påminnelse...';
+      case 'pl': return 'Nr rezerwacji, notatka...';
+      case 'id': return 'No reservasi, pengingat...';
+      case 'th': return 'รหัสการจอง, บันทึกเตือนความจำ...';
+      case 'vi': return 'Mã đặt chỗ, lời nhắc...';
+      case 'en':
+      default: return 'Booking ID, reminder...';
+    }
+  }
+
+  static String completedBadge(String lang, int completed, int total) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return '$completed / $total tamamlandı';
+      case 'de': return '$completed / $total erledigt';
+      case 'fr': return '$completed / $total terminés';
+      case 'es': return '$completed / $total completados';
+      case 'it': return '$completed / $total completati';
+      case 'pt': return '$completed / $total concluídos';
+      case 'ru': return '$completed / $total выполнено';
+      case 'zh': return '$completed / $total 已完成';
+      case 'ja': return '$completed / $total 完了';
+      case 'ko': return '$completed / $total 완료';
+      case 'ar': return '$completed / $total مكتمل';
+      case 'hi': return '$completed / $total पूर्ण';
+      case 'nl': return '$completed / $total voltooid';
+      case 'el': return '$completed / $total ολοκληρώθηκαν';
+      case 'sv': return '$completed / $total klara';
+      case 'pl': return '$completed / $total ukończono';
+      case 'id': return '$completed / $total selesai';
+      case 'th': return '$completed / $total เสร็จสิ้น';
+      case 'vi': return '$completed / $total hoàn thành';
+      case 'en':
+      default: return '$completed / $total completed';
+    }
+  }
+
+  static String itinerarySubtitle(String lang, int count, int completed) {
+    final clean = _cleanLang(lang);
+    if (count == 0) {
+      switch (clean) {
+        case 'tr': return 'Gün gün aktiviteleri planlayın';
+        case 'de': return 'Plane deine täglichen Aktivitäten';
+        case 'fr': return 'Planifiez vos activités jour par jour';
+        case 'es': return 'Planifica actividades día a día';
+        case 'it': return 'Pianifica le attività giorno per giorno';
+        case 'pt': return 'Planeje as atividades dia a dia';
+        case 'ru': return 'Планируйте дела по дням';
+        case 'zh': return '按天规划每日精彩行程';
+        case 'ja': return '日ごとのアクティビティを計画';
+        case 'ko': return '일자별 일정을 계획해보세요';
+        case 'ar': return 'خطط للأنشطة يوماً بيوم';
+        case 'hi': return 'दिन-प्रतिदिन की गतिविधियों की योजना बनाएं';
+        case 'nl': return 'Plan activiteiten dag voor dag';
+        case 'el': return 'Σχεδιάστε δραστηριότητες ανά ημέρα';
+        case 'sv': return 'Planera aktiviteter dag för dag';
+        case 'pl': return 'Planuj aktywności dzień po dniu';
+        case 'id': return 'Rencanakan kegiatan hari demi hari';
+        case 'th': return 'วางแผนกิจกรรมแบบวันต่อวัน';
+        case 'vi': return 'Lên lịch trình theo từng ngày';
+        case 'en':
+        default: return 'Plan activities day by day';
+      }
+    } else {
+      switch (clean) {
+        case 'tr': return '$count aktivite planlandı ($completed tamamlandı)';
+        case 'de': return '$count Aktivitäten geplant ($completed erledigt)';
+        case 'fr': return '$count activités prévues ($completed terminées)';
+        case 'es': return '$count actividades planificadas ($completed hechas)';
+        case 'it': return '$count attività pianificate ($completed completate)';
+        case 'pt': return '$count atividades planejadas ($completed concluídas)';
+        case 'ru': return '$count активностей запланировано ($completed выполнено)';
+        case 'zh': return '已规划 $count 个活动（已完成 $completed 个）';
+        case 'ja': return '$count 件のアクティビティを計画（$completed 件完了）';
+        case 'ko': return '$count개 일정 계획됨 ($completed개 완료)';
+        case 'ar': return 'تم التخطيط لـ $count نشاط ($completed مكتمل)';
+        case 'hi': return '$count गतिविधियां नियोजित ($completed पूर्ण)';
+        case 'nl': return '$count activiteiten gepland ($completed voltooid)';
+        case 'el': return '$count δραστηριότητες σχεδιάστηκαν ($completed ολοκληρώθηκαν)';
+        case 'sv': return '$count aktiviteter planerade ($completed klara)';
+        case 'pl': return 'Zaplanowano $count aktywności ($completed ukończono)';
+        case 'id': return '$count aktivitas direncanakan ($completed selesai)';
+        case 'th': return 'วางแผน $count กิจกรรม (เสร็จสิ้น $completed)';
+        case 'vi': return 'Đã lên $count hoạt động ($completed hoàn thành)';
+        case 'en':
+        default: return '$count activities planned ($completed done)';
+      }
     }
   }
 }

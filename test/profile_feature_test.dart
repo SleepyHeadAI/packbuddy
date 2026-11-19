@@ -3,12 +3,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/profile/domain/animal_avatar.dart';
+import 'package:packbuddy/features/profile/domain/friend_localization.dart';
+import 'package:packbuddy/features/profile/domain/friendship.dart';
 import 'package:packbuddy/features/profile/domain/profile_localization.dart';
+import 'package:packbuddy/features/profile/domain/travel_badge.dart';
+import 'package:packbuddy/features/profile/domain/travel_style.dart';
 import 'package:packbuddy/features/profile/domain/user_profile.dart';
+import 'package:packbuddy/features/profile/presentation/controllers/friends_controller.dart';
 import 'package:packbuddy/features/profile/presentation/controllers/profile_controller.dart';
+import 'package:packbuddy/features/profile/presentation/screens/friend_profile_screen.dart';
+import 'package:packbuddy/features/profile/presentation/screens/friends_screen.dart';
 import 'package:packbuddy/features/profile/presentation/screens/profile_screen.dart';
+import 'package:packbuddy/features/profile/presentation/screens/widgets/add_friend_sheet.dart';
 import 'package:packbuddy/features/profile/presentation/screens/widgets/edit_profile_sheet.dart';
+import 'package:packbuddy/features/profile/presentation/screens/widgets/friend_tile.dart';
+import 'package:packbuddy/features/profile/presentation/screens/widgets/my_buddy_qr_sheet.dart';
 import 'package:packbuddy/features/profile/presentation/screens/widgets/profile_header_card.dart';
+import 'package:packbuddy/features/profile/presentation/screens/widgets/travel_badges_card.dart';
 import 'package:packbuddy/features/profile/presentation/screens/widgets/travel_stats_card.dart';
 import 'package:packbuddy/features/profile/presentation/widgets/avatar_picker_sheet.dart';
 import 'package:packbuddy/features/profile/presentation/widgets/user_avatar.dart';
@@ -516,6 +527,367 @@ void main() {
         expect(tester.takeException(), isNull);
         expect(find.byType(ProfileScreen), findsOneWidget);
       }
+    });
+  });
+
+  group('Phase 1: Travel Badges, Styles & Handles Tests', () {
+    test('UserProfile handles username, travelStatus and travelStyles correctly', () {
+      final profile = UserProfile(
+        uid: 'user_ph1',
+        displayName: 'Caner Gezgin',
+        username: 'caner_traveler',
+        travelStatus: '🧳 Roma için bavul topluyor',
+        travelStyles: const ['backpacker', 'photographer'],
+        createdAt: DateTime(2026, 1, 1),
+      );
+
+      final map = profile.toMap();
+      expect(map['username'], equals('caner_traveler'));
+      expect(map['travelStatus'], equals('🧳 Roma için bavul topluyor'));
+      expect(map['travelStyles'], equals(['backpacker', 'photographer']));
+
+      final fromMap = UserProfile.fromMap(map);
+      expect(fromMap.username, equals('caner_traveler'));
+      expect(fromMap.travelStatus, equals('🧳 Roma için bavul topluyor'));
+      expect(fromMap.travelStyles, equals(['backpacker', 'photographer']));
+
+      final updated = profile.copyWith(
+        username: 'caner_nomad',
+        travelStyles: ['nature', 'foodie'],
+      );
+      expect(updated.username, equals('caner_nomad'));
+      expect(updated.travelStyles, equals(['nature', 'foodie']));
+    });
+
+    test('TravelStyle catalog contains 10 distinct styles with valid localizations', () {
+      expect(TravelStyle.catalog.length, equals(10));
+      for (final style in TravelStyle.catalog) {
+        expect(style.id.isNotEmpty, isTrue);
+        expect(style.emoji.isNotEmpty, isTrue);
+        expect(style.getLocalizedName('tr').isNotEmpty, isTrue);
+        expect(style.getLocalizedName('en').isNotEmpty, isTrue);
+        expect(style.getLocalizedName('de').isNotEmpty, isTrue);
+      }
+      expect(TravelStyle.findById('backpacker')?.emoji, equals('🎒'));
+      expect(TravelStyle.findById('unknown_id'), isNull);
+    });
+
+    test('TravelBadge calculator computes unlock status and ratios accurately', () {
+      final badges = TravelBadge.calculateBadges(
+        totalTrips: 6,
+        totalCountries: 10,
+        totalItems: 120,
+        totalDocuments: 2,
+      );
+
+      expect(badges.isNotEmpty, isTrue);
+
+      // Countries
+      final explorerBronze = badges.firstWhere((b) => b.id == 'explorer_bronze');
+      expect(explorerBronze.isUnlocked, isTrue);
+      final explorerGold = badges.firstWhere((b) => b.id == 'explorer_gold');
+      expect(explorerGold.isUnlocked, isTrue);
+      final explorerDiamond = badges.firstWhere((b) => b.id == 'explorer_diamond');
+      expect(explorerDiamond.isUnlocked, isFalse);
+      expect(explorerDiamond.progressRatio, equals(10 / 25));
+
+      // Trips
+      final tripsBronze = badges.firstWhere((b) => b.id == 'trips_bronze');
+      expect(tripsBronze.isUnlocked, isTrue);
+      final tripsSilver = badges.firstWhere((b) => b.id == 'trips_silver');
+      expect(tripsSilver.isUnlocked, isTrue);
+      final tripsGold = badges.firstWhere((b) => b.id == 'trips_gold');
+      expect(tripsGold.isUnlocked, isFalse);
+
+      // Packing
+      final packingSilver = badges.firstWhere((b) => b.id == 'packing_silver');
+      expect(packingSilver.isUnlocked, isTrue);
+
+      // Vault
+      final vaultBronze = badges.firstWhere((b) => b.id == 'vault_bronze');
+      expect(vaultBronze.isUnlocked, isTrue);
+      final vaultSilver = badges.firstWhere((b) => b.id == 'vault_silver');
+      expect(vaultSilver.isUnlocked, isFalse);
+    });
+
+    testWidgets('ProfileHeaderCard displays @username and travel status chips', (tester) async {
+      final profile = UserProfile(
+        uid: 'user_display_test',
+        displayName: 'Merve Bulut',
+        username: 'merve_b',
+        travelStatus: '✈️ Yolda / Havada',
+        createdAt: DateTime(2026, 2, 1),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ProfileHeaderCard(
+              profile: profile,
+              languageCode: 'tr',
+              onEditTap: () {},
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('@merve_b'), findsOneWidget);
+      expect(find.text('✈️ Yolda / Havada'), findsOneWidget);
+    });
+
+    testWidgets('TravelBadgesCard renders travel styles and badges seamlessly', (tester) async {
+      final profile = UserProfile(
+        uid: 'user_badges_test',
+        displayName: 'Selin Kaya',
+        travelStyles: const ['backpacker', 'beach'],
+        createdAt: DateTime(2026, 1, 1),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: TravelBadgesCard(
+                profile: profile,
+                totalTrips: 5,
+                totalCountries: 3,
+                totalItems: 80,
+                totalDocuments: 1,
+                languageCode: 'tr',
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(TravelBadgesCard), findsOneWidget);
+      expect(find.text('Sırt Çantalı'), findsOneWidget);
+      expect(find.text('Deniz & Plaj'), findsOneWidget);
+    });
+  });
+
+  group('Phase 2: Travel Buddies, Requests & QR Tests', () {
+    test('Friendship canonical ID and status serialization works accurately', () {
+      final id1 = Friendship.generateId('user_alpha', 'user_beta');
+      final id2 = Friendship.generateId('user_beta', 'user_alpha');
+      expect(id1, equals('user_alpha_user_beta'));
+      expect(id2, equals('user_alpha_user_beta'));
+
+      final friendship = Friendship(
+        id: id1,
+        users: const ['user_alpha', 'user_beta'],
+        requesterId: 'user_alpha',
+        receiverId: 'user_beta',
+        status: FriendshipStatus.pending,
+        createdAt: DateTime(2026, 2, 10),
+        updatedAt: DateTime(2026, 2, 10),
+      );
+
+      final map = friendship.toMap();
+      expect(map['status'], equals('pending'));
+      expect(map['users'], equals(['user_alpha', 'user_beta']));
+
+      final fromMap = Friendship.fromMap(map);
+      expect(fromMap.status, equals(FriendshipStatus.pending));
+      expect(fromMap.id, equals(id1));
+    });
+
+    test('FriendUserSummary serializes and parses json cleanly', () {
+      final summary = FriendUserSummary(
+        uid: 'buddy_42',
+        displayName: 'Kerem Kaya',
+        username: 'kerem_k',
+        photoUrl: 'avatar:animal_fox',
+        travelStatus: '🏖️ Tatil modunda',
+        homeCountryCode: 'TR',
+        homeCity: 'Antalya',
+        isPro: true,
+        travelStyles: const ['beach', 'foodie'],
+      );
+
+      final jsonStr = summary.toJson();
+      final fromJson = FriendUserSummary.fromJson(jsonStr);
+
+      expect(fromJson.uid, equals('buddy_42'));
+      expect(fromJson.displayName, equals('Kerem Kaya'));
+      expect(fromJson.username, equals('kerem_k'));
+      expect(fromJson.travelStatus, equals('🏖️ Tatil modunda'));
+      expect(fromJson.homeCountryCode, equals('TR'));
+      expect(fromJson.homeCity, equals('Antalya'));
+      expect(fromJson.isPro, isTrue);
+      expect(fromJson.travelStyles, equals(['beach', 'foodie']));
+    });
+
+    test('FriendLocalization returns non-empty strings across all supported languages', () {
+      const langs = ['tr', 'en', 'de', 'es', 'fr', 'it', 'pt', 'ru', 'zh', 'ja', 'ko', 'ar'];
+      for (final l in langs) {
+        expect(FriendLocalization.getFriends(l).isNotEmpty, isTrue);
+        expect(FriendLocalization.getFriendRequests(l).isNotEmpty, isTrue);
+        expect(FriendLocalization.getAddFriend(l).isNotEmpty, isTrue);
+        expect(FriendLocalization.getSearchHint(l).isNotEmpty, isTrue);
+        expect(FriendLocalization.getNoFriendsTitle(l).isNotEmpty, isTrue);
+        expect(FriendLocalization.getMyQrCode(l).isNotEmpty, isTrue);
+      }
+    });
+
+    testWidgets('FriendTile renders friend details and status chip properly', (tester) async {
+      final friend = FriendUserSummary(
+        uid: 'friend_1',
+        displayName: 'Deniz Demir',
+        username: 'deniz_d',
+        travelStatus: '🧳 Bavul topluyor',
+        homeCountryCode: 'TR',
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: FriendTile(
+              friend: friend,
+              languageCode: 'tr',
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Deniz Demir'), findsOneWidget);
+      expect(find.text('@deniz_d'), findsOneWidget);
+      expect(find.text('🧳 Bavul topluyor'), findsOneWidget);
+    });
+
+    testWidgets('MyBuddyQrSheet renders QR visual, handle and action buttons', (tester) async {
+      final profile = UserProfile(
+        uid: 'user_qr_test',
+        displayName: 'Barış Yıldız',
+        username: 'baris_y',
+        createdAt: DateTime(2026, 1, 1),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: MyBuddyQrSheet(
+              profile: profile,
+              languageCode: 'tr',
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Barış Yıldız'), findsOneWidget);
+      expect(find.text('@baris_y'), findsOneWidget);
+      expect(find.byType(CustomPaint), findsWidgets);
+      expect(find.text('Kopyala'), findsOneWidget);
+    });
+
+    testWidgets('FriendsScreen renders tabs, empty state and switches tabs', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            authUserProvider.overrideWith((ref) => null),
+            friendsControllerProvider.overrideWith((ref) {
+              return FriendsController(ref);
+            }),
+          ],
+          child: const MaterialApp(
+            locale: Locale('tr'),
+            home: FriendsScreen(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(find.byType(FriendsScreen), findsOneWidget);
+      expect(find.byType(TabBar), findsOneWidget);
+
+      // Switch to Requests tab
+      await tester.tap(find.byType(Tab).at(1));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('Phase 3: Friend Profile & Presence Tests', () {
+    test('PresenceFormatter formats smart activity timestamps accurately', () {
+      final now = DateTime.now();
+
+      // Null -> Offline
+      expect(PresenceFormatter.format(null, 'tr'), contains('Çevrimdışı'));
+      expect(PresenceFormatter.format(null, 'en'), contains('Offline'));
+
+      // < 5 min -> Currently active
+      final justNow = now.subtract(const Duration(minutes: 2));
+      expect(PresenceFormatter.format(justNow, 'tr'), equals('🟢 Şu an aktif'));
+      expect(PresenceFormatter.format(justNow, 'en'), equals('🟢 Active now'));
+
+      // 30 min -> 30m ago
+      final thirtyMin = now.subtract(const Duration(minutes: 30));
+      expect(PresenceFormatter.format(thirtyMin, 'tr'), equals('🟡 30 dk önce aktifti'));
+      expect(PresenceFormatter.format(thirtyMin, 'en'), equals('🟡 Active 30m ago'));
+
+      // 4 hours -> 4h ago
+      final fourHours = now.subtract(const Duration(hours: 4));
+      expect(PresenceFormatter.format(fourHours, 'tr'), equals('🟡 4 saat önce aktifti'));
+      expect(PresenceFormatter.format(fourHours, 'en'), equals('🟡 Active 4h ago'));
+
+      // 1 day -> yesterday
+      final oneDay = now.subtract(const Duration(days: 1, hours: 2));
+      expect(PresenceFormatter.format(oneDay, 'tr'), equals('⚪ Dün aktifti'));
+      expect(PresenceFormatter.format(oneDay, 'en'), equals('⚪ Active yesterday'));
+
+      // 3 days -> 3d ago
+      final threeDays = now.subtract(const Duration(days: 3));
+      expect(PresenceFormatter.format(threeDays, 'tr'), equals('⚪ 3 gün önce aktifti'));
+      expect(PresenceFormatter.format(threeDays, 'en'), equals('⚪ Active 3d ago'));
+    });
+
+    testWidgets('FriendProfileScreen renders friend info, presence, badges and invite button', (tester) async {
+      tester.view.physicalSize = const Size(800, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final summary = FriendUserSummary(
+        uid: 'friend_view_test',
+        displayName: 'Okan Yurt',
+        username: 'okan_y',
+        photoUrl: 'avatar:animal_owl',
+        travelStatus: '🗺️ Yeni rota planlıyor',
+        homeCountryCode: 'TR',
+        homeCity: 'Izmir',
+        lastActiveAt: DateTime.now().subtract(const Duration(minutes: 1)),
+        isPro: true,
+        travelStyles: const ['backpacker', 'nature'],
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            authUserProvider.overrideWith((ref) => null),
+          ],
+          child: MaterialApp(
+            locale: const Locale('tr'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: FriendProfileScreen(
+              friendUid: 'friend_view_test',
+              fallbackSummary: summary,
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Okan Yurt'), findsWidgets);
+      expect(find.text('@okan_y'), findsOneWidget);
+      expect(find.text('🟢 Şu an aktif'), findsOneWidget);
+      expect(find.text('🗺️ Yeni rota planlıyor'), findsOneWidget);
+      expect(find.text('Sırt Çantalı'), findsOneWidget);
+      expect(find.text('Doğa & Kamp'), findsOneWidget);
+      expect(find.byType(FilledButton), findsWidgets);
     });
   });
 }

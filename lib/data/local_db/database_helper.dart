@@ -134,6 +134,9 @@ class DatabaseHelper {
       if (!expCols.contains('user_id')) {
         await db.execute("ALTER TABLE ${AppConstants.tableExpenses} ADD COLUMN user_id TEXT NOT NULL DEFAULT ''");
       }
+      if (!expCols.contains('created_by_name')) {
+        await db.execute('ALTER TABLE ${AppConstants.tableExpenses} ADD COLUMN created_by_name TEXT');
+      }
     } catch (_) {}
 
     // 5. Itinerary Items table integrity
@@ -157,9 +160,15 @@ class DatabaseHelper {
           created_at INTEGER NOT NULL,
           updated_at INTEGER NOT NULL,
           is_deleted INTEGER NOT NULL DEFAULT 0,
+          created_by_name TEXT,
           FOREIGN KEY (trip_id) REFERENCES ${AppConstants.tableTrips}(id) ON DELETE CASCADE
         )
       ''');
+      final itinInfo = await db.rawQuery('PRAGMA table_info(${AppConstants.tableItineraryItems})');
+      final itinCols = itinInfo.map((row) => (row['name'] as String?)?.toLowerCase()).toSet();
+      if (!itinCols.contains('created_by_name')) {
+        await db.execute('ALTER TABLE ${AppConstants.tableItineraryItems} ADD COLUMN created_by_name TEXT');
+      }
     } catch (_) {}
   }
 
@@ -1469,44 +1478,75 @@ class DatabaseHelper {
     );
   }
 
-  /// Retrieves itinerary activities for a trip, sorted by day_number, time, and created_at
+  /// Retrieves itinerary activities for a trip, sorted by day_number, time, and created_at.
+  /// Seamlessly returns all activities belonging to this trip so collaborative partners see all changes.
   Future<List<Map<String, dynamic>>> getItineraryItemsByTrip(
     String tripId, {
     String? userId,
     bool includeDeleted = false,
   }) async {
     final db = await database;
-    final effectiveUid = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
-
-    if (effectiveUid.isNotEmpty) {
-      if (includeDeleted) {
-        return await db.query(
-          AppConstants.tableItineraryItems,
-          where: 'trip_id = ? AND (user_id = ? OR user_id = "")',
-          whereArgs: [tripId, effectiveUid],
-          orderBy: 'day_number ASC, time ASC, created_at ASC',
-        );
-      }
-      return await db.query(
-        AppConstants.tableItineraryItems,
-        where: 'trip_id = ? AND (user_id = ? OR user_id = "") AND is_deleted = 0',
-        whereArgs: [tripId, effectiveUid],
-        orderBy: 'day_number ASC, time ASC, created_at ASC',
-      );
-    }
-
     if (includeDeleted) {
       return await db.query(
         AppConstants.tableItineraryItems,
-        where: 'trip_id = ? AND (user_id = "" OR user_id IS NULL)',
+        where: 'trip_id = ?',
         whereArgs: [tripId],
         orderBy: 'day_number ASC, time ASC, created_at ASC',
       );
     }
     return await db.query(
       AppConstants.tableItineraryItems,
-      where: 'trip_id = ? AND (user_id = "" OR user_id IS NULL) AND is_deleted = 0',
+      where: 'trip_id = ? AND is_deleted = 0',
       whereArgs: [tripId],
+      orderBy: 'day_number ASC, time ASC, created_at ASC',
+    );
+  }
+
+  /// Retrieves soft-deleted itinerary activities for two-way cloud synchronization
+  Future<List<Map<String, dynamic>>> getDeletedItineraryItems({String? userId}) async {
+    final db = await database;
+    final effectiveUserId = (userId != null && userId.isNotEmpty) ? userId : _currentUserId;
+    if (effectiveUserId.isNotEmpty) {
+      return await db.query(
+        AppConstants.tableItineraryItems,
+        where: 'is_deleted = 1 AND (user_id = ? OR user_id = "")',
+        whereArgs: [effectiveUserId],
+        orderBy: 'updated_at DESC',
+      );
+    }
+    return await db.query(
+      AppConstants.tableItineraryItems,
+      where: 'is_deleted = 1',
+      orderBy: 'updated_at DESC',
+    );
+  }
+
+  /// Retrieves all itinerary activities for a user or trip
+  Future<List<Map<String, dynamic>>> getItineraryItems({
+    String? tripId,
+    String? userId,
+    bool includeDeleted = false,
+  }) async {
+    final db = await database;
+    final conditions = <String>[];
+    final args = <dynamic>[];
+
+    if (tripId != null && tripId.isNotEmpty) {
+      conditions.add('trip_id = ?');
+      args.add(tripId);
+    } else if (userId != null && userId.isNotEmpty) {
+      conditions.add('(user_id = ? OR user_id = "")');
+      args.add(userId);
+    }
+
+    if (!includeDeleted) {
+      conditions.add('is_deleted = 0');
+    }
+
+    return await db.query(
+      AppConstants.tableItineraryItems,
+      where: conditions.isNotEmpty ? conditions.join(' AND ') : null,
+      whereArgs: args.isNotEmpty ? args : null,
       orderBy: 'day_number ASC, time ASC, created_at ASC',
     );
   }

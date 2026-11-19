@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/features/budget/domain/collaboration_localization.dart';
 import 'package:packbuddy/features/itinerary/domain/itinerary_item.dart';
 import 'package:packbuddy/features/itinerary/domain/itinerary_localization.dart';
 import 'package:packbuddy/shared/widgets/app_animations.dart';
@@ -8,6 +9,9 @@ import 'package:packbuddy/shared/widgets/app_card.dart';
 class DayTimelineCard extends StatelessWidget {
   final ItineraryItem item;
   final String languageCode;
+  final bool isCollaborative;
+  final String? currentUserId;
+  final String? currentUserName;
   final VoidCallback onToggleCompleted;
   final VoidCallback? onEdit;
   final VoidCallback onDelete;
@@ -16,6 +20,9 @@ class DayTimelineCard extends StatelessWidget {
     super.key,
     required this.item,
     required this.languageCode,
+    this.isCollaborative = false,
+    this.currentUserId,
+    this.currentUserName,
     required this.onToggleCompleted,
     this.onEdit,
     required this.onDelete,
@@ -89,56 +96,125 @@ class DayTimelineCard extends StatelessWidget {
                     children: [
                       // Badges on left: Time and Category
                       Expanded(
-                        child: Wrap(
-                          spacing: 6,
-                          runSpacing: 4,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            if (displayTime != null && displayTime.isNotEmpty)
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
-                                decoration: BoxDecoration(
-                                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.access_time_rounded,
-                                      size: 12,
-                                      color: theme.colorScheme.primary,
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final maxTextWidth = (constraints.maxWidth - 36).clamp(35.0, 140.0);
+                            return Wrap(
+                              spacing: 6,
+                              runSpacing: 4,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                if (displayTime != null && displayTime.isNotEmpty)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(6),
                                     ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      displayTime,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w700,
-                                        color: theme.colorScheme.primary,
-                                      ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.access_time_rounded,
+                                          size: 12,
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        ConstrainedBox(
+                                          constraints: BoxConstraints(maxWidth: maxTextWidth),
+                                          child: Text(
+                                            displayTime,
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w700,
+                                              color: theme.colorScheme.primary,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              ),
+                                  ),
 
-                            // Category Pill
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
-                              decoration: BoxDecoration(
-                                color: categoryColor.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                ItineraryLocalization.getCategoryLabel(item.category, languageCode),
-                                style: TextStyle(
-                                  fontSize: 10.5,
-                                  fontWeight: FontWeight.w700,
-                                  color: categoryColor,
+                                // Category Pill
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                                  decoration: BoxDecoration(
+                                    color: categoryColor.withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: ConstrainedBox(
+                                    constraints: BoxConstraints(maxWidth: maxTextWidth),
+                                    child: Text(
+                                      ItineraryLocalization.getCategoryLabel(item.category, languageCode),
+                                      style: TextStyle(
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.w700,
+                                        color: categoryColor,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
+
+                                // Author Pill (ONLY rendered when isCollaborative is true)
+                                if (isCollaborative) ...[
+                                  Builder(
+                                    builder: (context) {
+                                      final isMe = (currentUserId != null && item.userId != null && item.userId == currentUserId) ||
+                                          (currentUserName != null && item.createdByName != null && item.createdByName!.trim().toLowerCase() == currentUserName!.trim().toLowerCase());
+                                      final label = CollaborationLocalization.formatAddedBy(
+                                        item.createdByName,
+                                        isMe: isMe,
+                                        languageCode: languageCode,
+                                      );
+                                      return Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                                        decoration: BoxDecoration(
+                                          color: isMe
+                                              ? const Color(0xFF6366F1).withValues(alpha: 0.12)
+                                              : const Color(0xFF0EA5E9).withValues(alpha: 0.12),
+                                          borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(
+                                            color: isMe
+                                                ? const Color(0xFF6366F1).withValues(alpha: 0.25)
+                                                : const Color(0xFF0EA5E9).withValues(alpha: 0.25),
+                                            width: 0.8,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              isMe ? Icons.person_rounded : Icons.person_outline_rounded,
+                                              size: 11,
+                                              color: isMe ? const Color(0xFF6366F1) : const Color(0xFF0EA5E9),
+                                            ),
+                                            const SizedBox(width: 3.5),
+                                            ConstrainedBox(
+                                              constraints: BoxConstraints(maxWidth: maxTextWidth),
+                                              child: Text(
+                                                label,
+                                                style: TextStyle(
+                                                  fontSize: 10.5,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: isMe ? const Color(0xFF6366F1) : const Color(0xFF0EA5E9),
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ],
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(width: 6),

@@ -2067,7 +2067,7 @@ class AppLocalizationsEl extends AppLocalizations {
   String get storyLayoutPolaroid => 'Καρτ ποστάλ';
 
   @override
-  String get storyLayoutInfographic => 'Infographic';
+  String get storyLayoutInfographic => 'Ινφογράφημα';
 
   @override
   String get storeUnavailableMessage =>
