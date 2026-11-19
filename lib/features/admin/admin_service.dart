@@ -11,6 +11,9 @@ import '../vault/domain/document.dart';
 import '../travel_map/data/world_countries_data.dart';
 import '../travel_map/domain/travel_country.dart';
 import '../budget/domain/country_localization.dart';
+import '../profile/domain/friendship.dart';
+import '../profile/domain/travel_style.dart';
+import '../profile/domain/travel_badge.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -35,6 +38,9 @@ class AdminPlatformMetrics {
   final int totalDocuments;
   final int totalChecklistItems;
   final int totalStorageBytes;
+  final int totalFriendships;
+  final int totalPendingFriendRequests;
+  final int totalUsernamesClaimed;
 
   const AdminPlatformMetrics({
     this.totalUsers = 0,
@@ -45,6 +51,9 @@ class AdminPlatformMetrics {
     this.totalDocuments = 0,
     this.totalChecklistItems = 0,
     this.totalStorageBytes = 0,
+    this.totalFriendships = 0,
+    this.totalPendingFriendRequests = 0,
+    this.totalUsernamesClaimed = 0,
   });
 
   AdminPlatformMetrics copyWith({
@@ -56,6 +65,9 @@ class AdminPlatformMetrics {
     int? totalDocuments,
     int? totalChecklistItems,
     int? totalStorageBytes,
+    int? totalFriendships,
+    int? totalPendingFriendRequests,
+    int? totalUsernamesClaimed,
   }) {
     return AdminPlatformMetrics(
       totalUsers: totalUsers ?? this.totalUsers,
@@ -66,6 +78,9 @@ class AdminPlatformMetrics {
       totalDocuments: totalDocuments ?? this.totalDocuments,
       totalChecklistItems: totalChecklistItems ?? this.totalChecklistItems,
       totalStorageBytes: totalStorageBytes ?? this.totalStorageBytes,
+      totalFriendships: totalFriendships ?? this.totalFriendships,
+      totalPendingFriendRequests: totalPendingFriendRequests ?? this.totalPendingFriendRequests,
+      totalUsernamesClaimed: totalUsernamesClaimed ?? this.totalUsernamesClaimed,
     );
   }
 }
@@ -201,6 +216,17 @@ class AdminDetailedAnalytics {
   final double averageExpensePerTrip;
   final double proConversionRate;
   final double emailVerificationRate;
+  final int totalFriendships;
+  final int totalPendingFriendRequests;
+  final double averageFriendsPerUser;
+  final int usersWithFriendsCount;
+  final double usernameClaimRate;
+  final double bioAdoptionRate;
+  final double travelStatusAdoptionRate;
+  final double travelStylesAdoptionRate;
+  final List<PreferenceShareMetric> travelStyleShares;
+  final List<PreferenceShareMetric> badgeTierShares;
+  final int totalBadgesUnlocked;
 
   const AdminDetailedAnalytics({
     this.topWishlistCountries = const [],
@@ -223,6 +249,17 @@ class AdminDetailedAnalytics {
     this.averageExpensePerTrip = 0.0,
     this.proConversionRate = 0.0,
     this.emailVerificationRate = 0.0,
+    this.totalFriendships = 0,
+    this.totalPendingFriendRequests = 0,
+    this.averageFriendsPerUser = 0.0,
+    this.usersWithFriendsCount = 0,
+    this.usernameClaimRate = 0.0,
+    this.bioAdoptionRate = 0.0,
+    this.travelStatusAdoptionRate = 0.0,
+    this.travelStylesAdoptionRate = 0.0,
+    this.travelStyleShares = const [],
+    this.badgeTierShares = const [],
+    this.totalBadgesUnlocked = 0,
   });
 
   String get formattedAverageSessionDuration =>
@@ -273,6 +310,10 @@ class AdminUserModel {
   final int sessionCount;
   final int lastSessionSeconds;
   final Map<String, dynamic> travelMapCountries;
+  final String username;
+  final String bio;
+  final String travelStatus;
+  final List<String> travelStyles;
 
   const AdminUserModel({
     required this.uid,
@@ -308,6 +349,10 @@ class AdminUserModel {
     this.sessionCount = 0,
     this.lastSessionSeconds = 0,
     this.travelMapCountries = const {},
+    this.username = '',
+    this.bio = '',
+    this.travelStatus = '',
+    this.travelStyles = const [],
   });
 
   bool get isCurrentlyBanned {
@@ -405,8 +450,25 @@ class AdminUserModel {
       travelMapCountries: ((data['travelMapCountries'] ?? data['travel_map_countries']) as Map<dynamic, dynamic>?)?.map(
             (k, v) => MapEntry(k.toString().toUpperCase(), v),
           ) ?? const {},
+      username: (data['username'] ?? data['userName'] ?? data['buddyId']) as String? ?? '',
+      bio: (data['bio'] ?? data['about']) as String? ?? '',
+      travelStatus: (data['travelStatus'] ?? data['status']) as String? ?? '',
+      travelStyles: ((data['travelStyles'] ?? data['travelStyle']) is List)
+          ? ((data['travelStyles'] ?? data['travelStyle']) as List)
+              .map((e) => e.toString().trim())
+              .where((e) => e.isNotEmpty)
+              .toList()
+          : const [],
     );
   }
+
+  bool get hasUsername => username.isNotEmpty;
+
+  String get formattedUsername => hasUsername ? '@$username' : '';
+
+  bool get hasBio => bio.isNotEmpty;
+
+  bool get hasTravelStatus => travelStatus.isNotEmpty;
 
   double get averageSessionMinutes =>
       sessionCount > 0 ? (totalSessionSeconds / sessionCount / 60) : 0.0;
@@ -502,6 +564,10 @@ class AdminUserModel {
     int? sessionCount,
     int? lastSessionSeconds,
     Map<String, dynamic>? travelMapCountries,
+    String? username,
+    String? bio,
+    String? travelStatus,
+    List<String>? travelStyles,
     bool clearBanExpiresAt = false,
     bool clearBanReason = false,
   }) {
@@ -538,6 +604,10 @@ class AdminUserModel {
       sessionCount: sessionCount ?? this.sessionCount,
       lastSessionSeconds: lastSessionSeconds ?? this.lastSessionSeconds,
       travelMapCountries: travelMapCountries ?? this.travelMapCountries,
+      username: username ?? this.username,
+      bio: bio ?? this.bio,
+      travelStatus: travelStatus ?? this.travelStatus,
+      travelStyles: travelStyles ?? this.travelStyles,
     );
   }
 }
@@ -622,6 +692,9 @@ abstract class AdminService {
   Future<List<Expense>> fetchUserExpenses(String uid);
   Future<List<AdminUserSessionLog>> fetchUserSessions(String uid);
   Future<List<TravelCountry>> fetchUserTravelCountries(String uid);
+  Future<List<FriendUserSummary>> fetchUserFriends(String uid);
+  Future<({List<FriendRequestItem> incoming, List<FriendRequestItem> outgoing})> fetchUserFriendRequests(String uid);
+  Future<bool> removeUserFriendship(String currentUid, String targetUid);
   Future<void> deleteUserDocumentAsAdmin({required String uid, required String documentId});
   Future<void> cancelAccountDeletionAsAdmin(String uid);
   Future<void> purgeUserDataAsAdmin(String uid);
@@ -770,6 +843,23 @@ class FirebaseAdminService implements AdminService {
         }
       }
 
+      String localUsername = '';
+      String localBio = '';
+      String localTravelStatus = '';
+      List<String> localTravelStyles = const [];
+      final cachedProfileStr = prefs.getCachedUserProfile(uid);
+      if (cachedProfileStr != null && cachedProfileStr.isNotEmpty) {
+        try {
+          final pMap = jsonDecode(cachedProfileStr);
+          localUsername = (pMap['username'] ?? '').toString();
+          localBio = (pMap['bio'] ?? '').toString();
+          localTravelStatus = (pMap['travelStatus'] ?? '').toString();
+          if (pMap['travelStyles'] is List) {
+            localTravelStyles = (pMap['travelStyles'] as List).map((e) => e.toString()).toList();
+          }
+        } catch (_) {}
+      }
+
       final localUser = AdminUserModel(
         uid: uid,
         email: email,
@@ -798,6 +888,10 @@ class FirebaseAdminService implements AdminService {
         sessionCount: prefs.getSessionCount(uid: uid) > 0 ? prefs.getSessionCount(uid: uid) : 1,
         lastSessionSeconds: prefs.getLastSessionSeconds(uid: uid),
         travelMapCountries: travelMap,
+        username: localUsername,
+        bio: localBio,
+        travelStatus: localTravelStatus,
+        travelStyles: localTravelStyles,
       );
 
       return [localUser];
@@ -860,6 +954,7 @@ class FirebaseAdminService implements AdminService {
       int verifiedUsers = 0;
       int proUsers = 0;
       int totalStorageBytes = 0;
+      int usernamesClaimed = 0;
 
       for (final doc in usersSnapshot.docs) {
         final data = doc.data();
@@ -876,7 +971,22 @@ class FirebaseAdminService implements AdminService {
         }
         final storage = ((data['totalVaultStorageBytes'] ?? data['total_vault_storage_bytes']) as num?)?.toInt() ?? 0;
         totalStorageBytes += storage;
+        final uName = (data['username'] ?? data['userName'] ?? '').toString().trim();
+        if (uName.isNotEmpty) {
+          usernamesClaimed++;
+        }
       }
+
+      int totalFriendships = 0;
+      int pendingFriendRequests = 0;
+      try {
+        final friendshipsSnap = await firestore.collection('friendships').get();
+        for (final doc in friendshipsSnap.docs) {
+          final st = (doc.data()['status'] as String? ?? 'pending').toLowerCase();
+          if (st == 'accepted') totalFriendships++;
+          if (st == 'pending') pendingFriendRequests++;
+        }
+      } catch (_) {}
 
       final totalTrips = await _getCollectionCount('trips');
       final totalExpenses = await _getCollectionCount('expenses');
@@ -899,6 +1009,9 @@ class FirebaseAdminService implements AdminService {
         totalDocuments: totalDocs,
         totalChecklistItems: totalItems,
         totalStorageBytes: totalStorageBytes,
+        totalFriendships: totalFriendships,
+        totalPendingFriendRequests: pendingFriendRequests,
+        totalUsernamesClaimed: usernamesClaimed,
       );
     } catch (e) {
       debugPrint('[AdminService] fetchMetrics error: $e');
@@ -977,12 +1090,17 @@ class FirebaseAdminService implements AdminService {
       final Map<String, int> vaultCategoryCounts = {};
       final Map<String, int> themeCounts = {};
       final Map<String, int> languageCounts = {};
+      final Map<String, int> travelStyleCounts = {};
 
       int totalPlatformSessionSeconds = 0;
       int totalPlatformSessions = 0;
       int verifiedUsers = 0;
       int proUsers = 0;
       int totalWorldMapMarks = 0;
+      int usernameClaimCount = 0;
+      int bioAdoptionCount = 0;
+      int travelStatusCount = 0;
+      int usersWithTravelStylesCount = 0;
 
       List<Map<String, dynamic>> userMaps = [];
       if (firestore != null) {
@@ -1098,6 +1216,27 @@ class FirebaseAdminService implements AdminService {
 
         final lang = ((data['appLanguage'] ?? data['app_language'] ?? data['languageCode'] ?? 'tr') as String).toLowerCase().trim();
         languageCounts[lang] = (languageCounts[lang] ?? 0) + 1;
+
+        // 6. Social, Profile & Travel Styles tracking
+        final uName = (data['username'] ?? data['userName'] ?? '').toString().trim();
+        if (uName.isNotEmpty) usernameClaimCount++;
+
+        final bio = (data['bio'] ?? data['about'] ?? '').toString().trim();
+        if (bio.isNotEmpty) bioAdoptionCount++;
+
+        final st = (data['travelStatus'] ?? data['status'] ?? '').toString().trim();
+        if (st.isNotEmpty) travelStatusCount++;
+
+        final stylesRaw = data['travelStyles'] ?? data['travelStyle'];
+        if (stylesRaw is List && stylesRaw.isNotEmpty) {
+          usersWithTravelStylesCount++;
+          for (final s in stylesRaw) {
+            final sStr = s.toString().trim().toLowerCase();
+            if (sStr.isNotEmpty) {
+              travelStyleCounts[sStr] = (travelStyleCounts[sStr] ?? 0) + 1;
+            }
+          }
+        }
       }
 
       // 5. Query Trips (Strictly Trip Data Analytics: Destinations, Dates, Transport, Currencies)
@@ -1373,6 +1512,128 @@ class FirebaseAdminService implements AdminService {
         },
       );
 
+      // Query friendships for social analytics
+      int totalFriendships = 0;
+      int pendingFriendRequests = 0;
+      final Set<String> usersWithFriends = {};
+      if (firestore != null) {
+        try {
+          final friendshipsSnap = await firestore.collection('friendships').get();
+          for (final doc in friendshipsSnap.docs) {
+            final fData = doc.data();
+            final status = (fData['status'] as String? ?? 'pending').toLowerCase();
+            if (status == 'accepted') {
+              totalFriendships++;
+              final users = (fData['users'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [];
+              usersWithFriends.addAll(users);
+            } else if (status == 'pending') {
+              pendingFriendRequests++;
+            }
+          }
+        } catch (_) {}
+      }
+
+      final avgFriendsPerUser = totalUsers > 0 ? ((totalFriendships * 2) / totalUsers) : 0.0;
+      final usernameClaimRate = totalUsers > 0 ? (usernameClaimCount / totalUsers) : 0.0;
+      final bioAdoptionRate = totalUsers > 0 ? (bioAdoptionCount / totalUsers) : 0.0;
+      final travelStatusAdoptionRate = totalUsers > 0 ? (travelStatusCount / totalUsers) : 0.0;
+      final travelStylesAdoptionRate = totalUsers > 0 ? (usersWithTravelStylesCount / totalUsers) : 0.0;
+
+      final travelStyleShares = travelStyleCounts.entries.map((entry) {
+        final style = TravelStyle.catalog.firstWhere(
+          (s) => s.id == entry.key,
+          orElse: () => TravelStyle(id: entry.key, emoji: '🎒', defaultName: entry.key),
+        );
+        return PreferenceShareMetric(
+          key: entry.key,
+          label: style.defaultName,
+          icon: style.emoji,
+          count: entry.value,
+          percentage: totalUsers > 0 ? (entry.value / totalUsers).clamp(0.0, 1.0) : 0.0,
+        );
+      }).toList()..sort((a, b) => b.count.compareTo(a.count));
+
+      int totalBadgesUnlocked = 0;
+      int diamondBadges = 0;
+      int goldBadges = 0;
+      int silverBadges = 0;
+      int bronzeBadges = 0;
+
+      for (final data in userMaps) {
+        final travelCountries = data['travelMapCountries'] ?? data['travel_map_countries'];
+        int vCount = 0;
+        if (travelCountries is Map) {
+          vCount = travelCountries.values.where((v) {
+            final s = (v is Map ? v['status'] : v).toString().toLowerCase();
+            return s.contains('visit') || s.contains('live');
+          }).length;
+        }
+        final badges = TravelBadge.calculateBadges(
+          totalTrips: tripCountWithDates,
+          totalCountries: vCount,
+          totalItems: 0,
+          totalDocuments: 0,
+        );
+        for (final b in badges) {
+          if (b.isUnlocked) {
+            totalBadgesUnlocked++;
+            switch (b.tier) {
+              case BadgeTier.diamond:
+                diamondBadges++;
+                break;
+              case BadgeTier.gold:
+                goldBadges++;
+                break;
+              case BadgeTier.silver:
+                silverBadges++;
+                break;
+              case BadgeTier.bronze:
+                bronzeBadges++;
+                break;
+            }
+          }
+        }
+      }
+
+      final badgeTierShares = [
+        PreferenceShareMetric(
+          key: 'diamond',
+          label: 'Elmas (Diamond)',
+          icon: '💎',
+          count: diamondBadges,
+          percentage: (totalUsers > 0 && totalBadgesUnlocked > 0)
+              ? (diamondBadges / totalBadgesUnlocked).clamp(0.0, 1.0)
+              : 0.0,
+        ),
+        PreferenceShareMetric(
+          key: 'gold',
+          label: 'Altın (Gold)',
+          icon: '🥇',
+          count: goldBadges,
+          percentage: (totalUsers > 0 && totalBadgesUnlocked > 0)
+              ? (goldBadges / totalBadgesUnlocked).clamp(0.0, 1.0)
+              : 0.0,
+        ),
+        PreferenceShareMetric(
+          key: 'silver',
+          label: 'Gümüş (Silver)',
+          icon: '🥈',
+          count: silverBadges,
+          percentage: (totalUsers > 0 && totalBadgesUnlocked > 0)
+              ? (silverBadges / totalBadgesUnlocked).clamp(0.0, 1.0)
+              : 0.0,
+        ),
+        PreferenceShareMetric(
+          key: 'bronze',
+          label: 'Bronz (Bronze)',
+          icon: '🥉',
+          count: bronzeBadges,
+          percentage: (totalUsers > 0 && totalBadgesUnlocked > 0)
+              ? (bronzeBadges / totalBadgesUnlocked).clamp(0.0, 1.0)
+              : 0.0,
+        ),
+      ];
+
       return AdminDetailedAnalytics(
         topWishlistCountries: topWishlist,
         topVisitedCountries: topVisited,
@@ -1394,6 +1655,17 @@ class FirebaseAdminService implements AdminService {
         averageExpensePerTrip: avgExpensePerTrip,
         proConversionRate: totalUsers > 0 ? (proUsers / totalUsers) : 0.0,
         emailVerificationRate: totalUsers > 0 ? (verifiedUsers / totalUsers) : 0.0,
+        totalFriendships: totalFriendships,
+        totalPendingFriendRequests: pendingFriendRequests,
+        averageFriendsPerUser: avgFriendsPerUser,
+        usersWithFriendsCount: usersWithFriends.length,
+        usernameClaimRate: usernameClaimRate,
+        bioAdoptionRate: bioAdoptionRate,
+        travelStatusAdoptionRate: travelStatusAdoptionRate,
+        travelStylesAdoptionRate: travelStylesAdoptionRate,
+        travelStyleShares: travelStyleShares,
+        badgeTierShares: badgeTierShares,
+        totalBadgesUnlocked: totalBadgesUnlocked,
       );
     } catch (e) {
       debugPrint('[AdminService] fetchDetailedAnalytics error: $e');
@@ -2038,6 +2310,113 @@ class FirebaseAdminService implements AdminService {
         notes: notes,
       );
     }).toList();
+  }
+
+  @override
+  Future<List<FriendUserSummary>> fetchUserFriends(String uid) async {
+    if (uid.isEmpty) return const [];
+    final firestore = _effectiveFirestore;
+    if (firestore == null) return const [];
+
+    try {
+      final query = await firestore
+          .collection('friendships')
+          .where('users', arrayContains: uid)
+          .where('status', isEqualTo: 'accepted')
+          .get();
+
+      final List<FriendUserSummary> friends = [];
+      for (final doc in query.docs) {
+        final data = doc.data();
+        final users = (data['users'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [];
+        final otherUid = users.firstWhere((u) => u != uid, orElse: () => '');
+        if (otherUid.isNotEmpty) {
+          final userDoc = await firestore.collection('users').doc(otherUid).get();
+          if (userDoc.exists && userDoc.data() != null) {
+            friends.add(FriendUserSummary.fromMap(userDoc.data()!, fallbackUid: otherUid));
+          } else {
+            friends.add(FriendUserSummary(uid: otherUid, displayName: 'Traveler ($otherUid)'));
+          }
+        }
+      }
+      return friends;
+    } catch (e) {
+      debugPrint('[AdminService] fetchUserFriends error: $e');
+      return const [];
+    }
+  }
+
+  @override
+  Future<({List<FriendRequestItem> incoming, List<FriendRequestItem> outgoing})> fetchUserFriendRequests(String uid) async {
+    if (uid.isEmpty) {
+      return (incoming: <FriendRequestItem>[], outgoing: <FriendRequestItem>[]);
+    }
+    final firestore = _effectiveFirestore;
+    if (firestore == null) {
+      return (incoming: <FriendRequestItem>[], outgoing: <FriendRequestItem>[]);
+    }
+
+    try {
+      final query = await firestore
+          .collection('friendships')
+          .where('users', arrayContains: uid)
+          .where('status', isEqualTo: 'pending')
+          .get();
+
+      final List<FriendRequestItem> incoming = [];
+      final List<FriendRequestItem> outgoing = [];
+
+      for (final doc in query.docs) {
+        final friendship = Friendship.fromMap(doc.data(), docId: doc.id);
+        final isIncoming = friendship.receiverId == uid;
+        final otherUid = isIncoming ? friendship.requesterId : friendship.receiverId;
+
+        if (otherUid.isNotEmpty) {
+          final userDoc = await firestore.collection('users').doc(otherUid).get();
+          final summary = (userDoc.exists && userDoc.data() != null)
+              ? FriendUserSummary.fromMap(userDoc.data()!, fallbackUid: otherUid)
+              : FriendUserSummary(uid: otherUid, displayName: 'Traveler ($otherUid)');
+
+          final item = FriendRequestItem(
+            friendshipId: friendship.id,
+            user: summary,
+            isIncoming: isIncoming,
+            createdAt: friendship.createdAt,
+          );
+          if (isIncoming) {
+            incoming.add(item);
+          } else {
+            outgoing.add(item);
+          }
+        }
+      }
+      return (incoming: incoming, outgoing: outgoing);
+    } catch (e) {
+      debugPrint('[AdminService] fetchUserFriendRequests error: $e');
+      return (incoming: <FriendRequestItem>[], outgoing: <FriendRequestItem>[]);
+    }
+  }
+
+  @override
+  Future<bool> removeUserFriendship(String currentUid, String targetUid) async {
+    if (currentUid.isEmpty || targetUid.isEmpty) return false;
+    final firestore = _effectiveFirestore;
+    if (firestore == null) return true;
+
+    try {
+      final docId = Friendship.generateId(currentUid, targetUid);
+      await firestore.collection('friendships').doc(docId).delete();
+      await recordAuditLog(
+        action: 'friendship_deleted',
+        actionTitle: 'Arkadaşlık Bağlantısı Silindi',
+        targetUid: currentUid,
+        details: {'otherUid': targetUid},
+      );
+      return true;
+    } catch (e) {
+      debugPrint('[AdminService] removeUserFriendship error: $e');
+      return false;
+    }
   }
 
   @override

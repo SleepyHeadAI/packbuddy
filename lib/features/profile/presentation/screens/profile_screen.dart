@@ -12,6 +12,10 @@ import 'package:packbuddy/features/profile/presentation/screens/widgets/edit_pro
 import 'package:packbuddy/features/profile/presentation/screens/widgets/profile_header_card.dart';
 import 'package:packbuddy/features/profile/presentation/screens/widgets/travel_badges_card.dart';
 import 'package:packbuddy/features/profile/presentation/screens/widgets/travel_stats_card.dart';
+import 'package:packbuddy/features/profile/presentation/screens/widgets/world_map_profile_card.dart';
+import 'package:packbuddy/features/profile/presentation/widgets/user_avatar.dart';
+import 'package:packbuddy/features/travel_map/presentation/controllers/travel_map_controller.dart';
+import 'package:packbuddy/features/travel_map/presentation/screens/travel_map_screen.dart';
 
 /// Serene Voyage primary Profile screen with editable traveler details,
 /// live travel analytics, and account metadata.
@@ -33,6 +37,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       if (user != null) {
         ref.read(profileControllerProvider.notifier).loadProfile(user.uid);
       }
+      ref.read(travelMapControllerProvider.notifier).loadCountries();
     });
   }
 
@@ -47,6 +52,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final profileState = ref.watch(profileControllerProvider);
+    final travelMapState = ref.watch(travelMapControllerProvider);
     final authUser = ref.watch(authUserProvider);
     final theme = Theme.of(context);
     final langCode = Localizations.localeOf(context).languageCode;
@@ -82,17 +88,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              margin: const EdgeInsetsDirectional.only(end: 8),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.person_rounded,
-                color: theme.colorScheme.primary,
-                size: 18,
+            GestureDetector(
+              onTap: () => _openEditSheet(effectiveProfile, langCode),
+              child: Padding(
+                padding: const EdgeInsetsDirectional.only(end: 10),
+                child: UserAvatar(
+                  photoUrl: effectiveProfile.photoUrl,
+                  displayName: effectiveProfile.displayName,
+                  email: effectiveProfile.email,
+                  size: 32,
+                  isAnimated: false,
+                ),
               ),
             ),
             Flexible(
@@ -125,6 +131,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           if (authUser != null) {
             await ref.read(profileControllerProvider.notifier).loadProfile(authUser.uid);
           }
+          await ref.read(travelMapControllerProvider.notifier).loadCountries();
         },
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -141,7 +148,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             const SizedBox(height: 20),
 
-            // 2. Bento Travel Statistics Card
+            // 2. World Travel Map & Live Exploration Coverage Card
+            WorldMapProfileCard(
+              countries: travelMapState.countries,
+              isOwnProfile: true,
+              onOpenMap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const TravelMapScreen()),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // 3. Bento Travel Statistics Card
             TravelStatsCard(
               totalTrips: profileState.totalTrips,
               totalCountries: profileState.totalCountriesVisited,

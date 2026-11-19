@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 
 /// Status of a friendship connection between two users
 enum FriendshipStatus {
@@ -105,6 +104,8 @@ class FriendUserSummary {
   final DateTime? lastActiveAt;
   final bool isPro;
   final List<String> travelStyles;
+  final Map<String, dynamic>? travelMapCountries;
+  final String? bio;
 
   const FriendUserSummary({
     required this.uid,
@@ -117,6 +118,8 @@ class FriendUserSummary {
     this.lastActiveAt,
     this.isPro = false,
     this.travelStyles = const [],
+    this.travelMapCountries,
+    this.bio,
   });
 
   Map<String, dynamic> toMap() {
@@ -131,6 +134,8 @@ class FriendUserSummary {
       'lastActiveAt': lastActiveAt?.toIso8601String(),
       'isPro': isPro,
       'travelStyles': travelStyles,
+      'travelMapCountries': travelMapCountries,
+      'bio': bio,
     };
   }
 
@@ -151,6 +156,11 @@ class FriendUserSummary {
         ? stylesRaw.map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList()
         : const [];
 
+    final rawCountries = map['travelMapCountries'] ?? map['countries'] ?? map['travelMap'];
+    final Map<String, dynamic>? parsedCountries = rawCountries is Map
+        ? Map<String, dynamic>.from(rawCountries)
+        : null;
+
     return FriendUserSummary(
       uid: (map['uid'] ?? map['id'] ?? fallbackUid ?? '').toString(),
       displayName: (map['displayName'] ?? map['name']) as String?,
@@ -162,6 +172,8 @@ class FriendUserSummary {
       lastActiveAt: parseDate(map['lastActiveAt']),
       isPro: isPremium,
       travelStyles: parsedStyles,
+      travelMapCountries: parsedCountries,
+      bio: (map['bio'] ?? map['about']) as String?,
     );
   }
 

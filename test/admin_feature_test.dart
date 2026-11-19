@@ -12,6 +12,7 @@ import 'package:packbuddy/features/vault/domain/document.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
 import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
+import 'package:packbuddy/features/profile/domain/friendship.dart';
 import 'package:packbuddy/features/admin/domain/broadcast_announcement.dart';
 import 'package:packbuddy/features/admin/domain/admin_audit_log.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
@@ -253,6 +254,16 @@ class MockAdminService implements AdminService {
 
   @override
   Future<List<TravelCountry>> fetchUserTravelCountries(String uid) async => [];
+
+  @override
+  Future<List<FriendUserSummary>> fetchUserFriends(String uid) async => const [];
+
+  @override
+  Future<({List<FriendRequestItem> incoming, List<FriendRequestItem> outgoing})> fetchUserFriendRequests(String uid) async =>
+      (incoming: <FriendRequestItem>[], outgoing: <FriendRequestItem>[]);
+
+  @override
+  Future<bool> removeUserFriendship(String currentUid, String targetUid) async => true;
 
   @override
   Future<void> deleteUserDocumentAsAdmin({required String uid, required String documentId}) async {}
@@ -772,7 +783,7 @@ void main() {
 
     testWidgets('Admin dashboard renders platform metrics and user cards when isAdmin',
         (tester) async {
-      tester.view.physicalSize = const Size(800, 4200);
+      tester.view.physicalSize = const Size(800, 6000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
 

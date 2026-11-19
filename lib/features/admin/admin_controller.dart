@@ -249,6 +249,10 @@ class AdminState {
       return u.email.toLowerCase().contains(q) ||
           u.displayName.toLowerCase().contains(q) ||
           u.uid.toLowerCase().contains(q) ||
+          u.username.toLowerCase().contains(q) ||
+          u.bio.toLowerCase().contains(q) ||
+          u.travelStatus.toLowerCase().contains(q) ||
+          u.travelStyles.any((s) => s.toLowerCase().contains(q)) ||
           u.effectiveLiveCountryCode.toLowerCase().contains(q) ||
           u.effectiveLiveCountryName.toLowerCase().contains(q) ||
           u.liveCity.toLowerCase().contains(q) ||

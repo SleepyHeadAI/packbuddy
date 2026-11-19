@@ -88,7 +88,7 @@ class _StatusBadgeState extends State<StatusBadge> with SingleTickerProviderStat
 
     return Container(
       constraints: widget.maxWidth != null ? BoxConstraints(maxWidth: widget.maxWidth!) : null,
-      padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 8.5, vertical: 4.5),
       decoration: BoxDecoration(
         color: widget.backgroundColor,
         borderRadius: BorderRadius.circular(16),
@@ -105,18 +105,22 @@ class _StatusBadgeState extends State<StatusBadge> with SingleTickerProviderStat
         children: [
           if (iconWidget != null) ...[
             iconWidget,
-            const SizedBox(width: 4.5),
+            const SizedBox(width: 4),
           ],
           Flexible(
-            child: Text(
-              widget.label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTheme.labelFont(
-                fontSize: widget.fontSize ?? 10.5,
-                fontWeight: FontWeight.w700,
-                color: widget.textColor,
-                letterSpacing: 0.1,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                widget.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTheme.labelFont(
+                  fontSize: widget.fontSize ?? 10.5,
+                  fontWeight: FontWeight.w700,
+                  color: widget.textColor,
+                  letterSpacing: 0.0,
+                ),
               ),
             ),
           ),

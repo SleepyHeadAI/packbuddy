@@ -17,6 +17,7 @@ import 'package:packbuddy/features/admin/domain/broadcast_announcement.dart';
 import 'package:packbuddy/features/admin/domain/admin_audit_log.dart';
 import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
 import 'package:packbuddy/features/travel_map/data/world_countries_data.dart';
+import 'package:packbuddy/features/profile/domain/friendship.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 class FakeUser extends Fake implements User {
@@ -36,8 +37,11 @@ class MockAdminServiceForTabs implements AdminService {
   final List<Expense> expenses;
   final List<VaultDocument> documents;
   final List<AdminUserSessionLog> sessions;
+  final List<FriendUserSummary> friends;
+  final ({List<FriendRequestItem> incoming, List<FriendRequestItem> outgoing})? friendRequests;
   final List<Map<String, dynamic>> moderationUpdates = [];
   final List<String> purgedUsers = [];
+  final List<({String userUid, String targetUid})> removedFriendships = [];
 
   MockAdminServiceForTabs({
     required this.users,
@@ -45,6 +49,8 @@ class MockAdminServiceForTabs implements AdminService {
     this.expenses = const [],
     this.documents = const [],
     this.sessions = const [],
+    this.friends = const [],
+    this.friendRequests,
   });
 
   @override
@@ -114,6 +120,19 @@ class MockAdminServiceForTabs implements AdminService {
       if (statusStr.contains('lived') || statusStr == 'yasayan') status = CountryStatus.lived;
       return c.copyWith(status: status);
     }).toList();
+  }
+
+  @override
+  Future<List<FriendUserSummary>> fetchUserFriends(String uid) async => friends;
+
+  @override
+  Future<({List<FriendRequestItem> incoming, List<FriendRequestItem> outgoing})> fetchUserFriendRequests(String uid) async =>
+      friendRequests ?? (incoming: <FriendRequestItem>[], outgoing: <FriendRequestItem>[]);
+
+  @override
+  Future<bool> removeUserFriendship(String currentUid, String targetUid) async {
+    removedFriendships.add((userUid: currentUid, targetUid: targetUid));
+    return true;
   }
 
   @override
@@ -340,7 +359,7 @@ void main() {
   }
 
   testWidgets('Admin Moderation Sheet renders TWO DISTINCT TABS and navigates between them', (tester) async {
-    tester.view.physicalSize = const Size(1000, 4200);
+    tester.view.physicalSize = const Size(1000, 6000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() => tester.view.resetPhysicalSize());
 
@@ -426,7 +445,7 @@ void main() {
   });
 
   testWidgets('Page 2: Usage duration switches dynamically across periods', (tester) async {
-    tester.view.physicalSize = const Size(1000, 4200);
+    tester.view.physicalSize = const Size(1000, 6000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() => tester.view.resetPhysicalSize());
 
@@ -477,7 +496,7 @@ void main() {
   });
 
   testWidgets('Page 1: Save moderation changes calls updateUserModeration and shows snackbar', (tester) async {
-    tester.view.physicalSize = const Size(1000, 4200);
+    tester.view.physicalSize = const Size(1000, 6000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() => tester.view.resetPhysicalSize());
 
@@ -536,7 +555,7 @@ void main() {
   });
 
   testWidgets('Page 1: Account purge button opens confirmation dialog and purges data', (tester) async {
-    tester.view.physicalSize = const Size(1000, 4200);
+    tester.view.physicalSize = const Size(1000, 6000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() => tester.view.resetPhysicalSize());
 
@@ -585,7 +604,7 @@ void main() {
   });
 
   testWidgets('Page 2: Country journey displays strictly per-user countries without cross-contamination', (tester) async {
-    tester.view.physicalSize = const Size(1000, 4200);
+    tester.view.physicalSize = const Size(1000, 6000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() => tester.view.resetPhysicalSize());
 
@@ -661,5 +680,112 @@ void main() {
     expect(find.text('Amerika Birleşik Devletleri'), findsOneWidget);
     expect(find.text('İtalya'), findsNothing);
     expect(find.text('Japonya'), findsNothing);
+  });
+
+  testWidgets(
+      'Page 2: Renders User Profile (Handle, Bio, Status, Travel Styles, Badges) and Friends (List, Presence, Requests, Remove Action)',
+      (tester) async {
+    tester.view.physicalSize = const Size(1000, 6000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() => tester.view.resetPhysicalSize());
+
+    final richUser = AdminUserModel(
+      uid: 'user-rich-1',
+      displayName: 'Marco Polo',
+      email: 'marco@polo.com',
+      username: 'marcopolo',
+      bio: 'World traveler and digital nomad exploring silk road routes.',
+      travelStatus: 'Exploring Mediterranean',
+      travelStyles: const ['backpacking', 'culture'],
+      photoUrl: 'fox',
+      liveCountryCode: 'IT',
+      liveCountryName: 'Italy',
+      travelMapCountries: const {'IT': 'lived', 'CN': 'visited'},
+    );
+
+    final friend = FriendUserSummary(
+      uid: 'friend-ibn-1',
+      displayName: 'Ibn Battuta',
+      username: 'ibnbattuta',
+      photoUrl: 'panda',
+      isPro: true,
+      homeCountryCode: 'MA',
+      travelStatus: 'Exploring Africa and Asia',
+      lastActiveAt: DateTime.now().subtract(const Duration(minutes: 5)),
+    );
+
+    final pendingReq = FriendRequestItem(
+      friendshipId: 'req-zheng-1',
+      user: const FriendUserSummary(
+        uid: 'user-zheng-1',
+        displayName: 'Zheng He',
+        username: 'zhenghe',
+        photoUrl: 'dolphin',
+      ),
+      isIncoming: true,
+      createdAt: DateTime.now().subtract(const Duration(hours: 1)),
+    );
+
+    final service = MockAdminServiceForTabs(
+      users: [richUser],
+      friends: [friend],
+      friendRequests: (incoming: [pendingReq], outgoing: const <FriendRequestItem>[]),
+    );
+    final controller = AdminController(service);
+    controller.state = controller.state.copyWith(allUsers: [richUser]);
+
+    await tester.pumpWidget(
+      createHarness(
+        service: service,
+        controller: controller,
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pumpAndSettle();
+
+    // 1. Verify User Card on Admin Dashboard displays @handle, animal avatar, travel status
+    expect(find.text('@marcopolo'), findsWidgets);
+    expect(find.textContaining('Exploring Mediterranean'), findsOneWidget);
+
+    // 2. Open Moderation Sheet
+    final tuneBtn = find.byIcon(Icons.tune_rounded);
+    expect(tuneBtn, findsOneWidget);
+    await tester.tap(tuneBtn);
+    await tester.pumpAndSettle();
+
+    // 3. Switch to Page 2 (Stats & Details)
+    await tester.tap(find.byKey(const ValueKey('tab_user_stats_details')), warnIfMissed: false);
+    await tester.pumpAndSettle();
+
+    // 4. Verify User Profile & Persona Section
+    expect(find.text('Profil & Seyahat Kimliği'), findsOneWidget);
+    expect(find.text('World traveler and digital nomad exploring silk road routes.'), findsOneWidget);
+    expect(find.text('Seyahat Başarı Rozetleri'), findsOneWidget);
+
+    // 5. Verify Friends Section
+    expect(find.text('Seyahat Arkadaşları & Sosyal Ağ'), findsOneWidget);
+    expect(find.text('Ibn Battuta'), findsOneWidget);
+    expect(find.text('@ibnbattuta'), findsOneWidget);
+    expect(find.text('PRO'), findsWidgets);
+    expect(find.text('Zheng He'), findsOneWidget);
+    expect(find.text('@zhenghe'), findsOneWidget);
+    expect(find.text('Gelen İstekler:'), findsOneWidget);
+
+    // 6. Test Admin Action: Remove Friendship
+    final removeFriendBtn = find.byIcon(Icons.person_remove_rounded);
+    expect(removeFriendBtn, findsOneWidget);
+    await tester.tap(removeFriendBtn);
+    await tester.pumpAndSettle();
+
+    // Confirm dialog
+    expect(find.text('Arkadaşlığı Sonlandır'), findsOneWidget);
+    await tester.tap(find.text('Arkadaşlığı Sil'));
+    await tester.pumpAndSettle();
+
+    // Verify service recorded friendship deletion
+    expect(
+      service.removedFriendships,
+      contains((userUid: 'user-rich-1', targetUid: 'friend-ibn-1')),
+    );
   });
 }

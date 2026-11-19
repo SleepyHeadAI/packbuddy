@@ -249,7 +249,7 @@ class ProfileHeaderCard extends StatelessWidget {
             const SizedBox(height: 10),
           ],
 
-          // Bio
+          // Bio / Hakkımda
           if (profile.bio != null && profile.bio!.isNotEmpty) ...[
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -262,6 +262,8 @@ class ProfileHeaderCard extends StatelessWidget {
                   fontSize: 13,
                 ),
                 textAlign: TextAlign.center,
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             const SizedBox(height: 14),

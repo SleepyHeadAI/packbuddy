@@ -112,6 +112,7 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
 
     Widget body = Container(
       padding: widget.padding ?? const EdgeInsets.all(18),
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: widget.gradient == null
             ? (widget.backgroundColor ?? theme.cardTheme.color ?? theme.colorScheme.surface)

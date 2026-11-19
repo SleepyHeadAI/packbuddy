@@ -436,7 +436,7 @@ class _EditProfileSheetState extends ConsumerState<EditProfileSheet> {
             ),
             const SizedBox(height: 16),
 
-            // Bio Field
+            // Bio Field (About Me - 300 chars limit)
             Text(
               ProfileLocalization.getBio(lang),
               style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
@@ -444,8 +444,8 @@ class _EditProfileSheetState extends ConsumerState<EditProfileSheet> {
             const SizedBox(height: 6),
             TextField(
               controller: _bioController,
-              maxLines: 3,
-              maxLength: 150,
+              maxLines: 4,
+              maxLength: 300,
               decoration: InputDecoration(
                 hintText: ProfileLocalization.getBioHint(lang),
                 filled: true,

@@ -337,6 +337,11 @@ void main() {
     });
 
     testWidgets('ProfileScreen renders profile state with Pro badge and stats', (tester) async {
+      tester.view.physicalSize = const Size(800, 1600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
       final testProfile = UserProfile(
         uid: 'uid_user_pro',
         displayName: 'Selin Yıldız',
@@ -376,7 +381,8 @@ void main() {
       expect(find.byIcon(Icons.workspace_premium_rounded), findsOneWidget);
       expect(find.text('12'), findsOneWidget);
       expect(find.text('5'), findsOneWidget);
-      expect(find.byType(UserAvatar), findsOneWidget);
+      // Both AppBar title and ProfileHeaderCard display the user's chosen avatar
+      expect(find.byType(UserAvatar), findsNWidgets(2));
     });
   });
 

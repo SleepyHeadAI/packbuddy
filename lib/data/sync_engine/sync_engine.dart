@@ -87,6 +87,7 @@ class SyncEngine extends StateNotifier<SyncState> {
   Timer? _heartbeatTimer;
   Timer? _retryTimer;
   int _retryCount = 0;
+  bool _wasOffline = false;
 
   SyncEngine({
     DatabaseHelper? dbHelper,
@@ -107,20 +108,25 @@ class SyncEngine extends StateNotifier<SyncState> {
         WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test');
   }
 
-  /// Automatically monitors device network connectivity and schedules sync on restore
+  /// Automatically monitors device network connectivity and schedules sync ONLY on genuine offline-to-online reconnection
   void _initConnectivityListener() {
     if (_isTestEnvironment) return;
     try {
       _connectivitySubscription = Connectivity().onConnectivityChanged.listen(
         (List<ConnectivityResult> results) {
           final isConnected = results.any((r) => r != ConnectivityResult.none);
-          if (isConnected) {
-            debugPrint('[SyncEngine] Connectivity restored ($results) -> scheduling debounced auto-sync');
-            _scheduleDebouncedSync(delay: const Duration(milliseconds: 1500));
-          } else {
-            debugPrint('[SyncEngine] Connectivity lost -> state set to offlineReady');
+          if (!isConnected) {
+            _wasOffline = true;
+            debugPrint('[SyncEngine] Connectivity lost -> state set to noInternet');
             if (mounted && state.status != SyncStatus.syncing) {
               state = state.copyWith(status: SyncStatus.noInternet);
+            }
+          } else {
+            // Only trigger sync if we were previously offline (reconnection event)
+            if (_wasOffline) {
+              _wasOffline = false;
+              debugPrint('[SyncEngine] Connectivity restored from offline -> scheduling debounced auto-sync');
+              _scheduleDebouncedSync(delay: const Duration(milliseconds: 2000));
             }
           }
         },
@@ -164,7 +170,7 @@ class SyncEngine extends StateNotifier<SyncState> {
       debugPrint('[SyncEngine] Scheduling automatic retry #$_retryCount in $delaySeconds seconds...');
       _retryTimer = Timer(Duration(seconds: delaySeconds), () {
         if (mounted && !_isSyncing) {
-          performSync();
+          forceSync();
         }
       });
     }
@@ -665,9 +671,27 @@ class SyncEngine extends StateNotifier<SyncState> {
 
   /// Executes two-way bidirectional sync between local SQLite and Cloud Firestore.
   /// Uses Future Memoization with pending request queueing so concurrent callers trigger a follow-up sync.
-  Future<void> performSync() {
+  Future<void> performSync() => _performSyncInternal(force: false);
+
+  /// Forces immediate cloud sync bypassing cooldowns (e.g. manual user interaction)
+  Future<void> forceSync() => _performSyncInternal(force: true);
+
+  Future<void> _performSyncInternal({bool force = false}) {
     _retryCount = 0;
     _retryTimer?.cancel();
+
+    // Prevent hammering / redundant auto-sync within 10 seconds unless forced or previous sync failed
+    if (!force &&
+        !_isSyncing &&
+        state.status == SyncStatus.upToDate &&
+        state.lastSyncTime != null) {
+      final elapsed = DateTime.now().difference(state.lastSyncTime!).inSeconds;
+      if (elapsed < 10) {
+        debugPrint('[SyncEngine] Skipping redundant sync (synced $elapsed s ago)');
+        return Future.value();
+      }
+    }
+
     if (_activeSyncFuture != null) {
       debugPrint('[SyncEngine] Sync already in progress, queuing follow-up sync');
       _hasPendingSyncRequest = true;
@@ -679,7 +703,7 @@ class SyncEngine extends StateNotifier<SyncState> {
       if (_hasPendingSyncRequest) {
         _hasPendingSyncRequest = false;
         debugPrint('[SyncEngine] Executing queued follow-up sync');
-        await performSync();
+        await _performSyncInternal(force: force);
       }
     });
 

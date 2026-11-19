@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:packbuddy/core/services/share_service.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/share_trip_sheet.dart';
@@ -12,7 +11,10 @@ import 'package:packbuddy/features/profile/domain/profile_localization.dart';
 import 'package:packbuddy/features/profile/domain/travel_badge.dart';
 import 'package:packbuddy/features/profile/domain/travel_style.dart';
 import 'package:packbuddy/features/profile/presentation/controllers/friends_controller.dart';
+import 'package:packbuddy/features/profile/presentation/screens/widgets/world_map_profile_card.dart';
 import 'package:packbuddy/features/profile/presentation/widgets/user_avatar.dart';
+import 'package:packbuddy/features/travel_map/data/world_countries_data.dart';
+import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
 import 'package:packbuddy/features/travel_map/presentation/controllers/travel_map_controller.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
 
@@ -39,12 +41,23 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
   int _totalItems = 0;
   int _totalDocuments = 0;
   List<String> _friendVisitedCodes = [];
+  List<TravelCountry> _friendCountries = [];
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _summary = widget.fallbackSummary;
+    if (_summary.travelMapCountries != null) {
+      _friendCountries = WorldMapProfileCard.parseCountriesFromRaw(_summary.travelMapCountries);
+      _friendVisitedCodes = _friendCountries
+          .where((c) => c.isVisited || c.isLived)
+          .map((c) => c.code.toUpperCase())
+          .toList();
+      _totalCountries = _friendVisitedCodes.length;
+    } else {
+      _friendCountries = WorldCountriesData.allCountries;
+    }
     _loadRemoteProfile();
   }
 
@@ -59,12 +72,20 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
           final data = doc.data()!;
           _summary = FriendUserSummary.fromMap(data, fallbackUid: widget.friendUid);
 
-          // Extract visited countries map
-          final mapRaw = data['travelMapCountries'];
-          if (mapRaw is Map) {
-            _friendVisitedCodes = mapRaw.entries
-                .where((e) => e.value is Map && e.value['status'] == 'visited')
-                .map((e) => e.key.toString().toUpperCase())
+          // Extract visited countries map or list
+          final mapRaw = data['travelMapCountries'] ?? data['countries'] ?? data['visitedCountries'];
+          if (mapRaw != null) {
+            _friendCountries = WorldMapProfileCard.parseCountriesFromRaw(mapRaw);
+            _friendVisitedCodes = _friendCountries
+                .where((c) => c.isVisited || c.isLived)
+                .map((c) => c.code.toUpperCase())
+                .toList();
+            _totalCountries = _friendVisitedCodes.length;
+          } else if (_summary.travelMapCountries != null) {
+            _friendCountries = WorldMapProfileCard.parseCountriesFromRaw(_summary.travelMapCountries);
+            _friendVisitedCodes = _friendCountries
+                .where((c) => c.isVisited || c.isLived)
+                .map((c) => c.code.toUpperCase())
                 .toList();
             _totalCountries = _friendVisitedCodes.length;
           }
@@ -84,7 +105,6 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
 
   void _showInviteSheet() {
     final trips = ref.read(tripControllerProvider).trips.where((t) => !t.isDeleted).toList();
-    final lang = Localizations.localeOf(context).languageCode;
 
     if (trips.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -211,6 +231,12 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
             ],
           ),
         ],
+        bottom: _isLoading
+            ? const PreferredSize(
+                preferredSize: Size.fromHeight(2),
+                child: LinearProgressIndicator(minHeight: 2),
+              )
+            : null,
       ),
       body: RefreshIndicator(
         onRefresh: _loadRemoteProfile,
@@ -221,7 +247,16 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
             _buildHeaderCard(context, theme, lang),
             const SizedBox(height: 18),
 
-            // 2. Mutual Travel Affinity Card (Ortak Noktalar)
+            // 2. Friend World Travel Map & Exploration Status Card
+            WorldMapProfileCard(
+              countries: _friendCountries,
+              isOwnProfile: false,
+              friendName: _summary.displayName,
+              mutualVisitedCodes: mutualCodes,
+            ),
+            const SizedBox(height: 18),
+
+            // 3. Mutual Travel Affinity Card (Ortak Noktalar)
             _buildMutualAffinityCard(context, theme, mutualCodes, lang),
             const SizedBox(height: 18),
 
@@ -360,18 +395,43 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.home_rounded, size: 14, color: theme.colorScheme.primary),
                 const SizedBox(width: 4),
-                Text(
-                  countryDisplay,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurfaceVariant,
+                Flexible(
+                  child: Text(
+                    countryDisplay,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
+            ),
+          ],
+
+          // Friend Bio / About (up to 300 characters)
+          if (_summary.bio != null && _summary.bio!.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: Text(
+                '"${_summary.bio!}"',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontStyle: FontStyle.italic,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.85),
+                  height: 1.4,
+                  fontSize: 13,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ],

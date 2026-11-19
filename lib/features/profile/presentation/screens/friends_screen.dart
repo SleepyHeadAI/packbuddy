@@ -126,8 +126,15 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> with SingleTicker
             Tab(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(FriendLocalization.getFriends(lang)),
+                  Flexible(
+                    child: Text(
+                      FriendLocalization.getFriends(lang),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                   if (friendsCount > 0) ...[
                     const SizedBox(width: 6),
                     Container(
@@ -148,8 +155,15 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> with SingleTicker
             Tab(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(FriendLocalization.getFriendRequests(lang)),
+                  Flexible(
+                    child: Text(
+                      FriendLocalization.getFriendRequests(lang),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                   if (incomingCount > 0) ...[
                     const SizedBox(width: 6),
                     Container(
@@ -200,8 +214,8 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> with SingleTicker
 
     if (state.friends.isEmpty) {
       return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

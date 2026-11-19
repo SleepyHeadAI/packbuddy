@@ -11,6 +11,7 @@ import 'package:packbuddy/features/vault/domain/document.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
 import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
+import 'package:packbuddy/features/profile/domain/friendship.dart';
 import 'package:packbuddy/features/admin/admin_service.dart';
 import 'package:packbuddy/features/admin/domain/broadcast_announcement.dart';
 import 'package:packbuddy/features/admin/domain/admin_audit_log.dart';
@@ -105,6 +106,16 @@ class MockCloudAdminService implements AdminService {
 
   @override
   Future<List<TravelCountry>> fetchUserTravelCountries(String uid) async => [];
+
+  @override
+  Future<List<FriendUserSummary>> fetchUserFriends(String uid) async => const [];
+
+  @override
+  Future<({List<FriendRequestItem> incoming, List<FriendRequestItem> outgoing})> fetchUserFriendRequests(String uid) async =>
+      (incoming: <FriendRequestItem>[], outgoing: <FriendRequestItem>[]);
+
+  @override
+  Future<bool> removeUserFriendship(String currentUid, String targetUid) async => true;
 
   @override
   Future<void> deleteUserDocumentAsAdmin({
@@ -324,7 +335,7 @@ void main() {
     }
 
     testWidgets('Renders pending deletion badge with remaining days on user card', (tester) async {
-      tester.view.physicalSize = const Size(1000, 3200);
+      tester.view.physicalSize = const Size(1000, 6000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() => tester.view.resetPhysicalSize());
 

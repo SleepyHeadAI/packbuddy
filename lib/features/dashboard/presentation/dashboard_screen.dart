@@ -504,7 +504,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 final messenger = ScaffoldMessenger.of(context);
                 messenger.clearSnackBars();
                 final notifier = ref.read(syncEngineProvider.notifier);
-                await notifier.performSync();
+                await notifier.forceSync();
                 if (!mounted) return;
                 final sync = ref.read(syncEngineProvider);
                 if (sync.status == SyncStatus.upToDate) {
@@ -545,7 +545,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       action: SnackBarAction(
                         label: l10n.syncNow,
                         textColor: Colors.white,
-                        onPressed: () => notifier.performSync(),
+                        onPressed: () => notifier.forceSync(),
                       ),
                       duration: const Duration(seconds: 4),
                     ),
@@ -925,21 +925,19 @@ class _HorizontalGreetingBar extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 8),
 
-              // Cloud Sync Status Pill
-              Flexible(
-                child: InkWell(
-                  onTap: onSyncTap,
-                  borderRadius: BorderRadius.circular(14),
-                  child: StatusBadge(
-                    label: syncLabel,
-                    icon: syncIcon,
-                    backgroundColor: syncBgColor,
-                    textColor: syncTextColor,
-                    isSpinning: isSyncing,
-                    maxWidth: 115,
-                  ),
+              // Cloud Sync Status Pill (Anchored to the right side cluster with natural width)
+              InkWell(
+                onTap: onSyncTap,
+                borderRadius: BorderRadius.circular(14),
+                child: StatusBadge(
+                  label: syncLabel,
+                  icon: syncIcon,
+                  backgroundColor: syncBgColor,
+                  textColor: syncTextColor,
+                  isSpinning: isSyncing,
+                  maxWidth: 140,
                 ),
               ),
               const SizedBox(width: 5),

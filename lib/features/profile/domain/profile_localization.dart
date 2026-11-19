@@ -147,7 +147,7 @@ class ProfileLocalization {
   static String getBio(String lang) {
     switch (_cleanLang(lang)) {
       case 'tr':
-        return 'Biyografi';
+        return 'Hakkımda / Biyografi';
       case 'de':
         return 'Biografie';
       case 'es':
@@ -193,7 +193,7 @@ class ProfileLocalization {
   static String getBioHint(String lang) {
     switch (_cleanLang(lang)) {
       case 'tr':
-        return 'Kendinizden ve seyahat tutkunuzdan kısaca bahsedin...';
+        return 'Kendinizden ve seyahat tutkunuzdan bahsedin (en fazla 300 karakter)...';
       case 'de':
         return 'Erzählen Sie kurz von sich und Ihrer Reiselust...';
       case 'es':
@@ -1810,7 +1810,250 @@ class ProfileLocalization {
       case 'ja': return '旅行の実績とバッジ';
       case 'ko': return '여행 업적 및 뱃지';
       case 'ar': return 'إنجازات وأوسمة السفر';
+      case 'hi': return 'यात्रा उपलब्धियां और बैज';
+      case 'nl': return 'Reisprestaties & Badges';
+      case 'el': return 'Επιτεύγματα & Σήματα Ταξιδιού';
+      case 'sv': return 'Reseprestationer & Märken';
+      case 'pl': return 'Osiągnięcia i Odznaki Podróżne';
+      case 'id': return 'Prestasi & Lencana Perjalanan';
+      case 'th': return 'ความสำเร็จและเหรียญตราการเดินทาง';
+      case 'vi': return 'Thành Tích & Huy Hiệu Du Lịch';
+      case 'en':
       default: return 'Travel Badges & Achievements';
+    }
+  }
+
+  static String getViewAll(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Tümünü Göster';
+      case 'de': return 'Alle anzeigen';
+      case 'es': return 'Ver todo';
+      case 'fr': return 'Tout afficher';
+      case 'it': return 'Mostra tutto';
+      case 'pt': return 'Ver tudo';
+      case 'ru': return 'Показать все';
+      case 'zh': return '查看全部';
+      case 'ja': return 'すべて表示';
+      case 'ko': return '모두 보기';
+      case 'ar': return 'عرض الكل';
+      case 'hi': return 'सभी देखें';
+      case 'nl': return 'Alles weergeven';
+      case 'el': return 'Προβολή όλων';
+      case 'sv': return 'Visa alla';
+      case 'pl': return 'Zobacz wszystko';
+      case 'id': return 'Lihat Semua';
+      case 'th': return 'ดูทั้งหมด';
+      case 'vi': return 'Xem tất cả';
+      case 'en':
+      default: return 'View All';
+    }
+  }
+
+  static String getAllBadges(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Tüm Rozetler & Başarılar';
+      case 'de': return 'Alle Abzeichen & Erfolge';
+      case 'es': return 'Todas las Insignias y Logros';
+      case 'fr': return 'Tous les Badges et Réussites';
+      case 'it': return 'Tutti i Distintivi e Obiettivi';
+      case 'pt': return 'Todos os Emblemas e Conquistas';
+      case 'ru': return 'Все значки и достижения';
+      case 'zh': return '所有徽章与成就';
+      case 'ja': return 'すべてのバッジと実績';
+      case 'ko': return '모든 배지 및 업적';
+      case 'ar': return 'جميع الشارات والإنجازات';
+      case 'hi': return 'सभी बैज और उपलब्धियां';
+      case 'nl': return 'Alle Badges en Prestaties';
+      case 'el': return 'Όλα τα Σήματα και Επιτεύγματα';
+      case 'sv': return 'Alla Märken & Prestationer';
+      case 'pl': return 'Wszystkie Odznaki i Osiągnięcia';
+      case 'id': return 'Semua Lencana & Prestasi';
+      case 'th': return 'เหรียญตราและความสำเร็จทั้งหมด';
+      case 'vi': return 'Tất Cả Huy Hiệu & Thành Tích';
+      case 'en':
+      default: return 'All Badges & Achievements';
+    }
+  }
+
+  static String getAllTab(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Tümü';
+      case 'de': return 'Alle';
+      case 'es': return 'Todos';
+      case 'fr': return 'Tous';
+      case 'it': return 'Tutti';
+      case 'pt': return 'Todos';
+      case 'ru': return 'Все';
+      case 'zh': return '全部';
+      case 'ja': return 'すべて';
+      case 'ko': return '전체';
+      case 'ar': return 'الكل';
+      case 'hi': return 'सभी';
+      case 'nl': return 'Alles';
+      case 'el': return 'Όλα';
+      case 'sv': return 'Alla';
+      case 'pl': return 'Wszystkie';
+      case 'id': return 'Semua';
+      case 'th': return 'ทั้งหมด';
+      case 'vi': return 'Tất cả';
+      case 'en':
+      default: return 'All';
+    }
+  }
+
+  static String getEarnedTab(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Kazanılanlar';
+      case 'de': return 'Freigeschaltet';
+      case 'es': return 'Desbloqueadas';
+      case 'fr': return 'Débloqués';
+      case 'it': return 'Sbloccati';
+      case 'pt': return 'Desbloqueados';
+      case 'ru': return 'Полученные';
+      case 'zh': return '已解锁';
+      case 'ja': return '獲得済み';
+      case 'ko': return '획득한 배지';
+      case 'ar': return 'المفتوحة';
+      case 'hi': return 'अनलॉक किए गए';
+      case 'nl': return 'Ontgrendeld';
+      case 'el': return 'Ξεκλείδωτα';
+      case 'sv': return 'Upplåsta';
+      case 'pl': return 'Odblokowane';
+      case 'id': return 'Terbuka';
+      case 'th': return 'ปลดล็อกแล้ว';
+      case 'vi': return 'Đã mở khóa';
+      case 'en':
+      default: return 'Unlocked';
+    }
+  }
+
+  static String getLockedTab(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Kilitli';
+      case 'de': return 'Gesperrt';
+      case 'es': return 'Bloqueadas';
+      case 'fr': return 'Verrouillés';
+      case 'it': return 'Bloccati';
+      case 'pt': return 'Bloqueados';
+      case 'ru': return 'Заблокированные';
+      case 'zh': return '未解锁';
+      case 'ja': return '未獲得';
+      case 'ko': return '잠김';
+      case 'ar': return 'مغلقة';
+      case 'hi': return 'लॉक';
+      case 'nl': return 'Vergrendeld';
+      case 'el': return 'Κλειδωμένα';
+      case 'sv': return 'Låsta';
+      case 'pl': return 'Zablokowane';
+      case 'id': return 'Terkunci';
+      case 'th': return 'ยังล็อกอยู่';
+      case 'vi': return 'Đang khóa';
+      case 'en':
+      default: return 'Locked';
+    }
+  }
+
+  static String getTapBadgeHint(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Detayları görmek için rozete dokunun';
+      case 'de': return 'Tippe auf ein Abzeichen für Details';
+      case 'es': return 'Toca una insignia para ver detalles';
+      case 'fr': return 'Appuyez sur un badge pour voir les détails';
+      case 'it': return 'Tocca un distintivo per i dettagli';
+      case 'pt': return 'Toque em um emblema para ver detalhes';
+      case 'ru': return 'Нажмите на значок для подробностей';
+      case 'zh': return '点击徽章查看详情';
+      case 'ja': return 'バッジをタップして詳細を表示';
+      case 'ko': return '상세 정보를 보려면 배지를 탭하세요';
+      case 'ar': return 'اضغط على الشارة لعرض التفاصيل';
+      case 'hi': return 'विवरण देखने के लिए बैज पर टैप करें';
+      case 'nl': return 'Tik op een badge voor details';
+      case 'el': return 'Πατήστε ένα σήμα για λεπτομέρειες';
+      case 'sv': return 'Tryck på ett märke för detaljer';
+      case 'pl': return 'Dotknij odznaki, aby zobaczyć szczegóły';
+      case 'id': return 'Ketuk lencana untuk melihat detail';
+      case 'th': return 'แตะเหรียญตราเพื่อดูรายละเอียด';
+      case 'vi': return 'Nhấn vào huy hiệu để xem chi tiết';
+      case 'en':
+      default: return 'Tap a badge to view details';
+    }
+  }
+
+  static String getBadgesUnlockedSummary(String lang, int unlocked, int total) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return '$unlocked / $total Rozet Açıldı';
+      case 'de': return '$unlocked / $total Abzeichen freigeschaltet';
+      case 'es': return '$unlocked / $total insignias desbloqueadas';
+      case 'fr': return '$unlocked / $total badges débloqués';
+      case 'it': return '$unlocked / $total distintivi sbloccati';
+      case 'pt': return '$unlocked / $total emblemas desbloqueados';
+      case 'ru': return '$unlocked из $total значков открыто';
+      case 'zh': return '已解锁 $unlocked / $total 个徽章';
+      case 'ja': return '$unlocked / $total バッジ獲得';
+      case 'ko': return '$unlocked / $total 배지 획득';
+      case 'ar': return 'تم فتح $unlocked من أصل $total شارة';
+      case 'hi': return '$unlocked / $total बैज अनलॉक';
+      case 'nl': return '$unlocked / $total badges ontgrendeld';
+      case 'el': return '$unlocked / $total σήματα ξεκλειδώθηκαν';
+      case 'sv': return '$unlocked / $total märken upplåsta';
+      case 'pl': return 'Odblokowano $unlocked z $total odznak';
+      case 'id': return '$unlocked / $total lencana terbuka';
+      case 'th': return 'ปลดล็อกแล้ว $unlocked / $total เหรียญ';
+      case 'vi': return 'Đã mở khóa $unlocked / $total huy hiệu';
+      case 'en':
+      default: return '$unlocked / $total Badges Unlocked';
+    }
+  }
+
+  static String getProgress(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'İlerleme';
+      case 'de': return 'Fortschritt';
+      case 'es': return 'Progreso';
+      case 'fr': return 'Progression';
+      case 'it': return 'Progresso';
+      case 'pt': return 'Progresso';
+      case 'ru': return 'Прогресс';
+      case 'zh': return '进度';
+      case 'ja': return '進捗';
+      case 'ko': return '진행도';
+      case 'ar': return 'التقدم';
+      case 'hi': return 'प्रगति';
+      case 'nl': return 'Voortgang';
+      case 'el': return 'Πρόοδος';
+      case 'sv': return 'Framsteg';
+      case 'pl': return 'Postęp';
+      case 'id': return 'Kemajuan';
+      case 'th': return 'ความคืบหน้า';
+      case 'vi': return 'Tiến độ';
+      case 'en':
+      default: return 'Progress';
+    }
+  }
+
+  static String getRequirement(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Gereksinim';
+      case 'de': return 'Anforderung';
+      case 'es': return 'Requisito';
+      case 'fr': return 'Condition';
+      case 'it': return 'Requisito';
+      case 'pt': return 'Requisito';
+      case 'ru': return 'Требование';
+      case 'zh': return '获取要求';
+      case 'ja': return '獲得条件';
+      case 'ko': return '달성 조건';
+      case 'ar': return 'المتطلب';
+      case 'hi': return 'आवश्यकता';
+      case 'nl': return 'Vereiste';
+      case 'el': return 'Απαίτηση';
+      case 'sv': return 'Krav';
+      case 'pl': return 'Wymaganie';
+      case 'id': return 'Persyaratan';
+      case 'th': return 'เงื่อนไข';
+      case 'vi': return 'Yêu cầu';
+      case 'en':
+      default: return 'Requirement';
     }
   }
 
@@ -1820,6 +2063,22 @@ class ProfileLocalization {
       case 'de': return 'Gesperrt';
       case 'es': return 'Bloqueado';
       case 'fr': return 'Verrouillé';
+      case 'it': return 'Bloccato';
+      case 'pt': return 'Bloqueado';
+      case 'ru': return 'Заблокировано';
+      case 'zh': return '未解锁';
+      case 'ja': return '未獲得';
+      case 'ko': return '잠김';
+      case 'ar': return 'مغلق';
+      case 'hi': return 'लॉक';
+      case 'nl': return 'Vergrendeld';
+      case 'el': return 'Κλειδωμένο';
+      case 'sv': return 'Låst';
+      case 'pl': return 'Zablokowane';
+      case 'id': return 'Terkunci';
+      case 'th': return 'ล็อก';
+      case 'vi': return 'Đã khóa';
+      case 'en':
       default: return 'Locked';
     }
   }
@@ -1830,6 +2089,22 @@ class ProfileLocalization {
       case 'de': return 'Freigeschaltet ✨';
       case 'es': return 'Desbloqueado ✨';
       case 'fr': return 'Débloqué ✨';
+      case 'it': return 'Sbloccato ✨';
+      case 'pt': return 'Desbloqueado ✨';
+      case 'ru': return 'Получено ✨';
+      case 'zh': return '已解锁 ✨';
+      case 'ja': return '獲得済み ✨';
+      case 'ko': return '획득 완료 ✨';
+      case 'ar': return 'تم الفتح ✨';
+      case 'hi': return 'अनलॉक ✨';
+      case 'nl': return 'Ontgrendeld ✨';
+      case 'el': return 'Ξεκλειδώθηκε ✨';
+      case 'sv': return 'Upplåst ✨';
+      case 'pl': return 'Odblokowane ✨';
+      case 'id': return 'Terbuka ✨';
+      case 'th': return 'ปลดล็อกแล้ว ✨';
+      case 'vi': return 'Đã mở khóa ✨';
+      case 'en':
       default: return 'Unlocked ✨';
     }
   }

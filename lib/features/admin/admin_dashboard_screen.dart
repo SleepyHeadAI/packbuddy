@@ -31,6 +31,11 @@ import 'domain/broadcast_announcement.dart';
 import 'domain/admin_audit_log.dart';
 import 'admin_service.dart';
 import 'admin_controller.dart';
+import '../profile/domain/friendship.dart';
+import '../profile/domain/travel_style.dart';
+import '../profile/domain/travel_badge.dart';
+import '../profile/domain/animal_avatar.dart';
+import '../profile/domain/friend_localization.dart';
 
 /// Helper to format relative or exact audit timestamp
 String _formatAuditTimestamp(DateTime time, bool isTr) {
@@ -274,6 +279,14 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
 
             // 3. User Preferences Analytics (Theme & Language Distribution)
             _buildThemeAndLanguageSection(context, adminState.detailedAnalytics, isDark),
+            const SizedBox(height: 20),
+
+            // 4. Social Network & Community Analytics (Friends, Connections, Requests)
+            _buildSocialAndCommunityAnalyticsCard(context, adminState, isDark),
+            const SizedBox(height: 20),
+
+            // 5. Travel Persona, Styles & Achievements Analytics
+            _buildTravelStylesAndPersonaAnalyticsCard(context, adminState.detailedAnalytics, isDark),
             const SizedBox(height: 28),
 
             // User Management Section Header
@@ -3156,26 +3169,54 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // User Avatar
-                CircleAvatar(
-                  radius: 20,
-                  backgroundColor: isBanned
-                      ? AppColors.errorPastel.withValues(alpha: 0.2)
-                      : (user.isPremium
-                          ? const Color(0xFFD97706).withValues(alpha: 0.2)
-                          : theme.colorScheme.primaryContainer),
-                  child: Text(
-                    displayName.isNotEmpty
-                        ? displayName.substring(0, 1).toUpperCase()
-                        : 'U',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                      color: isBanned
-                          ? AppColors.errorPastel
+                Builder(
+                  builder: (_) {
+                    final animal = AnimalAvatar.findById(user.photoUrl);
+                    if (animal != null) {
+                      return Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: animal.bgGradient,
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(animal.emoji, style: const TextStyle(fontSize: 20)),
+                      );
+                    }
+                    if (user.photoUrl.startsWith('http')) {
+                      return CircleAvatar(
+                        radius: 20,
+                        backgroundImage: NetworkImage(user.photoUrl),
+                        backgroundColor: theme.colorScheme.primaryContainer,
+                      );
+                    }
+                    return CircleAvatar(
+                      radius: 20,
+                      backgroundColor: isBanned
+                          ? AppColors.errorPastel.withValues(alpha: 0.2)
                           : (user.isPremium
-                              ? const Color(0xFFD97706)
-                              : theme.colorScheme.primary),
-                    ),
-                  ),
+                              ? const Color(0xFFD97706).withValues(alpha: 0.2)
+                              : theme.colorScheme.primaryContainer),
+                      child: Text(
+                        displayName.isNotEmpty
+                            ? displayName.substring(0, 1).toUpperCase()
+                            : 'U',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          color: isBanned
+                              ? AppColors.errorPastel
+                              : (user.isPremium
+                                  ? const Color(0xFFD97706)
+                                  : theme.colorScheme.primary),
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(width: 12),
 
@@ -3197,6 +3238,28 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
+                          if (user.hasUsername) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF0EA5E9).withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: const Color(0xFF0EA5E9).withValues(alpha: 0.3),
+                                  width: 0.8,
+                                ),
+                              ),
+                              child: Text(
+                                user.formattedUsername,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF0284C7),
+                                ),
+                              ),
+                            ),
+                          ],
                           const SizedBox(width: 6),
                           Icon(
                             providerIcon,
@@ -3205,6 +3268,27 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                           ),
                         ],
                       ),
+                      if (user.hasTravelStatus) ...[
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            const Text('💭', style: TextStyle(fontSize: 10)),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                user.travelStatus,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontStyle: FontStyle.italic,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                       const SizedBox(height: 2),
                       Text(
                         user.email.isNotEmpty ? user.email : user.uid,
@@ -3349,6 +3433,28 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                     backgroundColor: Color(0x2ED97706),
                     textColor: Color(0xFFD97706),
                     maxWidth: 70,
+                  ),
+
+                // Username Badge
+                if (user.hasUsername)
+                  StatusBadge(
+                    label: user.formattedUsername,
+                    icon: Icons.alternate_email_rounded,
+                    backgroundColor: const Color(0xFF0EA5E9).withValues(alpha: 0.12),
+                    textColor: const Color(0xFF0284C7),
+                    maxWidth: 130,
+                  ),
+
+                // Travel Styles Badge
+                if (user.travelStyles.isNotEmpty)
+                  StatusBadge(
+                    label: Localizations.localeOf(context).languageCode == 'tr'
+                        ? '${user.travelStyles.length} Seyahat Tarzı'
+                        : '${user.travelStyles.length} Travel Styles',
+                    icon: Icons.backpack_rounded,
+                    backgroundColor: const Color(0xFF8B5CF6).withValues(alpha: 0.12),
+                    textColor: const Color(0xFF7C3AED),
+                    maxWidth: 160,
                   ),
 
                 // Ban Status Badge
@@ -3672,6 +3778,440 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
       ),
     );
   }
+
+  /// Global Social Network & Friendship Intelligence Hub Card
+  Widget _buildSocialAndCommunityAnalyticsCard(
+    BuildContext context,
+    AdminState state,
+    bool isDark,
+  ) {
+    final theme = Theme.of(context);
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    final detailed = state.detailedAnalytics;
+
+    final friendshipsCount = detailed.totalFriendships > 0
+        ? detailed.totalFriendships
+        : state.metrics.totalFriendships;
+    final pendingCount = detailed.totalPendingFriendRequests > 0
+        ? detailed.totalPendingFriendRequests
+        : state.metrics.totalPendingFriendRequests;
+    final usernamesClaimed = state.metrics.totalUsernamesClaimed > 0
+        ? state.metrics.totalUsernamesClaimed
+        : state.allUsers.where((u) => u.hasUsername).length;
+    final totalUsers = state.allUsers.length;
+    final usernamePct = totalUsers > 0 ? (usernamesClaimed / totalUsers * 100) : 0.0;
+    final avgFriends = detailed.averageFriendsPerUser > 0
+        ? detailed.averageFriendsPerUser
+        : (totalUsers > 0 ? (friendshipsCount * 2 / totalUsers) : 0.0);
+
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      borderRadius: 18,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF06B6D4), Color(0xFF0284C7)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF0284C7).withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.diversity_3_rounded,
+                  color: Colors.white,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            isTr ? 'Sosyal Ağ & Arkadaşlık Analitiği' : 'Social Network & Friends Hub',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF0284C7).withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            isTr ? 'Topluluk' : 'Community',
+                            style: const TextStyle(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF0284C7),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      isTr
+                          ? 'Gezginler arası arkadaşlık bağlantıları, bekleyen istekler ve kullanıcı adı sahipliği.'
+                          : 'Travel buddy connections, pending friend requests and @username adoption.',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // 4 Mini Metrics
+          Row(
+            children: [
+              Expanded(
+                child: _buildMiniStatCard(
+                  context: context,
+                  title: isTr ? 'Toplam Arkadaşlık' : 'Friendships',
+                  value: '$friendshipsCount',
+                  subtitle: isTr ? 'Onaylı Bağlantı' : 'Confirmed',
+                  icon: Icons.handshake_rounded,
+                  iconColor: const Color(0xFF0284C7),
+                  bgColor: isDark ? const Color(0xFF0C2433) : const Color(0xFFE0F2FE),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildMiniStatCard(
+                  context: context,
+                  title: isTr ? 'Bekleyen İstek' : 'Requests',
+                  value: '$pendingCount',
+                  subtitle: isTr ? 'Cevap Bekleyen' : 'Pending',
+                  icon: Icons.mark_email_unread_rounded,
+                  iconColor: const Color(0xFFF59E0B),
+                  bgColor: isDark ? const Color(0xFF2E2312) : const Color(0xFFFEF3C7),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _buildMiniStatCard(
+                  context: context,
+                  title: isTr ? '@Kullanıcı Adı' : '@Username Claim',
+                  value: '%${usernamePct.toStringAsFixed(1)}',
+                  subtitle: isTr ? '$usernamesClaimed Gezgin' : '$usernamesClaimed Claimed',
+                  icon: Icons.alternate_email_rounded,
+                  iconColor: const Color(0xFF10B981),
+                  bgColor: isDark ? const Color(0xFF132E27) : const Color(0xFFECFDF5),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildMiniStatCard(
+                  context: context,
+                  title: isTr ? 'Ortalama Arkadaş' : 'Avg Friends',
+                  value: avgFriends.toStringAsFixed(1),
+                  subtitle: isTr ? 'Gezgin Başına' : 'Per Traveler',
+                  icon: Icons.people_alt_rounded,
+                  iconColor: const Color(0xFF8B5CF6),
+                  bgColor: isDark ? const Color(0xFF24153E) : const Color(0xFFF3E8FF),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Global Travel Styles, Persona & Achievements Analytics Card
+  Widget _buildTravelStylesAndPersonaAnalyticsCard(
+    BuildContext context,
+    AdminDetailedAnalytics detailed,
+    bool isDark,
+  ) {
+    final theme = Theme.of(context);
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+
+    final styles = detailed.travelStyleShares;
+    final diamondBadges = detailed.badgeTierShares.firstWhere((b) => b.key == 'diamond', orElse: () => const PreferenceShareMetric(key: 'diamond', label: 'Elmas', icon: '💎', count: 0, percentage: 0)).count;
+    final goldBadges = detailed.badgeTierShares.firstWhere((b) => b.key == 'gold', orElse: () => const PreferenceShareMetric(key: 'gold', label: 'Altın', icon: '🥇', count: 0, percentage: 0)).count;
+    final silverBadges = detailed.badgeTierShares.firstWhere((b) => b.key == 'silver', orElse: () => const PreferenceShareMetric(key: 'silver', label: 'Gümüş', icon: '🥈', count: 0, percentage: 0)).count;
+    final bronzeBadges = detailed.badgeTierShares.firstWhere((b) => b.key == 'bronze', orElse: () => const PreferenceShareMetric(key: 'bronze', label: 'Bronz', icon: '🥉', count: 0, percentage: 0)).count;
+
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      borderRadius: 18,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFEC4899), Color(0xFF8B5CF6)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.psychology_alt_rounded,
+                  color: Colors.white,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isTr ? 'Seyahat Tarzı & Başarım Analitiği' : 'Travel Persona & Achievements',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      isTr
+                          ? 'Gezgin tarzları, profil doluluk metrikleri ve kazanılan başarı rozetleri.'
+                          : 'Persona preferences, profile completeness and unlocked achievements.',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // 1. Profil Doluluk Barları
+          Text(
+            isTr ? 'Profil Tamamlama Oranları' : 'Profile Completeness Index',
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+          ),
+          const SizedBox(height: 8),
+          _buildHealthProgressBar(
+            label: isTr ? '@Kullanıcı Adı Sahipliği' : '@Username Handle Claimed',
+            value: detailed.usernameClaimRate,
+            displayValue: '%${(detailed.usernameClaimRate * 100).toStringAsFixed(1)}',
+            barColor: const Color(0xFF0284C7),
+          ),
+          const SizedBox(height: 6),
+          _buildHealthProgressBar(
+            label: isTr ? 'Biyografi (Hakkında) Yazma' : 'Bio Written',
+            value: detailed.bioAdoptionRate,
+            displayValue: '%${(detailed.bioAdoptionRate * 100).toStringAsFixed(1)}',
+            barColor: const Color(0xFF10B981),
+          ),
+          const SizedBox(height: 6),
+          _buildHealthProgressBar(
+            label: isTr ? 'Seyahat Durumu Paylaşma' : 'Travel Status Set',
+            value: detailed.travelStatusAdoptionRate,
+            displayValue: '%${(detailed.travelStatusAdoptionRate * 100).toStringAsFixed(1)}',
+            barColor: const Color(0xFFF59E0B),
+          ),
+          const SizedBox(height: 6),
+          _buildHealthProgressBar(
+            label: isTr ? 'Seyahat Tarzı Seçimi' : 'Travel Style Selected',
+            value: detailed.travelStylesAdoptionRate,
+            displayValue: '%${(detailed.travelStylesAdoptionRate * 100).toStringAsFixed(1)}',
+            barColor: const Color(0xFF8B5CF6),
+          ),
+
+          const SizedBox(height: 16),
+          const Divider(height: 1),
+          const SizedBox(height: 12),
+
+          // 2. Popüler Seyahat Tarzları
+          Text(
+            isTr ? 'En Popüler Seyahat Tarzları' : 'Popular Travel Styles',
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+          ),
+          const SizedBox(height: 8),
+          if (styles.isEmpty)
+            Text(
+              isTr ? 'Henüz seyahat tarzı verisi toplanmadı.' : 'No travel style data collected yet.',
+              style: TextStyle(fontSize: 11.5, color: theme.colorScheme.onSurfaceVariant),
+            )
+          else
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: styles.take(8).map((s) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(s.icon, style: const TextStyle(fontSize: 14)),
+                      const SizedBox(width: 6),
+                      Text(
+                        '${s.label} (${s.count})',
+                        style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+
+          const SizedBox(height: 16),
+          const Divider(height: 1),
+          const SizedBox(height: 12),
+
+          // 3. Başarım Rozetleri Dağılımı
+          Text(
+            isTr ? 'Kazanılan Seyahat Başarım Rozetleri' : 'Unlocked Achievement Badges',
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF00BCD4).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    children: [
+                      const Text('💎', style: TextStyle(fontSize: 18)),
+                      const SizedBox(height: 2),
+                      Text(
+                        '$diamondBadges',
+                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF00BCD4)),
+                      ),
+                      Text(
+                        isTr ? 'Elmas' : 'Diamond',
+                        style: const TextStyle(fontSize: 10, color: Color(0xFF00BCD4), fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFB300).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    children: [
+                      const Text('🥇', style: TextStyle(fontSize: 18)),
+                      const SizedBox(height: 2),
+                      Text(
+                        '$goldBadges',
+                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFFFF8F00)),
+                      ),
+                      Text(
+                        isTr ? 'Altın' : 'Gold',
+                        style: const TextStyle(fontSize: 10, color: Color(0xFFFF8F00), fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF9E9E9E).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    children: [
+                      const Text('🥈', style: TextStyle(fontSize: 18)),
+                      const SizedBox(height: 2),
+                      Text(
+                        '$silverBadges',
+                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF757575)),
+                      ),
+                      Text(
+                        isTr ? 'Gümüş' : 'Silver',
+                        style: const TextStyle(fontSize: 10, color: Color(0xFF757575), fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFCD7F32).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    children: [
+                      const Text('🥉', style: TextStyle(fontSize: 18)),
+                      const SizedBox(height: 2),
+                      Text(
+                        '$bronzeBadges',
+                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF8D5524)),
+                      ),
+                      Text(
+                        isTr ? 'Bronz' : 'Bronze',
+                        style: const TextStyle(fontSize: 10, color: Color(0xFF8D5524), fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 /// Comprehensive User Moderation Bottom Sheet
@@ -3709,6 +4249,8 @@ class _UserModerationBottomSheetState
   late Future<List<Expense>> _expensesFuture;
   late Future<List<AdminUserSessionLog>> _sessionsFuture;
   late Future<List<TravelCountry>> _countriesFuture;
+  late Future<List<FriendUserSummary>> _friendsFuture;
+  late Future<({List<FriendRequestItem> incoming, List<FriendRequestItem> outgoing})> _requestsFuture;
 
   // Usage Period selection state
   _ModerationUsagePeriod _usagePeriod = _ModerationUsagePeriod.daily;
@@ -3731,6 +4273,8 @@ class _UserModerationBottomSheetState
     _expensesFuture = ref.read(adminServiceProvider).fetchUserExpenses(widget.user.uid);
     _sessionsFuture = ref.read(adminServiceProvider).fetchUserSessions(widget.user.uid);
     _countriesFuture = ref.read(adminServiceProvider).fetchUserTravelCountries(widget.user.uid);
+    _friendsFuture = ref.read(adminServiceProvider).fetchUserFriends(widget.user.uid);
+    _requestsFuture = ref.read(adminServiceProvider).fetchUserFriendRequests(widget.user.uid);
   }
 
   void _reloadDocuments() {
@@ -3746,6 +4290,8 @@ class _UserModerationBottomSheetState
       _expensesFuture = ref.read(adminServiceProvider).fetchUserExpenses(widget.user.uid);
       _sessionsFuture = ref.read(adminServiceProvider).fetchUserSessions(widget.user.uid);
       _countriesFuture = ref.read(adminServiceProvider).fetchUserTravelCountries(widget.user.uid);
+      _friendsFuture = ref.read(adminServiceProvider).fetchUserFriends(widget.user.uid);
+      _requestsFuture = ref.read(adminServiceProvider).fetchUserFriendRequests(widget.user.uid);
     });
   }
 
@@ -4508,7 +5054,15 @@ class _UserModerationBottomSheetState
           _buildUserIdentityCard(context, user, isTr),
           const SizedBox(height: 16),
 
-          // 2. Country Journey (Gezdiği, Gezmek İstediği ve Yaşadığı Ülke)
+          // 2. Profil, Biyografi & Başarım Rozetleri (Profile Details, Bio, Styles & Badges)
+          _buildUserProfileDetailsSection(context, user, isTr),
+          const SizedBox(height: 16),
+
+          // 3. Seyahat Arkadaşları & İlişkileri (Friends Network & Requests)
+          _buildUserFriendsSection(context, user, isTr),
+          const SizedBox(height: 16),
+
+          // 4. Country Journey (Gezdiği, Gezmek İstediği ve Yaşadığı Ülke)
           _buildCountryJourneySection(context, user, isTr),
           const SizedBox(height: 16),
 
@@ -6366,6 +6920,748 @@ class _UserModerationBottomSheetState
     );
   }
 
+  /// Section 2: Detailed User Profile, Persona, Travel Styles & Achievement Badges
+  Widget _buildUserProfileDetailsSection(
+    BuildContext context,
+    AdminUserModel user,
+    bool isTr,
+  ) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return AppCard(
+      borderRadius: 18,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.badge_rounded,
+                  color: Color(0xFF8B5CF6),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isTr ? 'Profil & Seyahat Kimliği' : 'Profile & Travel Persona',
+                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                    ),
+                    Text(
+                      isTr
+                          ? '@kullanıcıadı, biyografi, seyahat durumu ve rozetler'
+                          : '@username, biography, status and achievements',
+                      style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // User Bio card (if provided)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.format_quote_rounded,
+                      size: 16,
+                      color: Color(0xFF8B5CF6),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      isTr ? 'Biyografi / Hakkında' : 'Biography / About',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  user.hasBio ? user.bio : (isTr ? 'Kullanıcı henüz bir biyografi eklemedi.' : 'User has not added a bio yet.'),
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontStyle: user.hasBio ? FontStyle.normal : FontStyle.italic,
+                    color: user.hasBio ? theme.colorScheme.onSurface : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Travel Status
+          if (user.hasTravelStatus) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0284C7).withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFF0284C7).withValues(alpha: 0.2)),
+              ),
+              child: Row(
+                children: [
+                  const Text('✈️', style: TextStyle(fontSize: 14)),
+                  const SizedBox(width: 8),
+                  Text(
+                    isTr ? 'Seyahat Durumu:' : 'Travel Status:',
+                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF0284C7)),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      user.travelStatus,
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+
+          // Travel Styles Tags
+          Text(
+            isTr
+                ? 'Seyahat Tarzı Tercihleri (${user.travelStyles.length})'
+                : 'Travel Style Preferences (${user.travelStyles.length})',
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+          ),
+          const SizedBox(height: 8),
+          if (user.travelStyles.isEmpty)
+            Text(
+              isTr ? 'Henüz seyahat tarzı seçilmemiş.' : 'No travel styles selected yet.',
+              style: TextStyle(fontSize: 11.5, fontStyle: FontStyle.italic, color: theme.colorScheme.onSurfaceVariant),
+            )
+          else
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: user.travelStyles.map((styleKey) {
+                final style = TravelStyle.catalog.firstWhere(
+                  (s) => s.id == styleKey,
+                  orElse: () => TravelStyle(id: styleKey, emoji: '🎒', defaultName: styleKey),
+                );
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(style.emoji, style: const TextStyle(fontSize: 13)),
+                      const SizedBox(width: 5),
+                      Text(
+                        style.getLocalizedName(isTr ? 'tr' : 'en'),
+                        style: const TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF7C3AED),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+
+          const SizedBox(height: 14),
+          const Divider(height: 1),
+          const SizedBox(height: 12),
+
+          // User Badges & Milestones Progress
+          FutureBuilder<List<Trip>>(
+            future: _tripsFuture,
+            builder: (context, tripSnap) {
+              final trips = tripSnap.data ?? [];
+              final visitedCount = user.visitedWorldMapCount;
+              final badges = TravelBadge.calculateBadges(
+                totalTrips: trips.length,
+                totalCountries: visitedCount,
+                totalItems: 0,
+                totalDocuments: 0,
+              );
+              final unlockedCount = badges.where((b) => b.isUnlocked).length;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Text('🏆', style: TextStyle(fontSize: 16)),
+                          const SizedBox(width: 6),
+                          Text(
+                            isTr ? 'Seyahat Başarı Rozetleri' : 'Achievement Badges',
+                            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFB300).withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          '$unlockedCount / ${badges.length} ${isTr ? "Kazanıldı" : "Unlocked"}',
+                          style: const TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFFFF8F00),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: badges.take(8).map((badge) {
+                      final title = badge.getLocalizedTitle(isTr ? 'tr' : 'en');
+                      final isUnlocked = badge.isUnlocked;
+                      final tierColor = badge.tier.primaryColor;
+
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: isUnlocked
+                              ? tierColor.withValues(alpha: 0.12)
+                              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: isUnlocked
+                                ? tierColor.withValues(alpha: 0.4)
+                                : theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              badge.iconData,
+                              size: 13,
+                              color: isUnlocked ? tierColor : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              title,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: isUnlocked ? FontWeight.w700 : FontWeight.w500,
+                                color: isUnlocked ? tierColor : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                              ),
+                            ),
+                            if (isUnlocked) ...[
+                              const SizedBox(width: 4),
+                              Icon(Icons.check_circle_rounded, size: 12, color: tierColor),
+                            ],
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Section 3: User Friends List & Pending Connection Requests
+  Widget _buildUserFriendsSection(
+    BuildContext context,
+    AdminUserModel user,
+    bool isTr,
+  ) {
+    final theme = Theme.of(context);
+
+    return AppCard(
+      borderRadius: 18,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0284C7).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.people_alt_rounded,
+                  color: Color(0xFF0284C7),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isTr ? 'Seyahat Arkadaşları & Sosyal Ağ' : 'Travel Buddies & Friends Network',
+                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                    ),
+                    Text(
+                      isTr
+                          ? 'Kullanıcının onaylı arkadaşları ve bekleyen bağlantı istekleri'
+                          : 'User confirmed friends and pending connection requests',
+                      style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // 1. CONFIRMED FRIENDS LIST
+          FutureBuilder<List<FriendUserSummary>>(
+            future: _friendsFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+                );
+              }
+
+              final friends = snapshot.data ?? [];
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        isTr ? 'Onaylı Arkadaşlar (${friends.length})' : 'Confirmed Friends (${friends.length})',
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                      ),
+                      if (friends.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            isTr ? 'Aktif Ağ' : 'Active Network',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF059669),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (friends.isEmpty)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.group_off_rounded,
+                            size: 28,
+                            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            isTr
+                                ? 'Bu kullanıcının henüz ekli bir seyahat arkadaşı bulunmuyor.'
+                                : 'This traveler has no confirmed travel buddies yet.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    ...friends.map((friend) {
+                      final fName = (friend.displayName != null && friend.displayName!.isNotEmpty)
+                          ? friend.displayName!
+                          : (friend.username != null ? '@${friend.username}' : friend.uid);
+                      final fCountry = (friend.homeCountryCode != null && friend.homeCountryCode!.isNotEmpty)
+                          ? friend.homeCountryCode!.toUpperCase()
+                          : '';
+                      final fFlag = fCountry.isNotEmpty ? countryCodeToFlagEmoji(fCountry) : '';
+
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            // Friend Avatar
+                            Builder(
+                              builder: (_) {
+                                final animal = AnimalAvatar.findById(friend.photoUrl);
+                                if (animal != null) {
+                                  return Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: LinearGradient(
+                                        colors: animal.bgGradient,
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(animal.emoji, style: const TextStyle(fontSize: 17)),
+                                  );
+                                }
+                                if (friend.photoUrl != null && friend.photoUrl!.startsWith('http')) {
+                                  return CircleAvatar(
+                                    radius: 18,
+                                    backgroundImage: NetworkImage(friend.photoUrl!),
+                                  );
+                                }
+                                return CircleAvatar(
+                                  radius: 18,
+                                  backgroundColor: theme.colorScheme.primaryContainer,
+                                  child: Text(
+                                    fName.isNotEmpty ? fName.substring(0, 1).toUpperCase() : 'U',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 12,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          fName,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 13,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      if (friend.username != null && friend.username!.isNotEmpty) ...[
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '@${friend.username}',
+                                          style: const TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF0284C7),
+                                          ),
+                                        ),
+                                      ],
+                                      if (friend.isPro) ...[
+                                        const SizedBox(width: 4),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFD97706).withValues(alpha: 0.15),
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: const Text(
+                                            'PRO',
+                                            style: TextStyle(
+                                              fontSize: 9,
+                                              fontWeight: FontWeight.w800,
+                                              color: Color(0xFFD97706),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Row(
+                                    children: [
+                                      if (fFlag.isNotEmpty) ...[
+                                        Text(fFlag, style: const TextStyle(fontSize: 12)),
+                                        const SizedBox(width: 4),
+                                      ],
+                                      Text(
+                                        friend.lastActiveAt != null
+                                            ? PresenceFormatter.format(friend.lastActiveAt, isTr ? 'tr' : 'en')
+                                            : (isTr ? 'Bilinmiyor' : 'Unknown'),
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: theme.colorScheme.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // Admin Remove Friend Action
+                            IconButton(
+                              icon: const Icon(
+                                Icons.person_remove_rounded,
+                                size: 18,
+                                color: AppColors.errorPastel,
+                              ),
+                              tooltip: isTr ? 'Arkadaşlığı Sil' : 'Remove Friendship',
+                              onPressed: () => _removeFriendAsAdmin(friend),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                ],
+              );
+            },
+          ),
+
+          const SizedBox(height: 14),
+          const Divider(height: 1),
+          const SizedBox(height: 12),
+
+          // 2. PENDING REQUESTS
+          FutureBuilder<({List<FriendRequestItem> incoming, List<FriendRequestItem> outgoing})>(
+            future: _requestsFuture,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) return const SizedBox.shrink();
+              final reqs = snapshot.data!;
+              final totalReqs = reqs.incoming.length + reqs.outgoing.length;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        isTr ? 'Bekleyen İstekler ($totalReqs)' : 'Pending Requests ($totalReqs)',
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                      ),
+                      if (totalReqs > 0)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            '${reqs.incoming.length} Gelen • ${reqs.outgoing.length} Giden',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFFD97706),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  if (totalReqs == 0)
+                    Text(
+                      isTr ? 'Bekleyen arkadaşlık isteği bulunmuyor.' : 'No pending friend requests.',
+                      style: TextStyle(fontSize: 11.5, color: theme.colorScheme.onSurfaceVariant),
+                    )
+                  else ...[
+                    if (reqs.incoming.isNotEmpty) ...[
+                      Text(
+                        isTr ? 'Gelen İstekler:' : 'Incoming Requests:',
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF0284C7)),
+                      ),
+                      const SizedBox(height: 4),
+                      ...reqs.incoming.map((item) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 2.0),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.arrow_downward_rounded, size: 14, color: Color(0xFF0284C7)),
+                            const SizedBox(width: 4),
+                            Text(
+                              item.user.displayName ?? item.user.username ?? item.user.uid,
+                              style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600),
+                            ),
+                            if (item.user.username != null && item.user.username!.isNotEmpty) ...[
+                              const SizedBox(width: 4),
+                              Text(
+                                '@${item.user.username}',
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Color(0xFF0284C7),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                            const Spacer(),
+                            Text(
+                              AppDateFormatter.formatRelativeTime(item.createdAt, locale: isTr ? 'tr' : 'en'),
+                              style: TextStyle(fontSize: 10.5, color: theme.colorScheme.onSurfaceVariant),
+                            ),
+                          ],
+                        ),
+                      )),
+                    ],
+                    if (reqs.outgoing.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        isTr ? 'Giden İstekler:' : 'Outgoing Requests:',
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFFF59E0B)),
+                      ),
+                      const SizedBox(height: 4),
+                      ...reqs.outgoing.map((item) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 2.0),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.arrow_upward_rounded, size: 14, color: Color(0xFFF59E0B)),
+                            const SizedBox(width: 4),
+                            Text(
+                              item.user.displayName ?? item.user.username ?? item.user.uid,
+                              style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600),
+                            ),
+                            if (item.user.username != null && item.user.username!.isNotEmpty) ...[
+                              const SizedBox(width: 4),
+                              Text(
+                                '@${item.user.username}',
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Color(0xFFF59E0B),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                            const Spacer(),
+                            Text(
+                              AppDateFormatter.formatRelativeTime(item.createdAt, locale: isTr ? 'tr' : 'en'),
+                              style: TextStyle(fontSize: 10.5, color: theme.colorScheme.onSurfaceVariant),
+                            ),
+                          ],
+                        ),
+                      )),
+                    ],
+                  ],
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _removeFriendAsAdmin(FriendUserSummary friend) async {
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    final name = friend.displayName ?? friend.username ?? friend.uid;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(isTr ? 'Arkadaşlığı Sonlandır' : 'Remove Friendship'),
+        content: Text(
+          isTr
+              ? '$name ile olan arkadaşlık bağlantısını yönetici yetkisiyle silmek istediğinize emin misiniz?'
+              : 'Are you sure you want to remove the friendship connection with $name as admin?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(isTr ? 'Vazgeç' : 'Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.errorPastel),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(isTr ? 'Arkadaşlığı Sil' : 'Remove'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      final success = await ref
+          .read(adminServiceProvider)
+          .removeUserFriendship(widget.user.uid, friend.uid);
+      if (success && mounted) {
+        setState(() {
+          _friendsFuture = ref.read(adminServiceProvider).fetchUserFriends(widget.user.uid);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(isTr ? 'Arkadaşlık bağlantısı silindi' : 'Friendship removed'),
+            backgroundColor: AppColors.errorPastel,
+          ),
+        );
+      }
+    }
+  }
+
   void _showSendWarningBottomSheet(BuildContext context, AdminUserModel user) {
     showModalBottomSheet(
       context: context,
@@ -6406,11 +7702,29 @@ class _AdminVaultInspectDialogState extends ConsumerState<_AdminVaultInspectDial
   @override
   void initState() {
     super.initState();
-    _loadDocumentBytes();
+    if (widget.doc.cloudDataBase64 != null && widget.doc.cloudDataBase64!.isNotEmpty) {
+      try {
+        var cleanB64 = widget.doc.cloudDataBase64!.trim();
+        if (cleanB64.contains(',')) cleanB64 = cleanB64.split(',').last;
+        final decoded = base64Decode(cleanB64);
+        if (decoded.isNotEmpty &&
+            (SecurityService.isImageBytes(decoded) || SecurityService.isPdfBytes(decoded))) {
+          _decryptedBytes = decoded;
+          _isLoading = false;
+        }
+      } catch (_) {}
+    }
+    if (_decryptedBytes == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _loadDocumentBytes();
+        }
+      });
+    }
   }
 
   Future<void> _loadDocumentBytes({bool forceCloud = false}) async {
-    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+    final isTr = mounted ? (Localizations.maybeLocaleOf(context)?.languageCode == 'tr') : false;
     setState(() {
       _isLoading = true;
       _errorMessage = null;
