@@ -15,6 +15,7 @@ class DayTimelineCard extends StatelessWidget {
   final VoidCallback onToggleCompleted;
   final VoidCallback? onEdit;
   final VoidCallback onDelete;
+  final Widget? dragHandle;
 
   const DayTimelineCard({
     super.key,
@@ -26,6 +27,7 @@ class DayTimelineCard extends StatelessWidget {
     required this.onToggleCompleted,
     this.onEdit,
     required this.onDelete,
+    this.dragHandle,
   });
 
   @override
@@ -163,7 +165,7 @@ class DayTimelineCard extends StatelessWidget {
                                 if (isCollaborative) ...[
                                   Builder(
                                     builder: (context) {
-                                      final isMe = (currentUserId != null && item.userId != null && item.userId == currentUserId) ||
+                                      final isMe = (currentUserId != null && item.userId.isNotEmpty && item.userId == currentUserId) ||
                                           (currentUserName != null && item.createdByName != null && item.createdByName!.trim().toLowerCase() == currentUserName!.trim().toLowerCase());
                                       final label = CollaborationLocalization.formatAddedBy(
                                         item.createdByName,
@@ -270,6 +272,10 @@ class DayTimelineCard extends StatelessWidget {
                               ),
                             ),
                           ),
+                          if (dragHandle != null) ...[
+                            const SizedBox(width: 2),
+                            dragHandle!,
+                          ],
                         ],
                       ),
                     ],

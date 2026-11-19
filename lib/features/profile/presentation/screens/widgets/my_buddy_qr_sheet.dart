@@ -24,6 +24,7 @@ class MyBuddyQrSheet extends StatelessWidget {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (_) => MyBuddyQrSheet(
         profile: profile,

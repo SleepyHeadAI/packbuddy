@@ -15,6 +15,7 @@ class AirlineGuideSheet extends ConsumerStatefulWidget {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       sheetAnimationStyle: const AnimationStyle(
         duration: Duration(milliseconds: 250),

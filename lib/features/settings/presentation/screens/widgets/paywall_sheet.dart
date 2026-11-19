@@ -17,6 +17,7 @@ class PaywallSheet extends ConsumerWidget {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       sheetAnimationStyle: const AnimationStyle(
         duration: Duration(milliseconds: 250),

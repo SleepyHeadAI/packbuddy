@@ -85,6 +85,30 @@ void main() {
       expect(cleared.endTime, isNull);
       expect(cleared.formattedTimeRange, equals('08:13'));
     });
+
+    test('ItineraryItem serializes and deserializes orderIndex correctly', () {
+      final item = ItineraryItem(
+        id: 'itin_order_1',
+        userId: 'u1',
+        tripId: 't1',
+        dayNumber: 1,
+        date: '2026-08-01',
+        title: 'Ordered Activity',
+        orderIndex: 4,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+
+      final map = item.toMap();
+      expect(map['order_index'], equals(4));
+      expect(map.containsKey('createdByName'), isFalse); // Ensure SQLite column safety
+
+      final fromMap = ItineraryItem.fromMap(map);
+      expect(fromMap.orderIndex, equals(4));
+
+      final updated = item.copyWith(orderIndex: 7);
+      expect(updated.orderIndex, equals(7));
+    });
   });
 
   group('ItineraryLocalization Tests', () {
@@ -315,6 +339,83 @@ void main() {
       expect(find.text('09:37'), findsOneWidget);
       expect(find.text('Ginza Six, Tokyo'), findsOneWidget);
       expect(find.text('15'), findsOneWidget);
+    });
+
+    testWidgets('ItineraryScreen has centered title, red location pin, and no middle add button on empty day', (tester) async {
+      final trip = Trip(
+        id: 'trip_hk',
+        title: 'Hongkong',
+        destination: 'Hong Kong',
+        startDate: DateTime(2026, 8, 1),
+        endDate: DateTime(2026, 8, 5),
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            itineraryControllerFamily('trip_hk').overrideWith((ref) {
+              final controller = ItineraryController(ref, 'trip_hk');
+              controller.state = const ItineraryState(
+                tripId: 'trip_hk',
+                selectedDay: 1,
+                totalDays: 5,
+                items: [],
+              );
+              return controller;
+            }),
+          ],
+          child: MaterialApp(
+            home: ItineraryScreen(trip: trip),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify centered AppBar with red pin icon
+      final appBar = tester.widget<AppBar>(find.byType(AppBar));
+      expect(appBar.centerTitle, isTrue);
+
+      final pinIcon = find.byIcon(Icons.location_on_rounded);
+      expect(pinIcon, findsOneWidget);
+
+      // Verify the middle empty state card does NOT have an outlined Add Activity button
+      expect(find.byType(OutlinedButton), findsNothing);
+
+      // But the bottom FloatingActionButton does exist
+      expect(find.byType(FloatingActionButton), findsOneWidget);
+    });
+
+    testWidgets('AddActivitySheet title is required and shows error on empty submission', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(
+              body: AddActivitySheet(
+                tripId: 'trip_hk',
+                initialDay: 1,
+                totalDays: 3,
+                tripStartDate: '2026-08-01',
+                languageCode: 'tr',
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Verify required labels
+      expect(find.text('*'), findsNWidgets(2)); // Title and Category
+
+      // Tap Kaydet without typing title
+      await tester.tap(find.text('Kaydet'));
+      await tester.pumpAndSettle();
+
+      // Should show validation error
+      expect(find.text('Lütfen aktivite başlığı giriniz'), findsWidgets);
     });
   });
 }

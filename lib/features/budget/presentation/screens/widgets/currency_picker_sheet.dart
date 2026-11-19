@@ -24,6 +24,7 @@ class CurrencyPickerSheet extends StatefulWidget {
     return showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       sheetAnimationStyle: const AnimationStyle(
         duration: Duration(milliseconds: 250),

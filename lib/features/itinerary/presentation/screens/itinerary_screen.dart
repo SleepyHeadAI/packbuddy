@@ -51,12 +51,13 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         titleSpacing: 0,
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
@@ -67,33 +68,32 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
             ),
+            const SizedBox(height: 1),
             Row(
               mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const Icon(
+                  Icons.location_on_rounded,
+                  size: 13,
+                  color: Color(0xFFE53935),
+                ),
+                const SizedBox(width: 3),
                 Flexible(
                   child: Text(
                     liveTrip.title,
                     style: TextStyle(
                       fontSize: 12,
                       color: theme.colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                   ),
                 ),
-                if (isCollaborative) ...[
-                  const SizedBox(width: 5),
-                  Container(
-                    width: 7,
-                    height: 7,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF10B981),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ],
               ],
             ),
           ],
@@ -239,38 +239,81 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                         selectedDay: selectedDay,
                         totalDays: totalDays,
                       )
-                    : ListView.builder(
-                        padding: const EdgeInsets.only(top: 4, bottom: 96),
-                        itemCount: dayItems.length,
-                        itemBuilder: (context, index) {
-                          final item = dayItems[index];
-                          return DayTimelineCard(
-                            item: item,
-                            languageCode: langCode,
-                            isCollaborative: isCollaborative,
-                            currentUserId: currentUserId,
-                            currentUserName: currentUserName,
-                            onToggleCompleted: () =>
-                                itineraryNotifier.toggleCompleted(item.id),
-                            onEdit: () {
-                              AddActivitySheet.show(
+                    : Theme(
+                        data: theme.copyWith(
+                          canvasColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                        ),
+                        child: ReorderableListView.builder(
+                          buildDefaultDragHandles: false,
+                          padding: const EdgeInsets.only(top: 4, bottom: 96),
+                          itemCount: dayItems.length,
+                          onReorder: (oldIndex, newIndex) {
+                            itineraryNotifier.reorderActivities(
+                              selectedDay,
+                              oldIndex,
+                              newIndex,
+                            );
+                          },
+                          proxyDecorator: (child, index, animation) {
+                            return AnimatedBuilder(
+                              animation: animation,
+                              builder: (context, child) {
+                                final double elevation =
+                                    Tween<double>(begin: 0, end: 6).animate(animation).value;
+                                return Material(
+                                  elevation: elevation,
+                                  color: Colors.transparent,
+                                  shadowColor: Colors.black26,
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: child,
+                                );
+                              },
+                              child: child,
+                            );
+                          },
+                          itemBuilder: (context, index) {
+                            final item = dayItems[index];
+                            return DayTimelineCard(
+                              key: ValueKey(item.id),
+                              item: item,
+                              languageCode: langCode,
+                              isCollaborative: isCollaborative,
+                              currentUserId: currentUserId,
+                              currentUserName: currentUserName,
+                              dragHandle: ReorderableDragStartListener(
+                                index: index,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+                                  child: Icon(
+                                    Icons.drag_indicator_rounded,
+                                    size: 19,
+                                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                                  ),
+                                ),
+                              ),
+                              onToggleCompleted: () =>
+                                  itineraryNotifier.toggleCompleted(item.id),
+                              onEdit: () {
+                                AddActivitySheet.show(
+                                  context,
+                                  tripId: widget.trip.id,
+                                  initialDay: item.dayNumber,
+                                  totalDays: totalDays,
+                                  tripStartDate: widget.trip.startDate.toIso8601String().split('T').first,
+                                  languageCode: langCode,
+                                  itemToEdit: item,
+                                );
+                              },
+                              onDelete: () => _confirmDelete(
                                 context,
-                                tripId: widget.trip.id,
-                                initialDay: item.dayNumber,
-                                totalDays: totalDays,
-                                tripStartDate: widget.trip.startDate.toIso8601String().split('T').first,
-                                languageCode: langCode,
-                                itemToEdit: item,
-                              );
-                            },
-                            onDelete: () => _confirmDelete(
-                              context,
-                              item.id,
-                              langCode,
-                              itineraryNotifier,
-                            ),
-                          );
-                        },
+                                item.id,
+                                langCode,
+                                itineraryNotifier,
+                              ),
+                            );
+                          },
+                        ),
                       ),
           ),
         ],
@@ -354,24 +397,6 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              OutlinedButton.icon(
-                onPressed: () {
-                  AddActivitySheet.show(
-                    context,
-                    tripId: widget.trip.id,
-                    initialDay: selectedDay,
-                    totalDays: totalDays,
-                    tripStartDate: widget.trip.startDate.toIso8601String().split('T').first,
-                    languageCode: langCode,
-                  );
-                },
-                icon: const Icon(Icons.add_rounded, size: 16),
-                label: Text(
-                  ItineraryLocalization.getAddActivity(langCode),
-                  style: const TextStyle(fontWeight: FontWeight.w700),
-                ),
               ),
             ],
           ),

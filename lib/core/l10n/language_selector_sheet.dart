@@ -9,6 +9,7 @@ void showLanguageSelectorSheet(BuildContext context, WidgetRef ref, Locale curre
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     backgroundColor: Colors.transparent,
     sheetAnimationStyle: const AnimationStyle(
       duration: Duration(milliseconds: 250),

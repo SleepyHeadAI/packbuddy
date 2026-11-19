@@ -88,6 +88,14 @@ class ItineraryController extends StateNotifier<ItineraryState> {
       );
 
       final items = raw.map((m) => ItineraryItem.fromMap(m)).toList();
+      items.sort((a, b) {
+        if (a.dayNumber != b.dayNumber) return a.dayNumber.compareTo(b.dayNumber);
+        if (a.orderIndex != b.orderIndex) return a.orderIndex.compareTo(b.orderIndex);
+        if (a.time != null && b.time != null) return a.time!.compareTo(b.time!);
+        if (a.time != null) return -1;
+        if (b.time != null) return 1;
+        return a.createdAt.compareTo(b.createdAt);
+      });
 
       state = state.copyWith(
         items: items,
@@ -134,6 +142,12 @@ class ItineraryController extends StateNotifier<ItineraryState> {
       final now = DateTime.now();
       final id = 'itin_${now.millisecondsSinceEpoch}_${state.tripId}';
 
+      final currentDayItems = state.items.where((i) => i.dayNumber == dayNumber).toList();
+      final maxOrder = currentDayItems.isEmpty
+          ? -1
+          : currentDayItems.map((e) => e.orderIndex).reduce((a, b) => a > b ? a : b);
+      final newOrderIndex = maxOrder + 1;
+
       final newItem = ItineraryItem(
         id: id,
         userId: user?.uid ?? '',
@@ -151,6 +165,7 @@ class ItineraryController extends StateNotifier<ItineraryState> {
         createdAt: now,
         updatedAt: now,
         createdByName: authorName,
+        orderIndex: newOrderIndex,
       );
 
       await _dbHelper.insertItineraryItem(newItem.toMap());
@@ -168,6 +183,7 @@ class ItineraryController extends StateNotifier<ItineraryState> {
       // Sort
       updatedList.sort((a, b) {
         if (a.dayNumber != b.dayNumber) return a.dayNumber.compareTo(b.dayNumber);
+        if (a.orderIndex != b.orderIndex) return a.orderIndex.compareTo(b.orderIndex);
         if (a.time != null && b.time != null) return a.time!.compareTo(b.time!);
         if (a.time != null) return -1;
         if (b.time != null) return 1;
@@ -242,6 +258,7 @@ class ItineraryController extends StateNotifier<ItineraryState> {
       // Sort
       updatedList.sort((a, b) {
         if (a.dayNumber != b.dayNumber) return a.dayNumber.compareTo(b.dayNumber);
+        if (a.orderIndex != b.orderIndex) return a.orderIndex.compareTo(b.orderIndex);
         if (a.time != null && b.time != null) return a.time!.compareTo(b.time!);
         if (a.time != null) return -1;
         if (b.time != null) return 1;
@@ -253,6 +270,48 @@ class ItineraryController extends StateNotifier<ItineraryState> {
     } catch (e) {
       state = state.copyWith(errorMessage: e.toString());
       return false;
+    }
+  }
+
+  /// Reorders activities for a specific day, persists new indices to local SQLite, and syncs
+  Future<void> reorderActivities(int dayNumber, int oldIndex, int newIndex) async {
+    final currentDayItems = state.items.where((i) => i.dayNumber == dayNumber).toList();
+    if (oldIndex < 0 || oldIndex >= currentDayItems.length) return;
+    if (newIndex > currentDayItems.length) newIndex = currentDayItems.length;
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final movedItem = currentDayItems.removeAt(oldIndex);
+    currentDayItems.insert(newIndex, movedItem);
+
+    // Update orderIndex sequentially for all items of this day
+    final updatedDayItems = <ItineraryItem>[];
+    for (int i = 0; i < currentDayItems.length; i++) {
+      updatedDayItems.add(currentDayItems[i].copyWith(orderIndex: i));
+    }
+
+    final otherItems = state.items.where((i) => i.dayNumber != dayNumber).toList();
+    final allUpdated = [...otherItems, ...updatedDayItems];
+    allUpdated.sort((a, b) {
+      if (a.dayNumber != b.dayNumber) return a.dayNumber.compareTo(b.dayNumber);
+      if (a.orderIndex != b.orderIndex) return a.orderIndex.compareTo(b.orderIndex);
+      if (a.time != null && b.time != null) return a.time!.compareTo(b.time!);
+      return a.createdAt.compareTo(b.createdAt);
+    });
+
+    state = state.copyWith(items: allUpdated);
+
+    final trips = _ref.read(tripControllerProvider).trips;
+    final trip = trips.where((t) => t.id == state.tripId).firstOrNull;
+    final isCollaborative = trip?.isCollaborative ?? false;
+
+    for (final item in updatedDayItems) {
+      try {
+        await _dbHelper.updateItineraryItem(item.toMap());
+        if (isCollaborative) {
+          _ref.read(syncEngineProvider.notifier).pushItineraryItem(item);
+        }
+      } catch (_) {}
     }
   }
 

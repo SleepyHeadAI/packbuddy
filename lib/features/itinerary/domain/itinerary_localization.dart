@@ -136,6 +136,58 @@ class ItineraryLocalization {
     }
   }
 
+  static String getRequired(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Zorunlu';
+      case 'de': return 'Erforderlich';
+      case 'es': return 'Obligatorio';
+      case 'fr': return 'Obligatoire';
+      case 'it': return 'Obbligatorio';
+      case 'pt': return 'Obrigatório';
+      case 'ru': return 'Обязательно';
+      case 'zh': return '必填';
+      case 'ja': return '必須';
+      case 'ko': return '필수';
+      case 'hi': return 'आवश्यक';
+      case 'ar': return 'مطلوب';
+      case 'nl': return 'Verplicht';
+      case 'el': return 'Υποχρεωτικό';
+      case 'sv': return 'Obligatorisk';
+      case 'pl': return 'Wymagane';
+      case 'id': return 'Wajib';
+      case 'th': return 'จำเป็น';
+      case 'vi': return 'Bắt buộc';
+      case 'en':
+      default: return 'Required';
+    }
+  }
+
+  static String getTitleRequired(String lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr': return 'Lütfen aktivite başlığı giriniz';
+      case 'de': return 'Bitte Aktivitätstitel eingeben';
+      case 'es': return 'Por favor ingrese el título de la actividad';
+      case 'fr': return 'Veuillez saisir un titre d\'activité';
+      case 'it': return 'Inserisci un titolo per l\'attività';
+      case 'pt': return 'Por favor insira o título da atividade';
+      case 'ru': return 'Пожалуйста, введите название активности';
+      case 'zh': return '请输入活动标题';
+      case 'ja': return 'アクティビティ名を入力してください';
+      case 'ko': return '활동 제목을 입력해주세요';
+      case 'hi': return 'कृपया गतिविधि का शीर्षक दर्ज करें';
+      case 'ar': return 'يرجى إدخال عنوان النشاط';
+      case 'nl': return 'Voer een activiteitstitel in';
+      case 'el': return 'Παρακαλώ εισάγετε τίτλο δραστηριότητας';
+      case 'sv': return 'Ange aktivitetstitel';
+      case 'pl': return 'Wprowadź tytuł aktywności';
+      case 'id': return 'Silakan masukkan judul aktivitas';
+      case 'th': return 'กรุณาระบุชื่อกิจกรรม';
+      case 'vi': return 'Vui lòng nhập tiêu đề hoạt động';
+      case 'en':
+      default: return 'Please enter an activity title';
+    }
+  }
+
   static String getTime(String lang) {
     switch (_cleanLang(lang)) {
       case 'tr': return 'Saat';

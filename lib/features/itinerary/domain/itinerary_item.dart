@@ -21,6 +21,7 @@ class ItineraryItem {
   final DateTime updatedAt;
   final bool isDeleted;
   final String? createdByName;
+  final int orderIndex;
 
   const ItineraryItem({
     required this.id,
@@ -41,6 +42,7 @@ class ItineraryItem {
     required this.updatedAt,
     this.isDeleted = false,
     this.createdByName,
+    this.orderIndex = 0,
   });
 
   /// Formats the single time or time range (e.g. "08:13 - 09:37" or "08:13")
@@ -75,6 +77,7 @@ class ItineraryItem {
     DateTime? updatedAt,
     bool? isDeleted,
     String? createdByName,
+    int? orderIndex,
   }) {
     return ItineraryItem(
       id: id ?? this.id,
@@ -95,6 +98,7 @@ class ItineraryItem {
       updatedAt: updatedAt ?? this.updatedAt,
       isDeleted: isDeleted ?? this.isDeleted,
       createdByName: createdByName ?? this.createdByName,
+      orderIndex: orderIndex ?? this.orderIndex,
     );
   }
 
@@ -118,7 +122,7 @@ class ItineraryItem {
       'updated_at': updatedAt.millisecondsSinceEpoch,
       'is_deleted': isDeleted ? 1 : 0,
       'created_by_name': createdByName,
-      'createdByName': createdByName,
+      'order_index': orderIndex,
     };
   }
 
@@ -159,6 +163,7 @@ class ItineraryItem {
           map['is_deleted'] == true ||
           map['isDeleted'] == true,
       createdByName: (map['created_by_name'] ?? map['createdByName']) as String?,
+      orderIndex: (map['order_index'] ?? map['orderIndex'] as num?)?.toInt() ?? 0,
     );
   }
 

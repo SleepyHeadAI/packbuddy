@@ -169,6 +169,9 @@ class DatabaseHelper {
       if (!itinCols.contains('created_by_name')) {
         await db.execute('ALTER TABLE ${AppConstants.tableItineraryItems} ADD COLUMN created_by_name TEXT');
       }
+      if (!itinCols.contains('order_index')) {
+        await db.execute('ALTER TABLE ${AppConstants.tableItineraryItems} ADD COLUMN order_index INTEGER NOT NULL DEFAULT 0');
+      }
     } catch (_) {}
   }
 
@@ -209,6 +212,8 @@ class DatabaseHelper {
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
         is_deleted INTEGER NOT NULL DEFAULT 0,
+        created_by_name TEXT,
+        order_index INTEGER NOT NULL DEFAULT 0,
         FOREIGN KEY (trip_id) REFERENCES ${AppConstants.tableTrips}(id) ON DELETE CASCADE
       )
     ''');
@@ -299,6 +304,8 @@ class DatabaseHelper {
         created_at INTEGER NOT NULL,
         updated_at INTEGER NOT NULL,
         is_deleted INTEGER NOT NULL DEFAULT 0,
+        created_by_name TEXT,
+        order_index INTEGER NOT NULL DEFAULT 0,
         FOREIGN KEY (trip_id) REFERENCES ${AppConstants.tableTrips}(id) ON DELETE CASCADE
       )
     ''');
@@ -461,6 +468,13 @@ class DatabaseHelper {
     if (oldVersion < 14) {
       try {
         await db.execute('ALTER TABLE ${AppConstants.tableItineraryItems} ADD COLUMN end_time TEXT');
+      } catch (_) {}
+    }
+
+    // Version 15: Add order_index column to itinerary_items table for manual drag & drop reordering
+    if (oldVersion < 15) {
+      try {
+        await db.execute('ALTER TABLE ${AppConstants.tableItineraryItems} ADD COLUMN order_index INTEGER NOT NULL DEFAULT 0');
       } catch (_) {}
     }
   }
@@ -1471,6 +1485,16 @@ class DatabaseHelper {
     rowCopy['created_at'] = rowCopy['created_at'] ?? now;
     rowCopy['updated_at'] = now;
     rowCopy['is_deleted'] = 0;
+
+    // Filter to valid SQLite table columns to prevent unknown column exceptions
+    const validColumns = {
+      'id', 'user_id', 'trip_id', 'day_number', 'date', 'time', 'end_time',
+      'title', 'description', 'location', 'category', 'cost', 'currency',
+      'is_completed', 'created_at', 'updated_at', 'is_deleted',
+      'created_by_name', 'order_index'
+    };
+    rowCopy.removeWhere((key, _) => !validColumns.contains(key));
+
     return await db.insert(
       AppConstants.tableItineraryItems,
       rowCopy,
@@ -1478,7 +1502,7 @@ class DatabaseHelper {
     );
   }
 
-  /// Retrieves itinerary activities for a trip, sorted by day_number, time, and created_at.
+  /// Retrieves itinerary activities for a trip, sorted by day_number, order_index, time, and created_at.
   /// Seamlessly returns all activities belonging to this trip so collaborative partners see all changes.
   Future<List<Map<String, dynamic>>> getItineraryItemsByTrip(
     String tripId, {
@@ -1491,14 +1515,14 @@ class DatabaseHelper {
         AppConstants.tableItineraryItems,
         where: 'trip_id = ?',
         whereArgs: [tripId],
-        orderBy: 'day_number ASC, time ASC, created_at ASC',
+        orderBy: 'day_number ASC, order_index ASC, time ASC, created_at ASC',
       );
     }
     return await db.query(
       AppConstants.tableItineraryItems,
       where: 'trip_id = ? AND is_deleted = 0',
       whereArgs: [tripId],
-      orderBy: 'day_number ASC, time ASC, created_at ASC',
+      orderBy: 'day_number ASC, order_index ASC, time ASC, created_at ASC',
     );
   }
 
@@ -1547,7 +1571,7 @@ class DatabaseHelper {
       AppConstants.tableItineraryItems,
       where: conditions.isNotEmpty ? conditions.join(' AND ') : null,
       whereArgs: args.isNotEmpty ? args : null,
-      orderBy: 'day_number ASC, time ASC, created_at ASC',
+      orderBy: 'day_number ASC, order_index ASC, time ASC, created_at ASC',
     );
   }
 
@@ -1557,6 +1581,16 @@ class DatabaseHelper {
     final rowCopy = Map<String, dynamic>.from(row);
     rowCopy['updated_at'] = DateTime.now().millisecondsSinceEpoch;
     final id = rowCopy['id'] as String;
+
+    // Filter to valid SQLite table columns to prevent unknown column exceptions
+    const validColumns = {
+      'id', 'user_id', 'trip_id', 'day_number', 'date', 'time', 'end_time',
+      'title', 'description', 'location', 'category', 'cost', 'currency',
+      'is_completed', 'created_at', 'updated_at', 'is_deleted',
+      'created_by_name', 'order_index'
+    };
+    rowCopy.removeWhere((key, _) => !validColumns.contains(key));
+
     return await db.update(
       AppConstants.tableItineraryItems,
       rowCopy,
