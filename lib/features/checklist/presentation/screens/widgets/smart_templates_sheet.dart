@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/features/checklist/domain/packing_templates.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
 import 'package:packbuddy/features/checklist/domain/canonical_packing_catalog.dart';
@@ -50,7 +51,7 @@ class _SmartTemplatesSheetState extends ConsumerState<SmartTemplatesSheet> {
         ),
         decoration: BoxDecoration(
           color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.sheet)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
@@ -137,20 +138,13 @@ class _SmartTemplatesSheetState extends ConsumerState<SmartTemplatesSheet> {
                 return Container(
                   decoration: BoxDecoration(
                     color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(AppRadius.card),
                     border: Border.all(
                       color: isExpanded
                           ? theme.colorScheme.primary.withValues(alpha: 0.5)
-                          : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
-                      width: isExpanded ? 1.5 : 1,
+                          : (isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight),
+                      width: isExpanded ? 1.5 : 0.8,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
                   ),
                   child: Column(
                     children: [
@@ -161,7 +155,7 @@ class _SmartTemplatesSheetState extends ConsumerState<SmartTemplatesSheet> {
                             _expandedTemplateId = isExpanded ? null : template.id;
                           });
                         },
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(AppRadius.card),
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Row(

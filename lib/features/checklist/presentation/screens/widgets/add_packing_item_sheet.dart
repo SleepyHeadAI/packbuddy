@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
+import 'package:packbuddy/core/theme/app_typography.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/features/checklist/domain/packing_item.dart';
 import 'package:packbuddy/features/checklist/domain/packing_tag.dart';
@@ -208,7 +210,7 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
         ),
         decoration: BoxDecoration(
           color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.sheet)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
@@ -343,11 +345,26 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: Text(
-                            '$_quantity ${l10n.pieces}',
+                          child: Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: '$_quantity ',
+                                  style: AppTypography.mono(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w700,
+                                    tabularFigures: true,
+                                    color: theme.colorScheme.onSurface,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: l10n.pieces,
+                                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                                ),
+                              ],
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                           ),
                         ),
                         IconButton(
