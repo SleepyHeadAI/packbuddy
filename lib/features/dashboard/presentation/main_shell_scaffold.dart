@@ -1,7 +1,11 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/app_motion.dart';
+import '../../../core/theme/app_radius.dart';
+import '../../../core/theme/app_typography.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/bouncy_pressable.dart';
 import '../../checklist/presentation/screens/checklist_screen.dart';
@@ -125,28 +129,28 @@ class _MainShellScaffoldState extends ConsumerState<MainShellScaffold> {
                         items: [
                           _FloatingNavItemData(
                             label: navHome,
-                            icon: Icons.home_outlined,
-                            selectedIcon: Icons.home_rounded,
+                            icon: AppIcons.homeOutlined,
+                            selectedIcon: AppIcons.home,
                           ),
                           _FloatingNavItemData(
                             label: navMap,
-                            icon: Icons.public_outlined,
-                            selectedIcon: Icons.public_rounded,
+                            icon: AppIcons.mapOutlined,
+                            selectedIcon: AppIcons.map,
                           ),
                           _FloatingNavItemData(
                             label: navBaggage,
-                            icon: Icons.checklist_rounded,
-                            selectedIcon: Icons.checklist_rtl_rounded,
+                            icon: AppIcons.checklistOutlined,
+                            selectedIcon: AppIcons.checklist,
                           ),
                           _FloatingNavItemData(
                             label: navVault,
-                            icon: Icons.folder_shared_outlined,
-                            selectedIcon: Icons.folder_shared_rounded,
+                            icon: AppIcons.vaultOutlined,
+                            selectedIcon: AppIcons.vault,
                           ),
                           _FloatingNavItemData(
                             label: navSettings,
-                            icon: Icons.tune_outlined,
-                            selectedIcon: Icons.tune_rounded,
+                            icon: AppIcons.settingsOutlined,
+                            selectedIcon: AppIcons.settings,
                           ),
                         ],
                       ),
@@ -186,7 +190,7 @@ class _FloatingGlassNavigationBar extends StatelessWidget {
   // R_inner = R_bar - padding_horizontal = 26.0 - 6.0 = 20.0 (Corner tabs).
   // Middle tabs use a disciplined, proportional radius (12.0) that eliminates any bulbous distortion.
   static const double barHeight = 64.0;
-  static const double barRadius = 26.0;
+  static const double barRadius = AppRadius.navBar; // 26.0
   static const double horizontalPadding = 6.0;
   static const double verticalPadding = 5.0;
   static const double outerCornerRadius = barRadius - horizontalPadding; // 20.0
@@ -209,66 +213,59 @@ class _FloatingGlassNavigationBar extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(barRadius),
           boxShadow: [
-            // 1. Ambient soft omni elevation glow (spreads in all directions)
+            // 1. Ambient soft omni elevation glow
             BoxShadow(
               color: isDark
-                  ? Colors.black.withValues(alpha: 0.45)
-                  : const Color(0xFF0F172A).withValues(alpha: 0.08),
-              blurRadius: 28,
+                  ? Colors.black.withValues(alpha: 0.38)
+                  : AppColors.navySlate.withValues(alpha: 0.08),
+              blurRadius: 24,
               spreadRadius: 0,
               offset: const Offset(0, 4),
             ),
-            // 2. Upward elevation shadow (casts shadow UPWARDS onto the scrolling content)
+            // 2. Subtle crisp contact shadow
             BoxShadow(
               color: isDark
-                  ? Colors.black.withValues(alpha: 0.30)
-                  : const Color(0xFF0F172A).withValues(alpha: 0.04),
-              blurRadius: 10,
-              spreadRadius: 0,
-              offset: const Offset(0, -2),
-            ),
-            // 3. Subtle crisp contact shadow
-            BoxShadow(
-              color: isDark
-                  ? Colors.black.withValues(alpha: 0.20)
-                  : const Color(0xFF0F172A).withValues(alpha: 0.02),
-              blurRadius: 4,
+                  ? Colors.black.withValues(alpha: 0.22)
+                  : AppColors.navySlate.withValues(alpha: 0.03),
+              blurRadius: 6,
               spreadRadius: 0,
               offset: const Offset(0, 1),
             ),
           ],
         ),
-        child: Container(
-          height: barHeight,
-          padding: const EdgeInsets.symmetric(
-            horizontal: horizontalPadding,
-            vertical: verticalPadding,
-          ),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: isDark
-                  ? [
-                      const Color(0xFF1E2632).withValues(alpha: 0.94),
-                      const Color(0xFF141A22).withValues(alpha: 0.92),
-                    ]
-                  : [
-                      Colors.white.withValues(alpha: 0.95),
-                      const Color(0xFFF8FAFC).withValues(alpha: 0.92),
-                    ],
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(barRadius),
+          child: Container(
+            height: barHeight,
+            padding: const EdgeInsets.symmetric(
+              horizontal: horizontalPadding,
+              vertical: verticalPadding,
             ),
-            borderRadius: BorderRadius.circular(barRadius),
-            border: Border.all(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.14)
-                  : Colors.white.withValues(alpha: 0.85),
-              width: 1.0,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: isDark
+                    ? [
+                        AppColors.surfaceRaisedDark.withValues(alpha: 0.96),
+                        AppColors.surfaceBaseDark.withValues(alpha: 0.92),
+                      ]
+                    : [
+                        AppColors.surfaceRaisedLight.withValues(alpha: 0.97),
+                        AppColors.surfaceBaseLight.withValues(alpha: 0.94),
+                      ],
+              ),
+              borderRadius: BorderRadius.circular(barRadius),
+              border: Border.all(
+                color: isDark
+                    ? AppColors.borderSubtleDark
+                    : AppColors.borderSubtleLight,
+                width: 1.0,
+              ),
             ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(items.length, (index) {
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(items.length, (index) {
                 final item = items[index];
                 final isSelected = index == selectedIndex;
                 final isFirst = index == 0;
@@ -286,7 +283,7 @@ class _FloatingGlassNavigationBar extends StatelessWidget {
                     outerCornerRadius: outerCornerRadius,
                     innerCornerRadius: innerCornerRadius,
                     onTap: () {
-                      HapticFeedback.selectionClick();
+                      AppHaptics.selection();
                       onDestinationSelected(index);
                     },
                   ),
@@ -295,7 +292,8 @@ class _FloatingGlassNavigationBar extends StatelessWidget {
             ),
           ),
         ),
-      );
+      ),
+    );
   }
 }
 
@@ -371,7 +369,7 @@ class _FloatingNavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activeColor = theme.colorScheme.primary;
-    final inactiveColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final inactiveColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
     final borderRadius = _computeProportionalBorderRadius();
 
     return Semantics(
@@ -384,8 +382,8 @@ class _FloatingNavItem extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 1.5),
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 220),
-            curve: Curves.easeOutCubic,
+            duration: AppMotion.fast,
+            curve: AppMotion.curveStandard,
             decoration: BoxDecoration(
               color: isSelected
                   ? activeColor.withValues(alpha: isDark ? 0.18 : 0.12)
@@ -393,7 +391,7 @@ class _FloatingNavItem extends StatelessWidget {
               borderRadius: borderRadius,
               border: isSelected
                   ? Border.all(
-                      color: activeColor.withValues(alpha: isDark ? 0.28 : 0.22),
+                      color: activeColor.withValues(alpha: isDark ? 0.30 : 0.24),
                       width: 1.0,
                     )
                   : Border.all(
@@ -408,7 +406,7 @@ class _FloatingNavItem extends StatelessWidget {
               children: [
                 AnimatedScale(
                   scale: isSelected ? 1.05 : 1.0,
-                  duration: const Duration(milliseconds: 220),
+                  duration: AppMotion.fast,
                   curve: Curves.easeOutBack,
                   child: Icon(
                     isSelected ? item.selectedIcon : item.icon,
@@ -426,7 +424,7 @@ class _FloatingNavItem extends StatelessWidget {
                         item.label,
                         maxLines: 1,
                         softWrap: false,
-                        style: TextStyle(
+                        style: AppTypography.caption.copyWith(
                           fontSize: 10,
                           fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                           color: isSelected ? activeColor : inactiveColor,
@@ -456,7 +454,7 @@ class FadeIndexedStack extends StatefulWidget {
     super.key,
     required this.index,
     required this.children,
-    this.duration = const Duration(milliseconds: 220),
+    this.duration = AppMotion.normal,
   });
 
   @override

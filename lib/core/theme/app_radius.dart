@@ -21,6 +21,9 @@ class AppRadius {
   /// 22.0 pt - Primary app cards, hero containers, floating action buttons
   static const double card = 22.0;
 
+  /// 22.0 pt - Floating action button radius
+  static const double fab = card;
+
   /// 26.0 pt - Floating navigation bar outer radius
   static const double navBar = 26.0;
 

@@ -38,6 +38,9 @@ class AppMotion {
 
   /// Standard gentle curve
   static const Curve gentle = Curves.easeInOut;
+
+  /// Standard UI transition curve
+  static const Curve curveStandard = enter;
 }
 
 /// Tactile haptic feedback triggers tailored for Apple / modern Android feel.

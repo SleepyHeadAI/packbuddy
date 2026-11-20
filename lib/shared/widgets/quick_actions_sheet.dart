@@ -1,11 +1,16 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_icons.dart';
+import '../../core/theme/app_motion.dart';
+import '../../core/theme/app_radius.dart';
+import '../../core/theme/app_spacing.dart';
+import '../../core/theme/app_typography.dart';
 import '../../l10n/app_localizations.dart';
-import '../widgets/app_card.dart';
+import 'app_divider.dart';
+import 'bouncy_pressable.dart';
 import '../../features/budget/domain/trip.dart';
 import '../../features/budget/presentation/controllers/trip_controller.dart';
 import '../../features/budget/presentation/screens/widgets/add_trip_sheet.dart';
@@ -413,6 +418,7 @@ class QuickActionsSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -421,34 +427,34 @@ class QuickActionsSheet extends StatelessWidget {
         // Grab Handle
         Center(
           child: Container(
-            width: 38,
+            width: 36,
             height: 4,
             decoration: BoxDecoration(
-              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(2),
+              color: isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight,
+              borderRadius: BorderRadius.circular(AppRadius.full),
             ),
           ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: AppSpacing.sm),
 
         // Header
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(7),
+                padding: const EdgeInsets.all(AppSpacing.xs + 1.0),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(10),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: Icon(
-                  Icons.bolt_rounded,
+                  AppIcons.spark,
                   size: 18,
                   color: theme.colorScheme.primary,
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -456,9 +462,9 @@ class QuickActionsSheet extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.3,
+                      style: AppTypography.titleMedium.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -467,8 +473,8 @@ class QuickActionsSheet extends StatelessWidget {
                       const SizedBox(height: 1),
                       Text(
                         subtitle!,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                        style: AppTypography.caption.copyWith(
+                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
                           fontSize: 11.5,
                         ),
                         maxLines: 1,
@@ -480,83 +486,114 @@ class QuickActionsSheet extends StatelessWidget {
               ),
               IconButton(
                 visualDensity: VisualDensity.compact,
-                icon: const Icon(Icons.close_rounded, size: 20),
+                icon: Icon(
+                  AppIcons.close,
+                  size: 20,
+                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                ),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: AppSpacing.sm),
 
-        // Action Options List
-        ...items.map((item) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: AppCard(
-              borderRadius: 16,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              onTap: () {
-                Navigator.of(context).pop();
-                item.onTap();
-              },
-              child: Row(
+        // Unified Action Options List with AppDivider (replaces nested card-in-a-card)
+        Container(
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            border: Border.all(
+              color: isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight,
+              width: 1.0,
+            ),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: List.generate(items.length, (index) {
+              final item = items[index];
+              return Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: item.iconBgColor,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(
-                      child: Icon(
-                        item.icon,
-                        color: item.iconColor,
-                        size: 20,
+                  BouncyPressable(
+                    scaleFactor: 0.98,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      item.onTap();
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: 11,
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 38,
+                            height: 38,
+                            decoration: BoxDecoration(
+                              color: item.iconBgColor,
+                              borderRadius: BorderRadius.circular(AppRadius.sm),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                item.icon,
+                                color: item.iconColor,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.sm + 4.0),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  item.title,
+                                  style: AppTypography.labelLarge.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                if (item.subtitle != null) ...[
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    item.subtitle!,
+                                    style: AppTypography.bodySmall.copyWith(
+                                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                                      fontSize: 11.5,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.xs),
+                          Icon(
+                            AppIcons.chevronRight,
+                            size: 16,
+                            color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          item.title,
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.2,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        if (item.subtitle != null) ...[
-                          const SizedBox(height: 2),
-                          Text(
-                            item.subtitle!,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                              fontSize: 11,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ],
+                  if (index < items.length - 1)
+                    AppDivider(
+                      indent: 58,
+                      color: isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight,
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 13,
-                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-                  ),
                 ],
-              ),
-            ),
-          );
-        }),
+              );
+            }),
+          ),
+        ),
       ],
     );
   }
@@ -950,11 +987,11 @@ class _FloatingQuickActionsOverlay extends StatelessWidget {
                   child: InkWell(
                     key: const Key('quick_actions_fab_close'),
                     onTap: () => Navigator.of(context).pop(),
-                    borderRadius: BorderRadius.circular(22),
+                    borderRadius: BorderRadius.circular(AppRadius.fab),
                     child: Ink(
                       decoration: BoxDecoration(
                         color: fabColor ?? (isDark ? AppColors.primaryDark : AppColors.primaryAmber),
-                        borderRadius: BorderRadius.circular(22),
+                        borderRadius: BorderRadius.circular(AppRadius.fab),
                         boxShadow: [
                           BoxShadow(
                             color: (fabColor ?? (isDark ? AppColors.primaryDark : AppColors.primaryAmber))
@@ -973,7 +1010,7 @@ class _FloatingQuickActionsOverlay extends StatelessWidget {
                         child: Transform.rotate(
                           angle: progress * (math.pi / 4), // 45 degrees
                           child: Icon(
-                            Icons.add_rounded,
+                            AppIcons.add,
                             size: 28,
                             color: fabIconColor ??
                                 (isDark ? AppColors.onPrimaryDark : const Color(0xFF281C00)),
@@ -1044,7 +1081,7 @@ class _FloatingActionBubbleState extends State<_FloatingActionBubble> {
               onTapUp: (_) => setState(() => _isPressed = false),
               onTapCancel: () => setState(() => _isPressed = false),
               onTap: () {
-                HapticFeedback.lightImpact();
+                AppHaptics.light();
                 widget.onTap();
               },
               child: Container(
@@ -1052,18 +1089,18 @@ class _FloatingActionBubbleState extends State<_FloatingActionBubble> {
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? const Color(0xFF1E293B).withValues(alpha: 0.94)
-                      : Colors.white.withValues(alpha: 0.96),
-                  borderRadius: BorderRadius.circular(20),
+                      ? AppColors.surfaceRaisedDark.withValues(alpha: 0.94)
+                      : AppColors.surfaceRaisedLight.withValues(alpha: 0.96),
+                  borderRadius: BorderRadius.circular(AppRadius.full),
                   border: Border.all(
                     color: isDark
-                        ? Colors.white.withValues(alpha: 0.12)
-                        : Colors.black.withValues(alpha: 0.07),
+                        ? AppColors.borderSubtleDark
+                        : AppColors.borderSubtleLight,
                     width: 1.0,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
+                      color: Colors.black.withValues(alpha: isDark ? 0.32 : 0.08),
                       blurRadius: 14,
                       offset: const Offset(0, 4),
                     ),
@@ -1077,7 +1114,7 @@ class _FloatingActionBubbleState extends State<_FloatingActionBubble> {
                       height: 32,
                       decoration: BoxDecoration(
                         color: widget.item.iconBgColor,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
                       ),
                       child: Center(
                         child: Icon(
@@ -1090,11 +1127,11 @@ class _FloatingActionBubbleState extends State<_FloatingActionBubble> {
                     const SizedBox(width: 10),
                     Text(
                       widget.item.title,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
+                      style: AppTypography.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w600,
                         fontSize: 13.5,
                         letterSpacing: -0.2,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
                       ),
                     ),
                   ],

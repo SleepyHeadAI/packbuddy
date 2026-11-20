@@ -50,6 +50,7 @@ class AppColors {
   static const Color brandAccentTextDark = Color(0xFFFDE68A);
 
   // --- Typographic Text Roles ---
+  static const Color navySlate = Color(0xFF0F172A);
   static const Color textPrimaryLight = Color(0xFF0F172A); // High emphasis
   static const Color textPrimaryDark = Color(0xFFF8FAFC);
 

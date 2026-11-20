@@ -135,4 +135,33 @@ class AppTypography {
       color: color,
     );
   }
+
+  // --- Standard Semantic Presets ---
+
+  /// Headline medium for section headers, card titles
+  static TextStyle get titleLarge => title(fontSize: 20, fontWeight: FontWeight.w700, letterSpacing: -0.3);
+
+  /// Title medium for bottom sheets, modal headers, list headers
+  static TextStyle get titleMedium => title(fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: -0.2);
+
+  /// Title small for subtitles, card subheaders
+  static TextStyle get titleSmall => title(fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: -0.1);
+
+  /// Body large for long-form reading
+  static TextStyle get bodyLarge => body(fontSize: 16, fontWeight: FontWeight.w400);
+
+  /// Body medium for standard interface text
+  static TextStyle get bodyMedium => body(fontSize: 14, fontWeight: FontWeight.w400);
+
+  /// Body small for secondary text, metadata
+  static TextStyle get bodySmall => body(fontSize: 12, fontWeight: FontWeight.w400);
+
+  /// Caption for micro labels, timestamps, tags
+  static TextStyle get caption => body(fontSize: 11, fontWeight: FontWeight.w400);
+
+  /// Label large for action buttons, sheet rows
+  static TextStyle get labelLarge => body(fontSize: 14, fontWeight: FontWeight.w600);
+
+  /// Label small for navigation items, micro badges
+  static TextStyle get labelSmall => body(fontSize: 10, fontWeight: FontWeight.w500);
 }
