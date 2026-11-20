@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/features/checklist/domain/packing_tag.dart';
 import 'package:packbuddy/features/checklist/domain/airline_baggage_guide.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
@@ -29,9 +30,9 @@ void main() {
       expect(PackingTagHelper.getLocalizedTag('CABIN ONLY', 'th'), 'ของใช้ส่วนตัว');
     });
 
-    test('tag icon is shopping_bag rather than backpack', () {
+    test('tag icon is backpack / personal item vector', () {
       final icon = PackingTagHelper.getTagIcon('CABIN ONLY');
-      expect(icon, Icons.shopping_bag_outlined);
+      expect(icon, AppIcons.backpack);
     });
   });
 

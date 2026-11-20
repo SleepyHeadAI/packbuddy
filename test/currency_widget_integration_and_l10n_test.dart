@@ -11,6 +11,7 @@ import 'package:packbuddy/features/budget/domain/expense.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/budget_analytics_card.dart';
 import 'package:packbuddy/features/dashboard/presentation/widgets/horizontal_currency_converter_card.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 void main() {
@@ -212,7 +213,10 @@ void main() {
       expect(find.text('AUD'), findsWidgets);
 
       // Verify swap button triggers state update & persistence
-      final swapBtn = find.byIcon(Icons.swap_horiz_rounded);
+      final swapBtn = find.descendant(
+        of: find.byType(IconButton),
+        matching: find.byIcon(AppIcons.currency),
+      );
       expect(swapBtn, findsOneWidget);
       await tester.tap(swapBtn);
       await tester.pumpAndSettle();

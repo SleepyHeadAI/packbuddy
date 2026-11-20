@@ -6,11 +6,9 @@ import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/core/theme/app_motion.dart';
 import 'package:packbuddy/core/theme/app_radius.dart';
-import 'package:packbuddy/core/theme/app_spacing.dart';
 import 'package:packbuddy/core/theme/app_typography.dart';
 import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:packbuddy/shared/widgets/app_button.dart';
-import 'package:packbuddy/shared/widgets/app_divider.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/features/checklist/domain/packing_item.dart';
 import 'package:packbuddy/features/checklist/domain/packing_tag.dart';
@@ -332,7 +330,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
           automaticallyImplyLeading: false,
           leading: !widget.isTabMode && Navigator.of(context).canPop()
               ? IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+                  icon: const Icon(AppIcons.chevronLeft, size: 20),
                   onPressed: () => Navigator.of(context).pop(),
                 )
               : null,
@@ -395,7 +393,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
             // Collapsible Search Toggle Icon
             IconButton(
               icon: Icon(
-                checklistState.isSearchExpanded ? Icons.search_off_rounded : Icons.search_rounded,
+                checklistState.isSearchExpanded ? AppIcons.close : AppIcons.search,
                 color: checklistState.isSearchExpanded ? theme.colorScheme.primary : null,
               ),
               tooltip: checklistState.isSearchExpanded
@@ -415,13 +413,13 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
             ),
             // Smart Packing Templates
             IconButton(
-              icon: const Icon(Icons.auto_awesome_rounded),
+              icon: const Icon(AppIcons.spark),
               tooltip: l10n.readyTemplates,
               onPressed: () => SmartTemplatesSheet.show(context, tripId: widget.tripId),
             ),
             // Social Checklist Share
             IconButton(
-              icon: const Icon(Icons.share_rounded),
+              icon: const Icon(AppIcons.share),
               tooltip: l10n.shareChecklist,
               onPressed: () {
                 ShareService.shareChecklist(
@@ -437,14 +435,19 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
         floatingActionButton: FloatingActionButton(
           key: _fabKey,
           heroTag: null,
-          elevation: 2,
+          elevation: 3,
+          backgroundColor: AppColors.brandAccent,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
           onPressed: () => QuickActionsSheet.showForChecklist(
             context,
             tripId: widget.tripId,
             tripTitle: widget.tripTitle,
             fabKey: _fabKey,
           ),
-          child: const Icon(Icons.add_rounded, size: 26),
+          child: const Icon(AppIcons.add, size: 24),
         ),
         floatingActionButtonLocation: widget.isTabMode
             ? kFloatingActionButtonAboveFloatingBar
@@ -568,10 +571,10 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                   hintStyle: AppTypography.bodySmall.copyWith(
                                     color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
                                   ),
-                                  prefixIcon: Icon(Icons.search_rounded, color: theme.colorScheme.primary, size: 20),
+                                  prefixIcon: Icon(AppIcons.search, color: theme.colorScheme.primary, size: 18),
                                   suffixIcon: _searchController.text.isNotEmpty
                                       ? IconButton(
-                                          icon: const Icon(Icons.clear_rounded, size: 18),
+                                          icon: const Icon(AppIcons.close, size: 16),
                                           onPressed: () {
                                             _searchController.clear();
                                             controller.setSearchQuery('');
@@ -588,18 +591,18 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                   ),
                 ),
 
-                // 2. Item Completion Progress & Overview Card (Things 3 / Apple Reminders style)
+                // 2. Compact Executive Item Completion & Overview Card (Apple / Things 3 style)
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 6, 16, 10),
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
                     child: Container(
-                      padding: const EdgeInsets.all(AppSpacing.md),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
                         color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
                         borderRadius: BorderRadius.circular(AppRadius.card),
                         border: Border.all(
                           color: isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight,
-                          width: 0.8,
+                          width: 0.6,
                         ),
                       ),
                       child: Builder(
@@ -609,82 +612,118 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                               ? '${widget.tripTitle} • ${l10n.packingReadiness}'
                               : l10n.packingReadiness;
 
-                          String airlineTitle;
-                          String airlineSubtitle;
+                          String airlineSummary;
 
                           if (checklistState.baggageAllowanceMode == BaggageAllowanceMode.none) {
-                            airlineTitle = l10n.airlineBaggageLimits;
-                            airlineSubtitle = l10n.standardBaggageLimitNote;
+                            airlineSummary = l10n.airlineBaggageLimits;
                           } else if (checklistState.selectedAirline != null) {
                             final air = checklistState.selectedAirline!;
                             final pkg = air.activePackage;
-                            final hasPkg = air.packages.isNotEmpty;
-                            final pkgSuffix = hasPkg ? ' • ${pkg.name}' : '';
                             final personalShort = PackingTagHelper.getShortTag('PERSONAL', langCode);
                             final cabinShort = PackingTagHelper.getShortTag('CABIN', langCode);
                             final checkedShort = PackingTagHelper.getShortTag('CHECKED', langCode);
 
-                            final personalStr = pkg.personalItemLimitKg > 0 ? '${pkg.personalItemLimitKg.toInt()} kg' : '-';
-                            final cabinStr = pkg.cabinLimitKg > 0 ? '${pkg.cabinLimitKg.toInt()} kg' : '-';
-                            final checkedStr = pkg.checkedLimitKg > 0 ? '${pkg.checkedLimitKg.toInt()} kg' : '-';
+                            final personalStr = pkg.personalItemLimitKg > 0 ? '${pkg.personalItemLimitKg.toInt()}k' : '-';
+                            final cabinStr = pkg.cabinLimitKg > 0 ? '${pkg.cabinLimitKg.toInt()}k' : '-';
+                            final checkedStr = pkg.checkedLimitKg > 0 ? '${pkg.checkedLimitKg.toInt()}k' : '-';
 
                             if (checklistState.baggageAllowanceMode == BaggageAllowanceMode.cabinOnly) {
-                              airlineTitle = '${air.airlineName}$pkgSuffix ($cabinShort)';
-                              airlineSubtitle = '${air.countryFlag} $personalShort: $personalStr • $cabinShort: $cabinStr (${pkg.cabinDimensions})';
+                              airlineSummary = '${air.airlineName} ($cabinShort $cabinStr)';
                             } else if (checklistState.baggageAllowanceMode == BaggageAllowanceMode.checkedOnly) {
-                              airlineTitle = '${air.airlineName}$pkgSuffix ($checkedShort)';
-                              airlineSubtitle = '${air.countryFlag} $checkedShort: $checkedStr';
+                              airlineSummary = '${air.airlineName} ($checkedShort $checkedStr)';
                             } else {
-                              airlineTitle = '${air.airlineName}$pkgSuffix';
-                              airlineSubtitle = '${air.countryFlag} $personalShort: $personalStr • $cabinShort: $cabinStr • $checkedShort: $checkedStr';
+                              airlineSummary = '${air.airlineName} ($personalShort $personalStr • $cabinShort $cabinStr • $checkedShort $checkedStr)';
                             }
                           } else {
                             if (checklistState.baggageAllowanceMode == BaggageAllowanceMode.cabinOnly) {
-                              airlineTitle = '${l10n.cabinBaggage} (8 kg)';
-                              airlineSubtitle = '8 kg (55x40x20 cm)';
+                              airlineSummary = '${l10n.cabinBaggage} 8 kg';
                             } else if (checklistState.baggageAllowanceMode == BaggageAllowanceMode.checkedOnly) {
-                              airlineTitle = '${l10n.checkedBaggage} (20-23 kg)';
-                              airlineSubtitle = '20-23 kg';
+                              airlineSummary = '${l10n.checkedBaggage} 20-23 kg';
                             } else {
-                              airlineTitle = l10n.airlineBaggageLimits;
-                              airlineSubtitle = l10n.standardBaggageLimitNote;
+                              airlineSummary = l10n.standardBaggageLimitNote;
                             }
                           }
 
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Header Row: Baggage status icon, title, and Dynamic Badge
+                              // Top Row: Circular Progress Gauge + Title/Count + Status Pill
                               Row(
                                 children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: statusColor.withValues(alpha: 0.12),
-                                      shape: BoxShape.circle,
+                                  // Circular Progress Ring Gauge
+                                  SizedBox(
+                                    width: 44,
+                                    height: 44,
+                                    child: Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        CircularProgressIndicator(
+                                          value: checklistState.totalCount == 0 ? 0.0 : progressRatio,
+                                          strokeWidth: 3.5,
+                                          backgroundColor: statusColor.withValues(alpha: 0.15),
+                                          valueColor: AlwaysStoppedAnimation<Color>(statusColor),
+                                          strokeCap: StrokeCap.round,
+                                        ),
+                                        if (completionRatio >= 1.0 && checklistState.totalCount > 0)
+                                          Icon(AppIcons.check, size: 18, color: statusColor)
+                                        else
+                                          Text(
+                                            '%${(completionRatio * 100).toInt()}',
+                                            style: AppTypography.mono(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w700,
+                                              tabularFigures: true,
+                                              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                                            ),
+                                          ),
+                                      ],
                                     ),
-                                    child: Icon(AppIcons.luggage, color: statusColor, size: 20),
                                   ),
-                                  const SizedBox(width: 10),
+                                  const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        FittedBox(
-                                          fit: BoxFit.scaleDown,
-                                          alignment: Alignment.centerLeft,
-                                          child: Text(
-                                            cardTitle,
-                                            style: AppTypography.title(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w700,
-                                              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                cardTitle,
+                                                style: AppTypography.title(
+                                                  fontSize: 14.5,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
                                             ),
-                                            maxLines: 1,
-                                          ),
+                                            const SizedBox(width: 8),
+                                            // Status Micro-Pill
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                                              decoration: BoxDecoration(
+                                                color: statusColor.withValues(alpha: 0.12),
+                                                borderRadius: BorderRadius.circular(AppRadius.sm),
+                                                border: Border.all(color: statusColor.withValues(alpha: 0.3), width: 0.6),
+                                              ),
+                                              child: Text(
+                                                checklistState.totalCount == 0
+                                                    ? l10n.listEmpty.toUpperCase()
+                                                    : (completionRatio >= 1.0
+                                                        ? l10n.completed.toUpperCase()
+                                                        : l10n.preparing.toUpperCase()),
+                                                style: TextStyle(
+                                                  color: statusColor,
+                                                  fontSize: 9.5,
+                                                  fontWeight: FontWeight.w800,
+                                                  letterSpacing: 0.3,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        const SizedBox(height: 2),
-                                        // Tabular numbers for packed counts and ratio
+                                        const SizedBox(height: 3),
                                         Text.rich(
                                           TextSpan(
                                             children: [
@@ -712,12 +751,10 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                                   ),
                                                 ),
                                                 TextSpan(
-                                                  text: '%${(completionRatio * 100).toInt()}',
-                                                  style: AppTypography.mono(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w700,
-                                                    tabularFigures: true,
+                                                  text: ChecklistScreen.getMotivationalProgressText(completionRatio, l10n, langCode),
+                                                  style: AppTypography.caption.copyWith(
                                                     color: statusColor,
+                                                    fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
                                               ],
@@ -729,213 +766,93 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
-                                  // Clean status badge
-                                  Flexible(
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                      decoration: BoxDecoration(
-                                        color: statusColor.withValues(alpha: 0.12),
-                                        borderRadius: BorderRadius.circular(AppRadius.sm),
-                                        border: Border.all(color: statusColor.withValues(alpha: 0.35), width: 0.8),
-                                      ),
-                                      child: FittedBox(
-                                        fit: BoxFit.scaleDown,
-                                        child: Text(
-                                          checklistState.totalCount == 0
-                                              ? l10n.listEmpty.toUpperCase()
-                                              : (completionRatio >= 1.0
-                                                  ? l10n.completed.toUpperCase()
-                                                  : l10n.preparing.toUpperCase()),
-                                          maxLines: 1,
-                                          style: TextStyle(
-                                            color: statusColor,
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w800,
-                                            letterSpacing: 0.3,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
                                 ],
                               ),
-                              const SizedBox(height: 12),
 
-                              // Real-time animated progress bar (clean & refined)
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(4),
-                                child: Container(
-                                  height: 6,
-                                  decoration: BoxDecoration(
-                                    color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
-                                  ),
-                                  child: LayoutBuilder(
-                                    builder: (context, constraints) {
-                                      final currentWidth = (constraints.maxWidth * progressRatio).clamp(0.0, constraints.maxWidth);
-                                      return Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: AnimatedContainer(
-                                          duration: AppMotion.normal,
-                                          curve: AppMotion.smoothCurve,
-                                          width: currentWidth,
-                                          height: 6,
-                                          decoration: BoxDecoration(
-                                            color: statusColor,
-                                            borderRadius: BorderRadius.circular(4),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 10),
 
-                              // Motivational tagline without decorative emojis
-                              Text(
-                                ChecklistScreen.getMotivationalProgressText(completionRatio, l10n, langCode),
-                                style: AppTypography.caption.copyWith(
-                                  color: statusColor,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 12),
-
-                              // Airline Baggage Limits Sub-Banner
+                              // Bottom Integrated Action Strip (Airline limits & templates in one line)
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: isDark
-                                      ? AppColors.surfaceRaisedDark
-                                      : AppColors.surfaceRaisedLight,
-                                  borderRadius: BorderRadius.circular(AppRadius.md),
+                                  color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+                                  borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
                                     color: isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight,
-                                    width: 0.8,
+                                    width: 0.6,
                                   ),
                                 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                child: Row(
                                   children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.all(6),
-                                          decoration: BoxDecoration(
-                                            color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: Icon(
-                                            AppIcons.flightTakeoff,
-                                            size: 15,
-                                            color: theme.colorScheme.primary,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 9),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Text(
-                                                airlineTitle,
-                                                style: AppTypography.bodySmall.copyWith(
-                                                  fontWeight: FontWeight.w700,
+                                    // Clickable Airline Limit Pill
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () => AirlineGuideSheet.show(context),
+                                        borderRadius: BorderRadius.circular(6),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              AppIcons.flightTakeoff,
+                                              size: 13,
+                                              color: theme.colorScheme.primary,
+                                            ),
+                                            const SizedBox(width: 5),
+                                            Expanded(
+                                              child: Text(
+                                                airlineSummary,
+                                                style: AppTypography.caption.copyWith(
+                                                  fontSize: 10.5,
+                                                  fontWeight: FontWeight.w600,
                                                   color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
                                                 ),
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
-                                              const SizedBox(height: 1),
-                                              Text(
-                                                airlineSubtitle,
-                                                style: AppTypography.caption.copyWith(
-                                                  color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                                            ),
+                                            const SizedBox(width: 2),
+                                            Icon(
+                                              AppIcons.chevronRight,
+                                              size: 11,
+                                              color: theme.colorScheme.primary,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      height: 14,
+                                      width: 1,
+                                      margin: const EdgeInsets.symmetric(horizontal: 6),
+                                      color: isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight,
+                                    ),
+                                    // Smart Templates Quick Action
+                                    Flexible(
+                                      child: InkWell(
+                                        onTap: () => SmartTemplatesSheet.show(context, tripId: widget.tripId),
+                                        borderRadius: BorderRadius.circular(6),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              AppIcons.spark,
+                                              size: 12,
+                                              color: AppColors.pineEmerald,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Flexible(
+                                              child: Text(
+                                                l10n.readyTemplates,
+                                                style: const TextStyle(
+                                                  fontSize: 10.5,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: AppColors.pineEmerald,
                                                 ),
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
-                                            ],
-                                          ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Align(
-                                      alignment: Alignment.centerRight,
-                                      child: Wrap(
-                                        alignment: WrapAlignment.end,
-                                        spacing: 8,
-                                        runSpacing: 6,
-                                        children: [
-                                          InkWell(
-                                            onTap: () => AirlineGuideSheet.show(context),
-                                            borderRadius: BorderRadius.circular(AppRadius.sm),
-                                            child: Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                              decoration: BoxDecoration(
-                                                color: isDark
-                                                    ? AppColors.primaryContainerDark
-                                                    : AppColors.primaryContainerLight.withValues(alpha: 0.5),
-                                                borderRadius: BorderRadius.circular(AppRadius.sm),
-                                                border: Border.all(
-                                                  color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
-                                                  width: 0.8,
-                                                ),
-                                              ),
-                                              child: Text(
-                                                l10n.set,
-                                                style: TextStyle(
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: isDark ? AppColors.brandAccentTextDark : AppColors.brandAccentTextLight,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          InkWell(
-                                            onTap: () => SmartTemplatesSheet.show(context, tripId: widget.tripId),
-                                            borderRadius: BorderRadius.circular(AppRadius.sm),
-                                            child: Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                              decoration: BoxDecoration(
-                                                color: isDark
-                                                    ? AppColors.secondaryContainerDark
-                                                    : AppColors.secondaryContainerLight,
-                                                borderRadius: BorderRadius.circular(AppRadius.sm),
-                                                border: Border.all(
-                                                  color: AppColors.secondaryLight,
-                                                  width: 0.8,
-                                                ),
-                                              ),
-                                              child: FittedBox(
-                                                fit: BoxFit.scaleDown,
-                                                child: Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    Icon(
-                                                      AppIcons.spark,
-                                                      size: 11,
-                                                      color: AppColors.secondaryLight,
-                                                    ),
-                                                    const SizedBox(width: 4),
-                                                    Text(
-                                                      l10n.readyTemplates,
-                                                      style: const TextStyle(
-                                                        fontSize: 11,
-                                                        fontWeight: FontWeight.w700,
-                                                        color: AppColors.secondaryLight,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
                                       ),
                                     ),
                                   ],
@@ -949,46 +866,50 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                   ),
                 ),
 
-                // 3. Dismissible Inline Smart Packing Tip Banner
+                // 3. Compact Smart Packing Tip Banner
                 if (!_isPackingTipDismissed)
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-                          borderRadius: BorderRadius.circular(AppRadius.md),
+                          color: theme.colorScheme.primary.withValues(alpha: 0.06),
+                          borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight,
-                            width: 0.8,
+                            color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                            width: 0.6,
                           ),
                         ),
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Icon(
-                              Icons.tips_and_updates_rounded,
-                              color: isDark ? AppColors.brandAccentTextDark : AppColors.brandAccentTextLight,
-                              size: 16,
+                              AppIcons.spark,
+                              color: theme.colorScheme.primary,
+                              size: 13,
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 6),
                             Expanded(
                               child: Text(
                                 l10n.packingTip,
                                 style: AppTypography.caption.copyWith(
+                                  fontSize: 11,
                                   color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
                                 ),
-                                maxLines: 2,
+                                maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            InkWell(
+                            InkResponse(
+                              radius: 12,
                               onTap: () => setState(() => _isPackingTipDismissed = true),
-                              borderRadius: BorderRadius.circular(12),
-                              child: const Padding(
-                                padding: EdgeInsets.all(4),
-                                child: Icon(Icons.close_rounded, size: 14, color: Colors.grey),
+                              child: Padding(
+                                padding: const EdgeInsets.all(2),
+                                child: Icon(
+                                  AppIcons.close,
+                                  size: 12,
+                                  color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                                ),
                               ),
                             ),
                           ],
@@ -997,130 +918,107 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                     ),
                   ),
 
-                // 4. Tactile Baggage Category Selector Bar
+                // 4. Modern Category Selector Bar
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 8, bottom: 8),
+                    padding: const EdgeInsets.only(top: 2, bottom: 6),
                     child: SizedBox(
-                      height: 40,
-                      child: ShaderMask(
-                        shaderCallback: (Rect bounds) {
-                          return const LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [
-                              Colors.transparent,
-                              Colors.white,
-                              Colors.white,
-                              Colors.transparent,
-                            ],
-                            stops: [0.0, 0.03, 0.97, 1.0],
-                          ).createShader(bounds);
-                        },
-                        blendMode: BlendMode.dstIn,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: _categories.length,
-                          separatorBuilder: (_, _) => const SizedBox(width: 8),
-                          itemBuilder: (context, index) {
-                            final category = _categories[index];
-                            final categoryLabels = {
-                              'Tümü': l10n.allCategories,
-                              'Kıyafet': l10n.categoryClothing,
-                              'Giyim': l10n.categoryClothing,
-                              'Elektronik': l10n.categoryElectronics,
-                              'Kişisel Bakım': l10n.categoryToiletries,
-                              'Belgeler': l10n.categoryDocuments,
-                              'Aksesuar': l10n.categoryAccessories,
-                              'Diğer': l10n.other == 'Other' ? 'Others' : l10n.other,
-                            };
-                            final categoryIcons = {
-                              'Tümü': Icons.grid_view_rounded,
-                              'Kıyafet': Icons.checkroom_rounded,
-                              'Giyim': Icons.checkroom_rounded,
-                              'Elektronik': Icons.devices_rounded,
-                              'Kişisel Bakım': Icons.spa_rounded,
-                              'Belgeler': Icons.description_rounded,
-                              'Aksesuar': Icons.watch_rounded,
-                              'Diğer': Icons.more_horiz_rounded,
-                            };
-                            final displayLabel = categoryLabels[category] ?? category;
-                            final displayIcon = categoryIcons[category] ?? Icons.category_rounded;
-                            final isSelected = (category == 'Tümü' && checklistState.selectedCategory == null) ||
-                                (checklistState.selectedCategory == category) ||
-                                (checklistState.selectedCategory != null &&
-                                    ChecklistState.normalizeCategoryToken(checklistState.selectedCategory!) ==
-                                        ChecklistState.normalizeCategoryToken(category));
+                      height: 34,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: _categories.length,
+                        separatorBuilder: (_, _) => const SizedBox(width: 6),
+                        itemBuilder: (context, index) {
+                          final category = _categories[index];
+                          final categoryLabels = {
+                            'Tümü': l10n.allCategories,
+                            'Kıyafet': l10n.categoryClothing,
+                            'Giyim': l10n.categoryClothing,
+                            'Elektronik': l10n.categoryElectronics,
+                            'Kişisel Bakım': l10n.categoryToiletries,
+                            'Belgeler': l10n.categoryDocuments,
+                            'Aksesuar': l10n.categoryAccessories,
+                            'Diğer': l10n.other == 'Other' ? 'Others' : l10n.other,
+                          };
+                          final categoryIcons = {
+                            'Tümü': AppIcons.categoryAll,
+                            'Kıyafet': AppIcons.categoryClothing,
+                            'Giyim': AppIcons.categoryClothing,
+                            'Elektronik': AppIcons.categoryElectronics,
+                            'Kişisel Bakım': AppIcons.categoryToiletries,
+                            'Belgeler': AppIcons.categoryDocuments,
+                            'Aksesuar': AppIcons.categoryAccessories,
+                            'Diğer': AppIcons.categoryOther,
+                          };
+                          final displayLabel = categoryLabels[category] ?? category;
+                          final displayIcon = categoryIcons[category] ?? AppIcons.checklist;
+                          final isSelected = (category == 'Tümü' && checklistState.selectedCategory == null) ||
+                              (checklistState.selectedCategory == category) ||
+                              (checklistState.selectedCategory != null &&
+                                  ChecklistState.normalizeCategoryToken(checklistState.selectedCategory!) ==
+                                      ChecklistState.normalizeCategoryToken(category));
 
-                            return BouncyPressable(
-                              scaleFactor: 0.94,
-                              onTap: () {
-                                AppHaptics.selection();
-                                if (isSelected && category != 'Tümü') {
-                                  controller.setCategoryFilter(null);
-                                } else {
-                                  controller.setCategoryFilter(category == 'Tümü' ? null : category);
-                                }
-                              },
-                              child: AnimatedContainer(
-                                duration: AppMotion.fast,
-                                curve: AppMotion.smoothCurve,
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                                decoration: BoxDecoration(
+                          return BouncyPressable(
+                            scaleFactor: 0.95,
+                            onTap: () {
+                              AppHaptics.selection();
+                              if (isSelected && category != 'Tümü') {
+                                controller.setCategoryFilter(null);
+                              } else {
+                                controller.setCategoryFilter(category == 'Tümü' ? null : category);
+                              }
+                            },
+                            child: AnimatedContainer(
+                              duration: AppMotion.fast,
+                              curve: AppMotion.smoothCurve,
+                              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? theme.colorScheme.primary
+                                    : (isDark
+                                        ? AppColors.surfaceRaisedDark
+                                        : AppColors.surfaceRaisedLight),
+                                borderRadius: BorderRadius.circular(17),
+                                border: Border.all(
                                   color: isSelected
                                       ? theme.colorScheme.primary
                                       : (isDark
-                                          ? AppColors.surfaceRaisedDark
-                                          : AppColors.surfaceRaisedLight),
-                                  borderRadius: BorderRadius.circular(AppRadius.md),
-                                  border: Border.all(
-                                    color: isSelected
-                                        ? theme.colorScheme.primary
-                                        : (isDark
-                                            ? AppColors.borderSubtleDark
-                                            : AppColors.borderSubtleLight),
-                                    width: 0.8,
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      displayIcon,
-                                      size: 14,
-                                      color: isSelected
-                                          ? theme.colorScheme.onPrimary
-                                          : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
-                                    ),
-                                    const SizedBox(width: 5),
-                                    Text(
-                                      displayLabel,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                                        color: isSelected
-                                            ? theme.colorScheme.onPrimary
-                                            : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight),
-                                        letterSpacing: -0.1,
-                                      ),
-                                    ),
-                                  ],
+                                          ? AppColors.borderSubtleDark
+                                          : AppColors.borderSubtleLight),
+                                  width: 0.6,
                                 ),
                               ),
-                            );
-                          },
-                        ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    displayIcon,
+                                    size: 13,
+                                    color: isSelected
+                                        ? theme.colorScheme.onPrimary
+                                        : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    displayLabel,
+                                    style: TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                                      color: isSelected
+                                          ? theme.colorScheme.onPrimary
+                                          : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight),
+                                      letterSpacing: -0.1,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
-                  ),
-                ),
-
-                const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    child: AppDivider(),
                   ),
                 ),
 
@@ -1218,12 +1116,12 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                     children: [
                                       AppButton.primary(
                                         label: l10n.readyTemplates,
-                                        leadingIcon: Icons.auto_awesome_rounded,
+                                        leadingIcon: AppIcons.spark,
                                         onPressed: () => SmartTemplatesSheet.show(context, tripId: widget.tripId),
                                       ),
                                       AppButton.outline(
                                         label: l10n.addItem,
-                                        leadingIcon: Icons.add_rounded,
+                                        leadingIcon: AppIcons.add,
                                         onPressed: () => AddPackingItemSheet.show(context, tripId: widget.tripId),
                                       ),
                                     ],

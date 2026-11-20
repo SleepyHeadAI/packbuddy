@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/core/theme/app_typography.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
@@ -28,36 +29,36 @@ class TripsScreen extends ConsumerStatefulWidget {
   const TripsScreen({super.key});
 
   static IconData getTransportIcon(String? mode) {
-    if (mode == null || mode.isEmpty) return Icons.luggage_outlined;
+    if (mode == null || mode.isEmpty) return AppIcons.luggage;
     final lower = mode.toLowerCase();
     if (lower.contains('uçak') || lower.contains('flight') || lower.contains('plane')) {
-      return Icons.flight_rounded;
+      return AppIcons.flight;
     } else if (lower.contains('hızlı tren') || lower.contains('yht') || lower.contains('bullet')) {
-      return Icons.directions_railway_rounded;
+      return AppIcons.train;
     } else if (lower.contains('tren') || lower.contains('train')) {
-      return Icons.train_rounded;
-    } else if (lower.contains('araba') || lower.contains('car') || lower.contains('kiralık')) {
-      return Icons.directions_car_rounded;
+      return AppIcons.train;
+    } else if (lower.contains('araba') || lower.contains('car') || lower.contains('kiralık') || lower.contains('jeep') || lower.contains('safari')) {
+      return AppIcons.car;
     } else if (lower.contains('gemi') || lower.contains('ship') || lower.contains('feribot') || lower.contains('ferry') || lower.contains('boat')) {
-      return Icons.directions_boat_rounded;
+      return AppIcons.boat;
     } else if (lower.contains('otobüs') || lower.contains('bus')) {
-      return Icons.directions_bus_rounded;
+      return AppIcons.car;
     } else if (lower.contains('moto') || lower.contains('motor')) {
-      return Icons.two_wheeler_rounded;
+      return AppIcons.car;
     } else if (lower.contains('karavan') || lower.contains('camper') || lower.contains('rv')) {
-      return Icons.airport_shuttle_rounded;
+      return AppIcons.car;
     } else if (lower.contains('bisiklet') || lower.contains('bike') || lower.contains('bicycle')) {
-      return Icons.pedal_bike_rounded;
+      return AppIcons.car;
     } else if (lower.contains('metro') || lower.contains('tram') || lower.contains('subway')) {
-      return Icons.tram_rounded;
+      return AppIcons.train;
     } else if (lower.contains('yürüyüş') || lower.contains('trekking') || lower.contains('hike') || lower.contains('walk')) {
-      return Icons.hiking_rounded;
+      return AppIcons.backpack;
     } else if (lower.contains('heli') || lower.contains('helikopter')) {
-      return Icons.flight_takeoff_rounded;
+      return AppIcons.flightTakeoff;
     } else if (lower == 'other' || lower == 'diğer') {
-      return Icons.luggage_outlined;
+      return AppIcons.luggage;
     }
-    return Icons.commute_rounded;
+    return AppIcons.luggage;
   }
 
   static String formatTransportMode(String? mode, AppLocalizations l10n) {
@@ -69,7 +70,7 @@ class TripsScreen extends ConsumerStatefulWidget {
       return l10n.bulletTrain;
     } else if (lower.contains('tren') || lower.contains('train')) {
       return l10n.train;
-    } else if (lower.contains('araba') || lower.contains('car') || lower.contains('kiralık')) {
+    } else if (lower.contains('araba') || lower.contains('car') || lower.contains('kiralık') || lower.contains('jeep') || lower.contains('safari')) {
       return l10n.car;
     } else if (lower.contains('gemi') || lower.contains('ship') || lower.contains('feribot') || lower.contains('ferry') || lower.contains('boat')) {
       return l10n.ferry;
@@ -312,9 +313,14 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
         floatingActionButton: FloatingActionButton(
           key: _fabKey,
           heroTag: null,
-          onPressed: () => QuickActionsSheet.showForTrips(context, fabKey: _fabKey),
           elevation: 3,
-          child: const Icon(Icons.add_rounded, size: 26),
+          backgroundColor: AppColors.brandAccent,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          onPressed: () => QuickActionsSheet.showForTrips(context, fabKey: _fabKey),
+          child: const Icon(AppIcons.add, size: 24),
         ),
         body: tripState.isLoading
             ? const Center(child: CircularProgressIndicator())

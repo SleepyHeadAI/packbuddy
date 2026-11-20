@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/core/theme/theme_provider.dart';
 import 'package:packbuddy/features/admin/admin_service.dart';
@@ -458,22 +459,22 @@ void main() {
       expect(tester.takeException(), isNull);
 
       // All 3 theme mode buttons are present
-      expect(find.byIcon(Icons.brightness_auto_rounded), findsOneWidget);
-      expect(find.byIcon(Icons.light_mode_rounded), findsOneWidget);
-      expect(find.byIcon(Icons.dark_mode_rounded), findsOneWidget);
+      expect(find.byIcon(AppIcons.spark), findsWidgets);
+      expect(find.byIcon(AppIcons.sun), findsWidgets);
+      expect(find.byIcon(AppIcons.moon), findsOneWidget);
 
       // Verify tapping Dark mode updates themeModeProvider
-      await tester.tap(find.byIcon(Icons.dark_mode_rounded));
+      await tester.tap(find.byIcon(AppIcons.moon));
       await tester.pumpAndSettle();
       expect(container.read(themeModeProvider), ThemeMode.dark);
 
       // Verify tapping Light mode updates themeModeProvider
-      await tester.tap(find.byIcon(Icons.light_mode_rounded));
+      await tester.tap(find.byIcon(AppIcons.sun).last);
       await tester.pumpAndSettle();
       expect(container.read(themeModeProvider), ThemeMode.light);
 
       // Verify tapping System mode updates themeModeProvider
-      await tester.tap(find.byIcon(Icons.brightness_auto_rounded));
+      await tester.tap(find.byIcon(AppIcons.spark).last);
       await tester.pumpAndSettle();
       expect(container.read(themeModeProvider), ThemeMode.system);
     });

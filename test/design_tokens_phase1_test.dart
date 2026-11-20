@@ -48,22 +48,22 @@ void main() {
 
     test('3. AppColors Semantic Layer & Rule 4 WCAG Contrast Verification', () {
       // Light surface tokens
-      expect(AppColors.scaffoldLight, const Color(0xFFF7F8FA));
+      expect(AppColors.scaffoldLight, const Color(0xFFF8F9FA));
       expect(AppColors.surfaceBaseLight, const Color(0xFFFFFFFF));
       expect(AppColors.surfaceRaisedLight, const Color(0xFFF1F3F6));
-      expect(AppColors.surfaceOverlayLight, const Color(0xFFE8EBF0));
-      expect(AppColors.borderSubtleLight, const Color(0xFFE5E8EE));
+      expect(AppColors.surfaceOverlayLight, const Color(0xFFE9ECF2));
+      expect(AppColors.borderSubtleLight, const Color(0xFFEAECEF));
 
       // Dark surface tokens
-      expect(AppColors.scaffoldDark, const Color(0xFF0B0F14));
-      expect(AppColors.surfaceBaseDark, const Color(0xFF131920));
-      expect(AppColors.surfaceRaisedDark, const Color(0xFF1C2430));
-      expect(AppColors.surfaceOverlayDark, const Color(0xFF263242));
+      expect(AppColors.scaffoldDark, const Color(0xFF0B0E14));
+      expect(AppColors.surfaceBaseDark, const Color(0xFF131822));
+      expect(AppColors.surfaceRaisedDark, const Color(0xFF1A2230));
+      expect(AppColors.surfaceOverlayDark, const Color(0xFF242E40));
       expect(AppColors.borderSubtleDark, const Color(0xFF1E2836));
 
-      // Brand accent tokens
-      expect(AppColors.brandAccent, const Color(0xFFD97706));
-      expect(AppColors.brandAccentTextLight, const Color(0xFF92400E));
+      // Brand accent tokens (Terracotta direction)
+      expect(AppColors.brandAccent, const Color(0xFFE05D38));
+      expect(AppColors.brandAccentTextLight, const Color(0xFFB83A1B));
 
       // Mathematical WCAG 2.1 Contrast Calculation:
       // (L1 + 0.05) / (L2 + 0.05) >= 4.5:1 for normal text

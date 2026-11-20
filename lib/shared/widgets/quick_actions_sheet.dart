@@ -127,7 +127,7 @@ class QuickActionsSheet extends StatelessWidget {
     final items = [
       // 1. Add Trip
       QuickActionItem(
-        icon: Icons.flight_takeoff_rounded,
+        icon: AppIcons.flightTakeoff,
         iconColor: theme.colorScheme.primary,
         iconBgColor: theme.colorScheme.primary.withValues(alpha: 0.15),
         title: l10n.addTrip,
@@ -136,7 +136,7 @@ class QuickActionsSheet extends StatelessWidget {
       ),
       // 2. Add Expense
       QuickActionItem(
-        icon: Icons.receipt_long_rounded,
+        icon: AppIcons.expense,
         iconColor: const Color(0xFF10B981),
         iconBgColor: const Color(0xFF10B981).withValues(alpha: 0.15),
         title: l10n.addExpense,
@@ -165,7 +165,7 @@ class QuickActionsSheet extends StatelessWidget {
       ),
       // 3. Add Packing Item
       QuickActionItem(
-        icon: Icons.luggage_rounded,
+        icon: AppIcons.luggage,
         iconColor: const Color(0xFF6366F1),
         iconBgColor: const Color(0xFF6366F1).withValues(alpha: 0.15),
         title: l10n.addItem,
@@ -179,7 +179,7 @@ class QuickActionsSheet extends StatelessWidget {
       ),
       // 4. Add Document
       QuickActionItem(
-        icon: Icons.note_add_rounded,
+        icon: AppIcons.document,
         iconColor: const Color(0xFF8B5CF6),
         iconBgColor: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
         title: l10n.addDocument,
@@ -214,7 +214,7 @@ class QuickActionsSheet extends StatelessWidget {
 
     final items = [
       QuickActionItem(
-        icon: Icons.flight_takeoff_rounded,
+        icon: AppIcons.flightTakeoff,
         iconColor: theme.colorScheme.primary,
         iconBgColor: theme.colorScheme.primary.withValues(alpha: 0.15),
         title: l10n.addTrip,
@@ -222,7 +222,7 @@ class QuickActionsSheet extends StatelessWidget {
         onTap: () => AddTripSheet.show(context),
       ),
       QuickActionItem(
-        icon: Icons.group_add_rounded,
+        icon: AppIcons.users,
         iconColor: const Color(0xFF0D9488),
         iconBgColor: const Color(0xFF0D9488).withValues(alpha: 0.15),
         title: l10n.joinSharedTrip,
@@ -251,7 +251,7 @@ class QuickActionsSheet extends StatelessWidget {
 
     final items = [
       QuickActionItem(
-        icon: Icons.receipt_long_rounded,
+        icon: AppIcons.expense,
         iconColor: const Color(0xFF10B981),
         iconBgColor: const Color(0xFF10B981).withValues(alpha: 0.15),
         title: l10n.addExpense,
@@ -263,7 +263,7 @@ class QuickActionsSheet extends StatelessWidget {
         ),
       ),
       QuickActionItem(
-        icon: Icons.luggage_rounded,
+        icon: AppIcons.luggage,
         iconColor: const Color(0xFF6366F1),
         iconBgColor: const Color(0xFF6366F1).withValues(alpha: 0.15),
         title: l10n.addItem,
@@ -271,7 +271,7 @@ class QuickActionsSheet extends StatelessWidget {
         onTap: () => AddPackingItemSheet.show(context, tripId: trip.id),
       ),
       QuickActionItem(
-        icon: Icons.note_add_rounded,
+        icon: AppIcons.document,
         iconColor: const Color(0xFF8B5CF6),
         iconBgColor: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
         title: l10n.addDocument,
@@ -303,7 +303,7 @@ class QuickActionsSheet extends StatelessWidget {
 
     final items = [
       QuickActionItem(
-        icon: Icons.note_add_rounded,
+        icon: AppIcons.document,
         iconColor: const Color(0xFF8B5CF6),
         iconBgColor: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
         title: l10n.addDocument,
@@ -314,7 +314,7 @@ class QuickActionsSheet extends StatelessWidget {
         ),
       ),
       QuickActionItem(
-        icon: Icons.add_a_photo_rounded,
+        icon: AppIcons.photo,
         iconColor: const Color(0xFFE11D48),
         iconBgColor: const Color(0xFFE11D48).withValues(alpha: 0.15),
         title: l10n.addPrivatePhoto,
@@ -352,7 +352,7 @@ class QuickActionsSheet extends StatelessWidget {
     final items = [
       // 1. Add Packing Item
       QuickActionItem(
-        icon: Icons.playlist_add_rounded,
+        icon: AppIcons.checklist,
         iconColor: const Color(0xFF3B82F6),
         iconBgColor: const Color(0xFF3B82F6).withValues(alpha: 0.15),
         title: l10n.addItem,
@@ -361,7 +361,7 @@ class QuickActionsSheet extends StatelessWidget {
       ),
       // 2. Ready Smart Templates
       QuickActionItem(
-        icon: Icons.auto_awesome_rounded,
+        icon: AppIcons.spark,
         iconColor: const Color(0xFF8B5CF6),
         iconBgColor: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
         title: l10n.readyTemplates,
@@ -370,7 +370,7 @@ class QuickActionsSheet extends StatelessWidget {
       ),
       // 3. Airline Baggage Guide
       QuickActionItem(
-        icon: Icons.luggage_rounded,
+        icon: AppIcons.luggage,
         iconColor: const Color(0xFF10B981),
         iconBgColor: const Color(0xFF10B981).withValues(alpha: 0.15),
         title: l10n.airlineBaggageGuide,
@@ -379,7 +379,7 @@ class QuickActionsSheet extends StatelessWidget {
       ),
       // 4. Share Checklist
       QuickActionItem(
-        icon: Icons.share_rounded,
+        icon: AppIcons.share,
         iconColor: const Color(0xFF0D9488),
         iconBgColor: const Color(0xFF0D9488).withValues(alpha: 0.15),
         title: l10n.shareChecklist,
@@ -990,18 +990,18 @@ class _FloatingQuickActionsOverlay extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AppRadius.fab),
                     child: Ink(
                       decoration: BoxDecoration(
-                        color: fabColor ?? (isDark ? AppColors.primaryDark : AppColors.primaryAmber),
+                        color: fabColor ?? (isDark ? AppColors.primaryDark : AppColors.brandAccent),
                         borderRadius: BorderRadius.circular(AppRadius.fab),
                         boxShadow: [
                           BoxShadow(
-                            color: (fabColor ?? (isDark ? AppColors.primaryDark : AppColors.primaryAmber))
-                                .withValues(alpha: 0.4),
+                            color: (fabColor ?? (isDark ? AppColors.primaryDark : AppColors.brandAccent))
+                                .withValues(alpha: 0.35),
                             blurRadius: 16,
                             offset: const Offset(0, 4),
                           ),
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.15),
-                            blurRadius: 8,
+                            color: Colors.black.withValues(alpha: 0.12),
+                            blurRadius: 6,
                             offset: const Offset(0, 2),
                           ),
                         ],
@@ -1011,9 +1011,8 @@ class _FloatingQuickActionsOverlay extends StatelessWidget {
                           angle: progress * (math.pi / 4), // 45 degrees
                           child: Icon(
                             AppIcons.add,
-                            size: 28,
-                            color: fabIconColor ??
-                                (isDark ? AppColors.onPrimaryDark : const Color(0xFF281C00)),
+                            size: 26,
+                            color: fabIconColor ?? Colors.white,
                           ),
                         ),
                       ),

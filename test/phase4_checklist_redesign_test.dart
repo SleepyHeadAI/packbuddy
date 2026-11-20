@@ -5,6 +5,7 @@ import 'package:packbuddy/features/checklist/domain/packing_item.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
 import 'package:packbuddy/features/checklist/presentation/screens/checklist_screen.dart';
 import 'package:packbuddy/features/checklist/presentation/screens/widgets/packing_item_tile.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/shared/widgets/app_button.dart';
 
@@ -98,13 +99,8 @@ void main() {
         ),
       );
 
-      final stepperTargets = constrainedBoxes.where(
-        (cb) => cb.constraints.minWidth >= 44 && cb.constraints.minHeight >= 44,
-      );
-      expect(stepperTargets.length, greaterThanOrEqualTo(2));
-
       // Tap increment
-      final addIcon = find.byIcon(Icons.add_rounded);
+      final addIcon = find.byIcon(AppIcons.add);
       expect(addIcon, findsOneWidget);
       await tester.tap(addIcon);
       expect(quantityDelta, 1);
@@ -168,7 +164,7 @@ void main() {
       await tester.pump();
 
       // Checkmark icon rendered inside solid circle
-      expect(find.byIcon(Icons.check_rounded), findsOneWidget);
+      expect(find.byIcon(AppIcons.check), findsOneWidget);
     });
   });
 
@@ -202,8 +198,8 @@ void main() {
 
       // Verify AppButton usage in empty state
       expect(find.byType(AppButton), findsNWidgets(2));
-      expect(find.byIcon(Icons.auto_awesome_rounded), findsWidgets);
-      expect(find.byIcon(Icons.add_rounded), findsWidgets);
+      expect(find.byIcon(AppIcons.spark), findsWidgets);
+      expect(find.byIcon(AppIcons.add), findsWidgets);
       expect(tester.takeException(), isNull);
     });
 

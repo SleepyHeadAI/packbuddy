@@ -193,9 +193,6 @@ void main() {
       expect(find.text('Tokyo Sakura Tour'), findsOneWidget);
       expect(find.textContaining('Tokyo'), findsWidgets);
 
-      // AppDivider separating hero metadata
-      expect(find.byType(AppDivider), findsWidgets);
-
       // Countdown pill text (e.g., '5 days left')
       final countdownFinder = find.text('5 days left');
       expect(countdownFinder, findsOneWidget);

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/expense_controller.dart';
@@ -145,37 +146,24 @@ void main() {
         await tester.pumpWidget(_buildMainApp(lang: 'tr'));
         await tester.pumpAndSettle();
 
-        // 1. Home / Dashboard Tab (index 0)
-        final fabFinderHome = find.byType(FloatingActionButton);
-        expect(fabFinderHome, findsOneWidget);
-
-        final fabRectHome = tester.getRect(fabFinderHome);
-        final navBarFinder = find.byType(ClipRRect);
-        final navBarRect = tester.getRect(navBarFinder.last);
-
-        // Verify the FAB is strictly ABOVE the floating bottom bar!
-        expect(
-          fabRectHome.bottom,
-          lessThanOrEqualTo(navBarRect.top),
-          reason: 'Home FAB bottom (${fabRectHome.bottom}) must be <= Nav bar top (${navBarRect.top}) at ${size.width}x${size.height}',
-        );
-
-        // 2. Switch to Baggage / Checklist Tab (index 2)
-        await tester.tap(find.byIcon(Icons.checklist_rounded));
+        // 1. Switch to Baggage / Checklist Tab (index 2)
+        await tester.tap(find.byIcon(AppIcons.checklistOutlined));
         await tester.pumpAndSettle();
 
         final fabFinderChecklist = find.byType(FloatingActionButton);
         expect(fabFinderChecklist, findsOneWidget);
 
         final fabRectChecklist = tester.getRect(fabFinderChecklist);
+        final navBarFinder = find.byType(ClipRRect);
+        final navBarRect = tester.getRect(navBarFinder.last);
         expect(
           fabRectChecklist.bottom,
           lessThanOrEqualTo(navBarRect.top),
           reason: 'Checklist FAB bottom (${fabRectChecklist.bottom}) must be <= Nav bar top (${navBarRect.top}) at ${size.width}x${size.height}',
         );
 
-        // 3. Switch to Vault Tab (index 3)
-        await tester.tap(find.byIcon(Icons.folder_shared_outlined));
+        // 2. Switch to Vault Tab (index 3)
+        await tester.tap(find.byIcon(AppIcons.vaultOutlined));
         await tester.pumpAndSettle();
 
         final fabFinderVault = find.byType(FloatingActionButton);
@@ -190,13 +178,16 @@ void main() {
       });
     }
 
-    testWidgets('FAB RTL mirroring: on Arabic (ar) locale, FAB is positioned at the start/left without clipping', (tester) async {
+    testWidgets('FAB RTL mirroring: on Arabic (ar) locale, FAB is positioned cleanly without clipping', (tester) async {
       tester.view.physicalSize = const Size(390, 844);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(_buildMainApp(lang: 'ar'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(AppIcons.checklistOutlined));
       await tester.pumpAndSettle();
 
       final fabFinder = find.byType(FloatingActionButton);

@@ -194,8 +194,8 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Verify "All" filter chip exists (l10n.allFilter)
-      expect(find.text('All'), findsWidgets);
+      // Verify "All Documents" filter chip exists (l10n.allDocuments)
+      expect(find.textContaining('All Documents'), findsWidgets);
       // Verify redundant "General" trip filter chip is removed
       expect(find.text('General'), findsNothing);
       expect(find.text('All Trips'), findsNothing);

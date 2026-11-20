@@ -11,21 +11,21 @@ void main() {
 
   group('Serene Voyage Design System Suite', () {
     test('1. Exact Palette Hex Verification', () {
-      // Primary: #E7B623 and #856404 (warm golden ochre)
-      expect(AppColors.primaryAmber, const Color(0xFFE7B623));
-      expect(AppColors.primaryLight, const Color(0xFF856404));
+      // Primary Terracotta & Brand Accents
+      expect(AppColors.brandAccent, const Color(0xFFE05D38));
+      expect(AppColors.primaryLight, const Color(0xFFE05D38));
 
       // Secondary: #0F766E
       expect(AppColors.secondaryLight, const Color(0xFF0F766E));
 
-      // Tertiary: #64748B
-      expect(AppColors.tertiaryLight, const Color(0xFF64748B));
+      // Tertiary: #475569 (Slate Titanium)
+      expect(AppColors.tertiaryLight, const Color(0xFF475569));
 
       // Neutral: #F3F5F7
-      expect(AppColors.backgroundLight, const Color(0xFFF3F5F7));
+      expect(AppColors.backgroundLight, const Color(0xFFF8F9FA));
 
       // Action circles
-      expect(AppColors.actionGold, const Color(0xFF856404));
+      expect(AppColors.actionGold, const Color(0xFFE05D38));
       expect(AppColors.actionTeal, const Color(0xFF0F766E));
       expect(AppColors.actionSlate, const Color(0xFF50607A));
       expect(AppColors.actionRed, const Color(0xFFB91C1C));
@@ -46,7 +46,7 @@ void main() {
       final lightTheme = AppTheme.lightTheme;
       expect(lightTheme.textTheme.headlineLarge?.fontFamily, 'Figtree');
       expect(lightTheme.textTheme.bodyMedium?.fontFamily, 'Noto Sans');
-      expect(lightTheme.textTheme.labelMedium?.fontFamily, 'JetBrains Mono');
+      expect(lightTheme.textTheme.labelMedium?.fontFamily, 'Noto Sans');
     });
 
     test('3. Theme Component Shape & Border Tokens', () {

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/expense_controller.dart';
@@ -491,14 +493,11 @@ void main() {
           expect(tester.takeException(), isNull);
 
           // Pop back to Dashboard
-          final backIconFinder = find.byIcon(Icons.arrow_back_ios_new_rounded);
+          final backIconFinder = find.byIcon(AppIcons.chevronLeft);
           if (backIconFinder.evaluate().isNotEmpty) {
-            await tester.tap(backIconFinder);
+            await tester.tap(backIconFinder.first);
           } else {
-            final iconButton = find.byWidgetPredicate(
-              (w) => w is IconButton && w.onPressed != null,
-            ).first;
-            await tester.tap(iconButton);
+            await tester.pageBack();
           }
           await tester.pumpAndSettle();
           expect(find.byType(DashboardScreen), findsOneWidget);

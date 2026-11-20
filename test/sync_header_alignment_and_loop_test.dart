@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/features/dashboard/presentation/dashboard_screen.dart';
@@ -141,7 +142,7 @@ void main() {
 
       // 1. In 'syncing' state:
       expect(find.text('Eşitleniyor...'), findsOneWidget);
-      final tuneIconSyncing = find.byIcon(Icons.tune_rounded);
+      final tuneIconSyncing = find.byIcon(AppIcons.tune);
       expect(tuneIconSyncing, findsOneWidget);
       final tuneRightSyncing = tester.getTopRight(tuneIconSyncing).dx;
 
@@ -151,7 +152,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
 
       expect(find.text('Güncel'), findsOneWidget);
-      final tuneIconUpToDate = find.byIcon(Icons.tune_rounded);
+      final tuneIconUpToDate = find.byIcon(AppIcons.tune);
       expect(tuneIconUpToDate, findsOneWidget);
       final tuneRightUpToDate = tester.getTopRight(tuneIconUpToDate).dx;
 
@@ -191,14 +192,14 @@ void main() {
 
           expect(tester.takeException(), isNull, reason: 'Overflow in $lang at $size');
 
-          final tuneRightSyncing = tester.getTopRight(find.byIcon(Icons.tune_rounded)).dx;
+          final tuneRightSyncing = tester.getTopRight(find.byIcon(AppIcons.tune)).dx;
 
           fakeEngine.setStatus(SyncStatus.upToDate);
           await tester.pump();
           await tester.pump(const Duration(milliseconds: 50));
 
           expect(tester.takeException(), isNull, reason: 'Overflow in $lang at $size (upToDate)');
-          final tuneRightUpToDate = tester.getTopRight(find.byIcon(Icons.tune_rounded)).dx;
+          final tuneRightUpToDate = tester.getTopRight(find.byIcon(AppIcons.tune)).dx;
 
           expect(
             tuneRightUpToDate,

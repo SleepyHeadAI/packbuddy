@@ -4,6 +4,7 @@ import '../../../../core/services/app_widget_service.dart';
 import '../../../../core/services/currency_service.dart';
 import '../../../../core/services/preferences_service.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_motion.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/currency_formatter.dart';
@@ -138,12 +139,12 @@ class _HorizontalCurrencyConverterCardState
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFD97706).withValues(alpha: 0.14),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(9),
                 ),
-                child: const Icon(
-                  Icons.currency_exchange_rounded,
-                  color: Color(0xFFD97706),
+                child: Icon(
+                  AppIcons.currency,
+                  color: theme.colorScheme.primary,
                   size: 16,
                 ),
               ),
@@ -211,7 +212,7 @@ class _HorizontalCurrencyConverterCardState
                         height: 13,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Icon(Icons.refresh_rounded, size: 16),
+                    : const Icon(AppIcons.refresh, size: 15),
                 tooltip: l10n?.refreshRates ?? 'Refresh',
                 onPressed: _refreshRates,
               ),
@@ -291,7 +292,7 @@ class _HorizontalCurrencyConverterCardState
                 child: RotationTransition(
                   turns: Tween(begin: 0.0, end: 0.5).animate(_swapAnimController),
                   child: IconButton.filledTonal(
-                    icon: const Icon(Icons.swap_horiz_rounded, size: 16),
+                    icon: const Icon(AppIcons.currency, size: 15),
                     onPressed: () {
                       AppHaptics.selection();
                       _swapCurrencies();
@@ -373,78 +374,116 @@ class _HorizontalCurrencyConverterCardState
               ),
             ],
           ),
+          const SizedBox(height: 10),
+
+          // 3. Quick Presets Row (Full Width Horizontal Scroll)
+          SizedBox(
+            height: 28,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: _quickPresets.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 5),
+              itemBuilder: (context, index) {
+                final preset = _quickPresets[index];
+                final isSelected = amount == preset;
+                return InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () {
+                    AppHaptics.light();
+                    _amountController.text = preset.toInt().toString();
+                    setState(() {});
+                    _persistConverterState();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? theme.colorScheme.primary
+                          : (isDark
+                              ? AppColors.surfaceRaisedDark
+                              : const Color(0xFFF1F5F9)),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isSelected
+                            ? theme.colorScheme.primary
+                            : (isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight),
+                        width: 0.6,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${CurrencyService.getCurrencySymbol(_fromCurrency)}${preset.toInt()}',
+                        style: AppTypography.mono(
+                          fontSize: 10.5,
+                          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                          color: isSelected
+                              ? Colors.white
+                              : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight),
+                          tabularFigures: true,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
           const SizedBox(height: 8),
 
-          // 3. Quick Presets Row & Live Ratio
-          Row(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  child: Row(
-                    children: _quickPresets.map((preset) {
-                      final isSelected = amount == preset;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 4),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(6),
-                          onTap: () {
-                            AppHaptics.light();
-                            _amountController.text = preset.toInt().toString();
-                            setState(() {});
-                            _persistConverterState();
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? theme.colorScheme.primary
-                                  : (isDark
-                                      ? theme.colorScheme.surfaceContainerHighest
-                                      : const Color(0xFFF1F5F9)),
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(
-                                color: isSelected
-                                    ? theme.colorScheme.primary
-                                    : theme.colorScheme.outline.withValues(alpha: 0.3),
-                                width: 0.7,
-                              ),
-                            ),
-                            child: Text(
-                              '${CurrencyService.getCurrencySymbol(_fromCurrency)}${preset.toInt()}',
-                              style: AppTypography.mono(
-                                fontSize: 10,
-                                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                                color: isSelected
-                                    ? Colors.white
-                                    : theme.colorScheme.onSurface,
-                                tabularFigures: true,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
+          // 4. Conversion Rate Info Footer (Dedicated Full Width, Guaranteed Zero Truncation!)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight,
+                width: 0.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  AppIcons.currency,
+                  size: 11,
+                  color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                ),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      '1 $_fromCurrency = ${rateFromTo.toStringAsFixed(2)} $_toCurrency',
+                      style: AppTypography.mono(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w700,
+                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                        tabularFigures: true,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 6),
-              // Conversion Rate Details
-              Flexible(
-                child: Text(
-                  '1 $_fromCurrency = ${rateFromTo.toStringAsFixed(2)} $_toCurrency',
-                  style: AppTypography.mono(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurfaceVariant,
-                    tabularFigures: true,
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    isLive
+                        ? (l10n?.liveRates ?? 'Live Rates')
+                        : (l10n?.offlineRates ?? 'Offline'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w600,
+                      color: isLive
+                          ? AppColors.pineEmerald
+                          : (isDark ? AppColors.textMutedDark : AppColors.textMutedLight),
+                    ),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

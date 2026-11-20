@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:async';
+import 'dart:ui';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -10,6 +11,7 @@ import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/core/theme/app_motion.dart';
 import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/core/theme/app_typography.dart';
@@ -175,39 +177,39 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
     if (cat.contains('özel') || cat.contains('private')) {
       return isDark ? const Color(0xFFFB7185) : const Color(0xFFE11D48); // Rose / Crimson
     } else if (cat.contains('pasaport') || cat.contains('passport') || cat.contains('kimlik') || cat.contains('vize')) {
-      return isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB); // Royal / Sky Blue
+      return AppColors.brandAccent; // Terracotta / Identity
     } else if (cat.contains('bilet') || cat.contains('ticket') || cat.contains('transit')) {
-      return isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7); // Sky Blue
+      return isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB); // Slate Blue
     } else if (cat.contains('konaklama') || cat.contains('booking') || cat.contains('rezervasyon') || cat.contains('hotel')) {
-      return isDark ? const Color(0xFF34D399) : const Color(0xFF059669); // Emerald
+      return AppColors.successPastel; // Alpine Pine Emerald
     } else if (cat.contains('sağlık') || cat.contains('sigorta') || cat.contains('insurance')) {
-      return isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626); // Rose / Red
+      return isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626); // Muted Crimson
     } else {
-      return isDark ? const Color(0xFFA78BFA) : const Color(0xFF7C3AED); // Purple
+      return isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B); // Slate Cool Grey
     }
   }
 
   IconData _getCategoryIcon(String category, [String? subCategory]) {
     if (subCategory != null) {
       final sub = subCategory.toLowerCase();
-      if (sub.contains('uçak') || sub.contains('flight')) return Icons.flight_takeoff_rounded;
-      if (sub.contains('otobüs') || sub.contains('bus')) return Icons.directions_bus_rounded;
-      if (sub.contains('gemi') || sub.contains('feribot') || sub.contains('ferry') || sub.contains('boat')) return Icons.directions_boat_rounded;
-      if (sub.contains('tren') || sub.contains('train')) return Icons.train_rounded;
+      if (sub.contains('uçak') || sub.contains('flight')) return AppIcons.flight;
+      if (sub.contains('otobüs') || sub.contains('bus')) return AppIcons.bus;
+      if (sub.contains('gemi') || sub.contains('feribot') || sub.contains('ferry') || sub.contains('boat')) return AppIcons.boat;
+      if (sub.contains('tren') || sub.contains('train')) return AppIcons.train;
     }
     final cat = category.toLowerCase();
     if (cat.contains('özel') || cat.contains('private')) {
-      return Icons.lock_person_rounded;
+      return AppIcons.lock;
     } else if (cat.contains('pasaport') || cat.contains('passport') || cat.contains('kimlik') || cat.contains('vize')) {
-      return Icons.menu_book_rounded;
+      return AppIcons.passport;
     } else if (cat.contains('bilet') || cat.contains('ticket') || cat.contains('transit')) {
-      return Icons.confirmation_number_rounded;
+      return AppIcons.ticket;
     } else if (cat.contains('konaklama') || cat.contains('booking') || cat.contains('hotel') || cat.contains('rezervasyon')) {
-      return Icons.hotel_rounded;
+      return AppIcons.hotel;
     } else if (cat.contains('sağlık') || cat.contains('sigorta') || cat.contains('insurance')) {
-      return Icons.health_and_safety_rounded;
+      return AppIcons.shield;
     } else {
-      return Icons.folder_open_rounded;
+      return AppIcons.document;
     }
   }
 
@@ -385,7 +387,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                 color: const Color(0xFFEF4444).withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.delete_outline_rounded, color: Color(0xFFEF4444), size: 20),
+              child: const Icon(AppIcons.delete, color: Color(0xFFEF4444), size: 20),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -411,7 +413,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
           const SizedBox(width: 8),
           AppButton.destructive(
             label: l10n.deleteDocument,
-            leadingIcon: Icons.delete_sweep_rounded,
+            leadingIcon: AppIcons.deleteSweep,
             size: AppButtonSize.medium,
             onPressed: () {
               ref.read(vaultControllerProvider.notifier).deleteDocument(doc.id);
@@ -470,13 +472,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                      color: AppColors.brandAccent.withValues(alpha: 0.15),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      Icons.menu_book_rounded,
+                    child: const Icon(
+                      AppIcons.passport,
                       size: 22,
-                      color: theme.colorScheme.primary,
+                      color: AppColors.brandAccent,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -507,7 +509,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close_rounded, size: 20),
+                    icon: const Icon(AppIcons.close, size: 20),
                     visualDensity: VisualDensity.compact,
                     onPressed: () => Navigator.of(ctx).pop(),
                   ),
@@ -522,10 +524,10 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                    color: AppColors.brandAccent.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(Icons.visibility_rounded, color: theme.colorScheme.primary, size: 20),
+                  child: const Icon(AppIcons.eye, color: AppColors.brandAccent, size: 20),
                 ),
                 title: Text(
                   l10n.viewDocument,
@@ -533,7 +535,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+                trailing: const Icon(AppIcons.chevronRight, size: 20),
                 onTap: () {
                   Navigator.of(ctx).pop();
                   Navigator.of(context).push(
@@ -555,7 +557,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                     color: AppColors.warningPastel.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.published_with_changes_rounded, color: AppColors.warningPastel, size: 20),
+                  child: const Icon(AppIcons.refresh, color: AppColors.warningPastel, size: 20),
                 ),
                 title: Text(
                   '${l10n.passport} ${l10n.change}',
@@ -572,7 +574,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+                trailing: const Icon(AppIcons.chevronRight, size: 20),
                 onTap: () {
                   Navigator.of(ctx).pop();
                   AddDocumentSheet.show(
@@ -595,7 +597,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                     color: AppColors.errorPastel.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.delete_outline_rounded, color: AppColors.errorPastel, size: 20),
+                  child: const Icon(AppIcons.delete, color: AppColors.errorPastel, size: 20),
                 ),
                 title: Text(
                   l10n.deleteDocument,
@@ -920,12 +922,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                       padding: const EdgeInsets.all(6),
                       margin: const EdgeInsets.only(right: 8),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.tertiary.withValues(alpha: 0.12),
+                        color: AppColors.brandAccent.withValues(alpha: 0.12),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
-                        Icons.shield_outlined,
-                        color: theme.colorScheme.tertiary,
+                      child: const Icon(
+                        AppIcons.shield,
+                        color: AppColors.brandAccent,
                         size: 18,
                       ),
                     ),
@@ -935,12 +937,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                     padding: const EdgeInsets.all(6),
                     margin: const EdgeInsets.only(right: 8),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.tertiary.withValues(alpha: 0.12),
+                      color: AppColors.brandAccent.withValues(alpha: 0.12),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      Icons.shield_outlined,
-                      color: theme.colorScheme.tertiary,
+                    child: const Icon(
+                      AppIcons.shield,
+                      color: AppColors.brandAccent,
                       size: 18,
                     ),
                   ),
@@ -971,13 +973,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
           actions: [
             if (!vaultState.hasPin)
               IconButton(
-                icon: const Icon(Icons.shield_outlined),
+                icon: const Icon(AppIcons.shield),
                 tooltip: l10n.setVaultPin,
                 onPressed: _showSetPinDialog,
               ),
             if (vaultState.hasPin && !vaultState.isLocked)
               IconButton(
-                icon: const Icon(Icons.lock_open_rounded),
+                icon: const Icon(AppIcons.lockOpen),
                 tooltip: l10n.lockVault,
                 onPressed: () {
                   ref.read(vaultControllerProvider.notifier).lockVault();
@@ -986,7 +988,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
             if (vaultState.isLocked)
               const Padding(
                 padding: EdgeInsets.only(right: 16),
-                child: Icon(Icons.lock_rounded, size: 20),
+                child: Icon(AppIcons.lock, size: 20),
               ),
           ],
         ),
@@ -1002,19 +1004,18 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                   fabKey: _fabKey,
                   fabColor: _selectedCategoryFilter == 'Özel Resimler'
                       ? const Color(0xFFE11D48)
-                      : null,
-                  fabIconColor: _selectedCategoryFilter == 'Özel Resimler'
-                      ? Colors.white
-                      : null,
+                      : AppColors.brandAccent,
+                  fabIconColor: Colors.white,
                 ),
                 backgroundColor: _selectedCategoryFilter == 'Özel Resimler'
                     ? const Color(0xFFE11D48)
-                    : null,
-                foregroundColor: _selectedCategoryFilter == 'Özel Resimler'
-                    ? Colors.white
-                    : null,
+                    : AppColors.brandAccent,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                ),
                 elevation: 3,
-                child: const Icon(Icons.add_rounded, size: 26),
+                child: const Icon(AppIcons.add, size: 24),
               ),
         floatingActionButtonLocation: widget.isTabMode
             ? kFloatingActionButtonAboveFloatingBar
@@ -1061,11 +1062,11 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                 },
                                 child: AnimatedContainer(
                                   duration: const Duration(milliseconds: 200),
-                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                                   decoration: BoxDecoration(
                                     color: _selectedCategoryFilter == 'Özel Resimler'
                                         ? const Color(0xFFE11D48).withValues(alpha: isDark ? 0.2 : 0.08)
-                                        : (isDark ? AppColors.surfaceDark : AppColors.surfaceLight),
+                                        : (isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceLight),
                                     borderRadius: BorderRadius.circular(18),
                                     border: Border.all(
                                       color: _selectedCategoryFilter == 'Özel Resimler'
@@ -1073,7 +1074,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                           : (_isPrivatePhotosUnlocked
                                               ? const Color(0xFFE11D48).withValues(alpha: 0.5)
                                               : (isDark ? AppColors.outlineDark : AppColors.outlineLight)),
-                                      width: _selectedCategoryFilter == 'Özel Resimler' ? 1.5 : 1,
+                                      width: _selectedCategoryFilter == 'Özel Resimler' ? 1.0 : 0.5,
                                     ),
                                     boxShadow: _selectedCategoryFilter == 'Özel Resimler'
                                         ? [
@@ -1098,8 +1099,8 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                               shape: BoxShape.circle,
                                             ),
                                             child: Icon(
-                                              _isPrivatePhotosUnlocked ? Icons.lock_open_rounded : Icons.lock_rounded,
-                                              size: 16,
+                                              _isPrivatePhotosUnlocked ? AppIcons.lockOpen : AppIcons.lock,
+                                              size: 15,
                                               color: const Color(0xFFE11D48),
                                             ),
                                           ),
@@ -1145,12 +1146,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                               : theme.colorScheme.onSurface,
                                         ),
                                       ),
-                                      const SizedBox(height: 2),
+                                      const SizedBox(height: 3),
                                       Row(
                                         children: [
                                           Icon(
-                                            _isPrivatePhotosUnlocked ? Icons.photo_library_outlined : Icons.shield_outlined,
-                                            size: 12,
+                                            _isPrivatePhotosUnlocked ? AppIcons.photo : AppIcons.shield,
+                                            size: 11,
                                             color: _selectedCategoryFilter == 'Özel Resimler'
                                                 ? const Color(0xFFE11D48)
                                                 : theme.colorScheme.onSurfaceVariant,
@@ -1201,24 +1202,24 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   }
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                                   decoration: BoxDecoration(
                                     color: passportDoc != null
                                         ? (isDark
-                                            ? Color.alphaBlend(theme.colorScheme.primary.withValues(alpha: 0.08), AppColors.surfaceDark)
-                                            : Color.alphaBlend(theme.colorScheme.primary.withValues(alpha: 0.05), AppColors.surfaceLight))
-                                        : (isDark ? AppColors.surfaceDark : AppColors.surfaceLight),
+                                            ? Color.alphaBlend(AppColors.brandAccent.withValues(alpha: 0.08), AppColors.surfaceRaisedDark)
+                                            : Color.alphaBlend(AppColors.brandAccent.withValues(alpha: 0.05), AppColors.surfaceLight))
+                                        : (isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceLight),
                                     borderRadius: BorderRadius.circular(18),
                                     border: Border.all(
                                       color: passportDoc != null
-                                          ? theme.colorScheme.primary.withValues(alpha: isDark ? 0.45 : 0.35)
+                                          ? AppColors.brandAccent.withValues(alpha: isDark ? 0.45 : 0.35)
                                           : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
-                                      width: passportDoc != null ? 1.5 : 1,
+                                      width: 0.5,
                                     ),
                                     boxShadow: passportDoc != null
                                         ? [
                                             BoxShadow(
-                                              color: theme.colorScheme.primary.withValues(alpha: isDark ? 0.12 : 0.06),
+                                              color: AppColors.brandAccent.withValues(alpha: isDark ? 0.12 : 0.06),
                                               blurRadius: 8,
                                               offset: const Offset(0, 3),
                                             ),
@@ -1234,13 +1235,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                           Container(
                                             padding: const EdgeInsets.all(7),
                                             decoration: BoxDecoration(
-                                              color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                                              color: AppColors.brandAccent.withValues(alpha: 0.15),
                                               shape: BoxShape.circle,
                                             ),
-                                            child: Icon(
-                                              Icons.menu_book_rounded,
-                                              size: 16,
-                                              color: theme.colorScheme.primary,
+                                            child: const Icon(
+                                              AppIcons.passport,
+                                              size: 15,
+                                              color: AppColors.brandAccent,
                                             ),
                                           ),
                                           const SizedBox(width: 4),
@@ -1252,7 +1253,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                                 decoration: BoxDecoration(
                                                   color: passportDoc != null
                                                       ? AppColors.successPastel.withValues(alpha: isDark ? 0.25 : 0.15)
-                                                      : theme.colorScheme.primaryContainer.withValues(alpha: 0.8),
+                                                      : AppColors.brandAccent.withValues(alpha: 0.15),
                                                   borderRadius: BorderRadius.circular(6),
                                                 ),
                                                 child: Text(
@@ -1264,7 +1265,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                                     fontWeight: FontWeight.bold,
                                                     color: passportDoc != null
                                                         ? AppColors.successPastel
-                                                        : (isDark ? theme.colorScheme.onPrimaryContainer : theme.colorScheme.primary),
+                                                        : AppColors.brandAccent,
                                                   ),
                                                 ),
                                               ),
@@ -1287,13 +1288,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                           color: theme.colorScheme.onSurface,
                                         ),
                                       ),
-                                      const SizedBox(height: 2),
+                                      const SizedBox(height: 3),
                                       Row(
                                         children: [
                                           Icon(
-                                            passportDoc != null ? Icons.visibility_rounded : Icons.add_circle_outline_rounded,
-                                            size: 12,
-                                            color: theme.colorScheme.primary,
+                                            passportDoc != null ? AppIcons.eye : AppIcons.add,
+                                            size: 11,
+                                            color: AppColors.brandAccent,
                                           ),
                                           const SizedBox(width: 4),
                                           Expanded(
@@ -1310,7 +1311,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                                 fontWeight: FontWeight.w500,
                                                 color: passportDoc != null
                                                     ? theme.colorScheme.onSurfaceVariant
-                                                    : theme.colorScheme.primary,
+                                                    : AppColors.brandAccent,
                                               ),
                                             ),
                                           ),
@@ -1335,20 +1336,38 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Main Categories
+                        // Main Categories (Cohesive Terracotta + Obsidian Micro-Pills)
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: [
                               ChoiceChip(
+                                showCheckmark: false,
+                                avatar: Icon(
+                                  AppIcons.categoryAll,
+                                  size: 14,
+                                  color: _selectedCategoryFilter == null
+                                      ? Colors.white
+                                      : theme.colorScheme.onSurfaceVariant,
+                                ),
                                 label: Text('${l10n.allDocuments} ($publicDocsCount)'),
                                 selected: _selectedCategoryFilter == null,
-                                selectedColor: theme.colorScheme.primary,
+                                selectedColor: AppColors.brandAccent,
+                                backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(17),
+                                  side: BorderSide(
+                                    color: _selectedCategoryFilter == null
+                                        ? Colors.transparent
+                                        : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
+                                    width: 0.5,
+                                  ),
+                                ),
                                 labelStyle: TextStyle(
                                   color: _selectedCategoryFilter == null
-                                      ? theme.colorScheme.onPrimary
-                                      : theme.colorScheme.onSurface,
-                                  fontWeight: FontWeight.w700,
+                                      ? Colors.white
+                                      : theme.colorScheme.onSurfaceVariant,
+                                  fontWeight: _selectedCategoryFilter == null ? FontWeight.w700 : FontWeight.w600,
                                   fontSize: 12,
                                 ),
                                 onSelected: (val) {
@@ -1363,15 +1382,32 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                               ),
                               const SizedBox(width: 8),
                               ChoiceChip(
-                                avatar: const Icon(Icons.confirmation_number_rounded, size: 15),
+                                showCheckmark: false,
+                                avatar: Icon(
+                                  AppIcons.ticket,
+                                  size: 14,
+                                  color: _selectedCategoryFilter == 'Biletler'
+                                      ? Colors.white
+                                      : theme.colorScheme.onSurfaceVariant,
+                                ),
                                 label: Text(l10n.tickets),
                                 selected: _selectedCategoryFilter == 'Biletler',
-                                selectedColor: const Color(0xFF0284C7),
+                                selectedColor: AppColors.brandAccent,
+                                backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(17),
+                                  side: BorderSide(
+                                    color: _selectedCategoryFilter == 'Biletler'
+                                        ? Colors.transparent
+                                        : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
+                                    width: 0.5,
+                                  ),
+                                ),
                                 labelStyle: TextStyle(
                                   color: _selectedCategoryFilter == 'Biletler'
                                       ? Colors.white
-                                      : theme.colorScheme.onSurface,
-                                  fontWeight: FontWeight.w700,
+                                      : theme.colorScheme.onSurfaceVariant,
+                                  fontWeight: _selectedCategoryFilter == 'Biletler' ? FontWeight.w700 : FontWeight.w600,
                                   fontSize: 12,
                                 ),
                                 onSelected: (val) {
@@ -1384,15 +1420,32 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                               ),
                               const SizedBox(width: 8),
                               ChoiceChip(
-                                avatar: const Icon(Icons.hotel_rounded, size: 15),
+                                showCheckmark: false,
+                                avatar: Icon(
+                                  AppIcons.hotel,
+                                  size: 14,
+                                  color: _selectedCategoryFilter == 'Konaklama'
+                                      ? Colors.white
+                                      : theme.colorScheme.onSurfaceVariant,
+                                ),
                                 label: Text(l10n.accommodation),
                                 selected: _selectedCategoryFilter == 'Konaklama',
-                                selectedColor: const Color(0xFF059669),
+                                selectedColor: AppColors.brandAccent,
+                                backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(17),
+                                  side: BorderSide(
+                                    color: _selectedCategoryFilter == 'Konaklama'
+                                        ? Colors.transparent
+                                        : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
+                                    width: 0.5,
+                                  ),
+                                ),
                                 labelStyle: TextStyle(
                                   color: _selectedCategoryFilter == 'Konaklama'
                                       ? Colors.white
-                                      : theme.colorScheme.onSurface,
-                                  fontWeight: FontWeight.w700,
+                                      : theme.colorScheme.onSurfaceVariant,
+                                  fontWeight: _selectedCategoryFilter == 'Konaklama' ? FontWeight.w700 : FontWeight.w600,
                                   fontSize: 12,
                                 ),
                                 onSelected: (val) {
@@ -1405,15 +1458,32 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                               ),
                               const SizedBox(width: 8),
                               ChoiceChip(
-                                avatar: const Icon(Icons.assignment_ind_rounded, size: 15),
+                                showCheckmark: false,
+                                avatar: Icon(
+                                  AppIcons.passport,
+                                  size: 14,
+                                  color: _selectedCategoryFilter == 'Kimlik & Pasaport'
+                                      ? Colors.white
+                                      : theme.colorScheme.onSurfaceVariant,
+                                ),
                                 label: Text(l10n.idAndPassport),
                                 selected: _selectedCategoryFilter == 'Kimlik & Pasaport',
-                                selectedColor: isDark ? const Color(0xFF2563EB) : const Color(0xFF1D4ED8),
+                                selectedColor: AppColors.brandAccent,
+                                backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(17),
+                                  side: BorderSide(
+                                    color: _selectedCategoryFilter == 'Kimlik & Pasaport'
+                                        ? Colors.transparent
+                                        : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
+                                    width: 0.5,
+                                  ),
+                                ),
                                 labelStyle: TextStyle(
                                   color: _selectedCategoryFilter == 'Kimlik & Pasaport'
                                       ? Colors.white
-                                      : theme.colorScheme.onSurface,
-                                  fontWeight: FontWeight.w700,
+                                      : theme.colorScheme.onSurfaceVariant,
+                                  fontWeight: _selectedCategoryFilter == 'Kimlik & Pasaport' ? FontWeight.w700 : FontWeight.w600,
                                   fontSize: 12,
                                 ),
                                 onSelected: (val) {
@@ -1426,15 +1496,32 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                               ),
                               const SizedBox(width: 8),
                               ChoiceChip(
-                                avatar: const Icon(Icons.health_and_safety_rounded, size: 15),
+                                showCheckmark: false,
+                                avatar: Icon(
+                                  AppIcons.shield,
+                                  size: 14,
+                                  color: _selectedCategoryFilter == 'Sağlık & Sigorta'
+                                      ? Colors.white
+                                      : theme.colorScheme.onSurfaceVariant,
+                                ),
                                 label: Text(l10n.healthAndInsurance),
                                 selected: _selectedCategoryFilter == 'Sağlık & Sigorta',
-                                selectedColor: const Color(0xFFE11D48),
+                                selectedColor: AppColors.brandAccent,
+                                backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(17),
+                                  side: BorderSide(
+                                    color: _selectedCategoryFilter == 'Sağlık & Sigorta'
+                                        ? Colors.transparent
+                                        : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
+                                    width: 0.5,
+                                  ),
+                                ),
                                 labelStyle: TextStyle(
                                   color: _selectedCategoryFilter == 'Sağlık & Sigorta'
                                       ? Colors.white
-                                      : theme.colorScheme.onSurface,
-                                  fontWeight: FontWeight.w700,
+                                      : theme.colorScheme.onSurfaceVariant,
+                                  fontWeight: _selectedCategoryFilter == 'Sağlık & Sigorta' ? FontWeight.w700 : FontWeight.w600,
                                   fontSize: 12,
                                 ),
                                 onSelected: (val) {
@@ -1447,15 +1534,32 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                               ),
                               const SizedBox(width: 8),
                               ChoiceChip(
-                                avatar: const Icon(Icons.folder_open_rounded, size: 15),
+                                showCheckmark: false,
+                                avatar: Icon(
+                                  AppIcons.document,
+                                  size: 14,
+                                  color: _selectedCategoryFilter == 'Diğer Belgeler'
+                                      ? Colors.white
+                                      : theme.colorScheme.onSurfaceVariant,
+                                ),
                                 label: Text(l10n.otherDocuments),
                                 selected: _selectedCategoryFilter == 'Diğer Belgeler',
-                                selectedColor: const Color(0xFF7C3AED),
+                                selectedColor: AppColors.brandAccent,
+                                backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(17),
+                                  side: BorderSide(
+                                    color: _selectedCategoryFilter == 'Diğer Belgeler'
+                                        ? Colors.transparent
+                                        : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
+                                    width: 0.5,
+                                  ),
+                                ),
                                 labelStyle: TextStyle(
                                   color: _selectedCategoryFilter == 'Diğer Belgeler'
                                       ? Colors.white
-                                      : theme.colorScheme.onSurface,
-                                  fontWeight: FontWeight.w700,
+                                      : theme.colorScheme.onSurfaceVariant,
+                                  fontWeight: _selectedCategoryFilter == 'Diğer Belgeler' ? FontWeight.w700 : FontWeight.w600,
                                   fontSize: 12,
                                 ),
                                 onSelected: (val) {
@@ -1476,10 +1580,11 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF0284C7).withValues(alpha: 0.08),
+                              color: AppColors.brandAccent.withValues(alpha: isDark ? 0.12 : 0.06),
                               borderRadius: BorderRadius.circular(14),
                               border: Border.all(
-                                color: const Color(0xFF0284C7).withValues(alpha: 0.2),
+                                color: AppColors.brandAccent.withValues(alpha: 0.2),
+                                width: 0.5,
                               ),
                             ),
                             child: SingleChildScrollView(
@@ -1487,9 +1592,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                               child: Row(
                                 children: [
                                   ChoiceChip(
+                                    showCheckmark: false,
                                     label: Text(l10n.allTickets),
                                     selected: _selectedSubCategoryFilter == null,
-                                    selectedColor: const Color(0xFF0284C7),
+                                    selectedColor: AppColors.brandAccent,
+                                    backgroundColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                     labelStyle: TextStyle(
                                       color: _selectedSubCategoryFilter == null
                                           ? Colors.white
@@ -1503,10 +1611,19 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   ),
                                   const SizedBox(width: 6),
                                   ChoiceChip(
-                                    avatar: const Icon(Icons.flight_takeoff_rounded, size: 13),
+                                    showCheckmark: false,
+                                    avatar: Icon(
+                                      AppIcons.flight,
+                                      size: 12,
+                                      color: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'flightTicket'
+                                          ? Colors.white
+                                          : theme.colorScheme.onSurface,
+                                    ),
                                     label: Text(l10n.flightTickets),
                                     selected: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'flightTicket',
-                                    selectedColor: const Color(0xFF0284C7),
+                                    selectedColor: AppColors.brandAccent,
+                                    backgroundColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                     labelStyle: TextStyle(
                                       color: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'flightTicket'
                                           ? Colors.white
@@ -1520,10 +1637,19 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   ),
                                   const SizedBox(width: 6),
                                   ChoiceChip(
-                                    avatar: const Icon(Icons.directions_bus_rounded, size: 13),
+                                    showCheckmark: false,
+                                    avatar: Icon(
+                                      AppIcons.bus,
+                                      size: 12,
+                                      color: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'busTicket'
+                                          ? Colors.white
+                                          : theme.colorScheme.onSurface,
+                                    ),
                                     label: Text(l10n.busTickets),
                                     selected: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'busTicket',
-                                    selectedColor: const Color(0xFF0284C7),
+                                    selectedColor: AppColors.brandAccent,
+                                    backgroundColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                     labelStyle: TextStyle(
                                       color: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'busTicket'
                                           ? Colors.white
@@ -1537,10 +1663,19 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   ),
                                   const SizedBox(width: 6),
                                   ChoiceChip(
-                                    avatar: const Icon(Icons.directions_boat_rounded, size: 13),
+                                    showCheckmark: false,
+                                    avatar: Icon(
+                                      AppIcons.boat,
+                                      size: 12,
+                                      color: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'ferryTicket'
+                                          ? Colors.white
+                                          : theme.colorScheme.onSurface,
+                                    ),
                                     label: Text(l10n.ferryBoat),
                                     selected: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'ferryTicket',
-                                    selectedColor: const Color(0xFF0284C7),
+                                    selectedColor: AppColors.brandAccent,
+                                    backgroundColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                     labelStyle: TextStyle(
                                       color: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'ferryTicket'
                                           ? Colors.white
@@ -1554,10 +1689,19 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   ),
                                   const SizedBox(width: 6),
                                   ChoiceChip(
-                                    avatar: const Icon(Icons.train_rounded, size: 13),
+                                    showCheckmark: false,
+                                    avatar: Icon(
+                                      AppIcons.train,
+                                      size: 12,
+                                      color: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'trainTicket'
+                                          ? Colors.white
+                                          : theme.colorScheme.onSurface,
+                                    ),
                                     label: Text(l10n.trainTickets),
                                     selected: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'trainTicket',
-                                    selectedColor: const Color(0xFF0284C7),
+                                    selectedColor: AppColors.brandAccent,
+                                    backgroundColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                     labelStyle: TextStyle(
                                       color: _selectedSubCategoryFilter != null && _normalizeSubCategoryKey(_selectedSubCategoryFilter!) == 'trainTicket'
                                           ? Colors.white
@@ -1575,53 +1719,89 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                           ),
                         ],
 
-                        const SizedBox(height: 8),
-
-                        // Trip Filter Row
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              ChoiceChip(
-                                label: Text(l10n.allFilter),
-                                selected: _selectedTripFilter == null,
-                                selectedColor: theme.colorScheme.secondaryContainer,
-                                labelStyle: TextStyle(
-                                  color: _selectedTripFilter == null
-                                      ? theme.colorScheme.onSecondaryContainer
-                                      : theme.colorScheme.onSurfaceVariant,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 11,
-                                ),
-                                onSelected: (val) {
-                                  if (val) setState(() => _selectedTripFilter = null);
-                                },
-                              ),
-                              ...tripState.trips.map((trip) {
-                                final isSelected = _selectedTripFilter == trip.id;
-                                return Padding(
-                                  padding: const EdgeInsets.only(left: 6),
-                                  child: ChoiceChip(
-                                    avatar: const Icon(Icons.flight_takeoff_rounded, size: 13),
-                                    label: Text(trip.title),
-                                    selected: isSelected,
-                                    selectedColor: theme.colorScheme.secondaryContainer,
-                                    labelStyle: TextStyle(
-                                      color: isSelected
-                                          ? theme.colorScheme.onSecondaryContainer
-                                          : theme.colorScheme.onSurfaceVariant,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 11,
-                                    ),
-                                    onSelected: (val) {
-                                      setState(() => _selectedTripFilter = val ? trip.id : null);
-                                    },
+                        // Trip Filter Row (Secondary, subordinated styling)
+                        if (tripState.trips.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                ChoiceChip(
+                                  showCheckmark: false,
+                                  avatar: Icon(
+                                    AppIcons.globe,
+                                    size: 12,
+                                    color: _selectedTripFilter == null
+                                        ? Colors.white
+                                        : theme.colorScheme.onSurfaceVariant,
                                   ),
-                                );
-                              }),
-                            ],
+                                  label: Text(l10n.allFilter),
+                                  selected: _selectedTripFilter == null,
+                                  selectedColor: isDark ? const Color(0xFF334155) : const Color(0xFF1E293B),
+                                  backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                    side: BorderSide(
+                                      color: _selectedTripFilter == null
+                                          ? Colors.transparent
+                                          : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
+                                      width: 0.5,
+                                    ),
+                                  ),
+                                  labelStyle: TextStyle(
+                                    color: _selectedTripFilter == null
+                                        ? Colors.white
+                                        : theme.colorScheme.onSurfaceVariant,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 11,
+                                  ),
+                                  onSelected: (val) {
+                                    if (val) setState(() => _selectedTripFilter = null);
+                                  },
+                                ),
+                                ...tripState.trips.map((trip) {
+                                  final isSelected = _selectedTripFilter == trip.id;
+                                  return Padding(
+                                    padding: const EdgeInsets.only(left: 6),
+                                    child: ChoiceChip(
+                                      showCheckmark: false,
+                                      avatar: Icon(
+                                        AppIcons.location,
+                                        size: 12,
+                                        color: isSelected
+                                            ? Colors.white
+                                            : theme.colorScheme.onSurfaceVariant,
+                                      ),
+                                      label: Text(trip.title),
+                                      selected: isSelected,
+                                      selectedColor: isDark ? const Color(0xFF334155) : const Color(0xFF1E293B),
+                                      backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(14),
+                                        side: BorderSide(
+                                          color: isSelected
+                                              ? Colors.transparent
+                                              : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
+                                          width: 0.5,
+                                        ),
+                                      ),
+                                      labelStyle: TextStyle(
+                                        color: isSelected
+                                            ? Colors.white
+                                            : theme.colorScheme.onSurfaceVariant,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 11,
+                                      ),
+                                      onSelected: (val) {
+                                        setState(() => _selectedTripFilter = val ? trip.id : null);
+                                      },
+                                    ),
+                                  );
+                                }),
+                              ],
+                            ),
                           ),
-                        ),
+                        ],
                       ],
                     ),
                   ),
@@ -1648,7 +1828,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.privacy_tip_outlined, color: Color(0xFFE11D48), size: 18),
+                            const Icon(AppIcons.shield, color: Color(0xFFE11D48), size: 18),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -1681,7 +1861,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(Icons.lock_rounded, size: 13, color: Color(0xFFE11D48)),
+                                    const Icon(AppIcons.lock, size: 13, color: Color(0xFFE11D48)),
                                     const SizedBox(width: 4),
                                     ConstrainedBox(
                                       constraints: const BoxConstraints(maxWidth: 90),
@@ -1732,8 +1912,8 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   ),
                                   child: Icon(
                                     _selectedCategoryFilter == 'Özel Resimler'
-                                        ? Icons.photo_library_outlined
-                                        : Icons.shield_outlined,
+                                        ? AppIcons.photo
+                                        : AppIcons.shield,
                                     size: 40,
                                     color: _selectedCategoryFilter == 'Özel Resimler'
                                         ? const Color(0xFFE11D48)
@@ -1771,8 +1951,8 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   initialCategory: _selectedCategoryFilter == 'Özel Resimler' ? 'PrivatePhotos' : null,
                                 ),
                                 leadingIcon: _selectedCategoryFilter == 'Özel Resimler'
-                                    ? Icons.add_a_photo_rounded
-                                    : Icons.add_rounded,
+                                    ? AppIcons.photo
+                                    : AppIcons.add,
                                 label: _selectedCategoryFilter == 'Özel Resimler'
                                     ? l10n.addPrivatePhoto
                                     : l10n.addDocument,
@@ -1825,17 +2005,17 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                 color: const Color(0xFFEF4444),
                                 borderRadius: BorderRadius.circular(AppRadius.card),
                               ),
-                              child: const Icon(Icons.delete_sweep_rounded, color: Colors.white, size: 24),
+                              child: const Icon(AppIcons.deleteSweep, color: Colors.white, size: 24),
                             ),
                             secondaryBackground: Container(
                               alignment: Alignment.centerRight,
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               decoration: BoxDecoration(
-                                color: theme.colorScheme.primary,
+                                color: AppColors.brandAccent,
                                 borderRadius: BorderRadius.circular(AppRadius.card),
                               ),
                               child: const Icon(
-                                Icons.visibility_rounded,
+                                AppIcons.eye,
                                 color: Colors.white,
                                 size: 24,
                               ),
@@ -1883,41 +2063,79 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                           ),
                                         ),
 
-                                        // PDF or Image badge
+                                        // Frosted Glass PDF or Image badge
                                         Positioned(
                                           top: 8,
                                           left: 8,
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                                            decoration: BoxDecoration(
-                                              color: isPdf
-                                                  ? const Color(0xFFE53935)
-                                                  : Colors.black.withValues(alpha: 0.6),
-                                              borderRadius: BorderRadius.circular(AppRadius.xs),
-                                            ),
-                                            child: Text(
-                                              isPdf ? l10n.pdfBadge : l10n.imageBadge,
-                                              style: AppTypography.caption.copyWith(
-                                                color: Colors.white,
-                                                fontSize: 9,
-                                                fontWeight: FontWeight.bold,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(6),
+                                            child: BackdropFilter(
+                                              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                                              child: Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3.5),
+                                                decoration: BoxDecoration(
+                                                  color: (isPdf ? const Color(0xFFDC2626) : Colors.black).withValues(alpha: 0.5),
+                                                  borderRadius: BorderRadius.circular(6),
+                                                  border: Border.all(
+                                                    color: Colors.white.withValues(alpha: 0.25),
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Icon(
+                                                      isPdf ? AppIcons.pdf : AppIcons.photo,
+                                                      size: 10,
+                                                      color: Colors.white,
+                                                    ),
+                                                    const SizedBox(width: 4),
+                                                    Text(
+                                                      isPdf ? l10n.pdfBadge : l10n.imageBadge,
+                                                      style: AppTypography.caption.copyWith(
+                                                        color: Colors.white,
+                                                        fontSize: 9,
+                                                        fontWeight: FontWeight.w700,
+                                                        letterSpacing: 0.3,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
 
-                                        // Delete button icon
+                                        // Refined Frosted Glass Delete action button
                                         Positioned(
-                                          top: 4,
-                                          right: 4,
-                                          child: IconButton(
-                                            visualDensity: VisualDensity.compact,
-                                            icon: const Icon(Icons.delete_outline_rounded, size: 18),
-                                            color: Colors.white,
-                                            style: IconButton.styleFrom(
-                                              backgroundColor: Colors.black.withValues(alpha: 0.4),
+                                          top: 6,
+                                          right: 6,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(14),
+                                            child: BackdropFilter(
+                                              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                                              child: Material(
+                                                color: Colors.black.withValues(alpha: 0.35),
+                                                shape: CircleBorder(
+                                                  side: BorderSide(
+                                                    color: Colors.white.withValues(alpha: 0.25),
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                                child: InkWell(
+                                                  onTap: () => _showDeleteDialog(context, doc),
+                                                  borderRadius: BorderRadius.circular(14),
+                                                  child: const Padding(
+                                                    padding: EdgeInsets.all(6),
+                                                    child: Icon(
+                                                      AppIcons.delete,
+                                                      size: 13,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
                                             ),
-                                            onPressed: () => _showDeleteDialog(context, doc),
                                           ),
                                         ),
                                       ],
@@ -1937,8 +2155,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                               child: Container(
                                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                                 decoration: BoxDecoration(
-                                                  color: categoryColor.withValues(alpha: isDark ? 0.22 : 0.12),
+                                                  color: categoryColor.withValues(alpha: isDark ? 0.22 : 0.1),
                                                   borderRadius: BorderRadius.circular(AppRadius.xs),
+                                                  border: Border.all(
+                                                    color: categoryColor.withValues(alpha: isDark ? 0.35 : 0.2),
+                                                    width: 0.5,
+                                                  ),
                                                 ),
                                                 child: Row(
                                                   mainAxisSize: MainAxisSize.min,
@@ -1964,7 +2186,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                             if (isPdf) ...[
                                               const SizedBox(width: 4),
                                               IconButton(
-                                                icon: const Icon(Icons.open_in_browser_rounded, size: 16),
+                                                icon: const Icon(AppIcons.arrowForward, size: 15),
                                                 padding: EdgeInsets.zero,
                                                 constraints: const BoxConstraints(),
                                                 tooltip: l10n.openPdf,
@@ -1991,13 +2213,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                             ),
                                           ),
                                         ),
-                                        const SizedBox(height: 2),
+                                        const SizedBox(height: 3),
 
-                                        // Trip badge or Date
+                                        // Trip badge or Clean Prose Date (Noto Sans, no monospace leak!)
                                         if (attachedTrip != null) ...[
                                           Row(
                                             children: [
-                                              Icon(Icons.flight_takeoff_rounded, size: 11, color: theme.colorScheme.primary),
+                                              const Icon(AppIcons.location, size: 11, color: AppColors.brandAccent),
                                               const SizedBox(width: 4),
                                               Expanded(
                                                 child: Text(
@@ -2007,26 +2229,37 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                                   style: AppTypography.caption.copyWith(
                                                     fontSize: 10,
                                                     fontWeight: FontWeight.w600,
-                                                    color: theme.colorScheme.primary,
+                                                    color: AppColors.brandAccent,
                                                   ),
                                                 ),
                                               ),
                                             ],
                                           ),
                                         ] else ...[
-                                          Text(
-                                            AppDateFormatter.formatYMMMd(
-                                              doc.createdAt,
-                                              locale: Localizations.localeOf(context).languageCode,
-                                            ),
-                                            style: AppTypography.mono(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w500,
-                                              color: theme.colorScheme.onSurfaceVariant,
-                                              tabularFigures: true,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                AppIcons.calendar,
+                                                size: 10,
+                                                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Expanded(
+                                                child: Text(
+                                                  AppDateFormatter.formatYMMMd(
+                                                    doc.createdAt,
+                                                    locale: Localizations.localeOf(context).languageCode,
+                                                  ),
+                                                  style: AppTypography.caption.copyWith(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: theme.colorScheme.onSurfaceVariant,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ],

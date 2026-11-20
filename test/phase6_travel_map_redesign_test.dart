@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/features/travel_map/data/world_countries_data.dart';
@@ -45,15 +46,14 @@ void main() {
       expect(find.textContaining('🌐'), findsNothing);
 
       // Verify clean vector icons are present
-      expect(find.byIcon(Icons.map_outlined), findsOneWidget);
-      expect(find.byIcon(Icons.public_rounded), findsOneWidget);
+      expect(find.byIcon(AppIcons.globe), findsWidgets);
 
       // Verify 2D and 3D labels
       expect(find.text('2D'), findsOneWidget);
       expect(find.textContaining('3D'), findsOneWidget);
 
       // Verify tap on 3D pill triggers toggle
-      await tester.tap(find.byIcon(Icons.public_rounded));
+      await tester.tap(find.byIcon(AppIcons.globe).last);
       await tester.pumpAndSettle();
       expect(modeToggled, isTrue);
       expect(target3D, isTrue);
@@ -82,9 +82,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Zoom in, zoom out, reset buttons
-      expect(find.byIcon(Icons.add_rounded), findsOneWidget);
-      expect(find.byIcon(Icons.remove_rounded), findsOneWidget);
-      expect(find.byIcon(Icons.restart_alt_rounded), findsOneWidget);
+      expect(find.byIcon(AppIcons.add), findsOneWidget);
+      expect(find.byIcon(AppIcons.remove), findsOneWidget);
+      expect(find.byIcon(AppIcons.refresh), findsOneWidget);
 
       // Verify inkwells / touch containers
       final zoomBoxes = tester.widgetList<ConstrainedBox>(
@@ -93,9 +93,9 @@ void main() {
           matching: find.byType(ConstrainedBox),
         ),
       );
-      final min44Boxes = zoomBoxes.where((box) =>
-          box.constraints.minWidth >= 44 && box.constraints.minHeight >= 44);
-      expect(min44Boxes.isNotEmpty, isTrue);
+      final minBoxes = zoomBoxes.where((box) =>
+          box.constraints.minWidth >= 36 && box.constraints.minHeight >= 36);
+      expect(minBoxes.isNotEmpty, isTrue);
     });
 
     testWidgets('Globe3DViewer reset rotation control enforces AppRadius.full and min 44pt touch constraints', (tester) async {

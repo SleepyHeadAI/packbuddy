@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 
 /// Helper and metadata resolver for baggage / luggage tags
 class PackingTagHelper {
@@ -258,18 +259,18 @@ class PackingTagHelper {
   static IconData getTagIcon(String rawTag) {
     final normalized = rawTag.trim().toUpperCase();
     if (normalized == tagCarryOn || normalized == 'CARRY_ON' || normalized == 'CABIN' || normalized == 'KABIN') {
-      return Icons.luggage_rounded;
+      return AppIcons.luggage;
     }
     if (normalized == tagCabinOnly || normalized == 'PERSONAL' || normalized == 'KIŞISEL' || normalized == 'KISISEL') {
-      return Icons.shopping_bag_outlined;
+      return AppIcons.backpack;
     }
     if (normalized == tagCheckIn || normalized == 'CHECK_IN' || normalized == 'CHECKED' || normalized == 'CARGO' || normalized == 'UÇAK ALTI') {
-      return Icons.work_outline_rounded;
+      return AppIcons.flightTakeoff;
     }
     if (normalized == tagEssential || normalized == 'ÖNEMLI' || normalized == 'ONEMLI') {
-      return Icons.star_rounded;
+      return AppIcons.spark;
     }
-    return Icons.sell_outlined;
+    return AppIcons.checklist;
   }
 
   static Color getTagColor(String rawTag, bool isDark) {

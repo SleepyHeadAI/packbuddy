@@ -1,86 +1,111 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// Unified iconography dictionary for PackBuddy.
-/// Standardizes all icon glyphs across the application to rounded, crisp vector outlines.
+/// Unified modern iconography dictionary for PackBuddy powered by Lucide Icons.
+/// Standardizes all icon glyphs across the application to crisp, rounded, consistent 1.5pt vector outlines.
 ///
-/// Note on future extensibility: If a third-party vector library (`lucide_icons_flutter` or
-/// `phosphor_flutter`) is activated in a future phase, only this dictionary needs to be pointed
-/// to the third-party glyphs; caller code remains completely unchanged.
+/// Fully type-compatible with Flutter 3.47+ [IconData].
 class AppIcons {
   AppIcons._();
 
   // --- Navigation & Core Shell ---
-  static const IconData home = Icons.home_rounded;
-  static const IconData homeOutlined = Icons.home_outlined;
-  static const IconData map = Icons.public_rounded;
-  static const IconData mapOutlined = Icons.public_outlined;
-  static const IconData checklist = Icons.checklist_rtl_rounded;
-  static const IconData checklistOutlined = Icons.checklist_rounded;
-  static const IconData vault = Icons.folder_shared_rounded;
-  static const IconData vaultOutlined = Icons.folder_shared_outlined;
-  static const IconData settings = Icons.tune_rounded;
-  static const IconData settingsOutlined = Icons.tune_outlined;
+  static const IconData home = LucideIcons.house;
+  static const IconData homeOutlined = LucideIcons.house;
+  static const IconData map = LucideIcons.globe;
+  static const IconData mapOutlined = LucideIcons.globe;
+  static const IconData checklist = LucideIcons.listCheck;
+  static const IconData checklistOutlined = LucideIcons.listCheck;
+  static const IconData vault = LucideIcons.folderLock;
+  static const IconData vaultOutlined = LucideIcons.folder;
+  static const IconData settings = LucideIcons.slidersHorizontal;
+  static const IconData settingsOutlined = LucideIcons.slidersHorizontal;
 
   // --- Actions & Controls ---
-  static const IconData add = Icons.add_rounded;
-  static const IconData close = Icons.close_rounded;
-  static const IconData check = Icons.check_rounded;
-  static const IconData checkCircle = Icons.check_circle_rounded;
-  static const IconData delete = Icons.delete_outline_rounded;
-  static const IconData deleteSweep = Icons.delete_sweep_rounded;
-  static const IconData edit = Icons.edit_rounded;
-  static const IconData search = Icons.search_rounded;
-  static const IconData filter = Icons.filter_list_rounded;
-  static const IconData share = Icons.share_rounded;
-  static const IconData copy = Icons.copy_rounded;
-  static const IconData more = Icons.more_horiz_rounded;
-  static const IconData chevronRight = Icons.chevron_right_rounded;
-  static const IconData chevronLeft = Icons.chevron_left_rounded;
-  static const IconData arrowForward = Icons.arrow_forward_rounded;
-  static const IconData arrowBack = Icons.arrow_back_rounded;
-  static const IconData refresh = Icons.refresh_rounded;
-  static const IconData undo = Icons.undo_rounded;
+  static const IconData add = LucideIcons.plus;
+  static const IconData remove = LucideIcons.minus;
+  static const IconData close = LucideIcons.x;
+  static const IconData check = LucideIcons.check;
+  static const IconData checkCircle = LucideIcons.circleCheck;
+  static const IconData delete = LucideIcons.trash2;
+  static const IconData deleteSweep = LucideIcons.trash;
+  static const IconData edit = LucideIcons.pencil;
+  static const IconData search = LucideIcons.search;
+  static const IconData filter = LucideIcons.slidersHorizontal;
+  static const IconData share = LucideIcons.share2;
+  static const IconData copy = LucideIcons.copy;
+  static const IconData more = LucideIcons.moreHorizontal;
+  static const IconData chevronRight = LucideIcons.chevronRight;
+  static const IconData chevronLeft = LucideIcons.chevronLeft;
+  static const IconData arrowForward = LucideIcons.arrowRight;
+  static const IconData arrowBack = LucideIcons.arrowLeft;
+  static const IconData refresh = LucideIcons.refreshCw;
+  static const IconData undo = LucideIcons.undo2;
+
+  // --- Categories ---
+  static const IconData categoryAll = LucideIcons.layoutGrid;
+  static const IconData categoryClothing = LucideIcons.shirt;
+  static const IconData categoryElectronics = LucideIcons.smartphone;
+  static const IconData categoryToiletries = LucideIcons.sparkles;
+  static const IconData categoryDocuments = LucideIcons.fileText;
+  static const IconData categoryAccessories = LucideIcons.watch;
+  static const IconData categoryOther = LucideIcons.ellipsis;
 
   // --- Travel & Packing ---
-  static const IconData flight = Icons.flight_rounded;
-  static const IconData flightTakeoff = Icons.flight_takeoff_rounded;
-  static const IconData flightLand = Icons.flight_land_rounded;
-  static const IconData luggage = Icons.luggage_rounded;
-  static const IconData backpack = Icons.backpack_rounded;
-  static const IconData train = Icons.train_rounded;
-  static const IconData car = Icons.directions_car_rounded;
-  static const IconData boat = Icons.directions_boat_rounded;
-  static const IconData hotel = Icons.hotel_rounded;
-  static const IconData calendar = Icons.calendar_today_rounded;
-  static const IconData location = Icons.place_rounded;
-  static const IconData globe = Icons.language_rounded;
-  static const IconData users = Icons.people_alt_rounded;
+  static const IconData flight = LucideIcons.plane;
+  static const IconData flightTakeoff = LucideIcons.planeTakeoff;
+  static const IconData flightLand = LucideIcons.planeLanding;
+  static const IconData luggage = LucideIcons.luggage;
+  static const IconData backpack = LucideIcons.backpack;
+  static const IconData train = LucideIcons.train;
+  static const IconData car = LucideIcons.car;
+  static const IconData boat = LucideIcons.ship;
+  static const IconData hotel = LucideIcons.bed;
+  static const IconData calendar = LucideIcons.calendar;
+  static const IconData location = LucideIcons.mapPin;
+  static const IconData globe = LucideIcons.globe;
+  static const IconData users = LucideIcons.users;
 
   // --- Finance & Budget ---
-  static const IconData budget = Icons.account_balance_wallet_rounded;
-  static const IconData expense = Icons.receipt_long_rounded;
-  static const IconData currency = Icons.currency_exchange_rounded;
-  static const IconData trendUp = Icons.trending_up_rounded;
-  static const IconData creditCard = Icons.credit_card_rounded;
-  static const IconData payments = Icons.payments_rounded;
+  static const IconData budget = LucideIcons.wallet;
+  static const IconData expense = LucideIcons.receipt;
+  static const IconData currency = LucideIcons.arrowLeftRight;
+  static const IconData trendUp = LucideIcons.trendingUp;
+  static const IconData creditCard = LucideIcons.creditCard;
+  static const IconData payments = LucideIcons.banknote;
 
   // --- Security & Vault ---
-  static const IconData lock = Icons.lock_rounded;
-  static const IconData lockOpen = Icons.lock_open_rounded;
-  static const IconData fingerprint = Icons.fingerprint_rounded;
-  static const IconData shield = Icons.shield_rounded;
-  static const IconData verified = Icons.verified_user_rounded;
-  static const IconData document = Icons.description_rounded;
-  static const IconData pdf = Icons.picture_as_pdf_rounded;
-  static const IconData photo = Icons.photo_rounded;
+  static const IconData lock = LucideIcons.lock;
+  static const IconData lockOpen = LucideIcons.lockOpen;
+  static const IconData fingerprint = LucideIcons.fingerprint;
+  static const IconData shield = LucideIcons.shield;
+  static const IconData verified = LucideIcons.badgeCheck;
+  static const IconData document = LucideIcons.fileText;
+  static const IconData pdf = LucideIcons.fileText;
+  static const IconData photo = LucideIcons.image;
+  static const IconData eye = LucideIcons.eye;
+  static const IconData ticket = LucideIcons.ticket;
+  static const IconData bus = LucideIcons.bus;
+  static const IconData passport = LucideIcons.book;
 
   // --- System Status & Feedback ---
-  static const IconData info = Icons.info_outline_rounded;
-  static const IconData warning = Icons.warning_amber_rounded;
-  static const IconData error = Icons.error_outline_rounded;
-  static const IconData success = Icons.check_circle_outline_rounded;
-  static const IconData spark = Icons.auto_awesome_rounded;
-  static const IconData cloudSync = Icons.cloud_sync_rounded;
-  static const IconData cloudDone = Icons.cloud_done_rounded;
-  static const IconData cloudOff = Icons.cloud_off_rounded;
+  static const IconData notification = LucideIcons.bell;
+  static const IconData bell = LucideIcons.bell;
+  static const IconData sun = LucideIcons.sun;
+  static const IconData moon = LucideIcons.moon;
+  static const IconData tune = LucideIcons.slidersHorizontal;
+  static const IconData info = LucideIcons.info;
+  static const IconData warning = LucideIcons.triangleAlert;
+  static const IconData error = LucideIcons.circleAlert;
+  static const IconData success = LucideIcons.circleCheck;
+  static const IconData spark = LucideIcons.sparkles;
+  static const IconData cloudSync = LucideIcons.cloudUpload;
+  static const IconData cloudDone = LucideIcons.cloudCheck;
+  static const IconData cloudOff = LucideIcons.cloudOff;
+  static const IconData logout = LucideIcons.logOut;
+  static const IconData help = LucideIcons.helpCircle;
+  static const IconData tour = LucideIcons.bookOpen;
+  static const IconData legal = LucideIcons.scale;
+  static const IconData bulb = LucideIcons.lightbulb;
+  static const IconData history = LucideIcons.history;
+  static const IconData admin = LucideIcons.shieldCheck;
 }

@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
@@ -193,8 +194,6 @@ class _FloatingGlassNavigationBar extends StatelessWidget {
   static const double barRadius = AppRadius.navBar; // 26.0
   static const double horizontalPadding = 6.0;
   static const double verticalPadding = 5.0;
-  static const double outerCornerRadius = barRadius - horizontalPadding; // 20.0
-  static const double innerCornerRadius = 12.0;
 
   const _FloatingGlassNavigationBar({
     required this.selectedIndex,
@@ -206,7 +205,6 @@ class _FloatingGlassNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isRtl = Directionality.of(context) == TextDirection.rtl;
 
     return RepaintBoundary(
       child: Container(
@@ -235,60 +233,56 @@ class _FloatingGlassNavigationBar extends StatelessWidget {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(barRadius),
-          child: Container(
-            height: barHeight,
-            padding: const EdgeInsets.symmetric(
-              horizontal: horizontalPadding,
-              vertical: verticalPadding,
-            ),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: isDark
-                    ? [
-                        AppColors.surfaceRaisedDark.withValues(alpha: 0.96),
-                        AppColors.surfaceBaseDark.withValues(alpha: 0.92),
-                      ]
-                    : [
-                        AppColors.surfaceRaisedLight.withValues(alpha: 0.97),
-                        AppColors.surfaceBaseLight.withValues(alpha: 0.94),
-                      ],
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 20.0, sigmaY: 20.0),
+            child: Container(
+              height: barHeight,
+              padding: const EdgeInsets.symmetric(
+                horizontal: horizontalPadding,
+                vertical: verticalPadding,
               ),
-              borderRadius: BorderRadius.circular(barRadius),
-              border: Border.all(
-                color: isDark
-                    ? AppColors.borderSubtleDark
-                    : AppColors.borderSubtleLight,
-                width: 1.0,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: isDark
+                      ? [
+                          AppColors.surfaceRaisedDark.withValues(alpha: 0.92),
+                          AppColors.surfaceBaseDark.withValues(alpha: 0.88),
+                        ]
+                      : [
+                          AppColors.surfaceBaseLight.withValues(alpha: 0.95),
+                          AppColors.surfaceBaseLight.withValues(alpha: 0.90),
+                        ],
+                ),
+                borderRadius: BorderRadius.circular(barRadius),
+                border: Border.all(
+                  color: isDark
+                      ? AppColors.borderSubtleDark
+                      : AppColors.borderSubtleLight,
+                  width: 0.5,
+                ),
               ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: List.generate(items.length, (index) {
-                final item = items[index];
-                final isSelected = index == selectedIndex;
-                final isFirst = index == 0;
-                final isLast = index == items.length - 1;
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(items.length, (index) {
+                  final item = items[index];
+                  final isSelected = index == selectedIndex;
 
-                return Expanded(
-                  child: _FloatingNavItem(
-                    item: item,
-                    isSelected: isSelected,
-                    isDark: isDark,
-                    theme: theme,
-                    isFirst: isFirst,
-                    isLast: isLast,
-                    isRtl: isRtl,
-                    outerCornerRadius: outerCornerRadius,
-                    innerCornerRadius: innerCornerRadius,
-                    onTap: () {
-                      AppHaptics.selection();
-                      onDestinationSelected(index);
-                    },
-                  ),
-                );
-              }),
+                  return Expanded(
+                    child: _FloatingNavItem(
+                      item: item,
+                      isSelected: isSelected,
+                      isDark: isDark,
+                      theme: theme,
+                      onTap: () {
+                        AppHaptics.selection();
+                        onDestinationSelected(index);
+                      },
+                    ),
+                  );
+                }),
+              ),
             ),
           ),
         ),
@@ -302,11 +296,6 @@ class _FloatingNavItem extends StatelessWidget {
   final bool isSelected;
   final bool isDark;
   final ThemeData theme;
-  final bool isFirst;
-  final bool isLast;
-  final bool isRtl;
-  final double outerCornerRadius;
-  final double innerCornerRadius;
   final VoidCallback onTap;
 
   const _FloatingNavItem({
@@ -314,63 +303,15 @@ class _FloatingNavItem extends StatelessWidget {
     required this.isSelected,
     required this.isDark,
     required this.theme,
-    required this.isFirst,
-    required this.isLast,
-    required this.isRtl,
-    required this.outerCornerRadius,
-    required this.innerCornerRadius,
     required this.onTap,
   });
 
-  /// Calculates mathematically concentric and proportional corner radii.
-  ///
-  /// Corner tabs ("Ana Sayfa" and "Ayarlar") curve concentrically with the outer bar
-  /// along their outer-facing side (radius = outerCornerRadius = 20.0),
-  /// while their inner-facing side matches the disciplined inner radius (12.0).
-  /// Middle tabs ("Harita", "Bavul", "Kasa") maintain a balanced 12.0 radius on all corners,
-  /// perfectly adapting to RTL layouts (such as Arabic) where outer positions mirror.
-  BorderRadius _computeProportionalBorderRadius() {
-    if (isFirst && isLast) {
-      return BorderRadius.circular(outerCornerRadius);
-    }
-    if (isFirst) {
-      return isRtl
-          ? BorderRadius.only(
-              topRight: Radius.circular(outerCornerRadius),
-              bottomRight: Radius.circular(outerCornerRadius),
-              topLeft: Radius.circular(innerCornerRadius),
-              bottomLeft: Radius.circular(innerCornerRadius),
-            )
-          : BorderRadius.only(
-              topLeft: Radius.circular(outerCornerRadius),
-              bottomLeft: Radius.circular(outerCornerRadius),
-              topRight: Radius.circular(innerCornerRadius),
-              bottomRight: Radius.circular(innerCornerRadius),
-            );
-    }
-    if (isLast) {
-      return isRtl
-          ? BorderRadius.only(
-              topLeft: Radius.circular(outerCornerRadius),
-              bottomLeft: Radius.circular(outerCornerRadius),
-              topRight: Radius.circular(innerCornerRadius),
-              bottomRight: Radius.circular(innerCornerRadius),
-            )
-          : BorderRadius.only(
-              topRight: Radius.circular(outerCornerRadius),
-              bottomRight: Radius.circular(outerCornerRadius),
-              topLeft: Radius.circular(innerCornerRadius),
-              bottomLeft: Radius.circular(innerCornerRadius),
-            );
-    }
-    return BorderRadius.circular(innerCornerRadius);
-  }
-
   @override
   Widget build(BuildContext context) {
-    final activeColor = theme.colorScheme.primary;
+    final activeColor = isDark ? AppColors.brandAccentDark : AppColors.brandAccent;
+    final activeTextColor = isDark ? AppColors.brandAccentDark : AppColors.brandAccentTextLight;
     final inactiveColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
-    final borderRadius = _computeProportionalBorderRadius();
+    final borderRadius = BorderRadius.circular(16.0);
 
     return Semantics(
       selected: isSelected,
@@ -386,26 +327,19 @@ class _FloatingNavItem extends StatelessWidget {
             curve: AppMotion.curveStandard,
             decoration: BoxDecoration(
               color: isSelected
-                  ? activeColor.withValues(alpha: isDark ? 0.18 : 0.12)
+                  ? (isDark
+                      ? AppColors.brandAccent.withValues(alpha: 0.16)
+                      : AppColors.brandAccent.withValues(alpha: 0.10))
                   : Colors.transparent,
               borderRadius: borderRadius,
-              border: isSelected
-                  ? Border.all(
-                      color: activeColor.withValues(alpha: isDark ? 0.30 : 0.24),
-                      width: 1.0,
-                    )
-                  : Border.all(
-                      color: Colors.transparent,
-                      width: 1.0,
-                    ),
             ),
-            padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 2.0),
+            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 2.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
                 AnimatedScale(
-                  scale: isSelected ? 1.05 : 1.0,
+                  scale: isSelected ? 1.08 : 1.0,
                   duration: AppMotion.fast,
                   curve: Curves.easeOutBack,
                   child: Icon(
@@ -414,7 +348,7 @@ class _FloatingNavItem extends StatelessWidget {
                     color: isSelected ? activeColor : inactiveColor,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 3),
                 Flexible(
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
@@ -425,9 +359,9 @@ class _FloatingNavItem extends StatelessWidget {
                         maxLines: 1,
                         softWrap: false,
                         style: AppTypography.caption.copyWith(
-                          fontSize: 10,
+                          fontSize: 10.5,
                           fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                          color: isSelected ? activeColor : inactiveColor,
+                          color: isSelected ? activeTextColor : inactiveColor,
                           letterSpacing: -0.2,
                         ),
                       ),

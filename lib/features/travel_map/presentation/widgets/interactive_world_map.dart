@@ -1,7 +1,9 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:countries_world_map/countries_world_map.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/core/theme/app_motion.dart';
 import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/core/theme/app_typography.dart';
@@ -278,7 +280,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
       statusColor = const Color(0xFF10B981);
       statusLabel = l10n.mapLegendLived;
     } else if (country.isVisited) {
-      statusColor = AppColors.primaryAmber;
+      statusColor = AppColors.brandAccent;
       statusLabel = l10n.mapLegendBeen;
     } else if (country.isWishlist) {
       statusColor = const Color(0xFFEF4444);
@@ -350,14 +352,14 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
     final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
 
-    // Build the dynamic country polygon color mapping (Lived: Green, Been: Orange, Skratch: Coral Red)
+    // Build the dynamic country polygon color mapping (Lived: Green, Been: Terracotta, Skratch: Coral Red)
     final colorMap = <String, Color>{};
     for (final country in widget.countries) {
       final code = country.code.toLowerCase().trim();
       if (country.isLived) {
         colorMap[code] = const Color(0xFF10B981);
       } else if (country.isVisited) {
-        colorMap[code] = AppColors.primaryAmber;
+        colorMap[code] = AppColors.brandAccent;
       } else if (country.isWishlist) {
         colorMap[code] = const Color(0xFFEF4444);
       }
@@ -369,7 +371,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
       if (nc.isLived) {
         colorMap['cy'] = const Color(0xFF10B981);
       } else if (nc.isVisited) {
-        colorMap['cy'] = AppColors.primaryAmber;
+        colorMap['cy'] = AppColors.brandAccent;
       } else if (nc.isWishlist && colorMap['cy'] == null) {
         colorMap['cy'] = const Color(0xFFEF4444);
       }
@@ -382,21 +384,21 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
     return Container(
       decoration: BoxDecoration(
         color: oceanColor,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppRadius.card),
         border: Border.all(
           color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
-          width: 1.5,
+          width: 0.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.06),
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.05),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppRadius.card),
         child: Listener(
           behavior: HitTestBehavior.opaque,
           onPointerDown: (_) => _setInteracting(true),
@@ -415,7 +417,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
               else
                 SizedBox(
                   width: double.infinity,
-                  height: 390,
+                  height: 300,
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       return InteractiveViewer(
@@ -423,13 +425,13 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                         minScale: 1.0,
                         maxScale: 30.0,
                         panAxis: PanAxis.free,
-                        boundaryMargin: const EdgeInsets.symmetric(horizontal: 320, vertical: 260),
+                        boundaryMargin: const EdgeInsets.symmetric(horizontal: 160, vertical: 100),
                         onInteractionStart: (_) => _setInteracting(true),
                         onInteractionEnd: (_) => _setInteracting(false),
                         child: RepaintBoundary(
                           child: SizedBox(
                             width: constraints.maxWidth,
-                            height: 390,
+                            height: 300,
                             child: SimpleMap(
                               instructions: WorldMapInstructions.instructions,
                               defaultColor: unvisitedLandColor,
@@ -450,198 +452,208 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                   ),
                 ),
 
-            // Top-Left: 2D / 3D Mode Toggle Switcher
+            // Top-Left: 2D / 3D Mode Toggle Switcher (Frosted Glass)
             Positioned(
               top: 12,
-              left: 14,
+              left: 12,
               child: AnimatedOpacity(
-                opacity: _isInteracting ? 0.06 : 0.90,
+                opacity: _isInteracting ? 0.08 : 0.95,
                 duration: const Duration(milliseconds: 180),
                 child: IgnorePointer(
                   ignoring: _isInteracting,
-                  child: Container(
-                    padding: const EdgeInsets.all(3),
-                    decoration: BoxDecoration(
-                      color: (isDark ? const Color(0xFF0F172A) : Colors.white).withValues(alpha: 0.90),
-                      borderRadius: BorderRadius.circular(AppRadius.full),
-                      border: Border.all(
-                        color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
-                        width: 1.0,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(AppRadius.full),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          color: (isDark ? const Color(0xFF0F172A) : Colors.white).withValues(alpha: 0.85),
+                          borderRadius: BorderRadius.circular(AppRadius.full),
+                          border: Border.all(
+                            color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+                            width: 0.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                AppHaptics.selectionClick();
+                                _set3DMode(false);
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: !_is3DMode
+                                      ? AppColors.brandAccent
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(AppRadius.full),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      AppIcons.map,
+                                      size: 13,
+                                      color: !_is3DMode ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '2D',
+                                      style: TextStyle(
+                                        fontSize: 11.5,
+                                        fontWeight: FontWeight.w700,
+                                        color: !_is3DMode ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 2),
+                            GestureDetector(
+                              onTap: () {
+                                AppHaptics.selectionClick();
+                                _set3DMode(true);
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: _is3DMode
+                                      ? AppColors.brandAccent
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(AppRadius.full),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      AppIcons.globe,
+                                      size: 13,
+                                      color: _is3DMode ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      l10n?.globe3D ?? '3D Küre',
+                                      style: TextStyle(
+                                        fontSize: 11.5,
+                                        fontWeight: FontWeight.w700,
+                                        color: _is3DMode ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            AppHaptics.selectionClick();
-                            _set3DMode(false);
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: !_is3DMode
-                                  ? AppColors.actionGold
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(AppRadius.full),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.map_outlined,
-                                  size: 13,
-                                  color: !_is3DMode ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '2D',
-                                  style: AppTypography.mono(
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w800,
-                                    color: !_is3DMode ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
-                                    tabularFigures: true,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 2),
-                        GestureDetector(
-                          onTap: () {
-                            AppHaptics.selectionClick();
-                            _set3DMode(true);
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: _is3DMode
-                                  ? const Color(0xFF0284C7)
-                                  : Colors.transparent,
-                              borderRadius: BorderRadius.circular(AppRadius.full),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.public_rounded,
-                                  size: 13,
-                                  color: _is3DMode ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  l10n?.globe3D ?? '3D Globe',
-                                  style: AppTypography.mono(
-                                    fontSize: 11.5,
-                                    fontWeight: FontWeight.w800,
-                                    color: _is3DMode ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
-                                    tabularFigures: true,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
                     ),
                   ),
                 ),
               ),
             ),
 
-            // Top-Right: Zoom Controls (Only in 2D mode)
+            // Top-Right: Zoom Controls (Frosted Glass - Only in 2D mode)
             if (!_is3DMode)
               Positioned(
                 top: 12,
-                right: 14,
+                right: 12,
                 child: AnimatedOpacity(
-                  opacity: _isInteracting ? 0.06 : 0.84,
+                  opacity: _isInteracting ? 0.08 : 0.90,
                   duration: const Duration(milliseconds: 180),
                   child: IgnorePointer(
                     ignoring: _isInteracting,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: (isDark ? const Color(0xFF0F172A) : Colors.white).withValues(alpha: 0.90),
-                        borderRadius: BorderRadius.circular(AppRadius.full),
-                        border: Border.all(
-                          color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
-                          width: 1.0,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Builder(
-                        builder: (ctx) {
-                          final l10n = AppLocalizations.of(ctx);
-                          final zoomInTooltip = l10n?.zoomIn ?? 'Zoom In';
-                          final zoomOutTooltip = l10n?.zoomOut ?? 'Zoom Out';
-                          final resetTooltip = l10n?.resetZoom ?? 'Reset';
-
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.add_rounded, size: 18),
-                                padding: const EdgeInsets.all(9),
-                                constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-                                tooltip: zoomInTooltip,
-                                onPressed: _zoomIn,
-                              ),
-                              Divider(
-                                height: 1,
-                                thickness: 1,
-                                color: isDark ? Colors.white10 : Colors.black12,
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.remove_rounded, size: 18),
-                                padding: const EdgeInsets.all(9),
-                                constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-                                tooltip: zoomOutTooltip,
-                                onPressed: _zoomOut,
-                              ),
-                              Divider(
-                                height: 1,
-                                thickness: 1,
-                                color: isDark ? Colors.white10 : Colors.black12,
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.restart_alt_rounded, size: 18),
-                                padding: const EdgeInsets.all(9),
-                                constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-                                tooltip: resetTooltip,
-                                onPressed: _resetZoom,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(AppRadius.full),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: (isDark ? const Color(0xFF0F172A) : Colors.white).withValues(alpha: 0.85),
+                            borderRadius: BorderRadius.circular(AppRadius.full),
+                            border: Border.all(
+                              color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+                              width: 0.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
                               ),
                             ],
-                          );
-                        },
+                          ),
+                          child: Builder(
+                            builder: (ctx) {
+                              final l10n = AppLocalizations.of(ctx);
+                              final zoomInTooltip = l10n?.zoomIn ?? 'Zoom In';
+                              final zoomOutTooltip = l10n?.zoomOut ?? 'Zoom Out';
+                              final resetTooltip = l10n?.resetZoom ?? 'Reset';
+
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(AppIcons.add, size: 16),
+                                    padding: const EdgeInsets.all(8),
+                                    constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
+                                    tooltip: zoomInTooltip,
+                                    onPressed: _zoomIn,
+                                  ),
+                                  Divider(
+                                    height: 1,
+                                    thickness: 0.5,
+                                    color: isDark ? Colors.white10 : Colors.black12,
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(AppIcons.remove, size: 16),
+                                    padding: const EdgeInsets.all(8),
+                                    constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
+                                    tooltip: zoomOutTooltip,
+                                    onPressed: _zoomOut,
+                                  ),
+                                  Divider(
+                                    height: 1,
+                                    thickness: 0.5,
+                                    color: isDark ? Colors.white10 : Colors.black12,
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(AppIcons.refresh, size: 15),
+                                    padding: const EdgeInsets.all(8),
+                                    constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
+                                    tooltip: resetTooltip,
+                                    onPressed: _resetZoom,
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
               ),
 
-            // Bottom Center: Floating Pill & Color Legend
+            // Bottom Center: Floating Pill & Color Legend (Frosted Glass)
             Positioned(
-              bottom: 12,
-              left: 14,
-              right: 14,
+              bottom: 10,
+              left: 12,
+              right: 12,
               child: AnimatedOpacity(
-                opacity: _isInteracting ? 0.06 : 0.84,
+                opacity: _isInteracting ? 0.08 : 0.90,
                 duration: const Duration(milliseconds: 180),
                 child: IgnorePointer(
                   ignoring: _isInteracting,
@@ -654,49 +666,55 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                         final legendWishlist = l10n?.mapLegendWant ?? 'Wishlist';
                         final legendOther = l10n?.mapLegendUnvisited ?? 'Unvisited';
 
-                        return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-                          decoration: BoxDecoration(
-                            color: (isDark ? const Color(0xFF0F172A) : Colors.white).withValues(alpha: 0.90),
-                            borderRadius: BorderRadius.circular(AppRadius.full),
-                            border: Border.all(
-                              color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
-                              width: 1.0,
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(AppRadius.full),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: (isDark ? const Color(0xFF0F172A) : Colors.white).withValues(alpha: 0.85),
+                                borderRadius: BorderRadius.circular(AppRadius.full),
+                                border: Border.all(
+                                  color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+                                  width: 0.5,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Wrap(
+                                spacing: 10,
+                                runSpacing: 4,
+                                alignment: WrapAlignment.center,
+                                children: [
+                                  _buildLegendDot(
+                                    color: const Color(0xFF10B981),
+                                    label: legendLived,
+                                    isDark: isDark,
+                                  ),
+                                  _buildLegendDot(
+                                    color: AppColors.brandAccent,
+                                    label: legendVisited,
+                                    isDark: isDark,
+                                  ),
+                                  _buildLegendDot(
+                                    color: const Color(0xFFEF4444),
+                                    label: legendWishlist,
+                                    isDark: isDark,
+                                  ),
+                                  _buildLegendDot(
+                                    color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
+                                    label: legendOther,
+                                    isDark: isDark,
+                                  ),
+                                ],
+                              ),
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
-                                blurRadius: 10,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Wrap(
-                            spacing: 10,
-                            runSpacing: 4,
-                            alignment: WrapAlignment.center,
-                            children: [
-                              _buildLegendDot(
-                                color: const Color(0xFF10B981),
-                                label: legendLived,
-                                isDark: isDark,
-                              ),
-                              _buildLegendDot(
-                                color: AppColors.primaryAmber,
-                                label: legendVisited,
-                                isDark: isDark,
-                              ),
-                              _buildLegendDot(
-                                color: const Color(0xFFEF4444),
-                                label: legendWishlist,
-                                isDark: isDark,
-                              ),
-                              _buildLegendDot(
-                                color: isDark ? const Color(0xFF475569) : const Color(0xFFCBD5E1),
-                                label: legendOther,
-                                isDark: isDark,
-                              ),
-                            ],
                           ),
                         );
                       },

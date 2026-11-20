@@ -21,7 +21,7 @@ class AppCard extends StatefulWidget {
     this.backgroundColor,
     this.gradient,
     this.border,
-    this.borderRadius = 22,
+    this.borderRadius = 20,
     this.customShadow,
   });
 
@@ -86,24 +86,24 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
         ? Border.fromBorderSide(widget.border!)
         : Border.all(
             color: isDark
-                ? AppColors.outlineDark
-                : AppColors.outlineLight,
-            width: 1,
+                ? AppColors.borderSubtleDark
+                : AppColors.borderSubtleLight,
+            width: 0.5,
           );
 
     final shadows = widget.customShadow ??
         [
           BoxShadow(
             color: isDark
-                ? Colors.black.withValues(alpha: 0.30)
-                : const Color(0xFF0F172A).withValues(alpha: 0.03),
-            blurRadius: 16,
+                ? Colors.black.withValues(alpha: 0.22)
+                : const Color(0xFF0F172A).withValues(alpha: 0.025),
+            blurRadius: 14,
             spreadRadius: 0,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 3),
           ),
           if (!isDark)
             BoxShadow(
-              color: const Color(0xFF0F172A).withValues(alpha: 0.015),
+              color: const Color(0xFF0F172A).withValues(alpha: 0.01),
               blurRadius: 4,
               spreadRadius: 0,
               offset: const Offset(0, 1),

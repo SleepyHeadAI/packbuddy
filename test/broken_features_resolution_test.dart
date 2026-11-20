@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/services/telemetry_service.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
 import 'package:packbuddy/features/travel_map/presentation/widgets/interactive_world_map.dart';
 import 'package:packbuddy/features/vault/presentation/controllers/vault_controller.dart';
@@ -104,20 +105,20 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify zoom controls exist
-      expect(find.byIcon(Icons.add_rounded), findsOneWidget);
-      expect(find.byIcon(Icons.remove_rounded), findsOneWidget);
-      expect(find.byIcon(Icons.restart_alt_rounded), findsOneWidget);
+      expect(find.byIcon(AppIcons.add), findsOneWidget);
+      expect(find.byIcon(AppIcons.remove), findsOneWidget);
+      expect(find.byIcon(AppIcons.refresh), findsOneWidget);
 
       // Tap zoom in
-      await tester.tap(find.byIcon(Icons.add_rounded));
+      await tester.tap(find.byIcon(AppIcons.add));
       await tester.pumpAndSettle();
 
       // Tap reset zoom
-      await tester.tap(find.byIcon(Icons.restart_alt_rounded));
+      await tester.tap(find.byIcon(AppIcons.refresh));
       await tester.pumpAndSettle();
 
       // Tap zoom out
-      await tester.tap(find.byIcon(Icons.remove_rounded));
+      await tester.tap(find.byIcon(AppIcons.remove));
       await tester.pumpAndSettle();
 
       // Verify no exceptions thrown during interaction

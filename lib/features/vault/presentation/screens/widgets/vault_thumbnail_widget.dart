@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:packbuddy/core/services/security_service.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
 
 /// In-memory LRU-like cache for decrypted vault thumbnails and rendered PDF first-page previews
@@ -212,8 +213,8 @@ class _VaultThumbnailWidgetState extends State<VaultThumbnailWidget> {
                     ),
                   ),
                   child: const Icon(
-                    Icons.picture_as_pdf_rounded,
-                    size: 28,
+                    AppIcons.pdf,
+                    size: 26,
                     color: Color(0xFFDC2626),
                   ),
                 ),

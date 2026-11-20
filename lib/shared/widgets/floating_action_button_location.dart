@@ -15,9 +15,9 @@ import 'package:flutter/material.dart';
 class FloatingActionButtonAboveFloatingBarLocation extends StandardFabLocation
     with FabEndOffsetX, FabFloatOffsetY {
   const FloatingActionButtonAboveFloatingBarLocation({
-    this.bottomBarHeight = 84.0,
-    this.gap = 22.0,
-    this.minBottomOffset = 120.0,
+    this.bottomBarHeight = 64.0,
+    this.gap = 12.0,
+    this.minBottomOffset = 96.0,
   });
 
   /// Height of the floating glass navigation bar plus container padding (66 + 12 = 78, plus buffer for shadows).

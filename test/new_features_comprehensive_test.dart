@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/features/budget/presentation/screens/trips_screen.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
 
@@ -40,18 +41,18 @@ void main() {
 
   group('Task 2: Detailed Transport Modes & Custom Transport Tests', () {
     test('getTransportIcon maps preset and custom modes accurately', () {
-      expect(TripsScreen.getTransportIcon('Uçak'), Icons.flight_rounded);
-      expect(TripsScreen.getTransportIcon('Flight'), Icons.flight_rounded);
-      expect(TripsScreen.getTransportIcon('Hızlı Tren (YHT)'), Icons.directions_railway_rounded);
-      expect(TripsScreen.getTransportIcon('Motosiklet'), Icons.two_wheeler_rounded);
-      expect(TripsScreen.getTransportIcon('Karavan'), Icons.airport_shuttle_rounded);
-      expect(TripsScreen.getTransportIcon('Bisiklet'), Icons.pedal_bike_rounded);
-      expect(TripsScreen.getTransportIcon('Metro / Tramvay'), Icons.tram_rounded);
-      expect(TripsScreen.getTransportIcon('Gemi / Feribot'), Icons.directions_boat_rounded);
-      expect(TripsScreen.getTransportIcon('Yürüyüş / Trekking'), Icons.hiking_rounded);
-      expect(TripsScreen.getTransportIcon('Helikopter'), Icons.flight_takeoff_rounded);
-      expect(TripsScreen.getTransportIcon('Safari Jeepi'), Icons.commute_rounded);
-      expect(TripsScreen.getTransportIcon('Other'), Icons.luggage_outlined);
+      expect(TripsScreen.getTransportIcon('Uçak'), AppIcons.flight);
+      expect(TripsScreen.getTransportIcon('Flight'), AppIcons.flight);
+      expect(TripsScreen.getTransportIcon('Hızlı Tren (YHT)'), AppIcons.train);
+      expect(TripsScreen.getTransportIcon('Motosiklet'), AppIcons.car);
+      expect(TripsScreen.getTransportIcon('Karavan'), AppIcons.car);
+      expect(TripsScreen.getTransportIcon('Bisiklet'), AppIcons.car);
+      expect(TripsScreen.getTransportIcon('Metro / Tramvay'), AppIcons.train);
+      expect(TripsScreen.getTransportIcon('Gemi / Feribot'), AppIcons.boat);
+      expect(TripsScreen.getTransportIcon('Yürüyüş / Trekking'), AppIcons.backpack);
+      expect(TripsScreen.getTransportIcon('Helikopter'), AppIcons.flightTakeoff);
+      expect(TripsScreen.getTransportIcon('Safari Jeepi'), AppIcons.car);
+      expect(TripsScreen.getTransportIcon('Other'), AppIcons.luggage);
     });
 
     test('Trip destination stores multi-stop itineraries', () {

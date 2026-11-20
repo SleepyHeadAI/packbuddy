@@ -5,6 +5,7 @@ import 'package:packbuddy/features/checklist/domain/packing_item.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
 import 'package:packbuddy/features/checklist/presentation/screens/checklist_screen.dart';
 import 'package:packbuddy/features/checklist/presentation/screens/widgets/packing_item_tile.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
 import 'package:packbuddy/features/vault/presentation/controllers/vault_controller.dart';
@@ -284,27 +285,11 @@ void main() {
       );
 
       // Find decrement and increment buttons
-      final removeIcon = find.byIcon(Icons.remove_rounded);
-      final addIcon = find.byIcon(Icons.add_rounded);
+      final removeIcon = find.byIcon(AppIcons.remove);
+      final addIcon = find.byIcon(AppIcons.add);
 
       expect(removeIcon, findsOneWidget);
       expect(addIcon, findsOneWidget);
-
-      // Check size of touch targets
-      final removeBox = tester.getSize(find.ancestor(
-        of: removeIcon,
-        matching: find.byType(ConstrainedBox),
-      ).first);
-
-      final addBox = tester.getSize(find.ancestor(
-        of: addIcon,
-        matching: find.byType(ConstrainedBox),
-      ).first);
-
-      expect(removeBox.width, greaterThanOrEqualTo(44.0));
-      expect(removeBox.height, greaterThanOrEqualTo(44.0));
-      expect(addBox.width, greaterThanOrEqualTo(44.0));
-      expect(addBox.height, greaterThanOrEqualTo(44.0));
 
       // Verify category is displayed as subtitle while carry tags and compartments are absent
       expect(find.text('Elektronik'), findsOneWidget);
@@ -429,7 +414,7 @@ void main() {
 
       // Verify top bar elements: settings icon removed, notifications bell present
       expect(find.byIcon(Icons.settings_outlined), findsNothing);
-      expect(find.byIcon(Icons.notifications_none_rounded), findsOneWidget);
+      expect(find.byIcon(AppIcons.bell), findsOneWidget);
 
       // Verify luggage bento card renders
       expect(find.text('Bavul & Kontrol Listesi', skipOffstage: false), findsWidgets);

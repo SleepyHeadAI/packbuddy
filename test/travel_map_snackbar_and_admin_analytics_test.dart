@@ -9,6 +9,7 @@ import 'package:packbuddy/features/admin/admin_service.dart';
 import 'package:packbuddy/features/travel_map/data/travel_map_service.dart';
 import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
 import 'package:packbuddy/features/travel_map/presentation/screens/travel_map_screen.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -70,8 +71,8 @@ void main() {
 
       // Ensure sync_rounded icon is removed from AppBar
       expect(find.byIcon(Icons.sync_rounded), findsNothing);
-      // Ensure share button is present
-      expect(find.byIcon(Icons.ios_share_rounded), findsOneWidget);
+      // Ensure share button is present in AppBar
+      expect(find.descendant(of: find.byType(AppBar), matching: find.byIcon(AppIcons.share)), findsOneWidget);
     });
   });
 

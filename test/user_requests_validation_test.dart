@@ -16,6 +16,7 @@ import 'package:packbuddy/features/dashboard/presentation/widgets/notifications_
 import 'package:packbuddy/features/settings/presentation/screens/widgets/home_widget_preview_card.dart';
 import 'package:packbuddy/features/settings/presentation/screens/widgets/paywall_sheet.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -286,17 +287,17 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify zoom in and zoom out buttons render and operate smoothly
-      expect(find.byIcon(Icons.add_rounded), findsOneWidget);
-      expect(find.byIcon(Icons.remove_rounded), findsOneWidget);
-      expect(find.byIcon(Icons.restart_alt_rounded), findsOneWidget);
+      expect(find.byIcon(AppIcons.add), findsOneWidget);
+      expect(find.byIcon(AppIcons.remove), findsOneWidget);
+      expect(find.byIcon(AppIcons.refresh), findsOneWidget);
 
-      await tester.tap(find.byIcon(Icons.add_rounded));
+      await tester.tap(find.byIcon(AppIcons.add));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.remove_rounded));
+      await tester.tap(find.byIcon(AppIcons.remove));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.restart_alt_rounded));
+      await tester.tap(find.byIcon(AppIcons.refresh));
       await tester.pumpAndSettle();
 
       expect(tappedCountry, isNull);

@@ -7,12 +7,12 @@ import 'app_radius.dart';
 import 'app_spacing.dart';
 import 'app_typography.dart';
 
-/// Centralized Material 3 ThemeData implementation for PackBuddy.
+/// Centralized Material 3 ThemeData implementation for PackBuddy (Modern Wanderlust 2.0).
 ///
 /// Typographic Hierarchy:
 /// - Headline / Display / Titles: Figtree (Geometric, warm, modern indie travel character)
-/// - Body / Interface: Noto Sans (Clean, high legibility across all 20 supported languages)
-/// - Label / Technical / Budget / Numbers: JetBrains Mono with [FontFeature.tabularFigures()]
+/// - Body / Interface / Labels: Noto Sans (Clean, high legibility across all 20 supported languages)
+/// - Technical Data & Currency: JetBrains Mono with [FontFeature.tabularFigures()]
 class AppTheme {
   // Test environment detection to prevent network font loader exceptions during automated unit tests
   static bool get _isTesting {
@@ -25,7 +25,6 @@ class AppTheme {
 
   /// Optimized font fallbacks covering all 20 supported languages:
   /// Arabic (RTL), CJK (Chinese, Japanese, Korean), Thai, Hindi, Cyrillic, Greek, etc.
-  /// Eliminates runtime system font search stalls during 120 FPS frame budget.
   static const List<String> kFontFallbacks = AppTypography.kFontFallbacks;
 
   /// Headline & Display font (Figtree)
@@ -57,7 +56,7 @@ class AppTheme {
     );
   }
 
-  /// Body font (Noto Sans) for clean, highly readable interface text and paragraphs
+  /// Body & Interface font (Noto Sans) for clean, highly readable interface text and paragraphs
   static TextStyle bodyFont({
     required double fontSize,
     required FontWeight fontWeight,
@@ -140,8 +139,8 @@ class AppTheme {
 
   /// Builds the complete TextTheme with refined typographic hierarchy:
   /// - Headlines & Displays in Figtree
-  /// - Titles, Subtitles & Body in Noto Sans
-  /// - Labels, Badges & Chips in JetBrains Mono with Tabular Figures
+  /// - Titles, Subtitles, Body, and UI Labels in Noto Sans
+  /// - (Monospace reserved for dedicated currency and code callers)
   static TextTheme _buildTextTheme(bool isDark) {
     final onSurface = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
     final onSurfaceVariant = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
@@ -233,24 +232,24 @@ class AppTheme {
         height: 1.5,
         color: textMuted,
       ),
-      labelLarge: labelFont(
+      labelLarge: bodyFont(
         fontSize: 13,
-        fontWeight: FontWeight.w700,
+        fontWeight: FontWeight.w600,
         letterSpacing: 0.1,
         height: 1.4,
         color: onSurface,
       ),
-      labelMedium: labelFont(
+      labelMedium: bodyFont(
         fontSize: 12,
         fontWeight: FontWeight.w600,
         letterSpacing: 0.1,
         height: 1.4,
         color: onSurfaceVariant,
       ),
-      labelSmall: labelFont(
+      labelSmall: bodyFont(
         fontSize: 11,
         fontWeight: FontWeight.w600,
-        letterSpacing: 0.2,
+        letterSpacing: 0.1,
         height: 1.4,
         color: textMuted,
       ),
@@ -318,13 +317,13 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: AppColors.surfaceLight,
         elevation: 0,
-        shadowColor: const Color(0xFF0F172A).withValues(alpha: 0.03),
+        shadowColor: const Color(0xFF0F172A).withValues(alpha: 0.025),
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.card),
           side: const BorderSide(
             color: AppColors.borderSubtleLight,
-            width: 1,
+            width: 0.5,
           ),
         ),
       ),
@@ -341,12 +340,12 @@ class AppTheme {
         backgroundColor: AppColors.surfaceLight,
         surfaceTintColor: Colors.transparent,
         elevation: 4,
-        shadowColor: const Color(0xFF0F172A).withValues(alpha: 0.08),
+        shadowColor: const Color(0xFF0F172A).withValues(alpha: 0.06),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
           side: const BorderSide(
             color: AppColors.borderSubtleLight,
-            width: 1,
+            width: 0.5,
           ),
         ),
         titleTextStyle: headlineFont(
@@ -360,7 +359,7 @@ class AppTheme {
           backgroundColor: AppColors.primaryLight,
           foregroundColor: AppColors.onPrimaryLight,
           elevation: 0,
-          shadowColor: AppColors.primaryLight.withValues(alpha: 0.25),
+          shadowColor: AppColors.primaryLight.withValues(alpha: 0.20),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.card),
           ),
@@ -377,12 +376,12 @@ class AppTheme {
           backgroundColor: AppColors.surfaceVariantLight,
           foregroundColor: AppColors.onSurfaceLight,
           elevation: 0,
-          shadowColor: Colors.black.withValues(alpha: 0.04),
+          shadowColor: Colors.black.withValues(alpha: 0.03),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.card),
             side: const BorderSide(
               color: AppColors.borderSubtleLight,
-              width: 1,
+              width: 0.5,
             ),
           ),
           padding: AppSpacing.buttonPadding,
@@ -401,7 +400,7 @@ class AppTheme {
           ),
           side: const BorderSide(
             color: AppColors.borderStrongLight,
-            width: 1.2,
+            width: 1.0,
           ),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           textStyle: bodyFont(
@@ -412,14 +411,14 @@ class AppTheme {
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: AppColors.primaryAmber,
-        foregroundColor: const Color(0xFF281C00),
+        backgroundColor: AppColors.primaryLight,
+        foregroundColor: Colors.white,
         elevation: 2,
         focusElevation: 3,
         hoverElevation: 3,
         highlightElevation: 4,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.card),
+          borderRadius: BorderRadius.circular(AppRadius.fab),
         ),
         extendedTextStyle: headlineFont(
           fontWeight: FontWeight.w700,
@@ -429,11 +428,11 @@ class AppTheme {
       ),
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surfaceVariantLight.withValues(alpha: 0.8),
-        side: const BorderSide(color: AppColors.borderSubtleLight, width: 1),
+        side: const BorderSide(color: AppColors.borderSubtleLight, width: 0.5),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
-        labelStyle: labelFont(
+        labelStyle: bodyFont(
           fontSize: 12,
           fontWeight: FontWeight.w600,
           color: AppColors.onSurfaceLight,
@@ -466,32 +465,32 @@ class AppTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.card),
-          borderSide: const BorderSide(color: AppColors.borderSubtleLight, width: 1),
+          borderSide: const BorderSide(color: AppColors.borderSubtleLight, width: 0.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.card),
-          borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.8),
+          borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.card),
-          borderSide: const BorderSide(color: AppColors.errorPastel, width: 1),
+          borderSide: const BorderSide(color: AppColors.errorPastel, width: 0.5),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.card),
-          borderSide: const BorderSide(color: AppColors.errorPastel, width: 1.8),
+          borderSide: const BorderSide(color: AppColors.errorPastel, width: 1.5),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
         height: 66,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        indicatorColor: const Color(0xFFF0D076),
+        indicatorColor: AppColors.primaryContainerLight,
         indicatorShape: const CircleBorder(),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return const IconThemeData(
               size: 22,
-              color: Color(0xFF281C00),
+              color: AppColors.primaryLight,
             );
           }
           return const IconThemeData(
@@ -503,8 +502,8 @@ class AppTheme {
           if (states.contains(WidgetState.selected)) {
             return bodyFont(
               fontSize: 11,
-              fontWeight: FontWeight.w800,
-              color: const Color(0xFF543C00),
+              fontWeight: FontWeight.w700,
+              color: AppColors.primaryLight,
             );
           }
           return bodyFont(
@@ -515,7 +514,7 @@ class AppTheme {
         }),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
-        color: AppColors.primaryAmber,
+        color: AppColors.primaryLight,
         linearTrackColor: AppColors.surfaceVariantLight,
         linearMinHeight: 6,
         borderRadius: BorderRadius.circular(100),
@@ -526,7 +525,7 @@ class AppTheme {
         shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(100),
-            side: const BorderSide(color: AppColors.borderSubtleLight, width: 1),
+            side: const BorderSide(color: AppColors.borderSubtleLight, width: 0.5),
           ),
         ),
         hintStyle: WidgetStatePropertyAll(
@@ -538,7 +537,7 @@ class AppTheme {
       ),
       dividerTheme: const DividerThemeData(
         color: AppColors.borderSubtleLight,
-        thickness: 1,
+        thickness: 0.5,
         space: 1,
       ),
       switchTheme: SwitchThemeData(
@@ -561,7 +560,7 @@ class AppTheme {
       ),
       checkboxTheme: CheckboxThemeData(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-        side: const BorderSide(color: Color(0xFF94A3B8), width: 1.6),
+        side: const BorderSide(color: Color(0xFF94A3B8), width: 1.5),
         fillColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return AppColors.primaryLight;
@@ -629,7 +628,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(AppRadius.card),
           side: const BorderSide(
             color: AppColors.borderSubtleDark,
-            width: 1,
+            width: 0.5,
           ),
         ),
       ),
@@ -651,7 +650,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(24),
           side: const BorderSide(
             color: AppColors.borderSubtleDark,
-            width: 1,
+            width: 0.5,
           ),
         ),
         titleTextStyle: headlineFont(
@@ -665,7 +664,7 @@ class AppTheme {
           backgroundColor: AppColors.primaryDark,
           foregroundColor: AppColors.onPrimaryDark,
           elevation: 0,
-          shadowColor: AppColors.primaryDark.withValues(alpha: 0.25),
+          shadowColor: AppColors.primaryDark.withValues(alpha: 0.20),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.card),
           ),
@@ -685,7 +684,7 @@ class AppTheme {
           shadowColor: Colors.black.withValues(alpha: 0.2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.card),
-            side: const BorderSide(color: AppColors.borderSubtleDark, width: 1),
+            side: const BorderSide(color: AppColors.borderSubtleDark, width: 0.5),
           ),
           padding: AppSpacing.buttonPadding,
           textStyle: bodyFont(
@@ -701,7 +700,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.card),
           ),
-          side: const BorderSide(color: AppColors.borderStrongDark, width: 1.2),
+          side: const BorderSide(color: AppColors.borderStrongDark, width: 1.0),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           textStyle: bodyFont(
             fontSize: 14,
@@ -718,7 +717,7 @@ class AppTheme {
         hoverElevation: 3,
         highlightElevation: 4,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.card),
+          borderRadius: BorderRadius.circular(AppRadius.fab),
         ),
         extendedTextStyle: headlineFont(
           fontWeight: FontWeight.w700,
@@ -728,11 +727,11 @@ class AppTheme {
       ),
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surfaceVariantDark.withValues(alpha: 0.6),
-        side: const BorderSide(color: AppColors.borderSubtleDark, width: 1),
+        side: const BorderSide(color: AppColors.borderSubtleDark, width: 0.5),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
-        labelStyle: labelFont(
+        labelStyle: bodyFont(
           fontSize: 12,
           fontWeight: FontWeight.w600,
           color: AppColors.onSurfaceDark,
@@ -765,32 +764,32 @@ class AppTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.card),
-          borderSide: const BorderSide(color: AppColors.borderSubtleDark, width: 1),
+          borderSide: const BorderSide(color: AppColors.borderSubtleDark, width: 0.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.card),
-          borderSide: const BorderSide(color: AppColors.primaryDark, width: 1.8),
+          borderSide: const BorderSide(color: AppColors.primaryDark, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.card),
-          borderSide: const BorderSide(color: AppColors.errorPastel, width: 1),
+          borderSide: const BorderSide(color: AppColors.errorPastel, width: 0.5),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppRadius.card),
-          borderSide: const BorderSide(color: AppColors.errorPastel, width: 1.8),
+          borderSide: const BorderSide(color: AppColors.errorPastel, width: 1.5),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
         height: 66,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        indicatorColor: AppColors.primaryDark,
+        indicatorColor: AppColors.primaryContainerDark,
         indicatorShape: const CircleBorder(),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return const IconThemeData(
               size: 22,
-              color: Color(0xFF281C00),
+              color: AppColors.primaryDark,
             );
           }
           return const IconThemeData(
@@ -802,8 +801,8 @@ class AppTheme {
           if (states.contains(WidgetState.selected)) {
             return bodyFont(
               fontSize: 11,
-              fontWeight: FontWeight.w800,
-              color: AppColors.onSurfaceDark,
+              fontWeight: FontWeight.w700,
+              color: AppColors.primaryDark,
             );
           }
           return bodyFont(
@@ -825,7 +824,7 @@ class AppTheme {
         shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(100),
-            side: const BorderSide(color: AppColors.borderSubtleDark, width: 1),
+            side: const BorderSide(color: AppColors.borderSubtleDark, width: 0.5),
           ),
         ),
         hintStyle: WidgetStatePropertyAll(
@@ -837,7 +836,7 @@ class AppTheme {
       ),
       dividerTheme: const DividerThemeData(
         color: AppColors.borderSubtleDark,
-        thickness: 1,
+        thickness: 0.5,
         space: 1,
       ),
       switchTheme: SwitchThemeData(
@@ -860,7 +859,7 @@ class AppTheme {
       ),
       checkboxTheme: CheckboxThemeData(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-        side: const BorderSide(color: Color(0xFF64748B), width: 1.6),
+        side: const BorderSide(color: Color(0xFF64748B), width: 1.5),
         fillColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return AppColors.primaryDark;

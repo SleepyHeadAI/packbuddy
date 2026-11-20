@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/expense_controller.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
@@ -261,28 +262,30 @@ void main() {
       await tester.pumpWidget(_buildTestApp(lang: 'tr', theme: AppTheme.darkTheme));
       await tester.pumpAndSettle();
 
+      final navBar = find.byType(ClipRRect).last;
+
       // Tab 1: Map (Harita)
-      await tester.tap(find.byIcon(Icons.public_outlined));
+      await tester.tap(find.descendant(of: navBar, matching: find.byIcon(AppIcons.mapOutlined)));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
 
       // Tab 2: Baggage / Checklist (Bavul)
-      await tester.tap(find.byIcon(Icons.checklist_rounded));
+      await tester.tap(find.descendant(of: navBar, matching: find.byIcon(AppIcons.checklistOutlined)));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
 
       // Tab 3: Vault (Kasa)
-      await tester.tap(find.byIcon(Icons.folder_shared_outlined));
+      await tester.tap(find.descendant(of: navBar, matching: find.byIcon(AppIcons.vaultOutlined)));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
 
       // Tab 4: Settings (Ayarlar)
-      await tester.tap(find.byIcon(Icons.tune_outlined));
+      await tester.tap(find.descendant(of: navBar, matching: find.byIcon(AppIcons.settingsOutlined)));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
 
       // Tab 0: Home (Ana Sayfa)
-      await tester.tap(find.byIcon(Icons.home_outlined));
+      await tester.tap(find.descendant(of: navBar, matching: find.byIcon(AppIcons.homeOutlined)));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
     });
@@ -298,8 +301,9 @@ void main() {
 
       expect(tester.takeException(), isNull);
 
+      final navBar = find.byType(ClipRRect).last;
       // Tap on settings tab in Arabic
-      await tester.tap(find.byIcon(Icons.tune_outlined));
+      await tester.tap(find.descendant(of: navBar, matching: find.byIcon(AppIcons.settingsOutlined)));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
     });

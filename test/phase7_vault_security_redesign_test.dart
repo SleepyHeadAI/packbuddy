@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/shared/widgets/app_button.dart';
@@ -313,7 +314,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify empty state shield icon
-      expect(find.byIcon(Icons.shield_outlined), findsWidgets);
+      expect(find.byIcon(AppIcons.shield), findsWidgets);
 
       // Verify "Belge Ekle" button is present and is an AppButton
       expect(find.byType(AppButton), findsWidgets);

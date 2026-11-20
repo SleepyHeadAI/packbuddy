@@ -16,7 +16,6 @@ import '../../../data/sync_engine/sync_engine.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_card.dart';
-import '../../../shared/widgets/app_divider.dart';
 import '../../../shared/widgets/app_logo.dart';
 import '../../../shared/widgets/status_badge.dart';
 import '../../budget/domain/country.dart';
@@ -292,31 +291,31 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     switch (syncState.status) {
       case SyncStatus.syncing:
         syncLabel = DashboardLocalization.syncStatusBanner(lang, 'syncing');
-        syncIcon = Icons.sync_rounded;
+        syncIcon = AppIcons.refresh;
         syncBgColor = AppColors.infoPastel.withValues(alpha: 0.15);
         syncTextColor = AppColors.infoPastel;
         break;
       case SyncStatus.upToDate:
         syncLabel = DashboardLocalization.syncStatusBanner(lang, 'upToDate');
-        syncIcon = Icons.cloud_done_rounded;
+        syncIcon = AppIcons.cloudDone;
         syncBgColor = AppColors.successPastel.withValues(alpha: 0.15);
         syncTextColor = AppColors.successPastel;
         break;
       case SyncStatus.failed:
         syncLabel = DashboardLocalization.syncStatusBanner(lang, 'failed');
-        syncIcon = Icons.cloud_off_rounded;
+        syncIcon = AppIcons.cloudOff;
         syncBgColor = AppColors.errorPastel.withValues(alpha: 0.15);
         syncTextColor = AppColors.errorPastel;
         break;
       case SyncStatus.noInternet:
         syncLabel = DashboardLocalization.syncStatusBanner(lang, 'noInternet');
-        syncIcon = Icons.wifi_off_rounded;
+        syncIcon = AppIcons.cloudOff;
         syncBgColor = theme.colorScheme.secondaryContainer.withValues(alpha: 0.7);
         syncTextColor = theme.colorScheme.secondary;
         break;
       case SyncStatus.idle:
         syncLabel = DashboardLocalization.syncStatusBanner(lang, 'idle');
-        syncIcon = Icons.cloud_sync_rounded;
+        syncIcon = AppIcons.cloudSync;
         syncBgColor = theme.colorScheme.primaryContainer.withValues(alpha: 0.7);
         syncTextColor = theme.colorScheme.primary;
         break;
@@ -409,7 +408,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             icon: Stack(
               alignment: Alignment.topRight,
               children: [
-                const Icon(Icons.notifications_none_rounded, size: 21),
+                const Icon(AppIcons.notification, size: 20),
                 if (_hasUnreadNotifications(tripState.trips))
                   Container(
                     width: 7,
@@ -480,6 +479,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         key: _fabKey,
         heroTag: null,
         elevation: 3,
+        backgroundColor: AppColors.brandAccent,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
         onPressed: () {
           AppHaptics.light();
           QuickActionsSheet.showForDashboard(
@@ -489,7 +493,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             fabKey: _fabKey,
           );
         },
-        child: const Icon(Icons.add_rounded, size: 26),
+        child: const Icon(AppIcons.add, size: 24),
       ),
       floatingActionButtonLocation: kFloatingActionButtonAboveFloatingBar,
       body: SafeArea(
@@ -537,7 +541,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     SnackBar(
                       content: Row(
                         children: [
-                          const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                          const Icon(AppIcons.checkCircle, color: Colors.white, size: 20),
                           const SizedBox(width: 8),
                           Text(l10n.syncUpToDate),
                         ],
@@ -552,7 +556,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     SnackBar(
                       content: Row(
                         children: [
-                          const Icon(Icons.error_outline_rounded, color: Colors.white, size: 20),
+                          const Icon(AppIcons.error, color: Colors.white, size: 20),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -931,7 +935,7 @@ class _HorizontalGreetingBar extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      isDayTime ? Icons.wb_sunny_rounded : Icons.nightlight_round,
+                      isDayTime ? AppIcons.sun : AppIcons.moon,
                       size: 13.5,
                       color: isDayTime ? const Color(0xFFF59E0B) : const Color(0xFF818CF8),
                     ),
@@ -953,20 +957,22 @@ class _HorizontalGreetingBar extends StatelessWidget {
               ),
               const SizedBox(width: 8),
 
-              // Cloud Sync Status Pill (Anchored to the right side cluster with natural width)
-              InkWell(
-                onTap: () {
-                  AppHaptics.selectionClick();
-                  onSyncTap();
-                },
-                borderRadius: BorderRadius.circular(14),
-                child: StatusBadge(
-                  label: syncLabel,
-                  icon: syncIcon,
-                  backgroundColor: syncBgColor,
-                  textColor: syncTextColor,
-                  isSpinning: isSyncing,
-                  maxWidth: 140,
+              // Cloud Sync Status Pill (Anchored to the right side cluster with responsive width)
+              Flexible(
+                child: InkWell(
+                  onTap: () {
+                    AppHaptics.selectionClick();
+                    onSyncTap();
+                  },
+                  borderRadius: BorderRadius.circular(14),
+                  child: StatusBadge(
+                    label: syncLabel,
+                    icon: syncIcon,
+                    backgroundColor: syncBgColor,
+                    textColor: syncTextColor,
+                    isSpinning: isSyncing,
+                    maxWidth: 86,
+                  ),
                 ),
               ),
               const SizedBox(width: 6),
@@ -1017,7 +1023,7 @@ class _HorizontalGreetingBar extends StatelessWidget {
                     ),
                   ),
                   child: Icon(
-                    Icons.tune_rounded,
+                    AppIcons.tune,
                     size: 15,
                     color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
                   ),
@@ -1067,7 +1073,7 @@ class _HorizontalGreetingBar extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Icon(
-                        Icons.chevron_right_rounded,
+                        AppIcons.chevronRight,
                         size: 16,
                         color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
                       ),
@@ -1153,7 +1159,7 @@ class _EmptyTripHeroCard extends StatelessWidget {
           const SizedBox(height: 16),
           AppButton.primary(
             label: l10n.addTrip,
-            leadingIcon: Icons.add_rounded,
+            leadingIcon: AppIcons.add,
             onPressed: () {
               AppHaptics.light();
               onAddTrip();
@@ -1180,6 +1186,23 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
     required this.allTrips,
     required this.onTap,
   });
+
+  /// Strips any leading emoji flags to prevent duplicate flag rendering
+  static String stripLeadingFlags(String text) {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return trimmed;
+    final runes = trimmed.runes.toList();
+    int i = 0;
+    while (i + 1 < runes.length &&
+        runes[i] >= 0x1F1E6 && runes[i] <= 0x1F1FF &&
+        runes[i + 1] >= 0x1F1E6 && runes[i + 1] <= 0x1F1FF) {
+      i += 2;
+      while (i < runes.length && (runes[i] == 0x20 || runes[i] == 0x00A0)) {
+        i++;
+      }
+    }
+    return String.fromCharCodes(runes.sublist(i)).trim();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1215,6 +1238,9 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
         ? AppColors.brandAccent.withValues(alpha: 0.12)
         : AppColors.brandAccent.withValues(alpha: 0.18);
 
+    final rawDest = CityLocalization.localizeDestination(trip.destination, lang);
+    final cleanDest = stripLeadingFlags(rawDest);
+
     return BouncyPressable(
       scaleFactor: 0.985,
       onTap: () {
@@ -1226,17 +1252,18 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Boarding Pass Header: Transport Badge + Route Status + Countdown Pill
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Hero(
                   tag: 'trip-transport-icon-${trip.id}',
                   child: Container(
-                    width: 42,
-                    height: 42,
+                    width: 40,
+                    height: 40,
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primary,
-                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
                           color: theme.colorScheme.primary.withValues(alpha: 0.22),
@@ -1303,89 +1330,112 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Countdown Pill & View All (Vertically stacked and constrained for zero horizontal overflow)
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 105),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: pillBgColor,
-                          borderRadius: BorderRadius.circular(AppRadius.xs),
-                        ),
-                        child: Text(
-                          countdownPill,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTypography.mono(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: pillTextColor,
-                            tabularFigures: true,
-                          ),
+                // Countdown Pill & View All Link
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+                      decoration: BoxDecoration(
+                        color: pillBgColor,
+                        borderRadius: BorderRadius.circular(7),
+                        border: Border.all(
+                          color: pillTextColor.withValues(alpha: 0.25),
+                          width: 0.6,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      BouncyPressable(
-                        scaleFactor: 0.95,
-                        onTap: () {
-                          AppHaptics.light();
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => const TripsScreen()),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  l10n.viewAll,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w700,
-                                    color: theme.colorScheme.primary,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 2),
-                              Icon(
-                                Icons.arrow_forward_ios_rounded,
-                                size: 8.5,
+                      child: Text(
+                        countdownPill,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.mono(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: pillTextColor,
+                          tabularFigures: true,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    BouncyPressable(
+                      scaleFactor: 0.95,
+                      onTap: () {
+                        AppHaptics.light();
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const TripsScreen()),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              l10n.viewAll,
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w700,
                                 color: theme.colorScheme.primary,
                               ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(width: 2),
+                            Icon(
+                              AppIcons.chevronRight,
+                              size: 11,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-
-            // Destination & Date Strip (Clean hairline divider + inline metadata)
-            AppDivider(
-              color: isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight,
-            ),
             const SizedBox(height: 10),
+
+            // Perforated Ticket Divider (Boarding Pass Aesthetic)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  const dashWidth = 4.0;
+                  const dashSpace = 4.0;
+                  final count = (constraints.maxWidth / (dashWidth + dashSpace)).floor();
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: List.generate(count, (_) {
+                      return SizedBox(
+                        width: dashWidth,
+                        height: 0.8,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? AppColors.borderSubtleDark
+                                : AppColors.borderSubtleLight,
+                          ),
+                        ),
+                      );
+                    }),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 6),
+
+            // Destination & Date Strip (Clean metadata row with guaranteed NO flag duplication)
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
+                  flex: 3,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Icon(
                         AppIcons.location,
-                        size: 14,
+                        size: 13.5,
                         color: theme.colorScheme.primary,
                       ),
                       const SizedBox(width: 5),
@@ -1395,10 +1445,7 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                           child: Material(
                             type: MaterialType.transparency,
                             child: Text(
-                              CityLocalization.localizeDestination(
-                                trip.destination,
-                                lang,
-                              ),
+                              cleanDest.isNotEmpty ? cleanDest : trip.title,
                               style: AppTypography.bodySmall.copyWith(
                                 fontWeight: FontWeight.w600,
                                 color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
@@ -1414,12 +1461,13 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Flexible(
+                  flex: 2,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
                         AppIcons.calendar,
-                        size: 13,
+                        size: 12.5,
                         color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
                       ),
                       const SizedBox(width: 4),
@@ -1470,11 +1518,11 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
               ),
             ],
 
-            // Secondary Trips horizontal chips (if user has > 1 trip)
+            // Secondary Trips horizontal chips (with strict flag deduplication)
             if (allTrips.length > 1) ...[
               const SizedBox(height: 10),
               SizedBox(
-                height: 32,
+                height: 30,
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
@@ -1484,6 +1532,11 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                     final t = allTrips[index];
                     final isCurrent = t.id == trip.id;
                     final tCountry = Country.findByCode(t.countryCode);
+                    final rawTDest = t.destination.isNotEmpty
+                        ? CityLocalization.localizeDestination(t.destination, lang)
+                        : t.title;
+                    final cleanTDest = stripLeadingFlags(rawTDest);
+
                     return BouncyPressable(
                       scaleFactor: 0.95,
                       onTap: () {
@@ -1498,14 +1551,14 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: isCurrent
-                              ? theme.colorScheme.primary.withValues(alpha: 0.14)
+                              ? theme.colorScheme.primary.withValues(alpha: 0.12)
                               : (isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight),
-                          borderRadius: BorderRadius.circular(AppRadius.sm),
+                          borderRadius: BorderRadius.circular(8),
                           border: Border.all(
                             color: isCurrent
-                                ? theme.colorScheme.primary.withValues(alpha: 0.45)
+                                ? theme.colorScheme.primary.withValues(alpha: 0.4)
                                 : (isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight),
-                            width: 0.8,
+                            width: 0.6,
                           ),
                         ),
                         child: Row(
@@ -1515,20 +1568,18 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                               Wrap(
                                 spacing: 2,
                                 children: t.countries
-                                    .map((c) => Text(c.flag, style: const TextStyle(fontSize: 12)))
+                                    .map((c) => Text(c.flag, style: const TextStyle(fontSize: 11)))
                                     .toList(),
                               ),
                               const SizedBox(width: 4),
                             ] else if (tCountry != null) ...[
-                              Text(tCountry.flag, style: const TextStyle(fontSize: 12)),
+                              Text(tCountry.flag, style: const TextStyle(fontSize: 11)),
                               const SizedBox(width: 4),
                             ],
                             Text(
-                              t.destination.isNotEmpty
-                                  ? CityLocalization.localizeDestination(t.destination, lang)
-                                  : t.title,
+                              cleanTDest.isNotEmpty ? cleanTDest : t.title,
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: 10.5,
                                 fontWeight: isCurrent ? FontWeight.w800 : FontWeight.w600,
                                 color: isCurrent
                                     ? theme.colorScheme.primary
@@ -1595,7 +1646,7 @@ class _LuggageChecklistCard extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      Icons.luggage_rounded,
+                      AppIcons.luggage,
                       color: checklistStatusColor,
                       size: 20,
                     ),
@@ -1697,8 +1748,8 @@ class _LuggageChecklistCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 12,
+                  AppIcons.chevronRight,
+                  size: 14,
                   color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
                 ),
               ],

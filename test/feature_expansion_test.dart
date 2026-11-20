@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
@@ -231,14 +232,14 @@ void main() {
     });
 
     test('TripsScreen.getTransportIcon resolves correct icons', () {
-      expect(TripsScreen.getTransportIcon('Flight'), Icons.flight_rounded);
-      expect(TripsScreen.getTransportIcon('Uçak'), Icons.flight_rounded);
-      expect(TripsScreen.getTransportIcon('Train'), Icons.train_rounded);
-      expect(TripsScreen.getTransportIcon('Car'), Icons.directions_car_rounded);
-      expect(TripsScreen.getTransportIcon('Ship'), Icons.directions_boat_rounded);
-      expect(TripsScreen.getTransportIcon('Bus'), Icons.directions_bus_rounded);
-      expect(TripsScreen.getTransportIcon('Other'), Icons.luggage_outlined);
-      expect(TripsScreen.getTransportIcon(null), Icons.luggage_outlined);
+      expect(TripsScreen.getTransportIcon('Flight'), AppIcons.flight);
+      expect(TripsScreen.getTransportIcon('Uçak'), AppIcons.flight);
+      expect(TripsScreen.getTransportIcon('Train'), AppIcons.train);
+      expect(TripsScreen.getTransportIcon('Car'), AppIcons.car);
+      expect(TripsScreen.getTransportIcon('Ship'), AppIcons.boat);
+      expect(TripsScreen.getTransportIcon('Bus'), AppIcons.car);
+      expect(TripsScreen.getTransportIcon('Other'), AppIcons.luggage);
+      expect(TripsScreen.getTransportIcon(null), AppIcons.luggage);
     });
   });
 }

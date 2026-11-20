@@ -104,6 +104,10 @@ void main() {
 
   group('Phase 5 - Settings & Paywall UI Widget Tests', () {
     testWidgets('SettingsScreen renders language, theme, sync, and Pro banner', (tester) async {
+      tester.view.physicalSize = const Size(390, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.resetPhysicalSize());
+
       final localeNotifier = LocaleNotifier()..setLocale(const Locale('en'));
 
       await tester.pumpWidget(
@@ -124,9 +128,9 @@ void main() {
 
       expect(find.text('Settings'), findsOneWidget);
       expect(find.text('PackBuddy Pro'), findsOneWidget);
-      expect(find.text('Language'), findsOneWidget);
-      expect(find.text('English'), findsOneWidget);
-      expect(find.text('Theme'), findsOneWidget);
+      expect(find.text('Language'), findsWidgets);
+      expect(find.textContaining('English'), findsOneWidget);
+      expect(find.text('Theme'), findsWidgets);
       expect(find.text('Sync Now'), findsOneWidget);
     });
 

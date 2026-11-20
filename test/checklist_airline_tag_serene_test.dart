@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/features/checklist/domain/packing_tag.dart';
 import 'package:packbuddy/features/checklist/domain/airline_baggage_guide.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
@@ -42,7 +43,7 @@ void main() {
       expect(PackingTagHelper.getLocalizedTag('CustomTag', 'tr'), 'CustomTag');
       expect(PackingTagHelper.getShortTag('CustomTag', 'tr'), 'CustomTag');
       final fallbackIcon = PackingTagHelper.getTagIcon('CustomTag');
-      expect(fallbackIcon, Icons.sell_outlined);
+      expect(fallbackIcon, AppIcons.checklist);
     });
   });
 

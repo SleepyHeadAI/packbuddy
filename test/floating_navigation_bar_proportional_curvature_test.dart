@@ -135,13 +135,13 @@ void main() {
   });
 
   group('Floating Navigation Bar - Proportional Curvature & Concentric Geometry', () {
-    testWidgets('Corner tabs (Ana Sayfa) and middle tabs (Kasa) have mathematically concentric radii in LTR', (tester) async {
+    testWidgets('Tabs render micro-pill curvature and outer dock has AppRadius.navBar', (tester) async {
       tester.view.physicalSize = const Size(390, 844);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      // Start with Home (index 0 - corner tab)
+      // Start with Home (index 0)
       await tester.pumpWidget(_buildTestApp(lang: 'tr', theme: AppTheme.lightTheme, initialIndex: 0));
       await tester.pumpAndSettle();
 
@@ -152,43 +152,20 @@ void main() {
       // The 5 nav item containers are the last ones rendered in the tree
       final navContainers = animatedContainers.sublist(animatedContainers.length - 5);
 
-      // Tab 0 (Ana Sayfa - Left Corner):
-      // In LTR, left corners curve concentrically with outer bar (radius 20.0),
-      // inner right corners use disciplined inner radius (12.0).
-      final homeDecor = navContainers[0].decoration as BoxDecoration?;
-      expect(homeDecor, isNotNull);
-      final homeBorderRadius = homeDecor!.borderRadius as BorderRadius?;
-      expect(homeBorderRadius, isNotNull);
-      expect(homeBorderRadius!.topLeft.x, equals(20.0));
-      expect(homeBorderRadius.bottomLeft.x, equals(20.0));
-      expect(homeBorderRadius.topRight.x, equals(12.0));
-      expect(homeBorderRadius.bottomRight.x, equals(12.0));
-
-      // Tab 3 (Kasa - Middle Tab):
-      // Middle tabs maintain balanced 12.0 on all 4 corners (no bulbous distortion)
-      final vaultDecor = navContainers[3].decoration as BoxDecoration?;
-      expect(vaultDecor, isNotNull);
-      final vaultBorderRadius = vaultDecor!.borderRadius as BorderRadius?;
-      expect(vaultBorderRadius, isNotNull);
-      expect(vaultBorderRadius!.topLeft.x, equals(12.0));
-      expect(vaultBorderRadius.topRight.x, equals(12.0));
-      expect(vaultBorderRadius.bottomLeft.x, equals(12.0));
-      expect(vaultBorderRadius.bottomRight.x, equals(12.0));
-
-      // Tab 4 (Ayarlar - Right Corner):
-      // In LTR, right corners curve concentrically with outer bar (radius 20.0),
-      // inner left corners use disciplined inner radius (12.0).
-      final settingsDecor = navContainers[4].decoration as BoxDecoration?;
-      expect(settingsDecor, isNotNull);
-      final settingsBorderRadius = settingsDecor!.borderRadius as BorderRadius?;
-      expect(settingsBorderRadius, isNotNull);
-      expect(settingsBorderRadius!.topRight.x, equals(20.0));
-      expect(settingsBorderRadius.bottomRight.x, equals(20.0));
-      expect(settingsBorderRadius.topLeft.x, equals(12.0));
-      expect(settingsBorderRadius.bottomLeft.x, equals(12.0));
+      // Tabs use modern 16.0 micro-pill border radius
+      for (final container in navContainers) {
+        final decor = container.decoration as BoxDecoration?;
+        expect(decor, isNotNull);
+        final borderRadius = decor!.borderRadius as BorderRadius?;
+        expect(borderRadius, isNotNull);
+        expect(borderRadius!.topLeft.x, equals(16.0));
+        expect(borderRadius.topRight.x, equals(16.0));
+        expect(borderRadius.bottomLeft.x, equals(16.0));
+        expect(borderRadius.bottomRight.x, equals(16.0));
+      }
     });
 
-    testWidgets('Arabic (ar) RTL mirrors outer corner radii symmetrically to the right and left ends', (tester) async {
+    testWidgets('Arabic (ar) RTL renders clean micro-pills symmetrically across all tabs', (tester) async {
       tester.view.physicalSize = const Size(390, 844);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -200,27 +177,17 @@ void main() {
       final animatedContainers = tester.widgetList<AnimatedContainer>(find.byType(AnimatedContainer)).toList();
       final navContainers = animatedContainers.sublist(animatedContainers.length - 5);
 
-      // In RTL:
-      // Tab 0 (Home / الرئيسية) is at the FAR RIGHT end:
-      // Outer corners are topRight and bottomRight (20.0), inner corners are topLeft and bottomLeft (12.0).
-      final homeDecor = navContainers[0].decoration as BoxDecoration?;
-      final homeBorderRadius = homeDecor!.borderRadius as BorderRadius?;
-      expect(homeBorderRadius!.topRight.x, equals(20.0));
-      expect(homeBorderRadius.bottomRight.x, equals(20.0));
-      expect(homeBorderRadius.topLeft.x, equals(12.0));
-      expect(homeBorderRadius.bottomLeft.x, equals(12.0));
-
-      // Tab 4 (Settings / الإعدادات) is at the FAR LEFT end:
-      // Outer corners are topLeft and bottomLeft (20.0), inner corners are topRight and bottomRight (12.0).
-      final settingsDecor = navContainers[4].decoration as BoxDecoration?;
-      final settingsBorderRadius = settingsDecor!.borderRadius as BorderRadius?;
-      expect(settingsBorderRadius!.topLeft.x, equals(20.0));
-      expect(settingsBorderRadius.bottomLeft.x, equals(20.0));
-      expect(settingsBorderRadius.topRight.x, equals(12.0));
-      expect(settingsBorderRadius.bottomRight.x, equals(12.0));
+      for (final container in navContainers) {
+        final decor = container.decoration as BoxDecoration?;
+        final borderRadius = decor!.borderRadius as BorderRadius?;
+        expect(borderRadius!.topLeft.x, equals(16.0));
+        expect(borderRadius.topRight.x, equals(16.0));
+        expect(borderRadius.bottomLeft.x, equals(16.0));
+        expect(borderRadius.bottomRight.x, equals(16.0));
+      }
     });
 
-    testWidgets('Theme adaptation: Selection indicator has soft cream/gold tint in Light Mode and glowing amber in Dark Mode', (tester) async {
+    testWidgets('Theme adaptation: Selection indicator has soft brand tint in Light Mode and Dark Mode', (tester) async {
       tester.view.physicalSize = const Size(390, 844);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -234,7 +201,6 @@ void main() {
       var navContainers = animatedContainers.sublist(animatedContainers.length - 5);
       var homeDecor = navContainers[0].decoration as BoxDecoration;
       expect(homeDecor.color, isNot(Colors.transparent));
-      expect(homeDecor.border, isNotNull);
 
       // Dark Theme
       await tester.pumpWidget(_buildTestApp(lang: 'tr', theme: AppTheme.darkTheme, initialIndex: 0));
@@ -244,7 +210,6 @@ void main() {
       navContainers = animatedContainers.sublist(animatedContainers.length - 5);
       homeDecor = navContainers[0].decoration as BoxDecoration;
       expect(homeDecor.color, isNot(Colors.transparent));
-      expect(homeDecor.border, isNotNull);
     });
   });
 }

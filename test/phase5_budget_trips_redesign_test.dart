@@ -55,15 +55,14 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Progress bar color should be warm amber
+      // Progress bar color should be brand accent (Terracotta)
       final indicator = tester.widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
       final colorAnim = indicator.valueColor as AlwaysStoppedAnimation<Color>;
       expect(colorAnim.value, equals(const Color(0xFFD97706)));
 
-      // Warning text should be rendered with AppColors.brandAccentTextLight (#92400E) for WCAG AA 4.5:1 contrast
+      // Warning text should be rendered with AppColors.brandAccentTextLight for WCAG AA 4.5:1 contrast
       final alertIcon = tester.widget<Icon>(find.byIcon(Icons.warning_amber_rounded));
       expect(alertIcon.color, equals(AppColors.brandAccentTextLight));
-      expect(alertIcon.color, equals(const Color(0xFF92400E)));
     });
 
     testWidgets('Budget over 100% uses serene red progress color', (tester) async {

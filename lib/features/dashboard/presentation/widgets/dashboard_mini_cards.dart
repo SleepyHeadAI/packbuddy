@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:packbuddy/features/profile/domain/friend_localization.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_motion.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -61,7 +62,7 @@ class DashboardMiniTravelMap extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
-                      Icons.public_rounded,
+                      AppIcons.globe,
                       color: Colors.white,
                       size: 19,
                     ),
@@ -179,7 +180,7 @@ class DashboardMiniVault extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
-                      Icons.shield_rounded,
+                      AppIcons.shield,
                       color: Color(0xFF8B5CF6),
                       size: 19,
                     ),
@@ -289,7 +290,7 @@ class DashboardMiniAllTrips extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
-                      Icons.account_balance_wallet_rounded,
+                      AppIcons.budget,
                       color: theme.colorScheme.primary,
                       size: 19,
                     ),
@@ -418,14 +419,14 @@ class DashboardMiniTripComparison extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
-                      Icons.compare_arrows_rounded,
+                      AppIcons.currency,
                       color: Color(0xFF6366F1),
                       size: 19,
                     ),
                   ),
                 ),
                 const Icon(
-                  Icons.arrow_forward_ios_rounded,
+                  AppIcons.chevronRight,
                   size: 11,
                   color: Color(0xFF6366F1),
                 ),
