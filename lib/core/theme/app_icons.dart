@@ -54,6 +54,7 @@ class AppIcons {
   static const IconData calendar = Icons.calendar_today_rounded;
   static const IconData location = Icons.place_rounded;
   static const IconData globe = Icons.language_rounded;
+  static const IconData users = Icons.people_alt_rounded;
 
   // --- Finance & Budget ---
   static const IconData budget = Icons.account_balance_wallet_rounded;

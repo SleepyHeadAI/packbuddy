@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -6,9 +7,16 @@ import '../../../core/utils/date_formatter.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/l10n/locale_provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
+import '../../../core/theme/app_motion.dart';
+import '../../../core/theme/app_radius.dart';
+import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/app_typography.dart';
 import '../../../data/sync_engine/sync_engine.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_card.dart';
+import '../../../shared/widgets/app_divider.dart';
 import '../../../shared/widgets/app_logo.dart';
 import '../../../shared/widgets/status_badge.dart';
 import '../../budget/domain/country.dart';
@@ -18,6 +26,7 @@ import '../../budget/presentation/controllers/trip_controller.dart';
 import '../../budget/presentation/screens/trips_screen.dart';
 import '../../budget/presentation/screens/trip_detail_screen.dart';
 import '../../budget/presentation/screens/trip_comparison_screen.dart';
+import '../../budget/presentation/screens/widgets/add_trip_sheet.dart';
 import '../../settings/data/mock_revenuecat_service.dart';
 import '../../vault/presentation/controllers/vault_controller.dart';
 import '../../vault/presentation/screens/vault_screen.dart';
@@ -418,6 +427,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
             tooltip: l10n.notifications,
             onPressed: () async {
+              AppHaptics.light();
               await NotificationsCenterSheet.show(context);
               if (mounted) setState(() {});
             },
@@ -425,19 +435,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           const SizedBox(width: 4),
 
           // Language Switcher Pill
-          InkWell(
-            borderRadius: BorderRadius.circular(12),
-            onTap: () => showLanguageSelectorSheet(context, ref, currentLocale),
+          BouncyPressable(
+            scaleFactor: 0.95,
+            onTap: () {
+              AppHaptics.light();
+              showLanguageSelectorSheet(context, ref, currentLocale);
+            },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
               decoration: BoxDecoration(
                 color: isDark
-                    ? theme.colorScheme.surfaceContainerHighest
-                    : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
-                borderRadius: BorderRadius.circular(12),
+                    ? AppColors.surfaceRaisedDark
+                    : AppColors.surfaceRaisedLight,
+                borderRadius: BorderRadius.circular(AppRadius.sm),
                 border: Border.all(
-                  color: theme.colorScheme.outline.withValues(alpha: 0.5),
-                  width: 1,
+                  color: isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight,
+                  width: 0.8,
                 ),
               ),
               child: Row(
@@ -450,7 +463,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   const SizedBox(width: 4),
                   Text(
                     currentLocale.languageCode.toUpperCase(),
-                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 10),
+                    style: AppTypography.mono(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 10,
+                      tabularFigures: true,
+                    ),
                   ),
                 ],
               ),
@@ -463,19 +480,27 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         key: _fabKey,
         heroTag: null,
         elevation: 3,
-        onPressed: () => QuickActionsSheet.showForDashboard(
-          context,
-          ref: ref,
-          activeTrip: upcomingTrip,
-          fabKey: _fabKey,
-        ),
+        onPressed: () {
+          AppHaptics.light();
+          QuickActionsSheet.showForDashboard(
+            context,
+            ref: ref,
+            activeTrip: upcomingTrip,
+            fabKey: _fabKey,
+          );
+        },
         child: const Icon(Icons.add_rounded, size: 26),
       ),
       floatingActionButtonLocation: kFloatingActionButtonAboveFloatingBar,
       body: SafeArea(
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-          padding: const EdgeInsets.fromLTRB(18, 10, 18, 110),
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.md,
+            AppSpacing.xs,
+            AppSpacing.md,
+            math.max(120.0, MediaQuery.of(context).padding.bottom + 100.0),
+          ),
           children: [
             // =========================================================================
             // 1. FIXED TOP: Horizontal Greeting & Live Sync Header Bar
@@ -554,7 +579,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               },
               onCustomizeTap: _openCustomizeSheet,
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: AppSpacing.md),
 
             // =========================================================================
             // 2+. REORDERABLE SECTIONS (With graceful fallback sliding)
@@ -605,13 +630,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
     for (final id in order) {
       if (hidden.contains(id)) continue;
-
-      // Condition: Active trip only renders if an upcoming/active trip exists.
-      // If none, it is omitted, sliding up the next section!
-      if (id == 'active_trip' && upcomingTrip == null) {
-        continue;
-      }
-
+      // Retain active_trip so if upcomingTrip == null, the empty state hero card renders
       activeIds.add(id);
     }
 
@@ -627,7 +646,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           final nextId = activeIds[i + 1];
           widgets.add(
             Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.only(bottom: AppSpacing.sm),
               child: IntrinsicHeight(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -651,7 +670,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                         l10n: l10n,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: _renderSectionById(
                         id: nextId,
@@ -681,7 +700,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
           // Single standalone mini card
           widgets.add(
             Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.only(bottom: AppSpacing.sm),
               child: _renderSectionById(
                 id: currentId,
                 isMini: false,
@@ -707,7 +726,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         // Full width section (Active Trip, Luggage Checklist, Live Currency Converter)
         widgets.add(
           Padding(
-            padding: const EdgeInsets.only(bottom: 14),
+            padding: const EdgeInsets.only(bottom: AppSpacing.md),
             child: _renderSectionById(
               id: currentId,
               isMini: false,
@@ -762,7 +781,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
   }) {
     switch (id) {
       case 'active_trip':
-        if (upcomingTrip == null) return const SizedBox.shrink();
+        if (upcomingTrip == null) {
+          return _EmptyTripHeroCard(
+            onAddTrip: () {
+              AddTripSheet.show(context);
+            },
+          );
+        }
         return _UpcomingTripHighlightCard(
           trip: upcomingTrip,
           badgeText: featuredTripBadge,
@@ -880,9 +905,10 @@ class _HorizontalGreetingBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final lang = Localizations.localeOf(context).languageCode;
     final hour = DateTime.now().hour;
-    final timeIcon = DashboardLocalization.timeIcon(hour);
+    final isDayTime = hour >= 5 && hour < 18;
     final cleanGreeting = DashboardLocalization.timeGreetingClean(lang, hour);
     final travelerTitle = DashboardLocalization.travelerTitle(lang);
 
@@ -896,7 +922,7 @@ class _HorizontalGreetingBar extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Row 1: Time Greeting with Emoji (Left) & Sync Status + Customize (Right)
+          // Row 1: Time Greeting with Vector Icon (Left) & Sync Status + Search + Customize (Right)
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -904,19 +930,19 @@ class _HorizontalGreetingBar extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      timeIcon,
-                      style: const TextStyle(fontSize: 13.5),
+                    Icon(
+                      isDayTime ? Icons.wb_sunny_rounded : Icons.nightlight_round,
+                      size: 13.5,
+                      color: isDayTime ? const Color(0xFFF59E0B) : const Color(0xFF818CF8),
                     ),
                     const SizedBox(width: 5),
                     Flexible(
                       child: Text(
                         cleanGreeting,
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: theme.colorScheme.primary,
+                        style: AppTypography.caption.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
                           letterSpacing: 0.15,
-                          fontSize: 12,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -929,7 +955,10 @@ class _HorizontalGreetingBar extends StatelessWidget {
 
               // Cloud Sync Status Pill (Anchored to the right side cluster with natural width)
               InkWell(
-                onTap: onSyncTap,
+                onTap: () {
+                  AppHaptics.selectionClick();
+                  onSyncTap();
+                },
                 borderRadius: BorderRadius.circular(14),
                 child: StatusBadge(
                   label: syncLabel,
@@ -940,62 +969,73 @@ class _HorizontalGreetingBar extends StatelessWidget {
                   maxWidth: 140,
                 ),
               ),
-              const SizedBox(width: 5),
+              const SizedBox(width: 6),
 
               // Global Search Button
               if (onSearchTap != null) ...[
-                InkWell(
-                  onTap: onSearchTap,
-                  borderRadius: BorderRadius.circular(10),
+                BouncyPressable(
+                  scaleFactor: 0.92,
+                  onTap: () {
+                    AppHaptics.light();
+                    onSearchTap!();
+                  },
                   child: Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(9),
+                      color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
                       border: Border.all(
-                        color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                        color: isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight,
                         width: 0.8,
                       ),
                     ),
                     child: Icon(
-                      Icons.search_rounded,
-                      size: 16,
-                      color: theme.colorScheme.primary,
+                      AppIcons.search,
+                      size: 15,
+                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
                     ),
                   ),
                 ),
-                const SizedBox(width: 5),
+                const SizedBox(width: 6),
               ],
 
               // Customize Home Layout Button
-              InkWell(
-                onTap: onCustomizeTap,
-                borderRadius: BorderRadius.circular(10),
+              BouncyPressable(
+                scaleFactor: 0.92,
+                onTap: () {
+                  AppHaptics.light();
+                  onCustomizeTap();
+                },
                 child: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(9),
+                    color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
                     border: Border.all(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                      color: isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight,
                       width: 0.8,
                     ),
                   ),
                   child: Icon(
                     Icons.tune_rounded,
-                    size: 16,
-                    color: theme.colorScheme.primary,
+                    size: 15,
+                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
 
           // Row 2: User Avatar + User Name (Left) + Formatted Date (Right)
-          InkWell(
-            onTap: onProfileTap,
-            borderRadius: BorderRadius.circular(8),
+          BouncyPressable(
+            scaleFactor: 0.98,
+            onTap: onProfileTap != null
+                ? () {
+                    AppHaptics.light();
+                    onProfileTap!();
+                  }
+                : null,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -1016,9 +1056,9 @@ class _HorizontalGreetingBar extends StatelessWidget {
                       Flexible(
                         child: Text(
                           displayName,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.4,
+                          style: AppTypography.titleMedium.copyWith(
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.3,
                             fontSize: 16,
                           ),
                           maxLines: 1,
@@ -1029,24 +1069,95 @@ class _HorizontalGreetingBar extends StatelessWidget {
                       Icon(
                         Icons.chevron_right_rounded,
                         size: 16,
-                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                        color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  subtitle,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.75),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 11.5,
-                    letterSpacing: -0.1,
+                Flexible(
+                  child: Text(
+                    subtitle,
+                    style: AppTypography.caption.copyWith(
+                      color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 1,
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Elegant empty state hero card displayed when the user has no trips planned yet.
+class _EmptyTripHeroCard extends StatelessWidget {
+  final VoidCallback onAddTrip;
+
+  const _EmptyTripHeroCard({
+    required this.onAddTrip,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
+
+    return AppCard(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Icon(
+                AppIcons.flight,
+                size: 24,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            l10n.noTripsYet,
+            style: AppTypography.titleMedium.copyWith(
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.3,
+              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            l10n.noTripsSubtitle,
+            style: AppTypography.bodySmall.copyWith(
+              color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 16),
+          AppButton.primary(
+            label: l10n.addTrip,
+            leadingIcon: Icons.add_rounded,
+            onPressed: () {
+              AppHaptics.light();
+              onAddTrip();
+            },
           ),
         ],
       ),
@@ -1074,6 +1185,7 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final isLight = !isDark;
     final country = Country.findByCode(trip.countryCode);
     final tripCountries = (trip is Trip) ? (trip as Trip).countries : <Country>[];
     final transportIcon = TripsScreen.getTransportIcon(trip.transportMode);
@@ -1098,168 +1210,173 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
       }
     }
 
-    return AppCard(
-      onTap: onTap,
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Hero(
-                tag: 'trip-transport-icon-${trip.id}',
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(13),
-                    boxShadow: [
-                      BoxShadow(
-                        color: theme.colorScheme.primary.withValues(alpha: 0.28),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Icon(transportIcon, color: Colors.white, size: 21),
+    final pillTextColor = isLight ? AppColors.brandAccentTextLight : AppColors.brandAccentTextDark;
+    final pillBgColor = isLight
+        ? AppColors.brandAccent.withValues(alpha: 0.12)
+        : AppColors.brandAccent.withValues(alpha: 0.18);
+
+    return BouncyPressable(
+      scaleFactor: 0.985,
+      onTap: () {
+        AppHaptics.light();
+        onTap();
+      },
+      child: AppCard(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Hero(
+                  tag: 'trip-transport-icon-${trip.id}',
+                  child: Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary,
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      boxShadow: [
+                        BoxShadow(
+                          color: theme.colorScheme.primary.withValues(alpha: 0.22),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Icon(transportIcon, color: Colors.white, size: 20),
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              badgeText,
+                              style: AppTypography.labelSmall.copyWith(
+                                color: theme.colorScheme.primary,
+                                letterSpacing: 0.8,
+                                fontSize: 9.5,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (tripCountries.isNotEmpty) ...[
+                            const SizedBox(width: 5),
+                            Wrap(
+                              spacing: 2,
+                              children: tripCountries
+                                  .map((c) => Text(c.flag, style: const TextStyle(fontSize: 12)))
+                                  .toList(),
+                            ),
+                          ] else if (country != null) ...[
+                            const SizedBox(width: 5),
+                            Text(country.flag, style: const TextStyle(fontSize: 12)),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Hero(
+                        tag: 'trip-title-${trip.id}',
+                        child: Material(
+                          type: MaterialType.transparency,
                           child: Text(
-                            badgeText,
-                            style: theme.textTheme.labelSmall?.copyWith(
+                            trip.title,
+                            style: AppTypography.titleMedium.copyWith(
                               fontWeight: FontWeight.w800,
-                              color: theme.colorScheme.primary,
-                              letterSpacing: 0.6,
-                              fontSize: 10,
+                              letterSpacing: -0.3,
+                              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        if (tripCountries.isNotEmpty) ...[
-                          const SizedBox(width: 5),
-                          Wrap(
-                            spacing: 2,
-                            children: tripCountries
-                                .map((c) => Text(c.flag, style: const TextStyle(fontSize: 12)))
-                                .toList(),
-                          ),
-                        ] else if (country != null) ...[
-                          const SizedBox(width: 5),
-                          Text(country.flag, style: const TextStyle(fontSize: 12)),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Hero(
-                      tag: 'trip-title-${trip.id}',
-                      child: Material(
-                        type: MaterialType.transparency,
+                      ),
+                    ],
+                  ),
+                ),
+                // Countdown Pill & View All (Vertically stacked and constrained for zero horizontal overflow)
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 105),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: pillBgColor,
+                          borderRadius: BorderRadius.circular(AppRadius.xs),
+                        ),
                         child: Text(
-                          trip.title,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.2,
-                          ),
+                          countdownPill,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+                          style: AppTypography.mono(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: pillTextColor,
+                            tabularFigures: true,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              // Countdown Pill & View All (Vertically stacked and constrained for zero horizontal overflow)
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 105),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        countdownPill,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.w800,
-                          color: theme.colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    InkWell(
-                      borderRadius: BorderRadius.circular(6),
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const TripsScreen()),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Flexible(
-                              child: Text(
-                                l10n.viewAll,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  color: theme.colorScheme.primary,
+                      const SizedBox(height: 4),
+                      BouncyPressable(
+                        scaleFactor: 0.95,
+                        onTap: () {
+                          AppHaptics.light();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const TripsScreen()),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  l10n.viewAll,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: theme.colorScheme.primary,
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 2),
-                            Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              size: 8.5,
-                              color: theme.colorScheme.primary,
-                            ),
-                          ],
+                              const SizedBox(width: 2),
+                              Icon(
+                                Icons.arrow_forward_ios_rounded,
+                                size: 8.5,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // Destination & Date Strip
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
-                  : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: theme.colorScheme.outline.withValues(alpha: 0.4),
-              ),
+              ],
             ),
-            child: Row(
+            const SizedBox(height: 12),
+
+            // Destination & Date Strip (Clean hairline divider + inline metadata)
+            AppDivider(
+              color: isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight,
+            ),
+            const SizedBox(height: 10),
+            Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
@@ -1267,11 +1384,11 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Icon(
-                        Icons.place_outlined,
+                        AppIcons.location,
                         size: 14,
                         color: theme.colorScheme.primary,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 5),
                       Expanded(
                         child: Hero(
                           tag: 'trip-destination-${trip.id}',
@@ -1282,8 +1399,9 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                                 trip.destination,
                                 lang,
                               ),
-                              style: theme.textTheme.bodySmall?.copyWith(
+                              style: AppTypography.bodySmall.copyWith(
                                 fontWeight: FontWeight.w600,
+                                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -1300,9 +1418,9 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        Icons.calendar_today_rounded,
-                        size: 12,
-                        color: theme.colorScheme.onSurfaceVariant,
+                        AppIcons.calendar,
+                        size: 13,
+                        color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
                       ),
                       const SizedBox(width: 4),
                       Flexible(
@@ -1312,8 +1430,8 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                             trip.endDate,
                             locale: lang,
                           ),
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
+                          style: AppTypography.caption.copyWith(
+                            color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
                             fontWeight: FontWeight.w500,
                           ),
                           maxLines: 1,
@@ -1325,108 +1443,108 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                 ),
               ],
             ),
-          ),
 
-          if (trip.collaborators.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(
-                  Icons.people_alt_rounded,
-                  size: 13,
-                  color: theme.colorScheme.primary,
-                ),
-                const SizedBox(width: 5),
-                Text(
-                  l10n.sharedTrip,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
+            if (trip.collaborators.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(
+                    AppIcons.users,
+                    size: 13,
                     color: theme.colorScheme.primary,
                   ),
-                ),
-                const SizedBox(width: 8),
-                CollaboratorAvatarStack(
-                  collaborators: trip.collaborators,
-                  size: 20,
-                ),
-              ],
-            ),
-          ],
-
-          // Secondary Trips horizontal chips (if user has > 1 trip)
-          if (allTrips.length > 1) ...[
-            const SizedBox(height: 10),
-            SizedBox(
-              height: 32,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                itemCount: allTrips.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 6),
-                itemBuilder: (context, index) {
-                  final t = allTrips[index];
-                  final isCurrent = t.id == trip.id;
-                  final tCountry = Country.findByCode(t.countryCode);
-                  return InkWell(
-                    borderRadius: BorderRadius.circular(10),
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => TripDetailScreen(trip: t),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: isCurrent
-                            ? theme.colorScheme.primary.withValues(alpha: 0.15)
-                            : (isDark ? const Color(0xFF1E293B) : Colors.white),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: isCurrent
-                              ? theme.colorScheme.primary.withValues(alpha: 0.4)
-                              : theme.colorScheme.outline.withValues(alpha: 0.3),
-                          width: 0.8,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (t.countries.isNotEmpty) ...[
-                            Wrap(
-                              spacing: 2,
-                              children: t.countries
-                                  .map((c) => Text(c.flag, style: const TextStyle(fontSize: 12)))
-                                  .toList(),
-                            ),
-                            const SizedBox(width: 4),
-                          ] else if (tCountry != null) ...[
-                            Text(tCountry.flag, style: const TextStyle(fontSize: 12)),
-                            const SizedBox(width: 4),
-                          ],
-                          Text(
-                            t.destination.isNotEmpty
-                                ? CityLocalization.localizeDestination(t.destination, lang)
-                                : t.title,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: isCurrent ? FontWeight.w800 : FontWeight.w600,
-                              color: isCurrent
-                                  ? theme.colorScheme.primary
-                                  : (isDark ? Colors.white70 : Colors.black87),
-                            ),
-                          ),
-                        ],
-                      ),
+                  const SizedBox(width: 5),
+                  Text(
+                    l10n.sharedTrip,
+                    style: AppTypography.caption.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: theme.colorScheme.primary,
                     ),
-                  );
-                },
+                  ),
+                  const SizedBox(width: 8),
+                  CollaboratorAvatarStack(
+                    collaborators: trip.collaborators,
+                    size: 20,
+                  ),
+                ],
               ),
-            ),
+            ],
+
+            // Secondary Trips horizontal chips (if user has > 1 trip)
+            if (allTrips.length > 1) ...[
+              const SizedBox(height: 10),
+              SizedBox(
+                height: 32,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: allTrips.length,
+                  separatorBuilder: (_, _) => const SizedBox(width: 6),
+                  itemBuilder: (context, index) {
+                    final t = allTrips[index];
+                    final isCurrent = t.id == trip.id;
+                    final tCountry = Country.findByCode(t.countryCode);
+                    return BouncyPressable(
+                      scaleFactor: 0.95,
+                      onTap: () {
+                        AppHaptics.light();
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => TripDetailScreen(trip: t),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: isCurrent
+                              ? theme.colorScheme.primary.withValues(alpha: 0.14)
+                              : (isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight),
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
+                          border: Border.all(
+                            color: isCurrent
+                                ? theme.colorScheme.primary.withValues(alpha: 0.45)
+                                : (isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight),
+                            width: 0.8,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (t.countries.isNotEmpty) ...[
+                              Wrap(
+                                spacing: 2,
+                                children: t.countries
+                                    .map((c) => Text(c.flag, style: const TextStyle(fontSize: 12)))
+                                    .toList(),
+                              ),
+                              const SizedBox(width: 4),
+                            ] else if (tCountry != null) ...[
+                              Text(tCountry.flag, style: const TextStyle(fontSize: 12)),
+                              const SizedBox(width: 4),
+                            ],
+                            Text(
+                              t.destination.isNotEmpty
+                                  ? CityLocalization.localizeDestination(t.destination, lang)
+                                  : t.title,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: isCurrent ? FontWeight.w800 : FontWeight.w600,
+                                color: isCurrent
+                                    ? theme.colorScheme.primary
+                                    : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -1454,136 +1572,184 @@ class _LuggageChecklistCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return AppCard(
-      padding: const EdgeInsets.all(16),
-      onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Hero(
-                tag: 'checklist-hero-badge',
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: checklistStatusColor.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.luggage_rounded,
-                    color: checklistStatusColor,
-                    size: 20,
+    return BouncyPressable(
+      scaleFactor: 0.985,
+      onTap: () {
+        AppHaptics.light();
+        onTap();
+      },
+      child: AppCard(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Hero(
+                  tag: 'checklist-hero-badge',
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: checklistStatusColor.withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.luggage_rounded,
+                      color: checklistStatusColor,
+                      size: 20,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Hero(
-                      tag: 'checklist-hero-title',
-                      child: Material(
-                        type: MaterialType.transparency,
-                        child: Text(
-                          l10n.baggageAndChecklist,
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.2,
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Hero(
+                        tag: 'checklist-hero-title',
+                        child: Material(
+                          type: MaterialType.transparency,
+                          child: Text(
+                            l10n.baggageAndChecklist,
+                            style: AppTypography.titleSmall.copyWith(
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.2,
+                              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 1),
+                      if (checklistState.totalCount == 0)
+                        Text(
+                          l10n.noItemsYet,
+                          style: AppTypography.caption.copyWith(
+                            color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        )
+                      else
+                        Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: '${checklistState.packedCount}/${checklistState.totalCount}',
+                                style: AppTypography.mono(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                                  tabularFigures: true,
+                                ),
+                              ),
+                              TextSpan(
+                                text: ' ${l10n.itemsReady} • ',
+                                style: AppTypography.caption.copyWith(
+                                  color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                                ),
+                              ),
+                              TextSpan(
+                                text: '%${(checklistCompletionRatio * 100).toInt()}',
+                                style: AppTypography.mono(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w700,
+                                  color: checklistStatusColor,
+                                  tabularFigures: true,
+                                ),
+                              ),
+                            ],
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 1),
-                    Text(
-                      checklistState.totalCount == 0
-                          ? l10n.noItemsYet
-                          : '${checklistState.packedCount}/${checklistState.totalCount} ${l10n.itemsReady} (%${(checklistCompletionRatio * 100).toInt()})',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: theme.colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Status Badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: checklistStatusColor.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: checklistStatusColor.withValues(alpha: 0.4), width: 1),
-                ),
-                child: Text(
-                  checklistState.totalCount == 0
-                      ? l10n.listEmpty.toUpperCase()
-                      : (checklistCompletionRatio >= 1.0
-                          ? l10n.completed.toUpperCase()
-                          : l10n.preparing.toUpperCase()),
-                  style: TextStyle(
-                    color: checklistStatusColor,
-                    fontSize: 9.5,
-                    fontWeight: FontWeight.w800,
+                    ],
                   ),
                 ),
-              ),
-              const SizedBox(width: 4),
-              Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 12,
-                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // Animated Progress Bar
-          AppAnimatedProgressBar(
-            progress: checklistCompletionRatio,
-            height: 6.5,
-            backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
-            foregroundColor: checklistStatusColor,
-            duration: const Duration(milliseconds: 450),
-          ),
-          const SizedBox(height: 10),
-
-          // Airline Baggage Limit / Responsibility Note
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4)
-                  : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
-              children: [
-                Icon(Icons.flight_takeoff_rounded, size: 14, color: theme.colorScheme.primary),
-                const SizedBox(width: 6),
-                Expanded(
+                // Status Badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: checklistStatusColor.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(AppRadius.xs),
+                    border: Border.all(
+                      color: checklistStatusColor.withValues(alpha: 0.35),
+                      width: 0.8,
+                    ),
+                  ),
                   child: Text(
-                    checklistState.selectedAirline != null
-                        ? '${checklistState.selectedAirline!.countryFlag} ${checklistState.selectedAirline!.airlineName} • ${l10n.cabinBaggage} ${checklistState.selectedAirline!.cabinLimitKg.toInt()} kg'
-                        : l10n.standardBaggageLimitNote,
+                    checklistState.totalCount == 0
+                        ? l10n.listEmpty.toUpperCase()
+                        : (checklistCompletionRatio >= 1.0
+                            ? l10n.completed.toUpperCase()
+                            : l10n.preparing.toUpperCase()),
+                    style: AppTypography.labelSmall.copyWith(
+                      color: checklistStatusColor,
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurface,
-                    ),
                   ),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 12,
+                  color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
                 ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+
+            // Animated Progress Bar
+            AppAnimatedProgressBar(
+              progress: checklistCompletionRatio,
+              height: 5.0,
+              backgroundColor: isDark
+                  ? theme.colorScheme.outlineVariant.withValues(alpha: 0.25)
+                  : theme.colorScheme.outlineVariant.withValues(alpha: 0.35),
+              foregroundColor: checklistStatusColor,
+              duration: const Duration(milliseconds: 450),
+            ),
+            const SizedBox(height: 10),
+
+            // Airline Baggage Limit / Responsibility Note
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+                borderRadius: BorderRadius.circular(AppRadius.sm),
+                border: Border.all(
+                  color: isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight,
+                  width: 0.8,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Icon(AppIcons.flightTakeoff, size: 14, color: theme.colorScheme.primary),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      checklistState.selectedAirline != null
+                          ? '${checklistState.selectedAirline!.countryFlag} ${checklistState.selectedAirline!.airlineName} • ${l10n.cabinBaggage} ${checklistState.selectedAirline!.cabinLimitKg.toInt()} kg'
+                          : l10n.standardBaggageLimitNote,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.caption.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

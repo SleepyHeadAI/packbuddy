@@ -52,6 +52,9 @@ class AppHaptics {
     HapticFeedback.selectionClick();
   }
 
+  /// Alias for selection haptic click
+  static void selectionClick() => selection();
+
   /// Light tactile feedback for standard button tap
   static void light() {
     HapticFeedback.lightImpact();

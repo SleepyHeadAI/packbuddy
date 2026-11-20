@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/widgets/app_animations.dart';
 import '../../../../shared/widgets/app_card.dart';
@@ -138,10 +139,11 @@ class BentoHubGrid extends StatelessWidget {
                             ),
                             child: Text(
                               '%${worldPercentage.toStringAsFixed(1)}',
-                              style: const TextStyle(
-                                color: Color(0xFF10B981),
+                              style: AppTypography.mono(
+                                color: const Color(0xFF10B981),
                                 fontSize: 10.5,
                                 fontWeight: FontWeight.w800,
+                                tabularFigures: true,
                               ),
                             ),
                           ),
@@ -218,12 +220,12 @@ class BentoHubGrid extends StatelessWidget {
                   delay: const Duration(milliseconds: 140),
                   child: _BentoCompanionTile(
                     icon: Icons.currency_exchange_rounded,
-                    iconColor: const Color(0xFFD97706),
-                    iconBgColor: const Color(0xFFD97706).withValues(alpha: 0.14),
+                    iconColor: AppColors.brandAccent,
+                    iconBgColor: AppColors.brandAccent.withValues(alpha: 0.14),
                     title: l10n.currencyConverter,
                     subtitle: l10n.quickConvert,
                     badgeText: 'LIVE',
-                    badgeColor: const Color(0xFFD97706),
+                    badgeColor: AppColors.brandAccent,
                     onTap: onOpenCurrency,
                   ),
                 ),

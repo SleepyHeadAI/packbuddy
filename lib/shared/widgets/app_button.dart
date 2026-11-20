@@ -45,6 +45,66 @@ class AppButton extends StatelessWidget {
     this.customRadius,
   });
 
+  const AppButton.primary({
+    super.key,
+    required this.label,
+    this.onPressed,
+    this.size = AppButtonSize.medium,
+    this.leadingIcon,
+    this.trailingIcon,
+    this.isLoading = false,
+    this.isExpanded = false,
+    this.customRadius,
+  }) : variant = AppButtonVariant.primary;
+
+  const AppButton.secondary({
+    super.key,
+    required this.label,
+    this.onPressed,
+    this.size = AppButtonSize.medium,
+    this.leadingIcon,
+    this.trailingIcon,
+    this.isLoading = false,
+    this.isExpanded = false,
+    this.customRadius,
+  }) : variant = AppButtonVariant.secondary;
+
+  const AppButton.outline({
+    super.key,
+    required this.label,
+    this.onPressed,
+    this.size = AppButtonSize.medium,
+    this.leadingIcon,
+    this.trailingIcon,
+    this.isLoading = false,
+    this.isExpanded = false,
+    this.customRadius,
+  }) : variant = AppButtonVariant.outline;
+
+  const AppButton.ghost({
+    super.key,
+    required this.label,
+    this.onPressed,
+    this.size = AppButtonSize.medium,
+    this.leadingIcon,
+    this.trailingIcon,
+    this.isLoading = false,
+    this.isExpanded = false,
+    this.customRadius,
+  }) : variant = AppButtonVariant.ghost;
+
+  const AppButton.destructive({
+    super.key,
+    required this.label,
+    this.onPressed,
+    this.size = AppButtonSize.medium,
+    this.leadingIcon,
+    this.trailingIcon,
+    this.isLoading = false,
+    this.isExpanded = false,
+    this.customRadius,
+  }) : variant = AppButtonVariant.destructive;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

@@ -4,7 +4,8 @@ import '../../../../core/services/app_widget_service.dart';
 import '../../../../core/services/currency_service.dart';
 import '../../../../core/services/preferences_service.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_motion.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/widgets/app_card.dart';
@@ -257,9 +258,10 @@ class _HorizontalCurrencyConverterCardState
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(RegExp(r'^\d*[\.,]?\d*')),
                         ],
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
+                        style: AppTypography.mono(
                           fontSize: 14.5,
+                          fontWeight: FontWeight.w700,
+                          tabularFigures: true,
                         ),
                         decoration: InputDecoration(
                           isDense: true,
@@ -290,7 +292,10 @@ class _HorizontalCurrencyConverterCardState
                   turns: Tween(begin: 0.0, end: 0.5).animate(_swapAnimController),
                   child: IconButton.filledTonal(
                     icon: const Icon(Icons.swap_horiz_rounded, size: 16),
-                    onPressed: _swapCurrencies,
+                    onPressed: () {
+                      AppHaptics.selection();
+                      _swapCurrencies();
+                    },
                     style: IconButton.styleFrom(
                       backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.12),
                       foregroundColor: theme.colorScheme.primary,
@@ -333,6 +338,7 @@ class _HorizontalCurrencyConverterCardState
                       const SizedBox(height: 1),
                       InkWell(
                         onTap: () {
+                          AppHaptics.light();
                           final formatted = CurrencyFormatter.format(converted, currency: _toCurrency);
                           Clipboard.setData(ClipboardData(text: formatted));
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -350,11 +356,12 @@ class _HorizontalCurrencyConverterCardState
                             alignment: Alignment.centerLeft,
                             child: Text(
                               CurrencyFormatter.format(converted, currency: _toCurrency),
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w900,
+                              style: AppTypography.mono(
                                 fontSize: 14.5,
+                                fontWeight: FontWeight.w700,
                                 color: theme.colorScheme.primary,
                                 letterSpacing: -0.3,
+                                tabularFigures: true,
                               ),
                             ),
                           ),
@@ -383,6 +390,7 @@ class _HorizontalCurrencyConverterCardState
                         child: InkWell(
                           borderRadius: BorderRadius.circular(6),
                           onTap: () {
+                            AppHaptics.light();
                             _amountController.text = preset.toInt().toString();
                             setState(() {});
                             _persistConverterState();
@@ -405,12 +413,13 @@ class _HorizontalCurrencyConverterCardState
                             ),
                             child: Text(
                               '${CurrencyService.getCurrencySymbol(_fromCurrency)}${preset.toInt()}',
-                              style: TextStyle(
+                              style: AppTypography.mono(
                                 fontSize: 10,
                                 fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                                 color: isSelected
                                     ? Colors.white
                                     : theme.colorScheme.onSurface,
+                                tabularFigures: true,
                               ),
                             ),
                           ),
@@ -425,10 +434,11 @@ class _HorizontalCurrencyConverterCardState
               Flexible(
                 child: Text(
                   '1 $_fromCurrency = ${rateFromTo.toStringAsFixed(2)} $_toCurrency',
-                  style: AppTheme.monoFont(
+                  style: AppTypography.mono(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
                     color: theme.colorScheme.onSurfaceVariant,
+                    tabularFigures: true,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
