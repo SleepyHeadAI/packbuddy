@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/gestures.dart';
@@ -9,7 +10,11 @@ import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_motion.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
+import 'package:packbuddy/core/theme/app_typography.dart';
 import 'package:packbuddy/features/dashboard/presentation/dashboard_localization.dart';
+import 'package:packbuddy/shared/widgets/app_button.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
 import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
@@ -23,7 +28,6 @@ import 'widgets/vault_pin_recovery_sheet.dart';
 import 'widgets/vault_thumbnail_widget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:packbuddy/features/dashboard/presentation/navigation_provider.dart';
-import 'package:flutter/services.dart';
 import 'package:packbuddy/core/services/biometric_service.dart';
 import '../../../../core/services/security_service.dart';
 import 'package:packbuddy/shared/widgets/quick_actions_sheet.dart';
@@ -366,24 +370,54 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
 
   void _showDeleteDialog(BuildContext context, Document doc) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(l10n.deleteDocument),
-        content: Text(l10n.deleteDocumentConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.cancel),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
+        backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEF4444).withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.delete_outline_rounded, color: Color(0xFFEF4444), size: 20),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                l10n.deleteDocument,
+                style: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.w800),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          l10n.deleteDocumentConfirm,
+          style: AppTypography.bodyMedium.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
           ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.errorPastel),
+        ),
+        actions: [
+          AppButton.outline(
+            label: l10n.cancel,
+            size: AppButtonSize.medium,
+            onPressed: () => Navigator.of(ctx).pop(),
+          ),
+          const SizedBox(width: 8),
+          AppButton.destructive(
+            label: l10n.deleteDocument,
+            leadingIcon: Icons.delete_sweep_rounded,
+            size: AppButtonSize.medium,
             onPressed: () {
               ref.read(vaultControllerProvider.notifier).deleteDocument(doc.id);
               Navigator.of(ctx).pop();
               _showUndoDeleteSnackBar(context, doc);
             },
-            child: Text(l10n.deleteDocument),
           ),
         ],
       ),
@@ -584,18 +618,27 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
 
   void _showSetPinDialog() {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final pinController = TextEditingController();
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(l10n.setVaultPin),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
+        backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+        title: Text(
+          l10n.setVaultPin,
+          style: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.w800),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               l10n.setPinDescription,
-              style: const TextStyle(fontSize: 13),
+              style: AppTypography.bodyMedium.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -604,19 +647,25 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
               maxLength: 4,
               obscureText: true,
               autofocus: true,
+              style: AppTypography.mono(fontSize: 18, fontWeight: FontWeight.bold, tabularFigures: true),
               decoration: InputDecoration(
                 labelText: l10n.fourDigitPin,
                 prefixIcon: const Icon(Icons.pin_rounded),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
               ),
             ),
           ],
         ),
         actions: [
-          TextButton(
+          AppButton.outline(
+            label: l10n.cancel,
+            size: AppButtonSize.medium,
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.cancel),
           ),
-          FilledButton(
+          const SizedBox(width: 8),
+          AppButton.primary(
+            label: l10n.saveAndOpen,
+            size: AppButtonSize.medium,
             onPressed: () async {
               final pin = pinController.text.trim();
               if (pin.length == 4) {
@@ -645,7 +694,6 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                 }
               }
             },
-            child: Text(l10n.saveAndOpen),
           ),
         ],
       ),
@@ -683,28 +731,50 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
 
   void _showSetPinForPrivatePhotosPrompt() {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
+        backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
         title: Row(
           children: [
-            const Icon(Icons.lock_rounded, color: Color(0xFFE11D48)),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE11D48).withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.lock_rounded, color: Color(0xFFE11D48), size: 20),
+            ),
             const SizedBox(width: 8),
-            Text(l10n.privatePhotos),
+            Text(
+              l10n.privatePhotos,
+              style: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.w800),
+            ),
           ],
         ),
-        content: Text(l10n.setPinFirstForPrivatePhotos),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.cancel),
+        content: Text(
+          l10n.setPinFirstForPrivatePhotos,
+          style: AppTypography.bodyMedium.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
           ),
-          FilledButton(
+        ),
+        actions: [
+          AppButton.outline(
+            label: l10n.cancel,
+            size: AppButtonSize.medium,
+            onPressed: () => Navigator.of(ctx).pop(),
+          ),
+          const SizedBox(width: 8),
+          AppButton.primary(
+            label: l10n.setup,
+            size: AppButtonSize.medium,
             onPressed: () {
               Navigator.of(ctx).pop();
               _showSetPinDialog();
             },
-            child: Text(l10n.setup),
           ),
         ],
       ),
@@ -1677,7 +1747,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                     ? l10n.noPrivatePhotosYet
                                     : (vaultState.documents.isEmpty ? l10n.noDocumentsYet : l10n.noDocumentsForFilter),
                                 textAlign: TextAlign.center,
-                                style: theme.textTheme.titleLarge?.copyWith(
+                                style: AppTypography.titleLarge.copyWith(
                                   fontWeight: FontWeight.w700,
                                   letterSpacing: -0.4,
                                 ),
@@ -1688,33 +1758,24 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                     ? l10n.noPrivatePhotosDesc
                                     : (vaultState.documents.isEmpty ? l10n.noDocumentsSubtitle : ''),
                                 textAlign: TextAlign.center,
-                                style: theme.textTheme.bodyMedium?.copyWith(
+                                style: AppTypography.bodyMedium.copyWith(
                                   color: theme.colorScheme.onSurfaceVariant,
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              FilledButton.icon(
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: _selectedCategoryFilter == 'Özel Resimler'
-                                      ? const Color(0xFFE11D48)
-                                      : theme.colorScheme.primary,
-                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                                ),
+                              AppButton.primary(
+                                size: AppButtonSize.medium,
                                 onPressed: () => AddDocumentSheet.show(
                                   context,
                                   initialTripId: _selectedTripFilter,
                                   initialCategory: _selectedCategoryFilter == 'Özel Resimler' ? 'PrivatePhotos' : null,
                                 ),
-                                icon: Icon(_selectedCategoryFilter == 'Özel Resimler'
+                                leadingIcon: _selectedCategoryFilter == 'Özel Resimler'
                                     ? Icons.add_a_photo_rounded
-                                    : Icons.add_rounded),
-                                label: Text(
-                                  _selectedCategoryFilter == 'Özel Resimler'
-                                      ? l10n.addPrivatePhoto
-                                      : l10n.addDocument,
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
-                                ),
+                                    : Icons.add_rounded,
+                                label: _selectedCategoryFilter == 'Özel Resimler'
+                                    ? l10n.addPrivatePhoto
+                                    : l10n.addDocument,
                               ),
                             ],
                           ),
@@ -1724,7 +1785,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                   )
                 else
                   SliverPadding(
-                    padding: const EdgeInsets.only(left: 20, right: 20, top: 8, bottom: 110),
+                    padding: EdgeInsets.only(
+                      left: 20,
+                      right: 20,
+                      top: 8,
+                      bottom: math.max(120.0, MediaQuery.paddingOf(context).bottom + 100.0),
+                    ),
                     sliver: SliverGrid(
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
@@ -1757,7 +1823,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFEF4444),
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(AppRadius.card),
                               ),
                               child: const Icon(Icons.delete_sweep_rounded, color: Colors.white, size: 24),
                             ),
@@ -1766,7 +1832,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               decoration: BoxDecoration(
                                 color: theme.colorScheme.primary,
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(AppRadius.card),
                               ),
                               child: const Icon(
                                 Icons.visibility_rounded,
@@ -1788,6 +1854,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                               return false;
                             },
                             child: AppCard(
+                              borderRadius: AppRadius.card,
                               padding: EdgeInsets.zero,
                               onTap: () {
                                 Navigator.of(context).push(
@@ -1806,7 +1873,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                       children: [
                                         ClipRRect(
                                           borderRadius: const BorderRadius.vertical(
-                                            top: Radius.circular(20),
+                                            top: Radius.circular(AppRadius.card),
                                           ),
                                           child: VaultThumbnailWidget(
                                             document: doc,
@@ -1826,11 +1893,11 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                               color: isPdf
                                                   ? const Color(0xFFE53935)
                                                   : Colors.black.withValues(alpha: 0.6),
-                                              borderRadius: BorderRadius.circular(6),
+                                              borderRadius: BorderRadius.circular(AppRadius.xs),
                                             ),
                                             child: Text(
                                               isPdf ? l10n.pdfBadge : l10n.imageBadge,
-                                              style: const TextStyle(
+                                              style: AppTypography.caption.copyWith(
                                                 color: Colors.white,
                                                 fontSize: 9,
                                                 fontWeight: FontWeight.bold,
@@ -1871,7 +1938,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                                 decoration: BoxDecoration(
                                                   color: categoryColor.withValues(alpha: isDark ? 0.22 : 0.12),
-                                                  borderRadius: BorderRadius.circular(6),
+                                                  borderRadius: BorderRadius.circular(AppRadius.xs),
                                                 ),
                                                 child: Row(
                                                   mainAxisSize: MainAxisSize.min,
@@ -1917,7 +1984,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                               doc.title,
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
-                                              style: theme.textTheme.titleSmall?.copyWith(
+                                              style: AppTypography.titleSmall.copyWith(
                                                 fontWeight: FontWeight.w700,
                                                 fontSize: 13,
                                               ),
@@ -1928,15 +1995,23 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
 
                                         // Trip badge or Date
                                         if (attachedTrip != null) ...[
-                                          Text(
-                                            '✈️ ${attachedTrip.title}',
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w600,
-                                              color: theme.colorScheme.primary,
-                                            ),
+                                          Row(
+                                            children: [
+                                              Icon(Icons.flight_takeoff_rounded, size: 11, color: theme.colorScheme.primary),
+                                              const SizedBox(width: 4),
+                                              Expanded(
+                                                child: Text(
+                                                  attachedTrip.title,
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: AppTypography.caption.copyWith(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: theme.colorScheme.primary,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ] else ...[
                                           Text(
@@ -1944,9 +2019,11 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                               doc.createdAt,
                                               locale: Localizations.localeOf(context).languageCode,
                                             ),
-                                            style: theme.textTheme.bodySmall?.copyWith(
-                                              color: theme.colorScheme.onSurfaceVariant,
+                                            style: AppTypography.mono(
                                               fontSize: 10,
+                                              fontWeight: FontWeight.w500,
+                                              color: theme.colorScheme.onSurfaceVariant,
+                                              tabularFigures: true,
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -2042,11 +2119,11 @@ class _PrivatePhotosPinSheetState extends ConsumerState<_PrivatePhotosPinSheet> 
 
   void _onDigitPressed(String d) {
     if (_lockoutSeconds > 0) {
-      HapticFeedback.heavyImpact();
+      AppHaptics.heavy();
       return;
     }
     if (_entered.length < 4) {
-      HapticFeedback.lightImpact();
+      AppHaptics.light();
       setState(() {
         _isError = false;
         _entered += d;
@@ -2061,7 +2138,7 @@ class _PrivatePhotosPinSheetState extends ConsumerState<_PrivatePhotosPinSheet> 
   void _onBackspace() {
     if (_lockoutSeconds > 0) return;
     if (_entered.isNotEmpty) {
-      HapticFeedback.selectionClick();
+      AppHaptics.selectionClick();
       setState(() {
         _isError = false;
         _entered = _entered.substring(0, _entered.length - 1);
@@ -2082,7 +2159,7 @@ class _PrivatePhotosPinSheetState extends ConsumerState<_PrivatePhotosPinSheet> 
       Navigator.of(context).pop();
       widget.onSuccess();
     } else {
-      HapticFeedback.heavyImpact();
+      AppHaptics.heavy();
       final remaining = controller.getRemainingPinAttempts();
       setState(() {
         _isError = true;
@@ -2132,28 +2209,32 @@ class _PrivatePhotosPinSheetState extends ConsumerState<_PrivatePhotosPinSheet> 
   Widget _buildNumpadButton(String digit) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isDisabled = _lockoutSeconds > 0;
-    return InkWell(
-      onTap: isDisabled ? null : () => _onDigitPressed(digit),
-      borderRadius: BorderRadius.circular(32),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        width: 64,
-        height: 64,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: isDisabled
-              ? (isDark ? const Color(0xFF1E1E26) : const Color(0xFFE5E7EB))
-              : (isDark ? const Color(0xFF2A2A36) : const Color(0xFFF3F4F6)),
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          digit,
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: isDisabled
-                ? Theme.of(context).disabledColor
-                : Theme.of(context).colorScheme.onSurface,
+    return Opacity(
+      opacity: isDisabled ? 0.35 : 1.0,
+      child: BouncyPressable(
+        onTap: isDisabled ? null : () => _onDigitPressed(digit),
+        child: Container(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+            border: Border.all(
+              color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+              width: 1,
+            ),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            digit,
+            style: AppTypography.mono(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: isDisabled
+                  ? Theme.of(context).disabledColor
+                  : Theme.of(context).colorScheme.onSurface,
+              tabularFigures: true,
+            ),
           ),
         ),
       ),
@@ -2173,7 +2254,7 @@ class _PrivatePhotosPinSheetState extends ConsumerState<_PrivatePhotosPinSheet> 
         padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
         decoration: BoxDecoration(
           color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.sheet)),
         ),
         child: SingleChildScrollView(
           child: Column(

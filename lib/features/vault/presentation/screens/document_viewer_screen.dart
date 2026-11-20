@@ -10,7 +10,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
+import 'package:packbuddy/core/theme/app_typography.dart';
 import 'package:packbuddy/core/services/security_service.dart';
+import 'package:packbuddy/shared/widgets/app_button.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
 import 'package:packbuddy/features/vault/domain/vault_localization.dart';
 import '../controllers/vault_controller.dart';
@@ -209,24 +212,54 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
 
   void _showDeleteDialog(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(l10n.deleteDocument),
-        content: Text(l10n.deleteDocumentConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.cancel),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
+        backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEF4444).withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.delete_outline_rounded, color: Color(0xFFEF4444), size: 20),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                l10n.deleteDocument,
+                style: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.w800),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          l10n.deleteDocumentConfirm,
+          style: AppTypography.bodyMedium.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
           ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.errorPastel),
+        ),
+        actions: [
+          AppButton.outline(
+            label: l10n.cancel,
+            size: AppButtonSize.medium,
+            onPressed: () => Navigator.of(ctx).pop(),
+          ),
+          const SizedBox(width: 8),
+          AppButton.destructive(
+            label: l10n.deleteDocument,
+            leadingIcon: Icons.delete_sweep_rounded,
+            size: AppButtonSize.medium,
             onPressed: () {
               ref.read(vaultControllerProvider.notifier).deleteDocument(widget.document.id);
               Navigator.of(ctx).pop(); // close dialog
               Navigator.of(context).pop(); // close viewer
             },
-            child: Text(l10n.deleteDocument),
           ),
         ],
       ),
@@ -235,6 +268,8 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
 
   void _showEditDialog(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final titleController = TextEditingController(text: _currentDoc.title);
     String selectedCat = _currentDoc.category;
 
@@ -250,7 +285,12 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          title: Text(l10n.edit),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
+          backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+          title: Text(
+            l10n.edit,
+            style: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.w800),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -260,12 +300,13 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
                 decoration: InputDecoration(
                   labelText: l10n.documentName,
                   prefixIcon: const Icon(Icons.title_rounded),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                 ),
               ),
               const SizedBox(height: 16),
               Text(
                 l10n.mainCategory,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                style: AppTypography.titleSmall.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
@@ -285,17 +326,21 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
                 },
                 decoration: InputDecoration(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                 ),
               ),
             ],
           ),
           actions: [
-            TextButton(
+            AppButton.outline(
+              label: l10n.cancel,
+              size: AppButtonSize.medium,
               onPressed: () => Navigator.of(ctx).pop(),
-              child: Text(l10n.cancel),
             ),
-            FilledButton(
+            const SizedBox(width: 8),
+            AppButton.primary(
+              label: l10n.save,
+              size: AppButtonSize.medium,
               onPressed: () async {
                 final newTitle = titleController.text.trim();
                 if (newTitle.isNotEmpty) {
@@ -315,7 +360,6 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
                   }
                 }
               },
-              child: Text(l10n.save),
             ),
           ],
         ),

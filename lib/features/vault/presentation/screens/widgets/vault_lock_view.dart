@@ -1,15 +1,18 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/services/biometric_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_motion.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
+import 'package:packbuddy/core/theme/app_typography.dart';
 import 'package:packbuddy/features/dashboard/presentation/navigation_provider.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import '../../controllers/vault_controller.dart';
 import 'vault_pin_recovery_sheet.dart';
 import 'package:packbuddy/features/dashboard/presentation/dashboard_localization.dart';
 import 'package:packbuddy/shared/widgets/app_animations.dart';
+import 'package:packbuddy/shared/widgets/app_button.dart';
 
 /// Secure PIN and Biometric authentication gate for Document Vault
 class VaultLockView extends ConsumerStatefulWidget {
@@ -122,7 +125,7 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
 
     _isAuthenticating = true;
     try {
-      HapticFeedback.mediumImpact();
+      AppHaptics.medium();
       final l10n = AppLocalizations.of(context);
       final reason = l10n?.vaultBiometricReason ??
           'Kasanın kilidini açmak için parmak izinizi doğrulayın';
@@ -138,11 +141,11 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
 
   void _onDigitPressed(String digit) {
     if (_lockoutRemainingSeconds > 0) {
-      HapticFeedback.heavyImpact();
+      AppHaptics.heavy();
       return;
     }
     if (_enteredPin.length < 4) {
-      HapticFeedback.lightImpact();
+      AppHaptics.light();
       setState(() {
         _isError = false;
         _enteredPin += digit;
@@ -157,7 +160,7 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
   void _onBackspace() {
     if (_lockoutRemainingSeconds > 0) return;
     if (_enteredPin.isNotEmpty) {
-      HapticFeedback.selectionClick();
+      AppHaptics.selectionClick();
       setState(() {
         _isError = false;
         _enteredPin = _enteredPin.substring(0, _enteredPin.length - 1);
@@ -178,9 +181,9 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
       _lockoutTimer?.cancel();
       _lockoutRemainingSeconds = 0;
       _remainingAttempts = 5;
-      HapticFeedback.mediumImpact();
+      AppHaptics.medium();
     } else {
-      HapticFeedback.heavyImpact();
+      AppHaptics.heavy();
       final remaining = controller.getRemainingPinAttempts();
       setState(() {
         _isError = true;
@@ -233,18 +236,27 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
 
   void _showSetPinDialog() {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final pinController = TextEditingController();
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(l10n.setVaultPin),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
+        backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+        title: Text(
+          l10n.setVaultPin,
+          style: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.w800),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               l10n.createPinToProtect,
-              style: const TextStyle(fontSize: 13),
+              style: AppTypography.bodyMedium.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -253,19 +265,25 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
               maxLength: 4,
               obscureText: true,
               autofocus: true,
+              style: AppTypography.mono(fontSize: 18, fontWeight: FontWeight.bold, tabularFigures: true),
               decoration: InputDecoration(
                 labelText: l10n.fourDigitPin,
                 prefixIcon: const Icon(Icons.pin_rounded),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
               ),
             ),
           ],
         ),
         actions: [
-          TextButton(
+          AppButton.outline(
+            label: l10n.cancel,
+            size: AppButtonSize.medium,
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.cancel),
           ),
-          FilledButton(
+          const SizedBox(width: 8),
+          AppButton.primary(
+            label: l10n.saveAndOpen,
+            size: AppButtonSize.medium,
             onPressed: () async {
               final pin = pinController.text.trim();
               if (pin.length == 4) {
@@ -279,7 +297,6 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
                 }
               }
             },
-            child: Text(l10n.saveAndOpen),
           ),
         ],
       ),
@@ -291,12 +308,12 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final vaultState = ref.watch(vaultControllerProvider);
-
     final isDark = theme.brightness == Brightness.dark;
 
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -305,8 +322,8 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
               shake: _isError,
               offset: 8.0,
               child: Container(
-                width: 88,
-                height: 88,
+                width: 80,
+                height: 80,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: isDark ? AppColors.primaryContainerDark : AppColors.primaryContainerLight,
@@ -319,41 +336,42 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
                 ),
                 child: Icon(
                   _isError ? Icons.lock_clock_rounded : Icons.lock_outline_rounded,
-                  size: 44,
+                  size: 40,
                   color: _isError
                       ? AppColors.errorPastel
                       : (isDark ? AppColors.primaryAmber : AppColors.primaryLight),
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
             Text(
               vaultState.hasPin ? l10n.vaultLocked : l10n.vaultPinRequiredTitle,
-              style: theme.textTheme.headlineSmall?.copyWith(
+              style: AppTypography.titleLarge.copyWith(
                 fontWeight: FontWeight.w800,
                 letterSpacing: -0.5,
               ),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               vaultState.hasPin
                   ? l10n.enterPinToUnlockVault
                   : l10n.vaultPinRequiredDesc,
               textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
+              style: AppTypography.bodyMedium.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
             if (_lockoutRemainingSeconds > 0) ...[
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                margin: const EdgeInsets.only(bottom: 24),
+                margin: const EdgeInsets.only(bottom: 20),
                 decoration: BoxDecoration(
                   color: AppColors.errorPastel.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                   border: Border.all(
                     color: AppColors.errorPastel.withValues(alpha: 0.4),
                     width: 1.2,
@@ -371,10 +389,11 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
                             Localizations.localeOf(context).languageCode,
                             _formatLockoutTime(_lockoutRemainingSeconds),
                           ),
-                          style: const TextStyle(
+                          style: AppTypography.mono(
                             fontWeight: FontWeight.w800,
                             color: AppColors.errorPastel,
                             fontSize: 14,
+                            tabularFigures: true,
                           ),
                         ),
                       ],
@@ -385,7 +404,7 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
                         Localizations.localeOf(context).languageCode,
                       ),
                       textAlign: TextAlign.center,
-                      style: theme.textTheme.bodySmall?.copyWith(
+                      style: AppTypography.caption.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                         fontSize: 11.5,
                       ),
@@ -404,10 +423,10 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
                   children: List.generate(4, (index) {
                     final isFilled = index < _enteredPin.length;
                     return AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
+                      duration: AppMotion.fast,
                       margin: const EdgeInsets.symmetric(horizontal: 10),
-                      width: 16,
-                      height: 16,
+                      width: 15,
+                      height: 15,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: isFilled
@@ -424,16 +443,16 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
                   }),
                 ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
 
               // Prominently Visible In-Place Warning Banner & Remaining Attempt Counter
               if (_lockoutRemainingSeconds <= 0 && (_isError || _remainingAttempts < 5)) ...[
                 AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
+                  duration: AppMotion.normal,
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                   decoration: BoxDecoration(
                     color: AppColors.errorPastel.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppRadius.md),
                     border: Border.all(
                       color: AppColors.errorPastel.withValues(alpha: 0.35),
                       width: 1,
@@ -463,9 +482,9 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
               ] else ...[
-                const SizedBox(height: 36),
+                const SizedBox(height: 28),
               ],
 
               // Number Pad (1-9, 0, Backspace, Biometric)
@@ -474,11 +493,11 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
                 child: Column(
                   children: [
                     _buildKeyRow(['1', '2', '3']),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     _buildKeyRow(['4', '5', '6']),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     _buildKeyRow(['7', '8', '9']),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -498,7 +517,7 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     // Forgot PIN Action
                     TextButton.icon(
                       key: const Key('forgot_vault_pin_button'),
@@ -516,7 +535,10 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
                       icon: const Icon(Icons.help_outline_rounded, size: 16),
                       label: Text(
                         l10n.forgotPin,
-                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                        style: AppTypography.bodySmall.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.primary,
+                        ),
                       ),
                     ),
                   ],
@@ -524,14 +546,11 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
               ),
             ] else ...[
               // Setup PIN Button (Mandatory - No continue unlocked!)
-              FilledButton.icon(
+              AppButton.primary(
                 onPressed: _showSetPinDialog,
-                icon: const Icon(Icons.shield_outlined),
-                label: Text(l10n.createPinAndProtect),
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                ),
+                leadingIcon: Icons.shield_outlined,
+                label: l10n.createPinAndProtect,
+                size: AppButtonSize.large,
               ),
             ],
           ],
@@ -549,28 +568,38 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
 
   Widget _buildNumberKey(String digit) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final isLockedOut = _lockoutRemainingSeconds > 0;
     return Opacity(
       opacity: isLockedOut ? 0.35 : 1.0,
-      child: InkWell(
+      child: BouncyPressable(
         onTap: isLockedOut ? null : () => _onDigitPressed(digit),
-        borderRadius: BorderRadius.circular(36),
         child: Container(
           width: 68,
           height: 68,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+            color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
             border: Border.all(
-              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+              color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
               width: 1,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           alignment: Alignment.center,
           child: Text(
             digit,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w700,
+            style: AppTypography.mono(
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.onSurface,
+              tabularFigures: true,
             ),
           ),
         ),
@@ -580,21 +609,27 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
 
   Widget _buildActionButton({required IconData icon, required VoidCallback onTap}) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final isLockedOut = _lockoutRemainingSeconds > 0;
     return Opacity(
       opacity: isLockedOut ? 0.35 : 1.0,
-      child: InkWell(
+      child: BouncyPressable(
         onTap: isLockedOut ? null : onTap,
-        borderRadius: BorderRadius.circular(36),
         child: Container(
           width: 68,
           height: 68,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.2),
+            color: isDark
+                ? AppColors.surfaceRaisedDark.withValues(alpha: 0.5)
+                : AppColors.surfaceRaisedLight.withValues(alpha: 0.5),
+            border: Border.all(
+              color: isDark ? AppColors.outlineDark.withValues(alpha: 0.5) : AppColors.outlineLight.withValues(alpha: 0.5),
+              width: 1,
+            ),
           ),
           alignment: Alignment.center,
-          child: Icon(icon, size: 26, color: theme.colorScheme.onSurfaceVariant),
+          child: Icon(icon, size: 24, color: theme.colorScheme.onSurfaceVariant),
         ),
       ),
     );
