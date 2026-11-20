@@ -3,18 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
+import 'app_radius.dart';
+import 'app_spacing.dart';
+import 'app_typography.dart';
 
-/// Serene Voyage Material 3 ThemeData
-/// Implements the exact Serene Voyage Design System:
-/// - Typography Hierarchy:
-///     - Headline / Display: Outfit (Geometric, modern, bold)
-///     - Body / Interface: Plus Jakarta Sans (Clean, legible, balanced)
-///     - Label / Technical: JetBrains Mono (Precision badges, codes, dates, chips)
-/// - Serene Voyage Palette:
-///     - Primary: Warm Sun Gold (#E7B623 / #856404)
-///     - Secondary: Deep Pine Teal / Sea Emerald (#0F766E)
-///     - Tertiary: Slate Grey-Blue (#64748B)
-///     - Neutral: Soft Pearl Alabaster (#F3F5F7)
+/// Centralized Material 3 ThemeData implementation for PackBuddy.
+///
+/// Typographic Hierarchy:
+/// - Headline / Display / Titles: Figtree (Geometric, warm, modern indie travel character)
+/// - Body / Interface: Noto Sans (Clean, high legibility across all 20 supported languages)
+/// - Label / Technical / Budget / Numbers: JetBrains Mono with [FontFeature.tabularFigures()]
 class AppTheme {
   // Test environment detection to prevent network font loader exceptions during automated unit tests
   static bool get _isTesting {
@@ -25,28 +23,12 @@ class AppTheme {
     }
   }
 
-  /// Optimized font fallbacks covering all 18+ supported languages:
+  /// Optimized font fallbacks covering all 20 supported languages:
   /// Arabic (RTL), CJK (Chinese, Japanese, Korean), Thai, Hindi, Cyrillic, Greek, etc.
   /// Eliminates runtime system font search stalls during 120 FPS frame budget.
-  static const List<String> kFontFallbacks = [
-    'Roboto',
-    'Noto Sans',
-    'Noto Sans Arabic',
-    'Noto Sans SC',
-    'Noto Sans JP',
-    'Noto Sans KR',
-    'Noto Sans Thai',
-    'Noto Sans Devanagari',
-    'PingFang SC',
-    'Hiragino Sans',
-    'Geeza Pro',
-    'Thonburi',
-    'Kohinoor Devanagari',
-    'Segoe UI',
-    'Apple Color Emoji',
-  ];
+  static const List<String> kFontFallbacks = AppTypography.kFontFallbacks;
 
-  /// Headline font (Outfit) for bold, modern geometric headers, titles and displays
+  /// Headline & Display font (Figtree)
   static TextStyle headlineFont({
     required double fontSize,
     required FontWeight fontWeight,
@@ -56,7 +38,7 @@ class AppTheme {
   }) {
     if (_isTesting) {
       return TextStyle(
-        fontFamily: 'Outfit',
+        fontFamily: 'Figtree',
         fontFamilyFallback: kFontFallbacks,
         fontSize: fontSize,
         fontWeight: fontWeight,
@@ -65,7 +47,7 @@ class AppTheme {
         color: color,
       );
     }
-    return GoogleFonts.outfit(
+    return GoogleFonts.figtree(
       textStyle: const TextStyle(fontFamilyFallback: kFontFallbacks),
       fontSize: fontSize,
       fontWeight: fontWeight,
@@ -75,7 +57,7 @@ class AppTheme {
     );
   }
 
-  /// Body font (Plus Jakarta Sans) for clean, highly readable interface text and paragraphs
+  /// Body font (Noto Sans) for clean, highly readable interface text and paragraphs
   static TextStyle bodyFont({
     required double fontSize,
     required FontWeight fontWeight,
@@ -85,7 +67,7 @@ class AppTheme {
   }) {
     if (_isTesting) {
       return TextStyle(
-        fontFamily: 'Plus Jakarta Sans',
+        fontFamily: 'Noto Sans',
         fontFamilyFallback: kFontFallbacks,
         fontSize: fontSize,
         fontWeight: fontWeight,
@@ -94,7 +76,7 @@ class AppTheme {
         color: color,
       );
     }
-    return GoogleFonts.plusJakartaSans(
+    return GoogleFonts.notoSans(
       textStyle: const TextStyle(fontFamilyFallback: kFontFallbacks),
       fontSize: fontSize,
       fontWeight: fontWeight,
@@ -104,14 +86,16 @@ class AppTheme {
     );
   }
 
-  /// Label & technical font (JetBrains Mono) for badges, codes, dates, numbers, and tags
+  /// Label & technical font (JetBrains Mono) with tabular figures for numbers, currency, badges, and codes
   static TextStyle labelFont({
     required double fontSize,
     required FontWeight fontWeight,
     double letterSpacing = 0.0,
     double? height,
     Color? color,
+    bool tabularFigures = true,
   }) {
+    final features = tabularFigures ? [const FontFeature.tabularFigures()] : <FontFeature>[];
     if (_isTesting) {
       return TextStyle(
         fontFamily: 'JetBrains Mono',
@@ -121,10 +105,14 @@ class AppTheme {
         letterSpacing: letterSpacing,
         height: height,
         color: color,
+        fontFeatures: features,
       );
     }
     return GoogleFonts.jetBrainsMono(
-      textStyle: const TextStyle(fontFamilyFallback: kFontFallbacks),
+      textStyle: TextStyle(
+        fontFamilyFallback: kFontFallbacks,
+        fontFeatures: features,
+      ),
       fontSize: fontSize,
       fontWeight: fontWeight,
       letterSpacing: letterSpacing,
@@ -140,22 +128,24 @@ class AppTheme {
     double letterSpacing = 0.0,
     double? height,
     Color? color,
+    bool tabularFigures = true,
   }) => labelFont(
     fontSize: fontSize,
     fontWeight: fontWeight,
     letterSpacing: letterSpacing,
     height: height,
     color: color,
+    tabularFigures: tabularFigures,
   );
 
-  /// Builds the complete Serene Voyage TextTheme with refined typographic hierarchy:
-  /// - Headlines & Displays in Outfit
-  /// - Titles, Subtitles & Body in Plus Jakarta Sans
-  /// - Labels, Badges & Chips in JetBrains Mono
+  /// Builds the complete TextTheme with refined typographic hierarchy:
+  /// - Headlines & Displays in Figtree
+  /// - Titles, Subtitles & Body in Noto Sans
+  /// - Labels, Badges & Chips in JetBrains Mono with Tabular Figures
   static TextTheme _buildTextTheme(bool isDark) {
-    final onSurface = isDark ? AppColors.onSurfaceDark : AppColors.onSurfaceLight;
-    final onSurfaceVariant = isDark ? AppColors.onSurfaceVariantDark : AppColors.onSurfaceVariantLight;
-    final textMuted = isDark ? AppColors.textMutedDark : AppColors.textMutedLight;
+    final onSurface = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final onSurfaceVariant = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+    final textMuted = isDark ? AppColors.textTertiaryDark : AppColors.textTertiaryLight;
     final baseTextTheme = isDark ? ThemeData.dark().textTheme : ThemeData.light().textTheme;
 
     return baseTextTheme.copyWith(
@@ -201,22 +191,22 @@ class AppTheme {
         height: 1.35,
         color: onSurface,
       ),
-      titleLarge: bodyFont(
-        fontSize: 20,
+      titleLarge: headlineFont(
+        fontSize: 18,
         fontWeight: FontWeight.w700,
         letterSpacing: -0.3,
         height: 1.35,
         color: onSurface,
       ),
       titleMedium: bodyFont(
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: FontWeight.w600,
         letterSpacing: -0.2,
         height: 1.4,
         color: onSurface,
       ),
       titleSmall: bodyFont(
-        fontSize: 14,
+        fontSize: 13,
         fontWeight: FontWeight.w600,
         letterSpacing: -0.1,
         height: 1.4,
@@ -267,7 +257,7 @@ class AppTheme {
     );
   }
 
-  // Fluid page transitions for 60/120fps high refresh rate displays
+  // Fluid page transitions for high refresh rate displays
   static const _smoothPageTransitionsTheme = PageTransitionsTheme(
     builders: {
       TargetPlatform.android: ZoomPageTransitionsBuilder(),
@@ -298,7 +288,7 @@ class AppTheme {
       onSurface: AppColors.onSurfaceLight,
       surfaceContainerHighest: AppColors.surfaceVariantLight,
       onSurfaceVariant: AppColors.onSurfaceVariantLight,
-      outline: AppColors.outlineLight,
+      outline: AppColors.borderSubtleLight,
       outlineVariant: AppColors.outlineVariantLight,
       error: AppColors.errorPastel,
       onError: Colors.white,
@@ -331,9 +321,9 @@ class AppTheme {
         shadowColor: const Color(0xFF0F172A).withValues(alpha: 0.03),
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppRadius.card),
           side: const BorderSide(
-            color: AppColors.outlineLight,
+            color: AppColors.borderSubtleLight,
             width: 1,
           ),
         ),
@@ -344,7 +334,7 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         clipBehavior: Clip.antiAliasWithSaveLayer,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: AppRadius.sheetRadius,
         ),
       ),
       dialogTheme: DialogThemeData(
@@ -355,7 +345,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
           side: const BorderSide(
-            color: AppColors.outlineLight,
+            color: AppColors.borderSubtleLight,
             width: 1,
           ),
         ),
@@ -372,9 +362,9 @@ class AppTheme {
           elevation: 0,
           shadowColor: AppColors.primaryLight.withValues(alpha: 0.25),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(AppRadius.card),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: AppSpacing.buttonPadding,
           textStyle: headlineFont(
             fontSize: 15,
             fontWeight: FontWeight.w700,
@@ -389,13 +379,13 @@ class AppTheme {
           elevation: 0,
           shadowColor: Colors.black.withValues(alpha: 0.04),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(AppRadius.card),
             side: const BorderSide(
-              color: AppColors.outlineLight,
+              color: AppColors.borderSubtleLight,
               width: 1,
             ),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: AppSpacing.buttonPadding,
           textStyle: bodyFont(
             fontSize: 15,
             fontWeight: FontWeight.w600,
@@ -407,10 +397,10 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primaryLight,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(AppRadius.card),
           ),
           side: const BorderSide(
-            color: AppColors.outlineLight,
+            color: AppColors.borderStrongLight,
             width: 1.2,
           ),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
@@ -429,7 +419,7 @@ class AppTheme {
         hoverElevation: 3,
         highlightElevation: 4,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppRadius.card),
         ),
         extendedTextStyle: headlineFont(
           fontWeight: FontWeight.w700,
@@ -439,9 +429,9 @@ class AppTheme {
       ),
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surfaceVariantLight.withValues(alpha: 0.8),
-        side: const BorderSide(color: AppColors.outlineLight, width: 1),
+        side: const BorderSide(color: AppColors.borderSubtleLight, width: 1),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         labelStyle: labelFont(
           fontSize: 12,
@@ -452,7 +442,7 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceVariantLight.withValues(alpha: 0.7),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        contentPadding: AppSpacing.inputPadding,
         labelStyle: bodyFont(
           color: AppColors.onSurfaceVariantLight,
           fontSize: 14,
@@ -471,23 +461,23 @@ class AppTheme {
         prefixIconColor: AppColors.onSurfaceVariantLight,
         suffixIconColor: AppColors.onSurfaceVariantLight,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppRadius.card),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(22),
-          borderSide: const BorderSide(color: AppColors.outlineLight, width: 1),
+          borderRadius: BorderRadius.circular(AppRadius.card),
+          borderSide: const BorderSide(color: AppColors.borderSubtleLight, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppRadius.card),
           borderSide: const BorderSide(color: AppColors.primaryLight, width: 1.8),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppRadius.card),
           borderSide: const BorderSide(color: AppColors.errorPastel, width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppRadius.card),
           borderSide: const BorderSide(color: AppColors.errorPastel, width: 1.8),
         ),
       ),
@@ -536,7 +526,7 @@ class AppTheme {
         shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(100),
-            side: const BorderSide(color: AppColors.outlineLight, width: 1),
+            side: const BorderSide(color: AppColors.borderSubtleLight, width: 1),
           ),
         ),
         hintStyle: WidgetStatePropertyAll(
@@ -547,7 +537,7 @@ class AppTheme {
         ),
       ),
       dividerTheme: const DividerThemeData(
-        color: AppColors.outlineLight,
+        color: AppColors.borderSubtleLight,
         thickness: 1,
         space: 1,
       ),
@@ -603,7 +593,7 @@ class AppTheme {
       onSurface: AppColors.onSurfaceDark,
       surfaceContainerHighest: AppColors.surfaceVariantDark,
       onSurfaceVariant: AppColors.onSurfaceVariantDark,
-      outline: AppColors.outlineDark,
+      outline: AppColors.borderSubtleDark,
       outlineVariant: AppColors.outlineVariantDark,
       error: AppColors.errorPastel,
       onError: Colors.white,
@@ -636,9 +626,9 @@ class AppTheme {
         shadowColor: Colors.black.withValues(alpha: 0.25),
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppRadius.card),
           side: const BorderSide(
-            color: AppColors.outlineDark,
+            color: AppColors.borderSubtleDark,
             width: 1,
           ),
         ),
@@ -649,7 +639,7 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         clipBehavior: Clip.antiAliasWithSaveLayer,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: AppRadius.sheetRadius,
         ),
       ),
       dialogTheme: DialogThemeData(
@@ -660,7 +650,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
           side: const BorderSide(
-            color: AppColors.outlineDark,
+            color: AppColors.borderSubtleDark,
             width: 1,
           ),
         ),
@@ -677,9 +667,9 @@ class AppTheme {
           elevation: 0,
           shadowColor: AppColors.primaryDark.withValues(alpha: 0.25),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(AppRadius.card),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: AppSpacing.buttonPadding,
           textStyle: headlineFont(
             fontSize: 15,
             fontWeight: FontWeight.w700,
@@ -694,10 +684,10 @@ class AppTheme {
           elevation: 0,
           shadowColor: Colors.black.withValues(alpha: 0.2),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(22),
-            side: const BorderSide(color: AppColors.outlineDark, width: 1),
+            borderRadius: BorderRadius.circular(AppRadius.card),
+            side: const BorderSide(color: AppColors.borderSubtleDark, width: 1),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: AppSpacing.buttonPadding,
           textStyle: bodyFont(
             fontSize: 15,
             fontWeight: FontWeight.w600,
@@ -709,9 +699,9 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primaryDark,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(AppRadius.card),
           ),
-          side: const BorderSide(color: AppColors.outlineDark, width: 1.2),
+          side: const BorderSide(color: AppColors.borderStrongDark, width: 1.2),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           textStyle: bodyFont(
             fontSize: 14,
@@ -728,7 +718,7 @@ class AppTheme {
         hoverElevation: 3,
         highlightElevation: 4,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppRadius.card),
         ),
         extendedTextStyle: headlineFont(
           fontWeight: FontWeight.w700,
@@ -738,9 +728,9 @@ class AppTheme {
       ),
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surfaceVariantDark.withValues(alpha: 0.6),
-        side: const BorderSide(color: AppColors.outlineDark, width: 1),
+        side: const BorderSide(color: AppColors.borderSubtleDark, width: 1),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         labelStyle: labelFont(
           fontSize: 12,
@@ -751,7 +741,7 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceVariantDark.withValues(alpha: 0.6),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        contentPadding: AppSpacing.inputPadding,
         labelStyle: bodyFont(
           color: AppColors.onSurfaceVariantDark,
           fontSize: 14,
@@ -770,23 +760,23 @@ class AppTheme {
         prefixIconColor: AppColors.onSurfaceVariantDark,
         suffixIconColor: AppColors.onSurfaceVariantDark,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppRadius.card),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(22),
-          borderSide: const BorderSide(color: AppColors.outlineDark, width: 1),
+          borderRadius: BorderRadius.circular(AppRadius.card),
+          borderSide: const BorderSide(color: AppColors.borderSubtleDark, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppRadius.card),
           borderSide: const BorderSide(color: AppColors.primaryDark, width: 1.8),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppRadius.card),
           borderSide: const BorderSide(color: AppColors.errorPastel, width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppRadius.card),
           borderSide: const BorderSide(color: AppColors.errorPastel, width: 1.8),
         ),
       ),
@@ -800,7 +790,7 @@ class AppTheme {
           if (states.contains(WidgetState.selected)) {
             return const IconThemeData(
               size: 22,
-              color: AppColors.onPrimaryDark,
+              color: Color(0xFF281C00),
             );
           }
           return const IconThemeData(
@@ -812,7 +802,7 @@ class AppTheme {
           if (states.contains(WidgetState.selected)) {
             return bodyFont(
               fontSize: 11,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w800,
               color: AppColors.onSurfaceDark,
             );
           }
@@ -835,7 +825,7 @@ class AppTheme {
         shape: WidgetStatePropertyAll(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(100),
-            side: const BorderSide(color: AppColors.outlineDark, width: 1),
+            side: const BorderSide(color: AppColors.borderSubtleDark, width: 1),
           ),
         ),
         hintStyle: WidgetStatePropertyAll(
@@ -846,7 +836,7 @@ class AppTheme {
         ),
       ),
       dividerTheme: const DividerThemeData(
-        color: AppColors.outlineDark,
+        color: AppColors.borderSubtleDark,
         thickness: 1,
         space: 1,
       ),
@@ -858,7 +848,7 @@ class AppTheme {
           if (states.contains(WidgetState.selected)) {
             return AppColors.primaryDark;
           }
-          return const Color(0xFF334155);
+          return const Color(0xFF475569);
         }),
         trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
         thumbIcon: WidgetStateProperty.resolveWith((states) {
@@ -877,7 +867,7 @@ class AppTheme {
           }
           return Colors.transparent;
         }),
-        checkColor: const WidgetStatePropertyAll(Colors.white),
+        checkColor: const WidgetStatePropertyAll(Colors.black),
       ),
     );
   }

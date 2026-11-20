@@ -38,14 +38,14 @@ void main() {
       final label = AppTheme.labelFont(fontSize: 12, fontWeight: FontWeight.w600);
       final mono = AppTheme.monoFont(fontSize: 12, fontWeight: FontWeight.w600);
 
-      expect(headline.fontFamily, 'Outfit');
-      expect(body.fontFamily, 'Plus Jakarta Sans');
+      expect(headline.fontFamily, 'Figtree');
+      expect(body.fontFamily, 'Noto Sans');
       expect(label.fontFamily, 'JetBrains Mono');
       expect(mono.fontFamily, 'JetBrains Mono');
 
       final lightTheme = AppTheme.lightTheme;
-      expect(lightTheme.textTheme.headlineLarge?.fontFamily, 'Outfit');
-      expect(lightTheme.textTheme.bodyMedium?.fontFamily, 'Plus Jakarta Sans');
+      expect(lightTheme.textTheme.headlineLarge?.fontFamily, 'Figtree');
+      expect(lightTheme.textTheme.bodyMedium?.fontFamily, 'Noto Sans');
       expect(lightTheme.textTheme.labelMedium?.fontFamily, 'JetBrains Mono');
     });
 
