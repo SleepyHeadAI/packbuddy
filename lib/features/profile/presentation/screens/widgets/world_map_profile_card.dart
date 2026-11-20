@@ -93,7 +93,6 @@ class WorldMapProfileCard extends StatelessWidget {
     final remainingCount = (totalCountries - totalPaintedCount).clamp(0, totalCountries);
 
     final exploredPct = totalCountries > 0 ? (visitedAndLivedCount / totalCountries) * 100 : 0.0;
-    final paintedPct = totalCountries > 0 ? (totalPaintedCount / totalCountries) * 100 : 0.0;
 
     const allContinents = ['Europe', 'Asia', 'Americas', 'Africa', 'Oceania'];
     final visitedOrLived = effectiveCountries.where((c) => c.isVisited || c.isLived);
@@ -305,33 +304,34 @@ class WorldMapProfileCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
 
-          // 3. Highlight Bento Metrics Cards
-          Row(
-            children: [
-              // Card A: Dünya Keşfi / World Explored
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryAmber.withValues(alpha: isDark ? 0.15 : 0.08),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: AppColors.primaryAmber.withValues(alpha: isDark ? 0.35 : 0.22),
-                    ),
-                  ),
+          // 3. Highlight Metric Card: Dünya Keşfi / World Explored
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: AppColors.primaryAmber.withValues(alpha: isDark ? 0.15 : 0.08),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: AppColors.primaryAmber.withValues(alpha: isDark ? 0.35 : 0.22),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.explore_rounded, size: 14, color: AppColors.primaryAmber),
-                          const SizedBox(width: 4),
+                          const Icon(Icons.explore_rounded, size: 16, color: AppColors.primaryAmber),
+                          const SizedBox(width: 6),
                           Flexible(
                             child: Text(
                               isTr ? 'Dünya Keşfedildi' : 'World Explored',
                               style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w700,
                                 color: isDark ? Colors.white70 : Colors.black87,
                               ),
                               maxLines: 1,
@@ -342,99 +342,32 @@ class WorldMapProfileCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '%${exploredPct.toStringAsFixed(1)}',
-                        style: const TextStyle(
-                          fontSize: 19,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.primaryAmber,
-                          letterSpacing: -0.5,
+                        isTr
+                            ? '$visitedAndLivedCount / $totalCountries Ülke Gezildi'
+                            : '$visitedAndLivedCount / $totalCountries Visited',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          isTr
-                              ? '$visitedAndLivedCount / $totalCountries Ülke Gezildi'
-                              : '$visitedAndLivedCount / $totalCountries Visited',
-                          style: TextStyle(
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w600,
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                          maxLines: 1,
-                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-
-              // Card B: Harita Boyandı / Map Painted
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF10B981).withValues(alpha: isDark ? 0.15 : 0.08),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: const Color(0xFF10B981).withValues(alpha: isDark ? 0.35 : 0.22),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.palette_rounded, size: 14, color: Color(0xFF10B981)),
-                          const SizedBox(width: 4),
-                          Flexible(
-                            child: Text(
-                              isTr ? 'Harita Boyandı' : 'Map Painted',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: isDark ? Colors.white70 : Colors.black87,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '%${paintedPct.toStringAsFixed(1)}',
-                        style: const TextStyle(
-                          fontSize: 19,
-                          fontWeight: FontWeight.w900,
-                          color: Color(0xFF10B981),
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          isTr
-                              ? '$totalPaintedCount / $totalCountries Ülke Boyandı'
-                              : '$totalPaintedCount / $totalCountries Painted',
-                          style: TextStyle(
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w600,
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                          maxLines: 1,
-                        ),
-                      ),
-                    ],
+                const SizedBox(width: 12),
+                Text(
+                  '%${exploredPct.toStringAsFixed(1)}',
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.primaryAmber,
+                    letterSpacing: -0.5,
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 12),
 
@@ -473,46 +406,48 @@ class WorldMapProfileCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          // 5. Breakdown Chips Row
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
+          // 5. Breakdown Chips Row (1 satıra sığdırıldı)
+          Row(
             children: [
-              _buildMetricChip(
-                dotColor: const Color(0xFF10B981),
-                label: isTr ? 'Yaşanan' : 'Lived',
-                count: livedCount,
-                theme: theme,
-                isDark: isDark,
+              Expanded(
+                child: _buildMetricChip(
+                  dotColor: const Color(0xFF10B981),
+                  label: isTr ? 'Yaşanan' : 'Lived',
+                  count: livedCount,
+                  theme: theme,
+                  isDark: isDark,
+                ),
               ),
-              _buildMetricChip(
-                dotColor: AppColors.primaryAmber,
-                label: isTr ? 'Gezilen' : 'Visited',
-                count: visitedOnlyCount,
-                theme: theme,
-                isDark: isDark,
+              const SizedBox(width: 5),
+              Expanded(
+                child: _buildMetricChip(
+                  dotColor: AppColors.primaryAmber,
+                  label: isTr ? 'Gezilen' : 'Visited',
+                  count: visitedOnlyCount,
+                  theme: theme,
+                  isDark: isDark,
+                ),
               ),
-              _buildMetricChip(
-                dotColor: const Color(0xFFEF4444),
-                label: isTr ? 'Hedef' : 'Wishlist',
-                count: wishlistCount,
-                theme: theme,
-                isDark: isDark,
+              const SizedBox(width: 5),
+              Expanded(
+                child: _buildMetricChip(
+                  dotColor: const Color(0xFFEF4444),
+                  label: isTr ? 'Hedef' : 'Wishlist',
+                  count: wishlistCount,
+                  theme: theme,
+                  isDark: isDark,
+                ),
               ),
-              _buildMetricChip(
-                dotColor: const Color(0xFF3B82F6),
-                label: isTr ? 'Kıta' : 'Continents',
-                count: continentsExplored,
-                suffix: '/5',
-                theme: theme,
-                isDark: isDark,
-              ),
-              _buildMetricChip(
-                dotColor: isDark ? const Color(0xFF64748B) : const Color(0xFF94A3B8),
-                label: isTr ? 'Kalan' : 'Remaining',
-                count: remainingCount,
-                theme: theme,
-                isDark: isDark,
+              const SizedBox(width: 5),
+              Expanded(
+                child: _buildMetricChip(
+                  dotColor: const Color(0xFF3B82F6),
+                  label: isTr ? 'Kıta' : 'Continents',
+                  count: continentsExplored,
+                  suffix: '/5',
+                  theme: theme,
+                  isDark: isDark,
+                ),
               ),
             ],
           ),
@@ -575,7 +510,7 @@ class WorldMapProfileCard extends StatelessWidget {
     required bool isDark,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 5),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
         borderRadius: BorderRadius.circular(10),
@@ -584,36 +519,41 @@ class WorldMapProfileCard extends StatelessWidget {
           width: 0.7,
         ),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 7,
-            height: 7,
-            decoration: BoxDecoration(
-              color: dotColor,
-              shape: BoxShape.circle,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.center,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 6.5,
+              height: 6.5,
+              decoration: BoxDecoration(
+                color: dotColor,
+                shape: BoxShape.circle,
+              ),
             ),
-          ),
-          const SizedBox(width: 5),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-              color: theme.colorScheme.onSurfaceVariant,
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w500,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
-          ),
-          const SizedBox(width: 4),
-          Text(
-            suffix != null ? '$count$suffix' : '$count',
-            style: TextStyle(
-              fontSize: 11.5,
-              fontWeight: FontWeight.w800,
-              color: theme.colorScheme.onSurface,
+            const SizedBox(width: 3.5),
+            Text(
+              suffix != null ? '$count$suffix' : '$count',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: theme.colorScheme.onSurface,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
