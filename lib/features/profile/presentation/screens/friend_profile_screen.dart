@@ -321,6 +321,7 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
             photoUrl: _summary.photoUrl,
             displayName: _summary.displayName,
             size: 80,
+            fallbackToDeviceUserAvatar: false,
           ),
           const SizedBox(height: 12),
 

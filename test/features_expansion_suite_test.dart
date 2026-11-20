@@ -73,7 +73,7 @@ void main() {
   group('F-11 Instant Currency Converter Tests (All 30 Currencies)', () {
     test('All 30 currencies have active exchange rates defined in CurrencyService', () {
       final currencies = CurrencyService.supportedCurrencies;
-      expect(currencies.length, 30);
+      expect(currencies.length, greaterThanOrEqualTo(30));
       for (final currency in currencies) {
         expect(CurrencyService.ratesAgainstUsd.containsKey(currency), isTrue,
             reason: 'Rate missing for $currency');

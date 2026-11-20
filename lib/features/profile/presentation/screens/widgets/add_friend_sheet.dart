@@ -276,6 +276,7 @@ class _AddFriendSheetState extends ConsumerState<AddFriendSheet> {
             photoUrl: target.photoUrl,
             displayName: target.displayName,
             size: 52,
+            fallbackToDeviceUserAvatar: false,
           ),
           const SizedBox(width: 14),
           Expanded(

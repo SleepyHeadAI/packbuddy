@@ -22,7 +22,7 @@ void main() {
   group('World Travel Map Reinstall & UI Tests', () {
     test('AppConstants includes tableTravelMap and version 11', () {
       expect(AppConstants.tableTravelMap, equals('travel_map'));
-      expect(AppConstants.databaseVersion, equals(11));
+      expect(AppConstants.databaseVersion, equals(15));
     });
 
     test('TravelMapService correctly stores and retrieves countries in local storage', () async {

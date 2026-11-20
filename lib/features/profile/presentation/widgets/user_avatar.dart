@@ -53,8 +53,7 @@ class UserAvatar extends StatelessWidget {
 
     Widget avatarCore;
 
-    final shouldFallback = fallbackToDeviceUserAvatar ??
-        (photoUrl == null && (displayName == null || displayName!.trim().isEmpty));
+    final shouldFallback = fallbackToDeviceUserAvatar ?? true;
     final effectivePhotoUrl = (photoUrl != null && photoUrl!.trim().isNotEmpty)
         ? photoUrl!.trim()
         : (shouldFallback ? PreferencesService.instance.getUserAvatar() : null);

@@ -154,9 +154,7 @@ void main() {
       expect(find.text('Dünya Seyahat Haritası'), findsOneWidget);
       expect(find.text('Güncel Keşif & Boyama Durumu'), findsOneWidget);
       expect(find.text(exploredPctStr), findsOneWidget);
-      expect(find.text(paintedPctStr), findsOneWidget);
       expect(find.text('6 / $totalCount Ülke Gezildi'), findsOneWidget);
-      expect(find.text('12 / $totalCount Ülke Boyandı'), findsOneWidget);
 
       // Breakdown chips
       expect(find.text('Yaşanan'), findsOneWidget);
@@ -208,7 +206,6 @@ void main() {
       expect(find.text('Live Exploration & Coverage'), findsOneWidget);
       expect(find.text('Open Map ↗'), findsOneWidget);
       expect(find.text('2 / $totalCount Visited'), findsOneWidget);
-      expect(find.text('2 / $totalCount Painted'), findsOneWidget);
       expect(find.text('Lived'), findsOneWidget);
       expect(find.text('Visited'), findsOneWidget);
       expect(find.text('Wishlist'), findsOneWidget);
@@ -254,7 +251,6 @@ void main() {
       expect(find.text('İncele 🔍'), findsOneWidget);
 
       expect(find.text(exploredPctStr), findsOneWidget);
-      expect(find.text(paintedPctStr), findsOneWidget);
 
       // Mutual visited countries banner
       expect(find.textContaining('2 Ortak Gezilen Ülke'), findsOneWidget);
@@ -325,7 +321,6 @@ void main() {
       expect(find.text('Güncel Keşif & Boyama Durumu'), findsOneWidget);
       expect(find.text('Haritayı Aç ↗'), findsOneWidget);
       expect(find.text('2 / $totalCount Ülke Gezildi'), findsOneWidget);
-      expect(find.text('2 / $totalCount Ülke Boyandı'), findsOneWidget);
     });
 
     testWidgets('FriendProfileScreen embeds WorldMapProfileCard displaying friend map and stats', (tester) async {
@@ -379,8 +374,6 @@ void main() {
 
       // Friend visited: TR (lived), FR (visited), IT (visited) = 3 countries
       expect(find.text('3 / $totalCount Ülke Gezildi'), findsOneWidget);
-      // Friend painted: 3 + 1 (ES wishlist) = 4 countries
-      expect(find.text('4 / $totalCount Ülke Boyandı'), findsOneWidget);
 
       // Mutual visited: TR and FR
       expect(find.textContaining('2 Ortak Gezilen Ülke'), findsOneWidget);

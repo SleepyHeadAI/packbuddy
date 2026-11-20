@@ -12,6 +12,7 @@ import 'package:packbuddy/features/vault/domain/document.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
 import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
+import 'package:packbuddy/features/profile/domain/friendship.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 class MockAuditAdminService implements AdminService {
@@ -202,6 +203,20 @@ class MockAuditAdminService implements AdminService {
 
   @override
   Future<void> sendInactivityWarningEmail(String uid) async {}
+
+  @override
+  Future<List<FriendUserSummary>> fetchUserFriends(String uid) async => <FriendUserSummary>[];
+
+  @override
+  Future<({List<FriendRequestItem> incoming, List<FriendRequestItem> outgoing})>
+      fetchUserFriendRequests(String uid) async =>
+          (incoming: <FriendRequestItem>[], outgoing: <FriendRequestItem>[]);
+
+  @override
+  Future<bool> removeUserFriendship(String currentUid, String targetUid) async => true;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 
   @override
   Future<InactivityScanResult> processInactivityPolicies() async =>

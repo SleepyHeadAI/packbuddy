@@ -101,7 +101,7 @@ class Trip {
     final seenCodes = <String>{};
 
     if (destination.trim().isNotEmpty) {
-      final stops = destination.split(RegExp(r'\s*➔\s*'));
+      final stops = destination.split(RegExp(r'\s*(?:➔|\s-\s)\s*'));
       for (final stop in stops) {
         final c = Country.resolveFromStop(stop);
         if (c != null && !seenCodes.contains(c.code.toUpperCase())) {

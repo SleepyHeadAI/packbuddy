@@ -133,7 +133,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('1 Trips'), findsOneWidget);
+      expect(find.text('1 Trip'), findsOneWidget);
       expect(find.text('2 Items'), findsOneWidget);
     });
 

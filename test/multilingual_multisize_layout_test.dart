@@ -9,6 +9,7 @@ import 'package:packbuddy/features/vault/presentation/screens/vault_screen.dart'
 import 'package:packbuddy/features/vault/presentation/screens/widgets/add_document_sheet.dart';
 import 'package:packbuddy/features/vault/presentation/screens/widgets/vault_lock_view.dart';
 import 'package:packbuddy/features/checklist/presentation/screens/widgets/airline_guide_sheet.dart';
+import 'package:packbuddy/shared/widgets/app_button.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -298,7 +299,7 @@ void main() {
 
       // Empty State: Center button must be shown, and FloatingActionButton must be NULL (no collision bug!)
       expect(find.byType(FloatingActionButton), findsNothing);
-      expect(find.widgetWithText(FilledButton, 'Belge Ekle'), findsOneWidget);
+      expect(find.widgetWithText(AppButton, 'Belge Ekle'), findsOneWidget);
 
       // Now enter Özel Kasa by tapping the top-left card
       final privateCard = find.byKey(const Key('private_photos_chip'));
@@ -316,10 +317,10 @@ void main() {
       await tester.tap(find.text('4').last);
       await tester.pumpAndSettle();
 
-      // In Özel Kasa empty state: Only the centered "Özel Resim Ekle" FilledButton must exist!
+      // In Özel Kasa empty state: Only the centered "Özel Resim Ekle" AppButton must exist!
       // FloatingActionButton MUST be NULL so they do NOT overlap!
       expect(find.byType(FloatingActionButton), findsNothing);
-      expect(find.widgetWithText(FilledButton, 'Özel Resim Ekle'), findsOneWidget);
+      expect(find.widgetWithText(AppButton, 'Özel Resim Ekle'), findsOneWidget);
     });
 
     testWidgets('Top Hero Cards Height & Compact Proportions Symmetry (<110px)', (tester) async {

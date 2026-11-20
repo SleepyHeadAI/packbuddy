@@ -14,10 +14,10 @@ void main() {
   GoogleFonts.config.allowRuntimeFetching = false;
   group('1 & 2: Smooth Animations & App Themes', () {
     test('AppAnimations contains consistent durations and cubic curves', () {
-      expect(AppAnimations.fast, const Duration(milliseconds: 200));
-      expect(AppAnimations.normal, const Duration(milliseconds: 350));
-      expect(AppAnimations.smooth, const Duration(milliseconds: 500));
-      expect(AppAnimations.relaxed, const Duration(milliseconds: 750));
+      expect(AppAnimations.fast, const Duration(milliseconds: 160));
+      expect(AppAnimations.normal, const Duration(milliseconds: 260));
+      expect(AppAnimations.smooth, const Duration(milliseconds: 360));
+      expect(AppAnimations.relaxed, const Duration(milliseconds: 500));
       expect(AppAnimations.smoothCurve, Curves.easeOutCubic);
       expect(AppAnimations.gentleCurve, Curves.easeInOutCubic);
       expect(AppAnimations.springCurve, Curves.easeOutBack);

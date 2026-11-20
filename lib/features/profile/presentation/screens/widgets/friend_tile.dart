@@ -46,6 +46,7 @@ class FriendTile extends StatelessWidget {
               photoUrl: friend.photoUrl,
               displayName: friend.displayName,
               size: 48,
+              fallbackToDeviceUserAvatar: false,
             ),
             const SizedBox(width: 12),
 

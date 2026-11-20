@@ -198,7 +198,9 @@ void main() {
           await tester.pumpAndSettle();
           expect(find.byType(ProfileScreen), findsOneWidget);
           expect(find.byType(ProfileHeaderCard), findsOneWidget);
-          expect(find.byType(TravelStatsCard, skipOffstage: false), findsOneWidget);
+          final travelStatsFinder = find.byType(TravelStatsCard);
+          await tester.scrollUntilVisible(travelStatsFinder, 200);
+          expect(travelStatsFinder, findsOneWidget);
           expect(tester.takeException(), isNull);
         });
 

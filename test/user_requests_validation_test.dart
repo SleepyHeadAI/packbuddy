@@ -387,6 +387,7 @@ void main() {
       final addWidgetBtn = find.text('Ana Ekrana Widget Ekle');
       expect(addWidgetBtn, findsOneWidget);
 
+      await tester.ensureVisible(addWidgetBtn);
       await tester.tap(addWidgetBtn);
       await tester.pump();
       // Verifies no unhandled exception occurs on tapping the button

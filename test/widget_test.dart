@@ -22,6 +22,10 @@ class _FakeUser extends Fake implements User {
   @override
   final String? email = 'smoke@packbuddy.com';
   @override
+  final String? displayName;
+  @override
+  final String? photoURL;
+  @override
   final bool emailVerified;
   @override
   final List<UserInfo> providerData;
@@ -29,6 +33,8 @@ class _FakeUser extends Fake implements User {
   _FakeUser({
     this.emailVerified = true,
     this.providerData = const [],
+    this.displayName = 'Smoke Tester',
+    this.photoURL,
   });
 }
 

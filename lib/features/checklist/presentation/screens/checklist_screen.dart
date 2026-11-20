@@ -358,18 +358,36 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                     ),
                   ),
                 ],
-                Text(
-                  widget.tripTitle != null
-                      ? '${widget.tripTitle} - ${l10n.luggageAndChecklist}'
-                      : l10n.baggageAndChecklist,
-                  style: theme.appBarTheme.titleTextStyle ??
-                      AppTypography.title(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.3,
-                        color: theme.colorScheme.onSurface,
+                if (!widget.isTabMode && widget.tripTitle == null)
+                  Hero(
+                    tag: 'checklist-hero-title',
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: Text(
+                        l10n.baggageAndChecklist,
+                        style: theme.appBarTheme.titleTextStyle ??
+                            AppTypography.title(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.3,
+                              color: theme.colorScheme.onSurface,
+                            ),
                       ),
-                ),
+                    ),
+                  )
+                else
+                  Text(
+                    widget.tripTitle != null
+                        ? '${widget.tripTitle} - ${l10n.luggageAndChecklist}'
+                        : l10n.baggageAndChecklist,
+                    style: theme.appBarTheme.titleTextStyle ??
+                        AppTypography.title(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                  ),
               ],
             ),
           ),
