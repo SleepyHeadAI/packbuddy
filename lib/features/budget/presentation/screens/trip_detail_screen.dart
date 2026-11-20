@@ -1,15 +1,19 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
+import 'package:packbuddy/core/theme/app_typography.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/features/budget/domain/budget_localization.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/currency_picker_sheet.dart';
 import 'package:packbuddy/shared/widgets/app_animations.dart';
+import 'package:packbuddy/shared/widgets/app_button.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
 import 'package:packbuddy/features/budget/domain/city_localization.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
@@ -266,26 +270,76 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
 
   void _showDeleteDialog(BuildContext context, Trip tripToDelete) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.deleteTrip),
-        content: Text(l10n.deleteTripConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.cancel),
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        child: Padding(
+          padding: const EdgeInsets.all(22),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.errorPastel.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Center(
+                  child: Icon(Icons.delete_outline_rounded, color: AppColors.errorPastel, size: 24),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                l10n.deleteTrip,
+                style: AppTypography.titleMedium.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                l10n.deleteTripConfirm,
+                style: AppTypography.body(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w400,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: AppButton.outline(
+                      label: l10n.cancel,
+                      size: AppButtonSize.medium,
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: AppButton.destructive(
+                      label: l10n.deleteTrip,
+                      size: AppButtonSize.medium,
+                      onPressed: () {
+                        ref.read(tripControllerProvider.notifier).deleteTrip(tripToDelete.id);
+                        Navigator.of(ctx).pop();
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.errorPastel),
-            onPressed: () {
-              ref.read(tripControllerProvider.notifier).deleteTrip(tripToDelete.id);
-              Navigator.of(ctx).pop();
-              Navigator.of(context).pop();
-            },
-            child: Text(l10n.deleteTrip),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -708,10 +762,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                               ),
                               child: Text(
                                 _formatExpenseCountLabel(expenses.length, context),
-                                style: TextStyle(
+                                style: AppTypography.mono(
                                   fontSize: 10.5,
                                   fontWeight: FontWeight.w600,
                                   color: theme.colorScheme.primary,
+                                  tabularFigures: true,
                                 ),
                               ),
                             ),
@@ -723,10 +778,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                               ),
                               child: Text(
                                 '%$percentage',
-                                style: TextStyle(
+                                style: AppTypography.mono(
                                   fontSize: 10.5,
                                   fontWeight: FontWeight.w700,
                                   color: categoryColor,
+                                  tabularFigures: true,
                                 ),
                               ),
                             ),
@@ -744,9 +800,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                           categoryTotal,
                           currency: targetCurrency,
                         ),
-                        style: const TextStyle(
+                        style: AppTypography.mono(
                           fontWeight: FontWeight.w800,
                           fontSize: 14,
+                          color: theme.colorScheme.onSurface,
+                          tabularFigures: true,
                         ),
                       ),
                     ],
@@ -876,10 +934,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                               ),
                               child: Text(
                                 _formatExpenseCountLabel(expenses.length, context),
-                                style: TextStyle(
+                                style: AppTypography.mono(
                                   fontSize: 10.5,
                                   fontWeight: FontWeight.w600,
                                   color: theme.colorScheme.primary,
+                                  tabularFigures: true,
                                 ),
                               ),
                             ),
@@ -891,10 +950,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                               ),
                               child: Text(
                                 '%$percentage',
-                                style: TextStyle(
+                                style: AppTypography.mono(
                                   fontSize: 10.5,
                                   fontWeight: FontWeight.w700,
                                   color: methodColor,
+                                  tabularFigures: true,
                                 ),
                               ),
                             ),
@@ -912,9 +972,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                           methodTotal,
                           currency: targetCurrency,
                         ),
-                        style: const TextStyle(
+                        style: AppTypography.mono(
                           fontWeight: FontWeight.w800,
                           fontSize: 14,
+                          color: theme.colorScheme.onSurface,
+                          tabularFigures: true,
                         ),
                       ),
                     ],
@@ -1122,18 +1184,22 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                       expense.amount,
                       currency: expense.currency,
                     ),
-                    style: const TextStyle(
+                    style: AppTypography.mono(
                       fontWeight: FontWeight.w700,
                       fontSize: 13.5,
+                      color: theme.colorScheme.onSurface,
+                      tabularFigures: true,
                     ),
                   ),
                   if (expense.currency.toUpperCase() != targetCurrency.toUpperCase()) ...[
                     const SizedBox(height: 2),
                     Text(
                       '≈ ${CurrencyFormatter.format(CurrencyService.convert(amount: expense.amount, fromCurrency: expense.currency, toCurrency: targetCurrency), currency: targetCurrency)}',
-                      style: TextStyle(
+                      style: AppTypography.mono(
                         fontSize: 10,
+                        fontWeight: FontWeight.w500,
                         color: theme.colorScheme.onSurfaceVariant,
+                        tabularFigures: true,
                       ),
                     ),
                   ],
@@ -1192,13 +1258,16 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
       child: Padding(
         padding: const EdgeInsets.only(bottom: 8),
         child: Material(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
+          color: theme.brightness == Brightness.dark ? AppColors.surfaceDark : AppColors.surfaceLight,
+          borderRadius: BorderRadius.circular(AppRadius.md),
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               border: Border.all(
-                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+                color: theme.brightness == Brightness.dark
+                    ? AppColors.outlineDark
+                    : AppColors.outlineLight,
+                width: 1,
               ),
             ),
             child: ListTile(
@@ -1316,18 +1385,22 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                   expense.amount,
                   currency: expense.currency,
                 ),
-                style: const TextStyle(
+                style: AppTypography.mono(
                   fontWeight: FontWeight.w700,
                   fontSize: 14,
+                  color: theme.colorScheme.onSurface,
+                  tabularFigures: true,
                 ),
               ),
               if (expense.currency.toUpperCase() != targetCurrency.toUpperCase()) ...[
                 const SizedBox(height: 2),
                 Text(
                   '≈ ${CurrencyFormatter.format(CurrencyService.convert(amount: expense.amount, fromCurrency: expense.currency, toCurrency: targetCurrency), currency: targetCurrency)}',
-                  style: TextStyle(
+                  style: AppTypography.mono(
                     fontSize: 10,
+                    fontWeight: FontWeight.w500,
                     color: theme.colorScheme.onSurfaceVariant,
+                    tabularFigures: true,
                   ),
                 ),
               ],
@@ -1717,6 +1790,18 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
+                          const SizedBox(height: 18),
+                          AppButton.primary(
+                            label: l10n.addExpense,
+                            leadingIcon: Icons.add_rounded,
+                            onPressed: () {
+                              AddExpenseSheet.show(
+                                context,
+                                tripId: currentTrip.id,
+                                defaultCurrency: currentTrip.defaultCurrency,
+                              );
+                            },
+                          ),
                         ],
                       ),
                     ),
@@ -1725,7 +1810,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
               else if (_viewMode == 0)
                 // Mode 0: All Expenses (Flat chronological list)
                 SliverPadding(
-                  padding: const EdgeInsets.only(left: 20, right: 20, bottom: 96),
+                  padding: EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    bottom: math.max(120.0, MediaQuery.paddingOf(context).bottom + 100.0),
+                  ),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
@@ -1760,7 +1849,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                   )
                 else
                   SliverPadding(
-                    padding: const EdgeInsets.only(left: 20, right: 20, bottom: 96),
+                    padding: EdgeInsets.only(
+                      left: 20,
+                      right: 20,
+                      bottom: math.max(120.0, MediaQuery.paddingOf(context).bottom + 100.0),
+                    ),
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
@@ -1797,7 +1890,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                   )
                 else
                   SliverPadding(
-                    padding: const EdgeInsets.only(left: 20, right: 20, bottom: 96),
+                    padding: EdgeInsets.only(
+                      left: 20,
+                      right: 20,
+                      bottom: math.max(120.0, MediaQuery.paddingOf(context).bottom + 100.0),
+                    ),
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
@@ -1883,7 +1980,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     return Container(
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.card),
         border: Border.all(
           color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
           width: 1,
@@ -2112,11 +2209,12 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
             Flexible(
               child: Text(
                 l10n.ongoingTrip.toUpperCase(),
-                style: const TextStyle(
+                style: AppTypography.mono(
                   fontSize: 9.5,
                   fontWeight: FontWeight.w800,
                   color: AppColors.successPastel,
                   letterSpacing: 0.3,
+                  tabularFigures: true,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -2147,11 +2245,12 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
             Flexible(
               child: Text(
                 label,
-                style: TextStyle(
+                style: AppTypography.mono(
                   fontSize: 9.5,
                   fontWeight: FontWeight.w800,
                   color: theme.colorScheme.primary,
                   letterSpacing: 0.3,
+                  tabularFigures: true,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -2175,11 +2274,12 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
             Flexible(
               child: Text(
                 l10n.completed.toUpperCase(),
-                style: TextStyle(
+                style: AppTypography.mono(
                   fontSize: 9.5,
                   fontWeight: FontWeight.w700,
                   color: theme.colorScheme.onSurfaceVariant,
                   letterSpacing: 0.3,
+                  tabularFigures: true,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -6,7 +7,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_motion.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
+import 'package:packbuddy/core/theme/app_typography.dart';
 import 'package:packbuddy/features/budget/presentation/screens/trips_screen.dart';
 import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
 import 'package:packbuddy/features/travel_map/presentation/controllers/travel_map_controller.dart';
@@ -15,6 +19,9 @@ import 'package:packbuddy/features/travel_map/presentation/widgets/travel_map_st
 import 'package:packbuddy/features/travel_map/presentation/widgets/country_flag.dart';
 import 'package:packbuddy/core/services/app_widget_localization.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
+import 'package:packbuddy/shared/widgets/app_animations.dart';
+import 'package:packbuddy/shared/widgets/app_button.dart';
+import 'package:packbuddy/shared/widgets/app_card.dart';
 
 /// Full-screen interactive world travel map and country tracker
 class TravelMapScreen extends ConsumerStatefulWidget {
@@ -503,61 +510,25 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          // Story Share Primary Button (Signature Travel Gradient)
-                          Container(
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFFE7B623), Color(0xFF856404)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFF856404).withValues(alpha: 0.28),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 15),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              ),
-                              onPressed: _isSharingStory
-                                  ? null
-                                  : () => _shareStoryImage(storyKey, setModalState),
-                              icon: _isSharingStory
-                                  ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : const Icon(Icons.camera_alt_rounded, size: 20),
-                              label: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text(
-                                  _isSharingStory ? l10n.generatingStoryImage : l10n.shareImageButton,
-                                  maxLines: 1,
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ),
-                            ),
+                          // Story Share Primary Button (Phase 1 Token)
+                          AppButton.primary(
+                            label: _isSharingStory ? l10n.generatingStoryImage : l10n.shareImageButton,
+                            leadingIcon: Icons.camera_alt_rounded,
+                            size: AppButtonSize.large,
+                            isExpanded: true,
+                            isLoading: _isSharingStory,
+                            onPressed: _isSharingStory
+                                ? null
+                                : () => _shareStoryImage(storyKey, setModalState),
                           ),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 8),
 
                           // Text Share Secondary Button
-                          TextButton.icon(
+                          AppButton.ghost(
+                            label: l10n.shareTextButton,
+                            leadingIcon: Icons.text_snippet_outlined,
+                            size: AppButtonSize.medium,
+                            isExpanded: true,
                             onPressed: () {
                               Navigator.pop(ctx);
                               _sharePassportText(
@@ -566,14 +537,6 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                 visitedContinentsCount,
                               );
                             },
-                            icon: const Icon(Icons.text_snippet_outlined, size: 18),
-                            label: Text(
-                              l10n.shareTextButton,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
                           ),
                         ],
                       ),
@@ -618,8 +581,14 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                 child: Container(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                    color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.sheet)),
+                    border: Border(
+                      top: BorderSide(
+                        color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+                        width: 1.0,
+                      ),
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.1),
@@ -639,7 +608,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                           height: 4.5,
                           decoration: BoxDecoration(
                             color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(3),
+                            borderRadius: BorderRadius.circular(AppRadius.full),
                           ),
                         ),
                       ),
@@ -667,7 +636,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                               children: [
                                 Text(
                                   latestCountry.getLocalizedName(currentLang),
-                                  style: theme.textTheme.titleLarge?.copyWith(
+                                  style: AppTypography.titleLarge.copyWith(
                                     fontWeight: FontWeight.w800,
                                     letterSpacing: -0.3,
                                   ),
@@ -677,8 +646,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                   latestCountry.capital.isNotEmpty
                                       ? '${_getLocalizedContinentName(latestCountry.continent, l10n)} • ${l10n.mapLegendCapital}: ${latestCountry.capital}'
                                       : _getLocalizedContinentName(latestCountry.continent, l10n),
-                                  style: TextStyle(
-                                    fontSize: 12.5,
+                                  style: AppTypography.caption.copyWith(
                                     color: theme.colorScheme.onSurfaceVariant,
                                   ),
                                 ),
@@ -694,7 +662,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
                           color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(AppRadius.card),
                           border: Border.all(
                             color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                           ),
@@ -703,8 +671,9 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                           children: [
                             // 1. Yaşadığım (Lived - Emerald Green)
                             Expanded(
-                              child: InkWell(
+                              child: BouncyPressable(
                                 onTap: () {
+                                  AppHaptics.lightImpact();
                                   sheetRef.read(travelMapControllerProvider.notifier).setCountryStatus(
                                         code: latestCountry.code,
                                         status: latestCountry.isLived
@@ -712,9 +681,8 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                             : CountryStatus.lived,
                                       );
                                 },
-                                borderRadius: BorderRadius.circular(12),
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
                                   decoration: BoxDecoration(
                                     color: latestCountry.isLived
                                         ? const Color(0xFF10B981)
@@ -763,8 +731,9 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
 
                             // 2. Gezdim (Visited - Orange Been style)
                             Expanded(
-                              child: InkWell(
+                              child: BouncyPressable(
                                 onTap: () {
+                                  AppHaptics.lightImpact();
                                   sheetRef.read(travelMapControllerProvider.notifier).setCountryStatus(
                                         code: latestCountry.code,
                                         status: latestCountry.isVisited
@@ -773,9 +742,8 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                         visitedDate: latestCountry.visitedDate ?? DateTime.now(),
                                       );
                                 },
-                                borderRadius: BorderRadius.circular(12),
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
                                   decoration: BoxDecoration(
                                     color: latestCountry.isVisited
                                         ? AppColors.primaryAmber
@@ -824,8 +792,9 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
 
                             // 3. Gezmek İstiyorum (Wishlist - Red Skratch style with explore icon)
                             Expanded(
-                              child: InkWell(
+                              child: BouncyPressable(
                                 onTap: () {
+                                  AppHaptics.lightImpact();
                                   sheetRef.read(travelMapControllerProvider.notifier).setCountryStatus(
                                         code: latestCountry.code,
                                         status: latestCountry.isWishlist
@@ -833,9 +802,8 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                             : CountryStatus.wishlist,
                                       );
                                 },
-                                borderRadius: BorderRadius.circular(12),
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 10),
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
                                   decoration: BoxDecoration(
                                     color: latestCountry.isWishlist
                                         ? const Color(0xFFEF4444)
@@ -884,16 +852,16 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
 
                             // İşareti Kaldır (None)
                             if (latestCountry.status != CountryStatus.none)
-                              InkWell(
+                              BouncyPressable(
                                 onTap: () {
+                                  AppHaptics.lightImpact();
                                   sheetRef.read(travelMapControllerProvider.notifier).setCountryStatus(
                                         code: latestCountry.code,
                                         status: CountryStatus.none,
                                       );
                                 },
-                                borderRadius: BorderRadius.circular(12),
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                                   child: Icon(
                                     Icons.delete_outline_rounded,
                                     size: 18,
@@ -906,36 +874,27 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                       ),
                       if (latestCountry.status != CountryStatus.none) ...[
                         const SizedBox(height: 10),
-                        OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: theme.colorScheme.error,
-                            side: BorderSide(color: theme.colorScheme.error.withValues(alpha: 0.4)),
-                            padding: const EdgeInsets.symmetric(vertical: 11),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                          ),
+                        AppButton.destructive(
+                          label: l10n.delete,
+                          leadingIcon: Icons.delete_sweep_rounded,
+                          size: AppButtonSize.medium,
+                          isExpanded: true,
                           onPressed: () {
                             sheetRef.read(travelMapControllerProvider.notifier).setCountryStatus(
                                   code: latestCountry.code,
                                   status: CountryStatus.none,
                                 );
                           },
-                          icon: const Icon(Icons.delete_sweep_rounded, size: 18),
-                          label: Text(
-                            l10n.delete,
-                            style: const TextStyle(fontWeight: FontWeight.w700),
-                          ),
                         ),
                       ],
                       const SizedBox(height: 14),
 
                       // Action Button: Seyahat Planla
-                      FilledButton.icon(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: theme.colorScheme.primary,
-                          foregroundColor: theme.colorScheme.onPrimary,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        ),
+                      AppButton.primary(
+                        label: l10n.planTripToCountry(latestCountry.getLocalizedName(currentLang)),
+                        leadingIcon: Icons.flight_takeoff_rounded,
+                        size: AppButtonSize.large,
+                        isExpanded: true,
                         onPressed: () {
                           Navigator.pop(ctx);
                           Navigator.push(
@@ -945,15 +904,6 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                             ),
                           );
                         },
-                        icon: const Icon(Icons.flight_takeoff_rounded, size: 18),
-                        label: Flexible(
-                          child: Text(
-                            l10n.planTripToCountry(latestCountry.getLocalizedName(currentLang)),
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
                       ),
                     ],
                   ),
@@ -1069,15 +1019,16 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: AppColors.primaryAmber.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                   border: Border.all(color: AppColors.primaryAmber.withValues(alpha: 0.4)),
                 ),
                 child: Text(
                   '%${mapState.worldPercentage.toStringAsFixed(1)}',
-                  style: TextStyle(
-                    color: isDark ? AppColors.primaryAmber : AppColors.primaryLight,
-                    fontWeight: FontWeight.bold,
+                  style: AppTypography.mono(
+                    color: isDark ? AppColors.primaryAmber : AppColors.brandAccentTextLight,
+                    fontWeight: FontWeight.w700,
                     fontSize: 12,
+                    tabularFigures: true,
                   ),
                 ),
               ),
@@ -1100,16 +1051,9 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 6, 16, 10),
-                    child: Container(
+                    child: AppCard(
+                      borderRadius: AppRadius.card,
                       padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
-                          width: 1,
-                        ),
-                      ),
                       child: Column(
                         children: [
                           Row(
@@ -1126,7 +1070,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                               Container(
                                 width: 1,
                                 height: 38,
-                                color: theme.colorScheme.outlineVariant,
+                                color: isDark ? Colors.white10 : const Color(0xFFF1F5F9),
                               ),
                               Expanded(
                                 child: _buildMetric(
@@ -1139,7 +1083,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                               Container(
                                 width: 1,
                                 height: 38,
-                                color: theme.colorScheme.outlineVariant,
+                                color: isDark ? Colors.white10 : const Color(0xFFF1F5F9),
                               ),
                               Expanded(
                                 child: _buildMetric(
@@ -1152,7 +1096,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                               Container(
                                 width: 1,
                                 height: 38,
-                                color: theme.colorScheme.outlineVariant,
+                                color: isDark ? Colors.white10 : const Color(0xFFF1F5F9),
                               ),
                               Expanded(
                                 child: _buildMetric(
@@ -1167,7 +1111,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                           const SizedBox(height: 14),
                           // Progress Bar
                           ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(AppRadius.xs),
                             child: LinearProgressIndicator(
                               value: (mapState.worldPercentage / 100).clamp(0.0, 1.0),
                               minHeight: 7,
@@ -1185,64 +1129,49 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
+                    child: AppCard(
+                      borderRadius: AppRadius.card,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       onTap: () => _openStoryShareModal(mapState, visitedContinentsCount),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFFE7B623), Color(0xFF856404)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppColors.actionGold.withValues(alpha: 0.15),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.camera_alt_rounded, color: AppColors.actionGold, size: 18),
                           ),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF856404).withValues(alpha: 0.28),
-                              blurRadius: 10,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(7),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.22),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 18),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    l10n.shareStory,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 13.5,
-                                    ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.shareStory,
+                                  style: AppTypography.titleSmall.copyWith(
+                                    fontWeight: FontWeight.w800,
                                   ),
-                                  Text(
-                                    l10n.shareStorySubtitle,
-                                    style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.9),
-                                      fontSize: 11,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 1),
+                                Text(
+                                  l10n.shareStorySubtitle,
+                                  style: AppTypography.caption.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
                                   ),
-                                ],
-                              ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
                             ),
-                            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 13),
-                          ],
-                        ),
+                          ),
+                          Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                            size: 13,
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -1274,23 +1203,9 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
-                    child: Container(
+                    child: AppCard(
+                      borderRadius: AppRadius.card,
                       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
-                      decoration: BoxDecoration(
-                        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-                        borderRadius: BorderRadius.circular(22),
-                        border: Border.all(
-                          color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
-                            blurRadius: 14,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
                       child: Row(
                         children: [
                           Expanded(
@@ -1341,7 +1256,6 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                         children: mapState.continentProgressList.map((cp) {
                           final isSelected = mapState.filter == cp.continent;
                           final name = _getLocalizedContinentName(cp.continent, l10n);
-                          final emoji = _getContinentEmoji(cp.continent);
                           final accentColor = _getContinentColor(cp.continent);
 
                           return Padding(
@@ -1351,14 +1265,14 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                 final newFilter = isSelected ? 'all' : cp.continent;
                                 ref.read(travelMapControllerProvider.notifier).setFilter(newFilter);
                               },
-                              borderRadius: BorderRadius.circular(18),
+                              borderRadius: BorderRadius.circular(AppRadius.card),
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
-                                width: 156,
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+                                width: 160,
+                                padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-                                  borderRadius: BorderRadius.circular(18),
+                                  color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+                                  borderRadius: BorderRadius.circular(AppRadius.card),
                                   border: Border.all(
                                     color: isSelected
                                         ? accentColor
@@ -1381,12 +1295,12 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                   children: [
                                     Row(
                                       children: [
-                                        Text(emoji, style: const TextStyle(fontSize: 14)),
+                                        Icon(Icons.public_rounded, size: 15, color: accentColor),
                                         const SizedBox(width: 6),
                                         Expanded(
                                           child: Text(
                                             name,
-                                            style: TextStyle(
+                                            style: AppTypography.titleSmall.copyWith(
                                               fontWeight: FontWeight.w700,
                                               fontSize: 12.5,
                                               color: isSelected
@@ -1406,10 +1320,11 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                         Expanded(
                                           child: Text(
                                             '${cp.visitedCountries}/${cp.totalCountries} ${l10n.countryUnit}',
-                                            style: TextStyle(
+                                            style: AppTypography.mono(
                                               fontSize: 11,
                                               fontWeight: FontWeight.w600,
                                               color: isDark ? Colors.white70 : const Color(0xFF64748B),
+                                              tabularFigures: true,
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -1418,17 +1333,18 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                         const SizedBox(width: 4),
                                         Text(
                                           '%${cp.percentage.toStringAsFixed(0)}',
-                                          style: TextStyle(
+                                          style: AppTypography.mono(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w800,
                                             color: accentColor,
+                                            tabularFigures: true,
                                           ),
                                         ),
                                       ],
                                     ),
                                     const SizedBox(height: 6),
                                     ClipRRect(
-                                      borderRadius: BorderRadius.circular(3),
+                                      borderRadius: BorderRadius.circular(AppRadius.xs),
                                       child: LinearProgressIndicator(
                                         value: (cp.percentage / 100).clamp(0.0, 1.0),
                                         minHeight: 4,
@@ -1513,21 +1429,21 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                         filled: true,
                         fillColor: isDark ? AppColors.surfaceVariantDark : AppColors.surfaceVariantLight,
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(100),
+                          borderRadius: BorderRadius.circular(AppRadius.full),
                           borderSide: BorderSide(
                             color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
                             width: 1,
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(100),
+                          borderRadius: BorderRadius.circular(AppRadius.full),
                           borderSide: BorderSide(
                             color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
                             width: 1,
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(100),
+                          borderRadius: BorderRadius.circular(AppRadius.full),
                           borderSide: BorderSide(
                             color: isDark ? AppColors.primaryDark : AppColors.primaryLight,
                             width: 1.6,
@@ -1544,8 +1460,70 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                 Builder(
                   builder: (context) {
                     final displayCountries = mapState.getFilteredCountries(currentLang);
+                    final bottomPadding = math.max(120.0, MediaQuery.paddingOf(context).bottom + 100.0);
+
+                    if (displayCountries.isEmpty) {
+                      return SliverPadding(
+                        padding: EdgeInsets.fromLTRB(24, 24, 24, bottomPadding),
+                        sliver: SliverToBoxAdapter(
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 36),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.travel_explore_rounded,
+                                      size: 38,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 14),
+                                  Text(
+                                    l10n.noMatchingCountry,
+                                    style: AppTypography.titleLarge.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 17,
+                                      color: theme.colorScheme.onSurface,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    l10n.searchCountryOrCapital,
+                                    style: AppTypography.bodyMedium.copyWith(
+                                      fontSize: 13,
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  AppButton.outline(
+                                    label: l10n.allFilter,
+                                    leadingIcon: Icons.filter_alt_off_rounded,
+                                    size: AppButtonSize.medium,
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      ref.read(travelMapControllerProvider.notifier).setSearchQuery('');
+                                      ref.read(travelMapControllerProvider.notifier).setFilter('all');
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+
                     return SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 110),
+                      padding: EdgeInsets.fromLTRB(16, 0, 16, bottomPadding),
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
@@ -1577,11 +1555,12 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
           fit: BoxFit.scaleDown,
           child: Text(
             value,
-            style: TextStyle(
+            style: AppTypography.mono(
               fontSize: 20,
               fontWeight: FontWeight.w900,
-              color: isDark ? AppColors.primaryAmber : AppColors.primaryLight,
+              color: isDark ? AppColors.primaryAmber : AppColors.brandAccentTextLight,
               letterSpacing: -0.5,
+              tabularFigures: true,
             ),
           ),
         ),
@@ -1590,8 +1569,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
           fit: BoxFit.scaleDown,
           child: Text(
             label,
-            style: TextStyle(
-              fontSize: 11.5,
+            style: AppTypography.caption.copyWith(
               color: isDark ? Colors.white60 : const Color(0xFF64748B),
               fontWeight: FontWeight.w600,
             ),
@@ -1619,10 +1597,11 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
               const SizedBox(width: 4),
               Text(
                 value,
-                style: TextStyle(
+                style: AppTypography.mono(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
                   color: color,
+                  tabularFigures: true,
                 ),
               ),
             ],
@@ -1638,8 +1617,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 11,
+              style: AppTypography.caption.copyWith(
                 color: Colors.grey,
                 fontWeight: FontWeight.w600,
               ),
@@ -1658,11 +1636,11 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
     return ChoiceChip(
       label: Text(label),
       selected: isSelected,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.full)),
       selectedColor: color ?? theme.colorScheme.primary,
-      labelStyle: TextStyle(
+      labelStyle: AppTypography.caption.copyWith(
         color: isSelected ? Colors.white : theme.colorScheme.onSurface,
         fontWeight: FontWeight.w700,
-        fontSize: 12,
       ),
       onSelected: (_) {
         ref.read(travelMapControllerProvider.notifier).setFilter(key);
@@ -1693,8 +1671,8 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(16),
+        color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
           color: statusColor != null
               ? statusColor.withValues(alpha: 0.4)
@@ -1711,7 +1689,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         child: ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
           onTap: () => _showCountryDetailSheet(country),
@@ -1722,7 +1700,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
           ),
           title: Text(
             country.getLocalizedName(currentLang),
-            style: const TextStyle(
+            style: AppTypography.titleSmall.copyWith(
               fontWeight: FontWeight.bold,
               fontSize: 14.5,
             ),
@@ -1734,8 +1712,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
               Expanded(
                 child: Text(
                   _getLocalizedContinentName(country.continent, l10n),
-                  style: TextStyle(
-                    fontSize: 12,
+                  style: AppTypography.caption.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                   maxLines: 1,
@@ -1748,7 +1725,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: statusColor.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(AppRadius.xs),
                   ),
                   child: Text(
                     statusText,
@@ -1830,31 +1807,39 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
   }) {
     return Tooltip(
       message: tooltip,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(9),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: isActive
-                ? activeColor.withValues(alpha: 0.16)
-                : (isDark ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFF1F5F9)),
-            borderRadius: BorderRadius.circular(9),
-            border: Border.all(
-              color: isActive
-                  ? activeColor
-                  : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
-              width: isActive ? 1.5 : 1.0,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+        child: Center(
+          child: InkWell(
+            onTap: () {
+              AppHaptics.selectionClick();
+              onTap();
+            },
+            borderRadius: BorderRadius.circular(AppRadius.sm),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: isActive
+                    ? activeColor.withValues(alpha: 0.16)
+                    : (isDark ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFF1F5F9)),
+                borderRadius: BorderRadius.circular(AppRadius.sm),
+                border: Border.all(
+                  color: isActive
+                      ? activeColor
+                      : (isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                  width: isActive ? 1.5 : 1.0,
+                ),
+              ),
+              child: Icon(
+                isActive ? activeIcon : inactiveIcon,
+                size: 17,
+                color: isActive
+                    ? activeColor
+                    : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+              ),
             ),
-          ),
-          child: Icon(
-            isActive ? activeIcon : inactiveIcon,
-            size: 17,
-            color: isActive
-                ? activeColor
-                : (isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
           ),
         ),
       ),
@@ -1875,23 +1860,6 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
         return l10n.continentOceania;
       default:
         return continent;
-    }
-  }
-
-  String _getContinentEmoji(String continent) {
-    switch (continent) {
-      case 'Europe':
-        return '🇪🇺';
-      case 'Asia':
-        return '⛩️';
-      case 'Americas':
-        return '🌎';
-      case 'Africa':
-        return '🦁';
-      case 'Oceania':
-        return '🦘';
-      default:
-        return '🌐';
     }
   }
 

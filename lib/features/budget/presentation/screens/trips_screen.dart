@@ -1,10 +1,14 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
+import 'package:packbuddy/core/theme/app_typography.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
+import 'package:packbuddy/shared/widgets/app_button.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
 import 'package:packbuddy/features/budget/domain/city_localization.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
@@ -96,25 +100,75 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
 
   void _showDeleteDialog(BuildContext context, Trip trip) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.deleteTrip),
-        content: Text(l10n.deleteTripConfirm),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.cancel),
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        child: Padding(
+          padding: const EdgeInsets.all(22),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.errorPastel.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Center(
+                  child: Icon(Icons.delete_outline_rounded, color: AppColors.errorPastel, size: 24),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                l10n.deleteTrip,
+                style: AppTypography.titleMedium.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                l10n.deleteTripConfirm,
+                style: AppTypography.body(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w400,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: AppButton.outline(
+                      label: l10n.cancel,
+                      size: AppButtonSize.medium,
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: AppButton.destructive(
+                      label: l10n.deleteTrip,
+                      size: AppButtonSize.medium,
+                      onPressed: () {
+                        ref.read(tripControllerProvider.notifier).deleteTrip(trip.id);
+                        Navigator.of(ctx).pop();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.errorPastel),
-            onPressed: () {
-              ref.read(tripControllerProvider.notifier).deleteTrip(trip.id);
-              Navigator.of(ctx).pop();
-            },
-            child: Text(l10n.deleteTrip),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -303,6 +357,12 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
+                          const SizedBox(height: 20),
+                          AppButton.primary(
+                            label: l10n.addTrip,
+                            leadingIcon: Icons.add_rounded,
+                            onPressed: () => AddTripSheet.show(context),
+                          ),
                         ],
                       ),
                     ),
@@ -387,7 +447,12 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
                               )
                             : ListView.builder(
                                 scrollCacheExtent: const ScrollCacheExtent.pixels(600.0),
-                                padding: const EdgeInsets.only(left: 20, right: 20, top: 4, bottom: 90),
+                                padding: EdgeInsets.only(
+                                  left: 20,
+                                  right: 20,
+                                  top: 4,
+                                  bottom: math.max(120.0, MediaQuery.paddingOf(context).bottom + 100.0),
+                                ),
                                 itemCount: filteredTrips.length,
                                 itemBuilder: (context, index) {
                                   final trip = filteredTrips[index];
@@ -523,6 +588,7 @@ class _ModernTripCard extends ConsumerWidget {
     final expenseState = ref.watch(expenseControllerProvider(trip.id));
 
     return AppCard(
+      borderRadius: AppRadius.card,
       padding: EdgeInsets.zero,
       onTap: onTap,
       child: Column(
@@ -688,17 +754,19 @@ class _ModernTripCard extends ConsumerWidget {
                     final ratio = (spent / limit).clamp(0.0, 1.0);
                     final isOverBudget = spent > limit;
 
-                    Color progressColor = theme.colorScheme.primary;
+                    Color progressColor;
                     if (isOverBudget) {
-                      progressColor = AppColors.errorPastel;
-                    } else if (ratio > 0.85) {
-                      progressColor = const Color(0xFFF59E0B);
+                      progressColor = isDark ? const Color(0xFFEF4444) : const Color(0xFFDC2626);
+                    } else if (ratio >= 0.8) {
+                      progressColor = const Color(0xFFD97706);
+                    } else {
+                      progressColor = isDark ? const Color(0xFF10B981) : const Color(0xFF059669);
                     }
 
                     return Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: isDark ? 0.35 : 0.45),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Column(
@@ -710,10 +778,13 @@ class _ModernTripCard extends ConsumerWidget {
                               Expanded(
                                 child: Text(
                                   '${CurrencyFormatter.format(spent, currency: trip.defaultCurrency)} / ${CurrencyFormatter.format(limit, currency: trip.defaultCurrency)}',
-                                  style: TextStyle(
+                                  style: AppTypography.mono(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w700,
-                                    color: isOverBudget ? AppColors.errorPastel : theme.colorScheme.onSurface,
+                                    color: isOverBudget
+                                        ? (isDark ? const Color(0xFFEF4444) : const Color(0xFFDC2626))
+                                        : theme.colorScheme.onSurface,
+                                    tabularFigures: true,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -722,10 +793,11 @@ class _ModernTripCard extends ConsumerWidget {
                               const SizedBox(width: 8),
                               Text(
                                 '${(spent / limit * 100).toInt()}%',
-                                style: TextStyle(
+                                style: AppTypography.mono(
                                   fontSize: 10.5,
                                   fontWeight: FontWeight.w800,
                                   color: progressColor,
+                                  tabularFigures: true,
                                 ),
                               ),
                             ],
@@ -736,7 +808,9 @@ class _ModernTripCard extends ConsumerWidget {
                             child: LinearProgressIndicator(
                               value: ratio,
                               minHeight: 4.5,
-                              backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                              backgroundColor: isDark
+                                  ? const Color(0xFF1E293B)
+                                  : const Color(0xFFE2E8F0),
                               valueColor: AlwaysStoppedAnimation<Color>(progressColor),
                             ),
                           ),
@@ -913,11 +987,12 @@ class _ModernTripCard extends ConsumerWidget {
             const SizedBox(width: 5),
             Text(
               l10n.ongoingTrip.toUpperCase(),
-              style: const TextStyle(
+              style: AppTypography.mono(
                 fontSize: 9.5,
                 fontWeight: FontWeight.w800,
                 color: AppColors.successPastel,
                 letterSpacing: 0.4,
+                tabularFigures: true,
               ),
             ),
           ],
@@ -944,11 +1019,12 @@ class _ModernTripCard extends ConsumerWidget {
             const SizedBox(width: 4),
             Text(
               label,
-              style: TextStyle(
+              style: AppTypography.mono(
                 fontSize: 9.5,
                 fontWeight: FontWeight.w800,
                 color: theme.colorScheme.primary,
                 letterSpacing: 0.3,
+                tabularFigures: true,
               ),
             ),
           ],
@@ -968,11 +1044,12 @@ class _ModernTripCard extends ConsumerWidget {
             const SizedBox(width: 4),
             Text(
               l10n.completed.toUpperCase(),
-              style: TextStyle(
+              style: AppTypography.mono(
                 fontSize: 9.5,
                 fontWeight: FontWeight.w700,
                 color: theme.colorScheme.onSurfaceVariant,
                 letterSpacing: 0.3,
+                tabularFigures: true,
               ),
             ),
           ],

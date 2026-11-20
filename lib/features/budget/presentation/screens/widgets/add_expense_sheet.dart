@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_typography.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
@@ -10,6 +11,7 @@ import 'package:packbuddy/features/budget/presentation/controllers/expense_contr
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/core/services/app_widget_service.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
+import 'package:packbuddy/shared/widgets/app_button.dart';
 import 'currency_picker_sheet.dart';
 
 /// Modal bottom sheet to add or edit an expense with multi-currency, payment method, dynamic category, and notes
@@ -299,17 +301,20 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
                       controller: _amountController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       autofocus: true,
-                      style: theme.textTheme.headlineMedium?.copyWith(
+                      style: AppTypography.mono(
+                        fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: theme.colorScheme.onSurface,
+                        tabularFigures: true,
                       ),
                       decoration: InputDecoration(
                         labelText: l10n.amount,
                         prefixText: '${CurrencyFormatter.getSymbol(_selectedCurrency)} ',
-                        prefixStyle: TextStyle(
+                        prefixStyle: AppTypography.mono(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
                           color: theme.colorScheme.onSurfaceVariant,
+                          tabularFigures: true,
                         ),
                       ),
                       validator: (value) {
@@ -386,9 +391,11 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
                       Flexible(
                         child: Text(
                           '≈ ${CurrencyFormatter.format(CurrencyService.convert(amount: double.tryParse(_amountController.text.trim()) ?? 0.0, fromCurrency: _selectedCurrency, toCurrency: widget.defaultCurrency), currency: widget.defaultCurrency)} (${widget.defaultCurrency})',
-                          style: theme.textTheme.bodySmall?.copyWith(
+                          style: AppTypography.mono(
+                            fontSize: 11,
                             color: theme.colorScheme.primary,
                             fontWeight: FontWeight.w600,
+                            tabularFigures: true,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -590,9 +597,11 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
               const SizedBox(height: 24),
 
               // Save Button
-              FilledButton(
+              AppButton.primary(
+                label: l10n.save,
+                size: AppButtonSize.large,
+                isExpanded: true,
                 onPressed: _submit,
-                child: Text(l10n.save),
               ),
             ],
           ),

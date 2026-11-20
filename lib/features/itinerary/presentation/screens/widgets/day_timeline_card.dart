@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_typography.dart';
 import 'package:packbuddy/features/budget/domain/collaboration_localization.dart';
 import 'package:packbuddy/features/itinerary/domain/itinerary_item.dart';
 import 'package:packbuddy/features/itinerary/domain/itinerary_localization.dart';
@@ -126,10 +127,11 @@ class DayTimelineCard extends StatelessWidget {
                                           constraints: BoxConstraints(maxWidth: maxTextWidth),
                                           child: Text(
                                             displayTime,
-                                            style: TextStyle(
+                                            style: AppTypography.mono(
                                               fontSize: 11,
                                               fontWeight: FontWeight.w700,
                                               color: theme.colorScheme.primary,
+                                              tabularFigures: true,
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,

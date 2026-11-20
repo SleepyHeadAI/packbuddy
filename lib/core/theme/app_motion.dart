@@ -60,6 +60,9 @@ class AppHaptics {
     HapticFeedback.lightImpact();
   }
 
+  /// Alias for light haptic feedback
+  static void lightImpact() => light();
+
   /// Medium tactile feedback for swipe completion, archive, bookmark
   static void medium() {
     HapticFeedback.mediumImpact();

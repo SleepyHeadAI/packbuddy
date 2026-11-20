@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
+import 'package:packbuddy/core/theme/app_typography.dart';
 import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
@@ -10,6 +12,7 @@ import 'package:packbuddy/features/budget/presentation/controllers/trip_controll
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
+import 'package:packbuddy/shared/widgets/app_button.dart';
 import 'country_picker_sheet.dart';
 
 const _customPinColor = Color(0xFFE05A47);
@@ -184,7 +187,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
     final customPlace = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
         title: Row(
           children: [
             Container(
@@ -199,7 +202,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
             Expanded(
               child: Text(
                 l10n.addCustomLocation,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                style: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.bold),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -279,7 +282,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
     final shouldAddAsCustom = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
         title: Row(
           children: [
             Container(
@@ -294,7 +297,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
             Expanded(
               child: Text(
                 l10n.addCustomLocation,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                style: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -865,6 +868,12 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
                     child: TextFormField(
                       controller: _budgetController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      style: AppTypography.mono(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.onSurface,
+                        tabularFigures: true,
+                      ),
                       decoration: InputDecoration(
                         labelText: l10n.budget,
                         prefixIcon: const Icon(Icons.attach_money_rounded, size: 20),
@@ -967,26 +976,12 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
               const SizedBox(height: 24),
 
               // Save Button
-              FilledButton(
+              AppButton.primary(
+                label: l10n.save,
+                leadingIcon: Icons.check_rounded,
+                size: AppButtonSize.large,
+                isExpanded: true,
                 onPressed: _submit,
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.check_rounded, size: 20),
-                    const SizedBox(width: 8),
-                    Flexible(
-                      child: Text(
-                        l10n.save,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
               ),
             ],
           ),

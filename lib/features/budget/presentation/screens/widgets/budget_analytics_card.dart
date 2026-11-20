@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_typography.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
@@ -942,11 +943,12 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                       fit: BoxFit.scaleDown,
                       child: Text(
                         CurrencyFormatter.format(convertedTotalSpent, currency: activeCurrency),
-                        style: TextStyle(
+                        style: AppTypography.mono(
                           fontSize: 15,
-                          fontWeight: FontWeight.w900,
+                          fontWeight: FontWeight.w800,
                           color: theme.colorScheme.onSurface,
                           letterSpacing: -0.3,
+                          tabularFigures: true,
                         ),
                       ),
                     ),
@@ -956,10 +958,11 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                         fit: BoxFit.scaleDown,
                         child: Text(
                           '≈ ${CurrencyFormatter.format(widget.totalSpent, currency: widget.tripCurrency)}',
-                          style: TextStyle(
+                          style: AppTypography.mono(
                             fontSize: 9.5,
                             color: theme.colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.w500,
+                            tabularFigures: true,
                           ),
                         ),
                       ),
@@ -1072,10 +1075,11 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                         alignment: Alignment.centerRight,
                         child: Text(
                           CurrencyFormatter.format(catAmount, currency: activeCurrency),
-                          style: TextStyle(
+                          style: AppTypography.mono(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
                             color: theme.colorScheme.onSurface,
+                            tabularFigures: true,
                           ),
                         ),
                       ),
@@ -1086,10 +1090,11 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                       child: Text(
                         '%${percentage.toStringAsFixed(0)}',
                         textAlign: TextAlign.right,
-                        style: TextStyle(
+                        style: AppTypography.mono(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           color: color,
+                          tabularFigures: true,
                         ),
                       ),
                     ),
@@ -1334,10 +1339,11 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                         alignment: Alignment.centerRight,
                         child: Text(
                           CurrencyFormatter.format(methodAmount, currency: activeCurrency),
-                          style: TextStyle(
+                          style: AppTypography.mono(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
                             color: theme.colorScheme.onSurface,
+                            tabularFigures: true,
                           ),
                         ),
                       ),
@@ -1348,10 +1354,11 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                       child: Text(
                         '%${percentage.toStringAsFixed(0)}',
                         textAlign: TextAlign.right,
-                        style: TextStyle(
+                        style: AppTypography.mono(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           color: color,
+                          tabularFigures: true,
                         ),
                       ),
                     ),
@@ -1793,10 +1800,11 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
             alignment: Alignment.centerLeft,
             child: Text(
               value,
-              style: TextStyle(
+              style: AppTypography.mono(
                 fontSize: 13,
                 fontWeight: FontWeight.w800,
                 color: theme.colorScheme.onSurface,
+                tabularFigures: true,
               ),
             ),
           ),
@@ -1959,9 +1967,11 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     CurrencyFormatter.format(dailyBurnRate, currency: activeCurrency),
-                    style: const TextStyle(
+                    style: AppTypography.mono(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
+                      color: theme.colorScheme.onSurface,
+                      tabularFigures: true,
                     ),
                   ),
                 ),

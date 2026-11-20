@@ -4,9 +4,11 @@ import 'package:packbuddy/core/services/app_widget_service.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
-import 'package:packbuddy/core/theme/app_theme.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
+import 'package:packbuddy/core/theme/app_typography.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
+import 'package:packbuddy/shared/widgets/app_card.dart';
 
 /// Interactive Live Currency Converter Card & Modal
 /// Supports all 30 PackBuddy travel currencies with live/offline rates,
@@ -363,9 +365,10 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
                 child: ChoiceChip(
                   label: Text(
                     '${CurrencyService.getCurrencySymbol(_fromCurrency)}${preset.toInt()}',
-                    style: TextStyle(
+                    style: AppTypography.mono(
                       fontSize: 11,
                       fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                      tabularFigures: true,
                     ),
                   ),
                   selected: isSelected,
@@ -436,10 +439,12 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
                 alignment: Alignment.centerLeft,
                 child: Text(
                   CurrencyFormatter.format(converted, currency: _toCurrency),
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w900,
+                  style: AppTypography.mono(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
                     color: theme.colorScheme.primary,
                     letterSpacing: -0.5,
+                    tabularFigures: true,
                   ),
                 ),
               ),
@@ -455,10 +460,11 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
                   Flexible(
                     child: Text(
                       '1 $_fromCurrency = ${rateFromTo.toStringAsFixed(4)} $_toCurrency',
-                      style: AppTheme.monoFont(
+                      style: AppTypography.mono(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: theme.colorScheme.onSurfaceVariant,
+                        tabularFigures: true,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -468,10 +474,11 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
                   Flexible(
                     child: Text(
                       '1 $_toCurrency = ${rateToFrom.toStringAsFixed(4)} $_fromCurrency',
-                      style: AppTheme.monoFont(
+                      style: AppTypography.mono(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: theme.colorScheme.onSurfaceVariant,
+                        tabularFigures: true,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -489,27 +496,9 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
       return content;
     }
 
-    return Container(
+    return AppCard(
+      borderRadius: AppRadius.card,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark
-            ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.45)
-            : theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: isDark
-                ? Colors.black.withValues(alpha: 0.25)
-                : const Color(0xFF0F172A).withValues(alpha: 0.03),
-            blurRadius: 14,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
       child: content,
     );
   }
@@ -530,28 +519,32 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
           return CurrencyService.supportedCurrencies.map((code) {
             final flag = CurrencyFormatter.getFlag(code);
             final symbol = CurrencyService.getCurrencySymbol(code);
-            return Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(flag, style: const TextStyle(fontSize: 14)),
-                const SizedBox(width: 6),
-                Text(
-                  code,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 13,
+            return FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(flag, style: const TextStyle(fontSize: 14)),
+                  const SizedBox(width: 6),
+                  Text(
+                    code,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 13,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '($symbol)',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary,
-                    fontSize: 12,
+                  const SizedBox(width: 4),
+                  Text(
+                    '($symbol)',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary,
+                      fontSize: 12,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             );
           }).toList();
         },

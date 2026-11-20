@@ -221,23 +221,25 @@ class _Globe3DViewerState extends State<Globe3DViewer> {
                     color: (widget.isDark
                             ? const Color(0xFF0F172A)
                             : Colors.white)
-                        .withValues(alpha: 0.8),
-                    borderRadius: BorderRadius.circular(14),
+                        .withValues(alpha: 0.90),
+                    borderRadius: BorderRadius.circular(999.0),
                     border: Border.all(
                       color: widget.isDark ? Colors.white12 : Colors.black12,
+                      width: 1.0,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: Colors.black.withValues(alpha: widget.isDark ? 0.25 : 0.08),
                         blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
                   child: IconButton(
                     icon: const Icon(Icons.restart_alt_rounded, size: 18),
                     tooltip: l10n?.resetZoom ?? 'Reset',
-                    padding: const EdgeInsets.all(7),
-                    constraints: const BoxConstraints(),
+                    padding: const EdgeInsets.all(9),
+                    constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
                     onPressed: _resetRotation,
                   ),
                 ),
@@ -249,22 +251,24 @@ class _Globe3DViewerState extends State<Globe3DViewer> {
                 left: 14,
                 child: AnimatedOpacity(
                   duration: const Duration(milliseconds: 180),
-                  opacity: _isDragging ? 0.0 : 0.85,
+                  opacity: _isDragging ? 0.0 : 0.88,
                   child: IgnorePointer(
                     child: Container(
                       padding:
-                          const EdgeInsets.symmetric(horizontal: 9, vertical: 4.5),
+                          const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
                         color: (widget.isDark ? const Color(0xFF0F172A) : Colors.white)
-                            .withValues(alpha: 0.8),
-                        borderRadius: BorderRadius.circular(12),
+                            .withValues(alpha: 0.90),
+                        borderRadius: BorderRadius.circular(999.0),
                         border: Border.all(
                           color: widget.isDark ? Colors.white12 : Colors.black12,
+                          width: 1.0,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.08),
+                            color: Colors.black.withValues(alpha: widget.isDark ? 0.20 : 0.06),
                             blurRadius: 6,
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),

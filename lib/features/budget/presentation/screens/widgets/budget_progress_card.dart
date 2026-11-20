@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
+import 'package:packbuddy/core/theme/app_typography.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
@@ -28,24 +30,26 @@ class BudgetProgressCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     final hasBudget = budgetLimit != null && budgetLimit! > 0;
     final remaining = hasBudget ? (budgetLimit! - totalSpent) : 0.0;
     final progress = hasBudget ? (totalSpent / budgetLimit!).clamp(0.0, 1.0) : 0.0;
     final ratio = hasBudget ? (totalSpent / budgetLimit!) : 0.0;
 
-    // Pastel dynamic color based on budget health
+    // Serene semantic colors based on budget health
     Color progressColor;
-    if (progress > 0.9) {
-      progressColor = AppColors.errorPastel;
-    } else if (progress > 0.7) {
-      progressColor = AppColors.warningPastel;
+    if (ratio > 1.0 || progress > 0.95) {
+      progressColor = isDark ? const Color(0xFFEF4444) : const Color(0xFFDC2626);
+    } else if (ratio >= 0.8) {
+      progressColor = const Color(0xFFD97706);
     } else {
-      progressColor = theme.colorScheme.primary;
+      progressColor = isDark ? const Color(0xFF10B981) : const Color(0xFF059669);
     }
 
     return RepaintBoundary(
       child: AppCard(
+        borderRadius: AppRadius.card,
         padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,9 +64,11 @@ class BudgetProgressCard extends StatelessWidget {
                       Flexible(
                         child: Text(
                           l10n.budget,
-                          style: theme.textTheme.titleMedium?.copyWith(
+                          style: AppTypography.title(
+                            fontSize: 16,
                             fontWeight: FontWeight.w700,
                             letterSpacing: -0.3,
+                            color: theme.colorScheme.onSurface,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -94,10 +100,11 @@ class BudgetProgressCard extends StatelessWidget {
                                 const SizedBox(width: 4),
                                 Text(
                                   currency,
-                                  style: TextStyle(
+                                  style: AppTypography.mono(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w800,
                                     color: theme.colorScheme.primary,
+                                    tabularFigures: true,
                                   ),
                                 ),
                                 const SizedBox(width: 1),
@@ -124,15 +131,16 @@ class BudgetProgressCard extends StatelessWidget {
                       return Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: progressColor.withValues(alpha: 0.18),
+                          color: progressColor.withValues(alpha: 0.14),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           '%${(val * 100).toInt()}',
-                          style: TextStyle(
+                          style: AppTypography.mono(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                             color: progressColor,
+                            tabularFigures: true,
                           ),
                         ),
                       );
@@ -143,40 +151,51 @@ class BudgetProgressCard extends StatelessWidget {
             ),
             if (hasBudget && ratio >= 0.85) ...[
               const SizedBox(height: 12),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: (ratio >= 1.0 ? AppColors.errorPastel : AppColors.warningPastel)
-                      .withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: (ratio >= 1.0 ? AppColors.errorPastel : AppColors.warningPastel)
-                        .withValues(alpha: 0.4),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      ratio >= 1.0 ? Icons.error_outline_rounded : Icons.warning_amber_rounded,
-                      size: 16,
-                      color: ratio >= 1.0 ? AppColors.errorPastel : AppColors.warningPastel,
+              Builder(
+                builder: (context) {
+                  final isCrit = ratio >= 1.0;
+                  final alertColor = isCrit
+                      ? (isDark ? const Color(0xFFFCA5A5) : const Color(0xFFB91C1C))
+                      : (isDark ? const Color(0xFFFDE68A) : AppColors.brandAccentTextLight);
+                  final alertBg = isCrit
+                      ? (isDark ? const Color(0xFF450A0A).withValues(alpha: 0.35) : const Color(0xFFFEE2E2))
+                      : (isDark ? const Color(0xFF422E00).withValues(alpha: 0.35) : const Color(0xFFFEF3C7));
+                  final alertBorder = isCrit
+                      ? (isDark ? const Color(0xFFDC2626).withValues(alpha: 0.45) : const Color(0xFFFECACA))
+                      : (isDark ? const Color(0xFFD97706).withValues(alpha: 0.45) : const Color(0xFFFDE68A));
+
+                  return Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: alertBg,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: alertBorder, width: 1),
                     ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        ratio >= 1.0 ? l10n.budgetAlert100 : l10n.budgetAlert85,
-                        style: TextStyle(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w700,
-                          color: ratio >= 1.0 ? AppColors.errorPastel : AppColors.warningPastel,
+                    child: Row(
+                      children: [
+                        Icon(
+                          isCrit ? Icons.error_outline_rounded : Icons.warning_amber_rounded,
+                          size: 16,
+                          color: alertColor,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            isCrit ? l10n.budgetAlert100 : l10n.budgetAlert85,
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w700,
+                              color: alertColor,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
             ],
             const SizedBox(height: 16),
@@ -189,11 +208,13 @@ class BudgetProgressCard extends StatelessWidget {
               curve: Curves.easeOutCubic,
               builder: (context, val, _) {
                 return ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
                     value: val,
-                    minHeight: 10,
-                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
+                    minHeight: 8,
+                    backgroundColor: isDark
+                        ? const Color(0xFF1E293B)
+                        : const Color(0xFFE2E8F0),
                     valueColor: AlwaysStoppedAnimation<Color>(progressColor),
                   ),
                 );
@@ -214,7 +235,9 @@ class BudgetProgressCard extends StatelessWidget {
                     children: [
                       Text(
                         l10n.spent,
-                        style: theme.textTheme.bodySmall?.copyWith(
+                        style: AppTypography.body(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
@@ -225,9 +248,11 @@ class BudgetProgressCard extends StatelessWidget {
                         child: AnimatedCurrencyCounter(
                           value: totalSpent,
                           currency: currency,
-                          style: theme.textTheme.titleMedium?.copyWith(
+                          style: AppTypography.mono(
+                            fontSize: 16,
                             fontWeight: FontWeight.w700,
                             color: theme.colorScheme.onSurface,
+                            tabularFigures: true,
                           ),
                         ),
                       ),
@@ -240,10 +265,11 @@ class BudgetProgressCard extends StatelessWidget {
                           alignment: Alignment.centerLeft,
                           child: Text(
                             '≈ ${CurrencyFormatter.format(originalTotalSpent!, currency: originalCurrency!)}',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: theme.colorScheme.onSurfaceVariant,
+                            style: AppTypography.mono(
+                              fontSize: 10.5,
                               fontWeight: FontWeight.w500,
+                              color: theme.colorScheme.onSurfaceVariant,
+                              tabularFigures: true,
                             ),
                           ),
                         ),
@@ -261,7 +287,9 @@ class BudgetProgressCard extends StatelessWidget {
                       children: [
                         Text(
                           l10n.remaining,
-                          style: theme.textTheme.bodySmall?.copyWith(
+                          style: AppTypography.body(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
@@ -272,11 +300,13 @@ class BudgetProgressCard extends StatelessWidget {
                           child: AnimatedCurrencyCounter(
                             value: remaining,
                             currency: currency,
-                            style: theme.textTheme.titleMedium?.copyWith(
+                            style: AppTypography.mono(
+                              fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: remaining < 0
-                                  ? AppColors.errorPastel
-                                  : theme.colorScheme.primary,
+                                  ? (isDark ? const Color(0xFFEF4444) : const Color(0xFFDC2626))
+                                  : (isDark ? const Color(0xFF10B981) : const Color(0xFF059669)),
+                              tabularFigures: true,
                             ),
                           ),
                         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
@@ -330,6 +331,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
         title: Text(ItineraryLocalization.getDeleteConfirmTitle(langCode)),
         content: Text(ItineraryLocalization.getDeleteConfirmMessage(langCode)),
         actions: [
@@ -340,6 +342,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.error,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: () => Navigator.of(ctx).pop(true),
             child: Text(ItineraryLocalization.getDelete(langCode)),

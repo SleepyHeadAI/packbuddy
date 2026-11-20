@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:countries_world_map/countries_world_map.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_motion.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
+import 'package:packbuddy/core/theme/app_typography.dart';
 import 'package:packbuddy/features/budget/domain/country_localization.dart';
 import 'package:packbuddy/features/travel_map/data/world_countries_data.dart';
 import 'package:packbuddy/features/travel_map/data/world_map_instructions.dart';
@@ -452,22 +455,24 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
               top: 12,
               left: 14,
               child: AnimatedOpacity(
-                opacity: _isInteracting ? 0.06 : 0.84,
+                opacity: _isInteracting ? 0.06 : 0.90,
                 duration: const Duration(milliseconds: 180),
                 child: IgnorePointer(
                   ignoring: _isInteracting,
                   child: Container(
                     padding: const EdgeInsets.all(3),
                     decoration: BoxDecoration(
-                      color: (isDark ? const Color(0xFF0F172A) : Colors.white).withValues(alpha: 0.8),
-                      borderRadius: BorderRadius.circular(14),
+                      color: (isDark ? const Color(0xFF0F172A) : Colors.white).withValues(alpha: 0.90),
+                      borderRadius: BorderRadius.circular(AppRadius.full),
                       border: Border.all(
-                        color: isDark ? Colors.white12 : Colors.black12,
+                        color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+                        width: 1.0,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.12),
+                          color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
                           blurRadius: 8,
+                          offset: const Offset(0, 2),
                         ),
                       ],
                     ),
@@ -475,45 +480,75 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         GestureDetector(
-                          onTap: () => _set3DMode(false),
+                          onTap: () {
+                            AppHaptics.selectionClick();
+                            _set3DMode(false);
+                          },
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
                             decoration: BoxDecoration(
                               color: !_is3DMode
                                   ? AppColors.actionGold
                                   : Colors.transparent,
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(AppRadius.full),
                             ),
-                            child: Text(
-                              '🗺️ 2D',
-                              style: TextStyle(
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.w800,
-                                color: !_is3DMode ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
-                              ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.map_outlined,
+                                  size: 13,
+                                  color: !_is3DMode ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '2D',
+                                  style: AppTypography.mono(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w800,
+                                    color: !_is3DMode ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                                    tabularFigures: true,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                        const SizedBox(width: 3),
+                        const SizedBox(width: 2),
                         GestureDetector(
-                          onTap: () => _set3DMode(true),
+                          onTap: () {
+                            AppHaptics.selectionClick();
+                            _set3DMode(true);
+                          },
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
                             decoration: BoxDecoration(
                               color: _is3DMode
                                   ? const Color(0xFF0284C7)
                                   : Colors.transparent,
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(AppRadius.full),
                             ),
-                            child: Text(
-                              '🌐 ${l10n?.globe3D ?? "3D Globe"}',
-                              style: TextStyle(
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.w800,
-                                color: _is3DMode ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
-                              ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.public_rounded,
+                                  size: 13,
+                                  color: _is3DMode ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  l10n?.globe3D ?? '3D Globe',
+                                  style: AppTypography.mono(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w800,
+                                    color: _is3DMode ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                                    tabularFigures: true,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -536,15 +571,17 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                     ignoring: _isInteracting,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: (isDark ? const Color(0xFF0F172A) : Colors.white).withValues(alpha: 0.8),
-                        borderRadius: BorderRadius.circular(16),
+                        color: (isDark ? const Color(0xFF0F172A) : Colors.white).withValues(alpha: 0.90),
+                        borderRadius: BorderRadius.circular(AppRadius.full),
                         border: Border.all(
-                          color: isDark ? Colors.white12 : Colors.black12,
+                          color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+                          width: 1.0,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.15),
+                            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
                             blurRadius: 8,
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
@@ -560,8 +597,8 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                             children: [
                               IconButton(
                                 icon: const Icon(Icons.add_rounded, size: 18),
-                                padding: const EdgeInsets.all(8),
-                                constraints: const BoxConstraints(),
+                                padding: const EdgeInsets.all(9),
+                                constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
                                 tooltip: zoomInTooltip,
                                 onPressed: _zoomIn,
                               ),
@@ -572,8 +609,8 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                               ),
                               IconButton(
                                 icon: const Icon(Icons.remove_rounded, size: 18),
-                                padding: const EdgeInsets.all(8),
-                                constraints: const BoxConstraints(),
+                                padding: const EdgeInsets.all(9),
+                                constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
                                 tooltip: zoomOutTooltip,
                                 onPressed: _zoomOut,
                               ),
@@ -584,8 +621,8 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                               ),
                               IconButton(
                                 icon: const Icon(Icons.restart_alt_rounded, size: 18),
-                                padding: const EdgeInsets.all(8),
-                                constraints: const BoxConstraints(),
+                                padding: const EdgeInsets.all(9),
+                                constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
                                 tooltip: resetTooltip,
                                 onPressed: _resetZoom,
                               ),
@@ -618,18 +655,19 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                         final legendOther = l10n?.mapLegendUnvisited ?? 'Unvisited';
 
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                           decoration: BoxDecoration(
-                            color: (isDark ? const Color(0xFF0F172A) : Colors.white).withValues(alpha: 0.8),
-                            borderRadius: BorderRadius.circular(20),
+                            color: (isDark ? const Color(0xFF0F172A) : Colors.white).withValues(alpha: 0.90),
+                            borderRadius: BorderRadius.circular(AppRadius.full),
                             border: Border.all(
-                              color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                              color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+                              width: 1.0,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.12),
+                                color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
                                 blurRadius: 10,
-                                offset: const Offset(0, 3),
+                                offset: const Offset(0, 2),
                               ),
                             ],
                           ),
@@ -699,8 +737,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
         const SizedBox(width: 5),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 10,
+          style: AppTypography.caption.copyWith(
             fontWeight: FontWeight.w700,
             color: isDark ? Colors.white70 : const Color(0xFF334155),
           ),
