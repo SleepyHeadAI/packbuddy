@@ -34,8 +34,8 @@ import 'admin_controller.dart';
 import '../profile/domain/friendship.dart';
 import '../profile/domain/travel_style.dart';
 import '../profile/domain/travel_badge.dart';
-import '../profile/domain/animal_avatar.dart';
 import '../profile/domain/friend_localization.dart';
+import '../profile/presentation/widgets/user_avatar.dart';
 
 /// Helper to format relative or exact audit timestamp
 String _formatAuditTimestamp(DateTime time, bool isTr) {
@@ -3169,54 +3169,13 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // User Avatar
-                Builder(
-                  builder: (_) {
-                    final animal = AnimalAvatar.findById(user.photoUrl);
-                    if (animal != null) {
-                      return Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: animal.bgGradient,
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(animal.emoji, style: const TextStyle(fontSize: 20)),
-                      );
-                    }
-                    if (user.photoUrl.startsWith('http')) {
-                      return CircleAvatar(
-                        radius: 20,
-                        backgroundImage: NetworkImage(user.photoUrl),
-                        backgroundColor: theme.colorScheme.primaryContainer,
-                      );
-                    }
-                    return CircleAvatar(
-                      radius: 20,
-                      backgroundColor: isBanned
-                          ? AppColors.errorPastel.withValues(alpha: 0.2)
-                          : (user.isPremium
-                              ? const Color(0xFFD97706).withValues(alpha: 0.2)
-                              : theme.colorScheme.primaryContainer),
-                      child: Text(
-                        displayName.isNotEmpty
-                            ? displayName.substring(0, 1).toUpperCase()
-                            : 'U',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w800,
-                          color: isBanned
-                              ? AppColors.errorPastel
-                              : (user.isPremium
-                                  ? const Color(0xFFD97706)
-                                  : theme.colorScheme.primary),
-                        ),
-                      ),
-                    );
-                  },
+                UserAvatar(
+                  photoUrl: user.photoUrl,
+                  displayName: displayName,
+                  email: user.email,
+                  size: 40,
+                  isAnimated: true,
+                  fallbackToDeviceUserAvatar: false,
                 ),
                 const SizedBox(width: 12),
 
@@ -4489,17 +4448,13 @@ class _UserModerationBottomSheetState
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      Icons.manage_accounts_rounded,
-                      size: 24,
-                      color: theme.colorScheme.primary,
-                    ),
+                  UserAvatar(
+                    photoUrl: user.photoUrl,
+                    displayName: user.displayName,
+                    email: user.email,
+                    size: 42,
+                    isAnimated: true,
+                    fallbackToDeviceUserAvatar: false,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -7359,44 +7314,12 @@ class _UserModerationBottomSheetState
                         child: Row(
                           children: [
                             // Friend Avatar
-                            Builder(
-                              builder: (_) {
-                                final animal = AnimalAvatar.findById(friend.photoUrl);
-                                if (animal != null) {
-                                  return Container(
-                                    width: 36,
-                                    height: 36,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: LinearGradient(
-                                        colors: animal.bgGradient,
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      ),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(animal.emoji, style: const TextStyle(fontSize: 17)),
-                                  );
-                                }
-                                if (friend.photoUrl != null && friend.photoUrl!.startsWith('http')) {
-                                  return CircleAvatar(
-                                    radius: 18,
-                                    backgroundImage: NetworkImage(friend.photoUrl!),
-                                  );
-                                }
-                                return CircleAvatar(
-                                  radius: 18,
-                                  backgroundColor: theme.colorScheme.primaryContainer,
-                                  child: Text(
-                                    fName.isNotEmpty ? fName.substring(0, 1).toUpperCase() : 'U',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 12,
-                                      color: theme.colorScheme.primary,
-                                    ),
-                                  ),
-                                );
-                              },
+                            UserAvatar(
+                              photoUrl: friend.photoUrl,
+                              displayName: fName,
+                              size: 36,
+                              isAnimated: true,
+                              fallbackToDeviceUserAvatar: false,
                             ),
                             const SizedBox(width: 10),
                             Expanded(

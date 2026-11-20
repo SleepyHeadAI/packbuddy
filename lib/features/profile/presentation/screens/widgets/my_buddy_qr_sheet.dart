@@ -52,9 +52,10 @@ class MyBuddyQrSheet extends StatelessWidget {
   }
 
   void _shareLink(BuildContext context) {
+    final name = profile.displayName ?? 'PackBuddy Traveler';
     ShareService.shareText(
-      text: '${profile.displayName ?? "PackBuddy Gezgini"} ile PackBuddy\'de seyahat arkadaşı ol! 🧳✈️\n$_inviteUrl',
-      subject: 'PackBuddy Seyahat Daveti',
+      text: FriendLocalization.getShareInviteText(languageCode, name, _inviteUrl),
+      subject: FriendLocalization.getShareInviteSubject(languageCode),
     );
   }
 
@@ -90,11 +91,16 @@ class MyBuddyQrSheet extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Sheet Title
-            Text(
-              FriendLocalization.getMyQrCode(languageCode),
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w800,
-                fontSize: 17,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.center,
+              child: Text(
+                FriendLocalization.getMyQrCode(languageCode),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 17,
+                ),
+                textAlign: TextAlign.center,
               ),
             ),
             const SizedBox(height: 20),
@@ -151,12 +157,18 @@ class MyBuddyQrSheet extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: () => _copyLink(context),
                     icon: const Icon(Icons.copy_rounded, size: 16),
-                    label: const Text(
-                      'Kopyala',
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                    label: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.center,
+                      child: Text(
+                        FriendLocalization.getCopy(languageCode),
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
                   ),
@@ -166,14 +178,18 @@ class MyBuddyQrSheet extends StatelessWidget {
                   child: FilledButton.icon(
                     onPressed: () => _shareLink(context),
                     icon: const Icon(Icons.share_rounded, size: 16),
-                    label: Text(
-                      FriendLocalization.getShareInviteLink(languageCode),
-                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    label: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.center,
+                      child: Text(
+                        FriendLocalization.getShare(languageCode),
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                     style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
                   ),

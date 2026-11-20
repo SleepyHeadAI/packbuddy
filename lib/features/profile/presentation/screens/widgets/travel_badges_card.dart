@@ -807,7 +807,7 @@ class TravelBadgesCard extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 clipBehavior: Clip.antiAlias,
                 itemCount: badges.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 10),
+                separatorBuilder: (_, _) => const SizedBox(width: 10),
                 itemBuilder: (context, index) {
                   final badge = badges[index];
                   return _buildBadgeItem(context, badge, theme);

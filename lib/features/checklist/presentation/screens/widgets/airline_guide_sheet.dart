@@ -270,7 +270,11 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
-                    child: Text(l10n.save, style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.center,
+                      child: Text(l10n.save, style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                    ),
                   ),
                 ],
               ),
@@ -308,12 +312,15 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
                   const SizedBox(width: 8),
                   ActionChip(
                     avatar: const Icon(Icons.block_rounded, size: 14, color: AppColors.errorPastel),
-                    label: Text(
-                      _getModeChipLabel(BaggageAllowanceMode.none, langCode),
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.errorPastel,
+                    label: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        _getModeChipLabel(BaggageAllowanceMode.none, langCode),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.errorPastel,
+                        ),
                       ),
                     ),
                     backgroundColor: isDark
@@ -597,11 +604,14 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
                                         Icon(Icons.shopping_bag_outlined, size: 13, color: isDark ? Colors.white70 : const Color(0xFF475569)),
                                         const SizedBox(width: 4),
                                         Expanded(
-                                          child: Text(
-                                            PackingTagHelper.getShortTag('PERSONAL', langCode),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              PackingTagHelper.getShortTag('PERSONAL', langCode),
+                                              maxLines: 1,
+                                              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -681,11 +691,14 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
                                           Icon(Icons.luggage_rounded, size: 13, color: theme.colorScheme.primary),
                                           const SizedBox(width: 4),
                                           Expanded(
-                                            child: Text(
-                                              l10n.cabinBaggage,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              alignment: Alignment.centerLeft,
+                                              child: Text(
+                                                PackingTagHelper.getShortTag('CABIN', langCode),
+                                                maxLines: 1,
+                                                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -766,11 +779,14 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
                                           Icon(Icons.inventory_rounded, size: 13, color: theme.colorScheme.secondary),
                                           const SizedBox(width: 4),
                                           Expanded(
-                                            child: Text(
-                                              l10n.checkedBaggage,
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
+                                            child: FittedBox(
+                                              fit: BoxFit.scaleDown,
+                                              alignment: Alignment.centerLeft,
+                                              child: Text(
+                                                PackingTagHelper.getShortTag('CHECKED', langCode),
+                                                maxLines: 1,
+                                                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -1019,12 +1035,15 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
               color: isSelected ? selectedFg : unselectedIcon,
             ),
             const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                color: isSelected ? selectedFg : unselectedFg,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                  color: isSelected ? selectedFg : unselectedFg,
+                ),
               ),
             ),
           ],

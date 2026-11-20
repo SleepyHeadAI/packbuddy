@@ -143,7 +143,7 @@ class CollaboratorAvatarStack extends ConsumerWidget {
               width: size,
               height: size,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => _buildInitial(initial, color),
+              errorBuilder: (_, _, _) => _buildInitial(initial, color),
             )
           : _buildInitial(initial, color),
     );

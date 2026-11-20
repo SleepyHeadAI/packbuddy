@@ -40,7 +40,7 @@ class _LegalConsentScreenState extends ConsumerState<LegalConsentScreen> {
 
   bool _acceptedTerms = false;
   bool _acceptedDataConsent = false;
-  bool _acceptedAnalytics = true;
+  bool _acceptedAnalytics = false;
   bool _showValidationError = false;
   bool _isSubmitting = false;
 
@@ -55,7 +55,7 @@ class _LegalConsentScreenState extends ConsumerState<LegalConsentScreen> {
   }
 
   Future<void> _handleAccept() async {
-    if (!_acceptedTerms || !_acceptedDataConsent) {
+    if (!_acceptedTerms || !_acceptedDataConsent || !_acceptedAnalytics) {
       setState(() {
         _showValidationError = true;
       });
@@ -832,6 +832,9 @@ class _LegalConsentScreenState extends ConsumerState<LegalConsentScreen> {
   /// Bottom Sticky Action Sheet
   Widget _buildBottomActionSheet(
       bool isDark, String lang, bool isSmallScreen) {
+    final allAccepted = _acceptedTerms &&
+        _acceptedDataConsent &&
+        _acceptedAnalytics;
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isSmallScreen ? 12 : 20,
@@ -869,7 +872,7 @@ class _LegalConsentScreenState extends ConsumerState<LegalConsentScreen> {
                   onChanged: (val) {
                     setState(() {
                       _acceptedTerms = val ?? false;
-                      if (_acceptedTerms && _acceptedDataConsent) {
+                      if (_acceptedTerms && _acceptedDataConsent && _acceptedAnalytics) {
                         _showValidationError = false;
                       }
                     });
@@ -888,7 +891,7 @@ class _LegalConsentScreenState extends ConsumerState<LegalConsentScreen> {
                   onChanged: (val) {
                     setState(() {
                       _acceptedDataConsent = val ?? false;
-                      if (_acceptedTerms && _acceptedDataConsent) {
+                      if (_acceptedTerms && _acceptedDataConsent && _acceptedAnalytics) {
                         _showValidationError = false;
                       }
                     });
@@ -899,7 +902,7 @@ class _LegalConsentScreenState extends ConsumerState<LegalConsentScreen> {
                 ),
                 SizedBox(height: isSmallScreen ? 5 : 8),
 
-                // Optional Checkbox 3: Telemetry & Analytics
+                // Mandatory Checkbox 3: Telemetry & Analytics
                 _buildCheckboxRow(
                   value: _acceptedAnalytics,
                   isDark: isDark,
@@ -907,11 +910,14 @@ class _LegalConsentScreenState extends ConsumerState<LegalConsentScreen> {
                   onChanged: (val) {
                     setState(() {
                       _acceptedAnalytics = val ?? false;
+                      if (_acceptedTerms && _acceptedDataConsent && _acceptedAnalytics) {
+                        _showValidationError = false;
+                      }
                     });
                   },
                   label:
                       LegalConsentLocalization.getOptionalAnalyticsCheckbox(lang),
-                  isMandatory: false,
+                  isMandatory: true,
                 ),
 
                 // Validation Error Banner
@@ -969,73 +975,80 @@ class _LegalConsentScreenState extends ConsumerState<LegalConsentScreen> {
                       child: BouncyPressable(
                         onTap: _isSubmitting ? null : _handleAccept,
                         borderRadius: BorderRadius.circular(16),
-                        child: Container(
-                          height: isSmallScreen ? 44 : 48,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: isDark
-                                  ? const [
-                                      AppColors.primaryDark,
-                                      Color(0xFFD4A054)
-                                    ]
-                                  : const [
-                                      AppColors.primaryLight,
-                                      Color(0xFF6E5203)
-                                    ],
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                              BoxShadow(
-                                color: (isDark
-                                        ? AppColors.primaryDark
-                                        : AppColors.primaryLight)
-                                    .withValues(alpha: 0.35),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
+                        child: AnimatedOpacity(
+                          duration: const Duration(milliseconds: 200),
+                          opacity: allAccepted ? 1.0 : 0.65,
+                          child: Container(
+                            height: isSmallScreen ? 44 : 48,
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: isDark
+                                    ? const [
+                                        AppColors.primaryDark,
+                                        Color(0xFFD4A054)
+                                      ]
+                                    : const [
+                                        AppColors.primaryLight,
+                                        Color(0xFF6E5203)
+                                      ],
                               ),
-                            ],
-                          ),
-                          child: _isSubmitting
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white),
-                                  ),
-                                )
-                              : FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        LegalConsentLocalization.getAcceptButton(
-                                            lang),
-                                        maxLines: 1,
-                                        style: TextStyle(
-                                          fontSize: isSmallScreen ? 12.5 : 13.5,
-                                          fontWeight: FontWeight.w800,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: allAccepted
+                                  ? [
+                                      BoxShadow(
+                                        color: (isDark
+                                                ? AppColors.primaryDark
+                                                : AppColors.primaryLight)
+                                            .withValues(alpha: 0.35),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ]
+                                  : null,
+                            ),
+                            child: _isSubmitting
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.white),
+                                    ),
+                                  )
+                                : FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    alignment: Alignment.center,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          LegalConsentLocalization.getAcceptButton(
+                                              lang),
+                                          maxLines: 1,
+                                          style: TextStyle(
+                                            fontSize: isSmallScreen ? 12.5 : 13.5,
+                                            fontWeight: FontWeight.w800,
+                                            color: isDark
+                                                ? AppColors.onPrimaryDark
+                                                : Colors.white,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Icon(
+                                          Icons.arrow_forward_rounded,
+                                          size: isSmallScreen ? 15 : 16,
                                           color: isDark
                                               ? AppColors.onPrimaryDark
                                               : Colors.white,
                                         ),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Icon(
-                                        Icons.arrow_forward_rounded,
-                                        size: isSmallScreen ? 15 : 16,
-                                        color: isDark
-                                            ? AppColors.onPrimaryDark
-                                            : Colors.white,
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
+                          ),
                         ),
                       ),
                     ),
@@ -1083,11 +1096,12 @@ class _LegalConsentScreenState extends ConsumerState<LegalConsentScreen> {
   }) {
     return GestureDetector(
       onTap: () => onChanged(!value),
+      behavior: HitTestBehavior.opaque,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 2, right: 8),
+            padding: const EdgeInsetsDirectional.only(top: 2, end: 8),
             child: SizedBox(
               width: isSmallScreen ? 18 : 20,
               height: isSmallScreen ? 18 : 20,

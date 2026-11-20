@@ -321,9 +321,13 @@ class _AddFriendSheetState extends ConsumerState<AddFriendSheet> {
                 color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Text(
-                'Siz',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurfaceVariant),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.center,
+                child: Text(
+                  FriendLocalization.getYou(lang),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurfaceVariant),
+                ),
               ),
             )
           else if (isAlreadyFriend)
@@ -333,14 +337,20 @@ class _AddFriendSheetState extends ConsumerState<AddFriendSheet> {
                 color: const Color(0xFF10B981).withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.check_circle_rounded, size: 14, color: Color(0xFF10B981)),
-                  SizedBox(width: 4),
-                  Text(
-                    'Arkadaş',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
+                  const Icon(Icons.check_circle_rounded, size: 14, color: Color(0xFF10B981)),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.center,
+                      child: Text(
+                        FriendLocalization.getBuddy(lang),
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -352,9 +362,13 @@ class _AddFriendSheetState extends ConsumerState<AddFriendSheet> {
                 color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Text(
-                'İstek Gönderildi ⏳',
-                style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Color(0xFFF59E0B)),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.center,
+                child: Text(
+                  '${FriendLocalization.getRequestSent(lang)} ⏳',
+                  style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700, color: Color(0xFFF59E0B)),
+                ),
               ),
             )
           else if (isPendingIncoming)
@@ -367,7 +381,11 @@ class _AddFriendSheetState extends ConsumerState<AddFriendSheet> {
                 visualDensity: VisualDensity.compact,
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               ),
-              child: Text(FriendLocalization.getAccept(lang)),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.center,
+                child: Text(FriendLocalization.getAccept(lang)),
+              ),
             )
           else
             FilledButton.icon(
@@ -375,9 +393,13 @@ class _AddFriendSheetState extends ConsumerState<AddFriendSheet> {
               icon: _isSending
                   ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                   : const Icon(Icons.person_add_rounded, size: 15),
-              label: Text(
-                FriendLocalization.getSendRequest(lang),
-                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+              label: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.center,
+                child: Text(
+                  FriendLocalization.getSendRequest(lang),
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                ),
               ),
               style: FilledButton.styleFrom(
                 visualDensity: VisualDensity.compact,

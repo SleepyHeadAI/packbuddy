@@ -970,7 +970,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     final currentUserName = profileState.profile?.displayName ??
         authState.user?.displayName ??
         (authState.user?.email != null ? authState.user!.email!.split('@').first : null);
-    final isMe = (currentUserId != null && expense.userId != null && expense.userId == currentUserId) ||
+    final isMe = (currentUserId != null && expense.userId == currentUserId) ||
         (currentUserName != null && expense.createdByName != null && expense.createdByName!.trim().toLowerCase() == currentUserName.trim().toLowerCase());
     final authorText = CollaborationLocalization.formatAddedBy(
       expense.createdByName,
@@ -1164,7 +1164,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     final currentUserName = profileState.profile?.displayName ??
         authState.user?.displayName ??
         (authState.user?.email != null ? authState.user!.email!.split('@').first : null);
-    final isMe = (currentUserId != null && expense.userId != null && expense.userId == currentUserId) ||
+    final isMe = (currentUserId != null && expense.userId == currentUserId) ||
         (currentUserName != null && expense.createdByName != null && expense.createdByName!.trim().toLowerCase() == currentUserName.trim().toLowerCase());
     final authorText = CollaborationLocalization.formatAddedBy(
       expense.createdByName,

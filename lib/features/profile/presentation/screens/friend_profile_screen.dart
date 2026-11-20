@@ -104,13 +104,14 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
   }
 
   void _showInviteSheet() {
+    final lang = Localizations.localeOf(context).languageCode;
     final trips = ref.read(tripControllerProvider).trips.where((t) => !t.isDeleted).toList();
 
     if (trips.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Henüz planlanmış bir seyahatiniz yok. Önce bir seyahat oluşturun! ✈️'),
-          duration: Duration(seconds: 3),
+        SnackBar(
+          content: Text(FriendLocalization.getNoPlannedTrips(lang)),
+          duration: const Duration(seconds: 3),
         ),
       );
       return;
@@ -131,7 +132,7 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${_summary.displayName ?? "Arkadaşınızı"} Hangi Seyahate Davet Etmek İstersiniz?',
+                FriendLocalization.getSelectTripToInvite(lang, _summary.displayName),
                 style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
               ),
               const SizedBox(height: 14),
@@ -139,7 +140,7 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
                 child: ListView.separated(
                   shrinkWrap: true,
                   itemCount: trips.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  separatorBuilder: (_, _) => const SizedBox(height: 8),
                   itemBuilder: (context, index) {
                     final trip = trips[index];
                     return ListTile(
@@ -605,16 +606,20 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
           const SizedBox(height: 6),
           Text(count, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
           const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 10.5,
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurfaceVariant,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.center,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -705,7 +710,7 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: badges.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              separatorBuilder: (_, _) => const SizedBox(width: 10),
               itemBuilder: (context, index) {
                 final badge = badges[index];
                 return Container(
@@ -754,12 +759,12 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
       builder: (ctx) => AlertDialog(
         title: Text(FriendLocalization.getRemoveFriend(lang)),
         content: Text(
-          '${_summary.displayName ?? "Bu gezgin"} arkadaş listenizden çıkarılsın mı?',
+          FriendLocalization.getRemoveFriendConfirm(lang, _summary.displayName),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Vazgeç'),
+            child: Text(FriendLocalization.getCancel(lang)),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),

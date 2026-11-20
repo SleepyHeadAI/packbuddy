@@ -376,48 +376,51 @@ class LegalConsentLocalization {
   static String getOptionalAnalyticsCheckbox(String? lang) {
     switch (_cleanLang(lang)) {
       case 'tr':
-        return 'Uygulama deneyimini geliştirmek amacıyla anonim telemetri ve hata raporlarının toplanmasını onaylıyorum. (İsteğe Bağlı)';
+        return 'Uygulama deneyimini geliştirmek amacıyla anonim telemetri ve hata raporlarının toplanmasını onaylıyorum. (Zorunlu)';
       case 'de':
-        return 'Ich willige in anonymisierte Telemetrie und Fehlerberichte zur Verbesserung der App-Stabilität ein. (Optional)';
+        return 'Ich willige in anonymisierte Telemetrie und Fehlerberichte zur Verbesserung der App-Stabilität ein. (Erforderlich)';
       case 'fr':
-        return 'J\'accepte les rapports de télémétrie et d\'erreurs anonymes pour améliorer la stabilité. (Facultatif)';
+        return 'J\'accepte les rapports de télémétrie et d\'erreurs anonymes pour améliorer la stabilité. (Obligatoire)';
       case 'es':
-        return 'Acepto compartir telemetría anónima e informes de errores para mejorar la aplicación. (Opcional)';
+        return 'Acepto compartir telemetría anónima e informes de errores para mejorar la aplicación. (Obligatorio)';
       case 'it':
-        return 'Accetto la condivisione di dati anonimi di telemetria e crash per migliorare l\'app. (Facoltativo)';
+        return 'Accetto la condivisione di dati anonimi di telemetria e crash per migliorare l\'app. (Obbligatorio)';
       case 'pt':
-        return 'Concordo com a telemetria anônima e relatórios de falhas para aprimorar a estabilidade. (Opcional)';
+        return 'Concordo com a telemetria anônima e relatórios de falhas para aprimorar a estabilidade. (Obrigatório)';
       case 'ru':
-        return 'Я согласен(-на) на сбор анонимной телеметрии и отчетов об ошибках для улучшения приложения. (Необязательно)';
+        return 'Я согласен(-на) на сбор анонимной телеметрии и отчетов об ошибках для улучшения приложения. (Обязательно)';
       case 'zh':
-        return '我同意收集匿名遥测与崩溃报告以优化应用性能与稳定性。（可选）';
+        return '我同意收集匿名遥测与崩溃报告以优化应用性能与稳定性。（必选）';
       case 'ja':
-        return 'アプリの安定性向上のため、匿名のテレメトリおよびクラッシュレポートの収集に同意します。（任意）';
+        return 'アプリの安定性向上のため、匿名のテレメトリおよびクラッシュレポートの収集に同意します。（必須）';
       case 'ko':
-        return '앱 품질 개선을 위해 익명 진단 및 충돌 보고서 수집에 동의합니다. (선택)';
+        return '앱 품질 개선을 위해 익명 진단 및 충돌 보고서 수집에 동의합니다. (필수)';
       case 'ar':
-        return 'أوافق على جمع تقارير القياس والأخطاء المجهولة لتحسين استقرار التطبيق. (اختياري)';
+        return 'أوافق على جمع تقارير القياس والأخطاء المجهولة لتحسين استقرار التطبيق. (إلزامي)';
       case 'hi':
-        return 'मैं ऐप अनुभव को बेहतर बनाने के लिए अनाम टेलीमेट्री और त्रुटि रिपोर्ट के संग्रह की अनुमति देता हूं। (वैकल्पिक)';
+        return 'मैं ऐप अनुभव को बेहतर बनाने के लिए अनाम टेलीमेट्री और त्रुटि रिपोर्ट के संग्रह की अनुमति देता हूं। (अनिवार्य)';
       case 'nl':
-        return 'Ik ga akkoord met anonieme telemetrie en foutrapporten om de app te verbeteren. (Optioneel)';
+        return 'Ik ga akkoord met anonieme telemetrie en foutrapporten om de app te verbeteren. (Verplicht)';
       case 'el':
-        return 'Συμφωνώ με τη συλλογή ανώνυμων αναφορών σφαλμάτων για τη βελτίωση της εφαρμογής. (Προαιρετικό)';
+        return 'Συμφωνώ με τη συλλογή ανώνυμων αναφορών σφαλμάτων για τη βελτίωση της εφαρμογής. (Υποχρεωτικό)';
       case 'sv':
-        return 'Jag godkänner anonym telemetri och felrapporter för att förbättra appens stabilitet. (Valfritt)';
+        return 'Jag godkänner anonym telemetri och felrapporter för att förbättra appens stabilitet. (Obligatoriskt)';
       case 'pl':
-        return 'Zgadzam się na anonimowe raporty o błędach w celu poprawy stabilności aplikacji. (Opcjonalne)';
+        return 'Zgadzam się na anonimowe raporty o błędach w celu poprawy stabilności aplikacji. (Wymagane)';
       case 'id':
-        return 'Saya menyetujui pengumpulan telemetri anonim untuk meningkatkan stabilitas aplikasi. (Opsional)';
+        return 'Saya menyetujui pengumpulan telemetri anonim untuk meningkatkan stabilitas aplikasi. (Wajib)';
       case 'th':
-        return 'ฉันยินยอมให้รวบรวมข้อมูลการทำงานและรายงานข้อผิดพลาดแบบไม่ระบุตัวตน (ไม่บังคับ)';
+        return 'ฉันยินยอมให้รวบรวมข้อมูลการทำงานและรายงานข้อผิดพลาดแบบไม่ระบุตัวตน (จำเป็น)';
       case 'vi':
-        return 'Tôi đồng ý gửi dữ liệu ẩn danh và báo cáo sự cố để nâng cao trải nghiệm ứng dụng. (Tùy chọn)';
+        return 'Tôi đồng ý gửi dữ liệu ẩn danh và báo cáo sự cố để nâng cao trải nghiệm ứng dụng. (Bắt buộc)';
       case 'en':
       default:
-        return 'I agree to anonymous telemetry and crash reports (PostHog EU) to improve app stability. (Optional)';
+        return 'I agree to anonymous telemetry and crash reports (PostHog EU) to improve app stability. (Required)';
     }
   }
+
+  static String getMandatoryAnalyticsCheckbox(String? lang) =>
+      getOptionalAnalyticsCheckbox(lang);
 
   // --- Buttons ---
   static String getAcceptButton(String? lang) {

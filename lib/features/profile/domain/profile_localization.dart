@@ -1691,7 +1691,7 @@ class ProfileLocalization {
       case 'tr': return 'Kullanıcı Adı (Buddy ID)';
       case 'de': return 'Benutzername (Buddy-ID)';
       case 'es': return 'Nombre de usuario';
-      case 'fr': return 'Nom d\'utilisateur';
+      case 'fr': return "Nom d'utilisateur";
       case 'it': return 'Nome utente';
       case 'pt': return 'Nome de usuário';
       case 'ru': return 'Имя пользователя';
@@ -1699,6 +1699,15 @@ class ProfileLocalization {
       case 'ja': return 'ユーザー名 (Buddy ID)';
       case 'ko': return '사용자 이름 (Buddy ID)';
       case 'ar': return 'اسم المستخدم';
+      case 'hi': return 'उपयोगकर्ता नाम (Buddy ID)';
+      case 'nl': return 'Gebruikersnaam (Buddy-ID)';
+      case 'el': return 'Όνομα χρήστη (Buddy ID)';
+      case 'sv': return 'Användarnamn (Buddy-ID)';
+      case 'pl': return 'Nazwa użytkownika (Buddy ID)';
+      case 'id': return 'Nama Pengguna (Buddy ID)';
+      case 'th': return 'ชื่อผู้ใช้ (Buddy ID)';
+      case 'vi': return 'Tên người dùng (Buddy ID)';
+      case 'en':
       default: return 'Username (Buddy ID)';
     }
   }
@@ -1716,6 +1725,15 @@ class ProfileLocalization {
       case 'ja': return 'traveler_name (3-20文字)';
       case 'ko': return 'traveler_name (3-20자)';
       case 'ar': return 'traveler_name (3-20 حرف)';
+      case 'hi': return 'traveler_name (3-20 अक्षर)';
+      case 'nl': return 'voorbeeld_reiziger (3-20 tekens)';
+      case 'el': return 'paradeigma_taksidioti (3-20 χαρακτήρες)';
+      case 'sv': return 'exempel_resenar (3-20 tecken)';
+      case 'pl': return 'przyklad_podroznik (3-20 znaków)';
+      case 'id': return 'contoh_pelancong (3-20 karakter)';
+      case 'th': return 'traveler_name (3-20 ตัวอักษร)';
+      case 'vi': return 'traveler_name (3-20 ký tự)';
+      case 'en':
       default: return 'traveler_name (3-20 characters)';
     }
   }
@@ -1729,6 +1747,19 @@ class ProfileLocalization {
       case 'it': return 'I tuoi amici possono cercarti e aggiungerti con questo nome';
       case 'pt': return 'Seus amigos podem procurar e adicionar você por este nome';
       case 'ru': return 'Друзья смогут найти вас по этому имени';
+      case 'zh': return '好友可以通过此用户名搜索并添加您';
+      case 'ja': return '友達はこの名前であなたを検索して追加できます';
+      case 'ko': return '친구들이 이 이름으로 당신을 찾아 추가할 수 있습니다';
+      case 'hi': return 'मित्र आपको इस नाम से खोज और जोड़ सकते हैं';
+      case 'ar': return 'يمكن لأصدقائك البحث عنك وإضافتك بهذا الاسم';
+      case 'nl': return 'Vrienden kunnen je met deze naam zoeken en toevoegen';
+      case 'el': return 'Οι φίλοι σας μπορούν να σας αναζητήσουν με αυτό το όνομα';
+      case 'sv': return 'Vänner kan söka efter och lägga till dig med detta namn';
+      case 'pl': return 'Znajomi mogą Cię wyszukać i dodać pod tą nazwą';
+      case 'id': return 'Teman dapat mencari dan menambahkan Anda dengan nama ini';
+      case 'th': return 'เพื่อนสามารถค้นหาและเพิ่มคุณด้วยชื่อนี้ได้';
+      case 'vi': return 'Bạn bè có thể tìm kiếm và thêm bạn bằng tên này';
+      case 'en':
       default: return 'Friends can find and add you with this unique handle';
     }
   }
@@ -1738,7 +1769,23 @@ class ProfileLocalization {
       case 'tr': return 'Yalnızca küçük harf, rakam ve alt çizgi (3-20 karakter)';
       case 'de': return 'Nur Kleinbuchstaben, Zahlen und Unterstriche (3-20 Zeichen)';
       case 'es': return 'Solo minúsculas, números y guión bajo (3-20 caracteres)';
-      case 'fr': return 'Uniquement lettres minuscules, chiffres et tirets bas';
+      case 'fr': return 'Uniquement lettres minuscules, chiffres et tirets bas (3-20 caractères)';
+      case 'it': return 'Solo lettere minuscole, numeri e trattini bassi (3-20 caratteri)';
+      case 'pt': return 'Apenas letras minúsculas, números e sublinhado (3-20 caracteres)';
+      case 'ru': return 'Только строчные буквы, цифры и подчеркивание (3-20 символов)';
+      case 'zh': return '仅限小写字母、数字和下划线 (3-20字符)';
+      case 'ja': return '英小文字、数字、アンダースコアのみ (3-20文字)';
+      case 'ko': return '영문 소문자, 숫자, 밑줄만 사용 가능 (3-20자)';
+      case 'hi': return 'केवल छोटे अक्षर, संख्याएं और अंडरस्कोर (3-20 अक्षर)';
+      case 'ar': return 'أحرف صغيرة وأرقام وشرطة سفلية فقط (3-20 حرفًا)';
+      case 'nl': return 'Alleen kleine letters, cijfers en liggende streepjes (3-20 tekens)';
+      case 'el': return 'Μόνο πεζά γράμματα, αριθμοί και κάτω παύλα (3-20 χαρακτήρες)';
+      case 'sv': return 'Endast gemener, siffror och understreck (3-20 tecken)';
+      case 'pl': return 'Tylko małe litery, cyfry i podkreślenia (3-20 znaków)';
+      case 'id': return 'Hanya huruf kecil, angka, dan garis bawah (3-20 karakter)';
+      case 'th': return 'เฉพาะตัวพิมพ์เล็ก ตัวเลข และขีดล่างเท่านั้น (3-20 ตัวอักษร)';
+      case 'vi': return 'Chỉ chữ thường, số và dấu gạch dưới (3-20 ký tự)';
+      case 'en':
       default: return 'Only lowercase letters, numbers, and underscore (3-20 chars)';
     }
   }
@@ -1755,7 +1802,16 @@ class ProfileLocalization {
       case 'zh': return '当前旅行状态';
       case 'ja': return '現在の旅行ステータス';
       case 'ko': return '현재 여행 상태';
+      case 'hi': return 'वर्तमान यात्रा स्थिति';
       case 'ar': return 'حالة السفر الحالية';
+      case 'nl': return 'Huidige reisstatus';
+      case 'el': return 'Τρέχουσα ταξιδιωτική κατάσταση';
+      case 'sv': return 'Aktuell resestatus';
+      case 'pl': return 'Aktualny status podróży';
+      case 'id': return 'Status Perjalanan Saat Ini';
+      case 'th': return 'สถานะการเดินทางปัจจุบัน';
+      case 'vi': return 'Trạng thái du lịch hiện tại';
+      case 'en':
       default: return 'Travel Status';
     }
   }
@@ -1766,6 +1822,22 @@ class ProfileLocalization {
       case 'de': return 'Z. B.: Koffer packen für Rom 🧳';
       case 'es': return 'Ej.: Preparando maleta para Roma 🧳';
       case 'fr': return 'Ex : En train de faire les bagages 🧳';
+      case 'it': return 'Es.: Facendo i bagagli per Roma 🧳';
+      case 'pt': return 'Ex.: Arrumando as malas para Roma 🧳';
+      case 'ru': return 'Напр.: Собираю чемодан в Рим 🧳';
+      case 'zh': return '例如：正在收拾去罗马的行李 🧳';
+      case 'ja': return '例: ローマ行きの荷造り中 🧳';
+      case 'ko': return '예: 로마 여행 짐 싸는 중 🧳';
+      case 'hi': return 'उदा: रोम के लिए बैग पैक कर रहे हैं 🧳';
+      case 'ar': return 'مثال: أحزم الأمتعة لروما 🧳';
+      case 'nl': return 'Bijv.: Koffer inpakken voor Rome 🧳';
+      case 'el': return 'Π.χ.: Ετοιμάζω βαλίτσες για Ρώμη 🧳';
+      case 'sv': return 'T.ex.: Packar resväskan för Rom 🧳';
+      case 'pl': return 'Np.: Pakuję walizkę do Rzymu 🧳';
+      case 'id': return 'Contoh: Sedang berkemas untuk ke Roma 🧳';
+      case 'th': return 'เช่น: กำลังจัดกระเป๋าไปโรม 🧳';
+      case 'vi': return 'Ví dụ: Đang chuẩn bị hành lý đi Rome 🧳';
+      case 'en':
       default: return 'E.g.: Packing for Rome 🧳';
     }
   }
@@ -1782,7 +1854,16 @@ class ProfileLocalization {
       case 'zh': return '我的旅行风格';
       case 'ja': return '旅行スタイル';
       case 'ko': return '내 여행 스타일';
+      case 'hi': return 'मेरी यात्रा शैली';
       case 'ar': return 'أسلوب سفري';
+      case 'nl': return 'Mijn reisstijl';
+      case 'el': return 'Το ταξιδιωτικό μου στιλ';
+      case 'sv': return 'Min resestil';
+      case 'pl': return 'Mój styl podróżowania';
+      case 'id': return 'Gaya Perjalanan Saya';
+      case 'th': return 'สไตล์การเดินทางของฉัน';
+      case 'vi': return 'Phong cách du lịch của tôi';
+      case 'en':
       default: return 'Travel Style';
     }
   }
@@ -1792,7 +1873,23 @@ class ProfileLocalization {
       case 'tr': return 'Sizi en iyi tanımlayan en fazla 3 tarz seçin';
       case 'de': return 'Wähle bis zu 3 Stile, die dich am besten beschreiben';
       case 'es': return 'Elige hasta 3 estilos que mejor te describan';
-      case 'fr': return 'Choisissez jusqu\'à 3 styles qui vous correspondent';
+      case 'fr': return "Choisissez jusqu'à 3 styles qui vous correspondent";
+      case 'it': return 'Scegli fino a 3 stili che ti descrivono al meglio';
+      case 'pt': return 'Escolha até 3 estilos que melhor descrevem você';
+      case 'ru': return 'Выберите до 3 стилей, которые лучше всего вас описывают';
+      case 'zh': return '选择最多3个最能代表您的旅行风格';
+      case 'ja': return 'あなたに最も当てはまるスタイルを3つまで選択してください';
+      case 'ko': return '자신을 가장 잘 나타내는 스타일을 최대 3개 선택하세요';
+      case 'hi': return 'अधिकतम 3 शैलियों का चयन करें जो आपका सबसे अच्छा वर्णन करती हैं';
+      case 'ar': return 'اختر ما يصل إلى 3 أساليب تصفك بأفضل شكل';
+      case 'nl': return 'Kies maximaal 3 stijlen die jou het best omschrijven';
+      case 'el': return 'Επιλέξτε έως 3 στιλ που σας ταιριάζουν καλύτερα';
+      case 'sv': return 'Välj upp till 3 stilar som bäst beskriver dig';
+      case 'pl': return 'Wybierz do 3 stylów najlepiej opisujących Twój sposób podróżowania';
+      case 'id': return 'Pilih hingga 3 gaya yang paling menggambarkan Anda';
+      case 'th': return 'เลือกได้สูงสุด 3 สไตล์ที่อธิบายความเป็นคุณได้ดีที่สุด';
+      case 'vi': return 'Chọn tối đa 3 phong cách mô tả đúng nhất về bạn';
+      case 'en':
       default: return 'Select up to 3 tags that describe your travel style';
     }
   }

@@ -26,7 +26,12 @@ class AirlineFarePackage {
 
   String getLocalizedDescription(String langCode) {
     final code = langCode.toLowerCase();
-    if (code.startsWith('tr')) return description;
+    if (code.startsWith('tr')) {
+      final personalKg = personalItemLimitKg > 0 ? '${personalItemLimitKg.toInt()} kg' : 'koltuk altı';
+      final cabinKg = cabinLimitKg > 0 ? '${cabinLimitKg.toInt()} kg' : '0 kg';
+      final checkedKg = checkedLimitKg > 0 ? '${checkedLimitKg.toInt()} kg' : '0 kg';
+      return '$name: Kişisel ($personalKg) • Kabin ($cabinKg) • Uçak Altı ($checkedKg)';
+    }
 
     final cabinKg = cabinLimitKg > 0 ? '${cabinLimitKg.toInt()} kg' : '0 kg';
     final checkedKg = checkedLimitKg > 0 ? '${checkedLimitKg.toInt()} kg' : '0 kg';
@@ -298,6 +303,17 @@ class AirlineBaggageRule {
     final isIt = code.startsWith('it');
     final isPt = code.startsWith('pt');
     final isNl = code.startsWith('nl');
+    final isZh = code.startsWith('zh');
+    final isJa = code.startsWith('ja');
+    final isKo = code.startsWith('ko');
+    final isAr = code.startsWith('ar');
+    final isHi = code.startsWith('hi');
+    final isSv = code.startsWith('sv');
+    final isPl = code.startsWith('pl');
+    final isId = code.startsWith('id');
+    final isTh = code.startsWith('th');
+    final isVi = code.startsWith('vi');
+    final isEl = code.startsWith('el');
 
     // Custom tiered rules for ultra-low-cost & specific carriers
     switch (iataCode) {
@@ -306,7 +322,14 @@ class AirlineBaggageRule {
         if (isDe) return '1 Handgepäck (8 kg) + 1 persönlicher Gegenstand (40x30x15 cm). Economy Aufgabegepäck 23 kg.';
         if (isFr) return '1 bagage cabine (8 kg) + 1 accessoire (40x30x15 cm). Bagage en soute Economy 23 kg.';
         if (isEs) return '1 equipaje de mano (8 kg) + 1 artículo personal (40x30x15 cm). Equipaje facturado Economy 23 kg.';
+        if (isIt) return '1 bagaglio a mano (8 kg) + 1 accessorio personale (40x30x15 cm). Bagaglio in stiva Economy 23 kg.';
+        if (isPt) return '1 bagagem de cabine (8 kg) + 1 item pessoal (40x30x15 cm). Bagagem de porão Economy 23 kg.';
+        if (isNl) return '1 handbagage (8 kg) + 1 persoonlijk item (40x30x15 cm). Economy ruimbagage 23 kg.';
         if (isRu) return '1 место ручной клади (8 кг) + 1 личная вещь (40x30x15 см). Багаж эконом-класса 23 кг.';
+        if (isZh) return '1件随身行李 (8 kg) + 1件个人物品 (40x30x15 cm)。经济舱托运行李 23 kg。';
+        if (isJa) return '機内持ち込み手荷物1個 (8 kg) + 身の回り品1個 (40x30x15 cm)。エコノミー受託手荷物 23 kg。';
+        if (isKo) return '기내 수하물 1개 (8 kg) + 개인 소지품 1개 (40x30x15 cm). 이코노미 위탁 수하물 23 kg.';
+        if (isAr) return 'حقيبة مقصورة واحدة (8 كجم) + حقيبة شخصية (40x30x15 سم). أمتعة شحن الدرجة السياحية 23 كجم.';
         return '1 cabin bag (8 kg) + 1 personal item (40x30x15 cm). Economy checked bag 23 kg.';
 
       case 'PC':
@@ -314,6 +337,9 @@ class AirlineBaggageRule {
         if (isDe) return 'Super Eco: 1 Unter-Sitz-Tasche (40x30x15 cm, 3 kg). Ab Vorteil: 8 kg Handgepäck + 20 kg Aufgabegepäck.';
         if (isFr) return 'Super Eco: 1 bagage sous siège (40x30x15 cm, 3 kg). À partir d\'Avantage: 8 kg cabine + 20 kg en soute.';
         if (isEs) return 'Super Eco: 1 bolso bajo el asiento (40x30x15 cm, 3 kg). Advantage y superior: 8 kg cabina + 20 kg facturado.';
+        if (isIt) return 'Super Eco: 1 borsa sotto il sedile (40x30x15 cm, 3 kg). Da Advantage in su: 8 kg cabina + 20 kg stiva.';
+        if (isPt) return 'Super Eco: 1 mala sob o assento (40x30x15 cm, 3 kg). A partir de Advantage: 8 kg cabine + 20 kg porão.';
+        if (isNl) return 'Super Eco: 1 tas onder de stoel (40x30x15 cm, 3 kg). Vanaf Advantage: 8 kg handbagage + 20 kg ruimbagage.';
         if (isRu) return 'Супер Эко: 1 сумка под сиденье (40x30x15 см, 3 кг). От Advantage: 8 кг ручная кладь + 20 кг багаж.';
         return 'Super Eco: 1 underseat bag (40x30x15 cm, 3 kg). Advantage & above: 8 kg cabin bag + 20 kg checked bag.';
 
@@ -322,6 +348,8 @@ class AirlineBaggageRule {
         if (isDe) return '1 Handgepäck (8 kg) + 1 Handtasche (40x30x15 cm, 4 kg). Inländisch 15-20 kg Aufgabegepäck.';
         if (isFr) return '1 bagage cabine (8 kg) + 1 sac à main (40x30x15 cm, 4 kg). Vols intérieurs 15-20 kg en soute.';
         if (isEs) return '1 equipaje de mano (8 kg) + 1 bolso de mano (40x30x15 cm, 4 kg). Facturado nacional 15-20 kg.';
+        if (isIt) return '1 bagaglio a mano (8 kg) + 1 borsetta (40x30x15 cm, 4 kg). Voli nazionali 15-20 kg in stiva.';
+        if (isPt) return '1 bagagem de cabine (8 kg) + 1 bolsa (40x30x15 cm, 4 kg). Voos domésticos 15-20 kg de porão.';
         if (isRu) return '1 место ручной клади (8 кг) + 1 сумочка (40x30x15 см, 4 кг). Внутренние рейсы 15-20 кг багаж.';
         return '1 cabin bag (8 kg) + 1 handbag (40x30x15 cm, 4 kg). Domestic 15-20 kg checked bag.';
 
@@ -330,6 +358,8 @@ class AirlineBaggageRule {
         if (isDe) return '1 Handgepäck (8 kg). Inlandsflüge 15-20 kg, internationale Flüge 20-30 kg.';
         if (isFr) return '1 bagage cabine (8 kg). Vols intérieurs 15-20 kg, vols internationaux 20-30 kg.';
         if (isEs) return '1 equipaje de mano (8 kg). Nacional 15-20 kg, vuelos internacionales 20-30 kg.';
+        if (isIt) return '1 bagaglio a mano (8 kg). Nazionali 15-20 kg, internazionali 20-30 kg.';
+        if (isPt) return '1 bagagem de cabine (8 kg). Voos domésticos 15-20 kg, internacionais 20-30 kg de porão.';
         if (isRu) return '1 место ручной клади (8 кг). Внутренние рейсы 15-20 кг, международные 20-30 кг.';
         return '1 cabin bag (8 kg). Domestic 15-20 kg, international 20-30 kg checked baggage.';
 
@@ -338,7 +368,21 @@ class AirlineBaggageRule {
         if (isDe) return '1 Handgepäck (8 kg) inklusive. Aufgabegepäck je nach Tarif 20-32 kg.';
         if (isFr) return '1 bagage cabine (8 kg) inclus. Bagage en soute selon tarif 20-32 kg.';
         if (isEs) return '1 equipaje de cabina (8 kg) incluido. Equipaje facturado según tarifa 20-32 kg.';
+        if (isIt) return '1 bagaglio a mano (8 kg) incluso. Bagaglio da stiva 20-32 kg a seconda della tariffa.';
+        if (isPt) return '1 bagagem de cabine (8 kg) incluída. A bagagem de porão varia entre 20-32 kg consoante a tarifa.';
+        if (isNl) return '1 stuk handbagage (8 kg) inbegrepen. Ruimbagage varieert tussen 20-32 kg afhankelijk van het tarief.';
         if (isRu) return '1 место ручной клади (8 кг) включено. Багаж от 20 до 32 кг в зависимости от тарифа.';
+        if (isZh) return '包含1件随身行李 (8 kg)。托运行李根据票价在 20-32 kg 之间。';
+        if (isJa) return '機内持ち込み手荷物1個 (8 kg) を含む。受託手荷物は運賃により 20-32 kg。';
+        if (isKo) return '기내 수하물 1개 (8 kg) 포함. 위탁 수하물은 운임에 따라 20-32 kg 사이입니다.';
+        if (isAr) return 'حقيبة مقصورة واحدة (8 كجم) مشمولة. تختلف أمتعة الشحن بين 20-32 كجم حسب نوع التذكرة.';
+        if (isEl) return 'Περιλαμβάνεται 1 χειραποσκευή (8 kg). Παραδοτέα αποσκευή 20-32 kg ανάλογα με τον ναύλο.';
+        if (isPl) return '1 sztuka bagażu podręcznego (8 kg) w cenie. Bagaż rejestrowany 20-32 kg zależnie od taryfy.';
+        if (isSv) return '1 handbagage (8 kg) ingår. Incheckat bagage varierar mellan 20-32 kg beroende på biljettyp.';
+        if (isId) return '1 bagasi kabin (8 kg) sudah termasuk. Bagasi terdaftar 20-32 kg tergantung tarif.';
+        if (isTh) return 'รวมกระเป๋าถือขึ้นเครื่อง 1 ใบ (8 kg) สัมภาระโหลดใต้เครื่อง 20-32 kg ตามประเภทบัตรโดยสาร';
+        if (isVi) return 'Bao gồm 1 kiện hành lý xách tay (8 kg). Hành lý ký gửi 20-32 kg tùy theo hạng vé.';
+        if (isHi) return '1 केबिन बैग (8 kg) शामिल। चेक-इन बैगेज किराए के आधार पर 20-32 kg के बीच होता है।';
         return '1 cabin bag (8 kg) included. Checked baggage varies between 20-32 kg depending on fare.';
 
       case 'FR':
@@ -346,6 +390,9 @@ class AirlineBaggageRule {
         if (isDe) return 'Standard: nur 1 kleine Unter-Sitz-Tasche (40x25x20 cm). Mit Priority zusätzlich 10 kg Handgepäck.';
         if (isFr) return 'Tarif standard: 1 petit sac sous le siège (40x25x20 cm). Priority ajoute 10 kg en cabine.';
         if (isEs) return 'Billete estándar: 1 bolso bajo el asiento (40x25x20 cm). Con Priority se añade maleta de 10 kg.';
+        if (isIt) return 'Tariffa standard: solo 1 borsa sotto il sedile (40x25x20 cm). Priority aggiunge 10 kg in cabina.';
+        if (isPt) return 'Bilhete standard: apenas 1 mala sob o assento (40x25x20 cm). Priority inclui mala de cabine de 10 kg.';
+        if (isNl) return 'Standaardtarief: alleen 1 tas onder de stoel (40x25x20 cm). Priority voegt 10 kg handbagage toe.';
         if (isRu) return 'Стандарт: 1 сумка под сиденье (40x25x20 см). Приоритет добавляет 10 кг на багажную полку.';
         return 'Standard ticket: 1 small underseat bag (40x25x20 cm). Priority adds 10 kg overhead locker bag.';
 
@@ -354,6 +401,8 @@ class AirlineBaggageRule {
         if (isDe) return 'Kostenlos 1 Unter-Sitz-Tasche (40x30x20 cm, 10 kg). Mit WIZZ Priority 10 kg Trolley-Handgepäck.';
         if (isFr) return 'Gratuit: 1 sac sous le siège (40x30x20 cm, 10 kg). Avec WIZZ Priority: 1 bagage trolley de 10 kg.';
         if (isEs) return 'Gratis: 1 bolso bajo el asiento (40x30x20 cm, 10 kg). WIZZ Priority añade maleta con ruedas de 10 kg.';
+        if (isIt) return 'Gratis: 1 borsa sotto il sedile (40x30x20 cm, 10 kg). WIZZ Priority aggiunge trolley da 10 kg.';
+        if (isPt) return 'Grátis: 1 mala sob o assento (40x30x20 cm, 10 kg). WIZZ Priority inclui trolley de cabine de 10 kg.';
         if (isRu) return 'Бесплатно: 1 сумка под сиденье (40x30x20 см, 10 кг). WIZZ Priority добавляет 10 кг сумку на колесах.';
         return 'Free 1 underseat bag (40x30x20 cm, 10 kg). WIZZ Priority adds 10 kg trolley cabin bag.';
 
@@ -362,6 +411,8 @@ class AirlineBaggageRule {
         if (isDe) return 'Standard: 1 Unter-Sitz-Tasche (max. 15 kg). Großes Handgepäck erfordert Speedy Boarding.';
         if (isFr) return 'Tarif standard: 1 sac sous le siège (max 15 kg). Grand bagage cabine avec Speedy Boarding.';
         if (isEs) return 'Estándar: 1 bolso bajo el asiento (máx 15 kg). Equipaje de cabina grande con Speedy Boarding.';
+        if (isIt) return 'Standard: 1 borsa sotto il sedile (max 15 kg). Bagaglio a mano grande con Speedy Boarding.';
+        if (isPt) return 'Bilhete standard: 1 mala sob o assento (máx 15 kg). Mala de cabine grande requer Speedy Boarding.';
         if (isRu) return 'Стандарт: сумка под сиденье (до 15 кг). Большой багаж требует Speedy Boarding.';
         return 'Standard ticket: 1 underseat bag (max 15 kg). Large cabin bag requires Speedy Boarding or extra legroom.';
 
@@ -370,6 +421,8 @@ class AirlineBaggageRule {
         if (isDe) return '1 Handgepäck (61x40x25 cm) + 1 persönlicher Gegenstand. 2 kostenlose Aufgabegepäckstücke bis je 23 kg!';
         if (isFr) return '1 bagage cabine (61x40x25 cm) + 1 accessoire. Avantage unique: 2 bagages en soute gratuits de 23 kg!';
         if (isEs) return '1 equipaje de mano (61x40x25 cm) + 1 artículo personal. ¡2 maletas facturadas gratis de hasta 23 kg cada una!';
+        if (isIt) return '1 bagaglio a mano (61x40x25 cm) + 1 accessorio. 2 bagagli in stiva gratuiti fino a 23 kg ciascuno!';
+        if (isPt) return '1 mala de cabine (61x40x25 cm) + 1 item pessoal. Vantagem única: 2 malas de porão grátis de até 23 kg cada!';
         if (isRu) return '1 ручная кладь (61x40x25 см) + 1 личная вещь. 2 бесплатных места багажа до 23 кг каждое!';
         return '1 carry-on bag (61x40x25 cm) + 1 personal item. Unique benefit: 2 free checked bags up to 23 kg (50 lbs) each!';
 
@@ -378,7 +431,9 @@ class AirlineBaggageRule {
         if (isDe) return 'Inklusive: 1 persönlicher Gegenstand (45x35x20 cm). Handgepäck und Aufgabegepäck (18 kg) gebührenpflichtig.';
         if (isFr) return 'Inclus: 1 accessoire personnel (45x35x20 cm). Bagage cabine et soute (18 kg) payants.';
         if (isEs) return 'Incluido: 1 artículo personal (45x35x20 cm). Equipaje de mano y facturado (18 kg) de pago.';
-        if (isRu) return 'Включено: 1 личная вещь (45x35x20 см). Ручная кладь и багаж (18 кг) оплачиваются отдельно.';
+        if (isIt) return 'Incluso: 1 accessorio personale (45x35x20 cm). Bagaglio a mano e da stiva (18 kg) a pagamento.';
+        if (isPt) return 'Incluído: 1 item pessoal (45x35x20 cm). Mala de cabine superior e porão (18 kg) mediante taxa.';
+        if (isRu) return 'Включено: 1 личная вещь (45x35x20 см). Ручная кладь и багаж (18 kg) оплачиваются отдельно.';
         return 'Included: 1 personal item (45x35x20 cm). Overhead carry-on and checked bags (18 kg / 40 lbs) require fee.';
 
       case 'B6':
@@ -386,6 +441,8 @@ class AirlineBaggageRule {
         if (isDe) return 'Blue-Tarife: 1 Handgepäck (10 kg) + 1 persönlicher Gegenstand. 23 kg Aufgabegepäck. Blue Basic nur persönlicher Gegenstand.';
         if (isFr) return 'Tarifs Blue: 1 bagage cabine (10 kg) + 1 accessoire. Soute 23 kg. Blue Basic uniquement accessoire.';
         if (isEs) return 'Tarifas Blue: 1 equipaje de mano (10 kg) + 1 artículo personal. Facturado 23 kg. Blue Basic solo artículo personal.';
+        if (isIt) return 'Tariffe Blue: 1 bagaglio a mano (10 kg) + 1 accessorio personale. Stiva 23 kg. Blue Basic solo accessorio personale.';
+        if (isPt) return 'Tarifas Blue incluem 1 mala de mão (10 kg, 56x35x23 cm) + 1 item pessoal. Porão 23 kg. Blue Basic apenas item pessoal.';
         return 'Blue fares include 1 carry-on (10 kg, 56x35x23 cm) + 1 personal item. Checked bag 23 kg. Blue Basic includes personal item only.';
 
       case 'BA':
@@ -393,6 +450,8 @@ class AirlineBaggageRule {
         if (isDe) return '1 Handgepäck (23 kg) + 1 Hand-/Laptoptasche (40x30x15 cm, 23 kg). Aufgabegepäck 23 kg.';
         if (isFr) return '1 bagage cabine (23 kg) + 1 sac à main/ordinateur (40x30x15 cm, 23 kg). Soute 23 kg.';
         if (isEs) return '1 maleta de cabina (23 kg) + 1 bolso para portátil (40x30x15 cm, 23 kg). Facturado 23 kg.';
+        if (isIt) return '1 bagaglio a mano (23 kg) + 1 borsa per laptop (40x30x15 cm, 23 kg). Stiva 23 kg.';
+        if (isPt) return '1 mala de cabine (23 kg) + 1 bolsa/computador (40x30x15 cm, 23 kg). Porão 23 kg.';
         if (isRu) return '1 место ручной клади (23 кг) + 1 ноутбук/сумка (40x30x15 см, 23 кг). Багаж 23 кг.';
         return 'Generous allowance: 1 cabin bag (23 kg) + 1 handbag/laptop bag (40x30x15 cm, 23 kg). Checked bag 23 kg.';
 
@@ -403,27 +462,35 @@ class AirlineBaggageRule {
         if (isDe) return '1 Handgepäck + 1 Zubehör mit Gesamtgewicht bis 12 kg. Aufgabegepäck 23 kg.';
         if (isFr) return '1 bagage cabine + 1 accessoire d\'un poids combiné max de 12 kg. Soute 23 kg.';
         if (isEs) return '1 equipaje de cabina + 1 accesorio con peso combinado de hasta 12 kg. Facturado 23 kg.';
+        if (isIt) return '1 bagaglio a mano + 1 accessorio con peso combinato fino a 12 kg. Stiva 23 kg.';
+        if (isPt) return '1 mala de cabine + 1 acessório com peso total combinado até 12 kg. Bagagem de porão 23 kg.';
         if (isRu) return '1 сумка + 1 аксессуар общим весом до 12 кг. Сдаваемый багаж 23 кг.';
         return '1 cabin bag + 1 personal accessory with combined weight up to 12 kg. Checked bag 23 kg.';
 
       case 'SK':
         if (isTr) return 'SAS Go: 8 kg kabin bagajı (55x40x23 cm) + 1 kişisel eşya + 23 kg kayıtlı bagaj. SAS Go Light sadece koltuk altı çantası.';
         if (isDe) return 'SAS Go: 8 kg Handgepäck + 1 persönlicher Gegenstand + 23 kg Aufgabegepäck. Go Light nur Unter-Sitz-Tasche.';
+        if (isPt) return 'SAS Go: 8 kg cabine + 1 item pessoal + 23 kg porão. SAS Go Light apenas mala sob o assento.';
+        if (isSv) return 'SAS Go: 8 kg kabinväska + 1 personlig sak + 23 kg incheckat. Go Light endast underseat.';
         return 'SAS Go: 8 kg cabin bag + 1 personal item + 23 kg checked bag. SAS Go Light includes underseat bag only.';
 
       case 'AY':
         if (isTr) return 'Superlight: 1 koltuk altı çantası (40x30x15 cm). Light ve Classic: 1 kabin bagajı + kişisel eşya (kombine 8 kg) + 23 kg kayıtlı.';
         if (isDe) return 'Superlight: 1 Unter-Sitz-Tasche. Light/Classic: Handgepäck + Zubehör (kombiniert 8 kg) + 23 kg Aufgabe.';
+        if (isPt) return 'Superlight: mala sob o assento. Light & Classic: 1 cabine + item pessoal (total 8 kg) + 23 kg porão.';
         return 'Superlight: 1 underseat bag. Light & Classic: 1 cabin bag + personal item (combined 8 kg) + 23 kg checked.';
 
       case 'VY':
         if (isTr) return 'Temel bilet: 1 koltuk altı çantası (40x30x20 cm). TimeFlex veya ilave hak ile 10 kg kabin bagajı (55x40x20 cm).';
         if (isDe) return 'Basic: 1 Unter-Sitz-Tasche (40x30x20 cm). TimeFlex: + 10 kg Handgepäck (55x40x20 cm).';
+        if (isEs) return 'Básico: 1 bolso bajo el asiento (40x30x20 cm). TimeFlex: + 10 kg equipaje de cabina (55x40x20 cm).';
+        if (isPt) return 'Basic: 1 mala sob o assento (40x30x20 cm). TimeFlex: + 10 kg mala de cabine (55x40x20 cm).';
         return 'Basic: 1 underseat bag (40x30x20 cm). TimeFlex: + 10 kg cabin bag (55x40x20 cm).';
 
       case 'DY':
         if (isTr) return 'LowFare: 1 koltuk altı çantası (38x30x20 cm, 10 kg). LowFare+: 1 baş üstü kabin çantası (55x40x23 cm, 10 kg) + 23 kg kayıtlı.';
         if (isDe) return 'LowFare: 1 Unter-Sitz-Tasche (10 kg). LowFare+: + 1 Handgepäck (55x40x23 cm, 10 kg) + 23 kg Aufgabe.';
+        if (isPt) return 'LowFare: 1 mala sob o assento (10 kg). LowFare+: 1 mala de cabine (10 kg) + 23 kg porão.';
         return 'LowFare: 1 underseat bag (10 kg). LowFare+: + 1 overhead cabin bag (55x40x23 cm, 10 kg) + 23 kg checked.';
 
       case 'NH':
@@ -432,12 +499,16 @@ class AirlineBaggageRule {
         if (isDe) return '1 Handgepäck ($cabinDimensions, max. 10 kg kombiniert) + 1 Zubehör. 2 x 23 kg Freigepäck in Economy!';
         if (isFr) return '1 bagage cabine ($cabinDimensions, 10 kg combiné) + 1 accessoire. 2 x 23 kg en soute gratuits en classe Éco!';
         if (isEs) return '1 equipaje de mano ($cabinDimensions, 10 kg combinado) + 1 accesorio. ¡2 x 23 kg facturados gratis en turista!';
+        if (isIt) return '1 bagaglio a mano ($cabinDimensions, 10 kg combinato) + 1 accessorio. 2 x 23 kg in stiva gratuiti in Economy!';
+        if (isPt) return '1 mala de mão ($cabinDimensions, 10 kg combinados) + 1 acessório. 2 x 23 kg de porão grátis em Econômica!';
+        if (isJa) return '機内持ち込み手荷物1個 ($cabinDimensions, 合計10kg) + 身の回り品。エコノミーで無料受託手荷物 2 x 23 kg！';
         if (isRu) return '1 место ручной клади ($cabinDimensions, 10 кг вместе с личной вещью). 2 x 23 кг бесплатного багажа!';
         return '1 carry-on ($cabinDimensions, 10 kg combined) + 1 personal item. Generous 2 x 23 kg free checked bags in Economy!';
 
       case 'ET':
         if (isTr) return '1 adet 7 kg kabin bagajı + 1 kişisel eşya. Uluslararası rotalarda ekonomi sınıfı için 2 x 23 kg kayıtlı bagaj.';
         if (isDe) return '1 Handgepäck (7 kg) + 1 Zubehör. 2 x 23 kg Aufgabegepäck auf internationalen Flügen in Economy.';
+        if (isPt) return '1 bagagem de cabine (7 kg) + 1 item pessoal. 2 x 23 kg de bagagem de porão em voos internacionais.';
         return '1 cabin bag (7 kg) + 1 personal item. 2 x 23 kg checked baggage allowance on international economy routes.';
 
       case 'TG':
@@ -445,43 +516,56 @@ class AirlineBaggageRule {
         if (isDe) return '1 Handgepäck (7 kg) + 1 persönlicher Gegenstand (3 kg). Saver 20 kg, Standard 30 kg, Flexi 35 kg.';
         if (isFr) return '1 bagage cabine (7 kg) + 1 accessoire (3 kg). Saver 20 kg, Standard 30 kg, Flexi 35 kg en soute.';
         if (isEs) return '1 equipaje de cabina (7 kg) + 1 artículo personal (3 kg). Saver 20 kg, Standard 30 kg, Flexi 35 kg facturado.';
+        if (isPt) return '1 cabine (7 kg, 56x45x25 cm) + 1 item pessoal (3 kg). Saver 20 kg, Standard 30 kg, Flexi 35 kg porão.';
+        if (isTh) return 'ถือขึ้นเครื่อง 1 ใบ (7 kg, 56x45x25 ซม.) + ของใช้ส่วนตัว 1 ชิ้น (3 kg) โหลดใต้เครื่อง Saver 20 kg, Standard 30 kg, Flexi 35 kg';
         if (isRu) return '1 место ручной клади (7 кг) + 1 личная вещь (3 кг). Saver 20 кг, Standard 30 кг, Flexi 35 кг багаж.';
         return '1 cabin bag (7 kg, 56x45x25 cm) + 1 personal item (37.5x25x12.5 cm, 3 kg). Saver 20 kg, Standard 30 kg, Flexi 35 kg checked bag.';
 
       case 'MH':
         if (isTr) return '1 adet 7 kg kabin bagajı (56x36x23 cm) + 1 kişisel eşya (4 kg). Lite: 0 kg, Basic: 20 kg, Flex: 35 kg kayıtlı bagaj.';
         if (isDe) return '1 Handgepäck (7 kg) + 1 persönlicher Gegenstand (4 kg). Lite 0 kg, Basic 20 kg, Flex 35 kg.';
+        if (isPt) return '1 cabine (7 kg) + 1 item pessoal (4 kg). Lite: 0 kg, Basic: 20 kg, Flex: 35 kg porão.';
         return '1 cabin bag (7 kg) + 1 personal item (4 kg). Lite 0 kg, Basic 20 kg, Flex 35 kg checked bag.';
 
       case 'AK':
         if (isTr) return '1 kabin bagajı + 1 kişisel eşya (kombine toplam 7 kg, 56x36x23 cm). Value Pack & Flex: 20 kg kayıtlı bagaj.';
         if (isDe) return '1 Handgepäck + 1 persönlicher Gegenstand (kombiniert 7 kg). Value Pack & Flex: 20 kg Aufgabegepäck.';
+        if (isPt) return '1 cabine + 1 item pessoal (combinados 7 kg, 56x36x23 cm). Value Pack & Flex: 20 kg porão.';
         return '1 cabin bag + 1 personal item (combined 7 kg, 56x36x23 cm). Value Pack & Flex: 20 kg checked bag.';
 
       case 'AI':
         if (isTr) return '1 adet 7 kg kabin bagajı (55x35x25 cm) + 1 kişisel eşya (4 kg). Comfort 15 kg, Comfort Plus 20 kg, Flex 25 kg kayıtlı bagaj.';
         if (isDe) return '1 Handgepäck (7 kg) + 1 persönlicher Gegenstand. Comfort 15 kg, Comfort Plus 20 kg, Flex 25 kg.';
+        if (isPt) return '1 cabine (7 kg) + 1 item pessoal (4 kg). Comfort 15 kg, Comfort Plus 20 kg, Flex 25 kg porão.';
+        if (isHi) return '1 केबिन बैग (7 kg) + 1 व्यक्तिगत वस्तु (4 kg)। कम्फर्ट 15 kg, कम्फर्ट प्लस 20 kg, फ्लेक्स 25 kg चेक-इन।';
         return '1 cabin bag (7 kg) + 1 personal item (4 kg). Comfort 15 kg, Comfort Plus 20 kg, Flex 25 kg checked bag.';
 
       case 'FZ':
         if (isTr) return '1 adet 7 kg kabin bagajı (55x38x20 cm) + 1 kişisel eşya (3 kg). Lite 0 kg, Value 20 kg, Flex 30 kg kayıtlı bagaj.';
         if (isDe) return '1 Handgepäck (7 kg) + 1 persönlicher Gegenstand (3 kg). Lite 0 kg, Value 20 kg, Flex 30 kg.';
+        if (isPt) return '1 cabine (7 kg) + 1 item pessoal (3 kg). Lite 0 kg, Value 20 kg, Flex 30 kg porão.';
+        if (isAr) return 'حقيبة يد واحدة (7 كجم) + حقيبة شخصية (3 كجم). لايت 0 كجم، فاليو 20 كجم، فليكس 30 كجم شحن.';
         return '1 cabin bag (7 kg) + 1 personal item (3 kg). Lite 0 kg, Value 20 kg, Flex 30 kg checked bag.';
 
       case 'NZ':
         if (isTr) return '1 adet 7 kg kabin bagajı (118 cm) + 1 kişisel eşya (4 kg). Seat: 0 kg, Seat + Bag / Flexi: 23 kg kayıtlı bagaj.';
+        if (isPt) return '1 cabine (7 kg, 118 cm) + 1 item pessoal (4 kg). Seat: 0 kg, Seat + Bag / Flexi: 23 kg porão.';
         return '1 cabin bag (7 kg, 118 cm) + 1 personal item (4 kg). Seat: 0 kg, Seat + Bag / Flexi: 23 kg checked bag.';
 
       case 'RJ':
         if (isTr) return '1 adet 7 kg kabin bagajı (56x45x25 cm) + 1 kişisel eşya (4 kg). Light: 0 kg, Classic & Flex: 23 kg kayıtlı bagaj.';
+        if (isPt) return '1 cabine (7 kg) + 1 item pessoal (4 kg). Light: 0 kg, Classic & Flex: 23 kg porão.';
+        if (isAr) return 'حقيبة مقصورة واحدة (7 كجم) + حقيبة شخصية (4 كجم). لايت: 0 كجم، كلاسيك وفليكس: 23 كجم.';
         return '1 cabin bag (7 kg) + 1 personal item (4 kg). Light: 0 kg, Classic & Flex: 23 kg checked bag.';
 
       case 'MS':
         if (isTr) return '1 adet 8 kg kabin bagajı (55x40x23 cm) + 1 kişisel eşya. Good Deal: 23 kg, Fully Flexible: 2 x 23 kg kayıtlı bagaj.';
+        if (isPt) return '1 cabine (8 kg) + 1 item pessoal. Good Deal: 23 kg, Fully Flexible: 2 x 23 kg porão.';
+        if (isAr) return 'حقيبة مقصورة واحدة (8 كجم) + حقيبة شخصية. جود ديل: 23 كجم، فليكسيبل بالكامل: 2 × 23 كجم.';
         return '1 cabin bag (8 kg) + 1 personal item. Good Deal: 23 kg, Fully Flexible: 2 x 23 kg checked bag.';
     }
 
-    // Default dynamic localization for standard carriers
+    // Default dynamic localization across 20 languages
     final cabinKg = cabinLimitKg.toInt();
     final checkedKg = checkedLimitKg.toInt();
 
@@ -501,27 +585,27 @@ class AirlineBaggageRule {
       return '1 stuk handbagage ($cabinKg kg, $cabinDimensions) + 1 persoonlijk item ($personalItemDimensions). Ruimbagage $checkedKg kg.';
     } else if (isRu) {
       return '1 место ручной клади ($cabinKg кг, $cabinDimensions) + 1 личная вещь ($personalItemDimensions). Регистрируемый багаж $checkedKg кг.';
-    } else if (code.startsWith('zh')) {
+    } else if (isZh) {
       return '1件随身行李 ($cabinKg kg, $cabinDimensions) + 1件个人随身物品 ($personalItemDimensions)。标准托运行李 $checkedKg kg。';
-    } else if (code.startsWith('ja')) {
+    } else if (isJa) {
       return '機内持ち込み手荷物1個 ($cabinKg kg, $cabinDimensions) + 身の回り品1個 ($personalItemDimensions)。無料受託手荷物 $checkedKg kg。';
-    } else if (code.startsWith('ko')) {
+    } else if (isKo) {
       return '기내 수하물 1개 ($cabinKg kg, $cabinDimensions) + 개인 소지품 1개 ($personalItemDimensions). 일반 위탁 수하물 $checkedKg kg.';
-    } else if (code.startsWith('ar')) {
+    } else if (isAr) {
       return 'حقيبة مقصورة واحدة ($cabinKg كجم, $cabinDimensions) + حقيبة شخصية ($personalItemDimensions). الأمتعة المسجلة $checkedKg كجم.';
-    } else if (code.startsWith('hi')) {
+    } else if (isHi) {
       return '1 केबिन बैग ($cabinKg kg, $cabinDimensions) + 1 व्यक्तिगत वस्तु ($personalItemDimensions)। इकोनॉमी चेक-इन बैग $checkedKg kg।';
-    } else if (code.startsWith('sv')) {
+    } else if (isSv) {
       return '1 handbagage ($cabinKg kg, $cabinDimensions) + 1 personlig tillhörighet ($personalItemDimensions). Incheckat bagage $checkedKg kg.';
-    } else if (code.startsWith('pl')) {
+    } else if (isPl) {
       return '1 sztuka bagażu podręcznego ($cabinKg kg, $cabinDimensions) + 1 przedmiot osobisty ($personalItemDimensions). Bagaż rejestrowany $checkedKg kg.';
-    } else if (code.startsWith('id')) {
+    } else if (isId) {
       return '1 tas kabin ($cabinKg kg, $cabinDimensions) + 1 barang pribadi ($personalItemDimensions). Bagasi terdaftar ekonomi $checkedKg kg.';
-    } else if (code.startsWith('th')) {
+    } else if (isTh) {
       return 'กระเป๋าถือขึ้นเครื่อง 1 ใบ ($cabinKg kg, $cabinDimensions) + ของใช้ส่วนตัว 1 ชิ้น ($personalItemDimensions) สัมภาระโหลด $checkedKg kg';
-    } else if (code.startsWith('vi')) {
+    } else if (isVi) {
       return '1 kiện hành lý xách tay ($cabinKg kg, $cabinDimensions) + 1 vật dụng cá nhân ($personalItemDimensions). Hành lý ký gửi $checkedKg kg.';
-    } else if (code.startsWith('el')) {
+    } else if (isEl) {
       return '1 χειραποσκευή ($cabinKg kg, $cabinDimensions) + 1 προσωπικό αντικείμενο ($personalItemDimensions). Παραδοτέα αποσκευή $checkedKg kg.';
     }
 

@@ -21,6 +21,7 @@ class UserAvatar extends StatelessWidget {
   final bool showEditBadge;
   final VoidCallback? onTap;
   final VoidCallback? onEditTap;
+  final bool? fallbackToDeviceUserAvatar;
 
   const UserAvatar({
     super.key,
@@ -32,6 +33,7 @@ class UserAvatar extends StatelessWidget {
     this.showEditBadge = false,
     this.onTap,
     this.onEditTap,
+    this.fallbackToDeviceUserAvatar,
   });
 
   String _getInitial() {
@@ -51,9 +53,11 @@ class UserAvatar extends StatelessWidget {
 
     Widget avatarCore;
 
+    final shouldFallback = fallbackToDeviceUserAvatar ??
+        (photoUrl == null && (displayName == null || displayName!.trim().isEmpty));
     final effectivePhotoUrl = (photoUrl != null && photoUrl!.trim().isNotEmpty)
         ? photoUrl!.trim()
-        : PreferencesService.instance.getUserAvatar();
+        : (shouldFallback ? PreferencesService.instance.getUserAvatar() : null);
 
     final animal = AnimalAvatar.findById(effectivePhotoUrl);
     if (animal != null) {

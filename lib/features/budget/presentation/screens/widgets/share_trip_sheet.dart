@@ -463,12 +463,18 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
                   Expanded(
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.text_snippet_rounded, size: 18),
-                      label: Text(
-                        l10n?.shareTrip ?? 'Itinerary',
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                      label: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.center,
+                        child: Text(
+                          l10n?.shareTrip ?? 'Itinerary',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                        alignment: Alignment.center,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -489,12 +495,18 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
                   Expanded(
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.checklist_rounded, size: 18),
-                      label: Text(
-                        l10n?.shareChecklist ?? 'Checklist',
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                      label: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.center,
+                        child: Text(
+                          l10n?.shareChecklist ?? 'Checklist',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                        alignment: Alignment.center,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),

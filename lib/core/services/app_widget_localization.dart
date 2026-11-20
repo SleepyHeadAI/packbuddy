@@ -379,91 +379,151 @@ class AppWidgetLocalization {
   /// Labels for custom mini option switches
   static String getShowContinentsLabel(String lang) {
     switch (lang) {
-      case 'tr':
-        return 'Kıta İstatistiklerini Göster';
-      case 'es':
-        return 'Mostrar estadísticas de continentes';
-      case 'fr':
-        return 'Afficher les statistiques de continents';
-      case 'de':
-        return 'Kontinent-Statistiken anzeigen';
-      default:
-        return 'Show Continent Stats';
+      case 'tr': return 'Kıta İstatistiklerini Göster';
+      case 'es': return 'Mostrar estadísticas de continentes';
+      case 'fr': return 'Afficher les statistiques de continents';
+      case 'de': return 'Kontinent-Statistiken anzeigen';
+      case 'it': return 'Mostra statistiche continenti';
+      case 'pt': return 'Mostrar estatísticas dos continentes';
+      case 'ru': return 'Показывать статистику континентов';
+      case 'zh': return '显示大洲统计';
+      case 'ja': return '大陸の統計を表示';
+      case 'ko': return '대륙 통계 표시';
+      case 'hi': return 'महाद्वीप के आंकड़े दिखाएं';
+      case 'ar': return 'إظهار إحصائيات القارات';
+      case 'nl': return 'Continentstatistieken weergeven';
+      case 'el': return 'Εμφάνιση στατιστικών ηπείρων';
+      case 'sv': return 'Visa kontinentstatistik';
+      case 'pl': return 'Pokaż statystyki kontynentów';
+      case 'id': return 'Tampilkan statistik benua';
+      case 'th': return 'แสดงสถิติทวีป';
+      case 'vi': return 'Hiển thị thống kê châu lục';
+      default: return 'Show Continent Stats';
     }
   }
 
   static String getShowWishlistLabel(String lang) {
     switch (lang) {
-      case 'tr':
-        return 'Hedef Ülkeleri Göster';
-      case 'es':
-        return 'Mostrar países deseados';
-      case 'fr':
-        return 'Afficher la liste des souhaits';
-      case 'de':
-        return 'Wunschländer anzeigen';
-      default:
-        return 'Show Wishlist Countries';
+      case 'tr': return 'Hedef Ülkeleri Göster';
+      case 'es': return 'Mostrar países deseados';
+      case 'fr': return 'Afficher la liste des souhaits';
+      case 'de': return 'Wunschländer anzeigen';
+      case 'it': return 'Mostra paesi desiderati';
+      case 'pt': return 'Mostrar países da lista de desejos';
+      case 'ru': return 'Показывать список желаний';
+      case 'zh': return '显示愿望清单国家';
+      case 'ja': return '行きたい国リストを表示';
+      case 'ko': return '위시리스트 국가 표시';
+      case 'hi': return 'इच्छा सूची वाले देश दिखाएं';
+      case 'ar': return 'إظهار قائمة الدول المرغوبة';
+      case 'nl': return 'Wenslijstlanden weergeven';
+      case 'el': return 'Εμφάνιση χωρών επιθυμιών';
+      case 'sv': return 'Visa önskeländer';
+      case 'pl': return 'Pokaż kraje z listy życzeń';
+      case 'id': return 'Tampilkan negara impian';
+      case 'th': return 'แสดงประเทศที่อยากไป';
+      case 'vi': return 'Hiển thị các quốc gia yêu thích';
+      default: return 'Show Wishlist Countries';
     }
   }
 
   static String getShowLiveRateLabel(String lang) {
     switch (lang) {
-      case 'tr':
-        return 'Canlı / Çevrimdışı Kur Göstergesi';
-      case 'es':
-        return 'Mostrar indicador en vivo / sin conexión';
-      case 'fr':
-        return 'Afficher l\'indicateur direct / hors-ligne';
-      case 'de':
-        return 'Live / Offline-Indikator anzeigen';
-      default:
-        return 'Show Live / Offline Indicator';
+      case 'tr': return 'Canlı / Çevrimdışı Kur Göstergesi';
+      case 'es': return 'Mostrar indicador en vivo / sin conexión';
+      case 'fr': return 'Afficher l\'indicateur direct / hors-ligne';
+      case 'de': return 'Live / Offline-Indikator anzeigen';
+      case 'it': return 'Mostra indicatore live / offline';
+      case 'pt': return 'Mostrar indicador online / offline';
+      case 'ru': return 'Индикатор курса (онлайн / офлайн)';
+      case 'zh': return '显示实时/离线汇率指示器';
+      case 'ja': return 'リアルタイム/オフライン表示';
+      case 'ko': return '실시간 / 오프라인 환율 표시';
+      case 'hi': return 'लाइव / ऑफ़लाइन दर संकेतक दिखाएं';
+      case 'ar': return 'مؤشر السعر المباشر / غير المتصل';
+      case 'nl': return 'Live / offline wisselkoersindicator';
+      case 'el': return 'Ένδειξη ζωντανής / εκτός σύνδεσης ισοτιμίας';
+      case 'sv': return 'Visa live / offline-indikator';
+      case 'pl': return 'Wskaźnik kursu online / offline';
+      case 'id': return 'Tampilkan indikator langsung / offline';
+      case 'th': return 'แสดงตัวระบุอัตราแลกเปลี่ยนสด / ออฟไลน์';
+      case 'vi': return 'Hiển thị tỷ giá trực tiếp / ngoại tuyến';
+      default: return 'Show Live / Offline Indicator';
     }
   }
 
   static String getShowReverseRateLabel(String lang) {
     switch (lang) {
-      case 'tr':
-        return 'Ters Çevrim Kurunu Göster';
-      case 'es':
-        return 'Mostrar tasa de cambio inversa';
-      case 'fr':
-        return 'Afficher le taux de change inverse';
-      case 'de':
-        return 'Inversen Wechselkurs anzeigen';
-      default:
-        return 'Show Inverse Conversion Rate';
+      case 'tr': return 'Ters Çevrim Kurunu Göster';
+      case 'es': return 'Mostrar tasa de cambio inversa';
+      case 'fr': return 'Afficher le taux de change inverse';
+      case 'de': return 'Inversen Wechselkurs anzeigen';
+      case 'it': return 'Mostra tasso di cambio inverso';
+      case 'pt': return 'Mostrar taxa de conversão inversa';
+      case 'ru': return 'Показывать обратный курс валют';
+      case 'zh': return '显示反向转换汇率';
+      case 'ja': return '逆方向の為替レートを表示';
+      case 'ko': return '역방향 환율 표시';
+      case 'hi': return 'विपरीत रूपांतरण दर दिखाएं';
+      case 'ar': return 'إظهار سعر التحويل العكسي';
+      case 'nl': return 'Omgekeerde wisselkoers weergeven';
+      case 'el': return 'Εμφάνιση αντίστροφης ισοτιμίας';
+      case 'sv': return 'Visa omvänd växelkurs';
+      case 'pl': return 'Pokaż odwrotny kurs wymiany';
+      case 'id': return 'Tampilkan kurs konversi terbalik';
+      case 'th': return 'แสดงอัตราการแปลงย้อนกลับ';
+      case 'vi': return 'Hiển thị tỷ giá quy đổi nghịch đảo';
+      default: return 'Show Inverse Conversion Rate';
     }
   }
 
   static String getShowRemainingBudgetLabel(String lang) {
     switch (lang) {
-      case 'tr':
-        return 'Kalan Bütçeyi Göster';
-      case 'es':
-        return 'Mostrar presupuesto restante';
-      case 'fr':
-        return 'Afficher le budget restant';
-      case 'de':
-        return 'Verbleibendes Budget anzeigen';
-      default:
-        return 'Show Remaining Budget';
+      case 'tr': return 'Kalan Bütçeyi Göster';
+      case 'es': return 'Mostrar presupuesto restante';
+      case 'fr': return 'Afficher le budget restant';
+      case 'de': return 'Verbleibendes Budget anzeigen';
+      case 'it': return 'Mostra budget rimanente';
+      case 'pt': return 'Mostrar orçamento restante';
+      case 'ru': return 'Показывать остаток бюджета';
+      case 'zh': return '显示剩余预算';
+      case 'ja': return '残りの予算を表示';
+      case 'ko': return '남은 예산 표시';
+      case 'hi': return 'शेष बजट दिखाएं';
+      case 'ar': return 'إظهار الميزانية المتبقية';
+      case 'nl': return 'Resterend budget weergeven';
+      case 'el': return 'Εμφάνιση υπολοίπου προϋπολογισμού';
+      case 'sv': return 'Visa återstående budget';
+      case 'pl': return 'Pokaż pozostały budżet';
+      case 'id': return 'Tampilkan sisa anggaran';
+      case 'th': return 'แสดงงบประมาณที่เหลือ';
+      case 'vi': return 'Hiển thị ngân sách còn lại';
+      default: return 'Show Remaining Budget';
     }
   }
 
   static String getShowLastExpenseLabel(String lang) {
     switch (lang) {
-      case 'tr':
-        return 'Son Harcama Detayını Göster';
-      case 'es':
-        return 'Mostrar último gasto';
-      case 'fr':
-        return 'Afficher la dernière dépense';
-      case 'de':
-        return 'Letzte Ausgabe anzeigen';
-      default:
-        return 'Show Last Expense Summary';
+      case 'tr': return 'Son Harcama Detayını Göster';
+      case 'es': return 'Mostrar último gasto';
+      case 'fr': return 'Afficher la dernière dépense';
+      case 'de': return 'Letzte Ausgabe anzeigen';
+      case 'it': return 'Mostra ultima spesa';
+      case 'pt': return 'Mostrar última despesa';
+      case 'ru': return 'Показывать последний расход';
+      case 'zh': return '显示最后一笔支出详情';
+      case 'ja': return '最後の支出を表示';
+      case 'ko': return '최근 지출 내역 표시';
+      case 'hi': return 'अंतिम खर्च का विवरण दिखाएं';
+      case 'ar': return 'إظهار آخر نفقة';
+      case 'nl': return 'Laatste uitgave weergeven';
+      case 'el': return 'Εμφάνιση τελευταίας δαπάνης';
+      case 'sv': return 'Visa senaste utgift';
+      case 'pl': return 'Pokaż ostatni wydatek';
+      case 'id': return 'Tampilkan pengeluaran terakhir';
+      case 'th': return 'แสดงค่าใช้จ่ายล่าสุด';
+      case 'vi': return 'Hiển thị chi tiêu gần nhất';
+      default: return 'Show Last Expense Summary';
     }
   }
 
@@ -1064,32 +1124,26 @@ class AppWidgetLocalization {
   /// Days countdown formatters
   static String getDaysSuffix(String lang) {
     switch (lang) {
-      case 'tr':
-        return 'g';
-      case 'de':
-        return 'T';
-      case 'fr':
-        return 'j';
-      case 'it':
-        return 'g';
-      case 'ru':
-        return 'д';
-      case 'zh':
-        return '天';
-      case 'ja':
-        return '日';
-      case 'ko':
-        return '일';
-      case 'ar':
-        return 'ي';
-      case 'el':
-        return 'ημ';
-      case 'th':
-        return 'วัน';
-      case 'vi':
-        return 'ng';
-      default:
-        return 'd';
+      case 'tr': return 'g';
+      case 'de': return 'T';
+      case 'fr': return 'j';
+      case 'it': return 'g';
+      case 'pt': return 'd';
+      case 'es': return 'd';
+      case 'nl': return 'd';
+      case 'sv': return 'd';
+      case 'pl': return 'dni';
+      case 'id': return 'hr';
+      case 'hi': return 'दिन';
+      case 'ru': return 'д';
+      case 'zh': return '天';
+      case 'ja': return '日';
+      case 'ko': return '일';
+      case 'ar': return 'ي';
+      case 'el': return 'ημ';
+      case 'th': return 'วัน';
+      case 'vi': return 'ng';
+      default: return 'd';
     }
   }
 

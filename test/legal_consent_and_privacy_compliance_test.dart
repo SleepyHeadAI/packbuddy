@@ -250,9 +250,9 @@ void main() {
       // Validation error message should be visible
       expect(find.text(LegalConsentLocalization.getValidationMustAccept('tr')), findsOneWidget);
 
-      // Now tick both mandatory checkboxes
+      // Now verify that all 3 checkboxes are mandatory and progress is blocked until all 3 are ticked
       final checkboxes = find.byType(Checkbox);
-      expect(checkboxes, findsNWidgets(3)); // 2 mandatory + 1 optional
+      expect(checkboxes, findsNWidgets(3)); // All 3 checkboxes mandatory
 
       await tester.tap(checkboxes.at(0));
       await tester.pumpAndSettle();
@@ -260,7 +260,17 @@ void main() {
       await tester.tap(checkboxes.at(1));
       await tester.pumpAndSettle();
 
-      // Tap Accept now
+      // Tap Accept before ticking the 3rd checkbox -> MUST still block and show validation error
+      await tester.tap(acceptBtn);
+      await tester.pumpAndSettle();
+      expect(PreferencesService.instance.hasAcceptedLegalConsent(), isFalse);
+      expect(find.text(LegalConsentLocalization.getValidationMustAccept('tr')), findsOneWidget);
+
+      // Now tick the 3rd mandatory checkbox
+      await tester.tap(checkboxes.at(2));
+      await tester.pumpAndSettle();
+
+      // Tap Accept now -> must succeed
       await tester.tap(acceptBtn);
       await tester.pumpAndSettle();
 

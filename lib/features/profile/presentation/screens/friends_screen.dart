@@ -266,7 +266,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> with SingleTicker
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       itemCount: state.friends.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final friend = state.friends[index];
         return FriendTile(
@@ -296,12 +296,12 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> with SingleTicker
       builder: (ctx) => AlertDialog(
         title: Text(FriendLocalization.getRemoveFriend(lang)),
         content: Text(
-          '${friend.displayName ?? "Bu gezgin"} seyahat arkadaşlarınızdan çıkarılsın mı?',
+          FriendLocalization.getRemoveFriendConfirm(lang, friend.displayName),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Vazgeç'),
+            child: Text(FriendLocalization.getCancel(lang)),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
