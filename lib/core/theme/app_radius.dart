@@ -15,6 +15,9 @@ class AppRadius {
   /// 14.0 pt - Input fields, search bars, nested card panels
   static const double md = 14.0;
 
+  /// 14.0 pt - Button border radius alias
+  static const double button = md;
+
   /// 18.0 pt - List tiles, selectable cards, secondary dialogs
   static const double lg = 18.0;
 

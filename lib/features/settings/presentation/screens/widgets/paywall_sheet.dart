@@ -3,6 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
 import 'package:packbuddy/core/services/telemetry_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_motion.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
+import 'package:packbuddy/core/theme/app_typography.dart';
+import 'package:packbuddy/shared/widgets/app_button.dart';
+import 'package:packbuddy/shared/widgets/app_card.dart';
 import 'package:packbuddy/features/admin/admin_service.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/settings/data/mock_revenuecat_service.dart';
@@ -97,7 +102,7 @@ class PaywallSheet extends ConsumerWidget {
         ),
         decoration: BoxDecoration(
           color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.sheet)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
@@ -154,16 +159,17 @@ class PaywallSheet extends ConsumerWidget {
           Text(
             l10n.proTitle,
             textAlign: TextAlign.center,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
+            style: AppTypography.titleLarge.copyWith(
+              fontWeight: FontWeight.w800,
               letterSpacing: -0.5,
+              fontSize: 22,
             ),
           ),
           const SizedBox(height: 6),
           Text(
             l10n.proSubtitle,
             textAlign: TextAlign.center,
-            style: theme.textTheme.bodyMedium?.copyWith(
+            style: AppTypography.bodyMedium.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
@@ -187,13 +193,11 @@ class PaywallSheet extends ConsumerWidget {
           const SizedBox(height: 24),
 
           if (proState.isPro) ...[
-            Container(
+            AppCard(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.successPastel.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.successPastel.withValues(alpha: 0.4)),
-              ),
+              borderRadius: AppRadius.card,
+              border: BorderSide(color: AppColors.successPastel.withValues(alpha: 0.4)),
+              backgroundColor: AppColors.successPastel.withValues(alpha: 0.08),
               child: Row(
                 children: [
                   const Icon(Icons.verified_rounded, color: AppColors.successPastel, size: 28),
@@ -204,11 +208,11 @@ class PaywallSheet extends ConsumerWidget {
                       children: [
                         Text(
                           l10n.proActive,
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                          style: AppTypography.titleSmall.copyWith(fontWeight: FontWeight.bold),
                         ),
                         Text(
                           '${l10n.activePlanLabel}: ${proState.activePlan == SubscriptionPlan.annual ? l10n.annualPlan : l10n.monthlyPlan}',
-                          style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+                          style: AppTypography.caption.copyWith(color: theme.colorScheme.onSurfaceVariant),
                         ),
                       ],
                     ),
@@ -217,16 +221,11 @@ class PaywallSheet extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: FilledButton(
-                onPressed: () => Navigator.of(context).pop(),
-                style: FilledButton.styleFrom(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                ),
-                child: Text(l10n.ok, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-              ),
+            AppButton.primary(
+              onPressed: () => Navigator.of(context).pop(),
+              label: l10n.ok,
+              isExpanded: true,
+              size: AppButtonSize.large,
             ),
           ] else ...[
             // Subscription Plan Selector (Annual vs Monthly)
@@ -265,145 +264,126 @@ class PaywallSheet extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // Subscribe / Purchase Action Button
-            SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: theme.colorScheme.onPrimary,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                onPressed: proState.isLoading
-                    ? null
-                    : () async {
-                        final authState = ref.read(authControllerProvider);
-                        final userEmail = authState.user?.email?.trim().toLowerCase();
-                        final isSuperAdmin = userEmail == kAdminEmail.toLowerCase();
+            AppButton.primary(
+              onPressed: proState.isLoading
+                  ? null
+                  : () async {
+                      final authState = ref.read(authControllerProvider);
+                      final userEmail = authState.user?.email?.trim().toLowerCase();
+                      final isSuperAdmin = userEmail == kAdminEmail.toLowerCase();
 
-                        if (isSuperAdmin) {
-                          // Dedicated Admin / Sandbox Test Purchase Confirmation Dialog
-                          final confirmed = await showDialog<bool>(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                              icon: const Icon(
-                                Icons.admin_panel_settings_rounded,
-                                color: AppColors.primaryLight,
-                                size: 36,
+                      if (isSuperAdmin) {
+                        // Dedicated Admin / Sandbox Test Purchase Confirmation Dialog
+                        final confirmed = await showDialog<bool>(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
+                            backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+                            icon: const Icon(
+                              Icons.admin_panel_settings_rounded,
+                              color: AppColors.primaryLight,
+                              size: 36,
+                            ),
+                            title: Text(
+                              l10n.adminTestPurchaseTitle,
+                              style: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.w800),
+                            ),
+                            content: Text(
+                              userEmail != null
+                                  ? '${l10n.adminTestPurchaseMessage}\n\n($userEmail)'
+                                  : l10n.adminTestPurchaseMessage,
+                              style: AppTypography.bodyMedium,
+                            ),
+                            actions: [
+                              AppButton.outline(
+                                onPressed: () => Navigator.of(ctx).pop(false),
+                                label: l10n.cancel,
                               ),
-                              title: Text(l10n.adminTestPurchaseTitle),
-                              content: Text(
-                                userEmail != null
-                                    ? '${l10n.adminTestPurchaseMessage}\n\n($userEmail)'
-                                    : l10n.adminTestPurchaseMessage,
+                              AppButton.primary(
+                                onPressed: () => Navigator.of(ctx).pop(true),
+                                label: l10n.activateTestPro,
                               ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.of(ctx).pop(false),
-                                  child: Text(l10n.cancel),
-                                ),
-                                FilledButton(
-                                  onPressed: () => Navigator.of(ctx).pop(true),
-                                  child: Text(l10n.activateTestPro),
-                                ),
-                              ],
+                            ],
+                          ),
+                        );
+
+                        if (confirmed != true) return;
+
+                        final success = await ref
+                            .read(proSubscriptionProvider.notifier)
+                            .purchaseActivePlan(isTestOrAdminConfirmation: true);
+                        if (context.mounted && success) {
+                          Navigator.of(context).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                                  const SizedBox(width: 12),
+                                  Expanded(child: Text(l10n.purchaseSuccess)),
+                                ],
+                              ),
+                              backgroundColor: AppColors.successPastel,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                           );
-
-                          if (confirmed != true) return;
-
-                          final success = await ref
-                              .read(proSubscriptionProvider.notifier)
-                              .purchaseActivePlan(isTestOrAdminConfirmation: true);
-                          if (context.mounted && success) {
-                            Navigator.of(context).pop();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Row(
-                                  children: [
-                                    const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
-                                    const SizedBox(width: 12),
-                                    Expanded(child: Text(l10n.purchaseSuccess)),
-                                  ],
-                                ),
-                                backgroundColor: AppColors.successPastel,
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              ),
-                            );
-                          }
-                        } else {
-                          // Normal user: Trigger real Google Play / App Store purchase flow directly!
-                          final success = await ref
-                              .read(proSubscriptionProvider.notifier)
-                              .purchaseActivePlan();
-
-                          if (!context.mounted) return;
-
-                          if (success) {
-                            Navigator.of(context).pop();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Row(
-                                  children: [
-                                    const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
-                                    const SizedBox(width: 12),
-                                    Expanded(child: Text(l10n.purchaseSuccess)),
-                                  ],
-                                ),
-                                backgroundColor: AppColors.successPastel,
-                                behavior: SnackBarBehavior.floating,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              ),
-                            );
-                          } else {
-                            final errorMsg = ref.read(proSubscriptionProvider).errorMessage;
-                            if (errorMsg != null && errorMsg.isNotEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Row(
-                                    children: [
-                                      const Icon(Icons.info_outline_rounded, color: Colors.white, size: 20),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Text(
-                                          errorMsg == 'store_unavailable'
-                                              ? l10n.storeUnavailableMessage
-                                              : errorMsg,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  backgroundColor: theme.colorScheme.error,
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                ),
-                              );
-                            }
-                          }
                         }
-                      },
-                child: proState.isLoading
-                    ? const SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.5,
-                          color: Colors.white,
-                        ),
-                      )
-                    : Text(
-                        l10n.subscribeNow,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-              ),
+                      } else {
+                        // Normal user: Trigger real Google Play / App Store purchase flow directly!
+                        final success = await ref
+                            .read(proSubscriptionProvider.notifier)
+                            .purchaseActivePlan();
+
+                        if (!context.mounted) return;
+
+                        if (success) {
+                          Navigator.of(context).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Row(
+                                children: [
+                                  const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                                  const SizedBox(width: 12),
+                                  Expanded(child: Text(l10n.purchaseSuccess)),
+                                ],
+                              ),
+                              backgroundColor: AppColors.successPastel,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                          );
+                        } else {
+                          final errorMsg = ref.read(proSubscriptionProvider).errorMessage;
+                          if (errorMsg != null && errorMsg.isNotEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Row(
+                                children: [
+                                  const Icon(Icons.info_outline_rounded, color: Colors.white, size: 20),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      errorMsg == 'store_unavailable'
+                                          ? l10n.storeUnavailableMessage
+                                          : errorMsg,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              backgroundColor: theme.colorScheme.error,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                          );
+                        }
+                      }
+                    }
+                  },
+              isLoading: proState.isLoading,
+              label: l10n.subscribeNow,
+              isExpanded: true,
+              size: AppButtonSize.large,
             ),
             const SizedBox(height: 12),
 
@@ -564,22 +544,26 @@ class _ProFeatureRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
-            borderRadius: BorderRadius.circular(10),
+            color: isDark ? AppColors.surfaceRaisedDark : AppColors.primaryContainerLight.withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(AppRadius.xs),
+            border: Border.all(
+              color: isDark ? AppColors.borderSubtle(true) : AppColors.borderSubtle(false),
+            ),
           ),
-          child: Icon(Icons.star_rounded, color: theme.colorScheme.primary, size: 18),
+          child: Icon(icon, color: isDark ? AppColors.primaryDark : AppColors.primaryLight, size: 18),
         ),
         const SizedBox(width: 14),
         Expanded(
           child: Text(
             title,
-            style: theme.textTheme.bodyMedium?.copyWith(
+            style: AppTypography.bodyMedium.copyWith(
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -617,56 +601,74 @@ class _PlanOptionCard extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      onTap: () {
+        AppHaptics.selectionClick();
+        onTap();
+      },
+      borderRadius: BorderRadius.circular(AppRadius.card),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
         decoration: BoxDecoration(
           color: isSelected
-              ? theme.colorScheme.primaryContainer.withValues(alpha: 0.3)
-              : (isDark ? AppColors.surfaceVariantDark : AppColors.surfaceVariantLight),
-          borderRadius: BorderRadius.circular(16),
+              ? (isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceLight)
+              : (isDark ? AppColors.surfaceDark : const Color(0xFFF8FAFC)),
+          borderRadius: BorderRadius.circular(AppRadius.card),
           border: Border.all(
             color: isSelected
-                ? theme.colorScheme.primary
-                : (isDark ? AppColors.outlineDark : AppColors.outlineLight),
+                ? (isDark ? AppColors.primaryDark : AppColors.primaryLight)
+                : (isDark ? AppColors.borderSubtle(true) : AppColors.borderSubtle(false)),
             width: isSelected ? 2 : 1,
           ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: (isDark ? AppColors.primaryDark : AppColors.primaryLight).withValues(alpha: 0.16),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
                   child: Text(
                     title,
                     maxLines: 1,
-                    style: theme.textTheme.titleSmall?.copyWith(
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.titleSmall.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
                 if (badge != null) ...[
                   const SizedBox(width: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: AppColors.tertiaryLight,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        badge!,
-                        maxLines: 1,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 9.5,
-                          fontWeight: FontWeight.bold,
+                  Flexible(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF78350F).withValues(alpha: 0.6) : const Color(0xFFFEF3C7),
+                        borderRadius: BorderRadius.circular(AppRadius.xs),
+                        border: Border.all(
+                          color: isDark ? const Color(0xFF92400E) : const Color(0xFFFDE68A),
+                          width: 1,
+                        ),
+                      ),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          badge!,
+                          maxLines: 1,
+                          style: TextStyle(
+                            color: isDark ? const Color(0xFFFDE68A) : AppColors.brandAccentTextLight,
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ),
                     ),
@@ -680,8 +682,10 @@ class _PlanOptionCard extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 price,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
+                style: AppTypography.mono(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  tabularFigures: true,
                   color: theme.colorScheme.onSurface,
                 ),
               ),
@@ -693,7 +697,10 @@ class _PlanOptionCard extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   subPrice!,
-                  style: theme.textTheme.bodySmall?.copyWith(
+                  style: AppTypography.mono(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    tabularFigures: true,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),

@@ -8,6 +8,7 @@ import 'package:packbuddy/core/services/app_widget_localization.dart';
 import 'package:packbuddy/core/services/app_widget_service.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
@@ -344,9 +345,9 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
         color: isDark
             ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.45)
             : theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(AppRadius.card),
         border: Border.all(
-          color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+          color: isDark ? AppColors.borderSubtle(true) : AppColors.borderSubtle(false),
         ),
       ),
       child: Column(
@@ -658,7 +659,7 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
               ),
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.button)),
               ),
             ),
           ),

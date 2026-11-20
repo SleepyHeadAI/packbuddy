@@ -36,6 +36,13 @@ class AppColors {
   static const Color borderStrongLight = Color(0xFFD0D5DD); // Interactive outline border
   static const Color borderStrongDark = Color(0xFF334155);
 
+  // --- Dynamic Brightness Resolution Helpers ---
+  static Color surfaceBase(bool isDark) => isDark ? surfaceBaseDark : surfaceBaseLight;
+  static Color surfaceRaised(bool isDark) => isDark ? surfaceRaisedDark : surfaceRaisedLight;
+  static Color surfaceOverlay(bool isDark) => isDark ? surfaceOverlayDark : surfaceOverlayLight;
+  static Color borderSubtle(bool isDark) => isDark ? borderSubtleDark : borderSubtleLight;
+  static Color borderStrong(bool isDark) => isDark ? borderStrongDark : borderStrongLight;
+
   // --- Brand & Primary Roles ---
   static const Color brandPrimaryLight = Color(0xFF0F172A); // Deep Slate / Jet
   static const Color brandPrimaryDark = Color(0xFFF8FAFC); // Crisp Snow

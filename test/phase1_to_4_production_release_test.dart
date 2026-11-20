@@ -415,7 +415,7 @@ void main() {
       expect(tk.getLocalizedNotes('tr'), contains('1 adet 8 kg kabin bagajı'));
       expect(tk.getLocalizedNotes('en'), contains('1 cabin bag (8 kg)'));
       expect(tk.getLocalizedNotes('de'), contains('1 Handgepäck (8 kg)'));
-      expect(tk.getLocalizedNotes('zh'), contains('1 cabin bag (8 kg)'));
+      expect(tk.getLocalizedNotes('zh'), contains('1件随身行李 (8 kg)'));
 
       final fr = AirlineBaggageRepository.airlines.firstWhere((a) => a.iataCode == 'FR');
       expect(fr.getLocalizedNotes('tr'), contains('Standart bilette'));
