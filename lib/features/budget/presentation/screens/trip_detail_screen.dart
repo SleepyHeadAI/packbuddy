@@ -2209,12 +2209,12 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
             Flexible(
               child: Text(
                 l10n.ongoingTrip.toUpperCase(),
-                style: AppTypography.mono(
+                style: AppTypography.caption.copyWith(
                   fontSize: 9.5,
                   fontWeight: FontWeight.w800,
                   color: AppColors.successPastel,
                   letterSpacing: 0.3,
-                  tabularFigures: true,
+                  height: 1.15,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -2239,18 +2239,19 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(Icons.schedule_rounded, size: 10, color: theme.colorScheme.primary),
             const SizedBox(width: 4),
             Flexible(
               child: Text(
                 label,
-                style: AppTypography.mono(
+                style: AppTypography.caption.copyWith(
                   fontSize: 9.5,
                   fontWeight: FontWeight.w800,
                   color: theme.colorScheme.primary,
                   letterSpacing: 0.3,
-                  tabularFigures: true,
+                  height: 1.15,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -2268,18 +2269,19 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(Icons.check_circle_outline_rounded, size: 10, color: theme.colorScheme.onSurfaceVariant),
             const SizedBox(width: 4),
             Flexible(
               child: Text(
                 l10n.completed.toUpperCase(),
-                style: AppTypography.mono(
+                style: AppTypography.caption.copyWith(
                   fontSize: 9.5,
                   fontWeight: FontWeight.w700,
                   color: theme.colorScheme.onSurfaceVariant,
                   letterSpacing: 0.3,
-                  tabularFigures: true,
+                  height: 1.15,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

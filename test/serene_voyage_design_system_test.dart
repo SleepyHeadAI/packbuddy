@@ -12,24 +12,24 @@ void main() {
   group('Serene Voyage Design System Suite', () {
     test('1. Exact Palette Hex Verification', () {
       // Primary Terracotta & Brand Accents
-      expect(AppColors.brandAccent, const Color(0xFFE05D38));
-      expect(AppColors.primaryLight, const Color(0xFFE05D38));
+      expect(AppColors.brandAccent, const Color(0xFFE7B580));
+      expect(AppColors.primaryLight, const Color(0xFF785148));
 
-      // Secondary: #0F766E
-      expect(AppColors.secondaryLight, const Color(0xFF0F766E));
+      // Secondary: #A09674 (Olive Sage)
+      expect(AppColors.secondaryLight, const Color(0xFFA09674));
 
-      // Tertiary: #475569 (Slate Titanium)
-      expect(AppColors.tertiaryLight, const Color(0xFF475569));
+      // Tertiary: #5C5652 (Warm Espresso)
+      expect(AppColors.tertiaryLight, const Color(0xFF5C5652));
 
-      // Neutral: #F3F5F7
-      expect(AppColors.backgroundLight, const Color(0xFFF8F9FA));
+      // Neutral: #FBFAF8 (Alabaster Linen)
+      expect(AppColors.backgroundLight, const Color(0xFFFBFAF8));
 
       // Action circles
-      expect(AppColors.actionGold, const Color(0xFFE05D38));
-      expect(AppColors.actionTeal, const Color(0xFF0F766E));
-      expect(AppColors.actionSlate, const Color(0xFF50607A));
+      expect(AppColors.actionGold, const Color(0xFFE7B580));
+      expect(AppColors.actionTeal, const Color(0xFFA09674));
+      expect(AppColors.actionSlate, const Color(0xFF5C5652));
       expect(AppColors.actionRed, const Color(0xFFB91C1C));
-      expect(AppColors.actionPeriwinkle, const Color(0xFFA4B8D1));
+      expect(AppColors.actionPeriwinkle, const Color(0xFFC5C4C2));
     });
 
     test('2. Typographic Hierarchy Font Families', () {

@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:packbuddy/core/l10n/locale_provider.dart';
 import 'package:packbuddy/core/services/notification_service.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
-import 'package:packbuddy/core/theme/theme_provider.dart';
 import 'package:packbuddy/data/sync_engine/sync_engine.dart';
 import 'package:packbuddy/features/admin/admin_service.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
@@ -27,7 +25,6 @@ class Phase8MockSyncEngine extends StateNotifier<SyncState> implements SyncEngin
   Phase8MockSyncEngine([SyncState state = const SyncState(status: SyncStatus.upToDate)])
       : super(state);
 
-  @override
   Future<void> syncNow({bool isManual = true}) async {}
 
   @override

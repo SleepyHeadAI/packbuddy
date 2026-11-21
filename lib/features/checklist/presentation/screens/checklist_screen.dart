@@ -699,9 +699,9 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                               ),
                                             ),
                                             const SizedBox(width: 8),
-                                            // Status Micro-Pill
+                                            // Status Micro-Pill (Optically centered with balanced padding)
                                             Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3.0),
                                               decoration: BoxDecoration(
                                                 color: statusColor.withValues(alpha: 0.12),
                                                 borderRadius: BorderRadius.circular(AppRadius.sm),
@@ -713,11 +713,12 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                                     : (completionRatio >= 1.0
                                                         ? l10n.completed.toUpperCase()
                                                         : l10n.preparing.toUpperCase()),
-                                                style: TextStyle(
+                                                style: AppTypography.caption.copyWith(
                                                   color: statusColor,
                                                   fontSize: 9.5,
                                                   fontWeight: FontWeight.w800,
                                                   letterSpacing: 0.3,
+                                                  height: 1.15,
                                                 ),
                                               ),
                                             ),
@@ -973,7 +974,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                             child: AnimatedContainer(
                               duration: AppMotion.fast,
                               curve: AppMotion.smoothCurve,
-                              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
+                              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5.5),
                               decoration: BoxDecoration(
                                 color: isSelected
                                     ? theme.colorScheme.primary
@@ -992,6 +993,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Icon(
                                     displayIcon,
@@ -1003,13 +1005,14 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                   const SizedBox(width: 5),
                                   Text(
                                     displayLabel,
-                                    style: TextStyle(
+                                    style: AppTypography.caption.copyWith(
                                       fontSize: 11.5,
                                       fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                                       color: isSelected
                                           ? theme.colorScheme.onPrimary
                                           : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight),
                                       letterSpacing: -0.1,
+                                      height: 1.15,
                                     ),
                                   ),
                                 ],

@@ -139,12 +139,12 @@ class _HorizontalCurrencyConverterCardState
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                  color: AppColors.brandAccent.withValues(alpha: 0.14),
                   borderRadius: BorderRadius.circular(9),
                 ),
                 child: Icon(
                   AppIcons.currency,
-                  color: theme.colorScheme.primary,
+                  color: isDark ? AppColors.brandAccentDark : AppColors.brandPrimaryLight,
                   size: 16,
                 ),
               ),
@@ -161,51 +161,59 @@ class _HorizontalCurrencyConverterCardState
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const SizedBox(width: 4),
-              // Live / Offline Status Pill
-              Flexible(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
+              const SizedBox(width: 6),
+              // Live / Offline Status Pill (Optically aligned, intrinsic width)
+              Container(
+                constraints: const BoxConstraints(maxWidth: 105),
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3.5),
+                decoration: BoxDecoration(
+                  color: isLive
+                      ? AppColors.successPastel.withValues(alpha: 0.12)
+                      : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
                     color: isLive
-                        ? AppColors.successPastel.withValues(alpha: 0.14)
-                        : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(7),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 5,
-                        height: 5,
-                        decoration: BoxDecoration(
-                          color: isLive ? AppColors.successPastel : theme.colorScheme.onSurfaceVariant,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          isLive
-                              ? (l10n?.liveRates ?? 'Live Rates')
-                              : (l10n?.offlineRates ?? 'Offline'),
-                          style: TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w700,
-                            color: isLive ? AppColors.successPastel : theme.colorScheme.onSurfaceVariant,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
+                        ? AppColors.successPastel.withValues(alpha: 0.25)
+                        : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.18),
+                    width: 0.6,
                   ),
                 ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 5,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: isLive ? AppColors.successPastel : theme.colorScheme.onSurfaceVariant,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 4.5),
+                    Flexible(
+                      child: Text(
+                        isLive
+                            ? (l10n?.liveRates ?? 'Live Rates')
+                            : (l10n?.offlineRates ?? 'Offline'),
+                        style: AppTypography.caption.copyWith(
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w700,
+                          color: isLive ? AppColors.successPastel : theme.colorScheme.onSurfaceVariant,
+                          height: 1.15,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 4),
               IconButton(
                 visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
                 icon: _isRefreshing
                     ? const SizedBox(
                         width: 13,
@@ -376,12 +384,13 @@ class _HorizontalCurrencyConverterCardState
           ),
           const SizedBox(height: 10),
 
-          // 3. Quick Presets Row (Full Width Horizontal Scroll)
+          // 3. Quick Presets Row (Full Width Horizontal Scroll with FAB Clearance)
           SizedBox(
             height: 28,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.only(right: 56),
               itemCount: _quickPresets.length,
               separatorBuilder: (_, _) => const SizedBox(width: 5),
               itemBuilder: (context, index) {
@@ -418,7 +427,7 @@ class _HorizontalCurrencyConverterCardState
                           fontSize: 10.5,
                           fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                           color: isSelected
-                              ? Colors.white
+                              ? theme.colorScheme.onPrimary
                               : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight),
                           tabularFigures: true,
                         ),
@@ -431,7 +440,7 @@ class _HorizontalCurrencyConverterCardState
           ),
           const SizedBox(height: 8),
 
-          // 4. Conversion Rate Info Footer (Dedicated Full Width, Guaranteed Zero Truncation!)
+          // 4. Conversion Rate Info Footer (Dedicated Full Width, Clean & Uncluttered)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
             decoration: BoxDecoration(
@@ -462,23 +471,6 @@ class _HorizontalCurrencyConverterCardState
                         color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
                         tabularFigures: true,
                       ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: Text(
-                    isLive
-                        ? (l10n?.liveRates ?? 'Live Rates')
-                        : (l10n?.offlineRates ?? 'Offline'),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w600,
-                      color: isLive
-                          ? AppColors.pineEmerald
-                          : (isDark ? AppColors.textMutedDark : AppColors.textMutedLight),
                     ),
                   ),
                 ),

@@ -505,7 +505,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                                     Icon(
                                       AppIcons.map,
                                       size: 13,
-                                      color: !_is3DMode ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                                      color: !_is3DMode ? const Color(0xFF101010) : (isDark ? Colors.white70 : Colors.black87),
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
@@ -513,7 +513,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                                       style: TextStyle(
                                         fontSize: 11.5,
                                         fontWeight: FontWeight.w700,
-                                        color: !_is3DMode ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                                        color: !_is3DMode ? const Color(0xFF101010) : (isDark ? Colors.white70 : Colors.black87),
                                       ),
                                     ),
                                   ],
@@ -541,7 +541,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                                     Icon(
                                       AppIcons.globe,
                                       size: 13,
-                                      color: _is3DMode ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                                      color: _is3DMode ? const Color(0xFF101010) : (isDark ? Colors.white70 : Colors.black87),
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
@@ -549,7 +549,7 @@ class _InteractiveWorldMapState extends State<InteractiveWorldMap> {
                                       style: TextStyle(
                                         fontSize: 11.5,
                                         fontWeight: FontWeight.w700,
-                                        color: _is3DMode ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                                        color: _is3DMode ? const Color(0xFF101010) : (isDark ? Colors.white70 : Colors.black87),
                                       ),
                                     ),
                                   ],

@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:async';
-import 'dart:ui';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -1347,12 +1346,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   AppIcons.categoryAll,
                                   size: 14,
                                   color: _selectedCategoryFilter == null
-                                      ? Colors.white
+                                      ? theme.colorScheme.onPrimary
                                       : theme.colorScheme.onSurfaceVariant,
                                 ),
                                 label: Text('${l10n.allDocuments} ($publicDocsCount)'),
                                 selected: _selectedCategoryFilter == null,
-                                selectedColor: AppColors.brandAccent,
+                                selectedColor: theme.colorScheme.primary,
                                 backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(17),
@@ -1363,12 +1362,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                     width: 0.5,
                                   ),
                                 ),
-                                labelStyle: TextStyle(
+                                labelStyle: AppTypography.caption.copyWith(
                                   color: _selectedCategoryFilter == null
-                                      ? Colors.white
+                                      ? theme.colorScheme.onPrimary
                                       : theme.colorScheme.onSurfaceVariant,
                                   fontWeight: _selectedCategoryFilter == null ? FontWeight.w700 : FontWeight.w600,
-                                  fontSize: 12,
+                                  fontSize: 11.5,
+                                  height: 1.15,
                                 ),
                                 onSelected: (val) {
                                   if (val) {
@@ -1387,12 +1387,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   AppIcons.ticket,
                                   size: 14,
                                   color: _selectedCategoryFilter == 'Biletler'
-                                      ? Colors.white
+                                      ? theme.colorScheme.onPrimary
                                       : theme.colorScheme.onSurfaceVariant,
                                 ),
                                 label: Text(l10n.tickets),
                                 selected: _selectedCategoryFilter == 'Biletler',
-                                selectedColor: AppColors.brandAccent,
+                                selectedColor: theme.colorScheme.primary,
                                 backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(17),
@@ -1403,12 +1403,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                     width: 0.5,
                                   ),
                                 ),
-                                labelStyle: TextStyle(
+                                labelStyle: AppTypography.caption.copyWith(
                                   color: _selectedCategoryFilter == 'Biletler'
-                                      ? Colors.white
+                                      ? theme.colorScheme.onPrimary
                                       : theme.colorScheme.onSurfaceVariant,
                                   fontWeight: _selectedCategoryFilter == 'Biletler' ? FontWeight.w700 : FontWeight.w600,
-                                  fontSize: 12,
+                                  fontSize: 11.5,
+                                  height: 1.15,
                                 ),
                                 onSelected: (val) {
                                   setState(() {
@@ -1425,12 +1426,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   AppIcons.hotel,
                                   size: 14,
                                   color: _selectedCategoryFilter == 'Konaklama'
-                                      ? Colors.white
+                                      ? theme.colorScheme.onPrimary
                                       : theme.colorScheme.onSurfaceVariant,
                                 ),
                                 label: Text(l10n.accommodation),
                                 selected: _selectedCategoryFilter == 'Konaklama',
-                                selectedColor: AppColors.brandAccent,
+                                selectedColor: theme.colorScheme.primary,
                                 backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(17),
@@ -1441,12 +1442,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                     width: 0.5,
                                   ),
                                 ),
-                                labelStyle: TextStyle(
+                                labelStyle: AppTypography.caption.copyWith(
                                   color: _selectedCategoryFilter == 'Konaklama'
-                                      ? Colors.white
+                                      ? theme.colorScheme.onPrimary
                                       : theme.colorScheme.onSurfaceVariant,
                                   fontWeight: _selectedCategoryFilter == 'Konaklama' ? FontWeight.w700 : FontWeight.w600,
-                                  fontSize: 12,
+                                  fontSize: 11.5,
+                                  height: 1.15,
                                 ),
                                 onSelected: (val) {
                                   setState(() {
@@ -1463,12 +1465,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   AppIcons.passport,
                                   size: 14,
                                   color: _selectedCategoryFilter == 'Kimlik & Pasaport'
-                                      ? Colors.white
+                                      ? theme.colorScheme.onPrimary
                                       : theme.colorScheme.onSurfaceVariant,
                                 ),
                                 label: Text(l10n.idAndPassport),
                                 selected: _selectedCategoryFilter == 'Kimlik & Pasaport',
-                                selectedColor: AppColors.brandAccent,
+                                selectedColor: theme.colorScheme.primary,
                                 backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(17),
@@ -1479,12 +1481,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                     width: 0.5,
                                   ),
                                 ),
-                                labelStyle: TextStyle(
+                                labelStyle: AppTypography.caption.copyWith(
                                   color: _selectedCategoryFilter == 'Kimlik & Pasaport'
-                                      ? Colors.white
+                                      ? theme.colorScheme.onPrimary
                                       : theme.colorScheme.onSurfaceVariant,
                                   fontWeight: _selectedCategoryFilter == 'Kimlik & Pasaport' ? FontWeight.w700 : FontWeight.w600,
-                                  fontSize: 12,
+                                  fontSize: 11.5,
+                                  height: 1.15,
                                 ),
                                 onSelected: (val) {
                                   setState(() {
@@ -1501,12 +1504,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   AppIcons.shield,
                                   size: 14,
                                   color: _selectedCategoryFilter == 'Sağlık & Sigorta'
-                                      ? Colors.white
+                                      ? theme.colorScheme.onPrimary
                                       : theme.colorScheme.onSurfaceVariant,
                                 ),
                                 label: Text(l10n.healthAndInsurance),
                                 selected: _selectedCategoryFilter == 'Sağlık & Sigorta',
-                                selectedColor: AppColors.brandAccent,
+                                selectedColor: theme.colorScheme.primary,
                                 backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(17),
@@ -1517,12 +1520,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                     width: 0.5,
                                   ),
                                 ),
-                                labelStyle: TextStyle(
+                                labelStyle: AppTypography.caption.copyWith(
                                   color: _selectedCategoryFilter == 'Sağlık & Sigorta'
-                                      ? Colors.white
+                                      ? theme.colorScheme.onPrimary
                                       : theme.colorScheme.onSurfaceVariant,
                                   fontWeight: _selectedCategoryFilter == 'Sağlık & Sigorta' ? FontWeight.w700 : FontWeight.w600,
-                                  fontSize: 12,
+                                  fontSize: 11.5,
+                                  height: 1.15,
                                 ),
                                 onSelected: (val) {
                                   setState(() {
@@ -1539,12 +1543,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   AppIcons.document,
                                   size: 14,
                                   color: _selectedCategoryFilter == 'Diğer Belgeler'
-                                      ? Colors.white
+                                      ? theme.colorScheme.onPrimary
                                       : theme.colorScheme.onSurfaceVariant,
                                 ),
                                 label: Text(l10n.otherDocuments),
                                 selected: _selectedCategoryFilter == 'Diğer Belgeler',
-                                selectedColor: AppColors.brandAccent,
+                                selectedColor: theme.colorScheme.primary,
                                 backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(17),
@@ -1555,12 +1559,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                     width: 0.5,
                                   ),
                                 ),
-                                labelStyle: TextStyle(
+                                labelStyle: AppTypography.caption.copyWith(
                                   color: _selectedCategoryFilter == 'Diğer Belgeler'
-                                      ? Colors.white
+                                      ? theme.colorScheme.onPrimary
                                       : theme.colorScheme.onSurfaceVariant,
                                   fontWeight: _selectedCategoryFilter == 'Diğer Belgeler' ? FontWeight.w700 : FontWeight.w600,
-                                  fontSize: 12,
+                                  fontSize: 11.5,
+                                  height: 1.15,
                                 ),
                                 onSelected: (val) {
                                   setState(() {
@@ -2063,76 +2068,64 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                           ),
                                         ),
 
-                                        // Frosted Glass PDF or Image badge
+                                        // High-Performance Translucent PDF or Image badge (Zero GPU blur overhead for 120 FPS)
                                         Positioned(
                                           top: 8,
                                           left: 8,
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(6),
-                                            child: BackdropFilter(
-                                              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                                              child: Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3.5),
-                                                decoration: BoxDecoration(
-                                                  color: (isPdf ? const Color(0xFFDC2626) : Colors.black).withValues(alpha: 0.5),
-                                                  borderRadius: BorderRadius.circular(6),
-                                                  border: Border.all(
-                                                    color: Colors.white.withValues(alpha: 0.25),
-                                                    width: 0.5,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3.5),
+                                            decoration: BoxDecoration(
+                                              color: (isPdf ? const Color(0xFFDC2626) : Colors.black).withValues(alpha: 0.72),
+                                              borderRadius: BorderRadius.circular(6),
+                                              border: Border.all(
+                                                color: Colors.white.withValues(alpha: 0.25),
+                                                width: 0.5,
+                                              ),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(
+                                                  isPdf ? AppIcons.pdf : AppIcons.photo,
+                                                  size: 10,
+                                                  color: Colors.white,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  isPdf ? l10n.pdfBadge : l10n.imageBadge,
+                                                  style: AppTypography.caption.copyWith(
+                                                    color: Colors.white,
+                                                    fontSize: 9,
+                                                    fontWeight: FontWeight.w700,
+                                                    letterSpacing: 0.3,
                                                   ),
                                                 ),
-                                                child: Row(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    Icon(
-                                                      isPdf ? AppIcons.pdf : AppIcons.photo,
-                                                      size: 10,
-                                                      color: Colors.white,
-                                                    ),
-                                                    const SizedBox(width: 4),
-                                                    Text(
-                                                      isPdf ? l10n.pdfBadge : l10n.imageBadge,
-                                                      style: AppTypography.caption.copyWith(
-                                                        color: Colors.white,
-                                                        fontSize: 9,
-                                                        fontWeight: FontWeight.w700,
-                                                        letterSpacing: 0.3,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
+                                              ],
                                             ),
                                           ),
                                         ),
 
-                                        // Refined Frosted Glass Delete action button
+                                        // High-Performance Translucent Delete action button (120 FPS fluid scrolling)
                                         Positioned(
                                           top: 6,
                                           right: 6,
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(14),
-                                            child: BackdropFilter(
-                                              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                                              child: Material(
-                                                color: Colors.black.withValues(alpha: 0.35),
-                                                shape: CircleBorder(
-                                                  side: BorderSide(
-                                                    color: Colors.white.withValues(alpha: 0.25),
-                                                    width: 0.5,
-                                                  ),
-                                                ),
-                                                child: InkWell(
-                                                  onTap: () => _showDeleteDialog(context, doc),
-                                                  borderRadius: BorderRadius.circular(14),
-                                                  child: const Padding(
-                                                    padding: EdgeInsets.all(6),
-                                                    child: Icon(
-                                                      AppIcons.delete,
-                                                      size: 13,
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
+                                          child: Material(
+                                            color: Colors.black.withValues(alpha: 0.55),
+                                            shape: CircleBorder(
+                                              side: BorderSide(
+                                                color: Colors.white.withValues(alpha: 0.25),
+                                                width: 0.5,
+                                              ),
+                                            ),
+                                            child: InkWell(
+                                              onTap: () => _showDeleteDialog(context, doc),
+                                              borderRadius: BorderRadius.circular(14),
+                                              child: const Padding(
+                                                padding: EdgeInsets.all(6),
+                                                child: Icon(
+                                                  AppIcons.delete,
+                                                  size: 13,
+                                                  color: Colors.white,
                                                 ),
                                               ),
                                             ),

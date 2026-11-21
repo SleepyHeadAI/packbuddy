@@ -98,12 +98,15 @@ class QuickActionsSheet extends StatelessWidget {
       barrierColor: Colors.transparent,
       transitionDuration: const Duration(milliseconds: 260),
       pageBuilder: (dialogContext, animation, secondaryAnimation) {
-        return _FloatingQuickActionsOverlay(
-          items: items,
-          fabRect: fabRect!,
-          animation: animation,
-          fabColor: fabColor,
-          fabIconColor: fabIconColor,
+        return Material(
+          type: MaterialType.transparency,
+          child: _FloatingQuickActionsOverlay(
+            items: items,
+            fabRect: fabRect!,
+            animation: animation,
+            fabColor: fabColor,
+            fabIconColor: fabIconColor,
+          ),
         );
       },
       transitionBuilder: (dialogContext, animation, secondaryAnimation, child) {
@@ -1083,57 +1086,61 @@ class _FloatingActionBubbleState extends State<_FloatingActionBubble> {
                 AppHaptics.light();
                 widget.onTap();
               },
-              child: Container(
-                key: Key('quick_action_${widget.item.title}'),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? AppColors.surfaceRaisedDark.withValues(alpha: 0.94)
-                      : AppColors.surfaceRaisedLight.withValues(alpha: 0.96),
-                  borderRadius: BorderRadius.circular(AppRadius.full),
-                  border: Border.all(
+              child: Material(
+                type: MaterialType.transparency,
+                child: Container(
+                  key: Key('quick_action_${widget.item.title}'),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
                     color: isDark
-                        ? AppColors.borderSubtleDark
-                        : AppColors.borderSubtleLight,
-                    width: 1.0,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: isDark ? 0.32 : 0.08),
-                      blurRadius: 14,
-                      offset: const Offset(0, 4),
+                        ? AppColors.surfaceRaisedDark.withValues(alpha: 0.94)
+                        : AppColors.surfaceRaisedLight.withValues(alpha: 0.96),
+                    borderRadius: BorderRadius.circular(AppRadius.full),
+                    border: Border.all(
+                      color: isDark
+                          ? AppColors.borderSubtleDark
+                          : AppColors.borderSubtleLight,
+                      width: 1.0,
                     ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: widget.item.iconBgColor,
-                        borderRadius: BorderRadius.circular(AppRadius.sm),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: isDark ? 0.32 : 0.08),
+                        blurRadius: 14,
+                        offset: const Offset(0, 4),
                       ),
-                      child: Center(
-                        child: Icon(
-                          widget.item.icon,
-                          color: widget.item.iconColor,
-                          size: 18,
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: widget.item.iconBgColor,
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            widget.item.icon,
+                            color: widget.item.iconColor,
+                            size: 18,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      widget.item.title,
-                      style: AppTypography.bodyMedium.copyWith(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13.5,
-                        letterSpacing: -0.2,
-                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                      const SizedBox(width: 10),
+                      Text(
+                        widget.item.title,
+                        style: AppTypography.bodyMedium.copyWith(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13.5,
+                          letterSpacing: -0.2,
+                          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                          decoration: TextDecoration.none,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

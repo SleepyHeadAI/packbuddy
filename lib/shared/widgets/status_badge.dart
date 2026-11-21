@@ -12,6 +12,7 @@ class StatusBadge extends StatefulWidget {
   final bool isSpinning;
   final EdgeInsetsGeometry? padding;
   final double? fontSize;
+  final bool useMono;
 
   const StatusBadge({
     super.key,
@@ -24,6 +25,7 @@ class StatusBadge extends StatefulWidget {
     this.isSpinning = false,
     this.padding,
     this.fontSize,
+    this.useMono = true,
   });
 
   @override
@@ -88,15 +90,15 @@ class _StatusBadgeState extends State<StatusBadge> with SingleTickerProviderStat
 
     return Container(
       constraints: widget.maxWidth != null ? BoxConstraints(maxWidth: widget.maxWidth!) : null,
-      padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 8.5, vertical: 4.5),
+      padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       decoration: BoxDecoration(
         color: widget.backgroundColor,
         borderRadius: BorderRadius.circular(16),
         border: widget.border != null
             ? Border.fromBorderSide(widget.border!)
             : Border.all(
-                color: widget.textColor.withValues(alpha: 0.15),
-                width: 1,
+                color: widget.textColor.withValues(alpha: 0.18),
+                width: 0.8,
               ),
       ),
       child: Row(
@@ -115,12 +117,20 @@ class _StatusBadgeState extends State<StatusBadge> with SingleTickerProviderStat
                 widget.label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: AppTheme.labelFont(
-                  fontSize: widget.fontSize ?? 10.5,
-                  fontWeight: FontWeight.w700,
-                  color: widget.textColor,
-                  letterSpacing: 0.0,
-                ),
+                style: widget.useMono
+                    ? AppTheme.labelFont(
+                        fontSize: widget.fontSize ?? 10.5,
+                        fontWeight: FontWeight.w700,
+                        color: widget.textColor,
+                        letterSpacing: 0.0,
+                      )
+                    : AppTheme.bodyFont(
+                        fontSize: widget.fontSize ?? 10.5,
+                        fontWeight: FontWeight.w700,
+                        color: widget.textColor,
+                        letterSpacing: 0.1,
+                        height: 1.15,
+                      ),
               ),
             ),
           ),

@@ -40,6 +40,25 @@ extension StoryCardLayoutX on StoryCardLayout {
     }
   }
 
+  IconData get icon {
+    switch (this) {
+      case StoryCardLayout.classic:
+        return Icons.auto_awesome_rounded;
+      case StoryCardLayout.passport:
+        return Icons.badge_outlined;
+      case StoryCardLayout.minimal:
+        return Icons.crop_portrait_rounded;
+      case StoryCardLayout.showcase:
+        return Icons.photo_size_select_actual_outlined;
+      case StoryCardLayout.journey:
+        return Icons.flight_takeoff_rounded;
+      case StoryCardLayout.polaroid:
+        return Icons.photo_camera_back_outlined;
+      case StoryCardLayout.infographic:
+        return Icons.analytics_outlined;
+    }
+  }
+
   String get emoji {
     switch (this) {
       case StoryCardLayout.classic:
@@ -226,9 +245,9 @@ class StoryCardPalette {
             end: Alignment.bottomCenter,
           ),
           mapBackground: const Color(0xFF03140F),
-          unvisitedLandColor: const Color(0xFF13382D),
-          mapBorderColor: const Color(0xFF09251D),
-          livedColor: const Color(0xFF34D399), // Mint Green
+          unvisitedLandColor: const Color(0xFF162521), // Deep Charcoal Pine
+          mapBorderColor: const Color(0xFF0D211C),
+          livedColor: const Color(0xFF22D3EE), // Luminous Polar Cyan Aqua
           visitedColor: const Color(0xFF10B981), // Emerald
           wishlistColor: const Color(0xFFFBBF24), // Champagne Gold
           textColor: Colors.white,
@@ -252,7 +271,7 @@ class StoryCardPalette {
           ),
           accentColor: const Color(0xFF10B981),
           isLight: false,
-          previewColors: const [Color(0xFF0A2D22), Color(0xFF10B981), Color(0xFFFBBF24)],
+          previewColors: const [Color(0xFF0A2D22), Color(0xFF10B981), Color(0xFF22D3EE)],
         );
 
       case StoryCardTheme.minimalLight:
@@ -421,11 +440,11 @@ class StoryCardPalette {
             end: Alignment.bottomCenter,
           ),
           mapBackground: const Color(0xFF180E10),
-          unvisitedLandColor: const Color(0xFF331D21),
-          mapBorderColor: const Color(0xFF1F1013),
-          livedColor: const Color(0xFFF59E0B),
-          visitedColor: const Color(0xFFFF3D00), // Molten Orange
-          wishlistColor: const Color(0xFFD50000), // Crimson
+          unvisitedLandColor: const Color(0xFF262022), // Basalt Ash Charcoal
+          mapBorderColor: const Color(0xFF1A1214),
+          livedColor: const Color(0xFFFFD600), // Sun Core Yellow Flare
+          visitedColor: const Color(0xFFFF5722), // Molten Lava Orange
+          wishlistColor: const Color(0xFFEC4899), // Hot Magenta Flare
           textColor: Colors.white,
           subtextColor: const Color(0xFFFFCCBC).withValues(alpha: 0.75),
           cardBorder: const Color(0xFFFF3D00).withValues(alpha: 0.35),
@@ -447,7 +466,7 @@ class StoryCardPalette {
           ),
           accentColor: const Color(0xFFFF3D00),
           isLight: false,
-          previewColors: const [Color(0xFF221113), Color(0xFFFF3D00), Color(0xFFF59E0B)],
+          previewColors: const [Color(0xFF221113), Color(0xFFFF3D00), Color(0xFFFFD600)],
         );
 
       case StoryCardTheme.nordicForest:
@@ -462,9 +481,9 @@ class StoryCardPalette {
           mapBackground: const Color(0xFF0B1921),
           unvisitedLandColor: const Color(0xFF1A3342),
           mapBorderColor: const Color(0xFF102532),
-          livedColor: const Color(0xFF2DD4BF),
+          livedColor: const Color(0xFF10B981), // Spruce Emerald
           visitedColor: const Color(0xFF38BDF8), // Ice Blue
-          wishlistColor: const Color(0xFFF472B6),
+          wishlistColor: const Color(0xFFF59E0B), // Nordic Amber Gold
           textColor: Colors.white,
           subtextColor: const Color(0xFFBAE6FD).withValues(alpha: 0.78),
           cardBorder: const Color(0xFF38BDF8).withValues(alpha: 0.3),
@@ -473,7 +492,7 @@ class StoryCardPalette {
           heroGradient: LinearGradient(
             colors: [
               const Color(0xFF38BDF8).withValues(alpha: 0.25),
-              const Color(0xFF2DD4BF).withValues(alpha: 0.15),
+              const Color(0xFF10B981).withValues(alpha: 0.15),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -486,7 +505,7 @@ class StoryCardPalette {
           ),
           accentColor: const Color(0xFF38BDF8),
           isLight: false,
-          previewColors: const [Color(0xFF0F232F), Color(0xFF38BDF8), Color(0xFF2DD4BF)],
+          previewColors: const [Color(0xFF0F232F), Color(0xFF38BDF8), Color(0xFF10B981)],
         );
 
       case StoryCardTheme.goldenHour:
@@ -883,6 +902,7 @@ class TravelMapStoryCard extends StatelessWidget {
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
@@ -906,6 +926,7 @@ class TravelMapStoryCard extends StatelessWidget {
               fontSize: 9.0,
               fontWeight: FontWeight.w900,
               letterSpacing: 0.5,
+              height: 1.15,
             ),
           ),
           if (title.isNotEmpty) ...[
@@ -914,9 +935,12 @@ class TravelMapStoryCard extends StatelessWidget {
               child: Text(
                 '•',
                 style: TextStyle(
-                  color: palette.accentColor.withValues(alpha: 0.6),
+                  color: palette.isLight
+                      ? palette.textColor.withValues(alpha: 0.45)
+                      : palette.accentColor.withValues(alpha: 0.7),
                   fontSize: 8.5,
                   fontWeight: FontWeight.w700,
+                  height: 1.15,
                 ),
               ),
             ),
@@ -926,10 +950,11 @@ class TravelMapStoryCard extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: palette.accentColor,
+                  color: palette.isLight ? palette.textColor : palette.accentColor,
                   fontSize: 8.5,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.8,
+                  height: 1.15,
                 ),
               ),
             ),

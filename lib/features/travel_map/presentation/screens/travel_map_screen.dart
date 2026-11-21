@@ -254,11 +254,14 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text(
-                                        l.emoji,
-                                        style: const TextStyle(fontSize: 13),
+                                      Icon(
+                                        l.icon,
+                                        size: 13.5,
+                                        color: isSelected
+                                            ? const Color(0xFF101010)
+                                            : (isDark ? Colors.white70 : Colors.black87),
                                       ),
-                                      const SizedBox(width: 6),
+                                      const SizedBox(width: 5),
                                       Text(
                                         l.getLocalizedName(
                                           l10n,
@@ -268,7 +271,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                           fontSize: 12,
                                           fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                                           color: isSelected
-                                              ? Colors.white
+                                              ? const Color(0xFF101010)
                                               : (isDark ? Colors.white70 : Colors.black87),
                                         ),
                                       ),
@@ -318,16 +321,29 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                   padding: const EdgeInsets.symmetric(horizontal: 4),
                                   child: FittedBox(
                                     fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      '🌙 ${AppWidgetLocalization.getDarkThemesCategory(lang)} (9)',
-                                      maxLines: 1,
-                                      style: TextStyle(
-                                        fontSize: 11.5,
-                                        fontWeight: selectedThemeCategory == 0 ? FontWeight.w800 : FontWeight.w600,
-                                        color: selectedThemeCategory == 0
-                                            ? Colors.white
-                                            : (isDark ? Colors.white70 : Colors.black87),
-                                      ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          AppIcons.moon,
+                                          size: 12,
+                                          color: selectedThemeCategory == 0
+                                              ? Colors.white
+                                              : (isDark ? Colors.white70 : Colors.black87),
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Text(
+                                          '${AppWidgetLocalization.getDarkThemesCategory(lang)} (9)',
+                                          maxLines: 1,
+                                          style: TextStyle(
+                                            fontSize: 11.5,
+                                            fontWeight: selectedThemeCategory == 0 ? FontWeight.w800 : FontWeight.w600,
+                                            color: selectedThemeCategory == 0
+                                                ? Colors.white
+                                                : (isDark ? Colors.white70 : Colors.black87),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -366,16 +382,29 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                   padding: const EdgeInsets.symmetric(horizontal: 4),
                                   child: FittedBox(
                                     fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      '☀️ ${AppWidgetLocalization.getLightThemesCategory(lang)} (7)',
-                                      maxLines: 1,
-                                      style: TextStyle(
-                                        fontSize: 11.5,
-                                        fontWeight: selectedThemeCategory == 1 ? FontWeight.w800 : FontWeight.w600,
-                                        color: selectedThemeCategory == 1
-                                            ? Colors.white
-                                            : (isDark ? Colors.white70 : Colors.black87),
-                                      ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          AppIcons.sun,
+                                          size: 12,
+                                          color: selectedThemeCategory == 1
+                                              ? const Color(0xFF101010)
+                                              : (isDark ? Colors.white70 : Colors.black87),
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Text(
+                                          '${AppWidgetLocalization.getLightThemesCategory(lang)} (7)',
+                                          maxLines: 1,
+                                          style: TextStyle(
+                                            fontSize: 11.5,
+                                            fontWeight: selectedThemeCategory == 1 ? FontWeight.w800 : FontWeight.w600,
+                                            color: selectedThemeCategory == 1
+                                                ? const Color(0xFF101010)
+                                                : (isDark ? Colors.white70 : Colors.black87),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -461,7 +490,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                       ),
                                       const SizedBox(width: 7),
                                       Text(
-                                        '${palette.emoji} ${palette.label}',
+                                        palette.label,
                                         style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
@@ -1596,7 +1625,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
           ? Icon(
               icon,
               size: 13,
-              color: isSelected ? Colors.white : theme.colorScheme.onSurfaceVariant,
+              color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurfaceVariant,
             )
           : null,
       label: Text(label),
@@ -1610,12 +1639,13 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
           width: 0.5,
         ),
       ),
-      selectedColor: color ?? AppColors.brandAccent,
+      selectedColor: color ?? theme.colorScheme.primary,
       backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
       labelStyle: AppTypography.caption.copyWith(
-        color: isSelected ? Colors.white : theme.colorScheme.onSurfaceVariant,
+        color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurfaceVariant,
         fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
         fontSize: 11.5,
+        height: 1.15,
       ),
       onSelected: (_) {
         ref.read(travelMapControllerProvider.notifier).setFilter(key);
@@ -1698,7 +1728,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                 const SizedBox(width: 6),
                 Flexible(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 6.5, vertical: 2.5),
                     decoration: BoxDecoration(
                       color: statusColor.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(AppRadius.xs),
@@ -1707,10 +1737,11 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                       statusText,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: AppTypography.caption.copyWith(
                         color: statusColor,
                         fontSize: 9.5,
                         fontWeight: FontWeight.bold,
+                        height: 1.15,
                       ),
                     ),
                   ),

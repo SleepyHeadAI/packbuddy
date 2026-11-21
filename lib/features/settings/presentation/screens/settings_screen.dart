@@ -400,11 +400,11 @@ class SettingsScreen extends ConsumerWidget {
                               syncState.lastSyncTime != null
                                   ? '${l10n.lastSync}: ${AppDateFormatter.formatDateTime(syncState.lastSyncTime!)}'
                                   : '${l10n.lastSync}: --',
-                              style: AppTypography.mono(
+                              style: AppTypography.caption.copyWith(
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.w500,
-                                tabularFigures: true,
                                 color: theme.colorScheme.onSurfaceVariant,
+                                fontFeatures: const [FontFeature.tabularFigures()],
                               ),
                             ),
                           ],
@@ -918,18 +918,23 @@ class _SettingsTile extends StatelessWidget {
                       if (badge != null) ...[
                         const SizedBox(width: 6),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 6.5, vertical: 2.5),
                           decoration: BoxDecoration(
                             color: (badgeColor ?? iconColor).withValues(alpha: 0.14),
-                            borderRadius: BorderRadius.circular(5),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: (badgeColor ?? iconColor).withValues(alpha: 0.25),
+                              width: 0.6,
+                            ),
                           ),
                           child: Text(
                             badge!,
-                            style: TextStyle(
+                            style: AppTypography.caption.copyWith(
                               fontSize: 9.5,
                               fontWeight: FontWeight.w800,
                               color: badgeColor ?? iconColor,
                               letterSpacing: 0.3,
+                              height: 1.15,
                             ),
                           ),
                         ),
@@ -1030,6 +1035,7 @@ class _ThemeModeSegmentedControl extends StatelessWidget {
                   icon: AppIcons.spark,
                   isSelected: selectedMode == ThemeMode.system,
                   isDark: isDark,
+                  flex: math.max(10, l10n.themeSystem.length + 6),
                 ),
                 _buildOption(
                   mode: ThemeMode.light,
@@ -1037,6 +1043,7 @@ class _ThemeModeSegmentedControl extends StatelessWidget {
                   icon: AppIcons.sun,
                   isSelected: selectedMode == ThemeMode.light,
                   isDark: isDark,
+                  flex: math.max(10, l10n.themeLight.length + 6),
                 ),
                 _buildOption(
                   mode: ThemeMode.dark,
@@ -1044,6 +1051,7 @@ class _ThemeModeSegmentedControl extends StatelessWidget {
                   icon: AppIcons.moon,
                   isSelected: selectedMode == ThemeMode.dark,
                   isDark: isDark,
+                  flex: math.max(10, l10n.themeDark.length + 6),
                 ),
               ],
             ),
@@ -1059,8 +1067,10 @@ class _ThemeModeSegmentedControl extends StatelessWidget {
     required IconData icon,
     required bool isSelected,
     required bool isDark,
+    int flex = 1,
   }) {
     return Expanded(
+      flex: flex,
       child: InkWell(
         onTap: () {
           AppHaptics.selectionClick();

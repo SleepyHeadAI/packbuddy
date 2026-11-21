@@ -194,13 +194,13 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
               width: 38,
               height: 38,
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                color: AppColors.brandAccent.withValues(alpha: 0.14),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
                 child: Icon(
                   Icons.currency_exchange_rounded,
-                  color: theme.colorScheme.primary,
+                  color: isDark ? AppColors.brandAccentDark : AppColors.brandPrimaryLight,
                   size: 20,
                 ),
               ),
@@ -219,15 +219,31 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  Text(
-                    isLive
-                        ? (l10n?.liveRates ?? 'Live Rates')
-                        : (l10n?.offlineRates ?? 'Offline Baseline'),
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: isLive ? AppColors.successPastel : theme.colorScheme.onSurfaceVariant,
-                    ),
+                  const SizedBox(height: 2),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 5,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: isLive ? AppColors.successPastel : theme.colorScheme.onSurfaceVariant,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 4.5),
+                      Text(
+                        isLive
+                            ? (l10n?.liveRates ?? 'Live Rates')
+                            : (l10n?.offlineRates ?? 'Offline Baseline'),
+                        style: AppTypography.caption.copyWith(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: isLive ? AppColors.successPastel : theme.colorScheme.onSurfaceVariant,
+                          height: 1.15,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

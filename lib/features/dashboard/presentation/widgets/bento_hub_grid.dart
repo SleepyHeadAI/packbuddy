@@ -356,22 +356,27 @@ class _BentoCompanionTile extends StatelessWidget {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               iconWidget,
               if (badgeText != null)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6.5, vertical: 2.5),
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                   decoration: BoxDecoration(
                     color: (badgeColor ?? iconColor).withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: (badgeColor ?? iconColor).withValues(alpha: 0.25),
+                      width: 0.6,
+                    ),
                   ),
                   child: Text(
                     badgeText!,
-                    style: TextStyle(
+                    style: AppTypography.caption.copyWith(
                       fontSize: 9.5,
                       fontWeight: FontWeight.w800,
                       color: badgeColor ?? iconColor,
+                      height: 1.15,
                     ),
                   ),
                 ),

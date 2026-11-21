@@ -96,14 +96,14 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
           BoxShadow(
             color: isDark
                 ? Colors.black.withValues(alpha: 0.22)
-                : const Color(0xFF0F172A).withValues(alpha: 0.025),
+                : const Color(0xFF785148).withValues(alpha: 0.025),
             blurRadius: 14,
             spreadRadius: 0,
             offset: const Offset(0, 3),
           ),
           if (!isDark)
             BoxShadow(
-              color: const Color(0xFF0F172A).withValues(alpha: 0.01),
+              color: const Color(0xFF785148).withValues(alpha: 0.012),
               blurRadius: 4,
               spreadRadius: 0,
               offset: const Offset(0, 1),

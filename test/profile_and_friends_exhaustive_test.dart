@@ -3,26 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
-import 'package:packbuddy/features/budget/domain/trip.dart';
-import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
-import 'package:packbuddy/features/profile/domain/animal_avatar.dart';
 import 'package:packbuddy/features/profile/domain/friend_localization.dart';
 import 'package:packbuddy/features/profile/domain/friendship.dart';
 import 'package:packbuddy/features/profile/domain/profile_localization.dart';
 import 'package:packbuddy/features/profile/domain/travel_badge.dart';
 import 'package:packbuddy/features/profile/domain/travel_style.dart';
 import 'package:packbuddy/features/profile/domain/user_profile.dart';
-import 'package:packbuddy/features/profile/presentation/controllers/friends_controller.dart';
-import 'package:packbuddy/features/profile/presentation/controllers/profile_controller.dart';
 import 'package:packbuddy/features/profile/presentation/screens/friend_profile_screen.dart';
 import 'package:packbuddy/features/profile/presentation/screens/friends_screen.dart';
-import 'package:packbuddy/features/profile/presentation/screens/profile_screen.dart';
 import 'package:packbuddy/features/profile/presentation/screens/widgets/collaborator_avatar_stack.dart';
 import 'package:packbuddy/features/profile/presentation/screens/widgets/friend_tile.dart';
-import 'package:packbuddy/features/profile/presentation/screens/widgets/my_buddy_qr_sheet.dart';
-import 'package:packbuddy/features/profile/presentation/screens/widgets/profile_header_card.dart';
 import 'package:packbuddy/features/profile/presentation/screens/widgets/travel_badges_card.dart';
-import 'package:packbuddy/features/profile/presentation/screens/widgets/travel_stats_card.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 void main() {

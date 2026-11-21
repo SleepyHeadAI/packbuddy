@@ -17,7 +17,6 @@ import 'package:packbuddy/features/vault/presentation/controllers/vault_controll
 import 'package:packbuddy/features/travel_map/presentation/controllers/travel_map_controller.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/shared/widgets/app_button.dart';
-import 'package:packbuddy/shared/widgets/app_divider.dart';
 
 class _FakeTripController extends StateNotifier<TripState> implements TripController {
   _FakeTripController({List<Trip>? trips})

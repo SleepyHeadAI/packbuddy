@@ -98,6 +98,7 @@ void main() {
           matching: find.byType(ConstrainedBox),
         ),
       );
+      expect(constrainedBoxes.isNotEmpty, isTrue);
 
       // Tap increment
       final addIcon = find.byIcon(AppIcons.add);

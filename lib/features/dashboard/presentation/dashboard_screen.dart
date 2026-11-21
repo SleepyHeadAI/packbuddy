@@ -503,7 +503,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             AppSpacing.md,
             AppSpacing.xs,
             AppSpacing.md,
-            math.max(120.0, MediaQuery.of(context).padding.bottom + 100.0),
+            math.max(140.0, MediaQuery.of(context).padding.bottom + 120.0),
           ),
           children: [
             // =========================================================================
@@ -957,22 +957,21 @@ class _HorizontalGreetingBar extends StatelessWidget {
               ),
               const SizedBox(width: 8),
 
-              // Cloud Sync Status Pill (Anchored to the right side cluster with responsive width)
-              Flexible(
-                child: InkWell(
-                  onTap: () {
-                    AppHaptics.selectionClick();
-                    onSyncTap();
-                  },
-                  borderRadius: BorderRadius.circular(14),
-                  child: StatusBadge(
-                    label: syncLabel,
-                    icon: syncIcon,
-                    backgroundColor: syncBgColor,
-                    textColor: syncTextColor,
-                    isSpinning: isSyncing,
-                    maxWidth: 86,
-                  ),
+              // Cloud Sync Status Pill (Anchored cleanly to the right cluster)
+              InkWell(
+                onTap: () {
+                  AppHaptics.selectionClick();
+                  onSyncTap();
+                },
+                borderRadius: BorderRadius.circular(14),
+                child: StatusBadge(
+                  label: syncLabel,
+                  icon: syncIcon,
+                  backgroundColor: syncBgColor,
+                  textColor: syncTextColor,
+                  isSpinning: isSyncing,
+                  maxWidth: 96,
+                  useMono: false,
                 ),
               ),
               const SizedBox(width: 6),
@@ -1033,67 +1032,98 @@ class _HorizontalGreetingBar extends StatelessWidget {
           ),
           const SizedBox(height: 8),
 
-          // Row 2: User Avatar + User Name (Left) + Formatted Date (Right)
-          BouncyPressable(
-            scaleFactor: 0.98,
-            onTap: onProfileTap != null
-                ? () {
-                    AppHaptics.light();
-                    onProfileTap!();
-                  }
-                : null,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Hero(
-                  tag: 'dashboard-profile-avatar',
-                  child: UserAvatar(
-                    photoUrl: photoUrl,
-                    displayName: displayName,
-                    size: 28,
-                    isAnimated: true,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
+          // Row 2: User Avatar + User Name (Left) + Formatted Date Pill (Right, optically aligned flush to right edge)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: BouncyPressable(
+                  scaleFactor: 0.98,
+                  onTap: onProfileTap != null
+                      ? () {
+                          AppHaptics.light();
+                          onProfileTap!();
+                        }
+                      : null,
                   child: Row(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Flexible(
-                        child: Text(
-                          displayName,
-                          style: AppTypography.titleMedium.copyWith(
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.3,
-                            fontSize: 16,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                      Hero(
+                        tag: 'dashboard-profile-avatar',
+                        child: UserAvatar(
+                          photoUrl: photoUrl,
+                          displayName: displayName,
+                          size: 28,
+                          isAnimated: true,
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      Icon(
-                        AppIcons.chevronRight,
-                        size: 16,
-                        color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                displayName,
+                                style: AppTypography.titleMedium.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: -0.3,
+                                  fontSize: 16,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              AppIcons.chevronRight,
+                              size: 16,
+                              color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: Text(
-                    subtitle,
-                    style: AppTypography.caption.copyWith(
-                      color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(width: 8),
+
+              // Formatted Date Badge (Flush with right edge of card)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                  border: Border.all(
+                    color: isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight,
+                    width: 0.8,
                   ),
                 ),
-              ],
-            ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      AppIcons.calendar,
+                      size: 11,
+                      color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      subtitle,
+                      style: AppTypography.caption.copyWith(
+                        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 10.5,
+                        height: 1.15,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -1211,7 +1241,11 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
     final isLight = !isDark;
     final country = Country.findByCode(trip.countryCode);
     final tripCountries = (trip is Trip) ? (trip as Trip).countries : <Country>[];
-    final transportIcon = TripsScreen.getTransportIcon(trip.transportMode);
+    final rawTransportIcon = TripsScreen.getTransportIcon(trip.transportMode);
+    // Distinct Journey/Transport Identity: Route card must never duplicate luggage icon
+    final transportIcon = (rawTransportIcon == AppIcons.luggage)
+        ? AppIcons.flight
+        : rawTransportIcon;
     final l10n = AppLocalizations.of(context)!;
     final lang = Localizations.localeOf(context).languageCode;
 
@@ -1249,6 +1283,19 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
       },
       child: AppCard(
         padding: const EdgeInsets.all(16),
+        gradient: LinearGradient(
+          colors: isDark
+              ? [
+                  AppColors.surfaceBaseDark,
+                  AppColors.brandAccent.withValues(alpha: 0.05),
+                ]
+              : [
+                  Colors.white,
+                  AppColors.brandAccent.withValues(alpha: 0.07),
+                ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1273,7 +1320,7 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                       ],
                     ),
                     child: Center(
-                      child: Icon(transportIcon, color: Colors.white, size: 20),
+                      child: Icon(transportIcon, color: theme.colorScheme.onPrimary, size: 20),
                     ),
                   ),
                 ),
@@ -1349,11 +1396,12 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                         countdownPill,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: AppTypography.mono(
+                        style: AppTypography.caption.copyWith(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
                           color: pillTextColor,
-                          tabularFigures: true,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                          height: 1.15,
                         ),
                       ),
                     ),
@@ -1526,6 +1574,7 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.only(right: 12),
                   itemCount: allTrips.length,
                   separatorBuilder: (_, _) => const SizedBox(width: 6),
                   itemBuilder: (context, index) {
@@ -1631,6 +1680,19 @@ class _LuggageChecklistCard extends StatelessWidget {
       },
       child: AppCard(
         padding: const EdgeInsets.all(16),
+        gradient: LinearGradient(
+          colors: isDark
+              ? [
+                  AppColors.surfaceBaseDark,
+                  AppColors.brandAccent.withValues(alpha: 0.05),
+                ]
+              : [
+                  Colors.white,
+                  AppColors.brandAccent.withValues(alpha: 0.07),
+                ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1721,10 +1783,10 @@ class _LuggageChecklistCard extends StatelessWidget {
                 ),
                 // Status Badge
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(horizontal: 7.5, vertical: 3.5),
                   decoration: BoxDecoration(
                     color: checklistStatusColor.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(AppRadius.xs),
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
                     border: Border.all(
                       color: checklistStatusColor.withValues(alpha: 0.35),
                       width: 0.8,
@@ -1736,11 +1798,12 @@ class _LuggageChecklistCard extends StatelessWidget {
                         : (checklistCompletionRatio >= 1.0
                             ? l10n.completed.toUpperCase()
                             : l10n.preparing.toUpperCase()),
-                    style: AppTypography.labelSmall.copyWith(
+                    style: AppTypography.caption.copyWith(
                       color: checklistStatusColor,
                       fontSize: 9.5,
                       fontWeight: FontWeight.w800,
-                      letterSpacing: 0.5,
+                      letterSpacing: 0.4,
+                      height: 1.15,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

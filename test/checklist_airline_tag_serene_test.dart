@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/features/checklist/domain/packing_tag.dart';

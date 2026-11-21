@@ -45,7 +45,7 @@ class DashboardMiniTravelMap extends StatelessWidget {
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Hero(
                   tag: 'travel-map-hero-badge',
@@ -69,10 +69,14 @@ class DashboardMiniTravelMap extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                   decoration: BoxDecoration(
                     color: const Color(0xFF10B981).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color(0xFF10B981).withValues(alpha: 0.25),
+                      width: 0.6,
+                    ),
                   ),
                   child: Text(
                     '${worldPercentage.toStringAsFixed(1)}%',
@@ -169,7 +173,7 @@ class DashboardMiniVault extends StatelessWidget {
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Hero(
                   tag: 'vault-hero-badge',
@@ -188,10 +192,14 @@ class DashboardMiniVault extends StatelessWidget {
                 ),
                 if (docCount > 0)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                     decoration: BoxDecoration(
                       color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: const Color(0xFF8B5CF6).withValues(alpha: 0.25),
+                        width: 0.6,
+                      ),
                     ),
                     child: Text(
                       '$docCount',
@@ -279,7 +287,7 @@ class DashboardMiniAllTrips extends StatelessWidget {
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Hero(
                   tag: 'trips-hero-badge',
@@ -298,10 +306,14 @@ class DashboardMiniAllTrips extends StatelessWidget {
                 ),
                 if (tripCount > 0)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primary.withValues(alpha: 0.14),
                       borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                        width: 0.6,
+                      ),
                     ),
                     child: Text(
                       '$tripCount',

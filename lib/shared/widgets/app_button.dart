@@ -144,7 +144,7 @@ class AppButton extends StatelessWidget {
     switch (variant) {
       case AppButtonVariant.primary:
         bg = isDark ? AppColors.brandPrimaryDark : AppColors.brandPrimaryLight;
-        fg = isDark ? const Color(0xFF0F172A) : Colors.white;
+        fg = isDark ? AppColors.deepObsidian : Colors.white;
         break;
       case AppButtonVariant.secondary:
         bg = isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight;

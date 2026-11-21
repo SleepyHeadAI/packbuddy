@@ -130,7 +130,6 @@ void main() {
 
       final totalCount = countries.length;
       final exploredPctStr = '%${((6 / totalCount) * 100).toStringAsFixed(1)}';
-      final paintedPctStr = '%${((12 / totalCount) * 100).toStringAsFixed(1)}';
 
       bool didTapOpen = false;
 
@@ -226,7 +225,6 @@ void main() {
 
       final totalCount = friendCountries.length;
       final exploredPctStr = '%${((4 / totalCount) * 100).toStringAsFixed(1)}';
-      final paintedPctStr = '%${((6 / totalCount) * 100).toStringAsFixed(1)}';
 
       await tester.pumpWidget(
         buildLocalizedApp(

@@ -14,7 +14,6 @@ import 'package:packbuddy/features/profile/presentation/controllers/profile_cont
 import 'package:packbuddy/features/profile/presentation/screens/friend_profile_screen.dart';
 import 'package:packbuddy/features/profile/presentation/screens/friends_screen.dart';
 import 'package:packbuddy/features/profile/presentation/screens/profile_screen.dart';
-import 'package:packbuddy/features/profile/presentation/screens/widgets/add_friend_sheet.dart';
 import 'package:packbuddy/features/profile/presentation/screens/widgets/edit_profile_sheet.dart';
 import 'package:packbuddy/features/profile/presentation/screens/widgets/friend_tile.dart';
 import 'package:packbuddy/features/profile/presentation/screens/widgets/my_buddy_qr_sheet.dart';
