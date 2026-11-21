@@ -913,7 +913,7 @@ class TravelBadge {
       TravelBadge(
         id: 'explorer_diamond',
         category: 'countries',
-        iconData: Icons.auto_awesome_rounded,
+        iconData: Icons.diamond_rounded,
         tier: BadgeTier.diamond,
         currentProgress: totalCountries,
         targetProgress: 25,

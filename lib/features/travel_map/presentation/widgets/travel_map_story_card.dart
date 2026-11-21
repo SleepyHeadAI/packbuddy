@@ -43,7 +43,7 @@ extension StoryCardLayoutX on StoryCardLayout {
   IconData get icon {
     switch (this) {
       case StoryCardLayout.classic:
-        return Icons.auto_awesome_rounded;
+        return Icons.style_rounded;
       case StoryCardLayout.passport:
         return Icons.badge_outlined;
       case StoryCardLayout.minimal:
@@ -1241,8 +1241,8 @@ class TravelMapStoryCard extends StatelessWidget {
             Flexible(
               child: _buildTopHeaderBadge(
                 palette: palette,
-                title: '%${worldPercentage.toStringAsFixed(1)} ${l10n.ofTheWorld.toUpperCase()}',
-                fallbackIcon: Icons.auto_awesome_rounded,
+                title: '${l10n.localeName.startsWith("tr") ? "%${worldPercentage.toStringAsFixed(1)}" : "${worldPercentage.toStringAsFixed(1)}%"} ${l10n.ofTheWorld.toUpperCase()}',
+                fallbackIcon: Icons.public_rounded,
               ),
             ),
           ],

@@ -80,7 +80,7 @@ class PackingItemTile extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
-          vertical: 2.0, // High-density list vertical spacing
+          vertical: 3.5, // Comfortable, spacious list vertical spacing
         ),
         child: Dismissible(
           key: ValueKey('packing_item_${item.id}'),
@@ -168,7 +168,7 @@ class PackingItemTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppRadius.md),
                 onTap: onTap ?? onTogglePacked,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   child: Row(
                     children: [
                       // Tactile Checkbox Target
@@ -183,9 +183,9 @@ class PackingItemTile extends StatelessWidget {
                             }
                             onTogglePacked();
                           },
-                          radius: 18,
+                          radius: 20,
                           child: Padding(
-                            padding: const EdgeInsets.only(right: 8, top: 2, bottom: 2),
+                            padding: const EdgeInsets.only(right: 10, top: 2, bottom: 2),
                             child: AnimatedSwitcher(
                               duration: const Duration(milliseconds: 200),
                               transitionBuilder: (child, animation) => ScaleTransition(
@@ -198,8 +198,8 @@ class PackingItemTile extends StatelessWidget {
                               child: item.isPacked
                                   ? Container(
                                       key: const ValueKey('packed'),
-                                      width: 22,
-                                      height: 22,
+                                      width: 24,
+                                      height: 24,
                                       decoration: BoxDecoration(
                                         color: isDark
                                             ? const Color(0xFF10B981)
@@ -209,13 +209,13 @@ class PackingItemTile extends StatelessWidget {
                                       child: const Icon(
                                         AppIcons.check,
                                         color: Colors.white,
-                                        size: 13,
+                                        size: 14,
                                       ),
                                     )
                                   : Container(
                                       key: const ValueKey('unpacked'),
-                                      width: 22,
-                                      height: 22,
+                                      width: 24,
+                                      height: 24,
                                       decoration: BoxDecoration(
                                         color: Colors.transparent,
                                         shape: BoxShape.circle,
@@ -223,7 +223,7 @@ class PackingItemTile extends StatelessWidget {
                                           color: isDark
                                               ? const Color(0xFF475569)
                                               : const Color(0xFFCBD5E1),
-                                          width: 1.5,
+                                          width: 1.6,
                                         ),
                                       ),
                                     ),
@@ -238,19 +238,20 @@ class PackingItemTile extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // Product Title with localized name & clean strikethrough
+                            // Product Title with localized name & clean strikethrough (Multi-line comfortable wrap)
                             AnimatedStrikethroughText(
                               text: CanonicalPackingCatalog.getLocalizedItemName(
                                 item.name,
                                 Localizations.localeOf(context).languageCode,
                               ),
                               isCrossed: item.isPacked,
-                              maxLines: 1,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: AppTypography.body(
-                                fontSize: 14.0,
+                                fontSize: 14.5,
                                 fontWeight: item.isPacked ? FontWeight.w500 : FontWeight.w600,
                                 letterSpacing: -0.2,
+                                height: 1.25,
                                 color: item.isPacked
                                     ? (isDark ? AppColors.textMutedDark : AppColors.textMutedLight)
                                     : (isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight),
@@ -260,7 +261,7 @@ class PackingItemTile extends StatelessWidget {
                                   : const Color(0xFF64748B),
                               strokeWidth: 1.6,
                             ),
-                            const SizedBox(height: 2),
+                            const SizedBox(height: 4),
 
                             // Subtitle Metadata Line: Category • Tag • Assignee
                             Row(
@@ -376,10 +377,10 @@ class PackingItemTile extends StatelessWidget {
                         duration: AppMotion.fast,
                         opacity: item.isPacked ? 0.45 : 1.0,
                         child: Container(
-                          height: 28,
+                          height: 30,
                           decoration: BoxDecoration(
                             color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(15),
                             border: Border.all(
                               color: tileBorderColor,
                               width: 0.6,
@@ -390,7 +391,7 @@ class PackingItemTile extends StatelessWidget {
                             children: [
                               // Decrement Button
                               InkResponse(
-                                radius: 14,
+                                radius: 15,
                                 onTap: item.quantity > 1
                                     ? () {
                                         AppHaptics.selection();
@@ -398,10 +399,10 @@ class PackingItemTile extends StatelessWidget {
                                       }
                                     : null,
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                                   child: Icon(
                                     AppIcons.remove,
-                                    size: 11,
+                                    size: 11.5,
                                     color: item.quantity > 1
                                         ? (isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight)
                                         : (isDark ? AppColors.textMutedDark : AppColors.textMutedLight),
@@ -411,11 +412,11 @@ class PackingItemTile extends StatelessWidget {
 
                               // Tabular Monospace Quantity
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 1),
+                                padding: const EdgeInsets.symmetric(horizontal: 2),
                                 child: Text(
                                   '${item.quantity}',
                                   style: AppTypography.mono(
-                                    fontSize: 12,
+                                    fontSize: 12.5,
                                     fontWeight: FontWeight.w700,
                                     tabularFigures: true,
                                     color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
@@ -425,17 +426,17 @@ class PackingItemTile extends StatelessWidget {
 
                               // Increment Button
                               InkResponse(
-                                radius: 14,
+                                radius: 15,
                                 onTap: () {
                                   AppHaptics.selection();
                                   onUpdateQuantity(1);
                                 },
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                                   child: Icon(
                                     AppIcons.add,
-                                    size: 11,
-                                    color: theme.colorScheme.primary,
+                                    size: 11.5,
+                                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
                                   ),
                                 ),
                               ),

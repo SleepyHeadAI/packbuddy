@@ -148,7 +148,7 @@ class PaywallSheet extends ConsumerWidget {
               ],
             ),
             child: Icon(
-              Icons.auto_awesome_rounded,
+              Icons.workspace_premium_rounded,
               color: isDark ? AppColors.primaryAmber : AppColors.primaryLight,
               size: 32,
             ),

@@ -45,7 +45,7 @@ class AppIcons {
   static const IconData categoryAll = LucideIcons.layoutGrid;
   static const IconData categoryClothing = LucideIcons.shirt;
   static const IconData categoryElectronics = LucideIcons.smartphone;
-  static const IconData categoryToiletries = LucideIcons.sparkles;
+  static const IconData categoryToiletries = LucideIcons.bath;
   static const IconData categoryDocuments = LucideIcons.fileText;
   static const IconData categoryAccessories = LucideIcons.watch;
   static const IconData categoryOther = LucideIcons.ellipsis;
@@ -98,6 +98,13 @@ class AppIcons {
   static const IconData error = LucideIcons.circleAlert;
   static const IconData success = LucideIcons.circleCheck;
   static const IconData spark = LucideIcons.sparkles;
+  static const IconData template = LucideIcons.layoutTemplate;
+  static const IconData star = LucideIcons.star;
+  static const IconData heart = LucideIcons.heart;
+  static const IconData zap = LucideIcons.zap;
+  static const IconData crown = LucideIcons.crown;
+  static const IconData gem = LucideIcons.gem;
+  static const IconData compass = LucideIcons.compass;
   static const IconData cloudSync = LucideIcons.cloudUpload;
   static const IconData cloudDone = LucideIcons.cloudCheck;
   static const IconData cloudOff = LucideIcons.cloudOff;

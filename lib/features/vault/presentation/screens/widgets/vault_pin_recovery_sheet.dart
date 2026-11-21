@@ -416,7 +416,7 @@ class _VaultPinRecoverySheetState extends ConsumerState<VaultPinRecoverySheet> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.auto_awesome_rounded, size: 14, color: theme.colorScheme.primary),
+                        Icon(Icons.password_rounded, size: 14, color: theme.colorScheme.primary),
                         const SizedBox(width: 5),
                         Text(
                           DashboardLocalization.vaultAutofillCode(

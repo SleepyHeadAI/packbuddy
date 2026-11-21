@@ -96,7 +96,7 @@ class QuickActionsSheet extends StatelessWidget {
       barrierDismissible: true,
       barrierLabel: 'QuickActionsOverlay',
       barrierColor: Colors.transparent,
-      transitionDuration: const Duration(milliseconds: 260),
+      transitionDuration: const Duration(milliseconds: 240),
       pageBuilder: (dialogContext, animation, secondaryAnimation) {
         return Material(
           type: MaterialType.transparency,
@@ -110,7 +110,14 @@ class QuickActionsSheet extends StatelessWidget {
         );
       },
       transitionBuilder: (dialogContext, animation, secondaryAnimation, child) {
-        return child;
+        return FadeTransition(
+          opacity: CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+            reverseCurve: Curves.easeInCubic,
+          ),
+          child: child,
+        );
       },
     );
   }
@@ -364,7 +371,7 @@ class QuickActionsSheet extends StatelessWidget {
       ),
       // 2. Ready Smart Templates
       QuickActionItem(
-        icon: AppIcons.spark,
+        icon: AppIcons.template,
         iconColor: const Color(0xFF8B5CF6),
         iconBgColor: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
         title: l10n.readyTemplates,
@@ -452,7 +459,7 @@ class QuickActionsSheet extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: Icon(
-                  AppIcons.spark,
+                  AppIcons.zap,
                   size: 18,
                   color: theme.colorScheme.primary,
                 ),
@@ -917,25 +924,29 @@ class _FloatingQuickActionsOverlay extends StatelessWidget {
           reverseCurve: Curves.easeInCubic,
         ).value;
 
-        final blurAmount = (16.0 * progress).clamp(0.001, 16.0);
+        final showBlur = progress > 0.03;
+        final blurAmount = (6.0 * progress).clamp(0.1, 6.0);
 
         return Stack(
           children: [
-            // 1. Fullscreen Blurred Backdrop & Tap-to-Dismiss
+            // 1. Fullscreen Blurred Backdrop & Tap-to-Dismiss (Ultra-smooth 60/120fps GPU friendly)
             Positioned.fill(
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () => Navigator.of(context).pop(),
-                child: BackdropFilter(
-                  filter: ui.ImageFilter.blur(
-                    sigmaX: blurAmount,
-                    sigmaY: blurAmount,
-                  ),
-                  child: Container(
-                    color: (isDark ? const Color(0xFF0F172A) : const Color(0xFF0F172A))
-                        .withValues(alpha: 0.35 * progress),
-                  ),
-                ),
+                child: showBlur
+                    ? BackdropFilter(
+                        filter: ui.ImageFilter.blur(
+                          sigmaX: blurAmount,
+                          sigmaY: blurAmount,
+                        ),
+                        child: Container(
+                          color: const Color(0xFF0F172A).withValues(alpha: 0.32 * progress),
+                        ),
+                      )
+                    : Container(
+                        color: const Color(0xFF0F172A).withValues(alpha: 0.32 * progress),
+                      ),
               ),
             ),
 
@@ -976,7 +987,7 @@ class _FloatingQuickActionsOverlay extends StatelessWidget {
               ),
             ),
 
-            // 3. Yellow Action Button (Smooth 45-degree rotation to '×')
+            // 3. Action Button (Pixel-perfect matching FAB shape & animated fading shadow)
             Positioned(
               left: fabRect.left,
               top: fabRect.top,
@@ -990,24 +1001,26 @@ class _FloatingQuickActionsOverlay extends StatelessWidget {
                   child: InkWell(
                     key: const Key('quick_actions_fab_close'),
                     onTap: () => Navigator.of(context).pop(),
-                    borderRadius: BorderRadius.circular(AppRadius.fab),
+                    borderRadius: BorderRadius.circular(18),
                     child: Ink(
                       decoration: BoxDecoration(
                         color: fabColor ?? (isDark ? AppColors.primaryDark : AppColors.brandAccent),
-                        borderRadius: BorderRadius.circular(AppRadius.fab),
-                        boxShadow: [
-                          BoxShadow(
-                            color: (fabColor ?? (isDark ? AppColors.primaryDark : AppColors.brandAccent))
-                                .withValues(alpha: 0.35),
-                            blurRadius: 16,
-                            offset: const Offset(0, 4),
-                          ),
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.12),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: progress > 0.05
+                            ? [
+                                BoxShadow(
+                                  color: (fabColor ?? (isDark ? AppColors.primaryDark : AppColors.brandAccent))
+                                      .withValues(alpha: (0.32 * progress).clamp(0.0, 0.32)),
+                                  blurRadius: 12 * progress,
+                                  offset: Offset(0, 3 * progress),
+                                ),
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: (0.10 * progress).clamp(0.0, 0.10)),
+                                  blurRadius: 5 * progress,
+                                  offset: Offset(0, 1.5 * progress),
+                                ),
+                              ]
+                            : null,
                       ),
                       child: Center(
                         child: Transform.rotate(

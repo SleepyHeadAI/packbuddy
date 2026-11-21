@@ -433,24 +433,10 @@ class _EmailVerificationScreenState
             ),
           ],
         ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Icon(
-              Icons.mark_email_unread_rounded,
-              size: 42,
-              color: isDark ? AppColors.onPrimaryDark : Colors.white,
-            ),
-            Positioned(
-              top: 16,
-              right: 16,
-              child: Icon(
-                Icons.auto_awesome_rounded,
-                size: 15,
-                color: AppColors.goldAccent,
-              ),
-            ),
-          ],
+        child: Icon(
+          Icons.mark_email_unread_rounded,
+          size: 42,
+          color: isDark ? AppColors.onPrimaryDark : Colors.white,
         ),
       ),
     );

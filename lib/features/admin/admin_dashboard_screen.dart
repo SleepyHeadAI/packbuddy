@@ -4857,7 +4857,7 @@ class _UserModerationBottomSheetState
                   keyName: 'ai_features',
                   title: isTr ? 'Akıllı Asistan & AI Önerileri' : 'Smart AI Suggestions',
                   subtitle: isTr ? 'Yapay zeka bavul ve gezi tavsiyeleri' : 'Smart AI luggage recommendations',
-                  icon: Icons.auto_awesome_rounded,
+                  icon: Icons.smart_toy_rounded,
                 ),
                 const Divider(height: 1),
                 _buildRestrictionToggle(

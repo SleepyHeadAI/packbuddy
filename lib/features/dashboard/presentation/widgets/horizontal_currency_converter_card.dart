@@ -126,6 +126,11 @@ class _HorizontalCurrencyConverterCardState
       toCurrency: _toCurrency,
     );
 
+    final inverseRate = rateFromTo > 0 ? (1.0 / rateFromTo) : 0.0;
+    final inverseFormatted = inverseRate >= 100
+        ? inverseRate.toStringAsFixed(1)
+        : (inverseRate >= 1 ? inverseRate.toStringAsFixed(2) : inverseRate.toStringAsFixed(4));
+
     final isLive = CurrencyService.isUsingLiveRates;
 
     return AppCard(
@@ -440,38 +445,77 @@ class _HorizontalCurrencyConverterCardState
           ),
           const SizedBox(height: 8),
 
-          // 4. Conversion Rate Info Footer (Dedicated Full Width, Clean & Uncluttered)
+          // 4. Conversion Rate Info Footer (Balanced 2-column Direct + Inverse rate, eliminating empty void)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(9),
               border: Border.all(
                 color: isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight,
-                width: 0.5,
+                width: 0.6,
               ),
             ),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Icon(
-                  AppIcons.currency,
-                  size: 11,
-                  color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
-                ),
-                const SizedBox(width: 5),
+                // Direct Rate (e.g. 1 USD = 50.53 TRY)
                 Expanded(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      '1 $_fromCurrency = ${rateFromTo.toStringAsFixed(2)} $_toCurrency',
-                      style: AppTypography.mono(
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-                        tabularFigures: true,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        AppIcons.currency,
+                        size: 11.5,
+                        color: theme.colorScheme.primary,
                       ),
-                    ),
+                      const SizedBox(width: 5),
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            '1 $_fromCurrency = ${rateFromTo.toStringAsFixed(2)} $_toCurrency',
+                            style: AppTypography.mono(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w700,
+                              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                              tabularFigures: true,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  height: 12,
+                  width: 1,
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  color: isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight,
+                ),
+                // Inverse Rate (e.g. 1 TRY = 0.0198 USD)
+                Expanded(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            '1 $_toCurrency = $inverseFormatted $_fromCurrency',
+                            style: AppTypography.mono(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                              tabularFigures: true,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],

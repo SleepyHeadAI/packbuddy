@@ -1571,75 +1571,86 @@ class _UpcomingTripHighlightCard extends StatelessWidget {
               const SizedBox(height: 10),
               SizedBox(
                 height: 30,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.only(right: 12),
-                  itemCount: allTrips.length,
-                  separatorBuilder: (_, _) => const SizedBox(width: 6),
-                  itemBuilder: (context, index) {
-                    final t = allTrips[index];
-                    final isCurrent = t.id == trip.id;
-                    final tCountry = Country.findByCode(t.countryCode);
-                    final rawTDest = t.destination.isNotEmpty
-                        ? CityLocalization.localizeDestination(t.destination, lang)
-                        : t.title;
-                    final cleanTDest = stripLeadingFlags(rawTDest);
-
-                    return BouncyPressable(
-                      scaleFactor: 0.95,
-                      onTap: () {
-                        AppHaptics.light();
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => TripDetailScreen(trip: t),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: isCurrent
-                              ? theme.colorScheme.primary.withValues(alpha: 0.12)
-                              : (isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: isCurrent
-                                ? theme.colorScheme.primary.withValues(alpha: 0.4)
-                                : (isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight),
-                            width: 0.6,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (t.countries.isNotEmpty) ...[
-                              Wrap(
-                                spacing: 2,
-                                children: t.countries
-                                    .map((c) => Text(c.flag, style: const TextStyle(fontSize: 11)))
-                                    .toList(),
-                              ),
-                              const SizedBox(width: 4),
-                            ] else if (tCountry != null) ...[
-                              Text(tCountry.flag, style: const TextStyle(fontSize: 11)),
-                              const SizedBox(width: 4),
-                            ],
-                            Text(
-                              cleanTDest.isNotEmpty ? cleanTDest : t.title,
-                              style: TextStyle(
-                                fontSize: 10.5,
-                                fontWeight: isCurrent ? FontWeight.w800 : FontWeight.w600,
-                                color: isCurrent
-                                    ? theme.colorScheme.primary
-                                    : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
+                child: ShaderMask(
+                  shaderCallback: (Rect bounds) {
+                    return const LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [Colors.black, Colors.black, Colors.transparent],
+                      stops: [0.0, 0.88, 1.0],
+                    ).createShader(bounds);
                   },
+                  blendMode: BlendMode.dstIn,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.only(right: 24),
+                    itemCount: allTrips.length,
+                    separatorBuilder: (_, _) => const SizedBox(width: 6),
+                    itemBuilder: (context, index) {
+                      final t = allTrips[index];
+                      final isCurrent = t.id == trip.id;
+                      final tCountry = Country.findByCode(t.countryCode);
+                      final rawTDest = t.destination.isNotEmpty
+                          ? CityLocalization.localizeDestination(t.destination, lang)
+                          : t.title;
+                      final cleanTDest = stripLeadingFlags(rawTDest);
+
+                      return BouncyPressable(
+                        scaleFactor: 0.95,
+                        onTap: () {
+                          AppHaptics.light();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => TripDetailScreen(trip: t),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: isCurrent
+                                ? theme.colorScheme.primary.withValues(alpha: 0.12)
+                                : (isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: isCurrent
+                                  ? theme.colorScheme.primary.withValues(alpha: 0.4)
+                                  : (isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight),
+                              width: 0.6,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (t.countries.isNotEmpty) ...[
+                                Wrap(
+                                  spacing: 2,
+                                  children: t.countries
+                                      .map((c) => Text(c.flag, style: const TextStyle(fontSize: 11)))
+                                      .toList(),
+                                ),
+                                const SizedBox(width: 4),
+                              ] else if (tCountry != null) ...[
+                                Text(tCountry.flag, style: const TextStyle(fontSize: 11)),
+                                const SizedBox(width: 4),
+                              ],
+                              Text(
+                                cleanTDest.isNotEmpty ? cleanTDest : t.title,
+                                style: TextStyle(
+                                  fontSize: 10.5,
+                                  fontWeight: isCurrent ? FontWeight.w800 : FontWeight.w600,
+                                  color: isCurrent
+                                      ? theme.colorScheme.primary
+                                      : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
             ],
@@ -1765,7 +1776,9 @@ class _LuggageChecklistCard extends StatelessWidget {
                                 ),
                               ),
                               TextSpan(
-                                text: '%${(checklistCompletionRatio * 100).toInt()}',
+                                text: Localizations.localeOf(context).languageCode.toLowerCase().startsWith('tr')
+                                    ? '%${(checklistCompletionRatio * 100).toInt()}'
+                                    : '${(checklistCompletionRatio * 100).toInt()}%',
                                 style: AppTypography.mono(
                                   fontSize: 11.5,
                                   fontWeight: FontWeight.w700,

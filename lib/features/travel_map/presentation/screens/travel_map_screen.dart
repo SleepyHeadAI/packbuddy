@@ -63,7 +63,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
     final text = '🌍 PackBuddy ${l10n?.worldTravelMapTitle ?? "World Travel Map"}:\n'
         '• $visitedCount ${l10n?.countryUnit ?? "countries"} ✈️\n'
         '• $continentsCount ${l10n?.continentsUnit ?? "continents"} 🗺️\n'
-        '• %${percentage.toStringAsFixed(1)} ${l10n?.ofTheWorld ?? "of the world"}!\n\n'
+        '• ${(l10n?.localeName ?? "").startsWith("tr") ? "%${percentage.toStringAsFixed(1)}" : "${percentage.toStringAsFixed(1)}%"} ${l10n?.ofTheWorld ?? "of the world"}!\n\n'
         'PackBuddy';
     try {
       await SharePlus.instance.share(
@@ -1043,30 +1043,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
               visitedContinentsCount,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.brandAccent.withValues(alpha: isDark ? 0.2 : 0.1),
-                  borderRadius: BorderRadius.circular(AppRadius.sm),
-                  border: Border.all(
-                    color: AppColors.brandAccent.withValues(alpha: 0.35),
-                    width: 0.5,
-                  ),
-                ),
-                child: Text(
-                  '%${mapState.worldPercentage.toStringAsFixed(1)}',
-                  style: const TextStyle(
-                    color: AppColors.brandAccent,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-            ),
-          ),
+          const SizedBox(width: 4),
         ],
       ),
       body: mapState.isLoading
@@ -1143,6 +1120,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                 child: _buildBeenStat(
                                   value: '%${mapState.worldPercentage.toStringAsFixed(1)}',
                                   label: l10n.ofTheWorld,
+                                  subLabel: '${mapState.totalVisited}/${mapState.totalCountries}',
                                   isDark: isDark,
                                 ),
                               ),
@@ -1261,7 +1239,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                               borderRadius: BorderRadius.circular(AppRadius.card),
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
-                                width: 160,
+                                width: 172,
                                 padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 12),
                                 decoration: BoxDecoration(
                                   color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
@@ -1372,7 +1350,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                           const SizedBox(width: 8),
                           _buildFilterChip('visited', '${l10n.visitedFilter} (${mapState.totalVisited})', color: AppColors.brandAccent, icon: AppIcons.flight),
                           const SizedBox(width: 8),
-                          _buildFilterChip('wishlist', '${l10n.wishlistFilter} (${mapState.totalWishlist})', color: const Color(0xFFEF4444), icon: AppIcons.spark),
+                          _buildFilterChip('wishlist', '${l10n.wishlistFilter} (${mapState.totalWishlist})', color: const Color(0xFFEF4444), icon: AppIcons.heart),
                           const SizedBox(width: 8),
                           _buildFilterChip('Europe', l10n.continentEurope, icon: AppIcons.globe),
                           const SizedBox(width: 8),
@@ -1541,6 +1519,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
     required String label,
     required bool isDark,
     bool isAccent = false,
+    String? subLabel,
   }) {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -1571,6 +1550,20 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
             ),
           ),
         ),
+        if (subLabel != null) ...[
+          const SizedBox(height: 2),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              subLabel,
+              style: AppTypography.caption.copyWith(
+                color: isDark ? Colors.white54 : const Color(0xFF94A3B8),
+                fontWeight: FontWeight.w700,
+                fontSize: 10,
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -1712,41 +1705,35 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
-          subtitle: Row(
+          subtitle: Wrap(
+            spacing: 6,
+            runSpacing: 2,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Flexible(
-                child: Text(
-                  _getLocalizedContinentName(country.continent, l10n),
-                  style: AppTypography.caption.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              Text(
+                _getLocalizedContinentName(country.continent, l10n),
+                style: AppTypography.caption.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontSize: 11,
                 ),
               ),
-              if (statusText != null && statusColor != null) ...[
-                const SizedBox(width: 6),
-                Flexible(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6.5, vertical: 2.5),
-                    decoration: BoxDecoration(
-                      color: statusColor.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(AppRadius.xs),
-                    ),
-                    child: Text(
-                      statusText,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTypography.caption.copyWith(
-                        color: statusColor,
-                        fontSize: 9.5,
-                        fontWeight: FontWeight.bold,
-                        height: 1.15,
-                      ),
+              if (statusText != null && statusColor != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6.5, vertical: 2.0),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(AppRadius.xs),
+                  ),
+                  child: Text(
+                    statusText,
+                    style: AppTypography.caption.copyWith(
+                      color: statusColor,
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.bold,
+                      height: 1.15,
                     ),
                   ),
                 ),
-              ],
             ],
           ),
           trailing: Row(
@@ -1788,8 +1775,8 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
               _buildCountryActionBadge(
                 isActive: country.isWishlist,
                 activeColor: const Color(0xFFEF4444),
-                activeIcon: AppIcons.spark,
-                inactiveIcon: AppIcons.spark,
+                activeIcon: AppIcons.heart,
+                inactiveIcon: AppIcons.heart,
                 tooltip: l10n.markAsWishlistTooltip,
                 isDark: isDark,
                 onTap: () {

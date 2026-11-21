@@ -209,7 +209,7 @@ class SettingsScreen extends ConsumerWidget {
 
                   // PackBuddy Pro Tile
                   _SettingsTile(
-                    icon: proState.isPro ? AppIcons.verified : AppIcons.spark,
+                    icon: proState.isPro ? AppIcons.verified : AppIcons.crown,
                     iconColor: proState.isPro ? const Color(0xFF10B981) : AppColors.brandAccent,
                     iconBgColor: (proState.isPro ? const Color(0xFF10B981) : AppColors.brandAccent)
                         .withValues(alpha: 0.12),
@@ -1032,7 +1032,7 @@ class _ThemeModeSegmentedControl extends StatelessWidget {
                 _buildOption(
                   mode: ThemeMode.system,
                   label: l10n.themeSystem,
-                  icon: AppIcons.spark,
+                  icon: AppIcons.tune,
                   isSelected: selectedMode == ThemeMode.system,
                   isDark: isDark,
                   flex: math.max(10, l10n.themeSystem.length + 6),

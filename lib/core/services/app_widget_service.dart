@@ -271,7 +271,11 @@ class AppWidgetService {
       final continentsCount = visitedCountries.map((c) => c.continent).where((c) => c.isNotEmpty).toSet().length;
       final totalCountries = mapCountries.isNotEmpty ? mapCountries.length : 229;
       final worldPct = (visitedCount / totalCountries) * 100;
-      final worldPercentStr = '%${worldPct.toStringAsFixed(1)}';
+      final widgetLang = PreferencesService.instance.getLocale()?.languageCode ?? 'en';
+      final isTrWidget = widgetLang.toLowerCase().startsWith('tr');
+      final worldPercentStr = isTrWidget
+          ? '%${worldPct.toStringAsFixed(1)}'
+          : '${worldPct.toStringAsFixed(1)}%';
 
       // 2. Resolve Trip Metrics
       final hasUpcomingTrip = upcomingTrip != null;

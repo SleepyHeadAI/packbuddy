@@ -54,7 +54,7 @@ class TravelMapState {
   List<ContinentProgress> get continentProgressList {
     const continents = ['Europe', 'Asia', 'Americas', 'Africa', 'Oceania'];
     return continents.map((cont) {
-      final inContinent = countries.where((c) => c.isInContinent(cont)).toList();
+      final inContinent = countries.where((c) => c.continent == cont).toList();
       final explored = inContinent.where((c) => c.isVisited || c.isLived).length;
       final total = inContinent.length;
       final pct = total > 0 ? (explored / total) * 100 : 0.0;

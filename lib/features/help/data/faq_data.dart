@@ -61,7 +61,7 @@ class FaqData {
     FaqItem(
       id: 'smartTemplates',
       category: 'checklist',
-      icon: Icons.auto_awesome_rounded,
+      icon: Icons.view_quilt_rounded,
     ),
     FaqItem(
       id: 'airlineBaggage',

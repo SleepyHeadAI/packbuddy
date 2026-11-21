@@ -29,7 +29,7 @@ class CanonicalPackingCatalog {
     replacements.forEach((key, val) {
       s = s.replaceAll(key, val);
     });
-    return s.replaceAll(RegExp(r'[^a-z0-9]'), ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
+    return s.replaceAll(RegExp(r'[\p{P}\p{S}]', unicode: true), ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
   }
 
   /// Generates a strictly deterministic ID for a seeded default item or template item.
@@ -51,35 +51,35 @@ class CanonicalPackingCatalog {
     if (n.isEmpty) return null;
 
     // Passport & Travel documents
-    if (n.contains('pasaport') || n.contains('passport') || (n.contains('vize') && n.contains('bilet')) || n.contains('reisepass')) {
+    if (n.contains('pasaport') || n.contains('passport') || (n.contains('vize') && n.contains('bilet')) || n.contains('reisepass') || n.contains('여권')) {
       return 'passport';
     }
     // Noise-cancelling headphones
-    if (n.contains('kulaklik') || n.contains('headphone') || n.contains('kopfhorer') || n.contains('casque') || n.contains('auricolari')) {
+    if (n.contains('kulaklik') || n.contains('headphone') || n.contains('kopfhorer') || n.contains('casque') || n.contains('auricolari') || n.contains('헤드폰') || n.contains('이어폰')) {
       return 'headphones';
     }
     // Raincoat
-    if (n.contains('yagmurluk') || n.contains('raincoat') || n.contains('regenjacke') || n.contains('impermeable')) {
+    if (n.contains('yagmurluk') || n.contains('raincoat') || n.contains('regenjacke') || n.contains('impermeable') || n.contains('우비') || n.contains('비옷')) {
       return 'raincoat';
     }
     // Universal Charger / Adapter
-    if (n.contains('priz') || (n.contains('sarj') && n.contains('cihazi')) || (n.contains('travel') && n.contains('adapter')) || n.contains('reiseadapter')) {
+    if (n.contains('priz') || (n.contains('sarj') && n.contains('cihazi')) || (n.contains('travel') && n.contains('adapter')) || n.contains('reiseadapter') || n.contains('어댑터') || (n.contains('충전기') && !n.contains('노트북'))) {
       return 'charger';
     }
     // Fast charger / cable
-    if (n.contains('hizli sarj') || (n.contains('sarj') && n.contains('kablosu')) || n.contains('phone cable')) {
+    if (n.contains('hizli sarj') || (n.contains('sarj') && n.contains('kablosu')) || n.contains('phone cable') || n.contains('케이블') || n.contains('고속 충전')) {
       return 'phone_cable';
     }
     // Laptop charger
-    if (n.contains('dizustu') || n.contains('laptop') || n.contains('notebook charger')) {
+    if (n.contains('dizustu') || n.contains('laptop') || n.contains('notebook charger') || n.contains('노트북')) {
       return 'laptop_charger';
     }
     // Powerbank
-    if (n.contains('powerbank') || n.contains('tasinabilir sarj') || n.contains('batterie externe')) {
+    if (n.contains('powerbank') || n.contains('tasinabilir sarj') || n.contains('batterie externe') || n.contains('보조배터리')) {
       return 'powerbank';
     }
     // Toiletry kit
-    if (n.contains('kisisel bakim') || n.contains('kozmetik cantasi') || n.contains('toiletry') || n.contains('kulturbeutel') || n.contains('trousse de toilette')) {
+    if (n.contains('kisisel bakim') || n.contains('kozmetik cantasi') || n.contains('toiletry') || n.contains('kulturbeutel') || n.contains('trousse de toilette') || n.contains('세면도구') || n.contains('화장품')) {
       return 'toiletries';
     }
     // Toothbrush / Dental kit
@@ -90,19 +90,21 @@ class CanonicalPackingCatalog {
         n.contains('toothbrush') ||
         n.contains('zahnbuerste') ||
         n.contains('brosse a dents') ||
-        n.contains('dental')) {
+        n.contains('dental') ||
+        n.contains('칫솔') ||
+        n.contains('치약')) {
       return 'toothbrush';
     }
     // Walking shoes / sneakers
-    if (n.contains('konforlu yuruyus') || n.contains('walking shoes') || n.contains('sneaker') || n.contains('turnschuhe')) {
+    if (n.contains('konforlu yuruyus') || n.contains('walking shoes') || n.contains('sneaker') || n.contains('turnschuhe') || n.contains('운동화') || n.contains('스니커즈')) {
       return 'walking_shoes';
     }
     // Thermal underwear / base layer
-    if (n.contains('termal iclik') || n.contains('thermal underwear') || n.contains('skiunterwaesche') || n.contains('sous vetement thermique')) {
+    if (n.contains('termal iclik') || n.contains('thermal underwear') || n.contains('skiunterwaesche') || n.contains('sous vetement thermique') || n.contains('내복') || n.contains('히트텍')) {
       return 'thermal_underwear';
     }
     // Swimwear
-    if (n.contains('mayo') || n.contains('swimwear') || n.contains('swimsuit') || n.contains('badehose') || n.contains('maillot')) {
+    if (n.contains('mayo') || n.contains('swimwear') || n.contains('swimsuit') || n.contains('badehose') || n.contains('maillot') || n.contains('수영복')) {
       return 'swimwear';
     }
     // Linen shirts
@@ -110,11 +112,11 @@ class CanonicalPackingCatalog {
       return 'linen_shirt';
     }
     // Shorts
-    if (n.contains('sort') || n.contains('shorts')) {
+    if (n.contains('sort') || n.contains('shorts') || n.contains('반바지')) {
       return 'shorts';
     }
     // Underwear & socks
-    if (n.contains('ic camadiri') || n.contains('ic camagiri') || n.contains('ic camasiri') || (n.contains('underwear') && n.contains('socks')) || n.contains('unterwaesche')) {
+    if (n.contains('ic camadiri') || n.contains('ic camagiri') || n.contains('ic camasiri') || (n.contains('underwear') && n.contains('socks')) || n.contains('unterwaesche') || n.contains('속옷')) {
       return 'underwear_socks';
     }
     // Beach slippers
@@ -126,27 +128,29 @@ class CanonicalPackingCatalog {
         n.contains('flip flop') ||
         n.contains('badelatschen') ||
         n.contains('chanclas') ||
+        n.contains('슬리퍼') ||
+        n.contains('샌들') ||
         n.contains('tongs')) {
       return 'beach_slippers';
     }
     // Sunscreen
-    if (n.contains('gunes kremi') || n.contains('sunscreen') || n.contains('sonnencreme') || n.contains('creme solaire')) {
+    if (n.contains('gunes kremi') || n.contains('sunscreen') || n.contains('sonnencreme') || n.contains('creme solaire') || n.contains('선크림') || n.contains('자외선')) {
       return 'sunscreen';
     }
     // Aloe vera
-    if (n.contains('aloe vera') || n.contains('gunes sonrasi') || n.contains('after sun')) {
+    if (n.contains('aloe vera') || n.contains('gunes sonrasi') || n.contains('after sun') || n.contains('알로에')) {
       return 'aloe_vera';
     }
     // Beach towel
-    if (n.contains('plaj havlusu') || n.contains('beach towel') || n.contains('strandtuch')) {
+    if (n.contains('plaj havlusu') || n.contains('beach towel') || n.contains('strandtuch') || n.contains('비치 타월')) {
       return 'beach_towel';
     }
     // Sunglasses
-    if (n.contains('gunes gozlugu') || n.contains('sunglasses') || n.contains('sonnenbrille') || n.contains('lunettes de soleil')) {
+    if (n.contains('gunes gozlugu') || n.contains('sunglasses') || n.contains('sonnenbrille') || n.contains('lunettes de soleil') || n.contains('선글라스')) {
       return 'sunglasses';
     }
     // Sun hat
-    if (n.contains('gunes sapkasi') || n.contains('sun hat') || n.contains('sonnenhut')) {
+    if (n.contains('gunes sapkasi') || n.contains('sun hat') || n.contains('sonnenhut') || n.contains('챙모자')) {
       return 'sun_hat';
     }
     // Waterproof pouch
@@ -162,12 +166,58 @@ class CanonicalPackingCatalog {
                 n.contains('phone')))) {
       return 'waterproof_case';
     }
+    // Leather jacket
+    if (n.contains('deri ceket') ||
+        n.contains('deri mont') ||
+        n.contains('leather jacket') ||
+        n.contains('lederjacke') ||
+        n.contains('chaqueta de cuero') ||
+        n.contains('cazadora de cuero') ||
+        n.contains('veste en cuir') ||
+        n.contains('giacca di pelle') ||
+        n.contains('jaqueta de couro') ||
+        n.contains('кожаная куртка') ||
+        n.contains('가죽 재킷') ||
+        n.contains('가죽 자켓') ||
+        n.contains('가죽재킷') ||
+        n.contains('가죽자켓') ||
+        n.contains('皮夹克') ||
+        n.contains('皮衣') ||
+        n.contains('レザージャケット') ||
+        n.contains('革ジャン') ||
+        n.contains('سترة جلدية') ||
+        n.contains('लेदर जैकेट') ||
+        n.contains('leren jas') ||
+        n.contains('skinnjacka') ||
+        n.contains('jaket kulit')) {
+      return 'leather_jacket';
+    }
     // Ski jacket / parka
-    if (n.contains('mont') || n.contains('parka') || n.contains('ski jacket') || n.contains('skijacke') || n.contains('anorak')) {
+    if (n.contains('mont') || n.contains('parka') || n.contains('ski jacket') || n.contains('skijacke') || n.contains('anorak') || n.contains('패딩') || n.contains('스키 재킷')) {
       return 'ski_jacket';
     }
+    // General Jacket / Outerwear
+    if (n == 'ceket' ||
+        n == 'jacket' ||
+        n == 'jacke' ||
+        n == 'chaqueta' ||
+        n == 'veste' ||
+        n == 'giacca' ||
+        n == 'jaqueta' ||
+        n.contains('outerwear') ||
+        n.contains('dis giyim') ||
+        n == '재킷' ||
+        n == '자켓' ||
+        n == '외투' ||
+        n == '夹克') {
+      return 'jacket';
+    }
+    // Winter coat / Overcoat
+    if (n.contains('kaban') || n.contains('palto') || n.contains('overcoat') || (n.contains('coat') && !n.contains('raincoat')) || n.contains('manteau') || n.contains('mantel') || n.contains('코트')) {
+      return 'coat';
+    }
     // Ski pants
-    if (n.contains('kayak pantolonu') || n.contains('kar pantolonu') || n.contains('ski pants') || n.contains('skihose')) {
+    if (n.contains('kayak pantolonu') || n.contains('kar pantolonu') || n.contains('ski pants') || n.contains('skihose') || n.contains('스키 바지')) {
       return 'ski_pants';
     }
     // Sweaters / Fleece
@@ -262,32 +312,40 @@ class CanonicalPackingCatalog {
     if (n.contains('caki') || n.contains('pensesi') || n.contains('pocket knife') || n.contains('taschenmesser')) {
       return 'pocket_knife';
     }
-    // First aid kit
-    if (n.contains('ilk yardim') || n.contains('first aid') || n.contains('erste hilfe') || n.contains('premiers secours')) {
-      return 'first_aid';
+    // First aid kit & medications
+    if (n.contains('ilk yardim') || n.contains('first aid') || n.contains('erste hilfe') || n.contains('premiers secours') || n.contains('ilac') || n.contains('medication') || n.contains('medicine') || n.contains('vitamin') || n.contains('상비약') || n.contains('약')) {
+      return 'medication';
     }
     // Insect spray
     if (n.contains('hasere') || n.contains('sinek') || n.contains('insect') || n.contains('repellent') || n.contains('mueckenspray')) {
       return 'insect_spray';
+    }
+    // Water bottle / flask
+    if (n.contains('su sisesi') || (n.contains('matara') && !n.contains('termos')) || n.contains('water bottle') || n.contains('trinkflasche') || n.contains('gourde') || n.contains('borraccia') || n.contains('물병') || n.contains('텀블러')) {
+      return 'water_bottle';
     }
     // Water filter bottle
     if (n.contains('su aritma') || n.contains('water filter') || n.contains('purification')) {
       return 'water_filter';
     }
     // Jeans & Joggers
-    if (n.contains('kot pantolon') || n.contains('esofman') || n.contains('jeans') || n.contains('jogger')) {
+    if (n.contains('kot pantolon') || n.contains('esofman') || n.contains('jeans') || n.contains('jogger') || n.contains('청바지') || n.contains('조거')) {
       return 'jeans_joggers';
     }
     // Casual t-shirts
-    if (n.contains('tisort') || n.contains('t shirt')) {
+    if (n.contains('tisort') || n.contains('t shirt') || n.contains('티셔츠')) {
       return 'casual_tshirts';
     }
     // Umbrella
-    if (n.contains('semsiye') || n.contains('umbrella') || n.contains('regenschirm') || n.contains('parapluie')) {
+    if (n.contains('semsiye') || n.contains('umbrella') || n.contains('regenschirm') || n.contains('parapluie') || n.contains('우산')) {
       return 'umbrella';
     }
+    // Wallet & Cash
+    if (n.contains('cuzdan') || n.contains('wallet') || n.contains('brieftasche') || n.contains('portefeuille') || n.contains('portafoglio') || n.contains('지갑')) {
+      return 'wallet';
+    }
     // Transit & ID cards
-    if (n.contains('kimlik') || n.contains('ulasim kart') || n.contains('transit cards')) {
+    if (n.contains('kimlik') || n.contains('ulasim kart') || n.contains('transit cards') || n.contains('교통카드')) {
       return 'id_cards';
     }
 
@@ -296,6 +354,138 @@ class CanonicalPackingCatalog {
 
   /// Master translations catalog for all canonical keys across 20 languages
   static const Map<String, Map<String, String>> _translations = {
+    'leather_jacket': {
+      'en': 'Leather Jacket',
+      'tr': 'Deri Ceket',
+      'de': 'Lederjacke',
+      'es': 'Chaqueta de cuero',
+      'fr': 'Veste en cuir',
+      'it': 'Giacca di pelle',
+      'pt': 'Jaqueta de couro',
+      'ru': 'Кожаная куртка',
+      'zh': '皮夹克',
+      'ja': 'レザージャケット',
+      'ko': '가죽 재킷',
+      'hi': 'लेदर जैकेट',
+      'ar': 'سترة جلدية',
+      'nl': 'Leren jas',
+      'el': 'Δερμάτινο μπουφάν',
+      'sv': 'Skinnjacka',
+      'pl': 'Skórzana kurtka',
+      'id': 'Jaket kulit',
+      'th': 'แจ็กเก็ตหนัง',
+      'vi': 'Áo khoác da',
+    },
+    'jacket': {
+      'en': 'Jacket / Outerwear',
+      'tr': 'Ceket / Dış Giyim',
+      'de': 'Jacke / Übergangsjacke',
+      'es': 'Chaqueta / Prenda exterior',
+      'fr': 'Veste / Manteau léger',
+      'it': 'Giacca / Capospalla',
+      'pt': 'Jaqueta / Casaco',
+      'ru': 'Куртка / Верхняя одежда',
+      'zh': '夹克 / 外套',
+      'ja': 'ジャケット / 上着',
+      'ko': '재킷 / 겉옷',
+      'hi': 'जैकेट / बाहरी कपड़े',
+      'ar': 'سترة / ملابس خارجية',
+      'nl': 'Jas / Bovenkleding',
+      'el': 'Μπουφάν / Πανωφόρι',
+      'sv': 'Jacka / Ytterplagg',
+      'pl': 'Kurtka / Okrycie wierzchnie',
+      'id': 'Jaket / Luaran',
+      'th': 'เสื้อแจ็กเก็ต / เสื้อคลุม',
+      'vi': 'Áo khoác / Trang phục ngoài',
+    },
+    'coat': {
+      'en': 'Overcoat / Winter Coat',
+      'tr': 'Kaban / Palto',
+      'de': 'Mantel / Wintermantel',
+      'es': 'Abrigo / Gabardina',
+      'fr': 'Manteau / Pardessus',
+      'it': 'Cappotto / Soprabito',
+      'pt': 'Casaco de inverno / Sobretudo',
+      'ru': 'Пальто / Зимнее пальто',
+      'zh': '大衣 / 冬季外套',
+      'ja': 'コート / オーバーコート',
+      'ko': '코트 / 외투',
+      'hi': 'ओवरकोट / गर्म कोट',
+      'ar': 'معطف شتوي',
+      'nl': 'Overjas / Winterjas',
+      'el': 'Παλτό / Χειμερινό μπουφάν',
+      'sv': 'Kappa / Vinterrock',
+      'pl': 'Płaszcz / Zimowy płaszcz',
+      'id': 'Mantel / Jas musim dingin',
+      'th': 'เสื้อโค้ต / เสื้อกันหนาว',
+      'vi': 'Áo măng tô / Áo khoác mùa đông',
+    },
+    'medication': {
+      'en': 'Medications & First Aid',
+      'tr': 'Kişisel İlaçlar & İlk Yardım',
+      'de': 'Medikamente & Erste Hilfe',
+      'es': 'Medicamentos y primeros auxilios',
+      'fr': 'Médicaments et premiers secours',
+      'it': 'Farmaci e pronto soccorso',
+      'pt': 'Medicamentos e primeiros socorros',
+      'ru': 'Лекарства и аптечка',
+      'zh': '个人药品与急救包',
+      'ja': '常備薬・救急セット',
+      'ko': '개인 상비약 & 비상 구급함',
+      'hi': 'दवाइयां और प्राथमिक चिकित्सा',
+      'ar': 'الأدوية والإسعافات الأولية',
+      'nl': 'Medicijnen & eerste hulp',
+      'el': 'Φάρμακα & πρώτες βοήθειες',
+      'sv': 'Mediciner & första hjälpen',
+      'pl': 'Leki i pierwsza pomoc',
+      'id': 'Obat-obatan & P3K',
+      'th': 'ยาสามัญประจำตัวและชุดปฐมพยาบาล',
+      'vi': 'Thuốc cá nhân & đồ sơ cứu',
+    },
+    'water_bottle': {
+      'en': 'Reusable Water Bottle',
+      'tr': 'Yeniden Kullanılabilir Su Matarası',
+      'de': 'Wiederverwendbare Wasserflasche',
+      'es': 'Botella de agua reutilizable',
+      'fr': 'Gourde d\'eau réutilisable',
+      'it': 'Borraccia riutilizzabile',
+      'pt': 'Garrafa de água reutilizável',
+      'ru': 'Многоразовая бутылка для воды',
+      'zh': '便携随身水杯 / 水壶',
+      'ja': 'マイボトル・水筒',
+      'ko': '다회용 텀블러 / 물병',
+      'hi': 'पुनः प्रयोज्य पानी की बोतल',
+      'ar': 'زجاجة ماء قابلة لإعادة الاستخدام',
+      'nl': 'Herbruikbare waterfles',
+      'el': 'Επαναχρησιμοποιούμενο παγούρι νερού',
+      'sv': 'Återanvändbar vattenflaska',
+      'pl': 'Wielorazowa butelka na wodę',
+      'id': 'Botol minum isi ulang',
+      'th': 'กระบอกน้ำพกพา',
+      'vi': 'Bình nước tái sử dụng',
+    },
+    'wallet': {
+      'en': 'Travel Wallet & Cash',
+      'tr': 'Seyahat Cüzdanı & Nakit Para',
+      'de': 'Reisebrieftasche & Bargeld',
+      'es': 'Billetera de viaje y efectivo',
+      'fr': 'Portefeuille de voyage et espèces',
+      'it': 'Portafoglio da viaggio e contanti',
+      'pt': 'Carteira de viagem e dinheiro',
+      'ru': 'Дорожный кошелек и наличные',
+      'zh': '旅行钱包与现金',
+      'ja': 'トラベルウォレット・現金',
+      'ko': '여행용 지갑 & 현금',
+      'hi': 'यात्रा बटुआ और नकदी',
+      'ar': 'محفظة السفر والنقود',
+      'nl': 'Reisportemonnee & contant geld',
+      'el': 'Ταξιδιωτικό πορτοφόλι & μετρητά',
+      'sv': 'Reseplånbok & kontanter',
+      'pl': 'Portfel podróżny i gotówka',
+      'id': 'Dompet perjalanan & uang tunai',
+      'th': 'กระเป๋าสตางค์เดินทางและเงินสด',
+      'vi': 'Ví du lịch & tiền mặt',
+    },
     'passport': {
       'en': 'Passport, Visa & Flight Tickets',
       'tr': 'Pasaport, Vize & Uçuş Biletleri',

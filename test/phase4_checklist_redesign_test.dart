@@ -199,7 +199,7 @@ void main() {
 
       // Verify AppButton usage in empty state
       expect(find.byType(AppButton), findsNWidgets(2));
-      expect(find.byIcon(AppIcons.spark), findsWidgets);
+      expect(find.byIcon(AppIcons.template), findsWidgets);
       expect(find.byIcon(AppIcons.add), findsWidgets);
       expect(tester.takeException(), isNull);
     });

@@ -47,7 +47,7 @@ class BentoHubGrid extends StatelessWidget {
         Row(
           children: [
             Icon(
-              Icons.auto_awesome_rounded,
+              Icons.explore_rounded,
               size: 14,
               color: theme.colorScheme.primary,
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/features/checklist/domain/packing_templates.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
@@ -86,7 +87,7 @@ class _SmartTemplatesSheetState extends ConsumerState<SmartTemplatesSheet> {
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Icon(
-                    Icons.auto_awesome_rounded,
+                    AppIcons.template,
                     color: theme.colorScheme.primary,
                     size: 22,
                   ),

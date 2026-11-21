@@ -36,7 +36,7 @@ class HelpTopicSelector extends StatelessWidget {
               ? HelpLocalization.getAllTopics(languageCode)
               : HelpLocalization.getCategoryName(cat, languageCode);
           final icon = cat == 'all'
-              ? Icons.auto_awesome_motion_rounded
+              ? Icons.grid_view_rounded
               : FaqData.getCategoryIcon(cat);
 
           final activeBg = isDark

@@ -1029,7 +1029,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                   Icon(
                     _mode == AuthMode.signIn
                         ? Icons.arrow_forward_rounded
-                        : Icons.auto_awesome_rounded,
+                        : Icons.person_add_rounded,
                     size: 18,
                     color: isDark ? AppColors.onPrimaryDark : Colors.white,
                   ),

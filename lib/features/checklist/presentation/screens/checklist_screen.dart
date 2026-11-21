@@ -202,7 +202,6 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   final ChecklistConfettiController _confettiController = ChecklistConfettiController();
-  bool _isPackingTipDismissed = false;
   bool _hasCelebratedCurrentList = false;
 
   final List<String> _categories = [
@@ -413,7 +412,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
             ),
             // Smart Packing Templates
             IconButton(
-              icon: const Icon(AppIcons.spark),
+              icon: const Icon(AppIcons.template),
               tooltip: l10n.readyTemplates,
               onPressed: () => SmartTemplatesSheet.show(context, tripId: widget.tripId),
             ),
@@ -531,7 +530,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                   ),
                                 ),
                                 child: Icon(
-                                  AppIcons.spark,
+                                  AppIcons.checkCircle,
                                   size: 16,
                                   color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF059669),
                                 ),
@@ -594,9 +593,9 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                 // 2. Compact Executive Item Completion & Overview Card (Apple / Things 3 style)
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                    padding: const EdgeInsets.fromLTRB(16, 6, 16, 12),
                     child: Container(
-                      padding: const EdgeInsets.all(14),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                       decoration: BoxDecoration(
                         color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
                         borderRadius: BorderRadius.circular(AppRadius.card),
@@ -652,26 +651,28 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                 children: [
                                   // Circular Progress Ring Gauge
                                   SizedBox(
-                                    width: 44,
-                                    height: 44,
+                                    width: 50,
+                                    height: 50,
                                     child: Stack(
                                       alignment: Alignment.center,
                                       children: [
                                         CircularProgressIndicator(
                                           value: checklistState.totalCount == 0 ? 0.0 : progressRatio,
-                                          strokeWidth: 3.5,
+                                          strokeWidth: 4.0,
                                           backgroundColor: statusColor.withValues(alpha: 0.15),
                                           valueColor: AlwaysStoppedAnimation<Color>(statusColor),
                                           strokeCap: StrokeCap.round,
                                         ),
                                         if (completionRatio >= 1.0 && checklistState.totalCount > 0)
-                                          Icon(AppIcons.check, size: 18, color: statusColor)
+                                          Icon(AppIcons.check, size: 22, color: statusColor)
                                         else
                                           Text(
-                                            '%${(completionRatio * 100).toInt()}',
+                                            langCode.toLowerCase().startsWith('tr')
+                                                ? '%${(completionRatio * 100).toInt()}'
+                                                : '${(completionRatio * 100).toInt()}%',
                                             style: AppTypography.mono(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w700,
+                                              fontSize: 12.5,
+                                              fontWeight: FontWeight.w800,
                                               tabularFigures: true,
                                               color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
                                             ),
@@ -690,7 +691,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                               child: Text(
                                                 cardTitle,
                                                 style: AppTypography.title(
-                                                  fontSize: 14.5,
+                                                  fontSize: 15.5,
                                                   fontWeight: FontWeight.w700,
                                                   color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
                                                 ),
@@ -698,10 +699,10 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
-                                            const SizedBox(width: 8),
+                                            const SizedBox(width: 6),
                                             // Status Micro-Pill (Optically centered with balanced padding)
                                             Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3.0),
+                                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                                               decoration: BoxDecoration(
                                                 color: statusColor.withValues(alpha: 0.12),
                                                 borderRadius: BorderRadius.circular(AppRadius.sm),
@@ -724,7 +725,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                             ),
                                           ],
                                         ),
-                                        const SizedBox(height: 3),
+                                        const SizedBox(height: 4),
                                         Text.rich(
                                           TextSpan(
                                             children: [
@@ -733,14 +734,15 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                                   text: l10n.noItemsYet,
                                                   style: AppTypography.caption.copyWith(
                                                     color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                                                    fontSize: 12.0,
                                                   ),
                                                 )
                                               else ...[
                                                 TextSpan(
                                                   text: '${checklistState.packedCount}/${checklistState.totalCount} ',
                                                   style: AppTypography.mono(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w700,
+                                                    fontSize: 12.5,
+                                                    fontWeight: FontWeight.w800,
                                                     tabularFigures: true,
                                                     color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
                                                   ),
@@ -749,6 +751,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                                   text: '${l10n.itemsReady} • ',
                                                   style: AppTypography.caption.copyWith(
                                                     color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                                                    fontSize: 11.5,
                                                   ),
                                                 ),
                                                 TextSpan(
@@ -756,6 +759,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                                   style: AppTypography.caption.copyWith(
                                                     color: statusColor,
                                                     fontWeight: FontWeight.w600,
+                                                    fontSize: 11.5,
                                                   ),
                                                 ),
                                               ],
@@ -770,11 +774,11 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                 ],
                               ),
 
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 12),
 
                               // Bottom Integrated Action Strip (Airline limits & templates in one line)
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6.5),
                                 decoration: BoxDecoration(
                                   color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
                                   borderRadius: BorderRadius.circular(10),
@@ -787,6 +791,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                   children: [
                                     // Clickable Airline Limit Pill
                                     Expanded(
+                                      flex: 3,
                                       child: InkWell(
                                         onTap: () => AirlineGuideSheet.show(context),
                                         borderRadius: BorderRadius.circular(6),
@@ -802,7 +807,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                               child: Text(
                                                 airlineSummary,
                                                 style: AppTypography.caption.copyWith(
-                                                  fontSize: 10.5,
+                                                  fontSize: 11.0,
                                                   fontWeight: FontWeight.w600,
                                                   color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
                                                 ),
@@ -828,6 +833,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                     ),
                                     // Smart Templates Quick Action
                                     Flexible(
+                                      flex: 2,
                                       child: InkWell(
                                         onTap: () => SmartTemplatesSheet.show(context, tripId: widget.tripId),
                                         borderRadius: BorderRadius.circular(6),
@@ -835,8 +841,8 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Icon(
-                                              AppIcons.spark,
-                                              size: 12,
+                                              AppIcons.template,
+                                              size: 12.5,
                                               color: AppColors.pineEmerald,
                                             ),
                                             const SizedBox(width: 4),
@@ -844,7 +850,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                               child: Text(
                                                 l10n.readyTemplates,
                                                 style: const TextStyle(
-                                                  fontSize: 10.5,
+                                                  fontSize: 11.0,
                                                   fontWeight: FontWeight.w700,
                                                   color: AppColors.pineEmerald,
                                                 ),
@@ -866,58 +872,6 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                     ),
                   ),
                 ),
-
-                // 3. Compact Smart Packing Tip Banner
-                if (!_isPackingTipDismissed)
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withValues(alpha: 0.06),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                            width: 0.6,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              AppIcons.spark,
-                              color: theme.colorScheme.primary,
-                              size: 13,
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                l10n.packingTip,
-                                style: AppTypography.caption.copyWith(
-                                  fontSize: 11,
-                                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            InkResponse(
-                              radius: 12,
-                              onTap: () => setState(() => _isPackingTipDismissed = true),
-                              child: Padding(
-                                padding: const EdgeInsets.all(2),
-                                child: Icon(
-                                  AppIcons.close,
-                                  size: 12,
-                                  color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
 
                 // 4. Modern Category Selector Bar
                 SliverToBoxAdapter(
@@ -1119,7 +1073,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                                     children: [
                                       AppButton.primary(
                                         label: l10n.readyTemplates,
-                                        leadingIcon: AppIcons.spark,
+                                        leadingIcon: AppIcons.template,
                                         onPressed: () => SmartTemplatesSheet.show(context, tripId: widget.tripId),
                                       ),
                                       AppButton.outline(

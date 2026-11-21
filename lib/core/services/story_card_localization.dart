@@ -41,25 +41,25 @@ class StoryCardLocalization {
     final pctStr = percent.toStringAsFixed(1);
     switch (lang) {
       case 'tr': return 'ATLAS ARŞİVİ • %$pctStr';
-      case 'es': return 'ARCHIVO ATLAS • %$pctStr';
-      case 'fr': return 'ARCHIVES ATLAS • %$pctStr';
-      case 'de': return 'ATLAS-ARCHIV • %$pctStr';
-      case 'it': return 'ARCHIVIO ATLAS • %$pctStr';
-      case 'pt': return 'ARQUIVO ATLAS • %$pctStr';
-      case 'ru': return 'АРХИВ АТЛАСА • %$pctStr';
-      case 'zh': return '地图集档案 • %$pctStr';
-      case 'ja': return 'アトラス・アーカイブ • %$pctStr';
-      case 'ko': return '아틀라스 기록 • %$pctStr';
-      case 'hi': return 'एटलस संग्रह • %$pctStr';
-      case 'ar': return 'أرشيف الأطلس • %$pctStr';
-      case 'nl': return 'ATLAS-ARCHIEF • %$pctStr';
-      case 'el': return 'ΑΡΧΕΙΟ ΑΤΛΑΝΤΑ • %$pctStr';
-      case 'sv': return 'ATLASARKIV • %$pctStr';
-      case 'pl': return 'ARCHIWUM ATLASU • %$pctStr';
-      case 'id': return 'ARSIP ATLAS • %$pctStr';
-      case 'th': return 'บันทึกแผนที่โลก • %$pctStr';
-      case 'vi': return 'LƯU TRỮ ATLAS • %$pctStr';
-      default: return 'ATLAS ARCHIVE • %$pctStr';
+      case 'es': return 'ARCHIVO ATLAS • $pctStr%';
+      case 'fr': return 'ARCHIVES ATLAS • $pctStr%';
+      case 'de': return 'ATLAS-ARCHIV • $pctStr%';
+      case 'it': return 'ARCHIVIO ATLAS • $pctStr%';
+      case 'pt': return 'ARQUIVO ATLAS • $pctStr%';
+      case 'ru': return 'АРХИВ АТЛАСА • $pctStr%';
+      case 'zh': return '地图集档案 • $pctStr%';
+      case 'ja': return 'アトラス・アーカイブ • $pctStr%';
+      case 'ko': return '아틀라스 기록 • $pctStr%';
+      case 'hi': return 'एटलस संग्रह • $pctStr%';
+      case 'ar': return 'أرشيف الأطلس • $pctStr%';
+      case 'nl': return 'ATLAS-ARCHIEF • $pctStr%';
+      case 'el': return 'ΑΡΧΕΙΟ ΑΤΛΑΝΤΑ • $pctStr%';
+      case 'sv': return 'ATLASARKIV • $pctStr%';
+      case 'pl': return 'ARCHIWUM ATLASU • $pctStr%';
+      case 'id': return 'ARSIP ATLAS • $pctStr%';
+      case 'th': return 'บันทึกแผนที่โลก • $pctStr%';
+      case 'vi': return 'LƯU TRỮ ATLAS • $pctStr%';
+      default: return 'ATLAS ARCHIVE • $pctStr%';
     }
   }
 

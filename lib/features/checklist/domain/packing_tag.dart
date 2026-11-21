@@ -268,7 +268,7 @@ class PackingTagHelper {
       return AppIcons.flightTakeoff;
     }
     if (normalized == tagEssential || normalized == 'ÖNEMLI' || normalized == 'ONEMLI') {
-      return AppIcons.spark;
+      return AppIcons.star;
     }
     return AppIcons.checklist;
   }
@@ -282,7 +282,7 @@ class PackingTagHelper {
       return isDark ? const Color(0xFF94A3B8) : AppColors.tertiaryLight;
     }
     if (normalized == tagCheckIn || normalized == 'CHECK_IN' || normalized == 'CHECKED' || normalized == 'CARGO' || normalized == 'UÇAK ALTI') {
-      return isDark ? const Color(0xFF2DD4BF) : AppColors.secondaryLight;
+      return isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7);
     }
     if (normalized == tagEssential || normalized == 'ÖNEMLI' || normalized == 'ONEMLI') {
       return isDark ? const Color(0xFFF87171) : const Color(0xFFDC2626);
@@ -304,8 +304,8 @@ class PackingTagHelper {
     }
     if (normalized == tagCheckIn || normalized == 'CHECK_IN' || normalized == 'CHECKED' || normalized == 'CARGO' || normalized == 'UÇAK ALTI') {
       return isDark
-          ? const Color(0xFF0F766E).withValues(alpha: 0.2)
-          : const Color(0xFFCCFBF1);
+          ? const Color(0xFF0369A1).withValues(alpha: 0.22)
+          : const Color(0xFFF0F9FF);
     }
     if (normalized == tagEssential || normalized == 'ÖNEMLI' || normalized == 'ONEMLI') {
       return isDark
@@ -329,8 +329,8 @@ class PackingTagHelper {
     }
     if (normalized == tagCheckIn || normalized == 'CHECK_IN' || normalized == 'CHECKED' || normalized == 'CARGO' || normalized == 'UÇAK ALTI') {
       return isDark
-          ? const Color(0xFF0F766E).withValues(alpha: 0.6)
-          : AppColors.secondaryLight.withValues(alpha: 0.45);
+          ? const Color(0xFF38BDF8).withValues(alpha: 0.4)
+          : const Color(0xFFBAE6FD);
     }
     if (normalized == tagEssential || normalized == 'ÖNEMLI' || normalized == 'ONEMLI') {
       return isDark
