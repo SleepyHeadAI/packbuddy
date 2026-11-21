@@ -1,0 +1,30 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        (request.auth.token.get('admin', false) == true ||
+        request.auth.token.email == 'sleepyheadaitr@gmail.com') &&
+        request.auth.token.email_verified == true
+      );
+    }
+
+    // Encrypted Vault Documents: strictly accessible by the owning user or verified Super Admin
+    match /users/{userId}/vault/{docId} {
+      allow read, write, delete: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
+    }
+
+    match /users/{userId}/vault/{docId}/{allPaths=**} {
+      allow read, write, delete: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
+    }
+
+    // Default deny for all other paths unless verified Super Admin
+    match /{allPaths=**} {
+      allow read, write: if isAdmin();
+    }
+  }
+}

@@ -80,6 +80,9 @@ class DatabaseHelper {
       if (!docCols.contains('cloud_data_base64')) {
         await db.execute('ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN cloud_data_base64 TEXT');
       }
+      if (!docCols.contains('storage_path')) {
+        await db.execute('ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN storage_path TEXT');
+      }
       if (!docCols.contains('file_extension')) {
         await db.execute('ALTER TABLE ${AppConstants.tableDocuments} ADD COLUMN file_extension TEXT');
       }
@@ -232,6 +235,7 @@ class DatabaseHelper {
         notes TEXT,
         file_size_bytes INTEGER NOT NULL DEFAULT 0,
         cloud_data_base64 TEXT,
+        storage_path TEXT,
         file_extension TEXT,
         is_private INTEGER NOT NULL DEFAULT 0,
         created_at INTEGER NOT NULL,

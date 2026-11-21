@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -132,6 +133,12 @@ class MockAdminServiceForAnalytics implements AdminService {
   Future<List<VaultDocument>> fetchUserDocuments(String uid) async => [];
 
   @override
+  Future<Uint8List?> viewUserDocumentDecrypted({
+    required String targetUserId,
+    required VaultDocument doc,
+  }) async => null;
+
+  @override
   Future<List<Trip>> fetchUserTrips(String uid) async => [];
 
   @override
@@ -189,6 +196,9 @@ class MockAdminServiceForAnalytics implements AdminService {
 
   @override
   Future<InactivityScanResult> processInactivityPolicies() async => const InactivityScanResult();
+
+  @override
+  Future<DeletedAccountsSummary> fetchDeletedAccountsArchive() async => const DeletedAccountsSummary();
 
   @override
   Future<bool> sendBroadcastAnnouncement({

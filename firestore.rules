@@ -8,8 +8,9 @@ service cloud.firestore {
 
     function isAdmin() {
       return isAuthenticated() && (
-        request.auth.token.get('admin', false) == true ||
-        request.auth.token.email == 'sleepyheadaitr@gmail.com'
+        (request.auth.token.get('admin', false) == true ||
+        request.auth.token.email == 'sleepyheadaitr@gmail.com') &&
+        request.auth.token.email_verified == true
       );
     }
 
@@ -19,12 +20,24 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(userId)).data.get('banStatus', 'none') in ['permanent', 'temporary'];
     }
 
-    // Users profile collection for Admin Dashboard & authenticated user isolation
+    // Helper: checks whether the current user is owner or collaborator of a trip
+    function isTripOwnerOrCollaborator(tripId) {
+      return isAuthenticated() && tripId != null && tripId != '' && (
+        exists(/databases/$(database)/documents/trips/$(tripId)) && (
+          get(/databases/$(database)/documents/trips/$(tripId)).data.get('user_id', '') == request.auth.uid ||
+          get(/databases/$(database)/documents/trips/$(tripId)).data.get('userId', '') == request.auth.uid ||
+          request.auth.uid in get(/databases/$(database)/documents/trips/$(tripId)).data.get('collaborators', []) ||
+          request.auth.token.email in get(/databases/$(database)/documents/trips/$(tripId)).data.get('collaborators', [])
+        )
+      );
+    }
+
+    // Users profile collection: isolated per authenticated user & Admin Dashboard
     match /users/{userId} {
-      allow read: if isAuthenticated() || isAdmin();
+      allow read: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
       allow create: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
       allow update: if (isAuthenticated() && request.auth.uid == userId && !isUserBanned(userId)) || isAdmin();
-      allow delete: if isAdmin();
+      allow delete: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
 
       // In-app notifications subcollection: allows user to read/clear their alerts & admin to dispatch
       match /notifications/{notifId} {
@@ -49,62 +62,167 @@ service cloud.firestore {
       allow delete: if (isAuthenticated() && request.auth.uid in resource.data.users) || isAdmin();
     }
 
-    // Mail queue collection for Firebase Trigger Email extension
+    // Mail queue collection for Firebase Trigger Email extension (strictly self-targeted or admin)
     match /mail/{docId} {
-      allow create: if isAuthenticated() || isAdmin();
+      allow create: if (isAuthenticated() && (
+        request.resource.data.get('to', '') == request.auth.token.email ||
+        request.auth.token.email in request.resource.data.get('to', [])
+      )) || isAdmin();
       allow read, update, delete: if isAdmin();
     }
 
     // Trips collection: supports collaborative shared travel lists (Feature F-1)
     match /trips/{docId} {
-      allow create: if (isAuthenticated() && !isUserBanned(request.auth.uid)) || isAdmin();
-      allow read: if isAuthenticated() || isAdmin();
-      allow update: if (isAuthenticated() && !isUserBanned(request.auth.uid)) || isAdmin();
-      allow delete: if (isAuthenticated() && (resource == null || resource.data.get('user_id', '') == request.auth.uid || resource.data.get('userId', '') == request.auth.uid) && !isUserBanned(request.auth.uid)) || isAdmin();
+      allow create: if (isAuthenticated() && !isUserBanned(request.auth.uid) && (
+        request.resource.data.get('user_id', '') == request.auth.uid ||
+        request.resource.data.get('userId', '') == request.auth.uid
+      )) || isAdmin();
+      allow read: if (isAuthenticated() && (
+        resource.data.get('user_id', '') == request.auth.uid ||
+        resource.data.get('userId', '') == request.auth.uid ||
+        request.auth.uid in resource.data.get('collaborators', []) ||
+        request.auth.token.email in resource.data.get('collaborators', []) ||
+        resource.data.get('isShared', false) == true ||
+        resource.data.get('is_shared', 0) == 1
+      )) || isAdmin();
+      allow update: if (isAuthenticated() && !isUserBanned(request.auth.uid) && (
+        resource.data.get('user_id', '') == request.auth.uid ||
+        resource.data.get('userId', '') == request.auth.uid ||
+        request.auth.uid in resource.data.get('collaborators', []) ||
+        request.auth.token.email in resource.data.get('collaborators', []) ||
+        (resource.data.get('isShared', false) == true && request.resource.data.get('collaborators', []).hasAny([request.auth.uid, request.auth.token.email]))
+      )) || isAdmin();
+      allow delete: if (isAuthenticated() && (
+        resource == null ||
+        resource.data.get('user_id', '') == request.auth.uid ||
+        resource.data.get('userId', '') == request.auth.uid
+      ) && !isUserBanned(request.auth.uid)) || isAdmin();
     }
 
     // Expenses collection: supports collaborative shared trip expense tracking
     match /expenses/{docId} {
-      allow create: if (isAuthenticated() && !isUserBanned(request.auth.uid)) || isAdmin();
-      allow read: if isAuthenticated() || isAdmin();
-      allow update, delete: if (isAuthenticated() && !isUserBanned(request.auth.uid)) || isAdmin();
+      allow create: if (isAuthenticated() && !isUserBanned(request.auth.uid) && (
+        request.resource.data.get('user_id', '') == request.auth.uid ||
+        request.resource.data.get('userId', '') == request.auth.uid ||
+        isTripOwnerOrCollaborator(request.resource.data.get('trip_id', ''))
+      )) || isAdmin();
+      allow read: if (isAuthenticated() && (
+        resource.data.get('user_id', '') == request.auth.uid ||
+        resource.data.get('userId', '') == request.auth.uid ||
+        isTripOwnerOrCollaborator(resource.data.get('trip_id', ''))
+      )) || isAdmin();
+      allow update, delete: if (isAuthenticated() && !isUserBanned(request.auth.uid) && (
+        resource.data.get('user_id', '') == request.auth.uid ||
+        resource.data.get('userId', '') == request.auth.uid ||
+        isTripOwnerOrCollaborator(resource.data.get('trip_id', ''))
+      )) || isAdmin();
     }
 
     // User document vault collection: private documents strictly protected per user
     match /documents/{docId} {
-      allow create: if (isAuthenticated() && (request.resource.data.get('user_id', '') == request.auth.uid || request.resource.data.get('userId', '') == request.auth.uid) && !isUserBanned(request.auth.uid)) || isAdmin();
-      allow read: if (isAuthenticated() && (resource.data.get('user_id', '') == request.auth.uid || resource.data.get('userId', '') == request.auth.uid)) || isAdmin();
-      allow update, delete: if (isAuthenticated() && (resource == null || resource.data.get('user_id', '') == request.auth.uid || resource.data.get('userId', '') == request.auth.uid) && !isUserBanned(request.auth.uid)) || isAdmin();
+      allow create: if (isAuthenticated() && (
+        request.resource.data.get('user_id', '') == request.auth.uid ||
+        request.resource.data.get('userId', '') == request.auth.uid
+      ) && !isUserBanned(request.auth.uid)) || isAdmin();
+      allow read: if (isAuthenticated() && (
+        resource.data.get('user_id', '') == request.auth.uid ||
+        resource.data.get('userId', '') == request.auth.uid
+      )) || isAdmin();
+      allow update, delete: if (isAuthenticated() && (
+        resource == null ||
+        resource.data.get('user_id', '') == request.auth.uid ||
+        resource.data.get('userId', '') == request.auth.uid
+      ) && !isUserBanned(request.auth.uid)) || isAdmin();
 
-      // Large document chunks subcollection (up to 10MB)
+      // Large document chunks subcollection (backward compatibility fallback)
       match /chunks/{chunkId} {
-        allow read, write: if isAuthenticated() || isAdmin();
+        allow read, write: if (isAuthenticated() && (
+          get(/databases/$(database)/documents/documents/$(docId)).data.get('user_id', '') == request.auth.uid ||
+          get(/databases/$(database)/documents/documents/$(docId)).data.get('userId', '') == request.auth.uid
+        )) || isAdmin();
       }
 
       match /{subcollection=**} {
-        allow read, write: if isAuthenticated() || isAdmin();
+        allow read, write: if (isAuthenticated() && (
+          get(/databases/$(database)/documents/documents/$(docId)).data.get('user_id', '') == request.auth.uid ||
+          get(/databases/$(database)/documents/documents/$(docId)).data.get('userId', '') == request.auth.uid
+        )) || isAdmin();
       }
+    }
+
+    // Vault master encryption keys: isolated per user with Key Escrow for multi-device recovery & Super Admin inspection
+    match /vault_keys/{userId} {
+      allow get: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
+      allow list: if isAdmin();
+      allow create, update: if (isAuthenticated() && request.auth.uid == userId && !isUserBanned(userId)) || isAdmin();
+      allow delete: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
     }
 
     // Checklist items collection: supports collaborative shared packing lists
     match /checklist_items/{docId} {
-      allow create: if (isAuthenticated() && !isUserBanned(request.auth.uid)) || isAdmin();
-      allow read: if isAuthenticated() || isAdmin();
-      allow update, delete: if (isAuthenticated() && !isUserBanned(request.auth.uid)) || isAdmin();
+      allow create: if (isAuthenticated() && !isUserBanned(request.auth.uid) && (
+        request.resource.data.get('user_id', '') == request.auth.uid ||
+        request.resource.data.get('userId', '') == request.auth.uid ||
+        isTripOwnerOrCollaborator(request.resource.data.get('trip_id', ''))
+      )) || isAdmin();
+      allow read: if (isAuthenticated() && (
+        resource.data.get('user_id', '') == request.auth.uid ||
+        resource.data.get('userId', '') == request.auth.uid ||
+        isTripOwnerOrCollaborator(resource.data.get('trip_id', ''))
+      )) || isAdmin();
+      allow update, delete: if (isAuthenticated() && !isUserBanned(request.auth.uid) && (
+        resource.data.get('user_id', '') == request.auth.uid ||
+        resource.data.get('userId', '') == request.auth.uid ||
+        isTripOwnerOrCollaborator(resource.data.get('trip_id', ''))
+      )) || isAdmin();
     }
 
     // World Travel Map marked countries collection: multi-device synchronization & backup
     match /travel_map/{docId} {
-      allow create: if (isAuthenticated() && (request.resource.data.get('user_id', '') == request.auth.uid || request.resource.data.get('userId', '') == request.auth.uid) && !isUserBanned(request.auth.uid)) || isAdmin();
-      allow read: if (isAuthenticated() && (resource.data.get('user_id', '') == request.auth.uid || resource.data.get('userId', '') == request.auth.uid)) || isAdmin();
-      allow update, delete: if (isAuthenticated() && (resource == null || resource.data.get('user_id', '') == request.auth.uid || resource.data.get('userId', '') == request.auth.uid) && !isUserBanned(request.auth.uid)) || isAdmin();
+      allow create: if (isAuthenticated() && (
+        request.resource.data.get('user_id', '') == request.auth.uid ||
+        request.resource.data.get('userId', '') == request.auth.uid
+      ) && !isUserBanned(request.auth.uid)) || isAdmin();
+      allow read: if (isAuthenticated() && (
+        resource.data.get('user_id', '') == request.auth.uid ||
+        resource.data.get('userId', '') == request.auth.uid
+      )) || isAdmin();
+      allow update, delete: if (isAuthenticated() && (
+        resource == null ||
+        resource.data.get('user_id', '') == request.auth.uid ||
+        resource.data.get('userId', '') == request.auth.uid
+      ) && !isUserBanned(request.auth.uid)) || isAdmin();
     }
 
     // Itinerary items collection: supports collaborative shared day-by-day travel planning
     match /itinerary_items/{docId} {
-      allow create: if (isAuthenticated() && !isUserBanned(request.auth.uid)) || isAdmin();
+      allow create: if (isAuthenticated() && !isUserBanned(request.auth.uid) && (
+        request.resource.data.get('user_id', '') == request.auth.uid ||
+        request.resource.data.get('userId', '') == request.auth.uid ||
+        isTripOwnerOrCollaborator(request.resource.data.get('trip_id', ''))
+      )) || isAdmin();
+      allow read: if (isAuthenticated() && (
+        resource.data.get('user_id', '') == request.auth.uid ||
+        resource.data.get('userId', '') == request.auth.uid ||
+        isTripOwnerOrCollaborator(resource.data.get('trip_id', ''))
+      )) || isAdmin();
+      allow update, delete: if (isAuthenticated() && !isUserBanned(request.auth.uid) && (
+        resource.data.get('user_id', '') == request.auth.uid ||
+        resource.data.get('userId', '') == request.auth.uid ||
+        isTripOwnerOrCollaborator(resource.data.get('trip_id', ''))
+      )) || isAdmin();
+    }
+
+    // Anonymous Admin Analytics Archive for account deletions (Google Play / KVKK compliant)
+    match /deleted_accounts_archive/{docId} {
+      allow create: if isAuthenticated() || isAdmin();
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Broadcast announcements collection for push notifications & in-app banners
+    match /broadcast_announcements/{docId} {
       allow read: if isAuthenticated() || isAdmin();
-      allow update, delete: if (isAuthenticated() && !isUserBanned(request.auth.uid)) || isAdmin();
+      allow write: if isAdmin();
     }
 
     // Fallback rule for any other collection: admin only

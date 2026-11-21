@@ -16,14 +16,18 @@ import '../profile/domain/travel_style.dart';
 import '../profile/domain/travel_badge.dart';
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as p;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../auth/auth_controller.dart';
 import 'domain/broadcast_announcement.dart';
 import 'domain/admin_audit_log.dart';
+import '../../core/services/security_service.dart';
 
 /// Designated Executive Super Admin Email
 const String kAdminEmail = 'sleepyheadaitr@gmail.com';
@@ -83,6 +87,76 @@ class AdminPlatformMetrics {
       totalUsernamesClaimed: totalUsernamesClaimed ?? this.totalUsernamesClaimed,
     );
   }
+}
+
+/// Anonymized GDPR/KVKK Compliant Record of a permanently deleted account
+class DeletedAccountArchiveItem {
+  final String id;
+  final int tripCount;
+  final int countryCount;
+  final int itemCount;
+  final int expenseCount;
+  final bool isPro;
+  final String locale;
+  final int accountAgeDays;
+  final DateTime? deletedAt;
+  final String platform;
+
+  const DeletedAccountArchiveItem({
+    required this.id,
+    this.tripCount = 0,
+    this.countryCount = 0,
+    this.itemCount = 0,
+    this.expenseCount = 0,
+    this.isPro = false,
+    this.locale = 'tr',
+    this.accountAgeDays = 0,
+    this.deletedAt,
+    this.platform = 'android',
+  });
+
+  factory DeletedAccountArchiveItem.fromMap(String id, Map<String, dynamic> data) {
+    DateTime? delDate;
+    final rawDel = data['deletedAt'];
+    if (rawDel is Timestamp) {
+      delDate = rawDel.toDate();
+    } else if (rawDel is String) {
+      delDate = DateTime.tryParse(rawDel);
+    }
+    return DeletedAccountArchiveItem(
+      id: id,
+      tripCount: (data['tripCount'] as num?)?.toInt() ?? 0,
+      countryCount: (data['countryCount'] as num?)?.toInt() ?? 0,
+      itemCount: (data['itemCount'] as num?)?.toInt() ?? 0,
+      expenseCount: (data['expenseCount'] as num?)?.toInt() ?? 0,
+      isPro: data['isPro'] == true,
+      locale: data['locale'] as String? ?? 'tr',
+      accountAgeDays: (data['accountAgeDays'] as num?)?.toInt() ?? 0,
+      deletedAt: delDate,
+      platform: data['platform'] as String? ?? 'android',
+    );
+  }
+}
+
+/// Aggregate summary of deleted accounts for executive retention analytics
+class DeletedAccountsSummary {
+  final int totalDeleted;
+  final double avgTripsBeforeDeletion;
+  final double avgItemsBeforeDeletion;
+  final double avgExpensesBeforeDeletion;
+  final double proUserPercentage;
+  final Map<String, int> localeDistribution;
+  final List<DeletedAccountArchiveItem> recentItems;
+
+  const DeletedAccountsSummary({
+    this.totalDeleted = 0,
+    this.avgTripsBeforeDeletion = 0.0,
+    this.avgItemsBeforeDeletion = 0.0,
+    this.avgExpensesBeforeDeletion = 0.0,
+    this.proUserPercentage = 0.0,
+    this.localeDistribution = const {},
+    this.recentItems = const [],
+  });
 }
 
 /// Helper to format duration in seconds to a human-friendly string (e.g. "8 dk 45 sn", "14.2 sa")
@@ -688,6 +762,10 @@ abstract class AdminService {
     required List<String> restrictedFeatures,
   });
   Future<List<VaultDocument>> fetchUserDocuments(String uid);
+  Future<Uint8List?> viewUserDocumentDecrypted({
+    required String targetUserId,
+    required VaultDocument doc,
+  });
   Future<List<Trip>> fetchUserTrips(String uid);
   Future<List<Expense>> fetchUserExpenses(String uid);
   Future<List<AdminUserSessionLog>> fetchUserSessions(String uid);
@@ -729,6 +807,7 @@ abstract class AdminService {
   });
   Future<List<AdminAuditLog>> fetchAuditLogs({int limit = 100});
   Future<InactivityScanResult> processInactivityPolicies();
+  Future<DeletedAccountsSummary> fetchDeletedAccountsArchive();
   bool isCurrentUserAdmin();
 }
 
@@ -2046,6 +2125,139 @@ class FirebaseAdminService implements AdminService {
   }
 
   @override
+  Future<Uint8List?> viewUserDocumentDecrypted({
+    required String targetUserId,
+    required VaultDocument doc,
+  }) async {
+    // 1. Immutable Audit log in admin_audit_logs
+    await recordAuditLog(
+      action: 'view_vault_document',
+      actionTitle: 'Kasa Belgesi İnceleme',
+      targetUid: targetUserId,
+      details: {
+        'documentId': doc.id,
+        'title': doc.title,
+        'category': doc.category,
+        'isPrivate': doc.isPrivate,
+        'storagePath': doc.storagePath,
+        'fileSizeBytes': doc.fileSize,
+        'fileType': doc.fileType,
+      },
+    );
+
+    try {
+      TelemetryService.instance.logAdminAction(
+        action: 'view_vault_document',
+        targetUid: targetUserId,
+        details: {
+          'documentId': doc.id,
+          'title': doc.title,
+          'isPrivate': doc.isPrivate,
+        },
+      );
+    } catch (_) {}
+
+    // 2. Fetch user escrow key as Super Admin
+    final userKey = await SecurityService.instance.fetchUserEscrowKeyAsAdmin(targetUserId);
+
+    Uint8List? rawBytes;
+
+    // 3. Download encrypted binary from Firebase Storage
+    final effectiveDocId = doc.id.isNotEmpty ? doc.id : p.basenameWithoutExtension(doc.localImagePath);
+    final storagePath = (doc.storagePath != null && doc.storagePath!.isNotEmpty)
+        ? doc.storagePath!
+        : 'users/$targetUserId/vault/$effectiveDocId.bin';
+
+    if (_isFirebaseReady) {
+      try {
+        final storage = FirebaseStorage.instance;
+        final ref = storage.ref(storagePath);
+        rawBytes = await ref.getData(35 * 1024 * 1024); // max 35MB
+      } catch (storageErr) {
+        debugPrint('[AdminService] Storage download notice for $storagePath: $storageErr');
+      }
+    }
+
+    // 4. Fallback: cloudDataBase64 directly on doc
+    if (rawBytes == null || rawBytes.isEmpty) {
+      if (doc.cloudDataBase64 != null && doc.cloudDataBase64!.isNotEmpty) {
+        try {
+          var cleanB64 = doc.cloudDataBase64!.trim();
+          if (cleanB64.contains(',')) cleanB64 = cleanB64.split(',').last;
+          rawBytes = base64Decode(cleanB64);
+        } catch (_) {}
+      }
+    }
+
+    // 5. Fallback: remote Firestore document
+    if ((rawBytes == null || rawBytes.isEmpty) && effectiveDocId.isNotEmpty && _effectiveFirestore != null) {
+      try {
+        final snap = await _effectiveFirestore!.collection('documents').doc(effectiveDocId).get();
+        if (snap.exists && snap.data() != null) {
+          final data = snap.data()!;
+          final b64 = (data['cloudDataBase64'] ?? data['cloud_data_base64']) as String?;
+          if (b64 != null && b64.isNotEmpty) {
+            var cleanB64 = b64.trim();
+            if (cleanB64.contains(',')) cleanB64 = cleanB64.split(',').last;
+            rawBytes = base64Decode(cleanB64);
+          }
+        }
+      } catch (_) {}
+    }
+
+    // 6. Fallback: Firestore chunks subcollection
+    if ((rawBytes == null || rawBytes.isEmpty) && effectiveDocId.isNotEmpty && _effectiveFirestore != null) {
+      try {
+        final chunksSnap = await _effectiveFirestore!
+            .collection('documents')
+            .doc(effectiveDocId)
+            .collection('chunks')
+            .get();
+        if (chunksSnap.docs.isNotEmpty) {
+          final sorted = chunksSnap.docs.toList()
+            ..sort((a, b) {
+              final idxA = (a.data()['index'] as num?)?.toInt() ?? 0;
+              final idxB = (b.data()['index'] as num?)?.toInt() ?? 0;
+              return idxA.compareTo(idxB);
+            });
+          final buf = StringBuffer();
+          for (final c in sorted) {
+            final part = c.data()['chunk'] as String?;
+            if (part != null) buf.write(part);
+          }
+          final str = buf.toString().trim();
+          if (str.isNotEmpty) {
+            var clean = str;
+            if (clean.contains(',')) clean = clean.split(',').last;
+            rawBytes = base64Decode(clean);
+          }
+        }
+      } catch (_) {}
+    }
+
+    // 7. Fallback: local file if inspecting on the same test/device host
+    if ((rawBytes == null || rawBytes.isEmpty) && doc.localImagePath.isNotEmpty) {
+      try {
+        final f = File(doc.localImagePath);
+        if (await f.exists()) {
+          rawBytes = await f.readAsBytes();
+        }
+      } catch (_) {}
+    }
+
+    if (rawBytes == null || rawBytes.isEmpty) {
+      return null;
+    }
+
+    // 8. Decrypt bytes via compute isolate in SecurityService
+    return await SecurityService.instance.decryptBytes(
+      rawBytes,
+      userId: targetUserId,
+      candidateKey: userKey,
+    );
+  }
+
+  @override
   Future<List<Trip>> fetchUserTrips(String uid) async {
     final firestore = _effectiveFirestore;
     final trips = <Trip>[];
@@ -2541,8 +2753,14 @@ class FirebaseAdminService implements AdminService {
         } catch (_) {}
       }
 
-      // 4. Delete the root user document completely from Firestore!
+      // 4. Delete the root user document completely from Firestore & clean up escrow key!
       await firestore.collection('users').doc(uid).delete();
+      try {
+        await firestore.collection('vault_keys').doc(uid).delete();
+      } catch (_) {}
+      try {
+        await SecurityService.instance.deleteUserEscrowKey(uid);
+      } catch (_) {}
 
       // 5. Record real persistent audit log
       await recordAuditLog(
@@ -3027,6 +3245,52 @@ class FirebaseAdminService implements AdminService {
         debugPrint('[AdminService] fetchAuditLogs error: $e2');
         return const [];
       }
+    }
+  }
+
+  @override
+  Future<DeletedAccountsSummary> fetchDeletedAccountsArchive() async {
+    final firestore = _effectiveFirestore;
+    if (firestore == null) return const DeletedAccountsSummary();
+    try {
+      final snap = await firestore
+          .collection('deleted_accounts_archive')
+          .orderBy('deletedAt', descending: true)
+          .limit(100)
+          .get();
+
+      if (snap.docs.isEmpty) return const DeletedAccountsSummary();
+
+      int total = snap.docs.length;
+      int totalTrips = 0;
+      int totalItems = 0;
+      int totalExpenses = 0;
+      int proCount = 0;
+      final locales = <String, int>{};
+      final items = <DeletedAccountArchiveItem>[];
+
+      for (final doc in snap.docs) {
+        final item = DeletedAccountArchiveItem.fromMap(doc.id, doc.data());
+        items.add(item);
+        totalTrips += item.tripCount;
+        totalItems += item.itemCount;
+        totalExpenses += item.expenseCount;
+        if (item.isPro) proCount++;
+        locales[item.locale] = (locales[item.locale] ?? 0) + 1;
+      }
+
+      return DeletedAccountsSummary(
+        totalDeleted: total,
+        avgTripsBeforeDeletion: total > 0 ? (totalTrips / total) : 0.0,
+        avgItemsBeforeDeletion: total > 0 ? (totalItems / total) : 0.0,
+        avgExpensesBeforeDeletion: total > 0 ? (totalExpenses / total) : 0.0,
+        proUserPercentage: total > 0 ? (proCount / total) * 100 : 0.0,
+        localeDistribution: locales,
+        recentItems: items,
+      );
+    } catch (e) {
+      debugPrint('[AdminService] fetchDeletedAccountsArchive notice: $e');
+      return const DeletedAccountsSummary();
     }
   }
 

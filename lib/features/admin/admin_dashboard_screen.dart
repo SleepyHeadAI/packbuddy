@@ -287,6 +287,10 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
 
             // 5. Travel Persona, Styles & Achievements Analytics
             _buildTravelStylesAndPersonaAnalyticsCard(context, adminState.detailedAnalytics, isDark),
+            const SizedBox(height: 20),
+
+            // 6. Kalıcı Hesap Silme & KVKK Analitik Arşivi
+            _buildDeletedAccountsAnalyticsCard(context, adminState.deletedAccountsSummary, isDark),
             const SizedBox(height: 28),
 
             // User Management Section Header
@@ -4171,6 +4175,118 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
       ),
     );
   }
+
+  Widget _buildDeletedAccountsAnalyticsCard(
+    BuildContext context,
+    DeletedAccountsSummary summary,
+    bool isDark,
+  ) {
+    final theme = Theme.of(context);
+    final isTr = Localizations.localeOf(context).languageCode == 'tr';
+
+    return AppCard(
+      padding: const EdgeInsets.all(16),
+      borderRadius: 18,
+      backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+      border: BorderSide(
+        color: isDark ? AppColors.borderSubtle(true) : AppColors.borderSubtle(false),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: AppColors.errorPastel.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.auto_delete_rounded, color: AppColors.errorPastel, size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isTr ? 'Kalıcı Hesap Silme & KVKK Analitik Arşivi' : 'Deleted Accounts & GDPR Analytics',
+                      style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+                    ),
+                    Text(
+                      isTr
+                          ? 'Google Play Veri Güvenliği uyumlu anonim retention verileri'
+                          : 'Google Play Data Safety compliant anonymized retention metrics',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.errorPastel.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${summary.totalDeleted} ${isTr ? "Kayıt" : "Records"}',
+                  style: const TextStyle(
+                    color: AppColors.errorPastel,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 11,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildMiniStatCard(
+                  context: context,
+                  title: isTr ? 'Ort. Seyahat' : 'Avg Trips',
+                  value: summary.avgTripsBeforeDeletion.toStringAsFixed(1),
+                  subtitle: isTr ? 'Silinmeden önce' : 'Before deletion',
+                  icon: Icons.flight_takeoff_rounded,
+                  iconColor: AppColors.primaryAmber,
+                  bgColor: AppColors.primaryAmber.withValues(alpha: 0.1),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildMiniStatCard(
+                  context: context,
+                  title: isTr ? 'Ort. Eşya' : 'Avg Items',
+                  value: summary.avgItemsBeforeDeletion.toStringAsFixed(1),
+                  subtitle: isTr ? 'Liste büyüklüğü' : 'List size',
+                  icon: Icons.checklist_rtl_rounded,
+                  iconColor: AppColors.secondaryLight,
+                  bgColor: AppColors.secondaryLight.withValues(alpha: 0.1),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildMiniStatCard(
+                  context: context,
+                  title: isTr ? 'Pro Dönüşüm' : 'Pro Users',
+                  value: '%${summary.proUserPercentage.toStringAsFixed(0)}',
+                  subtitle: isTr ? 'Abonelik payı' : 'Subscription share',
+                  icon: Icons.workspace_premium_rounded,
+                  iconColor: AppColors.actionGold,
+                  bgColor: AppColors.actionGold.withValues(alpha: 0.1),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 /// Comprehensive User Moderation Bottom Sheet
@@ -5922,12 +6038,176 @@ class _UserModerationBottomSheetState
             }
 
             final isDark = theme.brightness == Brightness.dark;
+            final totalDocs = docs.length;
             final regularDocs = docs.where((d) => !d.isPrivate).toList();
             final privateDocs = docs.where((d) => d.isPrivate).toList();
+            final totalSizeBytes = docs.fold<int>(0, (total, d) => total + d.fileSize);
+            final pdfCount = docs.where((d) => d.isPdf).length;
+            final imageCount = totalDocs - pdfCount;
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // 0. Vault Storage & Type Metrics Summary Card
+                Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: isDark ? 0.35 : 0.6),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          // Total Docs
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  isTr ? 'Toplam Kasa' : 'Total Vault',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Row(
+                                  children: [
+                                    Text(
+                                      '$totalDocs',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w800,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      isTr ? 'belge' : 'docs',
+                                      style: TextStyle(
+                                        fontSize: 10.5,
+                                        color: theme.colorScheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Private Vault count
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  isTr ? 'Özel Kasa' : 'Private Vault',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: Color(0xFFE11D48),
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.lock_rounded, size: 13, color: Color(0xFFE11D48)),
+                                    const SizedBox(width: 3),
+                                    Text(
+                                      '${privateDocs.length}',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w800,
+                                        color: Color(0xFFE11D48),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Total Storage in MB
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  isTr ? 'Toplam Boyut' : 'Total Size',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  formatStorageBytes(totalSizeBytes),
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      const Divider(height: 1, thickness: 0.5),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.photo_library_outlined, size: 14, color: theme.colorScheme.primary),
+                              const SizedBox(width: 4),
+                              Text(
+                                isTr ? '$imageCount Fotoğraf' : '$imageCount Photos',
+                                style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600),
+                              ),
+                              const SizedBox(width: 12),
+                              Icon(Icons.picture_as_pdf_outlined, size: 14, color: const Color(0xFFEF4444)),
+                              const SizedBox(width: 4),
+                              Text(
+                                isTr ? '$pdfCount PDF Belgesi' : '$pdfCount PDFs',
+                                style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.verified_user_rounded, size: 11, color: Color(0xFF10B981)),
+                                const SizedBox(width: 3),
+                                Text(
+                                  isTr ? 'AES-256 Korumalı' : 'AES-256 Protected',
+                                  style: const TextStyle(
+                                    fontSize: 9.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF10B981),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
                 // 1. Genel Kasa Belgeleri (Standard Documents)
                 if (privateDocs.isNotEmpty) ...[
                   Row(
@@ -7664,6 +7944,23 @@ class _AdminVaultInspectDialogState extends ConsumerState<_AdminVaultInspectDial
       final effectiveDocId = widget.doc.id.isNotEmpty
           ? widget.doc.id
           : p.basenameWithoutExtension(widget.doc.localImagePath);
+
+      // 0. Super Admin Decrypted Viewer via AdminService (Firebase Storage + Key Escrow + Audit Logging)
+      try {
+        final adminBytes = await ref.read(adminServiceProvider).viewUserDocumentDecrypted(
+          targetUserId: targetUid,
+          doc: widget.doc,
+        );
+        if (adminBytes != null && adminBytes.isNotEmpty) {
+          if (!SecurityService.instance.isEncrypted(adminBytes) ||
+              SecurityService.isImageBytes(adminBytes) ||
+              SecurityService.isPdfBytes(adminBytes)) {
+            resolvedBytes = adminBytes;
+          }
+        }
+      } catch (adminViewerErr) {
+        debugPrint('[_AdminVaultInspectDialog] admin viewer notice: $adminViewerErr');
+      }
 
       // 1. Direct cloud base64 payload from widget.doc (if present and not forcing clean cloud fetch)
       if (!forceCloud && widget.doc.cloudDataBase64 != null && widget.doc.cloudDataBase64!.isNotEmpty) {

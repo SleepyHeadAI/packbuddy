@@ -163,9 +163,6 @@ class LocalNotificationService implements INotificationService {
           AndroidFlutterLocalNotificationsPlugin>();
       if (androidImpl != null) {
         final androidGranted = await androidImpl.requestNotificationsPermission();
-        try {
-          await androidImpl.requestExactAlarmsPermission();
-        } catch (_) {}
         granted = androidGranted ?? false;
       }
 
@@ -338,23 +335,13 @@ class LocalNotificationService implements INotificationService {
           id: id,
           scheduledDate: tzDateTime,
           notificationDetails: notificationDetails,
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          title: title,
-          body: body,
-          payload: payload,
-        );
-      } catch (exactAlarmError) {
-        // Resilient fallback for Android 14+ or devices where exact alarm permission is restricted
-        debugPrint('[LocalNotificationService] Exact alarm rejected, falling back to inexact: $exactAlarmError');
-        await _plugin.zonedSchedule(
-          id: id,
-          scheduledDate: tzDateTime,
-          notificationDetails: notificationDetails,
           androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
           title: title,
           body: body,
           payload: payload,
         );
+      } catch (scheduleError) {
+        debugPrint('[LocalNotificationService] Inexact alarm schedule notice: $scheduleError');
       }
     } catch (e) {
       debugPrint('[LocalNotificationService] Failed to schedule notification #$id: $e');

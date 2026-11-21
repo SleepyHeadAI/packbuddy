@@ -11,6 +11,7 @@ class Document {
   final String? notes;
   final int fileSizeBytes;
   final String? cloudDataBase64;
+  final String? storagePath;
   final String? fileExtension;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -28,6 +29,7 @@ class Document {
     this.notes,
     this.fileSizeBytes = 0,
     this.cloudDataBase64,
+    this.storagePath,
     this.fileExtension,
     required this.createdAt,
     required this.updatedAt,
@@ -88,6 +90,8 @@ class Document {
     int? fileSizeBytes,
     String? cloudDataBase64,
     bool clearCloudData = false,
+    String? storagePath,
+    bool clearStoragePath = false,
     String? fileExtension,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -105,6 +109,7 @@ class Document {
       notes: notes ?? this.notes,
       fileSizeBytes: fileSizeBytes ?? this.fileSizeBytes,
       cloudDataBase64: clearCloudData ? null : (cloudDataBase64 ?? this.cloudDataBase64),
+      storagePath: clearStoragePath ? null : (storagePath ?? this.storagePath),
       fileExtension: fileExtension ?? this.fileExtension,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -133,6 +138,8 @@ class Document {
       'file_size_bytes': fileSizeBytes,
       'cloudDataBase64': cloudDataBase64,
       'cloud_data_base64': cloudDataBase64,
+      'storagePath': storagePath,
+      'storage_path': storagePath,
       'fileExtension': fileExtension,
       'file_extension': fileExtension,
       'createdAt': createdAt.toIso8601String(),
@@ -182,6 +189,7 @@ class Document {
       notes: json['notes'] as String?,
       fileSizeBytes: (json['file_size_bytes'] ?? json['fileSizeBytes'] as num?)?.toInt() ?? 0,
       cloudDataBase64: (json['cloudDataBase64'] ?? json['cloud_data_base64']) as String?,
+      storagePath: (json['storagePath'] ?? json['storage_path']) as String?,
       fileExtension: ext,
       createdAt: json['createdAt'] != null || json['created_at'] != null
           ? parseDate(json['createdAt'] ?? json['created_at'])
@@ -207,6 +215,7 @@ class Document {
       'notes': notes,
       'file_size_bytes': fileSizeBytes,
       'cloud_data_base64': cloudDataBase64,
+      'storage_path': storagePath,
       'file_extension': fileExtension,
       'created_at': createdAt.millisecondsSinceEpoch,
       'updated_at': updatedAt.millisecondsSinceEpoch,
@@ -249,6 +258,7 @@ class Document {
       notes: map['notes'] as String?,
       fileSizeBytes: (map['file_size_bytes'] ?? map['fileSizeBytes'] as num?)?.toInt() ?? 0,
       cloudDataBase64: (map['cloud_data_base64'] ?? map['cloudDataBase64']) as String?,
+      storagePath: (map['storage_path'] ?? map['storagePath']) as String?,
       fileExtension: ext,
       createdAt: parseDate(map['created_at'] ?? map['createdAt']),
       updatedAt: parseDate(map['updated_at'] ?? map['updatedAt']),

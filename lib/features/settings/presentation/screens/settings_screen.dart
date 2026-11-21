@@ -1032,7 +1032,7 @@ class _ThemeModeSegmentedControl extends StatelessWidget {
                 _buildOption(
                   mode: ThemeMode.system,
                   label: l10n.themeSystem,
-                  icon: AppIcons.tune,
+                  icon: AppIcons.spark,
                   isSelected: selectedMode == ThemeMode.system,
                   isDark: isDark,
                   flex: math.max(10, l10n.themeSystem.length + 6),
@@ -1298,7 +1298,7 @@ class _AccountSessionCard extends ConsumerWidget {
             onPressed: () => Navigator.of(ctx).pop(),
             label: l10n.cancel,
           ),
-          AppButton.destructive(
+          AppButton.outline(
             size: AppButtonSize.medium,
             onPressed: () async {
               Navigator.of(ctx).pop();
@@ -1309,6 +1309,26 @@ class _AccountSessionCard extends ConsumerWidget {
                     content: Text(l10n.deleteAccountScheduledNotice),
                     backgroundColor: AppColors.errorPastel,
                     duration: const Duration(seconds: 6),
+                  ),
+                );
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                }
+              }
+            },
+            label: '15 Günlük Planlı Silme',
+          ),
+          AppButton.destructive(
+            size: AppButtonSize.medium,
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              final success = await ref.read(authControllerProvider.notifier).deleteAccountPermanently();
+              if (success && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Hesabınız ve tüm verileriniz kalıcı olarak silindi.'),
+                    backgroundColor: AppColors.errorPastel,
+                    duration: Duration(seconds: 6),
                   ),
                 );
                 if (Navigator.of(context).canPop()) {

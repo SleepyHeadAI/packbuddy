@@ -179,6 +179,9 @@ class MockAuthService implements AuthService {
   Future<void> requestAccountDeletion(String uid) async {}
 
   @override
+  Future<void> deleteAccountPermanently(String uid, {String? password}) async {}
+
+  @override
   Future<void> recordLegalConsent({
     required String uid,
     required String version,

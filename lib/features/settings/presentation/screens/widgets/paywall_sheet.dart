@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
 import 'package:packbuddy/core/services/telemetry_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
@@ -448,6 +449,58 @@ class PaywallSheet extends ConsumerWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 8),
+            Wrap(
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: () async {
+                    final uri = Uri.parse('https://packbuddy.app/terms');
+                    try {
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      }
+                    } catch (_) {}
+                  },
+                  child: Text(
+                    Localizations.localeOf(context).languageCode == 'tr' ? 'Kullanım Koşulları (EULA)' : 'Terms of Service',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.primary,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+                Text(
+                  ' • ',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    final uri = Uri.parse('https://packbuddy.app/privacy');
+                    try {
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri, mode: LaunchMode.externalApplication);
+                      }
+                    } catch (_) {}
+                  },
+                  child: Text(
+                    Localizations.localeOf(context).languageCode == 'tr' ? 'Gizlilik Politikası' : 'Privacy Policy',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.primary,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
         ],
       ),
@@ -612,7 +665,7 @@ class _PlanOptionCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? (isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceLight)
-              : (isDark ? AppColors.surfaceDark : const Color(0xFFF8FAFC)),
+              : (isDark ? AppColors.surfaceDark : AppColors.surfaceRaisedLight),
           borderRadius: BorderRadius.circular(AppRadius.card),
           border: Border.all(
             color: isSelected
@@ -650,12 +703,12 @@ class _PlanOptionCard extends StatelessWidget {
                   const SizedBox(width: 4),
                   Flexible(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF78350F).withValues(alpha: 0.6) : const Color(0xFFFEF3C7),
+                        color: isDark ? AppColors.surfaceRaisedDark : AppColors.brandAccent.withValues(alpha: 0.16),
                         borderRadius: BorderRadius.circular(AppRadius.xs),
                         border: Border.all(
-                          color: isDark ? const Color(0xFF92400E) : const Color(0xFFFDE68A),
+                          color: isDark ? AppColors.borderSubtle(true) : AppColors.brandAccent.withValues(alpha: 0.35),
                           width: 1,
                         ),
                       ),
@@ -665,7 +718,7 @@ class _PlanOptionCard extends StatelessWidget {
                           badge!,
                           maxLines: 1,
                           style: TextStyle(
-                            color: isDark ? const Color(0xFFFDE68A) : AppColors.brandAccentTextLight,
+                            color: isDark ? AppColors.brandAccent : AppColors.brandAccentTextLight,
                             fontSize: 9.5,
                             fontWeight: FontWeight.w800,
                           ),

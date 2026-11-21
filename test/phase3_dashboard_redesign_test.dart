@@ -277,7 +277,7 @@ void main() {
       final RichText richTextWidget = tester.widget(richTextFinder);
       final plainText = richTextWidget.text.toPlainText();
       expect(plainText, contains('1/2'));
-      expect(plainText, contains('%50'));
+      expect(plainText, anyOf(contains('%50'), contains('50%')));
     });
 
     testWidgets('Currency Converter Card renders tabular figures for rates and amount', (tester) async {

@@ -84,6 +84,7 @@ class AdminState {
   final AnalyticsPeriod analyticsPeriod;
   final List<AdminAuditLog> auditLogs;
   final String auditLogFilter;
+  final DeletedAccountsSummary deletedAccountsSummary;
   final String? errorMessage;
   final DateTime? lastRefreshedAt;
 
@@ -99,6 +100,7 @@ class AdminState {
     this.analyticsPeriod = AnalyticsPeriod.daily,
     this.auditLogs = const [],
     this.auditLogFilter = 'all',
+    this.deletedAccountsSummary = const DeletedAccountsSummary(),
     this.errorMessage,
     this.lastRefreshedAt,
   });
@@ -273,6 +275,7 @@ class AdminState {
     AnalyticsPeriod? analyticsPeriod,
     List<AdminAuditLog>? auditLogs,
     String? auditLogFilter,
+    DeletedAccountsSummary? deletedAccountsSummary,
     String? errorMessage,
     DateTime? lastRefreshedAt,
     bool clearError = false,
@@ -289,6 +292,7 @@ class AdminState {
       analyticsPeriod: analyticsPeriod ?? this.analyticsPeriod,
       auditLogs: auditLogs ?? this.auditLogs,
       auditLogFilter: auditLogFilter ?? this.auditLogFilter,
+      deletedAccountsSummary: deletedAccountsSummary ?? this.deletedAccountsSummary,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       lastRefreshedAt: lastRefreshedAt ?? this.lastRefreshedAt,
     );
@@ -313,12 +317,14 @@ class AdminController extends StateNotifier<AdminState> {
         _adminService.fetchUsers(),
         _adminService.fetchDetailedAnalytics(),
         _adminService.fetchAuditLogs(),
+        _adminService.fetchDeletedAccountsArchive(),
       ]);
 
       final metrics = results[0] as AdminPlatformMetrics;
       final users = results[1] as List<AdminUserModel>;
       final analytics = results[2] as AdminDetailedAnalytics;
       final auditLogs = results[3] as List<AdminAuditLog>;
+      final deletedSummary = results[4] as DeletedAccountsSummary;
 
       state = state.copyWith(
         isLoading: false,
@@ -326,6 +332,7 @@ class AdminController extends StateNotifier<AdminState> {
         allUsers: users,
         detailedAnalytics: analytics,
         auditLogs: auditLogs,
+        deletedAccountsSummary: deletedSummary,
         lastRefreshedAt: DateTime.now(),
       );
     } catch (e) {

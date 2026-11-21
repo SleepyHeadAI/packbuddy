@@ -43,7 +43,7 @@ extension StoryCardLayoutX on StoryCardLayout {
   IconData get icon {
     switch (this) {
       case StoryCardLayout.classic:
-        return Icons.style_rounded;
+        return Icons.auto_awesome_rounded;
       case StoryCardLayout.passport:
         return Icons.badge_outlined;
       case StoryCardLayout.minimal:

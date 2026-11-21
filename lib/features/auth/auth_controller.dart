@@ -397,6 +397,54 @@ class AuthController extends StateNotifier<AuthState> {
     }
   }
 
+  /// Immediately and permanently deletes account, user collections, vault files, archives anonymous analytics, and signs out
+  Future<bool> deleteAccountPermanently({String? password}) async {
+    final user = state.user;
+    if (user == null) return false;
+    state = state.copyWith(isLoading: true);
+    try {
+      final r = _ref;
+      await _authService.deleteAccountPermanently(user.uid, password: password);
+
+      try {
+        await DatabaseHelper.instance.clearAllData();
+      } catch (_) {}
+      try {
+        await PreferencesService.instance.clearDeviceProStatus();
+        await PreferencesService.instance.setProUser(false);
+        await PreferencesService.instance.setVaultPin(null);
+        await PreferencesService.instance.setVaultBiometricEnabled(false);
+        await PreferencesService.instance.setVaultLocked(false);
+      } catch (_) {}
+
+      if (r != null) {
+        try {
+          r.read(tripControllerProvider.notifier).resetState();
+          r.read(checklistControllerProvider.notifier).resetState();
+          r.read(vaultControllerProvider.notifier).resetState();
+          r.read(proSubscriptionProvider.notifier).resetProStatus();
+          r.read(currencyProvider.notifier).resetToDefault();
+          r.read(userModerationProvider.notifier).reset();
+          r.read(profileControllerProvider.notifier).resetState();
+        } catch (_) {}
+      }
+
+      await _authService.signOut();
+      state = state.copyWith(
+        clearUser: true,
+        isLoading: false,
+        clearError: true,
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: _formatAuthError(e),
+      );
+      return false;
+    }
+  }
+
   /// Sign out current user
   Future<void> signOut() async {
     state = state.copyWith(isLoading: true);

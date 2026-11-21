@@ -1,13 +1,16 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../core/services/preferences_service.dart';
 import '../../core/services/currency_service.dart';
 import '../../core/services/live_location_service.dart';
+import '../../core/services/security_service.dart';
 import '../../data/local_db/database_helper.dart';
 import '../admin/admin_service.dart';
 import '../profile/domain/user_profile.dart';
@@ -55,6 +58,9 @@ abstract class AuthService {
 
   /// Schedules account for deletion in 15 days
   Future<void> requestAccountDeletion(String uid);
+
+  /// Immediately and permanently deletes account, user collections, vault files, and archives anonymous telemetry.
+  Future<void> deleteAccountPermanently(String uid, {String? password});
 
   /// Updates lastActiveAt timestamp for current user in Firestore
   Future<void> updateLastActive(String uid);
@@ -681,6 +687,9 @@ class FirebaseAuthService implements AuthService {
 
       await userDocRef.set(updateFields, SetOptions(merge: true));
 
+      // Ensure Vault AES-256 Key Escrow and multi-device key synchronization
+      unawaited(SecurityService.instance.getOrCreateUserVaultKey(userId: user.uid));
+
       return effectiveIsPremium;
     } catch (e) {
       debugPrint('[FirebaseAuthService] syncUserProfile notice: $e');
@@ -705,6 +714,127 @@ class FirebaseAuthService implements AuthService {
     } catch (e) {
       debugPrint('[FirebaseAuthService] requestAccountDeletion error: $e');
       rethrow;
+    }
+  }
+
+  @override
+  Future<void> deleteAccountPermanently(String uid, {String? password}) async {
+    final firestore = _firestore ?? (_isFirebaseReady ? FirebaseFirestore.instance : null);
+    final user = _auth?.currentUser;
+
+    // 1. Collect anonymized usage metrics before wiping
+    int tripCount = 0;
+    int countryCount = 0;
+    int itemCount = 0;
+    int expenseCount = 0;
+    int accountAgeDays = 0;
+    bool isPro = PreferencesService.instance.isProUser(uid: uid);
+    final locale = PreferencesService.instance.getLocale()?.languageCode ?? 'tr';
+
+    try {
+      final localTrips = await DatabaseHelper.instance.getTrips(userId: uid);
+      tripCount = localTrips.length;
+      final visitedCountries = <String>{};
+      for (final t in localTrips) {
+        if (t.countryCode != null && t.countryCode!.isNotEmpty) {
+          visitedCountries.add(t.countryCode!);
+        }
+      }
+      countryCount = visitedCountries.length;
+      final localItems = await DatabaseHelper.instance.getChecklistItems(userId: uid);
+      itemCount = localItems.length;
+      final localExpenses = await DatabaseHelper.instance.getExpenses(userId: uid);
+      expenseCount = localExpenses.length;
+    } catch (_) {}
+
+    try {
+      if (user?.metadata.creationTime != null) {
+        accountAgeDays = DateTime.now().difference(user!.metadata.creationTime!).inDays;
+      }
+    } catch (_) {}
+
+    // 2. Archive strictly anonymized metrics to deleted_accounts_archive
+    if (firestore != null) {
+      try {
+        await firestore.collection('deleted_accounts_archive').add({
+          'tripCount': tripCount,
+          'countryCount': countryCount,
+          'itemCount': itemCount,
+          'expenseCount': expenseCount,
+          'isPro': isPro,
+          'locale': locale,
+          'accountAgeDays': accountAgeDays,
+          'deletedAt': FieldValue.serverTimestamp(),
+          'platform': Platform.operatingSystem,
+        });
+      } catch (e) {
+        debugPrint('[FirebaseAuthService] Failed to archive deleted account metrics: $e');
+      }
+
+      // 3. Purge user collections in Firestore
+      try {
+        final collections = ['trips', 'expenses', 'checklist_items', 'documents', 'itinerary_items'];
+        for (final coll in collections) {
+          final snap = await firestore.collection(coll).where('user_id', isEqualTo: uid).get();
+          for (final doc in snap.docs) {
+            if (coll == 'documents') {
+              try {
+                final chunks = await doc.reference.collection('chunks').get();
+                for (final c in chunks.docs) {
+                  await c.reference.delete();
+                }
+              } catch (_) {}
+            }
+            await doc.reference.delete();
+          }
+        }
+        await firestore.collection('users').doc(uid).delete();
+        await firestore.collection('vault_keys').doc(uid).delete();
+      } catch (e) {
+        debugPrint('[FirebaseAuthService] Error purging Firestore user data: $e');
+      }
+
+      try {
+        await SecurityService.instance.deleteUserEscrowKey(uid);
+      } catch (e) {
+        debugPrint('[FirebaseAuthService] Error deleting local/escrow vault key: $e');
+      }
+    }
+
+    // 4. Purge Firebase Storage vault files
+    if (_isFirebaseReady) {
+      try {
+        final storage = FirebaseStorage.instance;
+        final vaultRef = storage.ref('users/$uid/vault');
+        final listResult = await vaultRef.listAll();
+        for (final item in listResult.items) {
+          await item.delete();
+        }
+      } catch (e) {
+        debugPrint('[FirebaseAuthService] Error purging Storage vault files: $e');
+      }
+    }
+
+    // 5. Delete Firebase Auth user with reauthentication support
+    if (user != null) {
+      try {
+        await user.delete();
+      } on FirebaseAuthException catch (authErr) {
+        if (authErr.code == 'requires-recent-login') {
+          if (password != null && password.isNotEmpty && user.email != null) {
+            final credential = EmailAuthProvider.credential(
+              email: user.email!,
+              password: password,
+            );
+            await user.reauthenticateWithCredential(credential);
+            await user.delete();
+          } else {
+            rethrow;
+          }
+        } else {
+          rethrow;
+        }
+      }
     }
   }
 

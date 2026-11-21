@@ -76,7 +76,7 @@ abstract class SubscriptionService {
 
 /// Official Google Play & App Store Billing Service managing entitlements, purchases, and subscriptions.
 /// Cleanly decoupled from the UI layer to allow seamless real store or mock testing.
-class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
+class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
     implements SubscriptionService {
   final PreferencesService _prefs;
   final InAppPurchase? _customIap;
@@ -124,7 +124,7 @@ class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
     }
   }
 
-  MockRevenueCatNotifier([PreferencesService? prefs, InAppPurchase? iap])
+  BillingSubscriptionNotifier([PreferencesService? prefs, InAppPurchase? iap])
       : _prefs = prefs ?? PreferencesService.instance,
         _customIap = iap,
         super(ProSubscriptionState(
@@ -508,8 +508,11 @@ class MockRevenueCatNotifier extends StateNotifier<ProSubscriptionState>
   }
 }
 
+/// Backward compatibility alias for legacy tests and references
+typedef MockRevenueCatNotifier = BillingSubscriptionNotifier;
+
 /// Global Riverpod Provider exposing the decoupled subscription service
 final proSubscriptionProvider =
-    StateNotifierProvider<MockRevenueCatNotifier, ProSubscriptionState>((ref) {
-  return MockRevenueCatNotifier();
+    StateNotifierProvider<BillingSubscriptionNotifier, ProSubscriptionState>((ref) {
+  return BillingSubscriptionNotifier();
 });

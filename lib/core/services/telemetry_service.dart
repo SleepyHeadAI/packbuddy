@@ -52,12 +52,16 @@ class TelemetryService {
     if (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) {
       return;
     }
-    if (posthogApiKey.isEmpty) {
+    final effectiveApiKey = posthogApiKey.isNotEmpty
+        ? posthogApiKey
+        : 'phc_zJWTksx4JFN95rKAsfPxR9fUeQLFyM9ArCb9ZUkVjLeK';
+
+    if (effectiveApiKey.isEmpty) {
       debugPrint('[TelemetryService] POSTHOG_API_KEY is not configured. Running in secure offline mode.');
       return;
     }
     try {
-      final config = PostHogConfig(posthogApiKey);
+      final config = PostHogConfig(effectiveApiKey);
       config.host = posthogHost;
       config.captureApplicationLifecycleEvents = true;
       config.sessionReplay = true;
@@ -272,6 +276,46 @@ class TelemetryService {
       );
     } catch (e) {
       debugPrint('[TelemetryService] logProStatusChanged error: $e');
+    }
+  }
+
+  /// Captures when user starts the onboarding experience
+  Future<void> logOnboardingStarted() async {
+    _record('onboarding_started', null);
+    try {
+      await Posthog().capture(eventName: 'onboarding_started');
+    } catch (e) {
+      debugPrint('[TelemetryService] logOnboardingStarted error: $e');
+    }
+  }
+
+  /// Captures each individual step viewed in the onboarding walkthrough
+  Future<void> logOnboardingStepViewed({
+    required int stepIndex,
+    required String stepTitle,
+  }) async {
+    final props = <String, Object>{
+      'step_index': stepIndex,
+      'step_title': stepTitle,
+    };
+    _record('onboarding_step_viewed', props);
+    try {
+      await Posthog().capture(
+        eventName: 'onboarding_step_viewed',
+        properties: props,
+      );
+    } catch (e) {
+      debugPrint('[TelemetryService] logOnboardingStepViewed error: $e');
+    }
+  }
+
+  /// Captures when user completes the onboarding tour
+  Future<void> logOnboardingCompleted() async {
+    _record('onboarding_completed', null);
+    try {
+      await Posthog().capture(eventName: 'onboarding_completed');
+    } catch (e) {
+      debugPrint('[TelemetryService] logOnboardingCompleted error: $e');
     }
   }
 

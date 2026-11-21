@@ -5,6 +5,7 @@ import 'package:packbuddy/core/l10n/l10n.dart';
 import 'package:packbuddy/core/l10n/locale_provider.dart';
 import 'package:packbuddy/core/l10n/language_selector_sheet.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
+import 'package:packbuddy/core/services/telemetry_service.dart';
 import 'package:packbuddy/shared/widgets/app_logo.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
@@ -84,7 +85,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     ),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    TelemetryService.instance.logOnboardingStarted();
+    TelemetryService.instance.logOnboardingStepViewed(
+      stepIndex: 0,
+      stepTitle: _pages[0].defaultTitle,
+    );
+  }
+
   Future<void> _completeOnboarding() async {
+    TelemetryService.instance.logOnboardingCompleted();
     await PreferencesService.instance.setOnboardingCompleted(true);
     if (!mounted) return;
 
@@ -260,7 +272,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               child: PageView.builder(
                 controller: _pageController,
                 itemCount: _pages.length,
-                onPageChanged: (idx) => setState(() => _currentPage = idx),
+                onPageChanged: (idx) {
+                  setState(() => _currentPage = idx);
+                  if (idx < _pages.length) {
+                    TelemetryService.instance.logOnboardingStepViewed(
+                      stepIndex: idx,
+                      stepTitle: _pages[idx].defaultTitle,
+                    );
+                  }
+                },
                 itemBuilder: (context, index) {
                   final page = _pages[index];
                   final title = _resolveTitle(page, l10n);

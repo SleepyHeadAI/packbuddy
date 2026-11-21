@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -181,6 +182,12 @@ class MockAuditAdminService implements AdminService {
   Future<List<VaultDocument>> fetchUserDocuments(String uid) async => [];
 
   @override
+  Future<Uint8List?> viewUserDocumentDecrypted({
+    required String targetUserId,
+    required VaultDocument doc,
+  }) async => null;
+
+  @override
   Future<List<Trip>> fetchUserTrips(String uid) async => [];
 
   @override
@@ -221,6 +228,9 @@ class MockAuditAdminService implements AdminService {
   @override
   Future<InactivityScanResult> processInactivityPolicies() async =>
       const InactivityScanResult();
+
+  @override
+  Future<DeletedAccountsSummary> fetchDeletedAccountsArchive() async => const DeletedAccountsSummary();
 }
 
 void main() {

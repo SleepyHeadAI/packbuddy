@@ -7,6 +7,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -77,6 +78,7 @@ class SyncEngine extends StateNotifier<SyncState> {
   final DatabaseHelper _dbHelper;
   final FirebaseFirestore? _firestoreInstance;
   final FirebaseAuth? _authInstance;
+  final FirebaseStorage? _storageInstance;
   final Ref? ref;
   final void Function(bool isPro)? onProStatusSynced;
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _userDocSubscription;
@@ -93,11 +95,13 @@ class SyncEngine extends StateNotifier<SyncState> {
     DatabaseHelper? dbHelper,
     FirebaseFirestore? firestore,
     FirebaseAuth? auth,
+    FirebaseStorage? storage,
     this.ref,
     this.onProStatusSynced,
   })  : _dbHelper = dbHelper ?? DatabaseHelper.instance,
         _firestoreInstance = firestore,
         _authInstance = auth,
+        _storageInstance = storage,
         super(const SyncState()) {
     _initConnectivityListener();
     _startPeriodicHeartbeat();
@@ -973,6 +977,17 @@ class SyncEngine extends StateNotifier<SyncState> {
               }
             } catch (_) {}
 
+            // Delete binary file from Firebase Storage
+            if (isFirebaseReady) {
+              try {
+                final storage = _storageInstance ?? FirebaseStorage.instance;
+                final sp = (doc.storagePath != null && doc.storagePath!.isNotEmpty)
+                    ? doc.storagePath!
+                    : 'users/$uid/vault/${doc.id}.bin';
+                await storage.ref(sp).delete();
+              } catch (_) {}
+            }
+
             batch.delete(firestore.collection('documents').doc(doc.id));
             await queueBatchOp();
           }
@@ -1282,54 +1297,57 @@ class SyncEngine extends StateNotifier<SyncState> {
 
       for (final localDoc in localDocs) {
         var docToPush = localDoc;
-        // Ensure local document bytes are encoded for cloud backup
-        if ((docToPush.cloudDataBase64 == null || docToPush.cloudDataBase64!.isEmpty) &&
+        // Upload to Firebase Storage with AES-256 binary encryption (or preserve local offline)
+        if ((docToPush.storagePath == null || docToPush.storagePath!.isEmpty) &&
             docToPush.localImagePath.isNotEmpty) {
           try {
             final f = File(docToPush.localImagePath);
             if (f.existsSync()) {
               var bytes = f.readAsBytesSync();
-              if (SecurityService.instance.isEncrypted(bytes)) {
-                bytes = await SecurityService.instance.decryptBytes(bytes, userId: docToPush.userId);
-              }
-              const maxDirectBytes = 500 * 1024;
+              final rawBytes = SecurityService.instance.isEncrypted(bytes)
+                  ? await SecurityService.instance.decryptBytes(bytes, userId: docToPush.userId)
+                  : bytes;
+              final encryptedBytes = await SecurityService.instance.encryptBytes(rawBytes, userId: uid);
               final ext = p.extension(docToPush.localImagePath).replaceAll('.', '').toLowerCase();
-              if (bytes.length <= maxDirectBytes) {
-                final payload = base64Encode(bytes);
-                docToPush = docToPush.copyWith(
-                  cloudDataBase64: payload,
-                  fileSizeBytes: bytes.length,
-                  fileExtension: ext.isNotEmpty ? ext : (docToPush.isPdf ? 'pdf' : 'jpg'),
-                );
-                docsToUpsertLocal.add(docToPush);
-              } else {
-                // Large document (>700KB up to 10MB): chunk into Firestore subcollection
-                final payload = base64Encode(bytes);
-                docToPush = docToPush.copyWith(
-                  fileSizeBytes: bytes.length,
-                  fileExtension: ext.isNotEmpty ? ext : (docToPush.isPdf ? 'pdf' : 'jpg'),
-                  cloudDataBase64: '',
-                );
-                docsToUpsertLocal.add(docToPush);
-                if (bytes.length <= 10 * 1024 * 1024) {
-                  const chunkSize = 400 * 1024;
-                  final totalChunks = (payload.length / chunkSize).ceil();
-                  for (int i = 0; i < totalChunks; i++) {
-                    final start = i * chunkSize;
-                    final end = (start + chunkSize < payload.length) ? start + chunkSize : payload.length;
-                    final chunkStr = payload.substring(start, end);
-                    batch.set(
-                      firestore.collection('documents').doc(docToPush.id).collection('chunks').doc('chunk_$i'),
-                      {
-                        'index': i,
-                        'total': totalChunks,
-                        'chunk': chunkStr,
-                        'updated_at': docToPush.updatedAt.millisecondsSinceEpoch,
-                      },
-                      SetOptions(merge: true),
+              final storagePath = 'users/$uid/vault/${docToPush.id}.bin';
+
+              if (isFirebaseReady) {
+                try {
+                  final storage = _storageInstance ?? FirebaseStorage.instance;
+                  await storage.ref(storagePath).putData(
+                    encryptedBytes,
+                    SettableMetadata(contentType: 'application/octet-stream'),
+                  );
+                  docToPush = docToPush.copyWith(
+                    storagePath: storagePath,
+                    fileSizeBytes: rawBytes.length,
+                    fileExtension: ext.isNotEmpty ? ext : (docToPush.isPdf ? 'pdf' : 'jpg'),
+                    clearCloudData: true,
+                  );
+                  docsToUpsertLocal.add(docToPush);
+                } catch (storageErr) {
+                  debugPrint('[SyncEngine] Firebase Storage upload notice: $storageErr');
+                  // Legacy fallback for tests or offline networks: direct payload if small
+                  if (rawBytes.length <= 500 * 1024) {
+                    final payload = base64Encode(rawBytes);
+                    docToPush = docToPush.copyWith(
+                      cloudDataBase64: payload,
+                      fileSizeBytes: rawBytes.length,
+                      fileExtension: ext.isNotEmpty ? ext : (docToPush.isPdf ? 'pdf' : 'jpg'),
                     );
-                    await queueBatchOp();
+                    docsToUpsertLocal.add(docToPush);
                   }
+                }
+              } else {
+                // Offline / unit test fallback: direct payload if small
+                if (rawBytes.length <= 500 * 1024) {
+                  final payload = base64Encode(rawBytes);
+                  docToPush = docToPush.copyWith(
+                    cloudDataBase64: payload,
+                    fileSizeBytes: rawBytes.length,
+                    fileExtension: ext.isNotEmpty ? ext : (docToPush.isPdf ? 'pdf' : 'jpg'),
+                  );
+                  docsToUpsertLocal.add(docToPush);
                 }
               }
             }
@@ -1614,12 +1632,32 @@ class SyncEngine extends StateNotifier<SyncState> {
 
           if (!fileExists) {
             Uint8List? fileBytes;
-            if (doc.cloudDataBase64 != null && doc.cloudDataBase64!.isNotEmpty) {
+
+            // 1. Prioritize restoring from Firebase Storage
+            if (isFirebaseReady) {
+              try {
+                final storage = _storageInstance ?? FirebaseStorage.instance;
+                final sp = (doc.storagePath != null && doc.storagePath!.isNotEmpty)
+                    ? doc.storagePath!
+                    : 'users/${doc.userId}/vault/${doc.id}.bin';
+                final data = await storage.ref(sp).getData();
+                if (data != null && data.isNotEmpty) {
+                  fileBytes = SecurityService.instance.isEncrypted(data)
+                      ? await SecurityService.instance.decryptBytes(data, userId: doc.userId)
+                      : data;
+                }
+              } catch (e) {
+                debugPrint('[SyncEngine] Storage download notice, falling back to legacy chunks: $e');
+              }
+            }
+
+            // 2. Legacy fallback: cloudDataBase64
+            if (fileBytes == null && doc.cloudDataBase64 != null && doc.cloudDataBase64!.isNotEmpty) {
               try {
                 fileBytes = base64Decode(doc.cloudDataBase64!);
               } catch (_) {}
-            } else if (doc.fileSizeBytes > 0) {
-              // Try restoring from chunks subcollection in Firestore
+            } else if (fileBytes == null && doc.fileSizeBytes > 0) {
+              // 3. Legacy fallback: chunks subcollection in Firestore
               try {
                 QuerySnapshot<Map<String, dynamic>>? chunksSnap;
                 try {
@@ -1669,7 +1707,27 @@ class SyncEngine extends StateNotifier<SyncState> {
                 final restoredFile = File(restoredPath);
                 final encryptedBytes = await SecurityService.instance.encryptBytes(fileBytes, userId: doc.userId);
                 await restoredFile.writeAsBytes(encryptedBytes);
-                updatedDoc = doc.copyWith(filePath: restoredPath);
+
+                String? migratedStoragePath = doc.storagePath;
+                // Auto-migration: if document was recovered from legacy chunks/base64, migrate to Firebase Storage
+                if ((migratedStoragePath == null || migratedStoragePath.isEmpty) && isFirebaseReady) {
+                  try {
+                    final storage = _storageInstance ?? FirebaseStorage.instance;
+                    final sp = 'users/${doc.userId}/vault/${doc.id}.bin';
+                    await storage.ref(sp).putData(
+                      encryptedBytes,
+                      SettableMetadata(contentType: 'application/octet-stream'),
+                    );
+                    migratedStoragePath = sp;
+                  } catch (migErr) {
+                    debugPrint('[SyncEngine] Auto-migration to Firebase Storage notice: $migErr');
+                  }
+                }
+
+                updatedDoc = doc.copyWith(
+                  filePath: restoredPath,
+                  storagePath: migratedStoragePath,
+                );
               } catch (e) {
                 debugPrint('[SyncEngine] Error writing restored file: $e');
               }
