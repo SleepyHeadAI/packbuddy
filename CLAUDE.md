@@ -1,3 +1,6 @@
+- Dil: Aksi söylenmedikçe her zaman Türkçe yanıt ver.
+- Üslup: Yanıtları kısa, doğrudan ve madde işaretli tut; giriş/nezaket/tekrar cümlesi yazma. (Kod, komut ve kritik güvenlik uyarılarını eksiksiz bırak.)
+
 # PackBuddy — Claude Code Guide
 
 ## Architecture
