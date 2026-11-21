@@ -202,13 +202,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get proSubtitle => '解锁无限旅程，享受无忧旅行';
 
   @override
-  String get proFeature1 => '无限制旅行与支出记录';
+  String get proFeature1 => '无限制创建旅行与行程规划';
 
   @override
-  String get proFeature2 => '无限制安全保险库存储';
+  String get proFeature2 => '无限制文件保险库与 5 GB 云存储';
 
   @override
-  String get proFeature3 => '自动云端双向同步';
+  String get proFeature3 => '全部 16 种地图故事主题与 7 种排版';
 
   @override
   String get monthly => '按月订阅';
@@ -2154,4 +2154,46 @@ class AppLocalizationsZh extends AppLocalizations {
   String revertToCurrency(String currency) {
     return '切回 $currency';
   }
+
+  @override
+  String get proFeature4 => '全部 16 种主屏幕小组件主题';
+
+  @override
+  String get proFeature5 => '每日行程活动数量无限制';
+
+  @override
+  String get proFeature6 => '导出旅行预算与开销明细报告';
+
+  @override
+  String get proTripLimitTitle => '规划无限旅行';
+
+  @override
+  String get proTripLimitSubtitle => '免费版支持 1 个进行中的旅行。升级至 Pro 可同时规划多趟精彩旅程。';
+
+  @override
+  String get proVaultLimitTitle => '无限保险库与 5 GB 云端空间';
+
+  @override
+  String get proVaultLimitSubtitle => '配备 5 GB 安全云端容量，安心存储所有重要旅行凭证与证件。';
+
+  @override
+  String get proItineraryLimitTitle => '每日活动添加无上限';
+
+  @override
+  String get proItineraryLimitSubtitle => '随心安排全天精彩。免费版每日最多可记录 3 项活动。';
+
+  @override
+  String get proThemeLockedTitle => '16 种主题与 7 种故事排版';
+
+  @override
+  String get proThemeLockedSubtitle => '解锁护照印章版、拍立得、信息图等全部高级配色小组件。';
+
+  @override
+  String get proExportLockedTitle => '导出预算与消费报表';
+
+  @override
+  String get proExportLockedSubtitle => '导出完整的旅行花费报表，与旅伴随时分享对账。';
+
+  @override
+  String get proFeatureHighlightedBadge => 'Pro 尊享功能';
 }

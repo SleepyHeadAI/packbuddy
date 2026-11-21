@@ -7,6 +7,8 @@ import '../../../../core/services/notification_service.dart';
 import '../../../../core/services/app_widget_service.dart';
 import '../../../../core/services/preferences_service.dart';
 import '../../../../core/services/telemetry_service.dart';
+import '../../../../core/services/pro_entitlement_service.dart';
+import '../../../settings/data/mock_revenuecat_service.dart';
 import '../../../../data/local_db/database_helper.dart';
 import '../../../../data/sync_engine/sync_engine.dart';
 import '../../domain/trip.dart';
@@ -118,6 +120,21 @@ class TripController extends StateNotifier<TripState> {
     // Feature restriction guard (Phase 3)
     if (PreferencesService.instance.getRestrictedFeatures().contains('trip_create')) {
       state = state.copyWith(errorMessage: 'restricted_trip_create');
+      return null;
+    }
+
+    // Pro Feature Gate check (Strict 1 Active / 2 Total trips for Free tier)
+    final isPro = _ref.read(proSubscriptionProvider).isPro;
+    final totalTrips = state.trips.where((t) => !t.isDeleted).length;
+    final now = DateTime.now();
+    final activeTrips = state.trips.where((t) => !t.isDeleted && t.endDate.isAfter(now.subtract(const Duration(days: 1)))).length;
+
+    if (!ProFeatureGate.canCreateTrip(isPro: isPro, totalTrips: totalTrips, activeTrips: activeTrips)) {
+      TelemetryService.instance.logProGateHit(
+        featureKey: 'trip_limit',
+        context: 'total_$totalTrips-active_$activeTrips',
+      );
+      state = state.copyWith(errorMessage: 'pro_trip_limit_reached');
       return null;
     }
 

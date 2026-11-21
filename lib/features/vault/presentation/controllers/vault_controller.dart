@@ -17,6 +17,8 @@ import 'package:packbuddy/core/services/biometric_service.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/services/telemetry_service.dart';
 import 'package:packbuddy/core/services/security_service.dart';
+import 'package:packbuddy/core/services/pro_entitlement_service.dart';
+import 'package:packbuddy/features/settings/data/mock_revenuecat_service.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
 
 /// State representation for Document Vault
@@ -317,16 +319,45 @@ class VaultController extends StateNotifier<VaultState> {
     }
 
     try {
-      // 1. Pick image (safe null check if user cancels, optimized resolution for cloud storage)
+      // 1. Pick image (automatically compressed to max ~1600px and 80 quality for cloud & memory safety)
       final XFile? pickedFile = await _picker.pickImage(
         source: source,
-        imageQuality: 75,
-        maxWidth: 1280,
-        maxHeight: 1280,
+        imageQuality: 80,
+        maxWidth: 1600,
+        maxHeight: 1600,
       );
 
       if (pickedFile == null) {
         // User cancelled selection - return gracefully without error
+        return null;
+      }
+
+      final originalFile = File(pickedFile.path);
+      final rawBytes = await originalFile.readAsBytes();
+      final fileBytes = rawBytes.length;
+
+      // Strict Single File 10 MB Limit Enforcement (RAM/OOM and abuse protection)
+      if (fileBytes > ProFeatureGate.kMaxSingleFileBytes) {
+        state = state.copyWith(errorMessage: 'file_too_large_10mb');
+        return null;
+      }
+
+      // Pro Feature Gate check (Free: max 5 docs, 50MB total; Pro: unlimited docs, 5GB total)
+      final isPro = _ref.read(proSubscriptionProvider).isPro;
+      final currentDocCount = state.documents.where((d) => !d.isDeleted).length;
+      final totalVaultBytes = state.documents.where((d) => !d.isDeleted).fold<int>(0, (total, d) => total + d.fileSizeBytes);
+
+      if (!ProFeatureGate.canAddVaultDocument(
+        isPro: isPro,
+        currentDocCount: currentDocCount,
+        fileSizeBytes: fileBytes,
+        totalVaultBytes: totalVaultBytes,
+      )) {
+        TelemetryService.instance.logProGateHit(
+          featureKey: 'vault_limit',
+          context: 'docs_${currentDocCount}_bytes_$totalVaultBytes',
+        );
+        state = state.copyWith(errorMessage: 'pro_vault_limit_reached');
         return null;
       }
 
@@ -342,12 +373,9 @@ class VaultController extends StateNotifier<VaultState> {
       final targetPath = p.join(vaultDir.path, fileName);
 
       final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
-      final originalFile = File(pickedFile.path);
-      final rawBytes = await originalFile.readAsBytes();
       final encryptedBytes = await SecurityService.instance.encryptBytes(rawBytes, userId: currentUid);
       final targetFile = File(targetPath);
       await targetFile.writeAsBytes(encryptedBytes);
-      final fileBytes = rawBytes.length;
 
       // 3. Create Document entity with cloud payload
       final cleanExt = ext.replaceAll('.', '').toLowerCase();
@@ -432,10 +460,36 @@ class VaultController extends StateNotifier<VaultState> {
       final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
       final originalFile = File(pickedPath);
       final rawBytes = await originalFile.readAsBytes();
+      final fileBytes = rawBytes.length;
+
+      // Strict Single File 10 MB Limit Enforcement (RAM/OOM and abuse protection)
+      if (fileBytes > ProFeatureGate.kMaxSingleFileBytes) {
+        state = state.copyWith(errorMessage: 'file_too_large_10mb');
+        return null;
+      }
+
+      // Pro Feature Gate check (Free: max 5 docs, 50MB total; Pro: unlimited docs, 5GB total)
+      final isPro = _ref.read(proSubscriptionProvider).isPro;
+      final currentDocCount = state.documents.where((d) => !d.isDeleted).length;
+      final totalVaultBytes = state.documents.where((d) => !d.isDeleted).fold<int>(0, (total, d) => total + d.fileSizeBytes);
+
+      if (!ProFeatureGate.canAddVaultDocument(
+        isPro: isPro,
+        currentDocCount: currentDocCount,
+        fileSizeBytes: fileBytes,
+        totalVaultBytes: totalVaultBytes,
+      )) {
+        TelemetryService.instance.logProGateHit(
+          featureKey: 'vault_limit',
+          context: 'docs_${currentDocCount}_bytes_$totalVaultBytes',
+        );
+        state = state.copyWith(errorMessage: 'pro_vault_limit_reached');
+        return null;
+      }
+
       final encryptedBytes = await SecurityService.instance.encryptBytes(rawBytes, userId: currentUid);
       final targetFile = File(targetPath);
       await targetFile.writeAsBytes(encryptedBytes);
-      final fileBytes = rawBytes.length;
 
       final cleanExt = ext.replaceAll('.', '').toLowerCase();
       final cloudData = await encodeFileForCloud(targetPath, userId: currentUid);
@@ -497,6 +551,29 @@ class VaultController extends StateNotifier<VaultState> {
           }
         } catch (_) {}
       }
+      if (fileBytes > ProFeatureGate.kMaxSingleFileBytes) {
+        state = state.copyWith(errorMessage: 'file_too_large_10mb');
+        return null;
+      }
+
+      final isPro = _ref.read(proSubscriptionProvider).isPro;
+      final currentDocCount = state.documents.where((d) => !d.isDeleted).length;
+      final totalVaultBytes = state.documents.where((d) => !d.isDeleted).fold<int>(0, (total, d) => total + d.fileSizeBytes);
+
+      if (!ProFeatureGate.canAddVaultDocument(
+        isPro: isPro,
+        currentDocCount: currentDocCount,
+        fileSizeBytes: fileBytes,
+        totalVaultBytes: totalVaultBytes,
+      )) {
+        TelemetryService.instance.logProGateHit(
+          featureKey: 'vault_limit',
+          context: 'docs_${currentDocCount}_bytes_$totalVaultBytes',
+        );
+        state = state.copyWith(errorMessage: 'pro_vault_limit_reached');
+        return null;
+      }
+
       var cloudData = doc.cloudDataBase64;
       var ext = doc.fileExtension;
       final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';

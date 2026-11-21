@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
@@ -55,6 +56,7 @@ class FakeAuthController extends StateNotifier<AuthState> implements AuthControl
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  FlutterSecureStorage.setMockInitialValues({});
 
   group('PHASE 1: Subscriptions Pricing, Store Billing Protection & Admin Sandbox', () {
     testWidgets('PaywallSheet displays affordable localized pricing across currencies (USD, TRY, EUR, GBP, JPY)', (tester) async {
@@ -215,6 +217,9 @@ void main() {
     });
 
     testWidgets('Super Admin shows Admin / Sandbox Test Purchase Confirmation dialog and activates Pro on confirmation', (tester) async {
+      await tester.binding.setSurfaceSize(const Size(400, 900));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
       final adminUser = FakeUser(uid: 'admin_123', email: kAdminEmail);
       final container = ProviderContainer(
         overrides: [
@@ -250,6 +255,8 @@ void main() {
 
       // Tap Subscribe
       final subscribeBtn = find.text('Continue with Pro');
+      await tester.ensureVisible(subscribeBtn);
+      await tester.pumpAndSettle();
       await tester.tap(subscribeBtn);
       await tester.pumpAndSettle();
 
@@ -259,7 +266,8 @@ void main() {
 
       // Confirm purchase
       await tester.tap(find.text('Activate Pro (Test)'));
-      await tester.pumpAndSettle(const Duration(milliseconds: 600));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 600));
 
       // Pro is successfully activated for Super Admin!
       expect(container.read(proSubscriptionProvider).isPro, isTrue);

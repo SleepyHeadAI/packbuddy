@@ -206,13 +206,13 @@ class AppLocalizationsNl extends AppLocalizations {
   String get proSubtitle => 'Onbeperkt reizen met totale gemoedsrust';
 
   @override
-  String get proFeature1 => 'Onbeperkte reizen en uitgaven';
+  String get proFeature1 => 'Onbeperkte reizen en reisplanning';
 
   @override
-  String get proFeature2 => 'Onbeperkte opslag veilige kluis';
+  String get proFeature2 => 'Onbeperkte documentkluis en 5 GB cloudopslag';
 
   @override
-  String get proFeature3 => 'Automatische tweerichtingssynchronisatie';
+  String get proFeature3 => 'Alle 16 kaartverhaaldelen en 7 premium lay-outs';
 
   @override
   String get monthly => 'Maandelijks';
@@ -2249,4 +2249,51 @@ class AppLocalizationsNl extends AppLocalizations {
   String revertToCurrency(String currency) {
     return 'Terug naar $currency';
   }
+
+  @override
+  String get proFeature4 => 'Alle 16 startscherm-widgetthema\'s';
+
+  @override
+  String get proFeature5 => 'Onbeperkte dagelijkse route-activiteiten';
+
+  @override
+  String get proFeature6 => 'Reisbudget en uitgavenrapporten exporteren';
+
+  @override
+  String get proTripLimitTitle => 'Plan onbeperkte reizen';
+
+  @override
+  String get proTripLimitSubtitle =>
+      'Gratis plan bevat 1 actieve reis. Upgrade om al je reizen tegelijkertijd te beheren.';
+
+  @override
+  String get proVaultLimitTitle => 'Onbeperkte kluis en 5 GB cloud';
+
+  @override
+  String get proVaultLimitSubtitle =>
+      'Bewaar onbeperkt reisdocumenten veilig met 5 GB cloudopslag.';
+
+  @override
+  String get proItineraryLimitTitle => 'Onbeperkte dagelijkse activiteiten';
+
+  @override
+  String get proItineraryLimitSubtitle =>
+      'Plan je hele dag zonder limieten. Gratis plan bevat 3 activiteiten per dag.';
+
+  @override
+  String get proThemeLockedTitle => '16 thema\'s en 7 lay-outs';
+
+  @override
+  String get proThemeLockedSubtitle =>
+      'Ontgrendel alle premiumpaletten, paspoorteditie en widgetstijlen.';
+
+  @override
+  String get proExportLockedTitle => 'Budget en rapporten exporteren';
+
+  @override
+  String get proExportLockedSubtitle =>
+      'Exporteer en deel uitgavenrapporten met je reisgenoten.';
+
+  @override
+  String get proFeatureHighlightedBadge => 'Inbegrepen in Pro';
 }

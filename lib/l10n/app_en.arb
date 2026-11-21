@@ -256,17 +256,17 @@
   "@proSubtitle": {
     "description": "Paywall subtitle"
   },
-  "proFeature1": "Unlimited Trips & Expense Tracking",
+  "proFeature1": "Unlimited Trips & Active Journeys",
   "@proFeature1": {
-    "description": "Pro feature 1 description"
+    "description": "Pro paywall and entitlement string for proFeature1"
   },
-  "proFeature2": "Unlimited Document Vault Storage",
+  "proFeature2": "Unlimited Document Vault & 5 GB Cloud Storage",
   "@proFeature2": {
-    "description": "Pro feature 2 description"
+    "description": "Pro paywall and entitlement string for proFeature2"
   },
-  "proFeature3": "Automatic Two-Way Cloud Sync",
+  "proFeature3": "All 16 Map Story Themes & 7 Premium Layouts",
   "@proFeature3": {
-    "description": "Pro feature 3 description"
+    "description": "Pro paywall and entitlement string for proFeature3"
   },
   "monthly": "Monthly",
   "@monthly": {
@@ -2529,5 +2529,61 @@
         "example": "AUD (A$)"
       }
     }
+  },
+  "proFeature4": "All 16 Home Screen Widget Themes",
+  "@proFeature4": {
+    "description": "Pro paywall and entitlement string for proFeature4"
+  },
+  "proFeature5": "Unlimited Daily Itinerary Activities",
+  "@proFeature5": {
+    "description": "Pro paywall and entitlement string for proFeature5"
+  },
+  "proFeature6": "Export Travel Budget & Expense Reports",
+  "@proFeature6": {
+    "description": "Pro paywall and entitlement string for proFeature6"
+  },
+  "proTripLimitTitle": "Plan Unlimited Trips",
+  "@proTripLimitTitle": {
+    "description": "Pro paywall and entitlement string for proTripLimitTitle"
+  },
+  "proTripLimitSubtitle": "Free tier includes 1 active trip. Upgrade to manage all your journeys simultaneously.",
+  "@proTripLimitSubtitle": {
+    "description": "Pro paywall and entitlement string for proTripLimitSubtitle"
+  },
+  "proVaultLimitTitle": "Unlimited Vault & 5 GB Cloud",
+  "@proVaultLimitTitle": {
+    "description": "Pro paywall and entitlement string for proVaultLimitTitle"
+  },
+  "proVaultLimitSubtitle": "Safeguard unlimited travel documents with 5 GB secure cloud storage.",
+  "@proVaultLimitSubtitle": {
+    "description": "Pro paywall and entitlement string for proVaultLimitSubtitle"
+  },
+  "proItineraryLimitTitle": "Unlimited Daily Activities",
+  "@proItineraryLimitTitle": {
+    "description": "Pro paywall and entitlement string for proItineraryLimitTitle"
+  },
+  "proItineraryLimitSubtitle": "Plan your whole day freely. Free tier includes 3 activities per day.",
+  "@proItineraryLimitSubtitle": {
+    "description": "Pro paywall and entitlement string for proItineraryLimitSubtitle"
+  },
+  "proThemeLockedTitle": "16 Themes & 7 Story Layouts",
+  "@proThemeLockedTitle": {
+    "description": "Pro paywall and entitlement string for proThemeLockedTitle"
+  },
+  "proThemeLockedSubtitle": "Unlock all premium palettes, passport edition, and widget styles.",
+  "@proThemeLockedSubtitle": {
+    "description": "Pro paywall and entitlement string for proThemeLockedSubtitle"
+  },
+  "proExportLockedTitle": "Export Budget & Reports",
+  "@proExportLockedTitle": {
+    "description": "Pro paywall and entitlement string for proExportLockedTitle"
+  },
+  "proExportLockedSubtitle": "Export and share complete travel expense reports with your travel buddies.",
+  "@proExportLockedSubtitle": {
+    "description": "Pro paywall and entitlement string for proExportLockedSubtitle"
+  },
+  "proFeatureHighlightedBadge": "Included in Pro",
+  "@proFeatureHighlightedBadge": {
+    "description": "Pro paywall and entitlement string for proFeatureHighlightedBadge"
   }
 }

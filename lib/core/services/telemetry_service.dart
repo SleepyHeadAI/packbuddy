@@ -239,12 +239,14 @@ class TelemetryService {
     }
   }
 
-  /// Captures paywall impression events
+  /// Captures paywall impression events with optional contextual highlight
   Future<void> logPaywallViewed({
     required String triggerSource,
+    String? highlightFeature,
   }) async {
     final props = <String, Object>{
       'trigger_source': triggerSource,
+      if (highlightFeature != null) 'highlight_feature': highlightFeature,
     };
     _record('paywall_viewed', props);
 
@@ -255,6 +257,90 @@ class TelemetryService {
       );
     } catch (e) {
       debugPrint('[TelemetryService] logPaywallViewed error: $e');
+    }
+  }
+
+  /// Captures when a user hits a Pro feature limit or locked capability
+  Future<void> logProGateHit({
+    required String featureKey,
+    String? context,
+  }) async {
+    final props = <String, Object>{
+      'feature_key': featureKey,
+      if (context != null) 'context': context,
+    };
+    _record('pro_gate_hit', props);
+
+    try {
+      await Posthog().capture(
+        eventName: 'pro_gate_hit',
+        properties: props,
+      );
+    } catch (e) {
+      debugPrint('[TelemetryService] logProGateHit error: $e');
+    }
+  }
+
+  /// Captures when user starts checkout / purchase flow
+  Future<void> logPurchaseStarted({
+    required String productId,
+    required String plan,
+  }) async {
+    final props = <String, Object>{
+      'product_id': productId,
+      'plan': plan,
+    };
+    _record('purchase_started', props);
+
+    try {
+      await Posthog().capture(
+        eventName: 'purchase_started',
+        properties: props,
+      );
+    } catch (e) {
+      debugPrint('[TelemetryService] logPurchaseStarted error: $e');
+    }
+  }
+
+  /// Captures successful subscription completion
+  Future<void> logPurchaseCompleted({
+    required String productId,
+    required String plan,
+    String? purchaseId,
+  }) async {
+    final props = <String, Object>{
+      'product_id': productId,
+      'plan': plan,
+      if (purchaseId != null) 'purchase_id': purchaseId,
+    };
+    _record('purchase_completed', props);
+
+    try {
+      await Posthog().capture(
+        eventName: 'purchase_completed',
+        properties: props,
+      );
+    } catch (e) {
+      debugPrint('[TelemetryService] logPurchaseCompleted error: $e');
+    }
+  }
+
+  /// Captures restored subscription
+  Future<void> logPurchaseRestored({
+    required String source,
+  }) async {
+    final props = <String, Object>{
+      'source': source,
+    };
+    _record('purchase_restored', props);
+
+    try {
+      await Posthog().capture(
+        eventName: 'purchase_restored',
+        properties: props,
+      );
+    } catch (e) {
+      debugPrint('[TelemetryService] logPurchaseRestored error: $e');
     }
   }
 

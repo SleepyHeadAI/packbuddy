@@ -447,7 +447,11 @@ class SecurityService {
     if (userId != null && userId.isNotEmpty) {
       key = await getOrCreateUserVaultKey(userId: userId);
     } else {
-      final currentUid = FirebaseAuth.instance.currentUser?.uid;
+      String? currentUid;
+      try {
+        currentUid = FirebaseAuth.instance.currentUser?.uid;
+      } catch (_) {}
+
       if (currentUid != null && currentUid.isNotEmpty) {
         key = await getOrCreateUserVaultKey(userId: currentUid);
       } else {

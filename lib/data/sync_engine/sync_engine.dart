@@ -25,6 +25,7 @@ import '../../core/services/currency_service.dart';
 import '../../core/services/preferences_service.dart';
 import '../../core/services/security_service.dart';
 import '../../core/services/notification_service.dart';
+import '../../core/services/pro_entitlement_service.dart';
 import '../../features/auth/auth_controller.dart';
 import '../../features/settings/data/mock_revenuecat_service.dart';
 import '../../features/vault/presentation/controllers/vault_controller.dart';
@@ -1295,6 +1296,9 @@ class SyncEngine extends StateNotifier<SyncState> {
       final localDocs = await _dbHelper.getDocuments(userId: uid, includeDeleted: false);
       final localDocsMap = <String, Document>{for (final d in localDocs) d.id: d};
 
+      final isProUser = PreferencesService.instance.isProUser(uid: uid);
+      int runningVaultBytes = await _dbHelper.getTotalVaultStorageBytes(userId: uid);
+
       for (final localDoc in localDocs) {
         var docToPush = localDoc;
         // Upload to Firebase Storage with AES-256 binary encryption (or preserve local offline)
@@ -1307,6 +1311,15 @@ class SyncEngine extends StateNotifier<SyncState> {
               final rawBytes = SecurityService.instance.isEncrypted(bytes)
                   ? await SecurityService.instance.decryptBytes(bytes, userId: docToPush.userId)
                   : bytes;
+
+              // Enforce 10 MB single file size limit & storage quota (50MB Free / 5GB Pro)
+              if (rawBytes.length > ProFeatureGate.kMaxSingleFileBytes ||
+                  !ProFeatureGate.canSyncToCloud(isPro: isProUser, totalCloudBytes: runningVaultBytes + rawBytes.length)) {
+                debugPrint('[SyncEngine] Storage quota or file size limit reached for doc ${docToPush.id}. Skipping upload.');
+                continue;
+              }
+
+              runningVaultBytes += rawBytes.length;
               final encryptedBytes = await SecurityService.instance.encryptBytes(rawBytes, userId: uid);
               final ext = p.extension(docToPush.localImagePath).replaceAll('.', '').toLowerCase();
               final storagePath = 'users/$uid/vault/${docToPush.id}.bin';

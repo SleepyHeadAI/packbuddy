@@ -207,13 +207,13 @@ class AppLocalizationsSv extends AppLocalizations {
   String get proSubtitle => 'Obegränsade resor och fullständig trygghet';
 
   @override
-  String get proFeature1 => 'Obegränsade resor och utgiftsspårning';
+  String get proFeature1 => 'Obegränsade resor och reseplanering';
 
   @override
-  String get proFeature2 => 'Obegränsad lagring i säkert valv';
+  String get proFeature2 => 'Obegränsat dokumentvalv & 5 GB molnlagring';
 
   @override
-  String get proFeature3 => 'Automatisk tvåvägssynk i molnet';
+  String get proFeature3 => 'Alla 16 kartberättelseteman & 7 premiumlayouter';
 
   @override
   String get monthly => 'Månadsvis';
@@ -2240,4 +2240,51 @@ class AppLocalizationsSv extends AppLocalizations {
   String revertToCurrency(String currency) {
     return 'Återgå till $currency';
   }
+
+  @override
+  String get proFeature4 => 'Alla 16 widget-teman för hemskärmen';
+
+  @override
+  String get proFeature5 => 'Obegränsade dagliga reseaktiviteter';
+
+  @override
+  String get proFeature6 => 'Exportera resebudget och utgiftsrapporter';
+
+  @override
+  String get proTripLimitTitle => 'Planera obegränsat med resor';
+
+  @override
+  String get proTripLimitSubtitle =>
+      'Gratisplanen inkluderar 1 aktiv resa. Uppgradera för att hantera alla resor samtidigt.';
+
+  @override
+  String get proVaultLimitTitle => 'Obegränsat valv & 5 GB moln';
+
+  @override
+  String get proVaultLimitSubtitle =>
+      'Spara alla dina resedokument säkert med 5 GB molnlagring.';
+
+  @override
+  String get proItineraryLimitTitle => 'Obegränsade dagliga aktiviteter';
+
+  @override
+  String get proItineraryLimitSubtitle =>
+      'Planera din dag fritt. Gratisversionen inkluderar 3 aktiviteter per dag.';
+
+  @override
+  String get proThemeLockedTitle => '16 teman & 7 berättelselayouter';
+
+  @override
+  String get proThemeLockedSubtitle =>
+      'Lås upp alla premiumpaletter, passversionen och widgetstilar.';
+
+  @override
+  String get proExportLockedTitle => 'Exportera budget och rapporter';
+
+  @override
+  String get proExportLockedSubtitle =>
+      'Exportera och dela utgiftsrapporter med dina reskamrater.';
+
+  @override
+  String get proFeatureHighlightedBadge => 'Ingår i Pro';
 }

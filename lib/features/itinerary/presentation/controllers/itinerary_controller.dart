@@ -6,6 +6,9 @@ import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/itinerary/domain/itinerary_item.dart';
 import 'package:packbuddy/features/profile/presentation/controllers/profile_controller.dart';
+import 'package:packbuddy/core/services/telemetry_service.dart';
+import 'package:packbuddy/core/services/pro_entitlement_service.dart';
+import 'package:packbuddy/features/settings/data/mock_revenuecat_service.dart';
 
 class ItineraryState {
   final String tripId;
@@ -128,6 +131,18 @@ class ItineraryController extends StateNotifier<ItineraryState> {
     double? cost,
     String? currency,
   }) async {
+    // Pro Feature Gate: Free tier limited to 3 activities per day
+    final isPro = _ref.read(proSubscriptionProvider).isPro;
+    final currentDayActivities = state.items.where((i) => i.dayNumber == dayNumber).length;
+    if (!ProFeatureGate.canAddItineraryActivity(isPro: isPro, currentActivitiesInDay: currentDayActivities)) {
+      TelemetryService.instance.logProGateHit(
+        featureKey: 'itinerary_limit',
+        context: 'day_${dayNumber}_count_$currentDayActivities',
+      );
+      state = state.copyWith(errorMessage: 'pro_itinerary_limit_reached');
+      return false;
+    }
+
     try {
       final user = _ref.read(authUserProvider);
       final profile = _ref.read(profileControllerProvider).profile;

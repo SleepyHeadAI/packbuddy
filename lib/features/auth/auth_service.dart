@@ -389,8 +389,8 @@ class FirebaseAuthService implements AuthService {
 
       await PreferencesService.instance.setProUser(effectiveIsPremium, uid: user.uid);
 
-      // If user has effective Pro but remote was not marked Pro, persist to Firestore
-      if (effectiveIsPremium && !remoteIsPremium) {
+      // If user has effective Pro but remote was not marked Pro, persist to Firestore (admin authorized only)
+      if (effectiveIsPremium && !remoteIsPremium && isSuperAdmin) {
         try {
           await userDocRef.set({
             'isPremium': true,
@@ -676,9 +676,9 @@ class FirebaseAuthService implements AuthService {
         'restrictedFeatures': restrictedFeatures,
       };
 
-      // Only update Pro fields if we successfully verified the remote document (existing or new), or if effective is true.
-      // This prevents transient fetch failures on reinstall from wiping out remote Pro entitlement.
-      if (existingDoc != null || effectiveIsPremium) {
+      // Only update Pro fields if super admin, on initial creation, or when not elevating Pro status.
+      // This protects against Firestore security rules self-upgrade rejection for normal users.
+      if (isSuperAdmin || !effectiveIsPremium || !remoteExists) {
         updateFields['isPremium'] = effectiveIsPremium;
         updateFields['is_premium'] = effectiveIsPremium;
         updateFields['isPro'] = effectiveIsPremium;

@@ -12,6 +12,9 @@ import 'package:packbuddy/features/budget/presentation/controllers/trip_controll
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
+import 'package:packbuddy/core/services/pro_entitlement_service.dart';
+import 'package:packbuddy/features/settings/data/mock_revenuecat_service.dart';
+import 'package:packbuddy/features/settings/presentation/screens/widgets/paywall_sheet.dart';
 import 'package:packbuddy/shared/widgets/app_button.dart';
 import 'country_picker_sheet.dart';
 
@@ -23,7 +26,18 @@ class AddTripSheet extends ConsumerStatefulWidget {
 
   const AddTripSheet({super.key, this.tripToEdit});
 
-  static Future<void> show(BuildContext context, {Trip? tripToEdit}) {
+  static Future<void> show(BuildContext context, {Trip? tripToEdit, WidgetRef? ref}) {
+    if (tripToEdit == null && ref != null) {
+      final isPro = ref.read(proSubscriptionProvider).isPro;
+      final trips = ref.read(tripControllerProvider).trips.where((t) => !t.isDeleted).toList();
+      final now = DateTime.now();
+      final activeTrips = trips.where((t) => t.endDate.isAfter(now.subtract(const Duration(days: 1)))).length;
+      if (!ProFeatureGate.canCreateTrip(isPro: isPro, totalTrips: trips.length, activeTrips: activeTrips)) {
+        PaywallSheet.show(context, triggerSource: 'trip_limit', highlightFeature: 'trip_limit');
+        return Future.value();
+      }
+    }
+
     if (tripToEdit == null &&
         PreferencesService.instance.getRestrictedFeatures().contains('trip_create')) {
       final l10n = AppLocalizations.of(context);
@@ -400,7 +414,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
     });
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     final l10n = AppLocalizations.of(context)!;
     final textStop = _stopInputController.text.trim();
     if (textStop.isNotEmpty) {
@@ -466,7 +480,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
         return;
       }
 
-      ref.read(tripControllerProvider.notifier).addTrip(
+      final newTrip = await ref.read(tripControllerProvider.notifier).addTrip(
             title: _titleController.text.trim(),
             destination: finalDestination,
             startDate: _startDate,
@@ -476,9 +490,23 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
             countryCode: _selectedCountry?.code,
             notes: notes,
           );
+
+      if (newTrip == null) {
+        final err = ref.read(tripControllerProvider).errorMessage;
+        if (err == 'pro_trip_limit_reached') {
+          if (mounted) {
+            Navigator.of(context).pop();
+            PaywallSheet.show(context, triggerSource: 'trip_limit', highlightFeature: 'trip_limit');
+          }
+          return;
+        }
+      }
+
       PreferencesService.instance.setDefaultCurrency(_selectedCurrency);
 
-      Navigator.of(context).pop();
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
     }
   }
 

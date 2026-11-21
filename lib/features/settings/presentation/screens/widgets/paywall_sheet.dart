@@ -16,10 +16,24 @@ import 'package:packbuddy/l10n/app_localizations.dart';
 
 /// Modal bottom sheet showcasing PackBuddy Pro features and mock subscription plans
 class PaywallSheet extends ConsumerWidget {
-  const PaywallSheet({super.key});
+  final String triggerSource;
+  final String? highlightFeature;
 
-  static Future<void> show(BuildContext context, {String triggerSource = 'settings'}) {
-    TelemetryService.instance.logPaywallViewed(triggerSource: triggerSource);
+  const PaywallSheet({
+    super.key,
+    this.triggerSource = 'settings',
+    this.highlightFeature,
+  });
+
+  static Future<void> show(
+    BuildContext context, {
+    String triggerSource = 'settings',
+    String? highlightFeature,
+  }) {
+    TelemetryService.instance.logPaywallViewed(
+      triggerSource: triggerSource,
+      highlightFeature: highlightFeature,
+    );
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -31,7 +45,12 @@ class PaywallSheet extends ConsumerWidget {
         reverseDuration: Duration(milliseconds: 200),
         reverseCurve: Curves.easeInCubic,
       ),
-      builder: (_) => const RepaintBoundary(child: PaywallSheet()),
+      builder: (_) => RepaintBoundary(
+        child: PaywallSheet(
+          triggerSource: triggerSource,
+          highlightFeature: highlightFeature,
+        ),
+      ),
     );
   }
 
@@ -42,6 +61,34 @@ class PaywallSheet extends ConsumerWidget {
     final isDark = theme.brightness == Brightness.dark;
     final proState = ref.watch(proSubscriptionProvider);
     final currentCurrency = ref.watch(currencyProvider);
+
+    // Contextual Dynamic Headline & Subtitle based on triggered feature gate
+    final String sheetTitle;
+    final String sheetSubtitle;
+
+    if (highlightFeature == 'trip_limit' || triggerSource == 'trip_limit') {
+      sheetTitle = l10n.proTripLimitTitle;
+      sheetSubtitle = l10n.proTripLimitSubtitle;
+    } else if (highlightFeature == 'vault_limit' || triggerSource == 'vault_limit') {
+      sheetTitle = l10n.proVaultLimitTitle;
+      sheetSubtitle = l10n.proVaultLimitSubtitle;
+    } else if (highlightFeature == 'itinerary_limit' || triggerSource == 'itinerary_limit') {
+      sheetTitle = l10n.proItineraryLimitTitle;
+      sheetSubtitle = l10n.proItineraryLimitSubtitle;
+    } else if (highlightFeature == 'theme_locked' ||
+        triggerSource == 'theme_locked' ||
+        triggerSource == 'story_theme_locked' ||
+        triggerSource == 'story_layout_locked' ||
+        triggerSource == 'widget_theme_locked') {
+      sheetTitle = l10n.proThemeLockedTitle;
+      sheetSubtitle = l10n.proThemeLockedSubtitle;
+    } else if (highlightFeature == 'export_locked' || triggerSource == 'export_locked') {
+      sheetTitle = l10n.proExportLockedTitle;
+      sheetSubtitle = l10n.proExportLockedSubtitle;
+    } else {
+      sheetTitle = l10n.proTitle;
+      sheetSubtitle = l10n.proSubtitle;
+    }
 
     // Affordable, localized micro-subscription tiers adapting cleanly to user currency
     final String fallbackMonthlyPriceText;
@@ -156,9 +203,9 @@ class PaywallSheet extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
 
-          // Title & Subtitle
+          // Title & Subtitle (Contextual or default)
           Text(
-            l10n.proTitle,
+            sheetTitle,
             textAlign: TextAlign.center,
             style: AppTypography.titleLarge.copyWith(
               fontWeight: FontWeight.w800,
@@ -168,7 +215,7 @@ class PaywallSheet extends ConsumerWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            l10n.proSubtitle,
+            sheetSubtitle,
             textAlign: TextAlign.center,
             style: AppTypography.bodyMedium.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
@@ -176,20 +223,50 @@ class PaywallSheet extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
-          // Features List
+          // Features List (Strict 1:1 Matched to Real Pro Entitlements)
           _ProFeatureRow(
             icon: Icons.luggage_outlined,
             title: l10n.proFeature1,
+            isHighlighted: highlightFeature == 'trip_limit' || triggerSource == 'trip_limit',
+            highlightBadge: l10n.proFeatureHighlightedBadge,
           ),
-          const SizedBox(height: 12),
-          _ProFeatureRow(
-            icon: Icons.lock_outline_rounded,
-            title: l10n.proFeature2,
-          ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           _ProFeatureRow(
             icon: Icons.cloud_sync_outlined,
+            title: l10n.proFeature2,
+            isHighlighted: highlightFeature == 'vault_limit' || triggerSource == 'vault_limit',
+            highlightBadge: l10n.proFeatureHighlightedBadge,
+          ),
+          const SizedBox(height: 10),
+          _ProFeatureRow(
+            icon: Icons.auto_awesome_rounded,
             title: l10n.proFeature3,
+            isHighlighted: highlightFeature == 'theme_locked' ||
+                triggerSource == 'theme_locked' ||
+                triggerSource == 'story_theme_locked' ||
+                triggerSource == 'story_layout_locked',
+            highlightBadge: l10n.proFeatureHighlightedBadge,
+          ),
+          const SizedBox(height: 10),
+          _ProFeatureRow(
+            icon: Icons.widgets_outlined,
+            title: l10n.proFeature4,
+            isHighlighted: highlightFeature == 'widget_theme_locked' || triggerSource == 'widget_theme_locked',
+            highlightBadge: l10n.proFeatureHighlightedBadge,
+          ),
+          const SizedBox(height: 10),
+          _ProFeatureRow(
+            icon: Icons.calendar_today_outlined,
+            title: l10n.proFeature5,
+            isHighlighted: highlightFeature == 'itinerary_limit' || triggerSource == 'itinerary_limit',
+            highlightBadge: l10n.proFeatureHighlightedBadge,
+          ),
+          const SizedBox(height: 10),
+          _ProFeatureRow(
+            icon: Icons.file_download_outlined,
+            title: l10n.proFeature6,
+            isHighlighted: highlightFeature == 'export_locked' || triggerSource == 'export_locked',
+            highlightBadge: l10n.proFeatureHighlightedBadge,
           ),
           const SizedBox(height: 24),
 
@@ -314,7 +391,9 @@ class PaywallSheet extends ConsumerWidget {
                             .read(proSubscriptionProvider.notifier)
                             .purchaseActivePlan(isTestOrAdminConfirmation: true);
                         if (context.mounted && success) {
-                          Navigator.of(context).pop();
+                          if (Navigator.of(context).canPop()) {
+                            Navigator.of(context).pop();
+                          }
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Row(
@@ -339,7 +418,9 @@ class PaywallSheet extends ConsumerWidget {
                         if (!context.mounted) return;
 
                         if (success) {
-                          Navigator.of(context).pop();
+                          if (Navigator.of(context).canPop()) {
+                            Navigator.of(context).pop();
+                          }
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Row(
@@ -588,10 +669,14 @@ class PaywallSheet extends ConsumerWidget {
 class _ProFeatureRow extends StatelessWidget {
   final IconData icon;
   final String title;
+  final bool isHighlighted;
+  final String? highlightBadge;
 
   const _ProFeatureRow({
     required this.icon,
     required this.title,
+    this.isHighlighted = false,
+    this.highlightBadge,
   });
 
   @override
@@ -599,34 +684,92 @@ class _ProFeatureRow extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceRaisedDark : AppColors.primaryContainerLight.withValues(alpha: 0.6),
-            borderRadius: BorderRadius.circular(AppRadius.xs),
-            border: Border.all(
-              color: isDark ? AppColors.borderSubtle(true) : AppColors.borderSubtle(false),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      padding: EdgeInsets.symmetric(
+        horizontal: isHighlighted ? 10 : 0,
+        vertical: isHighlighted ? 8 : 0,
+      ),
+      decoration: BoxDecoration(
+        color: isHighlighted
+            ? (isDark
+                ? AppColors.primaryAmber.withValues(alpha: 0.12)
+                : AppColors.brandAccent.withValues(alpha: 0.12))
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        border: isHighlighted
+            ? Border.all(
+                color: isDark ? AppColors.primaryAmber : AppColors.brandAccent,
+                width: 1.4,
+              )
+            : null,
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isHighlighted
+                  ? (isDark ? AppColors.primaryAmber.withValues(alpha: 0.25) : AppColors.brandAccent.withValues(alpha: 0.25))
+                  : (isDark ? AppColors.surfaceRaisedDark : AppColors.primaryContainerLight.withValues(alpha: 0.6)),
+              borderRadius: BorderRadius.circular(AppRadius.xs),
+              border: Border.all(
+                color: isHighlighted
+                    ? (isDark ? AppColors.primaryAmber : AppColors.brandAccent)
+                    : (isDark ? AppColors.borderSubtle(true) : AppColors.borderSubtle(false)),
+              ),
+            ),
+            child: Icon(
+              icon,
+              color: isHighlighted
+                  ? (isDark ? AppColors.primaryAmber : AppColors.brandAccentTextLight)
+                  : (isDark ? AppColors.primaryDark : AppColors.primaryLight),
+              size: 18,
             ),
           ),
-          child: Icon(icon, color: isDark ? AppColors.primaryDark : AppColors.primaryLight, size: 18),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Text(
-            title,
-            style: AppTypography.bodyMedium.copyWith(
-              fontWeight: FontWeight.w500,
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: AppTypography.bodyMedium.copyWith(
+                    fontWeight: isHighlighted ? FontWeight.w800 : FontWeight.w600,
+                    color: isHighlighted
+                        ? (isDark ? Colors.white : AppColors.brandAccentTextLight)
+                        : null,
+                  ),
+                ),
+                if (isHighlighted && highlightBadge != null) ...[
+                  const SizedBox(height: 2),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.primaryAmber.withValues(alpha: 0.2) : AppColors.brandAccent.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      highlightBadge!,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        color: isDark ? AppColors.primaryAmber : AppColors.brandAccentTextLight,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
-        ),
-        const Icon(
-          Icons.check_circle_rounded,
-          color: AppColors.successPastel,
-          size: 18,
-        ),
-      ],
+          Icon(
+            Icons.check_circle_rounded,
+            color: isHighlighted ? AppColors.primaryAmber : AppColors.successPastel,
+            size: 18,
+          ),
+        ],
+      ),
     );
   }
 }

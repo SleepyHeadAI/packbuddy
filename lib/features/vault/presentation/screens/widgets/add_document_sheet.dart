@@ -4,6 +4,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
+import 'package:packbuddy/core/services/pro_entitlement_service.dart';
+import 'package:packbuddy/features/settings/data/mock_revenuecat_service.dart';
+import 'package:packbuddy/features/settings/presentation/screens/widgets/paywall_sheet.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/vault/presentation/controllers/vault_controller.dart';
 
@@ -31,7 +34,16 @@ class AddDocumentSheet extends ConsumerStatefulWidget {
     String? initialSubCategory,
     bool isCategoryLocked = false,
     String? oldDocumentIdToReplace,
+    WidgetRef? ref,
   }) {
+    if (ref != null && oldDocumentIdToReplace == null) {
+      final isPro = ref.read(proSubscriptionProvider).isPro;
+      final docs = ref.read(vaultControllerProvider).documents.where((d) => !d.isDeleted).toList();
+      if (!isPro && docs.length >= ProFeatureGate.kFreeMaxVaultDocs) {
+        PaywallSheet.show(context, triggerSource: 'vault_limit', highlightFeature: 'vault_limit');
+        return Future.value();
+      }
+    }
     if (PreferencesService.instance.getRestrictedFeatures().contains('vault_upload')) {
       final l10n = AppLocalizations.of(context);
       final msg = l10n != null ? l10n.adminFeatureRestrictedNotice : 'This feature has been restricted by an administrator.';
@@ -292,6 +304,16 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
           ? _notesController.text.trim()
           : null;
 
+      if (widget.oldDocumentIdToReplace == null) {
+        final isPro = ref.read(proSubscriptionProvider).isPro;
+        final docs = ref.read(vaultControllerProvider).documents.where((d) => !d.isDeleted).toList();
+        if (!isPro && docs.length >= ProFeatureGate.kFreeMaxVaultDocs) {
+          Navigator.of(context).pop();
+          PaywallSheet.show(context, triggerSource: 'vault_limit', highlightFeature: 'vault_limit');
+          return;
+        }
+      }
+
       Navigator.of(context).pop();
 
       if (widget.oldDocumentIdToReplace != null) {
@@ -322,6 +344,16 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
       final notes = _notesController.text.trim().isNotEmpty
           ? _notesController.text.trim()
           : null;
+
+      if (widget.oldDocumentIdToReplace == null) {
+        final isPro = ref.read(proSubscriptionProvider).isPro;
+        final docs = ref.read(vaultControllerProvider).documents.where((d) => !d.isDeleted).toList();
+        if (!isPro && docs.length >= ProFeatureGate.kFreeMaxVaultDocs) {
+          Navigator.of(context).pop();
+          PaywallSheet.show(context, triggerSource: 'vault_limit', highlightFeature: 'vault_limit');
+          return;
+        }
+      }
 
       Navigator.of(context).pop();
 

@@ -207,13 +207,13 @@ class AppLocalizationsPl extends AppLocalizations {
   String get proSubtitle => 'Nieograniczone podróże i pełen spokój ducha';
 
   @override
-  String get proFeature1 => 'Nielimitowane podróże i wydatki';
+  String get proFeature1 => 'Nielimitowane podróże i planowanie';
 
   @override
-  String get proFeature2 => 'Nielimitowane miejsce w bezpiecznym sejfie';
+  String get proFeature2 => 'Nielimitowany sejf na dokumenty i 5 GB w chmurze';
 
   @override
-  String get proFeature3 => 'Automatyczna synchronizacja w chmurze';
+  String get proFeature3 => 'Wszystkie 16 motywów mapy i 7 układów relacji';
 
   @override
   String get monthly => 'Miesięcznie';
@@ -2252,4 +2252,52 @@ class AppLocalizationsPl extends AppLocalizations {
   String revertToCurrency(String currency) {
     return 'Wróć do $currency';
   }
+
+  @override
+  String get proFeature4 => 'Wszystkie 16 motywów widżetów ekranu głównego';
+
+  @override
+  String get proFeature5 =>
+      'Nielimitowane codzienne aktywności w planie podróży';
+
+  @override
+  String get proFeature6 => 'Eksport raportów budżetu i wydatków podróżnych';
+
+  @override
+  String get proTripLimitTitle => 'Planuj nielimitowane podróże';
+
+  @override
+  String get proTripLimitSubtitle =>
+      'Plan darmowy zawiera 1 aktywną podróż. Przejdź na Pro, by zarządzać wszystkimi naraz.';
+
+  @override
+  String get proVaultLimitTitle => 'Nielimitowany sejf i 5 GB w chmurze';
+
+  @override
+  String get proVaultLimitSubtitle =>
+      'Przechowuj dokumenty bezpiecznie z 5 GB przestrzeni w chmurze.';
+
+  @override
+  String get proItineraryLimitTitle => 'Nielimitowane aktywności dziennie';
+
+  @override
+  String get proItineraryLimitSubtitle =>
+      'Planuj dzień bez ograniczeń. Wersja darmowa obejmuje 3 aktywności na dzień.';
+
+  @override
+  String get proThemeLockedTitle => '16 motywów i 7 układów relacji';
+
+  @override
+  String get proThemeLockedSubtitle =>
+      'Odblokuj wszystkie palety premium, układ paszportowy i style widżetów.';
+
+  @override
+  String get proExportLockedTitle => 'Eksport budżetu i raportów';
+
+  @override
+  String get proExportLockedSubtitle =>
+      'Eksportuj i udostępniaj raporty wydatków towarzyszom podróży.';
+
+  @override
+  String get proFeatureHighlightedBadge => 'W pakiecie Pro';
 }

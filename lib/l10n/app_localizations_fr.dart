@@ -208,13 +208,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get proSubtitle => 'Voyages illimités et sérénité totale';
 
   @override
-  String get proFeature1 => 'Voyages et suivi des dépenses illimités';
+  String get proFeature1 => 'Voyages illimités et planification active';
 
   @override
-  String get proFeature2 => 'Stockage illimité du coffre-fort sécurisé';
+  String get proFeature2 => 'Coffre-fort illimité et 5 Go de stockage cloud';
 
   @override
-  String get proFeature3 => 'Synchronisation cloud automatique';
+  String get proFeature3 => 'Les 16 thèmes de carte et 7 mises en page premium';
 
   @override
   String get monthly => 'Mensuel';
@@ -2272,4 +2272,52 @@ class AppLocalizationsFr extends AppLocalizations {
   String revertToCurrency(String currency) {
     return 'Revenir à $currency';
   }
+
+  @override
+  String get proFeature4 => 'Les 16 thèmes de widget pour écran d\'accueil';
+
+  @override
+  String get proFeature5 => 'Activités quotidiennes d\'itinéraire illimitées';
+
+  @override
+  String get proFeature6 =>
+      'Exporter les rapports de budget et dépenses de voyage';
+
+  @override
+  String get proTripLimitTitle => 'Planifiez des voyages illimités';
+
+  @override
+  String get proTripLimitSubtitle =>
+      'Le forfait gratuit comprend 1 voyage actif. Passez à Pro pour tout gérer en simultané.';
+
+  @override
+  String get proVaultLimitTitle => 'Coffre illimité et 5 Go de cloud';
+
+  @override
+  String get proVaultLimitSubtitle =>
+      'Protégez des documents illimités avec 5 Go de stockage sécurisé.';
+
+  @override
+  String get proItineraryLimitTitle => 'Activités quotidiennes illimitées';
+
+  @override
+  String get proItineraryLimitSubtitle =>
+      'Planifiez librement votre journée. Le forfait gratuit comprend 3 activités par jour.';
+
+  @override
+  String get proThemeLockedTitle => '16 thèmes et 7 mises en page';
+
+  @override
+  String get proThemeLockedSubtitle =>
+      'Débloquez toutes les palettes premium, l\'édition passeport et les widgets.';
+
+  @override
+  String get proExportLockedTitle => 'Exporter le budget et rapports';
+
+  @override
+  String get proExportLockedSubtitle =>
+      'Exportez et partagez vos rapports de dépenses avec vos compagnons de route.';
+
+  @override
+  String get proFeatureHighlightedBadge => 'Inclus dans Pro';
 }

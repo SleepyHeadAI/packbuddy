@@ -518,22 +518,22 @@ abstract class AppLocalizations {
   /// **'Unlock limitless travel and ultimate peace of mind'**
   String get proSubtitle;
 
-  /// Pro feature 1 description
+  /// Pro paywall and entitlement string for proFeature1
   ///
   /// In en, this message translates to:
-  /// **'Unlimited Trips & Expense Tracking'**
+  /// **'Unlimited Trips & Active Journeys'**
   String get proFeature1;
 
-  /// Pro feature 2 description
+  /// Pro paywall and entitlement string for proFeature2
   ///
   /// In en, this message translates to:
-  /// **'Unlimited Document Vault Storage'**
+  /// **'Unlimited Document Vault & 5 GB Cloud Storage'**
   String get proFeature2;
 
-  /// Pro feature 3 description
+  /// Pro paywall and entitlement string for proFeature3
   ///
   /// In en, this message translates to:
-  /// **'Automatic Two-Way Cloud Sync'**
+  /// **'All 16 Map Story Themes & 7 Premium Layouts'**
   String get proFeature3;
 
   /// Monthly subscription label
@@ -4345,6 +4345,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Switch back to {currency}'**
   String revertToCurrency(String currency);
+
+  /// Pro paywall and entitlement string for proFeature4
+  ///
+  /// In en, this message translates to:
+  /// **'All 16 Home Screen Widget Themes'**
+  String get proFeature4;
+
+  /// Pro paywall and entitlement string for proFeature5
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited Daily Itinerary Activities'**
+  String get proFeature5;
+
+  /// Pro paywall and entitlement string for proFeature6
+  ///
+  /// In en, this message translates to:
+  /// **'Export Travel Budget & Expense Reports'**
+  String get proFeature6;
+
+  /// Pro paywall and entitlement string for proTripLimitTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Plan Unlimited Trips'**
+  String get proTripLimitTitle;
+
+  /// Pro paywall and entitlement string for proTripLimitSubtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Free tier includes 1 active trip. Upgrade to manage all your journeys simultaneously.'**
+  String get proTripLimitSubtitle;
+
+  /// Pro paywall and entitlement string for proVaultLimitTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited Vault & 5 GB Cloud'**
+  String get proVaultLimitTitle;
+
+  /// Pro paywall and entitlement string for proVaultLimitSubtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Safeguard unlimited travel documents with 5 GB secure cloud storage.'**
+  String get proVaultLimitSubtitle;
+
+  /// Pro paywall and entitlement string for proItineraryLimitTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited Daily Activities'**
+  String get proItineraryLimitTitle;
+
+  /// Pro paywall and entitlement string for proItineraryLimitSubtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Plan your whole day freely. Free tier includes 3 activities per day.'**
+  String get proItineraryLimitSubtitle;
+
+  /// Pro paywall and entitlement string for proThemeLockedTitle
+  ///
+  /// In en, this message translates to:
+  /// **'16 Themes & 7 Story Layouts'**
+  String get proThemeLockedTitle;
+
+  /// Pro paywall and entitlement string for proThemeLockedSubtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock all premium palettes, passport edition, and widget styles.'**
+  String get proThemeLockedSubtitle;
+
+  /// Pro paywall and entitlement string for proExportLockedTitle
+  ///
+  /// In en, this message translates to:
+  /// **'Export Budget & Reports'**
+  String get proExportLockedTitle;
+
+  /// Pro paywall and entitlement string for proExportLockedSubtitle
+  ///
+  /// In en, this message translates to:
+  /// **'Export and share complete travel expense reports with your travel buddies.'**
+  String get proExportLockedSubtitle;
+
+  /// Pro paywall and entitlement string for proFeatureHighlightedBadge
+  ///
+  /// In en, this message translates to:
+  /// **'Included in Pro'**
+  String get proFeatureHighlightedBadge;
 }
 
 class _AppLocalizationsDelegate

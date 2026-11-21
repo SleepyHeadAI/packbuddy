@@ -16,6 +16,10 @@ import 'package:packbuddy/features/travel_map/data/travel_map_service.dart';
 import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
 import 'package:packbuddy/core/services/widget_card_renderer.dart';
 import 'package:packbuddy/core/services/widget_map_renderer.dart';
+import 'package:packbuddy/core/services/pro_entitlement_service.dart';
+import 'package:packbuddy/core/services/telemetry_service.dart';
+import 'package:packbuddy/features/settings/data/mock_revenuecat_service.dart';
+import 'package:packbuddy/features/settings/presentation/screens/widgets/paywall_sheet.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
 /// In-App Home Screen Widget Preview & Customization Card (Feature F-9)
@@ -116,6 +120,16 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
   }
 
   Future<void> _updateWidgetTheme(String themeKey) async {
+    final isPro = ref.read(proSubscriptionProvider).isPro;
+    if (!ProFeatureGate.canUseWidgetTheme(isPro: isPro, themeKey: themeKey)) {
+      TelemetryService.instance.logProGateHit(
+        featureKey: 'widget_theme_locked',
+        context: themeKey,
+      );
+      PaywallSheet.show(context, triggerSource: 'widget_theme_locked', highlightFeature: 'theme_locked');
+      return;
+    }
+
     setState(() => _widgetTheme = themeKey);
     await HomeWidget.saveWidgetData<String>('pending_pin_theme', themeKey);
     await HomeWidget.saveWidgetData<String>('${_widgetMode}_theme', themeKey);
@@ -699,6 +713,8 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
   ) {
     final isSelected = _widgetTheme == key;
     final label = AppWidgetLocalization.getThemeName(lang, key);
+    final isPro = ref.watch(proSubscriptionProvider).isPro;
+    final isLocked = !ProFeatureGate.canUseWidgetTheme(isPro: isPro, themeKey: key);
     return InkWell(
       onTap: () => _updateWidgetTheme(key),
       borderRadius: BorderRadius.circular(10),
@@ -749,6 +765,14 @@ class _HomeWidgetPreviewCardState extends ConsumerState<HomeWidgetPreviewCard> {
                 color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface,
               ),
             ),
+            if (isLocked) ...[
+              const SizedBox(width: 4),
+              const Icon(
+                Icons.workspace_premium_rounded,
+                size: 12,
+                color: AppColors.primaryAmber,
+              ),
+            ],
           ],
         ),
       ),

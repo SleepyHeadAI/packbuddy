@@ -203,13 +203,13 @@ class AppLocalizationsHi extends AppLocalizations {
   String get proSubtitle => 'असीमित यात्रा और पूर्ण मानसिक शांति';
 
   @override
-  String get proFeature1 => 'असीमित यात्रा और खर्च ट्रैकिंग';
+  String get proFeature1 => 'असीमित यात्राएं और यात्रा योजना';
 
   @override
-  String get proFeature2 => 'असीमित सुरक्षित वॉल्ट भंडारण';
+  String get proFeature2 => 'असीमित दस्तावेज़ वॉल्ट और 5 GB क्लाउड स्टोरेज';
 
   @override
-  String get proFeature3 => 'स्वचालित क्लाउड सिंक';
+  String get proFeature3 => 'सभी 16 मानचित्र स्टोरी थीम और 7 प्रीमियम लेआउट';
 
   @override
   String get monthly => 'मासिक';
@@ -2234,4 +2234,51 @@ class AppLocalizationsHi extends AppLocalizations {
   String revertToCurrency(String currency) {
     return '$currency पर वापस जाएँ';
   }
+
+  @override
+  String get proFeature4 => 'सभी 16 होम स्क्रीन विजेट थीम';
+
+  @override
+  String get proFeature5 => 'प्रतिदिन असीमित यात्रा कार्यक्रम गतिविधियां';
+
+  @override
+  String get proFeature6 => 'यात्रा बजट और व्यय रिपोर्ट निर्यात करें';
+
+  @override
+  String get proTripLimitTitle => 'असीमित यात्राओं की योजना बनाएं';
+
+  @override
+  String get proTripLimitSubtitle =>
+      'मुफ्त योजना में 1 सक्रिय यात्रा शामिल है। सभी यात्राओं को एक साथ प्रबंधित करने के लिए Pro लें।';
+
+  @override
+  String get proVaultLimitTitle => 'असीमित वॉल्ट और 5 GB क्लाउड';
+
+  @override
+  String get proVaultLimitSubtitle =>
+      '5 GB क्लाउड स्टोरेज के साथ सभी दस्तावेज़ सुरक्षित रूप से रखें।';
+
+  @override
+  String get proItineraryLimitTitle => 'प्रतिदिन असीमित गतिविधियां';
+
+  @override
+  String get proItineraryLimitSubtitle =>
+      'अपने दिन की खुलकर योजना बनाएं। मुफ्त संस्करण में प्रतिदिन 3 गतिविधियां हैं।';
+
+  @override
+  String get proThemeLockedTitle => '16 थीम और 7 स्टोरी लेआउट';
+
+  @override
+  String get proThemeLockedSubtitle =>
+      'पासपोर्ट संस्करण, पोलरॉइड और सभी प्रीमियम शैलियों को अनलॉक करें।';
+
+  @override
+  String get proExportLockedTitle => 'बजट और रिपोर्ट निर्यात करें';
+
+  @override
+  String get proExportLockedSubtitle =>
+      'यात्रा के खर्च की रिपोर्ट निर्यात करें और साथियों के साथ साझा करें।';
+
+  @override
+  String get proFeatureHighlightedBadge => 'Pro में शामिल';
 }

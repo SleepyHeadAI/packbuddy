@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import '../../../../core/services/preferences_service.dart';
 import '../../../../core/services/telemetry_service.dart';
+import '../../../../core/services/pro_entitlement_service.dart';
 
 /// Package subscription types for PackBuddy Pro
 enum SubscriptionPlan {
@@ -136,7 +137,36 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
     if (!enableTestPurchasesForUnitTests && isStoreBillingConfigured) {
       _initBilling();
     }
+    _initSecureEntitlement();
     _checkRemoteEntitlementOnStartup();
+    _startLiveListener();
+  }
+
+  Future<void> _initSecureEntitlement() async {
+    final uid = _auth?.currentUser?.uid;
+    final isSecurePro = await ProEntitlementService.instance.resolveEffectivePro(uid: uid);
+    if (!mounted) return;
+    if (isSecurePro != state.isPro) {
+      state = state.copyWith(isPro: isSecurePro);
+    }
+  }
+
+  void _startLiveListener() {
+    final uid = _auth?.currentUser?.uid;
+    if (uid == null) return;
+    ProEntitlementService.instance.startLiveUserEntitlementListener(
+      uid,
+      onStatusUpdated: (isLivePro) {
+        if (!mounted) return;
+        if (state.isPro != isLivePro) {
+          state = state.copyWith(isPro: isLivePro);
+          TelemetryService.instance.logProStatusChanged(
+            isPro: isLivePro,
+            source: 'firestore_live_admin_sync',
+          );
+        }
+      },
+    );
   }
 
   void _checkRemoteEntitlementOnStartup() {
@@ -146,6 +176,7 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
     if (firestore == null) return;
 
     firestore.collection('users').doc(uid).get().then((doc) {
+      if (!mounted) return;
       if (doc.exists && doc.data() != null) {
         final data = doc.data()!;
         final isRemotePro = (data['isPremium'] == true) ||
@@ -232,21 +263,24 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
             }
           }
 
-          // 2. Update local state and persist
+          // 2. Update local state and persist securely
           final currentUid = _auth?.currentUser?.uid;
-          await _prefs.setProUser(true, uid: currentUid);
+          await ProEntitlementService.instance.setProEntitlement(
+            isPro: true,
+            source: 'google_play_${purchaseDetails.productID}',
+            uid: currentUid,
+          );
           state = state.copyWith(
             isPro: true,
             isLoading: false,
             errorMessage: null,
           );
 
-          // 3. Update Firestore users/{uid} with isPremium: true, subscriptionProductId, subscriptionPurchaseId, subscriptionUpdatedAt
+          // 3. Update Firestore users/{uid} with subscription metadata (safely without self-upgrade permission collision)
           final firestore = _firestore ?? (Firebase.apps.isNotEmpty ? FirebaseFirestore.instance : null);
           if (currentUid != null && firestore != null) {
             try {
               await firestore.collection('users').doc(currentUid).set({
-                'isPremium': true,
                 'subscriptionProductId': purchaseDetails.productID,
                 'subscriptionPurchaseId': purchaseDetails.purchaseID ?? '',
                 'subscriptionUpdatedAt': FieldValue.serverTimestamp(),
@@ -256,7 +290,12 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
             }
           }
 
-          // 4. Telemetry
+          // 4. Telemetry & conversion funnel
+          TelemetryService.instance.logPurchaseCompleted(
+            productId: purchaseDetails.productID,
+            plan: purchaseDetails.productID == productMonthly ? 'monthly' : 'annual',
+            purchaseId: purchaseDetails.purchaseID,
+          );
           TelemetryService.instance.logProStatusChanged(
             isPro: true,
             source: 'google_play_${purchaseDetails.productID}',
@@ -285,6 +324,11 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
   Future<bool> purchasePlan(String productId, {bool isTestOrAdminConfirmation = false}) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
+    TelemetryService.instance.logPurchaseStarted(
+      productId: productId,
+      plan: productId == productMonthly ? 'monthly' : 'annual',
+    );
+
     if (enableTestPurchasesForUnitTests) {
       if (!isTestOrAdminConfirmation && !isStoreBillingConfigured) {
         state = state.copyWith(
@@ -294,21 +338,32 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
         return false;
       }
       final currentUid = _auth?.currentUser?.uid;
-      await _prefs.setProUser(true, uid: currentUid);
+      await ProEntitlementService.instance.setProEntitlement(
+        isPro: true,
+        source: 'unit_test_purchase',
+        uid: currentUid,
+      );
       if (currentUid != null) {
         try {
-          await FirebaseFirestore.instance.collection('users').doc(currentUid).set({
-            'isPremium': true,
-            'is_premium': true,
-            'isPro': true,
-            'pro': true,
-            'proPurchasedAt': DateTime.now().toIso8601String(),
-          }, SetOptions(merge: true));
+          final firestore = _firestore ?? (Firebase.apps.isNotEmpty ? FirebaseFirestore.instance : null);
+          if (firestore != null) {
+            await firestore.collection('users').doc(currentUid).set({
+              'isPremium': true,
+              'is_premium': true,
+              'isPro': true,
+              'pro': true,
+              'proPurchasedAt': DateTime.now().toIso8601String(),
+            }, SetOptions(merge: true));
+          }
         } catch (e) {
           debugPrint('[SubscriptionService] Error syncing isPremium to Firestore: $e');
         }
       }
       state = state.copyWith(isPro: true, isLoading: false, errorMessage: null);
+      TelemetryService.instance.logPurchaseCompleted(
+        productId: productId,
+        plan: productId == productMonthly ? 'monthly' : 'annual',
+      );
       TelemetryService.instance.logProStatusChanged(isPro: true, source: 'purchase');
       return true;
     }
@@ -395,13 +450,16 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
       await _prefs.setProUser(true, uid: currentUid);
       if (currentUid != null) {
         try {
-          await FirebaseFirestore.instance.collection('users').doc(currentUid).set({
-            'isPremium': true,
-            'is_premium': true,
-            'isPro': true,
-            'pro': true,
-            'proPurchasedAt': DateTime.now().toIso8601String(),
-          }, SetOptions(merge: true));
+          final firestore = _firestore ?? (Firebase.apps.isNotEmpty ? FirebaseFirestore.instance : null);
+          if (firestore != null) {
+            await firestore.collection('users').doc(currentUid).set({
+              'isPremium': true,
+              'is_premium': true,
+              'isPro': true,
+              'pro': true,
+              'proPurchasedAt': DateTime.now().toIso8601String(),
+            }, SetOptions(merge: true));
+          }
         } catch (e) {
           debugPrint('[SubscriptionService] Error syncing isPremium to Firestore: $e');
         }
@@ -432,8 +490,13 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
                 (data['isPro'] == true) ||
                 (data['pro'] == true));
         if (hasPro) {
-          await _prefs.setProUser(true, uid: currentUid);
+          await ProEntitlementService.instance.setProEntitlement(
+            isPro: true,
+            source: 'firestore_restore',
+            uid: currentUid,
+          );
           state = state.copyWith(isPro: true, isLoading: false, errorMessage: null);
+          TelemetryService.instance.logPurchaseRestored(source: 'firestore_restore');
           TelemetryService.instance.logProStatusChanged(isPro: true, source: 'firestore_restore');
           return true;
         }
@@ -451,6 +514,7 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
           await Future.delayed(const Duration(milliseconds: 500));
           if (state.isPro) {
             state = state.copyWith(isLoading: false);
+            TelemetryService.instance.logPurchaseRestored(source: 'google_play_restore');
             return true;
           }
         }
@@ -460,8 +524,13 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
     }
 
     if (isTestOrAdminConfirmation) {
-      await _prefs.setProUser(true, uid: currentUid);
+      await ProEntitlementService.instance.setProEntitlement(
+        isPro: true,
+        source: 'restore_admin',
+        uid: currentUid,
+      );
       state = state.copyWith(isPro: true, isLoading: false, errorMessage: null);
+      TelemetryService.instance.logPurchaseRestored(source: 'admin_test_restore');
       TelemetryService.instance.logProStatusChanged(isPro: true, source: 'restore_admin');
       return true;
     }
@@ -476,8 +545,7 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
   /// Reset Pro status (useful for QA testing and debug developer settings)
   @override
   Future<void> resetProStatus({String? uid}) async {
-    await _prefs.setProUser(false, uid: uid);
-    await _prefs.clearDeviceProStatus();
+    await ProEntitlementService.instance.clearProEntitlement(uid: uid);
     state = state.copyWith(isPro: false);
     TelemetryService.instance.logProStatusChanged(isPro: false, source: 'reset');
   }
@@ -485,7 +553,11 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
   /// Sets or synchronizes Pro status directly (e.g. from Firestore admin or remote entitlements)
   @override
   Future<void> updateProStatus(bool isPro, {String? uid}) async {
-    await _prefs.setProUser(isPro, uid: uid);
+    await ProEntitlementService.instance.setProEntitlement(
+      isPro: isPro,
+      source: 'update_pro_status',
+      uid: uid,
+    );
     if (state.isPro != isPro) {
       state = state.copyWith(isPro: isPro);
       TelemetryService.instance.logProStatusChanged(isPro: isPro, source: 'sync');
@@ -494,14 +566,17 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
 
   /// Reloads Pro status for a specific or current user from user-scoped storage
   void reloadForUser({String? uid}) {
-    final isPro = _prefs.isProUser(uid: uid);
-    if (state.isPro != isPro) {
-      state = state.copyWith(isPro: isPro);
-    }
+    final effectiveUid = uid ?? _auth?.currentUser?.uid;
+    ProEntitlementService.instance.resolveEffectivePro(uid: effectiveUid).then((isPro) {
+      if (state.isPro != isPro) {
+        state = state.copyWith(isPro: isPro);
+      }
+    });
   }
 
   @override
   void dispose() {
+    ProEntitlementService.instance.cancelLiveListener();
     _purchaseSubscription?.cancel();
     _purchaseSubscription = null;
     super.dispose();

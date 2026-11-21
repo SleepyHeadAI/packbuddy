@@ -208,13 +208,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Unlock limitless travel and ultimate peace of mind';
 
   @override
-  String get proFeature1 => 'Unlimited Trips & Expense Tracking';
+  String get proFeature1 => 'Unlimited Trips & Active Journeys';
 
   @override
-  String get proFeature2 => 'Unlimited Document Vault Storage';
+  String get proFeature2 => 'Unlimited Document Vault & 5 GB Cloud Storage';
 
   @override
-  String get proFeature3 => 'Automatic Two-Way Cloud Sync';
+  String get proFeature3 => 'All 16 Map Story Themes & 7 Premium Layouts';
 
   @override
   String get monthly => 'Monthly';
@@ -2240,4 +2240,51 @@ class AppLocalizationsEn extends AppLocalizations {
   String revertToCurrency(String currency) {
     return 'Switch back to $currency';
   }
+
+  @override
+  String get proFeature4 => 'All 16 Home Screen Widget Themes';
+
+  @override
+  String get proFeature5 => 'Unlimited Daily Itinerary Activities';
+
+  @override
+  String get proFeature6 => 'Export Travel Budget & Expense Reports';
+
+  @override
+  String get proTripLimitTitle => 'Plan Unlimited Trips';
+
+  @override
+  String get proTripLimitSubtitle =>
+      'Free tier includes 1 active trip. Upgrade to manage all your journeys simultaneously.';
+
+  @override
+  String get proVaultLimitTitle => 'Unlimited Vault & 5 GB Cloud';
+
+  @override
+  String get proVaultLimitSubtitle =>
+      'Safeguard unlimited travel documents with 5 GB secure cloud storage.';
+
+  @override
+  String get proItineraryLimitTitle => 'Unlimited Daily Activities';
+
+  @override
+  String get proItineraryLimitSubtitle =>
+      'Plan your whole day freely. Free tier includes 3 activities per day.';
+
+  @override
+  String get proThemeLockedTitle => '16 Themes & 7 Story Layouts';
+
+  @override
+  String get proThemeLockedSubtitle =>
+      'Unlock all premium palettes, passport edition, and widget styles.';
+
+  @override
+  String get proExportLockedTitle => 'Export Budget & Reports';
+
+  @override
+  String get proExportLockedSubtitle =>
+      'Export and share complete travel expense reports with your travel buddies.';
+
+  @override
+  String get proFeatureHighlightedBadge => 'Included in Pro';
 }

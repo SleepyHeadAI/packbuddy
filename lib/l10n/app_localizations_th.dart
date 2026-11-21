@@ -204,13 +204,13 @@ class AppLocalizationsTh extends AppLocalizations {
   String get proSubtitle => 'ท่องเที่ยวได้ไม่จำกัดและอุ่นใจสูงสุด';
 
   @override
-  String get proFeature1 => 'ทริปและการติดตามค่าใช้จ่ายไม่จำกัด';
+  String get proFeature1 => 'สร้างทริปและวางแผนการเดินทางได้ไม่จำกัด';
 
   @override
-  String get proFeature2 => 'พื้นที่จัดเก็บตู้นิรภัยไม่จำกัด';
+  String get proFeature2 => 'ตู้นิรภัยเอกสารไม่จำกัดและพื้นที่คลาวด์ 5 GB';
 
   @override
-  String get proFeature3 => 'ซิงค์สองทางบนคลาวด์อัตโนมัติ';
+  String get proFeature3 => 'ธีมสตอรี่แผนที่ 16 แบบและ 7 เลย์เอาต์พรีเมียม';
 
   @override
   String get monthly => 'รายเดือน';
@@ -2235,4 +2235,51 @@ class AppLocalizationsTh extends AppLocalizations {
   String revertToCurrency(String currency) {
     return 'กลับไปที่ $currency';
   }
+
+  @override
+  String get proFeature4 => 'ธีมวิดเจ็ตหน้าจอหลักทั้ง 16 แบบ';
+
+  @override
+  String get proFeature5 => 'เพิ่มกิจกรรมในแผนการเดินทางต่อวันได้ไม่จำกัด';
+
+  @override
+  String get proFeature6 => 'ส่งออกรายงานงบประมาณและค่าใช้จ่ายการเดินทาง';
+
+  @override
+  String get proTripLimitTitle => 'วางแผนการเดินทางได้ไม่จำกัด';
+
+  @override
+  String get proTripLimitSubtitle =>
+      'แพ็กเกจฟรีมีทริปที่ใช้งานได้ 1 ทริป อัปเกรดเพื่อจัดการทุกทริปพร้อมกัน';
+
+  @override
+  String get proVaultLimitTitle => 'ตู้นิรภัยไม่จำกัดและคลาวด์ 5 GB';
+
+  @override
+  String get proVaultLimitSubtitle =>
+      'เก็บเอกสารการเดินทางได้อย่างปลอดภัยด้วยพื้นที่คลาวด์ 5 GB';
+
+  @override
+  String get proItineraryLimitTitle => 'เพิ่มกิจกรรมต่อวันได้ไม่จำกัด';
+
+  @override
+  String get proItineraryLimitSubtitle =>
+      'วางแผนวันของคุณได้อย่างอิสระ แพ็กเกจฟรีรวม 3 กิจกรรมต่อวัน';
+
+  @override
+  String get proThemeLockedTitle => '16 ธีมและ 7 เลย์เอาต์สตอรี่';
+
+  @override
+  String get proThemeLockedSubtitle =>
+      'ปลดล็อกชุดสีพรีเมียม เลย์เอาต์พาสปอร์ต และวิดเจ็ตทั้งหมด';
+
+  @override
+  String get proExportLockedTitle => 'ส่งออกงบประมาณและรายงาน';
+
+  @override
+  String get proExportLockedSubtitle =>
+      'ส่งออกและแชร์รายงานค่าใช้จ่ายกับเพื่อนร่วมทริปของคุณ';
+
+  @override
+  String get proFeatureHighlightedBadge => 'รวมอยู่ใน Pro';
 }

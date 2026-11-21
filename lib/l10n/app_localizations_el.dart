@@ -210,13 +210,13 @@ class AppLocalizationsEl extends AppLocalizations {
   String get proSubtitle => 'Απεριόριστα ταξίδια με απόλυτη ηρεμία';
 
   @override
-  String get proFeature1 => 'Απεριόριστα ταξίδια και καταγραφή εξόδων';
+  String get proFeature1 => 'Απεριόριστα ταξίδια και προγραμματισμός';
 
   @override
-  String get proFeature2 => 'Απεριόριστος χώρος ασφαλούς θησαυροφυλακίου';
+  String get proFeature2 => 'Απεριόριστη θυρίδα εγγράφων & 5 GB στο cloud';
 
   @override
-  String get proFeature3 => 'Αυτόματος αμφίδρομος συγχρονισμός';
+  String get proFeature3 => 'Και τα 16 θέματα χάρτη & 7 premium διατάξεις';
 
   @override
   String get monthly => 'Μηνιαίο';
@@ -2272,4 +2272,51 @@ class AppLocalizationsEl extends AppLocalizations {
   String revertToCurrency(String currency) {
     return 'Επιστροφή σε $currency';
   }
+
+  @override
+  String get proFeature4 => 'Και τα 16 θέματα γραφικών στοιχείων οθόνης';
+
+  @override
+  String get proFeature5 => 'Απεριόριστες ημερήσιες δραστηριότητες';
+
+  @override
+  String get proFeature6 => 'Εξαγωγή αναφορών προϋπολογισμού και εξόδων';
+
+  @override
+  String get proTripLimitTitle => 'Σχεδιάστε απεριόριστα ταξίδια';
+
+  @override
+  String get proTripLimitSubtitle =>
+      'Το δωρεάν πρόγραμμα περιλαμβάνει 1 ενεργό ταξίδι. Αναβαθμίστε για όλα ταυτόχρονα.';
+
+  @override
+  String get proVaultLimitTitle => 'Απεριόριστη θυρίδα & 5 GB cloud';
+
+  @override
+  String get proVaultLimitSubtitle =>
+      'Φυλάξτε τα ταξιδιωτικά σας έγγραφα με ασφάλεια στα 5 GB cloud.';
+
+  @override
+  String get proItineraryLimitTitle => 'Απεριόριστες ημερήσιες δραστηριότητες';
+
+  @override
+  String get proItineraryLimitSubtitle =>
+      'Προγραμματίστε ελεύθερα. Το δωρεάν πρόγραμμα περιλαμβάνει 3 δραστηριότητες/ημέρα.';
+
+  @override
+  String get proThemeLockedTitle => '16 θέματα & 7 διατάξεις ιστορίας';
+
+  @override
+  String get proThemeLockedSubtitle =>
+      'Ξεκλειδώστε όλες τις παλέτες, τη διάταξη διαβατηρίου και τα widget.';
+
+  @override
+  String get proExportLockedTitle => 'Εξαγωγή προϋπολογισμού & αναφορών';
+
+  @override
+  String get proExportLockedSubtitle =>
+      'Εξαγάγετε και μοιραστείτε τα έξοδα με τους συνταξιδιώτες σας.';
+
+  @override
+  String get proFeatureHighlightedBadge => 'Περιλαμβάνεται στο Pro';
 }

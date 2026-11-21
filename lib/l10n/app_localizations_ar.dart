@@ -203,13 +203,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get proSubtitle => 'سفر بلا حدود وراحة بال تامة';
 
   @override
-  String get proFeature1 => 'رحلات ونفقات غير محدودة';
+  String get proFeature1 => 'رحلات غير محدودة وتخطيط نشط';
 
   @override
-  String get proFeature2 => 'تخزين غير محدود في الخزينة الآمنة';
+  String get proFeature2 => 'خزنة مستندات غير محدودة ومساحة سحابية 5 غيغابايت';
 
   @override
-  String get proFeature3 => 'مزامنة سحابية تلقائية';
+  String get proFeature3 => 'جميع ثيمات قصص الخريطة الـ 16 و7 تخطيطات متميزة';
 
   @override
   String get monthly => 'شهري';
@@ -2227,4 +2227,51 @@ class AppLocalizationsAr extends AppLocalizations {
   String revertToCurrency(String currency) {
     return 'العودة إلى $currency';
   }
+
+  @override
+  String get proFeature4 => 'جميع ثيمات ويدجت الشاشة الرئيسية الـ 16';
+
+  @override
+  String get proFeature5 => 'أنشطة يومية غير محدودة في جدول الرحلة';
+
+  @override
+  String get proFeature6 => 'تصدير تقارير ميزانية ونفقات السفر';
+
+  @override
+  String get proTripLimitTitle => 'خطط لرحلات غير محدودة';
+
+  @override
+  String get proTripLimitSubtitle =>
+      'تتضمن الخطة المجانية رحلة نشطة واحدة. قم بالترقية لإدارة جميع رحلاتك معًا.';
+
+  @override
+  String get proVaultLimitTitle => 'خزنة غير محدودة وسحابة 5 غيغابايت';
+
+  @override
+  String get proVaultLimitSubtitle =>
+      'احفظ مستندات السفر بأمان مع 5 غيغابايت من التخزين السحابي.';
+
+  @override
+  String get proItineraryLimitTitle => 'أنشطة يومية غير محدودة';
+
+  @override
+  String get proItineraryLimitSubtitle =>
+      'خطط ليومك بكل حرية. تتضمن الخطة المجانية 3 أنشطة يوميًا.';
+
+  @override
+  String get proThemeLockedTitle => '16 ثيم و7 تخطيطات للقصص';
+
+  @override
+  String get proThemeLockedSubtitle =>
+      'افتح جميع اللوحات المتميزة وتخطيط جواز السفر وأنماط الويدجت.';
+
+  @override
+  String get proExportLockedTitle => 'تصدير الميزانية والتقارير';
+
+  @override
+  String get proExportLockedSubtitle =>
+      'قم بتصدير ومشاركة تقارير النفقات مع رفقاء سفرك.';
+
+  @override
+  String get proFeatureHighlightedBadge => 'مضمن في Pro';
 }

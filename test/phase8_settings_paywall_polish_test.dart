@@ -365,7 +365,9 @@ void main() {
       final discountText = tester.widget<Text>(discountFinder);
       expect(discountText.style?.color, equals(AppColors.brandAccentTextLight));
 
-      // Verify plan toggle (tap Monthly option)
+      // Verify plan toggle (scroll and tap Monthly option)
+      await tester.ensureVisible(find.text('Monthly'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Monthly'));
       await tester.pumpAndSettle();
       expect(proNotifier.state.activePlan, equals(SubscriptionPlan.monthly));

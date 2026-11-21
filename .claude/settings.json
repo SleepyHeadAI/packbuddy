@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./build/**)",
+      "Read(./.dart_tool/**)",
+      "Read(./android/.gradle/**)",
+      "Read(**/*.g.dart)",
+      "Read(**/*.freezed.dart)",
+      "Read(./lib/l10n/app_localizations_*.dart)",
+      "Read(./lib/l10n/app_ar.arb)",
+      "Read(./lib/l10n/app_de.arb)",
+      "Read(./lib/l10n/app_el.arb)",
+      "Read(./lib/l10n/app_es.arb)",
+      "Read(./lib/l10n/app_fr.arb)",
+      "Read(./lib/l10n/app_hi.arb)",
+      "Read(./lib/l10n/app_id.arb)",
+      "Read(./lib/l10n/app_it.arb)",
+      "Read(./lib/l10n/app_ja.arb)",
+      "Read(./lib/l10n/app_ko.arb)",
+      "Read(./lib/l10n/app_nl.arb)",
+      "Read(./lib/l10n/app_pl.arb)",
+      "Read(./lib/l10n/app_pt.arb)",
+      "Read(./lib/l10n/app_ru.arb)",
+      "Read(./lib/l10n/app_sv.arb)",
+      "Read(./lib/l10n/app_th.arb)",
+      "Read(./lib/l10n/app_vi.arb)",
+      "Read(./lib/l10n/app_zh.arb)"
+    ]
+  }
+}

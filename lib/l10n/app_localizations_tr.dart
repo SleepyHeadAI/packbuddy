@@ -209,13 +209,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get proSubtitle => 'Sınırsız seyahat ve tam güvence ile seyahat edin';
 
   @override
-  String get proFeature1 => 'Sınırsız Seyahat ve Bütçe Takibi';
+  String get proFeature1 => 'Sınırsız Seyahat & Aktif Gezi Planlama';
 
   @override
-  String get proFeature2 => 'Sınırsız Güvenli Kasa Depolama';
+  String get proFeature2 => 'Sınırsız Belge Kasası & 5 GB Bulut Depolama';
 
   @override
-  String get proFeature3 => 'Otomatik Çift Yönlü Bulut Senkronizasyonu';
+  String get proFeature3 => '16 Harita Hikaye Teması & 7 Özel Düzen';
 
   @override
   String get monthly => 'Aylık';
@@ -2253,4 +2253,51 @@ class AppLocalizationsTr extends AppLocalizations {
   String revertToCurrency(String currency) {
     return '$currency para birimine dön';
   }
+
+  @override
+  String get proFeature4 => '16 Ana Ekran Widget Teması & Renk Paleti';
+
+  @override
+  String get proFeature5 => 'Gün Başına Sınırsız Rota Aktivitesi';
+
+  @override
+  String get proFeature6 => 'Seyahat Bütçe ve Harcama Raporlarını Dışa Aktarma';
+
+  @override
+  String get proTripLimitTitle => 'Sınırsız Seyahat Planlayın';
+
+  @override
+  String get proTripLimitSubtitle =>
+      'Ücretsiz plan 1 aktif seyahat içerir. Tüm gezilerinizi aynı anda planlamak için Pro\'ya geçin.';
+
+  @override
+  String get proVaultLimitTitle => 'Sınırsız Kasa & 5 GB Bulut Depolama';
+
+  @override
+  String get proVaultLimitSubtitle =>
+      '5 GB güvenli bulut depolamayla tüm seyahat evraklarınızı sınırsızca saklayın.';
+
+  @override
+  String get proItineraryLimitTitle => 'Sınırsız Rota Aktivitesi';
+
+  @override
+  String get proItineraryLimitSubtitle =>
+      'Gününüzü özgürce planlayın. Ücretsiz plan gün başına 3 aktivite içerir.';
+
+  @override
+  String get proThemeLockedTitle => '16 Özel Tema & 7 Hikaye Düzeni';
+
+  @override
+  String get proThemeLockedSubtitle =>
+      'Pasaport, Polaroid, İnfografik ve tüm premium widget renklerine erişin.';
+
+  @override
+  String get proExportLockedTitle => 'Bütçe ve Harcama Raporları';
+
+  @override
+  String get proExportLockedSubtitle =>
+      'Tüm seyahat harcamalarınızı ve bütçenizi dışa aktarın ve arkadaşlarınızla paylaşın.';
+
+  @override
+  String get proFeatureHighlightedBadge => 'Pro ile Açılır';
 }

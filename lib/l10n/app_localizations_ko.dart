@@ -202,13 +202,13 @@ class AppLocalizationsKo extends AppLocalizations {
   String get proSubtitle => '무제한 여행과 완전한 안심을 누리세요';
 
   @override
-  String get proFeature1 => '무제한 여행 및 지출 관리';
+  String get proFeature1 => '무제한 여행 생성 및 일정 계획';
 
   @override
-  String get proFeature2 => '안전 보관함 무제한 저장공간';
+  String get proFeature2 => '무제한 문서 보관함 및 5 GB 클라우드 저장소';
 
   @override
-  String get proFeature3 => '자동 클라우드 양방향 동기화';
+  String get proFeature3 => '16가지 지도 스토리 테마 및 7가지 프리미엄 레이아웃';
 
   @override
   String get monthly => '월간 구독';
@@ -2162,4 +2162,49 @@ class AppLocalizationsKo extends AppLocalizations {
   String revertToCurrency(String currency) {
     return '$currency(으)로 돌아가기';
   }
+
+  @override
+  String get proFeature4 => '16가지 홈 화면 위젯 테마';
+
+  @override
+  String get proFeature5 => '하루 일정 활동 무제한 등록';
+
+  @override
+  String get proFeature6 => '여행 예산 및 지출 보고서 내보내기';
+
+  @override
+  String get proTripLimitTitle => '무제한 여행 계획하기';
+
+  @override
+  String get proTripLimitSubtitle =>
+      '무료 요금제는 활성 여행 1개만 지원합니다. Pro로 업그레이드하여 모든 여행을 동시에 관리하세요.';
+
+  @override
+  String get proVaultLimitTitle => '무제한 보관함 및 5 GB 클라우드';
+
+  @override
+  String get proVaultLimitSubtitle => '5 GB 클라우드 용량으로 여행 문서를 안전하게 무제한 보관하세요.';
+
+  @override
+  String get proItineraryLimitTitle => '일일 활동 무제한 등록';
+
+  @override
+  String get proItineraryLimitSubtitle =>
+      '하루 일정을 자유롭게 채워보세요. 무료 버전은 하루 3개까지 등록 가능합니다.';
+
+  @override
+  String get proThemeLockedTitle => '16가지 테마 및 7가지 레이아웃';
+
+  @override
+  String get proThemeLockedSubtitle =>
+      '여권 에디션, 폴라로이드 및 모든 프리미엄 위젯 테마를 잠금 해제하세요.';
+
+  @override
+  String get proExportLockedTitle => '예산 및 지출 보고서 내보내기';
+
+  @override
+  String get proExportLockedSubtitle => '동행자와 전체 지출 내역을 내보내고 손쉽게 공유하세요.';
+
+  @override
+  String get proFeatureHighlightedBadge => 'Pro 포함 기능';
 }

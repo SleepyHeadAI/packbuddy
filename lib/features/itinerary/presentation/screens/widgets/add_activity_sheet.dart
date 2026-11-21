@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/features/itinerary/domain/itinerary_item.dart';
 import 'package:packbuddy/features/itinerary/domain/itinerary_localization.dart';
 import 'package:packbuddy/features/itinerary/presentation/controllers/itinerary_controller.dart';
+import 'package:packbuddy/core/services/pro_entitlement_service.dart';
+import 'package:packbuddy/features/settings/data/mock_revenuecat_service.dart';
+import 'package:packbuddy/features/settings/presentation/screens/widgets/paywall_sheet.dart';
 
 /// Modal bottom sheet for scheduling or editing an activity in the day planner
 class AddActivitySheet extends ConsumerStatefulWidget {
@@ -31,7 +34,16 @@ class AddActivitySheet extends ConsumerStatefulWidget {
     required String tripStartDate,
     required String languageCode,
     ItineraryItem? itemToEdit,
+    WidgetRef? ref,
   }) {
+    if (ref != null && itemToEdit == null) {
+      final isPro = ref.read(proSubscriptionProvider).isPro;
+      final currentDayCount = ref.read(itineraryControllerFamily(tripId)).items.where((i) => i.dayNumber == initialDay).length;
+      if (!ProFeatureGate.canAddItineraryActivity(isPro: isPro, currentActivitiesInDay: currentDayCount)) {
+        PaywallSheet.show(context, triggerSource: 'itinerary_limit', highlightFeature: 'itinerary_limit');
+        return Future.value();
+      }
+    }
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -262,11 +274,16 @@ class _AddActivitySheetState extends ConsumerState<AddActivitySheet> {
       if (success) {
         Navigator.of(context).pop();
       } else {
-        final errorMsg = ref.read(itineraryControllerFamily(widget.tripId)).errorMessage ??
-            (widget.languageCode == 'tr' ? 'Aktivite kaydedilemedi' : 'Could not save activity');
+        final errorMsg = ref.read(itineraryControllerFamily(widget.tripId)).errorMessage;
+        if (errorMsg == 'pro_itinerary_limit_reached') {
+          Navigator.of(context).pop();
+          PaywallSheet.show(context, triggerSource: 'itinerary_limit', highlightFeature: 'itinerary_limit');
+          return;
+        }
+        final fallbackMsg = widget.languageCode == 'tr' ? 'Aktivite kaydedilemedi' : 'Could not save activity';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(errorMsg),
+            content: Text(errorMsg ?? fallbackMsg),
             backgroundColor: Theme.of(context).colorScheme.error,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

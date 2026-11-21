@@ -207,13 +207,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get proSubtitle => 'Безлимитные путешествия и полное спокойствие';
 
   @override
-  String get proFeature1 => 'Неограниченное число поездок и расходов';
+  String get proFeature1 => 'Неограниченное число поездок и планирование';
 
   @override
-  String get proFeature2 => 'Неограниченное хранилище безопасного сейфа';
+  String get proFeature2 => 'Неограниченный сейф документов и 5 ГБ в облаке';
 
   @override
-  String get proFeature3 => 'Автоматическая двусторонняя синхронизация';
+  String get proFeature3 => 'Все 16 тем карты историй и 7 премиум-макетов';
 
   @override
   String get monthly => 'Ежемесячно';
@@ -2251,4 +2251,51 @@ class AppLocalizationsRu extends AppLocalizations {
   String revertToCurrency(String currency) {
     return 'Вернуться к $currency';
   }
+
+  @override
+  String get proFeature4 => 'Все 16 тем виджетов на главном экране';
+
+  @override
+  String get proFeature5 => 'Неограниченные ежедневные дела в маршруте';
+
+  @override
+  String get proFeature6 => 'Экспорт отчетов по бюджету и расходам поездки';
+
+  @override
+  String get proTripLimitTitle => 'Планируйте любые поездки без ограничений';
+
+  @override
+  String get proTripLimitSubtitle =>
+      'Бесплатный план включает 1 активную поездку. Перейдите на Pro для параллельного планирования.';
+
+  @override
+  String get proVaultLimitTitle => 'Безлимитный сейф и 5 ГБ в облаке';
+
+  @override
+  String get proVaultLimitSubtitle =>
+      'Храните любые документы безопасно с 5 ГБ облачного пространства.';
+
+  @override
+  String get proItineraryLimitTitle => 'Безлимитные активности на день';
+
+  @override
+  String get proItineraryLimitSubtitle =>
+      'Свободно планируйте день. Бесплатный план включает до 3 активностей в день.';
+
+  @override
+  String get proThemeLockedTitle => '16 тем и 7 эксклюзивных макетов';
+
+  @override
+  String get proThemeLockedSubtitle =>
+      'Откройте все палитры, паспортный макет и стили виджетов.';
+
+  @override
+  String get proExportLockedTitle => 'Экспорт бюджета и отчетов';
+
+  @override
+  String get proExportLockedSubtitle =>
+      'Экспортируйте и делитесь отчетами о расходах с попутчиками.';
+
+  @override
+  String get proFeatureHighlightedBadge => 'Включено в Pro';
 }

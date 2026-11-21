@@ -202,13 +202,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get proSubtitle => '旅行を無制限に。究極の安心をお届けします';
 
   @override
-  String get proFeature1 => '旅行と支出記録が無制限';
+  String get proFeature1 => '無制限の旅行作成＆スケジュール管理';
 
   @override
-  String get proFeature2 => '安全な保管庫の無制限ストレージ';
+  String get proFeature2 => '書類金庫の無制限保管＆5 GBクラウド容量';
 
   @override
-  String get proFeature3 => '自動クラウド双方向同期';
+  String get proFeature3 => '全16種類のマップテーマ＆7種類のストーリーレイアウト';
 
   @override
   String get monthly => '月額プラン';
@@ -2160,4 +2160,47 @@ class AppLocalizationsJa extends AppLocalizations {
   String revertToCurrency(String currency) {
     return '$currency に戻す';
   }
+
+  @override
+  String get proFeature4 => '全16種類のホーム画面ウィジェットテーマ';
+
+  @override
+  String get proFeature5 => '1日あたりの旅程アクティビティ登録が無制限';
+
+  @override
+  String get proFeature6 => '旅費予算・支出レポートのエクスポート';
+
+  @override
+  String get proTripLimitTitle => '旅行を無制限に計画';
+
+  @override
+  String get proTripLimitSubtitle =>
+      '無料プランはアクティブな旅行1件までです。Proにアップグレードしてすべての旅を同時に管理しましょう。';
+
+  @override
+  String get proVaultLimitTitle => '無制限金庫＆5 GBクラウド';
+
+  @override
+  String get proVaultLimitSubtitle => '5 GBの安全なクラウド容量で、すべての旅行書類を容量を気にせず保管できます。';
+
+  @override
+  String get proItineraryLimitTitle => '1日のアクティビティが無制限';
+
+  @override
+  String get proItineraryLimitSubtitle => '1日の予定を自由に計画。無料プランは1日3件まで登録可能です。';
+
+  @override
+  String get proThemeLockedTitle => '16種類のテーマ＆7種類のレイアウト';
+
+  @override
+  String get proThemeLockedSubtitle => 'パスポート版、ポラロイド、全プレミアムカラーパレットをアンロック。';
+
+  @override
+  String get proExportLockedTitle => '予算とレポートのエクスポート';
+
+  @override
+  String get proExportLockedSubtitle => '旅行の支出レポートを旅仲間と手軽に共有・エクスポートできます。';
+
+  @override
+  String get proFeatureHighlightedBadge => 'Proに含まれる機能';
 }

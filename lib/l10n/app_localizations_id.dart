@@ -209,13 +209,14 @@ class AppLocalizationsId extends AppLocalizations {
   String get proSubtitle => 'Perjalanan tanpa batas dan ketenangan pikiran';
 
   @override
-  String get proFeature1 => 'Perjalanan & pelacakan pengeluaran tanpa batas';
+  String get proFeature1 => 'Perjalanan tak terbatas & perencanaan aktif';
 
   @override
-  String get proFeature2 => 'Penyimpanan brankas aman tanpa batas';
+  String get proFeature2 =>
+      'Brankas dokumen tak terbatas & 5 GB penyimpanan cloud';
 
   @override
-  String get proFeature3 => 'Sinkronisasi cloud dua arah otomatis';
+  String get proFeature3 => 'Semua 16 tema cerita peta & 7 tata letak premium';
 
   @override
   String get monthly => 'Bulanan';
@@ -2248,4 +2249,51 @@ class AppLocalizationsId extends AppLocalizations {
   String revertToCurrency(String currency) {
     return 'Kembali ke $currency';
   }
+
+  @override
+  String get proFeature4 => 'Semua 16 tema widget layar utama';
+
+  @override
+  String get proFeature5 => 'Aktivitas rencana perjalanan harian tanpa batas';
+
+  @override
+  String get proFeature6 => 'Ekspor laporan anggaran & pengeluaran perjalanan';
+
+  @override
+  String get proTripLimitTitle => 'Rencanakan perjalanan tanpa batas';
+
+  @override
+  String get proTripLimitSubtitle =>
+      'Paket gratis mencakup 1 perjalanan aktif. Tingkatkan ke Pro untuk mengelola semuanya bersamaan.';
+
+  @override
+  String get proVaultLimitTitle => 'Brankas tanpa batas & 5 GB cloud';
+
+  @override
+  String get proVaultLimitSubtitle =>
+      'Amankan dokumen perjalanan tanpa batas dengan 5 GB penyimpanan cloud.';
+
+  @override
+  String get proItineraryLimitTitle => 'Aktivitas harian tanpa batas';
+
+  @override
+  String get proItineraryLimitSubtitle =>
+      'Atur harimu dengan bebas. Paket gratis mencakup 3 aktivitas per hari.';
+
+  @override
+  String get proThemeLockedTitle => '16 tema & 7 tata letak cerita';
+
+  @override
+  String get proThemeLockedSubtitle =>
+      'Buka kunci semua palet premium, edisi paspor, dan gaya widget.';
+
+  @override
+  String get proExportLockedTitle => 'Ekspor anggaran & laporan';
+
+  @override
+  String get proExportLockedSubtitle =>
+      'Ekspor dan bagikan laporan pengeluaran bersama teman perjalananmu.';
+
+  @override
+  String get proFeatureHighlightedBadge => 'Termasuk di Pro';
 }

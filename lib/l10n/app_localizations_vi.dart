@@ -204,13 +204,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get proSubtitle => 'Du lịch không giới hạn và hoàn toàn yên tâm';
 
   @override
-  String get proFeature1 => 'Không giới hạn chuyến đi và chi tiêu';
+  String get proFeature1 => 'Không giới hạn chuyến đi & lập kế hoạch';
 
   @override
-  String get proFeature2 => 'Lưu trữ két an toàn không giới hạn';
+  String get proFeature2 => 'Két tài liệu không giới hạn & 5 GB đám mây';
 
   @override
-  String get proFeature3 => 'Đồng bộ hai chiều tự động';
+  String get proFeature3 => 'Tất cả 16 chủ đề bản đồ & 7 bố cục cao cấp';
 
   @override
   String get monthly => 'Hàng tháng';
@@ -2245,4 +2245,51 @@ class AppLocalizationsVi extends AppLocalizations {
   String revertToCurrency(String currency) {
     return 'Quay lại $currency';
   }
+
+  @override
+  String get proFeature4 => 'Tất cả 16 chủ đề tiện ích màn hình chính';
+
+  @override
+  String get proFeature5 => 'Hoạt động lịch trình hàng ngày không giới hạn';
+
+  @override
+  String get proFeature6 => 'Xuất báo cáo ngân sách & chi tiêu chuyến đi';
+
+  @override
+  String get proTripLimitTitle => 'Lập kế hoạch chuyến đi không giới hạn';
+
+  @override
+  String get proTripLimitSubtitle =>
+      'Gói miễn phí bao gồm 1 chuyến đi đang hoạt động. Nâng cấp Pro để quản lý đồng thời tất cả chuyến đi.';
+
+  @override
+  String get proVaultLimitTitle => 'Két không giới hạn & 5 GB đám mây';
+
+  @override
+  String get proVaultLimitSubtitle =>
+      'Lưu trữ tài liệu du lịch an toàn với 5 GB dung lượng đám mây.';
+
+  @override
+  String get proItineraryLimitTitle => 'Hoạt động hàng ngày không giới hạn';
+
+  @override
+  String get proItineraryLimitSubtitle =>
+      'Thỏa sức lên kế hoạch. Gói miễn phí bao gồm 3 hoạt động mỗi ngày.';
+
+  @override
+  String get proThemeLockedTitle => '16 chủ đề & 7 bố cục câu chuyện';
+
+  @override
+  String get proThemeLockedSubtitle =>
+      'Mở khóa toàn bộ bảng màu cao cấp, phiên bản hộ chiếu và widget.';
+
+  @override
+  String get proExportLockedTitle => 'Xuất ngân sách & báo cáo';
+
+  @override
+  String get proExportLockedSubtitle =>
+      'Xuất và chia sẻ báo cáo chi tiêu với bạn đồng hành của bạn.';
+
+  @override
+  String get proFeatureHighlightedBadge => 'Bao gồm trong Pro';
 }

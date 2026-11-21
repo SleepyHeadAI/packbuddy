@@ -19,6 +19,10 @@ import 'package:packbuddy/features/travel_map/presentation/widgets/interactive_w
 import 'package:packbuddy/features/travel_map/presentation/widgets/travel_map_story_card.dart';
 import 'package:packbuddy/features/travel_map/presentation/widgets/country_flag.dart';
 import 'package:packbuddy/core/services/app_widget_localization.dart';
+import 'package:packbuddy/core/services/pro_entitlement_service.dart';
+import 'package:packbuddy/core/services/telemetry_service.dart';
+import 'package:packbuddy/features/settings/data/mock_revenuecat_service.dart';
+import 'package:packbuddy/features/settings/presentation/screens/widgets/paywall_sheet.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:packbuddy/shared/widgets/app_button.dart';
@@ -126,6 +130,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final lang = Localizations.localeOf(context).languageCode;
+    final isPro = ref.read(proSubscriptionProvider).isPro;
     final storyKey = GlobalKey();
     StoryCardLayout selectedLayout = StoryCardLayout.classic;
     StoryCardTheme selectedTheme = StoryCardTheme.midnight;
@@ -218,11 +223,24 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                         child: Row(
                           children: StoryCardLayout.values.map((l) {
                             final isSelected = l == selectedLayout;
+                            final isLocked = !ProFeatureGate.canUseStoryLayout(isPro: isPro, layout: l);
                             return Padding(
                               padding: const EdgeInsets.only(right: 8),
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(16),
                                 onTap: () {
+                                  if (isLocked) {
+                                    TelemetryService.instance.logProGateHit(
+                                      featureKey: 'story_layout_locked',
+                                      context: l.name,
+                                    );
+                                    PaywallSheet.show(
+                                      context,
+                                      triggerSource: 'story_layout_locked',
+                                      highlightFeature: 'theme_locked',
+                                    );
+                                    return;
+                                  }
                                   setModalState(() {
                                     selectedLayout = l;
                                   });
@@ -275,6 +293,14 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                               : (isDark ? Colors.white70 : Colors.black87),
                                         ),
                                       ),
+                                      if (isLocked) ...[
+                                        const SizedBox(width: 4),
+                                        const Icon(
+                                          Icons.workspace_premium_rounded,
+                                          size: 12,
+                                          color: AppColors.primaryAmber,
+                                        ),
+                                      ],
                                     ],
                                   ),
                                 ),
@@ -430,11 +456,24 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                               l10n: l10n,
                             );
                             final isSelected = t == selectedTheme;
+                            final isLocked = !ProFeatureGate.canUseStoryTheme(isPro: isPro, theme: t);
                             return Padding(
                               padding: const EdgeInsets.only(right: 8),
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(20),
                                 onTap: () {
+                                  if (isLocked) {
+                                    TelemetryService.instance.logProGateHit(
+                                      featureKey: 'story_theme_locked',
+                                      context: t.name,
+                                    );
+                                    PaywallSheet.show(
+                                      context,
+                                      triggerSource: 'story_theme_locked',
+                                      highlightFeature: 'theme_locked',
+                                    );
+                                    return;
+                                  }
                                   setModalState(() {
                                     selectedTheme = t;
                                     selectedThemeCategory = t.isLight ? 1 : 0;
@@ -499,6 +538,14 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                               : (isDark ? Colors.white70 : Colors.black87),
                                         ),
                                       ),
+                                      if (isLocked) ...[
+                                        const SizedBox(width: 4),
+                                        const Icon(
+                                          Icons.workspace_premium_rounded,
+                                          size: 12,
+                                          color: AppColors.primaryAmber,
+                                        ),
+                                      ],
                                     ],
                                   ),
                                 ),

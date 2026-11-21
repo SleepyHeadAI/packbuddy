@@ -32,11 +32,38 @@ service cloud.firestore {
       );
     }
 
+    // Helper: verifies initial Pro fields are not self-elevated to active Pro during profile creation
+    function hasValidInitialProFields() {
+      let data = request.resource.data;
+      return (!('isPremium' in data) || data.isPremium == false) &&
+             (!('is_premium' in data) || data.is_premium == false) &&
+             (!('isPro' in data) || data.isPro == false) &&
+             (!('pro' in data) || data.pro == false) &&
+             (!('adminGrantedPro' in data) || data.adminGrantedPro == false) &&
+             (!('subscriptionTier' in data) || data.subscriptionTier == 'free' || data.subscriptionTier == null) &&
+             (!('proExpiresAt' in data) || data.proExpiresAt == null);
+    }
+
+    // Helper: checks whether user is attempting to self-upgrade Pro/entitlement fields to active/true
+    function isElevatingProFields() {
+      let incoming = request.resource.data;
+      let existing = resource.data;
+      return (
+        ('adminGrantedPro' in incoming && incoming.adminGrantedPro == true && (!('adminGrantedPro' in existing) || existing.adminGrantedPro != true)) ||
+        ('isPremium' in incoming && incoming.isPremium == true && (!('isPremium' in existing) || existing.isPremium != true)) ||
+        ('is_premium' in incoming && incoming.is_premium == true && (!('is_premium' in existing) || existing.is_premium != true)) ||
+        ('isPro' in incoming && incoming.isPro == true && (!('isPro' in existing) || existing.isPro != true)) ||
+        ('pro' in incoming && incoming.pro == true && (!('pro' in existing) || existing.pro != true)) ||
+        ('subscriptionTier' in incoming && incoming.subscriptionTier != 'free' && incoming.subscriptionTier != null && (!('subscriptionTier' in existing) || existing.subscriptionTier != incoming.subscriptionTier)) ||
+        ('proExpiresAt' in incoming && incoming.proExpiresAt != null && (!('proExpiresAt' in existing) || existing.proExpiresAt != incoming.proExpiresAt))
+      );
+    }
+
     // Users profile collection: isolated per authenticated user & Admin Dashboard
     match /users/{userId} {
       allow read: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
-      allow create: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
-      allow update: if (isAuthenticated() && request.auth.uid == userId && !isUserBanned(userId)) || isAdmin();
+      allow create: if (isAuthenticated() && request.auth.uid == userId && (hasValidInitialProFields() || isAdmin())) || isAdmin();
+      allow update: if (isAuthenticated() && request.auth.uid == userId && !isUserBanned(userId) && (!isElevatingProFields() || isAdmin())) || isAdmin();
       allow delete: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
 
       // In-app notifications subcollection: allows user to read/clear their alerts & admin to dispatch

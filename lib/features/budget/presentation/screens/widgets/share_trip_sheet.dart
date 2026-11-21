@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/services/share_service.dart';
+import 'package:packbuddy/core/services/pro_entitlement_service.dart';
+import 'package:packbuddy/core/services/telemetry_service.dart';
+import 'package:packbuddy/features/settings/data/mock_revenuecat_service.dart';
+import 'package:packbuddy/features/settings/presentation/screens/widgets/paywall_sheet.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
@@ -481,6 +485,19 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
                         ),
                       ),
                       onPressed: () {
+                        final isPro = ref.read(proSubscriptionProvider).isPro;
+                        if (!ProFeatureGate.canExportBudget(isPro: isPro)) {
+                          TelemetryService.instance.logProGateHit(
+                            featureKey: 'export_locked',
+                            context: 'share_trip_summary',
+                          );
+                          PaywallSheet.show(
+                            context,
+                            triggerSource: 'export_locked',
+                            highlightFeature: 'export_locked',
+                          );
+                          return;
+                        }
                         final expenses = ref.read(expenseControllerProvider(currentTrip.id)).expenses;
                         final items = ref.read(checklistControllerProvider).items;
                         ShareService.shareTripSummary(
