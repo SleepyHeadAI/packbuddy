@@ -502,8 +502,9 @@ class VaultController extends StateNotifier<VaultState> {
       if (fileBytes == 0 && doc.localImagePath.isNotEmpty) {
         try {
           final f = File(doc.localImagePath);
-          if (f.existsSync()) {
-            fileBytes = f.lengthSync();
+          // #10: async IO keeps the UI thread free
+          if (await f.exists()) {
+            fileBytes = await f.length();
           }
         } catch (_) {}
       }

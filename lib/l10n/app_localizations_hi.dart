@@ -1385,7 +1385,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get vaultCloudBackupNotice =>
-      'दस्तावेज़ एन्क्रिप्टेड हैं और क्रॉस-डिवाइस सिंक, 15-दिन खाता रिकवरी और सुरक्षा के लिए क्लाउड में सुरक्षित संग्रहीत किए जाते हैं।';
+      'दस्तावेज़ AES-256 एन्क्रिप्शन के साथ संग्रहीत होते हैं और डिवाइसों के बीच सिंक तथा पुनर्प्राप्ति के लिए क्लाउड पर बैकअप किए जाते हैं।';
 
   @override
   String get deleteAccountTitle => 'खाता हटाएं';

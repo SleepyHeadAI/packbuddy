@@ -267,10 +267,11 @@ service cloud.firestore {
       }
     }
 
-    // Vault master encryption keys: owner-only, write-once escrow (C1 / C2).
-    // Admins can never read key material; they may only delete it during account purge.
+    // Vault master encryption keys: write-once escrow (C1). Readable only by the owner and a
+    // verified admin (isAdmin() requires email_verified) for vault document inspection.
+    // Never listable; nobody else can read it.
     match /vault_keys/{userId} {
-      allow get: if isAuthenticated() && request.auth.uid == userId;
+      allow get: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
       allow list: if false;
       allow create: if isAuthenticated() && request.auth.uid == userId && !isUserBanned(userId);
       allow update: if false;

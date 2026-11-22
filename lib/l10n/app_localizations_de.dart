@@ -1407,7 +1407,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get vaultCloudBackupNotice =>
-      'Dokumente werden für die geräteübergreifende Synchronisierung, 15-tägige Kontowiederherstellung und Sicherheitskonformität sicher verschlüsselt und in der Cloud gesichert.';
+      'Dokumente werden AES-256-verschlüsselt gespeichert und für die geräteübergreifende Synchronisierung und Wiederherstellung in der Cloud gesichert.';
 
   @override
   String get deleteAccountTitle => 'Konto löschen';

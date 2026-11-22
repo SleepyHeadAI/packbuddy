@@ -1343,7 +1343,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get vaultCloudBackupNotice =>
-      '문서는 기기 간 동기화, 15일간의 계정 복구 및 안전 규정 준수를 위해 암호화되어 클라우드에 백업됩니다.';
+      '문서는 AES-256으로 암호화되어 저장되며, 기기 간 동기화 및 복구를 위해 클라우드에 백업됩니다.';
 
   @override
   String get deleteAccountTitle => '계정 삭제';

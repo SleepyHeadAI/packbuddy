@@ -1394,7 +1394,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get vaultCloudBackupNotice =>
-      'Dokument krypteras och säkerhetskopieras till molnet för synkronisering mellan enheter, 15 dagars kontoåterställning och säkerhet.';
+      'Dokument lagras AES-256-krypterade och säkerhetskopieras i molnet för synkronisering mellan enheter och återställning.';
 
   @override
   String get deleteAccountTitle => 'Radera konto';

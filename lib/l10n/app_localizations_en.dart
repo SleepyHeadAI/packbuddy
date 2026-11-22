@@ -1392,7 +1392,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get vaultCloudBackupNotice =>
-      'Documents are encrypted & backed up to cloud storage for cross-device sync, 15-day account recovery, and safety compliance.';
+      'Documents are stored with AES-256 encryption and backed up to the cloud for cross-device sync and recovery.';
 
   @override
   String get deleteAccountTitle => 'Delete Account';

@@ -439,7 +439,7 @@
   "templateCampingDesc": "Trwały ekwipunek na biwak pod namiotem, trekking i piesze wędrówki",
   "templateCityTitle": "Weekendowy City Break",
   "templateCityDesc": "Lekki i kompaktowy plecak na 2-3 dniowy wypad do miasta",
-  "vaultCloudBackupNotice": "Dokumenty są szyfrowane i zapisywane w chmurze w celu synchronizacji, 15-dniowego odzyskiwania konta i bezpieczeństwa.",
+  "vaultCloudBackupNotice": "Dokumenty są przechowywane z szyfrowaniem AES-256 i kopiowane do chmury w celu synchronizacji między urządzeniami i odzyskiwania.",
   "deleteAccountTitle": "Usuń konto",
   "accountRestoredNotice": "Witaj ponownie! Usunięcie konta zostało anulowane, a dane przywrócone.",
   "adminPendingDeletionBadge": "Zaplanowano usunięcie (pozostało {days} dni)",

@@ -440,21 +440,35 @@ void main() {
       expect(base64Encode(key.bytes), isNot(legacyDeviceKey));
     });
 
-    test('C2: admin vault viewer returns no content (no key fetch, no decryption)', () async {
-      final service = FirebaseAdminService();
-      final bytes = await service.viewUserDocumentDecrypted(
-        targetUserId: 'client-user-99',
+    test('Admin viewer decrypts the owner\'s AES-GCM document with only the escrowed key', () async {
+      const ownerUid = 'client-user-99';
+      // Owner device: key is created + escrowed, document encrypted (PBENC2)
+      await SecurityService.instance.getOrCreateUserVaultKey(userId: ownerUid);
+      final pdf = Uint8List.fromList([0x25, 0x50, 0x44, 0x46, ...List<int>.generate(64, (i) => i)]);
+      final encrypted = await SecurityService.instance.encryptBytes(pdf, userId: ownerUid);
+      expect(encrypted.sublist(0, 6), SecurityService.magicHeaderV2);
+
+      // Admin device: empty Keystore
+      final adminStorage = MockFlutterSecureStorage();
+      SecurityService.instance.setSecureStorageForTesting(adminStorage);
+      SecurityService.instance.clearKeyCacheForTesting();
+
+      final bytes = await FirebaseAdminService().viewUserDocumentDecrypted(
+        targetUserId: ownerUid,
         doc: Document(
           id: 'doc-1',
-          userId: 'client-user-99',
+          userId: ownerUid,
           title: 'Passport',
           category: 'passport',
           localImagePath: '',
+          cloudDataBase64: base64Encode(encrypted),
           createdAt: DateTime(2026, 1, 1),
           updatedAt: DateTime(2026, 1, 1),
         ),
       );
-      expect(bytes, isNull);
+      expect(bytes, equals(pdf));
+      // The owner's key is never persisted on the admin device
+      expect(adminStorage.storage.keys.where((k) => k.contains(ownerUid)), isEmpty);
     });
 
     test('Encryption & Decryption using User Escrow Key preserves data integrity', () async {
@@ -635,10 +649,11 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 200));
 
-      // C2: admins can never fetch/decrypt vault content — no decryption call is made and the
-      // inspect dialog explains that the content is end-to-end encrypted.
-      expect(mockAdmin.loggedAudits, isEmpty);
-      expect(find.textContaining('uçtan uca şifrelidir'), findsOneWidget);
+      // Verified admin inspection goes through viewUserDocumentDecrypted (audit-logged)
+      expect(mockAdmin.loggedAudits.length, equals(1));
+      expect(mockAdmin.loggedAudits.first['action'], equals('view_vault_document'));
+      expect(mockAdmin.loggedAudits.first['targetUserId'], equals('user-inspect-1'));
+      expect(find.textContaining('uçtan uca'), findsNothing);
     });
   });
 }

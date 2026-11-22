@@ -439,7 +439,7 @@
   "templateCampingDesc": "Trang thiết bị dã ngoại bền bỉ cho cắm trại lều và leo núi",
   "templateCityTitle": "Dạo chơi thành phố cuối tuần",
   "templateCityDesc": "Balo gọn nhẹ và tiện lợi cho chuyến du lịch thành phố 2-3 ngày",
-  "vaultCloudBackupNotice": "Tài liệu được mã hóa và sao lưu lên đám mây để đồng bộ đa thiết bị, khôi phục tài khoản trong 15 ngày và đảm bảo an toàn.",
+  "vaultCloudBackupNotice": "Tài liệu được lưu trữ với mã hóa AES-256 và sao lưu lên đám mây để đồng bộ giữa các thiết bị và khôi phục.",
   "deleteAccountTitle": "Xóa tài khoản",
   "accountRestoredNotice": "Chào mừng bạn quay lại! Yêu cầu xóa tài khoản đã được hủy và toàn bộ dữ liệu đã được khôi phục.",
   "adminPendingDeletionBadge": "Lên lịch xóa (còn {days} ngày)",

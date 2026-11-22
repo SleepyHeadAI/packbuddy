@@ -459,10 +459,9 @@ void main() {
       await tester.tap(inspectButtons.first);
       await tester.pumpAndSettle();
 
-      // C2: content is never rendered for admins (even legacy plaintext payloads); only
-      // moderation actions (delete) remain available.
-      expect(find.byType(InteractiveViewer), findsNothing);
-      expect(find.textContaining('uçtan uca şifrelidir'), findsOneWidget);
+      // Verified admins can inspect vault images (pinch-to-zoom preview) and moderate them
+      expect(find.byType(InteractiveViewer), findsOneWidget);
+      expect(find.textContaining('uçtan uca'), findsNothing);
       expect(find.text('Delete Document'), findsOneWidget);
 
       // Cancel dialog

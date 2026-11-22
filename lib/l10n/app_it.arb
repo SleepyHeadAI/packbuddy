@@ -439,7 +439,7 @@
   "templateCampingDesc": "Attrezzatura outdoor resistente per campeggio in tenda e trekking",
   "templateCityTitle": "Weekend in Città",
   "templateCityDesc": "Bagaglio compatto e leggero per un city break di 2-3 giorni",
-  "vaultCloudBackupNotice": "I documenti sono crittografati e salvati nel cloud per sincronizzazione tra dispositivi, recupero account in 15 giorni e conformità di sicurezza.",
+  "vaultCloudBackupNotice": "I documenti sono archiviati con crittografia AES-256 e salvati nel cloud per la sincronizzazione tra dispositivi e il ripristino.",
   "deleteAccountTitle": "Elimina account",
   "accountRestoredNotice": "Bentornato! L'eliminazione dell'account è stata annullata e tutti i tuoi dati sono stati ripristinati.",
   "adminPendingDeletionBadge": "Pianificato per eliminazione ({days}g rimanenti)",

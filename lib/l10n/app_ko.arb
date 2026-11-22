@@ -439,7 +439,7 @@
   "templateCampingDesc": "텐트 캠핑, 트레킹, 등산을 위한 튼튼한 아웃도어 장비",
   "templateCityTitle": "주말 도시 여행",
   "templateCityDesc": "2~3일간의 가볍고 편리한 도심 여행을 위한 콤팩트 배낭",
-  "vaultCloudBackupNotice": "문서는 기기 간 동기화, 15일간의 계정 복구 및 안전 규정 준수를 위해 암호화되어 클라우드에 백업됩니다.",
+  "vaultCloudBackupNotice": "문서는 AES-256으로 암호화되어 저장되며, 기기 간 동기화 및 복구를 위해 클라우드에 백업됩니다.",
   "deleteAccountTitle": "계정 삭제",
   "accountRestoredNotice": "다시 오신 것을 환영합니다! 계정 삭제가 취소되고 모든 데이터가 복원되었습니다.",
   "adminPendingDeletionBadge": "삭제 예정 (남은 기간 {days}일)",

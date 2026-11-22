@@ -1408,7 +1408,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get vaultCloudBackupNotice =>
-      'Os documentos são criptografados e salvos na nuvem para sincronização entre dispositivos, recuperação em 15 dias e segurança.';
+      'Os documentos são armazenados com criptografia AES-256 e copiados para a nuvem para sincronização entre dispositivos e recuperação.';
 
   @override
   String get deleteAccountTitle => 'Excluir conta';

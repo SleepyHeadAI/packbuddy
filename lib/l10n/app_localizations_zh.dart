@@ -1341,7 +1341,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get templateCityDesc => '轻松紧凑的双肩包出行，适合2-3天城市短途游';
 
   @override
-  String get vaultCloudBackupNotice => '文件已安全加密并备份至云端，以实现多设备同步、15天账户恢复和安全合规。';
+  String get vaultCloudBackupNotice => '文档以 AES-256 加密存储，并备份到云端，用于跨设备同步和恢复。';
 
   @override
   String get deleteAccountTitle => '删除账户';

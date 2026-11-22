@@ -20,20 +20,25 @@ class _CryptParams {
   const _CryptParams(this.payload, this.keyBytes, this.ivBytes);
 }
 
-Uint8List _isolateEncryptBytes(_CryptParams params) {
-  final key = enc.Key(params.keyBytes);
-  final iv = enc.IV(params.ivBytes);
-  final encrypter = enc.Encrypter(enc.AES(key, mode: enc.AESMode.cbc));
-  final encrypted = encrypter.encryptBytes(params.payload, iv: iv);
-  return Uint8List.fromList(encrypted.bytes);
-}
-
+/// Legacy AES-CBC (PBENC1) decryption — read-only backward compatibility.
 Uint8List _isolateDecryptBytes(_CryptParams params) {
   final key = enc.Key(params.keyBytes);
   final iv = enc.IV(params.ivBytes);
   final encrypter = enc.Encrypter(enc.AES(key, mode: enc.AESMode.cbc));
   final decrypted = encrypter.decryptBytes(enc.Encrypted(params.payload), iv: iv);
   return Uint8List.fromList(decrypted);
+}
+
+// AES-256-GCM via pointycastle GCMBlockCipher.process (default padding arg makes `encrypt` use the
+// full AEAD process() path, which appends/verifies the 16-byte tag).
+Uint8List _isolateEncryptGcm(_CryptParams params) {
+  final encrypter = enc.Encrypter(enc.AES(enc.Key(params.keyBytes), mode: enc.AESMode.gcm));
+  return Uint8List.fromList(encrypter.encryptBytes(params.payload, iv: enc.IV(params.ivBytes)).bytes);
+}
+
+Uint8List _isolateDecryptGcm(_CryptParams params) {
+  final encrypter = enc.Encrypter(enc.AES(enc.Key(params.keyBytes), mode: enc.AESMode.gcm));
+  return Uint8List.fromList(encrypter.decryptBytes(enc.Encrypted(params.payload), iv: enc.IV(params.ivBytes)));
 }
 
 /// Thrown when the vault key escrow can't be read/written. Callers must retry later instead of
@@ -55,9 +60,12 @@ class SecurityService {
   static const MethodChannel _channel = MethodChannel('com.sleepyhead.packbuddy/security');
 
   /// Magic header to identify PackBuddy encrypted files (PBENC1)
-  static const List<int> magicHeader = [80, 66, 69, 78, 67, 49]; // ASCII for 'PBENC1'
-  static const int ivLength = 16;
-  static const int headerLength = 6; // 'PBENC1' length
+  static const List<int> magicHeader = [80, 66, 69, 78, 67, 49]; // ASCII 'PBENC1' (legacy AES-CBC, read-only)
+  static const List<int> magicHeaderV2 = [80, 66, 69, 78, 67, 50]; // ASCII 'PBENC2' (AES-256-GCM)
+  static const int ivLength = 16; // legacy CBC IV
+  static const int gcmNonceLength = 12;
+  static const int gcmTagLength = 16;
+  static const int headerLength = 6; // header length (both versions)
 
   enc.Key? _cachedKey;
   final Map<String, enc.Key> _cachedUserKeys = {};
@@ -95,8 +103,10 @@ class SecurityService {
   FlutterSecureStorage get _secureStorage =>
       _customSecureStorage ??
       const FlutterSecureStorage(
+        // #13: a transient Keystore error must not wipe all secure storage; keys are
+        // recovered from the escrow instead.
         aOptions: AndroidOptions(
-          resetOnError: true,
+          resetOnError: false,
         ),
       );
 
@@ -243,6 +253,20 @@ class SecurityService {
     }
   }
 
+  /// Admin vault inspection: reads [targetUserId]'s escrowed key (Firestore rules allow only the
+  /// owner and a verified admin). Never generates, escrows or persists a key on this device.
+  Future<enc.Key?> fetchUserEscrowKeyAsAdmin(String targetUserId) async {
+    final uid = targetUserId.trim();
+    if (uid.isEmpty) return null;
+    try {
+      final escrow = await _readEscrow(uid);
+      return escrow == null ? null : enc.Key(base64Decode(escrow));
+    } catch (e) {
+      debugPrint('[SecurityService] Admin escrow read notice for $uid: $e');
+      return null;
+    }
+  }
+
   /// Cleans up a user's encryption key from Keystore, memory cache, and Firestore (for GDPR / deletion)
   Future<void> deleteUserEscrowKey(String userId) async {
     final cleanUid = userId.trim();
@@ -302,8 +326,11 @@ class SecurityService {
       try {
         await _secureStorage.write(key: 'pb_vault_aes_key', value: base64Key);
       } catch (e) {
-        debugPrint('[SecurityService] Secure storage write notice: $e');
-        // Fallback for headless testing environments without platform channel implementation
+        // #12: never persist key material in plaintext SharedPreferences in production.
+        if (!_isTesting) {
+          throw StateError('Secure storage unavailable; refusing to store the vault key in plaintext: $e');
+        }
+        // Headless unit tests only (no platform channel implementation)
         await PreferencesService.instance.setVaultEncryptionKey(base64Key);
       }
     }
@@ -402,11 +429,21 @@ class SecurityService {
     return candidates;
   }
 
-  /// Checks if the provided bytes have the PBENC1 magic header
-  bool isEncrypted(Uint8List bytes) {
-    if (bytes.length < headerLength + ivLength) return false;
-    for (var i = 0; i < headerLength; i++) {
-      if (bytes[i] != magicHeader[i]) return false;
+  /// True for both the current AES-256-GCM format (PBENC2) and the legacy AES-CBC format (PBENC1).
+  bool isEncrypted(Uint8List bytes) => isGcmEncrypted(bytes) || isLegacyCbcEncrypted(bytes);
+
+  /// PBENC2: header(6) | nonce(12) | ciphertext | GCM tag(16)
+  bool isGcmEncrypted(Uint8List bytes) =>
+      _hasHeader(bytes, magicHeaderV2) && bytes.length >= headerLength + gcmNonceLength + gcmTagLength;
+
+  /// PBENC1 (legacy, read-only): header(6) | IV(16) | AES-CBC ciphertext
+  bool isLegacyCbcEncrypted(Uint8List bytes) =>
+      _hasHeader(bytes, magicHeader) && bytes.length >= headerLength + ivLength;
+
+  static bool _hasHeader(Uint8List bytes, List<int> header) {
+    if (bytes.length < header.length) return false;
+    for (var i = 0; i < header.length; i++) {
+      if (bytes[i] != header[i]) return false;
     }
     return true;
   }
@@ -437,8 +474,9 @@ class SecurityService {
     return false;
   }
 
-  /// Encrypts raw bytes with AES-256 CBC and prepends PBENC1 magic header and 16-byte IV.
-  /// Offloads payloads >= 32KB to a background Isolate via [compute] to protect 120 FPS UI thread.
+  /// Encrypts raw bytes with authenticated AES-256-GCM (#11) and writes the versioned PBENC2 format:
+  /// header | 12-byte random nonce | ciphertext + 16-byte tag.
+  /// Payloads >= 32KB are processed in a background isolate via [compute].
   Future<Uint8List> encryptBytes(Uint8List rawBytes, {String? userId}) async {
     if (rawBytes.isEmpty) return rawBytes;
     if (isEncrypted(rawBytes)) return rawBytes; // Guard against double-encryption
@@ -460,48 +498,107 @@ class SecurityService {
     }
 
     final random = Random.secure();
-    final ivBytes = Uint8List(ivLength);
-    for (var i = 0; i < ivLength; i++) {
-      ivBytes[i] = random.nextInt(256);
+    final nonce = Uint8List(gcmNonceLength);
+    for (var i = 0; i < gcmNonceLength; i++) {
+      nonce[i] = random.nextInt(256);
     }
 
-    Uint8List encryptedPayload;
-    if (!_isTesting && rawBytes.length >= 32 * 1024) {
-      // Offload large payload to background Isolate to protect 120 FPS scrolling
-      encryptedPayload = await compute(
-        _isolateEncryptBytes,
-        _CryptParams(rawBytes, key.bytes, ivBytes),
-      );
-    } else {
-      final encrypter = enc.Encrypter(enc.AES(key, mode: enc.AESMode.cbc));
-      final encrypted = encrypter.encryptBytes(rawBytes, iv: enc.IV(ivBytes));
-      encryptedPayload = Uint8List.fromList(encrypted.bytes);
-    }
+    final params = _CryptParams(rawBytes, key.bytes, nonce);
+    final Uint8List sealed = (!_isTesting && rawBytes.length >= 32 * 1024)
+        ? await compute(_isolateEncryptGcm, params)
+        : _isolateEncryptGcm(params);
 
-    final result = Uint8List(headerLength + ivLength + encryptedPayload.length);
-    result.setRange(0, headerLength, magicHeader);
-    result.setRange(headerLength, headerLength + ivLength, ivBytes);
-    result.setRange(headerLength + ivLength, result.length, encryptedPayload);
-
+    final result = Uint8List(headerLength + gcmNonceLength + sealed.length);
+    result.setRange(0, headerLength, magicHeaderV2);
+    result.setRange(headerLength, headerLength + gcmNonceLength, nonce);
+    result.setRange(headerLength + gcmNonceLength, result.length, sealed);
     return result;
   }
 
-  /// Decrypts bytes if they start with PBENC1 header, otherwise returns original bytes for 100% backward compatibility.
-  /// Offloads payloads >= 32KB to a background Isolate via [compute] to protect 120 FPS UI thread.
+  /// Decrypts PackBuddy vault bytes.
+  ///
+  /// * PBENC2 (AES-GCM): decrypted with exactly ONE key — [candidateKey] if given, otherwise the
+  ///   user's existing key (Keystore → escrow; a key is never generated here). The GCM tag is
+  ///   verified, so tampered or wrong-key data is rejected instead of yielding garbage.
+  /// * PBENC1 (legacy AES-CBC): read-only backward compatibility via the legacy candidate keys.
+  /// * Anything else is returned unchanged (unencrypted legacy file).
+  ///
+  /// On failure the original bytes are returned (callers detect this via [isEncrypted]).
   Future<Uint8List> decryptBytes(
     Uint8List fileBytes, {
     String? userId,
     List<String>? extraSeeds,
     enc.Key? candidateKey,
   }) async {
-    if (!isEncrypted(fileBytes)) {
-      return fileBytes; // Unencrypted legacy file - return as is
+    if (isGcmEncrypted(fileBytes)) {
+      final key = candidateKey ?? await _resolveDecryptionKey(userId);
+      if (key == null) {
+        debugPrint('[SecurityService] Decryption notice: no vault key available for this file.');
+        return fileBytes;
+      }
+      final nonce = fileBytes.sublist(headerLength, headerLength + gcmNonceLength);
+      final sealed = fileBytes.sublist(headerLength + gcmNonceLength);
+      final params = _CryptParams(sealed, key.bytes, nonce);
+      try {
+        return (!_isTesting && sealed.length >= 32 * 1024)
+            ? await compute(_isolateDecryptGcm, params)
+            : _isolateDecryptGcm(params);
+      } catch (e) {
+        debugPrint('[SecurityService] Decryption notice: GCM authentication failed ($e).');
+        return fileBytes;
+      }
     }
 
-    if (fileBytes.length < headerLength + ivLength) {
-      return fileBytes;
+    if (isLegacyCbcEncrypted(fileBytes)) {
+      return _decryptLegacyCbc(fileBytes, userId: userId, extraSeeds: extraSeeds, candidateKey: candidateKey);
     }
 
+    return fileBytes; // Unencrypted legacy file - return as is
+  }
+
+  /// Key for decrypting the current format: user key from Keystore/escrow (never generated),
+  /// or the device-bound key for data never bound to an account.
+  Future<enc.Key?> _resolveDecryptionKey(String? userId) async {
+    final uid = userId?.trim();
+    if (uid == null || uid.isEmpty) {
+      try {
+        return await _getOrCreateKey();
+      } catch (_) {
+        return null;
+      }
+    }
+    if (_cachedUserKeys.containsKey(uid)) return _cachedUserKeys[uid];
+    try {
+      final stored = await _secureStorage.read(key: _userKeyStorageKey(uid));
+      if (stored != null && stored.isNotEmpty) {
+        final key = enc.Key(base64Decode(stored));
+        _cachedUserKeys[uid] = key;
+        return key;
+      }
+    } catch (_) {}
+    try {
+      final escrow = await _readEscrow(uid);
+      if (escrow != null) {
+        final key = enc.Key(base64Decode(escrow));
+        _cachedUserKeys[uid] = key;
+        try {
+          await _secureStorage.write(key: _userKeyStorageKey(uid), value: escrow);
+        } catch (_) {}
+        return key;
+      }
+    } catch (e) {
+      debugPrint('[SecurityService] Escrow read notice during decryption: $e');
+    }
+    return null;
+  }
+
+  /// Legacy AES-CBC (PBENC1) read path: tries the historical candidate keys.
+  Future<Uint8List> _decryptLegacyCbc(
+    Uint8List fileBytes, {
+    String? userId,
+    List<String>? extraSeeds,
+    enc.Key? candidateKey,
+  }) async {
     final ivBytes = fileBytes.sublist(headerLength, headerLength + ivLength);
     final cipherBytes = fileBytes.sublist(headerLength + ivLength);
 
@@ -542,7 +639,7 @@ class SecurityService {
       return firstValidCandidate;
     }
 
-    debugPrint('[SecurityService] Decryption notice: All candidate keys failed. Returning raw bytes fallback.');
+    debugPrint('[SecurityService] Decryption notice: All legacy candidate keys failed. Returning raw bytes fallback.');
     return fileBytes;
   }
 

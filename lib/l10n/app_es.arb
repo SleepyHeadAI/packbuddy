@@ -439,7 +439,7 @@
   "templateCampingDesc": "Equipo duradero para acampada en tienda, senderismo y trekking",
   "templateCityTitle": "Escapada Urbana de Fin de Semana",
   "templateCityDesc": "Esenciales ligeros y prácticos para una escapada urbana de 2 o 3 días",
-  "vaultCloudBackupNotice": "Los documentos se cifran y respaldan en la nube para sincronización entre dispositivos, recuperación de cuenta en 15 días y cumplimiento de seguridad.",
+  "vaultCloudBackupNotice": "Los documentos se guardan cifrados con AES-256 y se respaldan en la nube para sincronizarlos entre dispositivos y recuperarlos.",
   "deleteAccountTitle": "Eliminar cuenta",
   "accountRestoredNotice": "¡Bienvenido de nuevo! La eliminación de su cuenta fue cancelada y sus datos han sido restaurados.",
   "adminPendingDeletionBadge": "Programado para eliminación ({days}d restantes)",

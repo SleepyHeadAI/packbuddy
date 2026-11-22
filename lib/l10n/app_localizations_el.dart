@@ -1415,7 +1415,7 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get vaultCloudBackupNotice =>
-      'Τα έγγραφα είναι κρυπτογραφημένα και αποθηκεύονται στο cloud για συγχρονισμό, ανάκτηση λογαριασμού 15 ημερών και ασφάλεια.';
+      'Τα έγγραφα αποθηκεύονται κρυπτογραφημένα με AES-256 και δημιουργείται αντίγραφο ασφαλείας στο cloud για συγχρονισμό μεταξύ συσκευών και ανάκτηση.';
 
   @override
   String get deleteAccountTitle => 'Διαγραφή λογαριασμού';

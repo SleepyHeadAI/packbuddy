@@ -1343,7 +1343,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get vaultCloudBackupNotice =>
-      'ドキュメントは端末間の同期、15日間のアカウント復元、および安全性確保のために暗号化されクラウドにバックアップされます。';
+      '書類は AES-256 で暗号化して保存され、デバイス間の同期と復元のためにクラウドへバックアップされます。';
 
   @override
   String get deleteAccountTitle => 'アカウントを削除';

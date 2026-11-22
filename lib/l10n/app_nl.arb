@@ -439,7 +439,7 @@
   "templateCampingDesc": "Stevige uitrusting voor tentkamperen, trektochten en wandelingen",
   "templateCityTitle": "Weekendje Stad",
   "templateCityDesc": "Compacte en lichte rugzak voor een 2-3 daagse stedentrip",
-  "vaultCloudBackupNotice": "Documenten worden versleuteld en opgeslagen in de cloud voor synchronisatie tussen apparaten, 15 dagen accountherstel en beveiliging.",
+  "vaultCloudBackupNotice": "Documenten worden met AES-256-versleuteling opgeslagen en in de cloud geback-upt voor synchronisatie tussen apparaten en herstel.",
   "deleteAccountTitle": "Account verwijderen",
   "accountRestoredNotice": "Welkom terug! Uw accountverwijdering is geannuleerd en al uw gegevens zijn hersteld.",
   "adminPendingDeletionBadge": "Gepland voor verwijdering (nog {days}d)",

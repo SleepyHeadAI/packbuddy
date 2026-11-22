@@ -439,7 +439,7 @@
   "templateCampingDesc": "Matériel robuste pour le camping sous tente, la randonnée et le trekking",
   "templateCityTitle": "Week-end en Ville",
   "templateCityDesc": "Bagage léger et pratique pour une escapade citadine de 2 à 3 jours",
-  "vaultCloudBackupNotice": "Les documents sont chiffrés et sauvegardés dans le cloud pour la synchronisation multi-appareils, la récupération sous 15 jours et la sécurité.",
+  "vaultCloudBackupNotice": "Les documents sont stockés chiffrés en AES-256 et sauvegardés dans le cloud pour la synchronisation entre appareils et la récupération.",
   "deleteAccountTitle": "Supprimer le compte",
   "accountRestoredNotice": "Bon retour ! La suppression de votre compte a été annulée et vos données ont été restaurées.",
   "adminPendingDeletionBadge": "Prévu pour suppression ({days}j restants)",

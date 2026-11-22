@@ -1400,7 +1400,7 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get vaultCloudBackupNotice =>
-      'Dokumenty są szyfrowane i zapisywane w chmurze w celu synchronizacji, 15-dniowego odzyskiwania konta i bezpieczeństwa.';
+      'Dokumenty są przechowywane z szyfrowaniem AES-256 i kopiowane do chmury w celu synchronizacji między urządzeniami i odzyskiwania.';
 
   @override
   String get deleteAccountTitle => 'Usuń konto';

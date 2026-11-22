@@ -1382,7 +1382,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get vaultCloudBackupNotice =>
-      'المستندات مشفرة وتُحفظ بأمان في التخزين السحابي للمزامنة بين الأجهزة واستعادة الحساب في غضون 15 يومًا والامتثال للسلامة.';
+      'تُخزَّن المستندات مشفّرة بمعيار AES-256 ويتم نسخها احتياطيًا إلى السحابة للمزامنة بين الأجهزة والاستعادة.';
 
   @override
   String get deleteAccountTitle => 'حذف الحساب';

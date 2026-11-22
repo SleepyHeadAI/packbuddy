@@ -439,7 +439,7 @@
   "templateCampingDesc": "Equipamentos duráveis para acampar em barraca, trilhas e trekking",
   "templateCityTitle": "Fim de Semana na Cidade",
   "templateCityDesc": "Mochila leve e compacta para um passeio de 2 a 3 dias na cidade",
-  "vaultCloudBackupNotice": "Os documentos são criptografados e salvos na nuvem para sincronização entre dispositivos, recuperação em 15 dias e segurança.",
+  "vaultCloudBackupNotice": "Os documentos são armazenados com criptografia AES-256 e copiados para a nuvem para sincronização entre dispositivos e recuperação.",
   "deleteAccountTitle": "Excluir conta",
   "accountRestoredNotice": "Bem-vindo de volta! A exclusão da sua conta foi cancelada e seus dados foram restaurados.",
   "adminPendingDeletionBadge": "Agendado para exclusão ({days}d restantes)",

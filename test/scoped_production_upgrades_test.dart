@@ -83,17 +83,17 @@ void main() {
   });
 
   group('PHASE 3: Vault AES-256 At-Rest Local File Encryption', () {
-    test('Encrypts and decrypts byte stream with PBENC1 header roundtrip', () async {
+    test('Encrypts and decrypts byte stream with PBENC2 (AES-256-GCM) header roundtrip', () async {
       final originalData = Uint8List.fromList(utf8.encode('Top Secret Passport Document Data 12345!'));
 
       expect(SecurityService.instance.isEncrypted(originalData), isFalse);
 
       final encryptedData = await SecurityService.instance.encryptBytes(originalData);
 
-      // Verify encrypted output has PBENC1 header
+      // Verify encrypted output has the PBENC2 header: header(6) + nonce(12) + ciphertext + tag(16)
       expect(SecurityService.instance.isEncrypted(encryptedData), isTrue);
-      expect(encryptedData.length, greaterThan(originalData.length + 6 + 16));
-      expect(encryptedData.sublist(0, 6), equals([80, 66, 69, 78, 67, 49]));
+      expect(encryptedData.length, equals(originalData.length + 6 + 12 + 16));
+      expect(encryptedData.sublist(0, 6), equals([80, 66, 69, 78, 67, 50]));
 
       // Verify decrypted data matches original exactly
       final decryptedData = await SecurityService.instance.decryptBytes(encryptedData);

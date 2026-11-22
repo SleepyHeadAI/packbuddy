@@ -1414,7 +1414,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get vaultCloudBackupNotice =>
-      'Les documents sont chiffrés et sauvegardés dans le cloud pour la synchronisation multi-appareils, la récupération sous 15 jours et la sécurité.';
+      'Les documents sont stockés chiffrés en AES-256 et sauvegardés dans le cloud pour la synchronisation entre appareils et la récupération.';
 
   @override
   String get deleteAccountTitle => 'Supprimer le compte';

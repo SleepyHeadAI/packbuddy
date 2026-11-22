@@ -1401,7 +1401,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get vaultCloudBackupNotice =>
-      'Dokumen dienkripsi & dicadangkan ke penyimpanan cloud untuk sinkronisasi antar perangkat, pemulihan 15 hari, dan kepatuhan keamanan.';
+      'Dokumen disimpan dengan enkripsi AES-256 dan dicadangkan ke cloud untuk sinkronisasi antarperangkat dan pemulihan.';
 
   @override
   String get deleteAccountTitle => 'Hapus Akun';

@@ -439,7 +439,7 @@
   "templateCampingDesc": "Tålig utrustning för tältning, vandring och friluftsliv",
   "templateCityTitle": "Weekend i Stan",
   "templateCityDesc": "Lätt och kompakt packning för en 2-3 dagars storstadshelg",
-  "vaultCloudBackupNotice": "Dokument krypteras och säkerhetskopieras till molnet för synkronisering mellan enheter, 15 dagars kontoåterställning och säkerhet.",
+  "vaultCloudBackupNotice": "Dokument lagras AES-256-krypterade och säkerhetskopieras i molnet för synkronisering mellan enheter och återställning.",
   "deleteAccountTitle": "Radera konto",
   "accountRestoredNotice": "Välkommen tillbaka! Din kontoradering avbröts och alla data har återställts.",
   "adminPendingDeletionBadge": "Schemalagt för radering ({days}d kvar)",

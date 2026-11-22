@@ -439,7 +439,7 @@
   "templateCampingDesc": "Çadır kampı, trekking ve doğa yürüyüşleri için dayanıklı ekipmanlar",
   "templateCityTitle": "Hafta Sonu Şehir Turu",
   "templateCityDesc": "Pratik sırt çantasıyla 2-3 günlük rahat ve kompakt şehir kaçamağı",
-  "vaultCloudBackupNotice": "Belgeler; cihazlar arası eşitleme, 15 günlük hesap kurtarma ve güvenlik uyumluluğu için buluta güvenle yedeklenir.",
+  "vaultCloudBackupNotice": "Belgeler AES-256 şifreli olarak saklanır ve cihazlar arası eşitleme ile kurtarma için buluta yedeklenir.",
   "deleteAccountTitle": "Hesabı Sil",
   "accountRestoredNotice": "Tekrar hoş geldiniz! Hesap silme talebiniz iptal edildi ve tüm verileriniz geri yüklendi.",
   "adminPendingDeletionBadge": "Silinmesi planlandı ({days} gün kaldı)",

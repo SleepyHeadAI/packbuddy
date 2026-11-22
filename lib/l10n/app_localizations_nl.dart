@@ -1397,7 +1397,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get vaultCloudBackupNotice =>
-      'Documenten worden versleuteld en opgeslagen in de cloud voor synchronisatie tussen apparaten, 15 dagen accountherstel en beveiliging.';
+      'Documenten worden met AES-256-versleuteling opgeslagen en in de cloud geback-upt voor synchronisatie tussen apparaten en herstel.';
 
   @override
   String get deleteAccountTitle => 'Account verwijderen';

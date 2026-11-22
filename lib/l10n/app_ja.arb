@@ -439,7 +439,7 @@
   "templateCampingDesc": "テント泊、トレッキング、ハイキングに適したアウトドアギア",
   "templateCityTitle": "週末シティトリップ",
   "templateCityDesc": "2〜3日の都市旅行にぴったりの身軽でコンパクトなバックパック",
-  "vaultCloudBackupNotice": "ドキュメントは端末間の同期、15日間のアカウント復元、および安全性確保のために暗号化されクラウドにバックアップされます。",
+  "vaultCloudBackupNotice": "書類は AES-256 で暗号化して保存され、デバイス間の同期と復元のためにクラウドへバックアップされます。",
   "deleteAccountTitle": "アカウントを削除",
   "accountRestoredNotice": "お帰りなさい！アカウント削除申請はキャンセルされ、すべてのデータが復元されました。",
   "adminPendingDeletionBadge": "削除予定（残り{days}日）",

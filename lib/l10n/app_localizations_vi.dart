@@ -1396,7 +1396,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get vaultCloudBackupNotice =>
-      'Tài liệu được mã hóa và sao lưu lên đám mây để đồng bộ đa thiết bị, khôi phục tài khoản trong 15 ngày và đảm bảo an toàn.';
+      'Tài liệu được lưu trữ với mã hóa AES-256 và sao lưu lên đám mây để đồng bộ giữa các thiết bị và khôi phục.';
 
   @override
   String get deleteAccountTitle => 'Xóa tài khoản';

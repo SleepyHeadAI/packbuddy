@@ -1389,7 +1389,7 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get vaultCloudBackupNotice =>
-      'เอกสารได้รับการเข้ารหัสและสำรองข้อมูลไปยังระบบคลาวด์เพื่อการซิงค์ข้ามอุปกรณ์ การกู้คืนบัญชีภายใน 15 วัน และความปลอดภัย';
+      'เอกสารถูกจัดเก็บแบบเข้ารหัส AES-256 และสำรองไว้บนคลาวด์เพื่อซิงค์ระหว่างอุปกรณ์และกู้คืนข้อมูล';
 
   @override
   String get deleteAccountTitle => 'ลบบัญชี';

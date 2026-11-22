@@ -52,11 +52,21 @@ class SyncState {
   final String? errorMessage;
   final int syncedCount;
 
+  /// #14: true when at least one vault file could not be uploaded because the cloud storage quota
+  /// (Free 50 MB / Pro 5 GB) or the 10 MB single-file limit was reached. Document metadata is still
+  /// synced; only the file upload is skipped. UI can surface an upgrade / free-space hint.
+  final bool isCloudQuotaExceeded;
+
+  /// Number of vault files whose upload was skipped for quota / size reasons in the last sync.
+  final int quotaSkippedFiles;
+
   const SyncState({
     this.status = SyncStatus.idle,
     this.lastSyncTime,
     this.errorMessage,
     this.syncedCount = 0,
+    this.isCloudQuotaExceeded = false,
+    this.quotaSkippedFiles = 0,
   });
 
   SyncState copyWith({
@@ -64,14 +74,23 @@ class SyncState {
     DateTime? lastSyncTime,
     String? errorMessage,
     int? syncedCount,
+    bool? isCloudQuotaExceeded,
+    int? quotaSkippedFiles,
   }) {
     return SyncState(
       status: status ?? this.status,
       lastSyncTime: lastSyncTime ?? this.lastSyncTime,
       errorMessage: errorMessage,
       syncedCount: syncedCount ?? this.syncedCount,
+      isCloudQuotaExceeded: isCloudQuotaExceeded ?? this.isCloudQuotaExceeded,
+      quotaSkippedFiles: quotaSkippedFiles ?? this.quotaSkippedFiles,
     );
   }
+}
+
+/// Internal signal: a vault file upload was skipped for quota / size reasons (metadata still syncs).
+class _QuotaSkip implements Exception {
+  const _QuotaSkip();
 }
 
 /// Two-Way Sync Engine implementing the offline-first synchronization algorithm with Delta Sync & Batching
@@ -1296,6 +1315,7 @@ class SyncEngine extends StateNotifier<SyncState> {
 
       final isProUser = PreferencesService.instance.isProUser(uid: uid);
       int runningVaultBytes = await _dbHelper.getTotalVaultStorageBytes(userId: uid);
+      int quotaSkippedFiles = 0;
 
       for (final localDoc in localDocs) {
         var docToPush = localDoc;
@@ -1307,21 +1327,40 @@ class SyncEngine extends StateNotifier<SyncState> {
           if (!isFirebaseReady) continue;
           try {
             final f = File(docToPush.localImagePath);
-            if (f.existsSync()) {
-              var bytes = f.readAsBytesSync();
-              final rawBytes = SecurityService.instance.isEncrypted(bytes)
-                  ? await SecurityService.instance.decryptBytes(bytes, userId: docToPush.userId)
-                  : bytes;
+            // #10: async file IO so large vault files never block the UI thread (ANR).
+            if (await f.exists()) {
+              final bytes = await f.readAsBytes();
+              final security = SecurityService.instance;
+              // Files already in the current AES-GCM format (encrypted with this user's key at
+              // add time) are uploaded as-is; legacy/plain files are (re-)encrypted once.
+              final alreadyGcm = security.isGcmEncrypted(bytes);
+              final plainSize = alreadyGcm
+                  ? bytes.length -
+                      SecurityService.headerLength -
+                      SecurityService.gcmNonceLength -
+                      SecurityService.gcmTagLength
+                  : null;
 
-              // Enforce 10 MB single file size limit & storage quota (50MB Free / 5GB Pro)
-              if (rawBytes.length > ProFeatureGate.kMaxSingleFileBytes ||
-                  !ProFeatureGate.canSyncToCloud(isPro: isProUser, totalCloudBytes: runningVaultBytes + rawBytes.length)) {
-                debugPrint('[SyncEngine] Storage quota or file size limit reached for doc ${docToPush.id}. Skipping upload.');
-                continue;
+              Uint8List? rawBytes;
+              if (!alreadyGcm) {
+                rawBytes = security.isEncrypted(bytes)
+                    ? await security.decryptBytes(bytes, userId: docToPush.userId)
+                    : bytes;
+              }
+              final fileSize = plainSize ?? rawBytes!.length;
+
+              // #14: 10 MB single-file limit & cloud quota (50MB Free / 5GB Pro). Skip ONLY the
+              // file upload; metadata is still pushed below and the UI gets a quota flag.
+              if (fileSize > ProFeatureGate.kMaxSingleFileBytes ||
+                  !ProFeatureGate.canSyncToCloud(isPro: isProUser, totalCloudBytes: runningVaultBytes + fileSize)) {
+                debugPrint('[SyncEngine] Cloud quota / file size limit reached for doc ${docToPush.id}. Skipping file upload only.');
+                quotaSkippedFiles++;
+                throw const _QuotaSkip();
               }
 
-              runningVaultBytes += rawBytes.length;
-              final encryptedBytes = await SecurityService.instance.encryptBytes(rawBytes, userId: uid);
+              runningVaultBytes += fileSize;
+              final encryptedBytes = alreadyGcm ? bytes : await security.encryptBytes(rawBytes!, userId: uid);
+              final rawLength = fileSize;
               final ext = p.extension(docToPush.localImagePath).replaceAll('.', '').toLowerCase();
               final storagePath = 'users/$uid/vault/${docToPush.id}.bin';
 
@@ -1333,18 +1372,20 @@ class SyncEngine extends StateNotifier<SyncState> {
                 );
               } catch (storageErr) {
                 debugPrint('[SyncEngine] Storage upload failed for ${docToPush.id}; retry on next sync: $storageErr');
-                runningVaultBytes -= rawBytes.length;
+                runningVaultBytes -= rawLength;
                 continue;
               }
               docToPush = docToPush.copyWith(
                 storagePath: storagePath,
-                fileSizeBytes: rawBytes.length,
+                fileSizeBytes: rawLength,
                 fileExtension: ext.isNotEmpty ? ext : (docToPush.isPdf ? 'pdf' : 'jpg'),
                 clearCloudData: true,
               );
               docsToUpsertLocal.add(docToPush);
               uploadedThisSync = true;
             }
+          } on _QuotaSkip {
+            // Fall through: metadata push still happens (file stays local until space is available).
           } catch (e) {
             debugPrint('[SyncEngine] Vault upload preparation failed for ${docToPush.id}; retry on next sync: $e');
             continue;
@@ -1883,11 +1924,13 @@ class SyncEngine extends StateNotifier<SyncState> {
         debugPrint('[SyncEngine] Storage metering update notice: $e');
       }
 
-      // Mark sync as completed and up to date
+      // Mark sync as completed and up to date (+ #14 cloud quota flag for the UI)
       state = state.copyWith(
         status: SyncStatus.upToDate,
         lastSyncTime: DateTime.fromMillisecondsSinceEpoch(syncStartTime),
         syncedCount: processedItems,
+        isCloudQuotaExceeded: quotaSkippedFiles > 0,
+        quotaSkippedFiles: quotaSkippedFiles,
       );
       _recordSyncLog(
         status: 'upToDate',

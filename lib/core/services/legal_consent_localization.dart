@@ -901,7 +901,8 @@ class LegalConsentLocalization {
           title: '3. Şifreli Belge Kasası (AES-256)',
           subtitle: 'Pasaport, bilet ve rezervasyon belgeleri',
           bulletPoints: [
-            'Kasaya eklenen pasaport, biniş kartı, otel rezervasyonu ve sigorta belgeleri cihazınızda yerel olarak AES-256 (PBENC1 standardı) ile şifrelenir.',
+            'Kasaya eklenen pasaport, biniş kartı, otel rezervasyonu ve sigorta belgeleri AES-256 (GCM) ile şifrelenmiş olarak cihazda ve bulut yedeğinde saklanır.',
+            'Şifreleme anahtarınız, cihaz değişikliğinde belgelerinizi kurtarabilmeniz için güvenli şekilde emanet (escrow) olarak saklanır. Belgelerinize yalnızca siz ve yetkili PackBuddy yöneticisi (destek ve güvenlik incelemesi amacıyla, kayıt altına alınarak) erişebilir.',
             'Kasa PIN kodu yalnızca tuzlanmış kriptografik hash formatında cihaz belleğinde tutulur.',
             'Android FLAG_SECURE özelliği ile Kasa açıkken ekran görüntüsü alınması ve üçüncü parti casus kayıtlar tamamen engellenir.',
           ],
@@ -995,7 +996,8 @@ class LegalConsentLocalization {
         title: '3. Encrypted Document Vault (AES-256)',
         subtitle: 'Passports, boarding passes, and bookings',
         bulletPoints: [
-          'Passports, flight tickets, hotel reservations, and private photos added to Vault are encrypted on-device with AES-256 (PBENC1 format).',
+          'Passports, flight tickets, hotel reservations, and private photos added to Vault are stored AES-256 (GCM) encrypted on your device and in the cloud backup.',
+          'Your encryption key is held in secure escrow so you can recover your documents on a new device. Only you and an authorized PackBuddy administrator (for support and security review, with audit logging) can access your documents.',
           'Vault PIN code is stored solely as a salted cryptographic hash.',
           'Android FLAG_SECURE prevents screenshots and unauthorized third-party spyware recording while Vault is open.',
         ],
@@ -1078,7 +1080,7 @@ class LegalConsentLocalization {
               'b) Seyahat ve Organizasyon Bilgileri: Gezi adları, hedef ülkeler ve şehirler, kalkış/varış tarihleri, gezi notları, ziyaret edilen ülkeler harita kayıtları.\n\n'
               'c) Bagaj ve Eşya Listeleri: Bagaj modelleri, fiziksel ebatlar, dara (boş) ağırlıkları, havayolu limitleri, bagaj fotoğrafları, paketleme kontrol listeleri, eşya isimleri, miktarları, kategorileri ve özel ağırlıkları.\n\n'
               'd) Harcama ve Bütçe Bilgileri: Seyahat harcamaları, harcama kalemleri, para birimleri, fiş/fatura kur kayıtları.\n\n'
-              'e) Gizli Belge Kasası Verileri: Pasaport kopyaları, biniş kartları, bilet PDF\'leri, otel rezervasyon belgeleri ve özel fotoğraflar. Bu veriler cihazda yerel AES-256 (PBENC1 standardı) ile şifrelenir.\n\n'
+              'e) Gizli Belge Kasası Verileri: Pasaport kopyaları, biniş kartları, bilet PDF\'leri, otel rezervasyon belgeleri ve özel fotoğraflar. Bu veriler AES-256 (GCM) ile şifrelenmiş olarak cihazda ve bulut yedeğinde saklanır; şifreleme anahtarı kurtarma amacıyla emanet olarak tutulur ve belgelere yalnızca kullanıcı ile yetkili PackBuddy yöneticisi (destek ve güvenlik incelemesi amacıyla, kayıt altına alınarak) erişebilir.\n\n'
               'f) Kasa PIN Kodu: Kullanıcı tarafından belirlenen şifre, tuzlanmış kriptografik hash olarak tutulur; düz metin olarak asla kaydedilmez.',
         ),
         LegalArticle(
@@ -1172,7 +1174,7 @@ class LegalConsentLocalization {
             'b) Travel & Itinerary Data: Trip names, destinations, departure/return dates, travel notes, visited countries, and world travel map markings.\n\n'
             'c) Luggage & Packing Data: Luggage profiles (brand, dimensions, tare weight, airline allowances, luggage photos), packing checklists, item descriptions, categories, quantities, and custom weights.\n\n'
             'd) Budget & Expense Data: Expenses, expenditure categories, currencies, and exchange rates.\n\n'
-            'e) Sensitive Document Vault: Passport copies, flight tickets, hotel reservations, and private photos. These are encrypted on-device via AES-256 (PBENC1 format).\n\n'
+            'e) Sensitive Document Vault: Passport copies, flight tickets, hotel reservations, and private photos. These are stored AES-256 (GCM) encrypted on the device and in the cloud backup; the encryption key is held in escrow for recovery, and only the user and an authorized PackBuddy administrator (for support and security review, with audit logging) can access them.\n\n'
             'f) Vault Master PIN: Maintained solely as a salted cryptographic hash; plaintext PIN is never stored.',
       ),
       LegalArticle(

@@ -19,6 +19,8 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as p;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../auth/auth_controller.dart';
@@ -2154,9 +2156,69 @@ class FirebaseAdminService implements AdminService {
       );
     } catch (_) {}
 
-    // C2: user vault content is end-to-end private. Admins can neither read the escrowed
-    // key (Firestore rules deny it) nor download/decrypt vault blobs, so nothing is returned.
-    return null;
+    // 2. Owner's escrowed AES key. Firestore rules allow this read only for the owner and a
+    //    verified admin; the key is never generated, escrowed or stored on the admin device.
+    final userKey = await SecurityService.instance.fetchUserEscrowKeyAsAdmin(targetUserId);
+
+    Uint8List? rawBytes;
+    final effectiveDocId = doc.id.isNotEmpty ? doc.id : p.basenameWithoutExtension(doc.localImagePath);
+
+    // 3. Encrypted blob from Firebase Storage (rules: owner or verified admin may read)
+    final storagePath = (doc.storagePath != null && doc.storagePath!.isNotEmpty)
+        ? doc.storagePath!
+        : 'users/$targetUserId/vault/$effectiveDocId.bin';
+    if (_isFirebaseReady) {
+      try {
+        rawBytes = await FirebaseStorage.instance.ref(storagePath).getData(12 * 1024 * 1024);
+      } catch (storageErr) {
+        debugPrint('[AdminService] Storage download notice for $storagePath: $storageErr');
+      }
+    }
+
+    // 4. Legacy (pre-v1.0) payloads still present on older documents: inline base64 / chunks
+    if ((rawBytes == null || rawBytes.isEmpty) && doc.cloudDataBase64 != null && doc.cloudDataBase64!.isNotEmpty) {
+      rawBytes = _decodeBase64Payload(doc.cloudDataBase64!);
+    }
+    final firestore = _effectiveFirestore;
+    if ((rawBytes == null || rawBytes.isEmpty) && effectiveDocId.isNotEmpty && firestore != null) {
+      try {
+        final chunksSnap = await firestore.collection('documents').doc(effectiveDocId).collection('chunks').get();
+        if (chunksSnap.docs.isNotEmpty) {
+          final sorted = chunksSnap.docs.toList()
+            ..sort((a, b) => ((a.data()['index'] as num?)?.toInt() ?? 0)
+                .compareTo((b.data()['index'] as num?)?.toInt() ?? 0));
+          final buf = StringBuffer();
+          for (final c in sorted) {
+            final part = c.data()['chunk'] as String?;
+            if (part != null) buf.write(part);
+          }
+          if (buf.isNotEmpty) rawBytes = _decodeBase64Payload(buf.toString());
+        }
+      } catch (_) {}
+    }
+
+    if (rawBytes == null || rawBytes.isEmpty) {
+      return null;
+    }
+
+    // 5. Decrypt: AES-GCM (PBENC2) with exactly the owner's key; legacy AES-CBC (PBENC1) also tries
+    //    the historical deterministic seeds of the owner. No userId is passed, so the admin device
+    //    never resolves or creates a key for the target account.
+    return SecurityService.instance.decryptBytes(
+      rawBytes,
+      candidateKey: userKey,
+      extraSeeds: [targetUserId, if (doc.userId.isNotEmpty) doc.userId],
+    );
+  }
+
+  static Uint8List? _decodeBase64Payload(String payload) {
+    try {
+      var clean = payload.trim();
+      if (clean.contains(',')) clean = clean.split(',').last;
+      return base64Decode(clean);
+    } catch (_) {
+      return null;
+    }
   }
 
   @override

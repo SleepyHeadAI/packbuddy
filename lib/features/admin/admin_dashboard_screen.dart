@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:open_filex/open_filex.dart';
@@ -13,7 +12,6 @@ import '../../core/services/security_service.dart';
 import '../../core/services/email_dispatch_service.dart';
 import '../../core/utils/date_formatter.dart';
 import '../../core/theme/app_colors.dart';
-import '../../data/local_db/database_helper.dart';
 import '../../data/sync_engine/sync_engine.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/app_card.dart';
@@ -7902,17 +7900,10 @@ class _AdminVaultInspectDialogState extends ConsumerState<_AdminVaultInspectDial
   int _pdfCurrentPage = 1;
   bool _isDeleting = false;
 
-  /// C2: vault document content is never shown to admins (metadata/delete only).
-  static final bool _adminVaultContentAccessEnabled = false;
-
   @override
   void initState() {
     super.initState();
-    if (!_adminVaultContentAccessEnabled) {
-      _isLoading = false;
-      _errorMessage = 'Kasa belgeleri uçtan uca şifrelidir; içerik admin panelinde görüntülenemez.';
-      return;
-    }
+    // Legacy (pre-v1.0) documents may still carry an unencrypted inline payload.
     if (widget.doc.cloudDataBase64 != null && widget.doc.cloudDataBase64!.isNotEmpty) {
       try {
         var cleanB64 = widget.doc.cloudDataBase64!.trim();
@@ -7934,14 +7925,17 @@ class _AdminVaultInspectDialogState extends ConsumerState<_AdminVaultInspectDial
     }
   }
 
+  static bool _isRenderable(Uint8List? bytes) =>
+      bytes != null &&
+      bytes.isNotEmpty &&
+      (SecurityService.isImageBytes(bytes) ||
+          SecurityService.isPdfBytes(bytes) ||
+          !SecurityService.instance.isEncrypted(bytes));
+
+  /// Loads and decrypts a user's AES-256 encrypted vault document for verified admins.
+  /// The owner's key is only read from the escrow (rules: owner or verified admin) and is never
+  /// generated, stored or used to re-encrypt anything on the admin device.
   Future<void> _loadDocumentBytes({bool forceCloud = false}) async {
-    if (!_adminVaultContentAccessEnabled) {
-      setState(() {
-        _isLoading = false;
-        _errorMessage = 'Kasa belgeleri uçtan uca şifrelidir; içerik admin panelinde görüntülenemez.';
-      });
-      return;
-    }
     final isTr = mounted ? (Localizations.maybeLocaleOf(context)?.languageCode == 'tr') : false;
     setState(() {
       _isLoading = true;
@@ -7960,104 +7954,25 @@ class _AdminVaultInspectDialogState extends ConsumerState<_AdminVaultInspectDial
           ? widget.doc.id
           : p.basenameWithoutExtension(widget.doc.localImagePath);
 
-      // 0. Super Admin Decrypted Viewer via AdminService (Firebase Storage + Key Escrow + Audit Logging)
+      // 1. AdminService: Firebase Storage blob (AES-GCM / legacy AES-CBC) + legacy inline/chunk
+      //    payloads, decrypted with the owner's escrowed key. Audit-logged.
       try {
         final adminBytes = await ref.read(adminServiceProvider).viewUserDocumentDecrypted(
-          targetUserId: targetUid,
-          doc: widget.doc,
-        );
-        if (adminBytes != null && adminBytes.isNotEmpty) {
-          if (!SecurityService.instance.isEncrypted(adminBytes) ||
-              SecurityService.isImageBytes(adminBytes) ||
-              SecurityService.isPdfBytes(adminBytes)) {
-            resolvedBytes = adminBytes;
-          }
-        }
+              targetUserId: targetUid,
+              doc: widget.doc,
+            );
+        if (_isRenderable(adminBytes)) resolvedBytes = adminBytes;
       } catch (adminViewerErr) {
         debugPrint('[_AdminVaultInspectDialog] admin viewer notice: $adminViewerErr');
       }
 
-      // 1. Direct cloud base64 payload from widget.doc (if present and not forcing clean cloud fetch)
-      if (!forceCloud && widget.doc.cloudDataBase64 != null && widget.doc.cloudDataBase64!.isNotEmpty) {
-        try {
-          var cleanB64 = widget.doc.cloudDataBase64!.trim();
-          if (cleanB64.contains(',')) cleanB64 = cleanB64.split(',').last;
-          final decoded = base64Decode(cleanB64);
-          if (decoded.isNotEmpty) {
-            if (SecurityService.isImageBytes(decoded) || SecurityService.isPdfBytes(decoded)) {
-              resolvedBytes = decoded;
-            } else {
-              final decrypted = await SecurityService.instance.decryptBytes(
-                decoded,
-                userId: targetUid,
-                extraSeeds: candidateSeeds.toList(),
-              );
-              if (!SecurityService.instance.isEncrypted(decrypted) ||
-                  SecurityService.isImageBytes(decrypted) ||
-                  SecurityService.isPdfBytes(decrypted)) {
-                resolvedBytes = decrypted;
-              } else {
-                resolvedBytes = decoded;
-              }
-            }
-          }
-        } catch (e) {
-          debugPrint('[_AdminVaultInspectDialog] direct cloudDataBase64 decode notice: $e');
-        }
-      }
-
-      // 1.5. Direct fetch of remote Firestore document documents/{effectiveDocId}
-      // Vital when cloudDataBase64 was updated after initial load or on forced cloud refresh
-      if (resolvedBytes == null || resolvedBytes.isEmpty) {
-        if (effectiveDocId.isNotEmpty) {
-          try {
-            final remoteSnap = await FirebaseFirestore.instance
-                .collection('documents')
-                .doc(effectiveDocId)
-                .get();
-            if (remoteSnap.exists && remoteSnap.data() != null) {
-              final data = remoteSnap.data()!;
-              final remoteB64 = (data['cloudDataBase64'] ?? data['cloud_data_base64']) as String?;
-              if (remoteB64 != null && remoteB64.isNotEmpty) {
-                var cleanB64 = remoteB64.trim();
-                if (cleanB64.contains(',')) cleanB64 = cleanB64.split(',').last;
-                final decoded = base64Decode(cleanB64);
-                if (decoded.isNotEmpty) {
-                  if (SecurityService.isImageBytes(decoded) || SecurityService.isPdfBytes(decoded)) {
-                    resolvedBytes = decoded;
-                  } else {
-                    final decrypted = await SecurityService.instance.decryptBytes(
-                      decoded,
-                      userId: targetUid,
-                      extraSeeds: candidateSeeds.toList(),
-                    );
-                    if (!SecurityService.instance.isEncrypted(decrypted) ||
-                        SecurityService.isImageBytes(decrypted) ||
-                        SecurityService.isPdfBytes(decrypted)) {
-                      resolvedBytes = decrypted;
-                    } else {
-                      resolvedBytes = decoded;
-                    }
-                  }
-                }
-              }
-            }
-          } catch (e) {
-            debugPrint('[_AdminVaultInspectDialog] direct remote doc get notice: $e');
-          }
-        }
-      }
-
-      // 2. Local device file check (if not forcing cloud)
-      if (!forceCloud && (resolvedBytes == null || resolvedBytes.isEmpty)) {
+      // 2. Local copy on this device (e.g. the admin inspecting their own document)
+      if (!forceCloud && resolvedBytes == null) {
         File? localFile;
         if (widget.doc.localImagePath.isNotEmpty) {
           final f = File(widget.doc.localImagePath);
-          if (await f.exists()) {
-            localFile = f;
-          }
+          if (await f.exists()) localFile = f;
         }
-        // Fallback: search in app documents vault / vault_docs by basename and doc id
         if (localFile == null) {
           try {
             final appDir = await getApplicationDocumentsDirectory();
@@ -8082,165 +7997,20 @@ class _AdminVaultInspectDialogState extends ConsumerState<_AdminVaultInspectDial
         if (localFile != null) {
           try {
             final rawBytes = await localFile.readAsBytes();
-            if (rawBytes.isNotEmpty) {
-              if (SecurityService.isImageBytes(rawBytes) || SecurityService.isPdfBytes(rawBytes)) {
-                resolvedBytes = rawBytes;
-              } else {
-                final decrypted = await SecurityService.instance.decryptBytes(
-                  rawBytes,
-                  userId: targetUid,
-                  extraSeeds: candidateSeeds.toList(),
-                );
-                if (!SecurityService.instance.isEncrypted(decrypted) ||
-                    SecurityService.isImageBytes(decrypted) ||
-                    SecurityService.isPdfBytes(decrypted)) {
-                  resolvedBytes = decrypted;
-                } else {
-                  resolvedBytes = rawBytes;
-                }
-              }
+            if (SecurityService.isImageBytes(rawBytes) || SecurityService.isPdfBytes(rawBytes)) {
+              resolvedBytes = rawBytes;
+            } else if (rawBytes.isNotEmpty) {
+              final ownerKey = await SecurityService.instance.fetchUserEscrowKeyAsAdmin(targetUid);
+              final decrypted = await SecurityService.instance.decryptBytes(
+                rawBytes,
+                candidateKey: ownerKey,
+                extraSeeds: candidateSeeds.toList(),
+              );
+              if (_isRenderable(decrypted)) resolvedBytes = decrypted;
             }
           } catch (e) {
             debugPrint('[_AdminVaultInspectDialog] local file read/decrypt notice: $e');
           }
-        }
-      }
-
-      // 3. Firestore chunks subcollection (documents/{id}/chunks)
-      // Canonical cloud source of truth for documents > 500KB (up to 10MB)
-      if ((resolvedBytes == null || resolvedBytes.isEmpty) && effectiveDocId.isNotEmpty) {
-        try {
-          QuerySnapshot<Map<String, dynamic>>? chunksSnap;
-          try {
-            chunksSnap = await FirebaseFirestore.instance
-                .collection('documents')
-                .doc(effectiveDocId)
-                .collection('chunks')
-                .orderBy('index')
-                .get();
-          } catch (e) {
-            debugPrint('[_AdminVaultInspectDialog] ordered chunks query notice, trying unindexed get: $e');
-            chunksSnap = await FirebaseFirestore.instance
-                .collection('documents')
-                .doc(effectiveDocId)
-                .collection('chunks')
-                .get();
-          }
-
-          if (chunksSnap.docs.isNotEmpty) {
-            final sortedDocs = chunksSnap.docs.toList()
-              ..sort((a, b) {
-                final idxA = (a.data()['index'] as num?)?.toInt() ?? 0;
-                final idxB = (b.data()['index'] as num?)?.toInt() ?? 0;
-                return idxA.compareTo(idxB);
-              });
-            final buffer = StringBuffer();
-            for (final c in sortedDocs) {
-              final piece = c.data()['chunk'] as String?;
-              if (piece != null && piece.isNotEmpty) buffer.write(piece);
-            }
-            final chunkedStr = buffer.toString().trim();
-            if (chunkedStr.isNotEmpty) {
-              var cleanChunked = chunkedStr;
-              if (cleanChunked.contains(',')) cleanChunked = cleanChunked.split(',').last;
-              final decoded = base64Decode(cleanChunked);
-              if (decoded.isNotEmpty) {
-                if (SecurityService.isImageBytes(decoded) || SecurityService.isPdfBytes(decoded)) {
-                  resolvedBytes = decoded;
-                } else {
-                  final decrypted = await SecurityService.instance.decryptBytes(
-                    decoded,
-                    userId: targetUid,
-                    extraSeeds: candidateSeeds.toList(),
-                  );
-                  if (!SecurityService.instance.isEncrypted(decrypted) ||
-                      SecurityService.isImageBytes(decrypted) ||
-                      SecurityService.isPdfBytes(decrypted)) {
-                    resolvedBytes = decrypted;
-                  } else {
-                    resolvedBytes = decoded;
-                  }
-                }
-              }
-            }
-          }
-        } catch (e) {
-          debugPrint('[_AdminVaultInspectDialog] chunks loading notice: $e');
-        }
-      }
-
-      // 4. Local SQLite database fallback (if admin and user share device/test database)
-      if (resolvedBytes == null || resolvedBytes.isEmpty) {
-        try {
-          VaultDocument? localDoc;
-          if (effectiveDocId.isNotEmpty) {
-            localDoc = await DatabaseHelper.instance.getDocumentById(effectiveDocId);
-          }
-          if (localDoc == null && targetUid.isNotEmpty) {
-            final userDocs = await DatabaseHelper.instance.getDocuments(userId: targetUid);
-            localDoc = userDocs.where((d) =>
-              (effectiveDocId.isNotEmpty && d.id == effectiveDocId) ||
-              d.title == widget.doc.title
-            ).firstOrNull;
-          }
-          if (localDoc != null) {
-            if (localDoc.cloudDataBase64 != null && localDoc.cloudDataBase64!.isNotEmpty) {
-              var cleanB64 = localDoc.cloudDataBase64!.trim();
-              if (cleanB64.contains(',')) cleanB64 = cleanB64.split(',').last;
-              final decoded = base64Decode(cleanB64);
-              if (SecurityService.isImageBytes(decoded) || SecurityService.isPdfBytes(decoded)) {
-                resolvedBytes = decoded;
-              } else {
-                final decrypted = await SecurityService.instance.decryptBytes(
-                  decoded,
-                  userId: targetUid,
-                  extraSeeds: candidateSeeds.toList(),
-                );
-                resolvedBytes = (!SecurityService.instance.isEncrypted(decrypted) ||
-                        SecurityService.isImageBytes(decrypted) ||
-                        SecurityService.isPdfBytes(decrypted))
-                    ? decrypted
-                    : decoded;
-              }
-            } else if (localDoc.localImagePath.isNotEmpty) {
-              final f = File(localDoc.localImagePath);
-              if (await f.exists()) {
-                final rawBytes = await f.readAsBytes();
-                if (SecurityService.isImageBytes(rawBytes) || SecurityService.isPdfBytes(rawBytes)) {
-                  resolvedBytes = rawBytes;
-                } else {
-                  final decrypted = await SecurityService.instance.decryptBytes(
-                    rawBytes,
-                    userId: targetUid,
-                    extraSeeds: candidateSeeds.toList(),
-                  );
-                  resolvedBytes = (!SecurityService.instance.isEncrypted(decrypted) ||
-                          SecurityService.isImageBytes(decrypted) ||
-                          SecurityService.isPdfBytes(decrypted))
-                      ? decrypted
-                      : rawBytes;
-                }
-              }
-            }
-          }
-        } catch (e) {
-          debugPrint('[_AdminVaultInspectDialog] local fallback notice: $e');
-        }
-      }
-
-      // 5. Final decryption attempt if resolved bytes still have PBENC1 header
-      if (resolvedBytes != null && SecurityService.instance.isEncrypted(resolvedBytes)) {
-        final decrypted = await SecurityService.instance.decryptBytes(
-          resolvedBytes,
-          userId: targetUid,
-          extraSeeds: candidateSeeds.toList(),
-        );
-        if (!SecurityService.instance.isEncrypted(decrypted) ||
-            SecurityService.isImageBytes(decrypted) ||
-            SecurityService.isPdfBytes(decrypted)) {
-          resolvedBytes = decrypted;
-        } else {
-          resolvedBytes = null; // Guard against passing raw ciphertext to Image.memory
         }
       }
 
@@ -8249,22 +8019,11 @@ class _AdminVaultInspectDialogState extends ConsumerState<_AdminVaultInspectDial
           setState(() {
             _isLoading = false;
             _errorMessage = isTr
-                ? 'Belge verisi (cloud payload) henüz eşitlenmemiş veya cihazda bulunamadı.'
-                : 'Document payload is not yet synced or available on this device.';
+                ? 'Belge henüz buluta yüklenmemiş veya şifresi çözülemedi.'
+                : 'Document is not uploaded yet or could not be decrypted.';
           });
         }
         return;
-      }
-
-      // Auto-repair local file with correctly decrypted/re-encrypted bytes if local file was missing or broken
-      if (!SecurityService.instance.isEncrypted(resolvedBytes) && widget.doc.localImagePath.isNotEmpty) {
-        try {
-          final f = File(widget.doc.localImagePath);
-          final parent = f.parent;
-          if (!await parent.exists()) await parent.create(recursive: true);
-          final reEncrypted = await SecurityService.instance.encryptBytes(resolvedBytes, userId: targetUid);
-          await f.writeAsBytes(reEncrypted);
-        } catch (_) {}
       }
 
       if (!mounted) return;

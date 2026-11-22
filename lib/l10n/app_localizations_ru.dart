@@ -1400,7 +1400,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get vaultCloudBackupNotice =>
-      'Документы зашифрованы и сохраняются в облаке для синхронизации, 15-дневного восстановления и безопасности.';
+      'Документы хранятся в зашифрованном виде (AES-256) и копируются в облако для синхронизации между устройствами и восстановления.';
 
   @override
   String get deleteAccountTitle => 'Удалить аккаунт';

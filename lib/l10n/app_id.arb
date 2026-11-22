@@ -439,7 +439,7 @@
   "templateCampingDesc": "Peralatan luar ruangan tangguh untuk berkemah dengan tenda dan trekking",
   "templateCityTitle": "Wisata Akhir Pekan di Kota",
   "templateCityDesc": "Ransel ringkas dan praktis untuk liburan kota selama 2-3 hari",
-  "vaultCloudBackupNotice": "Dokumen dienkripsi & dicadangkan ke penyimpanan cloud untuk sinkronisasi antar perangkat, pemulihan 15 hari, dan kepatuhan keamanan.",
+  "vaultCloudBackupNotice": "Dokumen disimpan dengan enkripsi AES-256 dan dicadangkan ke cloud untuk sinkronisasi antarperangkat dan pemulihan.",
   "deleteAccountTitle": "Hapus Akun",
   "accountRestoredNotice": "Selamat datang kembali! Penghapusan akun dibatalkan dan seluruh data Anda telah dipulihkan.",
   "adminPendingDeletionBadge": "Dijadwalkan untuk dihapus (sisa {days} hari)",

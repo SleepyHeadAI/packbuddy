@@ -13,23 +13,24 @@ service firebase.storage {
       );
     }
 
-    // Encrypted Vault Documents: strictly accessible by the owning user only (C2).
-    // Admins can never read or overwrite vault blobs; they may only delete them during account purge.
+    // AES-256 encrypted vault documents: readable by the owner and a verified admin (inspection).
+    // Only the owner can write; admins may additionally delete during account purge.
     // Server-side enforcement of maximum single file size (10 MB = 10 * 1024 * 1024 bytes)
     match /users/{userId}/vault/{docId} {
-      allow read: if isAuthenticated() && request.auth.uid == userId;
+      allow read: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
       allow write: if isAuthenticated() && request.auth.uid == userId && request.resource.size <= 10 * 1024 * 1024;
       allow delete: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
     }
 
     match /users/{userId}/vault/{docId}/{allPaths=**} {
-      allow read: if isAuthenticated() && request.auth.uid == userId;
+      allow read: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
       allow write: if isAuthenticated() && request.auth.uid == userId && request.resource.size <= 10 * 1024 * 1024;
       allow delete: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
     }
 
     // Default deny for all other paths unless verified Super Admin.
-    // Vault paths (users/{uid}/vault/**) are excluded so admin cannot read/write them through this fallback.
+    // Vault paths (users/{uid}/vault/**) are excluded here: their access is defined explicitly above
+    // (admin may read/delete but never write vault blobs).
     match /{allPaths=**} {
       allow read, write: if isAdmin() && (allPaths[0] != 'users' || allPaths[2] != 'vault');
     }

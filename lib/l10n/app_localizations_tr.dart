@@ -1401,7 +1401,7 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get vaultCloudBackupNotice =>
-      'Belgeler; cihazlar arası eşitleme, 15 günlük hesap kurtarma ve güvenlik uyumluluğu için buluta güvenle yedeklenir.';
+      'Belgeler AES-256 şifreli olarak saklanır ve cihazlar arası eşitleme ile kurtarma için buluta yedeklenir.';
 
   @override
   String get deleteAccountTitle => 'Hesabı Sil';
