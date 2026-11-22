@@ -13,19 +13,33 @@ service firebase.storage {
       );
     }
 
-    // AES-256 encrypted vault documents: readable by the owner and a verified admin (inspection).
-    // Only the owner can write; admins may additionally delete during account purge.
-    // Server-side enforcement of maximum single file size (10 MB = 10 * 1024 * 1024 bytes)
-    match /users/{userId}/vault/{docId} {
-      allow read: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
-      allow write: if isAuthenticated() && request.auth.uid == userId && request.resource.size <= 10 * 1024 * 1024;
-      allow delete: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
     }
 
+    // #6: the app only ever uploads AES-encrypted blobs as
+    //   users/{uid}/vault/{documentId}.bin   (contentType application/octet-stream)
+    // where documentId is a UUID. 10 MB plaintext limit + AES-GCM envelope overhead
+    // (6-byte header + 12-byte nonce + 16-byte tag), with a small margin.
+    function isValidVaultUpload(docId) {
+      return docId.matches('^[A-Za-z0-9_-]{1,64}[.]bin$') &&
+        request.resource.contentType == 'application/octet-stream' &&
+        request.resource.size > 0 &&
+        request.resource.size <= 10 * 1024 * 1024 + 64;
+    }
+
+    // AES-256 encrypted vault documents: readable by the owner and a verified admin (inspection).
+    // Only the owner can create/replace (validated format); admins may additionally delete during purge.
+    match /users/{userId}/vault/{docId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create, update: if isOwner(userId) && isValidVaultUpload(docId);
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+
+    // Nested paths are never written by the app; legacy objects stay readable/deletable.
     match /users/{userId}/vault/{docId}/{allPaths=**} {
-      allow read: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
-      allow write: if isAuthenticated() && request.auth.uid == userId && request.resource.size <= 10 * 1024 * 1024;
-      allow delete: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
+      allow read: if isOwner(userId) || isAdmin();
+      allow delete: if isOwner(userId) || isAdmin();
     }
 
     // Default deny for all other paths unless verified Super Admin.

@@ -508,7 +508,9 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
             views.setOnClickPendingIntent(R.id.widget_container, pendingIntent)
 
             fun makeBroadcastPendingIntent(action: String, actionCode: Int): PendingIntent {
-                val intent = Intent(context, receiverClass).apply {
+                // #17: in-app widget actions go to the non-exported PackBuddyWidgetActionReceiver,
+                // so other apps on the device cannot trigger them (e.g. inject fake expenses).
+                val intent = Intent(context, PackBuddyWidgetActionReceiver::class.java).apply {
                     this.action = action
                     putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
                 }
@@ -1208,7 +1210,14 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
     }
 
     override fun onReceive(context: Context, intent: Intent) {
+        // This provider is exported (required for APPWIDGET_UPDATE from the launcher). Custom
+        // actions sent to it directly are ignored (#17); they are only accepted through the
+        // non-exported [PackBuddyWidgetActionReceiver], which calls [handleWidgetAction].
         super.onReceive(context, intent)
+    }
+
+    /** Executes a widget button action. Only invoked by [PackBuddyWidgetActionReceiver]. */
+    fun handleWidgetAction(context: Context, intent: Intent) {
         val action = intent.action ?: return
         val appWidgetManager = AppWidgetManager.getInstance(context)
         val widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)

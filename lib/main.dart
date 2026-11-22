@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:flutter/foundation.dart';
 import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
 import 'core/l10n/locale_provider.dart';
@@ -40,6 +42,18 @@ void main() async {
     );
   } catch (e) {
     debugPrint('[Firebase] Initialization notice: $e');
+  }
+
+  // #20 Firebase App Check: Play Integrity in release, debug provider otherwise.
+  // Never blocks startup; failures are only logged. (Enforcement is switched on in the console.)
+  try {
+    if (Firebase.apps.isNotEmpty) {
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: kReleaseMode ? AndroidProvider.playIntegrity : AndroidProvider.debug,
+      );
+    }
+  } catch (e) {
+    debugPrint('[AppCheck] Activation notice: $e');
   }
 
   // Initialize PostHog EU Cloud with Session Replay & PII text masking

@@ -94,7 +94,26 @@ class _QuotaSkip implements Exception {
 }
 
 /// Two-Way Sync Engine implementing the offline-first synchronization algorithm with Delta Sync & Batching
-class SyncEngine extends StateNotifier<SyncState> {
+class SyncEngine extends StateNotifier<SyncState> with WidgetsBindingObserver {
+  /// Billing protection (#1): background heartbeat every 30 min, only while the app is in the foreground.
+  static const Duration heartbeatInterval = Duration(minutes: 30);
+
+  /// Delta queries look back this much before last_synced_at to tolerate device clock skew.
+  static const int deltaSafetyMarginMs = 5 * 60 * 1000;
+
+  /// users/{uid}.lastActiveAt is written at most this often (#3).
+  static const Duration lastActiveWriteInterval = Duration(hours: 1);
+
+  /// Firestore `whereIn` accepts at most 30 values.
+  static const int whereInChunkSize = 30;
+
+  /// Latest users/{uid} snapshot from the live listener; reused by sync instead of an extra get() (#4).
+  Map<String, dynamic>? _latestUserDocData;
+  String? _latestUserDocUid;
+  DateTime? _lastActiveWrittenAt;
+  int? _lastReportedVaultBytes;
+  bool _lifecycleObserverRegistered = false;
+
   final DatabaseHelper _dbHelper;
   final FirebaseFirestore? _firestoreInstance;
   final FirebaseAuth? _authInstance;
@@ -124,7 +143,37 @@ class SyncEngine extends StateNotifier<SyncState> {
         _storageInstance = storage,
         super(const SyncState()) {
     _initConnectivityListener();
+    _registerLifecycleObserver();
     _startPeriodicHeartbeat();
+  }
+
+  void _registerLifecycleObserver() {
+    if (_isTestEnvironment) return;
+    try {
+      WidgetsBinding.instance.addObserver(this);
+      _lifecycleObserverRegistered = true;
+    } catch (_) {}
+  }
+
+  bool get _isAppInForeground {
+    try {
+      final lifecycle = WidgetsBinding.instance.lifecycleState;
+      return lifecycle == null || lifecycle == AppLifecycleState.resumed;
+    } catch (_) {
+      return true;
+    }
+  }
+
+  @override
+  // ignore: avoid_renaming_method_parameters
+  void didChangeAppLifecycleState(AppLifecycleState lifecycle) {
+    if (lifecycle == AppLifecycleState.resumed) {
+      _startPeriodicHeartbeat();
+    } else {
+      // Paused / hidden / detached: no background Firestore traffic.
+      _heartbeatTimer?.cancel();
+      _heartbeatTimer = null;
+    }
   }
 
   bool get _isTestEnvironment {
@@ -173,12 +222,13 @@ class SyncEngine extends StateNotifier<SyncState> {
     });
   }
 
-  /// Periodic silent background heartbeat (every 5 minutes) to sync multi-device modifications
+  /// Periodic silent heartbeat (every 30 minutes, foreground only) to pick up multi-device changes.
   void _startPeriodicHeartbeat() {
     if (_isTestEnvironment) return;
     _heartbeatTimer?.cancel();
-    _heartbeatTimer = Timer.periodic(const Duration(minutes: 5), (_) {
-      if (mounted && !_isSyncing && state.status != SyncStatus.syncing) {
+    if (!_isAppInForeground) return;
+    _heartbeatTimer = Timer.periodic(heartbeatInterval, (_) {
+      if (mounted && _isAppInForeground && !_isSyncing && state.status != SyncStatus.syncing) {
         performSync();
       }
     });
@@ -218,6 +268,8 @@ class SyncEngine extends StateNotifier<SyncState> {
       (snapshot) async {
         if (snapshot.exists && snapshot.data() != null) {
           final data = snapshot.data()!;
+          _latestUserDocData = Map<String, dynamic>.from(data);
+          _latestUserDocUid = uid;
           // A1: only react when a Pro entitlement field is actually present; a false remote
           // flag never revokes a store (Google Play) purchase.
           if (ProEntitlementService.hasRemoteProKey(data)) {
@@ -658,6 +710,11 @@ class SyncEngine extends StateNotifier<SyncState> {
     _debounceTimer?.cancel();
     _heartbeatTimer?.cancel();
     _retryTimer?.cancel();
+    if (_lifecycleObserverRegistered) {
+      try {
+        WidgetsBinding.instance.removeObserver(this);
+      } catch (_) {}
+    }
     super.dispose();
   }
 
@@ -786,21 +843,31 @@ class SyncEngine extends StateNotifier<SyncState> {
 
       final firestore = _firestoreInstance ?? FirebaseFirestore.instance;
 
-      // Update lastActiveAt in Firestore
-      try {
-        await firestore.collection('users').doc(uid).set({
-          'lastActiveAt': DateTime.now().toIso8601String(),
-        }, SetOptions(merge: true));
-      } catch (_) {}
+      // Update lastActiveAt in Firestore at most once per [lastActiveWriteInterval] (#3)
+      final nowForActive = DateTime.now();
+      if (_lastActiveWrittenAt == null ||
+          nowForActive.difference(_lastActiveWrittenAt!) >= lastActiveWriteInterval) {
+        try {
+          await firestore.collection('users').doc(uid).set({
+            'lastActiveAt': nowForActive.toIso8601String(),
+          }, SetOptions(merge: true));
+          _lastActiveWrittenAt = nowForActive;
+        } catch (_) {}
+      }
 
       // Remote Pro Status Sync (A3): server data is applied through the Keystore-backed
       // entitlement service. Plaintext SharedPreferences is never an input, and
       // `lastVerifiedAt` is only refreshed when the server actually grants Pro.
       try {
-        final userDoc = await firestore.collection('users').doc(uid).get();
+        // #4: reuse the live listener's snapshot when available instead of an extra get().
+        Map<String, dynamic>? userData =
+            (_userDocSubscription != null && _latestUserDocUid == uid) ? _latestUserDocData : null;
+        if (userData == null) {
+          final userDoc = await firestore.collection('users').doc(uid).get();
+          userData = userDoc.exists ? userDoc.data() : null;
+        }
         bool? resolvedIsPro;
-        if (userDoc.exists && userDoc.data() != null) {
-          final userData = userDoc.data()!;
+        if (userData != null) {
           if (ProEntitlementService.hasRemoteProKey(userData)) {
             resolvedIsPro = await ProEntitlementService.instance.applyRemoteEntitlement(
               remoteIsPro: ProEntitlementService.remoteProValue(userData),
@@ -1077,8 +1144,22 @@ class SyncEngine extends StateNotifier<SyncState> {
       // Multi-tenant & Delta Sync with WriteBatch & SQLite Transactions
       // ===================================================================
 
+      // #1 Real delta sync: after the first full sync only documents changed since
+      // last_synced_at (minus a clock-skew margin) are read. Needs composite indexes
+      // (owner field + updated_at); if one is missing the query falls back to a full read.
+      final int deltaSince = lastSyncedAt > 0 ? lastSyncedAt - deltaSafetyMarginMs : 0;
+
+      Future<QuerySnapshot<Map<String, dynamic>>> getWithDelta(Query<Map<String, dynamic>> base) async {
+        if (deltaSince <= 0) return base.get();
+        try {
+          return await base.where('updated_at', isGreaterThan: deltaSince).get();
+        } catch (e) {
+          debugPrint('[SyncEngine] Delta query fallback to full read (index missing?): $e');
+          return base.get();
+        }
+      }
+
       // Helper to fetch documents from Firestore supporting both snake_case (user_id) and camelCase (userId).
-      // Uses single-field equality filters to avoid requiring Firestore composite indexes (FAILED_PRECONDITION).
       Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchDualDocs(
         String collectionName,
       ) async {
@@ -1086,10 +1167,9 @@ class SyncEngine extends StateNotifier<SyncState> {
 
         // Query 1: user_id == uid (primary snake_case column)
         try {
-          final snap1 = await firestore
+          final snap1 = await getWithDelta(firestore
               .collection(collectionName)
-              .where('user_id', isEqualTo: uid)
-              .get();
+              .where('user_id', isEqualTo: uid));
           for (final doc in snap1.docs) {
             results[doc.id] = doc;
           }
@@ -1099,10 +1179,9 @@ class SyncEngine extends StateNotifier<SyncState> {
 
         // Query 2: userId == uid (legacy / cross-platform camelCase compatibility)
         try {
-          final snap2 = await firestore
+          final snap2 = await getWithDelta(firestore
               .collection(collectionName)
-              .where('userId', isEqualTo: uid)
-              .get();
+              .where('userId', isEqualTo: uid));
           for (final doc in snap2.docs) {
             results[doc.id] = doc;
           }
@@ -1134,10 +1213,9 @@ class SyncEngine extends StateNotifier<SyncState> {
 
       // Also pull collaborative trips where user is a participant
       try {
-        final collabSnap = await firestore
+        final collabSnap = await getWithDelta(firestore
             .collection('trips')
-            .where('collaborators', arrayContains: uid)
-            .get();
+            .where('collaborators', arrayContains: uid));
         for (final doc in collabSnap.docs) {
           try {
             final data = Map<String, dynamic>.from(doc.data());
@@ -1154,10 +1232,9 @@ class SyncEngine extends StateNotifier<SyncState> {
       final userEmail = _authInstance?.currentUser?.email ?? FirebaseAuth.instance.currentUser?.email;
       if (userEmail != null && userEmail.isNotEmpty) {
         try {
-          final collabEmailSnap = await firestore
+          final collabEmailSnap = await getWithDelta(firestore
               .collection('trips')
-              .where('collaborators', arrayContains: userEmail)
-              .get();
+              .where('collaborators', arrayContains: userEmail));
           for (final doc in collabEmailSnap.docs) {
             try {
               final data = Map<String, dynamic>.from(doc.data());
@@ -1229,14 +1306,15 @@ class SyncEngine extends StateNotifier<SyncState> {
         }
       }
 
-      // Also pull expenses for active shared trips
-      for (final t in localTrips) {
-        if (t.isCollaborative) {
+      // Also pull expenses for active shared trips (#2: one whereIn query per 30 trips, not N+1)
+      final sharedTripIds = localTrips.where((t) => t.isCollaborative).map((t) => t.id).toList();
+      for (var i = 0; i < sharedTripIds.length; i += whereInChunkSize) {
+        final chunk = sharedTripIds.sublist(i, (i + whereInChunkSize).clamp(0, sharedTripIds.length));
+        {
           try {
-            final sharedExpSnap = await firestore
+            final sharedExpSnap = await getWithDelta(firestore
                 .collection('expenses')
-                .where('trip_id', isEqualTo: t.id)
-                .get();
+                .where('trip_id', whereIn: chunk));
             for (final doc in sharedExpSnap.docs) {
               try {
                 final data = Map<String, dynamic>.from(doc.data());
@@ -1597,14 +1675,15 @@ class SyncEngine extends StateNotifier<SyncState> {
         }
       }
 
-      // Also pull itinerary items for active shared collaborative trips
-      for (final t in localTrips) {
-        if (t.isCollaborative) {
+      // Also pull itinerary items for active shared collaborative trips (#2: whereIn chunks of 30)
+      final sharedItinTripIds = localTrips.where((t) => t.isCollaborative).map((t) => t.id).toList();
+      for (var i = 0; i < sharedItinTripIds.length; i += whereInChunkSize) {
+        final chunk = sharedItinTripIds.sublist(i, (i + whereInChunkSize).clamp(0, sharedItinTripIds.length));
+        {
           try {
-            final sharedItinSnap = await firestore
+            final sharedItinSnap = await getWithDelta(firestore
                 .collection('itinerary_items')
-                .where('trip_id', isEqualTo: t.id)
-                .get();
+                .where('trip_id', whereIn: chunk));
             for (final doc in sharedItinSnap.docs) {
               try {
                 final data = Map<String, dynamic>.from(doc.data());
@@ -1913,13 +1992,20 @@ class SyncEngine extends StateNotifier<SyncState> {
       // 4. Meter and sync aggregate vault storage to users/{uid} profile in Firestore
       try {
         final totalStorage = await _dbHelper.getTotalVaultStorageBytes(userId: uid);
-        await firestore.collection('users').doc(uid).set(
-          {
-            'totalVaultStorageBytes': totalStorage,
-            'storage_updated_at': syncStartTime,
-          },
-          SetOptions(merge: true),
-        );
+        // #3: only write when the value actually changed.
+        final cachedUserDoc = _latestUserDocUid == uid ? _latestUserDocData : null;
+        final remoteStorage = cachedUserDoc == null ? null : cachedUserDoc['totalVaultStorageBytes'];
+        final knownValue = _lastReportedVaultBytes ?? (remoteStorage is num ? remoteStorage.toInt() : null);
+        if (knownValue != totalStorage) {
+          await firestore.collection('users').doc(uid).set(
+            {
+              'totalVaultStorageBytes': totalStorage,
+              'storage_updated_at': syncStartTime,
+            },
+            SetOptions(merge: true),
+          );
+        }
+        _lastReportedVaultBytes = totalStorage;
       } catch (e) {
         debugPrint('[SyncEngine] Storage metering update notice: $e');
       }

@@ -852,20 +852,114 @@ class FirebaseAdminService implements AdminService {
     }
   }
 
+  /// Upper bound of documents read per collection for admin analytics distributions (#5).
+  static const int analyticsSampleSize = 1000;
+
+  /// Bounded collection read for analytics (never downloads an unbounded collection).
+  Future<QuerySnapshot<Map<String, dynamic>>> _boundedGet(CollectionReference<Map<String, dynamic>> collection) async {
+    try {
+      return await collection.limit(analyticsSampleSize).get();
+    } on UnimplementedError {
+      return collection.get(); // in-memory test fakes only
+    }
+  }
+
+  /// Inactivity policy candidates (#5): pages through users from the OLDEST login onwards and
+  /// stops as soon as a page reaches users who logged in within the last 150 days, so only
+  /// potentially inactive profiles are read (instead of the whole users collection).
+  Future<List<AdminUserModel>> _fetchInactivityCandidates() async {
+    final firestore = _effectiveFirestore;
+    if (firestore == null) return fetchUsers();
+    try {
+      final now = DateTime.now().toUtc();
+      final out = <AdminUserModel>[];
+      DocumentSnapshot<Map<String, dynamic>>? cursor;
+      while (true) {
+        Query<Map<String, dynamic>> query =
+            firestore.collection('users').orderBy('lastLoginAt').limit(adminUserPageSize);
+        if (cursor != null) query = query.startAfterDocument(cursor);
+        final page = await query.get();
+        if (page.docs.isEmpty) break;
+        out.addAll(page.docs.map((d) => AdminUserModel.fromMap(d.id, d.data())));
+        cursor = page.docs.last;
+        final newestInPage = AdminUserModel.fromMap(cursor.id, cursor.data()!).lastLoginAt;
+        final reachedActiveUsers =
+            newestInPage != null && now.difference(newestInPage.toUtc()).inDays < 150;
+        if (reachedActiveUsers || page.docs.length < adminUserPageSize) break;
+      }
+      return out;
+    } on UnimplementedError {
+      return fetchUsers(); // in-memory test fakes only
+    } catch (e) {
+      debugPrint('[AdminService] inactivity candidate scan notice: $e');
+      return fetchUsers();
+    }
+  }
+
+  /// Page size for admin user lists (#5).
+  static const int adminUserPageSize = 300;
+
+  /// Cursor-based page of users ordered by lastLoginAt (desc). Pass the last uid of the previous
+  /// page as [startAfterUid] to continue. Bounded read for large user bases (#5).
+  Future<List<AdminUserModel>> fetchUsersPage({
+    int limit = adminUserPageSize,
+    String? startAfterUid,
+  }) async {
+    final firestore = _effectiveFirestore;
+    if (firestore == null) return const [];
+    Query<Map<String, dynamic>> query =
+        firestore.collection('users').orderBy('lastLoginAt', descending: true).limit(limit);
+    if (startAfterUid != null && startAfterUid.isNotEmpty) {
+      final cursor = await firestore.collection('users').doc(startAfterUid).get();
+      if (cursor.exists) query = query.startAfterDocument(cursor);
+    }
+    final snapshot = await query.get();
+    return snapshot.docs.map((doc) => AdminUserModel.fromMap(doc.id, doc.data())).toList();
+  }
+
   Future<int> _getCollectionCount(String collectionName) async {
     final firestore = _effectiveFirestore;
     if (firestore == null) return 0;
     try {
       final aggregate = await firestore.collection(collectionName).count().get();
       return aggregate.count ?? 0;
-    } catch (_) {
+    } on UnimplementedError {
+      // In-memory test fakes without aggregation support only.
       try {
         final snapshot = await firestore.collection(collectionName).get();
         return snapshot.size;
       } catch (_) {
         return 0;
       }
+    } catch (e) {
+      // #5: never fall back to downloading a whole collection in production.
+      debugPrint('[AdminService] count($collectionName) notice: $e');
+      return 0;
     }
+  }
+
+  /// Legacy full scan, used only when aggregation queries are unsupported (test fakes).
+  Future<(int, int, int, int, int, int, int)> _legacyUserMetricsScan(FirebaseFirestore firestore) async {
+    final usersSnapshot = await firestore.collection('users').get();
+    int verified = 0, pro = 0, storage = 0, usernames = 0, accepted = 0, pending = 0;
+    for (final doc in usersSnapshot.docs) {
+      final data = doc.data();
+      if (data['emailVerified'] == true || data['email_verified'] == true) verified++;
+      if (data['isPremium'] == true || data['is_premium'] == true || data['isPro'] == true || data['pro'] == true) {
+        pro++;
+      }
+      storage += ((data['totalVaultStorageBytes'] ?? data['total_vault_storage_bytes']) as num?)?.toInt() ?? 0;
+      if ((data['username'] ?? data['userName'] ?? '').toString().trim().isNotEmpty) usernames++;
+    }
+    try {
+      final friendshipsSnap = await firestore.collection('friendships').get();
+      for (final doc in friendshipsSnap.docs) {
+        final st = (doc.data()['status'] as String? ?? 'pending').toLowerCase();
+        if (st == 'accepted') accepted++;
+        if (st == 'pending') pending++;
+      }
+    } catch (_) {}
+    return (usersSnapshot.docs.length, verified, pro, storage, usernames, accepted, pending);
   }
 
   Future<AdminPlatformMetrics> _fetchLocalMetrics() async {
@@ -1027,44 +1121,37 @@ class FirebaseAdminService implements AdminService {
     }
 
     try {
-      final usersSnapshot = await firestore.collection('users').get();
-      final totalUsers = usersSnapshot.docs.length;
+      // #5 Billing protection: server-side count()/sum() aggregations instead of downloading
+      // every users / friendships document (one aggregation ≈ 1 read per 1000 index entries).
+      int totalUsers = 0;
       int verifiedUsers = 0;
       int proUsers = 0;
       int totalStorageBytes = 0;
       int usernamesClaimed = 0;
-
-      for (final doc in usersSnapshot.docs) {
-        final data = doc.data();
-        if (data['emailVerified'] == true || data['email_verified'] == true) {
-          verifiedUsers++;
-        }
-        final isPro = (data['isPremium'] == true) ||
-            (data['is_premium'] == true) ||
-            (data['isPro'] == true) ||
-            (data['pro'] == true) ||
-            PreferencesService.instance.isProUser(uid: doc.id);
-        if (isPro) {
-          proUsers++;
-        }
-        final storage = ((data['totalVaultStorageBytes'] ?? data['total_vault_storage_bytes']) as num?)?.toInt() ?? 0;
-        totalStorageBytes += storage;
-        final uName = (data['username'] ?? data['userName'] ?? '').toString().trim();
-        if (uName.isNotEmpty) {
-          usernamesClaimed++;
-        }
-      }
-
       int totalFriendships = 0;
       int pendingFriendRequests = 0;
       try {
-        final friendshipsSnap = await firestore.collection('friendships').get();
-        for (final doc in friendshipsSnap.docs) {
-          final st = (doc.data()['status'] as String? ?? 'pending').toLowerCase();
-          if (st == 'accepted') totalFriendships++;
-          if (st == 'pending') pendingFriendRequests++;
-        }
-      } catch (_) {}
+        final users = firestore.collection('users');
+        final usersAgg = await users.aggregate(count(), sum('totalVaultStorageBytes')).get();
+        totalUsers = usersAgg.count ?? 0;
+        totalStorageBytes = (usersAgg.getSum('totalVaultStorageBytes') ?? 0).toInt();
+        verifiedUsers = (await users.where('emailVerified', isEqualTo: true).count().get()).count ?? 0;
+        proUsers = (await users.where('isPremium', isEqualTo: true).count().get()).count ?? 0;
+        usernamesClaimed = await _getCollectionCount('usernames');
+        final friendships = firestore.collection('friendships');
+        totalFriendships = (await friendships.where('status', isEqualTo: 'accepted').count().get()).count ?? 0;
+        pendingFriendRequests = (await friendships.where('status', isEqualTo: 'pending').count().get()).count ?? 0;
+      } on UnimplementedError {
+        // Aggregations unsupported (in-memory test fakes): legacy client-side tally.
+        final legacy = await _legacyUserMetricsScan(firestore);
+        totalUsers = legacy.$1;
+        verifiedUsers = legacy.$2;
+        proUsers = legacy.$3;
+        totalStorageBytes = legacy.$4;
+        usernamesClaimed = legacy.$5;
+        totalFriendships = legacy.$6;
+        pendingFriendRequests = legacy.$7;
+      }
 
       final totalTrips = await _getCollectionCount('trips');
       final totalExpenses = await _getCollectionCount('expenses');
@@ -1120,15 +1207,21 @@ class FirebaseAdminService implements AdminService {
         }());
       }
 
+      // #5: bounded read — the most recently active [adminUserPageSize] users. Older pages can be
+      // loaded with [fetchUsersPage] (limit + startAfter) instead of downloading every profile.
       QuerySnapshot<Map<String, dynamic>> snapshot;
       try {
         snapshot = await firestore
             .collection('users')
             .orderBy('lastLoginAt', descending: true)
+            .limit(adminUserPageSize)
             .get();
-      } catch (_) {
-        // Fallback without server-side ordering if composite index is pending
+      } on UnimplementedError {
+        // In-memory test fakes without ordering/limit support only
         snapshot = await firestore.collection('users').get();
+      } catch (_) {
+        // Single-field index on lastLoginAt not ready yet: still bounded, unordered
+        snapshot = await firestore.collection('users').limit(adminUserPageSize).get();
       }
 
       final users = snapshot.docs
@@ -1183,7 +1276,7 @@ class FirebaseAdminService implements AdminService {
       List<Map<String, dynamic>> userMaps = [];
       if (firestore != null) {
         try {
-          final usersSnap = await firestore.collection('users').get();
+          final usersSnap = await _boundedGet(firestore.collection('users'));
           userMaps = usersSnap.docs.map((d) => d.data()).toList();
         } catch (_) {}
       }
@@ -1326,8 +1419,10 @@ class FirebaseAdminService implements AdminService {
 
       if (firestore != null) {
         try {
-          final tripsSnap = await firestore.collection('trips').get();
-          totalTripsSnapCount = tripsSnap.docs.length;
+          final tripsSnap = await _boundedGet(firestore.collection('trips'));
+          // Exact total via count(); distributions use the bounded sample (#5).
+          final exactTrips = await _getCollectionCount('trips');
+          totalTripsSnapCount = exactTrips > 0 ? exactTrips : tripsSnap.docs.length;
           final now = DateTime.now();
           for (final doc in tripsSnap.docs) {
             final tData = doc.data();
@@ -1424,7 +1519,7 @@ class FirebaseAdminService implements AdminService {
       int expenseCount = 0;
       if (firestore != null) {
         try {
-          final expSnap = await firestore.collection('expenses').get();
+          final expSnap = await _boundedGet(firestore.collection('expenses'));
           for (final doc in expSnap.docs) {
             final eData = doc.data();
             final amt = (eData['amount'] as num?)?.toDouble() ?? 0.0;
@@ -1461,7 +1556,7 @@ class FirebaseAdminService implements AdminService {
       // 7. Query Vault Documents (for Category Distribution)
       if (firestore != null) {
         try {
-          final docsSnap = await firestore.collection('documents').get();
+          final docsSnap = await _boundedGet(firestore.collection('documents'));
           for (final doc in docsSnap.docs) {
             final cat = (doc.data()['category'] as String? ?? 'other').toLowerCase().trim();
             vaultCategoryCounts[cat] = (vaultCategoryCounts[cat] ?? 0) + 1;
@@ -1596,7 +1691,7 @@ class FirebaseAdminService implements AdminService {
       final Set<String> usersWithFriends = {};
       if (firestore != null) {
         try {
-          final friendshipsSnap = await firestore.collection('friendships').get();
+          final friendshipsSnap = await _boundedGet(firestore.collection('friendships'));
           for (final doc in friendshipsSnap.docs) {
             final fData = doc.data();
             final status = (fData['status'] as String? ?? 'pending').toLowerCase();
@@ -3260,7 +3355,7 @@ class FirebaseAdminService implements AdminService {
 
   @override
   Future<InactivityScanResult> processInactivityPolicies() async {
-    final users = await fetchUsers();
+    final users = await _fetchInactivityCandidates();
     final now = DateTime.now().toUtc();
     int warnings = 0;
     int purged = 0;

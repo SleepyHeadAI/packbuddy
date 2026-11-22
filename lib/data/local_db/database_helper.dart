@@ -33,6 +33,35 @@ class DatabaseHelper {
     }
   }
 
+  String? get _currentUserEmail {
+    try {
+      final email = FirebaseAuth.instance.currentUser?.email?.trim();
+      return (email == null || email.isEmpty) ? null : email;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// #16 Account isolation: a signed-in user sees only their own trips and shared trips that
+  /// explicitly list them (uid or e-mail) as a collaborator. Guest (empty / NULL user_id) rows
+  /// are migrated to the account at sign-in and are never shown to a signed-in account.
+  /// SQL pre-filter: own rows + rows carrying share metadata; the exact membership check
+  /// happens in Dart on the decoded collaborator list.
+  static const String _tripOwnerOrShareCandidateSql =
+      "(user_id = ? OR notes LIKE '%\"collaborators\"%' OR notes LIKE '%isShared%')";
+  static const String _guestTripsSql = "(user_id = '' OR user_id IS NULL)";
+
+  @visibleForTesting
+  static bool isTripVisibleTo(Trip trip, String uid, {String? email}) {
+    if (trip.userId == uid) return true;
+    if (trip.collaborators.contains(uid)) return true;
+    if (email != null && email.isNotEmpty) {
+      final lower = email.toLowerCase();
+      return trip.collaborators.any((c) => c.trim().toLowerCase() == lower);
+    }
+    return false;
+  }
+
   Future<Database> _initDB(String fileName) async {
     final documentsDirectory = await getApplicationDocumentsDirectory();
     final path = join(documentsDirectory.path, fileName);
@@ -667,8 +696,10 @@ class DatabaseHelper {
     final args = <dynamic>[];
 
     if (effectiveUserId.isNotEmpty) {
-      conditions.add("(user_id = ? OR user_id = '' OR user_id IS NULL OR notes LIKE '%isShared%true%' OR notes LIKE '%\"isShared\":true%')");
+      conditions.add(_tripOwnerOrShareCandidateSql);
       args.add(effectiveUserId);
+    } else {
+      conditions.add(_guestTripsSql);
     }
 
     if (!includeDeleted) {
@@ -677,11 +708,14 @@ class DatabaseHelper {
 
     final result = await db.query(
       AppConstants.tableTrips,
-      where: conditions.isNotEmpty ? conditions.join(' AND ') : null,
+      where: conditions.join(' AND '),
       whereArgs: args.isNotEmpty ? args : null,
       orderBy: 'start_date DESC',
     );
-    return result.map((map) => Trip.fromMap(map)).toList();
+    final trips = result.map((map) => Trip.fromMap(map)).toList();
+    if (effectiveUserId.isEmpty) return trips;
+    final email = _currentUserEmail;
+    return trips.where((t) => isTripVisibleTo(t, effectiveUserId, email: email)).toList();
   }
 
   /// Retrieves a single trip by ID
@@ -692,8 +726,10 @@ class DatabaseHelper {
     final args = <dynamic>[id];
 
     if (effectiveUserId.isNotEmpty) {
-      conditions.add("(user_id = ? OR user_id = '' OR user_id IS NULL OR notes LIKE '%isShared%true%' OR notes LIKE '%\"isShared\":true%')");
+      conditions.add(_tripOwnerOrShareCandidateSql);
       args.add(effectiveUserId);
+    } else {
+      conditions.add(_guestTripsSql);
     }
 
     final maps = await db.query(
@@ -701,10 +737,10 @@ class DatabaseHelper {
       where: conditions.join(' AND '),
       whereArgs: args,
     );
-    if (maps.isNotEmpty) {
-      return Trip.fromMap(maps.first);
-    }
-    return null;
+    if (maps.isEmpty) return null;
+    final trip = Trip.fromMap(maps.first);
+    if (effectiveUserId.isEmpty) return trip;
+    return isTripVisibleTo(trip, effectiveUserId, email: _currentUserEmail) ? trip : null;
   }
 
   /// Updates an existing trip
