@@ -82,7 +82,7 @@
                 android:layout_marginTop="1dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="0 Ülke Gezildi"
+                android:text="@string/widget_countries_visited_zero"
                 android:textColor="#FFFFFF"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -93,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="0 Kıta Keşfedildi"
+                android:text="@string/widget_continents_explored_zero"
                 android:textColor="#94A3B8"
                 android:textSize="9.5sp" />
         </LinearLayout>

@@ -13,6 +13,7 @@ import 'package:packbuddy/features/dashboard/presentation/dashboard_localization
 import 'package:packbuddy/features/settings/presentation/screens/widgets/paywall_sheet.dart';
 import 'package:packbuddy/core/services/push_notification_service.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
+import 'package:packbuddy/core/l10n/app_l10n_lookup.dart';
 
 /// In-app notification history record
 class InAppNotificationRecord {
@@ -124,7 +125,7 @@ class _NotificationsCenterSheetState extends ConsumerState<NotificationsCenterSh
             final data = doc.data();
             final id = doc.id;
             if (!existingIds.contains(id)) {
-              final title = data['title'] as String? ?? 'PackBuddy Bildirimi';
+              final title = data['title'] as String? ?? appL10nFor().notificationDefaultTitle;
               final message = data['message'] as String? ?? '';
               final ts = (data['timestamp'] as num?)?.toInt() ?? 0;
               final type = data['type'] as String? ?? 'admin_warning';

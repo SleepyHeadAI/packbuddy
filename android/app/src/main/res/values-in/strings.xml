@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget strings. Generated from lib/core/services/app_widget_localization.dart; keep in sync. -->
+<resources>
+    <string name="widget_label_trip">PackBuddy: Perjalanan Aktif</string>
+    <string name="widget_label_trip_medium">PackBuddy: Perjalanan Aktif (Sedang)</string>
+    <string name="widget_label_trip_large">PackBuddy: Perjalanan Aktif (Besar)</string>
+    <string name="widget_label_map">PackBuddy: Peta Dunia</string>
+    <string name="widget_label_map_medium">PackBuddy: Peta Dunia (Sedang)</string>
+    <string name="widget_label_map_large">PackBuddy: Peta Dunia (Besar)</string>
+    <string name="widget_label_expense">PackBuddy: Pengeluaran Cepat</string>
+    <string name="widget_label_expense_medium">PackBuddy: Pengeluaran Cepat (Sedang)</string>
+    <string name="widget_label_expense_large">PackBuddy: Pengeluaran Cepat (Besar)</string>
+    <string name="widget_label_currency">PackBuddy: Konverter Mata Uang</string>
+    <string name="widget_label_currency_medium">PackBuddy: Konverter Mata Uang (Sedang)</string>
+    <string name="widget_label_currency_large">PackBuddy: Konverter Mata Uang (Besar)</string>
+    <string name="widget_trip_app_name">PackBuddy • Perjalanan</string>
+    <string name="widget_world_app_name">PackBuddy • Dunia</string>
+    <string name="widget_rates_app_name">PackBuddy • Kurs</string>
+    <string name="widget_budget_app_name">PackBuddy • Anggaran</string>
+    <string name="widget_add_expense">Tambah Pengeluaran</string>
+    <string name="widget_add_expense_action">+ Tambah Pengeluaran</string>
+    <string name="widget_quick_log">Catat Cepat</string>
+    <string name="widget_spent">Dibelanjakan</string>
+    <string name="widget_spent_budget">Anggaran Terpakai</string>
+    <string name="widget_remaining_budget">Sisa Anggaran</string>
+    <string name="widget_last_expense">Pengeluaran Terakhir</string>
+    <string name="widget_no_expense_yet">Belum ada pengeluaran dicatat</string>
+    <string name="widget_packing">Packing</string>
+    <string name="widget_packing_zero">Packing: 0/0</string>
+    <string name="widget_countdown_started">Hitung mundur aktif</string>
+    <string name="widget_plan_next_trip">Rencanakan perjalanan berikutnya</string>
+    <string name="widget_currency">Konverter Mata Uang</string>
+    <string name="widget_quick_conversions">Konversi Cepat</string>
+    <string name="widget_live_rates">Kurs Langsung</string>
+    <string name="widget_live_rates_dot">● Kurs Langsung</string>
+    <string name="widget_auto_sync">✓ Sinkronisasi Dua Arah Otomatis</string>
+    <string name="widget_offline_ready">Siap Offline</string>
+    <string name="widget_exploration_rate">Tingkat Eksplorasi</string>
+    <string name="widget_countries_visited">%1$d Negara Dikunjungi</string>
+    <string name="widget_continents_explored">%1$d Benua Dijelajahi</string>
+    <string name="widget_stat_visited">✈️ %1$d Dikunjungi</string>
+    <string name="widget_stat_wishlist">🌟 %1$d Impian</string>
+    <string name="widget_stat_continents">🌍 %1$d Benua</string>
+    <string name="widget_legend_lived">● Tinggal (%1$d)</string>
+    <string name="widget_countries_visited_zero">Peta Dunia</string>
+    <string name="widget_continents_explored_zero">Tandai negara di peta</string>
+    <string name="widget_stat_visited_zero">✈️ 0 Dikunjungi</string>
+    <string name="widget_stat_wishlist_zero">🌟 0 Impian</string>
+    <string name="widget_stat_continents_zero">🌍 0 Benua</string>
+    <string name="widget_legend_lived_zero">● Tinggal (0)</string>
+    <string name="widget_legend_visited_zero">● Dikunjungi (0)</string>
+    <string name="widget_legend_wishlist_zero">● Impian (0)</string>
+    <string name="widget_tap_to_open">Ketuk untuk membuka</string>
+    <string name="widget_quick_expense_title">Pengeluaran Cepat</string>
+    <string name="widget_quick_expense_prefix">Cepat</string>
+</resources>

@@ -36,7 +36,7 @@
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="PackBuddy • Bütçe"
+                android:text="@string/widget_budget_app_name"
                 android:textColor="#3B82F6"
                 android:textSize="10.5sp"
                 android:textStyle="bold" />
@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Harcanan"
+                android:text="@string/widget_spent"
                 android:textColor="#94A3B8"
                 android:textSize="10sp"
                 android:textStyle="normal" />
@@ -108,7 +108,7 @@
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="+ Hızlı Harcama"
+                android:text="@string/widget_add_expense_action"
                 android:textColor="#3B82F6"
                 android:textSize="9.5sp"
                 android:textStyle="bold" />

@@ -4453,6 +4453,450 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your subscription renews automatically at the end of each billing period unless cancelled at least 24 hours before renewal. Payment is charged to your Google Play account. You can cancel anytime in Google Play › Subscriptions.'**
   String get subscriptionAutoRenewNotice;
+
+  /// Paywall button that restores previous Google Play purchases
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Purchases'**
+  String get restorePurchases;
+
+  /// Snackbar shown after purchases were restored
+  ///
+  /// In en, this message translates to:
+  /// **'Your purchases were restored successfully!'**
+  String get restorePurchasesSuccess;
+
+  /// Snackbar shown when no active subscription can be restored
+  ///
+  /// In en, this message translates to:
+  /// **'No active subscription found to restore.'**
+  String get restoreNoPurchasesFound;
+
+  /// Shown when a Google Play purchase fails
+  ///
+  /// In en, this message translates to:
+  /// **'The purchase could not be completed. Please try again.'**
+  String get errorPurchaseFailed;
+
+  /// Generic user-facing error used instead of raw exception text
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get errorGenericRetry;
+
+  /// Shown when the packing checklist cannot be loaded
+  ///
+  /// In en, this message translates to:
+  /// **'Your packing list could not be loaded.'**
+  String get errorChecklistLoadFailed;
+
+  /// Shown when an itinerary activity cannot be saved
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save activity'**
+  String get activitySaveFailed;
+
+  /// Subtitle of the world map card on the user's own profile
+  ///
+  /// In en, this message translates to:
+  /// **'Live Exploration & Coverage'**
+  String get worldMapLiveCoverage;
+
+  /// Subtitle of a friend's world map card
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s Map'**
+  String worldMapFriendMap(String name);
+
+  /// Title of the zoomable dialog for a friend's world map
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s World Map'**
+  String worldMapFriendWorldMap(String name);
+
+  /// Used in place of a friend's name when it is unknown
+  ///
+  /// In en, this message translates to:
+  /// **'Friend'**
+  String get worldMapFriendFallbackName;
+
+  /// Button on the profile world map card that opens the full map
+  ///
+  /// In en, this message translates to:
+  /// **'Open Map'**
+  String get worldMapOpenMap;
+
+  /// Button on a friend's world map card that opens a zoomable preview
+  ///
+  /// In en, this message translates to:
+  /// **'Inspect'**
+  String get worldMapInspect;
+
+  /// Overlay hint on the own-profile map preview
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Map'**
+  String get worldMapGoToMap;
+
+  /// Overlay hint on a friend's map preview
+  ///
+  /// In en, this message translates to:
+  /// **'Zoom & Inspect'**
+  String get worldMapZoomInspect;
+
+  /// Highlight metric title on the world map card
+  ///
+  /// In en, this message translates to:
+  /// **'World Explored'**
+  String get worldMapExplored;
+
+  /// Visited countries out of total on the world map card
+  ///
+  /// In en, this message translates to:
+  /// **'{visited} / {total} Visited'**
+  String worldMapVisitedOfTotal(int visited, int total);
+
+  /// Short chip label for explored continents count
+  ///
+  /// In en, this message translates to:
+  /// **'Continents'**
+  String get worldMapContinentsChip;
+
+  /// Countries both users visited, shown on a friend's map card
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Mutual Visited Countries: {countries}'**
+  String worldMapMutualCountries(int count, String countries);
+
+  /// Hint in the zoomable world map dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Pinch or double-tap to explore'**
+  String get worldMapPinchToExplore;
+
+  /// Profile travel status preset chip
+  ///
+  /// In en, this message translates to:
+  /// **'🧳 Packing my bags'**
+  String get statusPresetPacking;
+
+  /// Profile travel status preset chip
+  ///
+  /// In en, this message translates to:
+  /// **'✈️ On the road / In the air'**
+  String get statusPresetOnTheRoad;
+
+  /// Profile travel status preset chip
+  ///
+  /// In en, this message translates to:
+  /// **'🏖️ In vacation mode'**
+  String get statusPresetVacation;
+
+  /// Profile travel status preset chip
+  ///
+  /// In en, this message translates to:
+  /// **'🗺️ Planning a new route'**
+  String get statusPresetPlanning;
+
+  /// Profile travel status preset chip
+  ///
+  /// In en, this message translates to:
+  /// **'🏡 Resting at home'**
+  String get statusPresetResting;
+
+  /// Email greeting line
+  ///
+  /// In en, this message translates to:
+  /// **'Hello {name},'**
+  String emailGreeting(String name);
+
+  /// Fallback recipient name in emails
+  ///
+  /// In en, this message translates to:
+  /// **'Traveler'**
+  String get emailDefaultName;
+
+  /// Email footer inviting the user to reach out through the app
+  ///
+  /// In en, this message translates to:
+  /// **'If you have any questions or feedback, please contact us through the PackBuddy app.'**
+  String get emailContactFooter;
+
+  /// Email sign-off line
+  ///
+  /// In en, this message translates to:
+  /// **'Safe travels,'**
+  String get emailSignoff;
+
+  /// Email signature
+  ///
+  /// In en, this message translates to:
+  /// **'The PackBuddy Team'**
+  String get emailTeamSignature;
+
+  /// Subject of an administrator notice email
+  ///
+  /// In en, this message translates to:
+  /// **'⚠️ PackBuddy Notice: {title}'**
+  String emailAdminNoticeSubject(String title);
+
+  /// HTML heading of an administrator notice email
+  ///
+  /// In en, this message translates to:
+  /// **'PackBuddy Administrator Notice'**
+  String get emailAdminNoticeHeading;
+
+  /// HTML footer of an administrator notice email
+  ///
+  /// In en, this message translates to:
+  /// **'This notice was sent by the PackBuddy administration team.'**
+  String get emailAdminNoticeFooter;
+
+  /// Subject of the inactivity deletion warning email
+  ///
+  /// In en, this message translates to:
+  /// **'⚠️ Your PackBuddy account will be deleted in {days} days (Notice #{count})'**
+  String emailInactivitySubject(int days, int count);
+
+  /// HTML heading of the inactivity warning email
+  ///
+  /// In en, this message translates to:
+  /// **'PackBuddy Account Inactivity Notice'**
+  String get emailInactivityHeading;
+
+  /// Inactivity email: opening sentence
+  ///
+  /// In en, this message translates to:
+  /// **'We noticed that you haven\'t signed in to your PackBuddy account for about 5 months.'**
+  String get emailInactivityIntro;
+
+  /// Inactivity email: retention policy explanation
+  ///
+  /// In en, this message translates to:
+  /// **'Under our data retention and privacy policy, accounts with no sign-in for 6 months (180 days) are permanently deleted, together with their trips, expenses, packing lists and vault documents.'**
+  String get emailInactivityPolicy;
+
+  /// Inactivity email: days left before deletion
+  ///
+  /// In en, this message translates to:
+  /// **'About {days} days remain before your account and all your data are permanently deleted.'**
+  String emailInactivityRemaining(int days);
+
+  /// Inactivity email: what the user must do
+  ///
+  /// In en, this message translates to:
+  /// **'To keep your account and all your travel data, simply sign in to the PackBuddy mobile app. Your account stays active the moment you sign in.'**
+  String get emailInactivityAction;
+
+  /// Inactivity email: weekly reminder counter
+  ///
+  /// In en, this message translates to:
+  /// **'(Automatic weekly reminder sent during the 5th month: #{count})'**
+  String emailInactivityNoticeCount(int count);
+
+  /// Inactivity email: highlighted call to action
+  ///
+  /// In en, this message translates to:
+  /// **'All you need to do to keep your account: sign in to the app!'**
+  String get emailInactivityCta;
+
+  /// Inactivity email: HTML footer
+  ///
+  /// In en, this message translates to:
+  /// **'This email was sent by the PackBuddy automatic account protection service.'**
+  String get emailInactivityFooter;
+
+  /// Subject of the email sent after an inactive account is deleted
+  ///
+  /// In en, this message translates to:
+  /// **'Your PackBuddy account was deleted after 6 months of inactivity'**
+  String get emailPurgedSubject;
+
+  /// Body of the email sent after an inactive account is deleted
+  ///
+  /// In en, this message translates to:
+  /// **'Because your PackBuddy account was not signed in to for 6 months (180 days), your account and all its data have been permanently deleted in line with our security and data protection policy.'**
+  String get emailPurgedBody;
+
+  /// Title saved for an expense logged from the home screen widget
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Expense'**
+  String get widgetQuickExpenseTitle;
+
+  /// Short prefix on the widget for the last quick expense, e.g. 'Quick: +$10'
+  ///
+  /// In en, this message translates to:
+  /// **'Quick'**
+  String get widgetQuickExpensePrefix;
+
+  /// Subtitle in the currency picker
+  ///
+  /// In en, this message translates to:
+  /// **'{count} world currencies'**
+  String currencyPickerWorldCount(int count);
+
+  /// Search field hint in the currency picker
+  ///
+  /// In en, this message translates to:
+  /// **'Search currency (e.g. USD, EUR, TRY, JPY)...'**
+  String get currencyPickerSearchHint;
+
+  /// Button that resets the selection to the default currency
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to {currency}'**
+  String currencyPickerResetTo(String currency);
+
+  /// Empty state in the currency picker
+  ///
+  /// In en, this message translates to:
+  /// **'No currencies found'**
+  String get currencyPickerNoResults;
+
+  /// Snackbar when a search result's trip no longer exists
+  ///
+  /// In en, this message translates to:
+  /// **'Trip details could not be found'**
+  String get searchTripNotFound;
+
+  /// App bar title of a friend's profile when the name is unknown
+  ///
+  /// In en, this message translates to:
+  /// **'Traveler Profile'**
+  String get friendProfileFallbackTitle;
+
+  /// Small label above the legal consent title
+  ///
+  /// In en, this message translates to:
+  /// **'PackBuddy Legal & Privacy'**
+  String get legalPrivacyHubTitle;
+
+  /// Shows when the user accepted the legal terms
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted at: {date}'**
+  String consentAcceptedAt(String date);
+
+  /// Compliance badge for the EU General Data Protection Regulation
+  ///
+  /// In en, this message translates to:
+  /// **'GDPR (EU 2016/679)'**
+  String get consentBadgeGdpr;
+
+  /// Compliance badge for the Turkish Personal Data Protection Law No. 6698
+  ///
+  /// In en, this message translates to:
+  /// **'KVKK (Law No. 6698)'**
+  String get consentBadgeKvkk;
+
+  /// Compliance badge for AES-256 encryption
+  ///
+  /// In en, this message translates to:
+  /// **'AES-256 Encryption'**
+  String get consentBadgeEncryption;
+
+  /// Compliance badge: analytics without personally identifiable information
+  ///
+  /// In en, this message translates to:
+  /// **'Zero-PII Telemetry'**
+  String get consentBadgeZeroPii;
+
+  /// Label of a numbered article in the legal consent screen
+  ///
+  /// In en, this message translates to:
+  /// **'Article {number}'**
+  String consentArticleNumber(String number);
+
+  /// Shown in shared trip text when no budget is set
+  ///
+  /// In en, this message translates to:
+  /// **'Not specified'**
+  String get shareNotSpecified;
+
+  /// Footer appended to a shared trip summary
+  ///
+  /// In en, this message translates to:
+  /// **'Shared via PackBuddy — your minimalist travel companion.'**
+  String get shareFooterTagline;
+
+  /// Short footer appended to a shared packing list
+  ///
+  /// In en, this message translates to:
+  /// **'Shared via PackBuddy'**
+  String get shareFooterShort;
+
+  /// Share sheet subject for a trip summary
+  ///
+  /// In en, this message translates to:
+  /// **'PackBuddy Trip: {title}'**
+  String shareTripSubject(String title);
+
+  /// Share sheet subject for a packing list
+  ///
+  /// In en, this message translates to:
+  /// **'Packing list: {title}'**
+  String shareChecklistSubject(String title);
+
+  /// First line of a shared trip invite
+  ///
+  /// In en, this message translates to:
+  /// **'✈️ Join my trip \"{title}\" on PackBuddy!'**
+  String shareInviteText(String title);
+
+  /// Navigation hint in a shared trip invite
+  ///
+  /// In en, this message translates to:
+  /// **'PackBuddy → Trips → Join Trip'**
+  String get shareInviteHowTo;
+
+  /// Share sheet subject for a trip invite
+  ///
+  /// In en, this message translates to:
+  /// **'PackBuddy trip invite: {title}'**
+  String shareInviteSubject(String title);
+
+  /// Android notification channel name for packing reminders
+  ///
+  /// In en, this message translates to:
+  /// **'Trip Packing Reminders'**
+  String get notificationChannelRemindersName;
+
+  /// Android notification channel description for packing reminders
+  ///
+  /// In en, this message translates to:
+  /// **'Smart notifications and packing reminders before trip departure'**
+  String get notificationChannelRemindersDescription;
+
+  /// Android notification channel name for urgent system alerts
+  ///
+  /// In en, this message translates to:
+  /// **'System & Admin Alerts'**
+  String get notificationChannelAlertsName;
+
+  /// Android notification channel description for urgent system alerts
+  ///
+  /// In en, this message translates to:
+  /// **'Important account, security, and administrative alerts'**
+  String get notificationChannelAlertsDescription;
+
+  /// Fallback notification title and ticker text
+  ///
+  /// In en, this message translates to:
+  /// **'PackBuddy Notification'**
+  String get notificationDefaultTitle;
+
+  /// Neutral title of the world map card (used on own and friends' profiles)
+  ///
+  /// In en, this message translates to:
+  /// **'World Travel Map'**
+  String get worldMapCardTitle;
+
+  /// Neutral chip label for countries lived in (own and friends' profiles)
+  ///
+  /// In en, this message translates to:
+  /// **'Lived'**
+  String get worldMapChipLived;
 }
 
 class _AppLocalizationsDelegate

@@ -146,7 +146,7 @@ class _CurrencyPickerSheetState extends State<CurrencyPickerSheet> {
                           ),
                         ),
                         Text(
-                          '${CurrencyFormatter.supportedCurrencies.length} world currencies',
+                          AppLocalizations.of(context)!.currencyPickerWorldCount(CurrencyFormatter.supportedCurrencies.length),
                           style: TextStyle(
                             fontSize: 11.5,
                             color: theme.colorScheme.onSurfaceVariant,
@@ -183,7 +183,7 @@ class _CurrencyPickerSheetState extends State<CurrencyPickerSheet> {
                   autofocus: false,
                   style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                   decoration: InputDecoration(
-                    hintText: 'Search currency (e.g. USD, EUR, TRY, JPY)...',
+                    hintText: AppLocalizations.of(context)!.currencyPickerSearchHint,
                     hintStyle: TextStyle(
                       fontSize: 13,
                       color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
@@ -237,7 +237,7 @@ class _CurrencyPickerSheetState extends State<CurrencyPickerSheet> {
                           ),
                           const SizedBox(width: 5),
                           Text(
-                            'Reset to ${widget.defaultCurrency!} (${CurrencyFormatter.getSymbol(widget.defaultCurrency!)})',
+                            AppLocalizations.of(context)!.currencyPickerResetTo('${widget.defaultCurrency!} (${CurrencyFormatter.getSymbol(widget.defaultCurrency!)})'),
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
@@ -271,7 +271,7 @@ class _CurrencyPickerSheetState extends State<CurrencyPickerSheet> {
                             ),
                             const SizedBox(height: 10),
                             Text(
-                              'No currencies found',
+                              AppLocalizations.of(context)!.currencyPickerNoResults,
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,

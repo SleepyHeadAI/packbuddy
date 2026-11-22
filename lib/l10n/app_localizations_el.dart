@@ -2333,4 +2333,280 @@ class AppLocalizationsEl extends AppLocalizations {
   @override
   String get subscriptionAutoRenewNotice =>
       'Η συνδρομή ανανεώνεται αυτόματα στο τέλος κάθε περιόδου, εκτός αν ακυρωθεί τουλάχιστον 24 ώρες πριν από την ανανέωση. Η χρέωση γίνεται στον λογαριασμό σας Google Play. Μπορείτε να την ακυρώσετε οποιαδήποτε στιγμή από το Google Play › Συνδρομές.';
+
+  @override
+  String get restorePurchases => 'Επαναφορά αγορών';
+
+  @override
+  String get restorePurchasesSuccess =>
+      'Οι αγορές σας επαναφέρθηκαν με επιτυχία!';
+
+  @override
+  String get restoreNoPurchasesFound =>
+      'Δεν βρέθηκε ενεργή συνδρομή για επαναφορά.';
+
+  @override
+  String get errorPurchaseFailed => 'Η αγορά δεν ολοκληρώθηκε. Δοκιμάστε ξανά.';
+
+  @override
+  String get errorGenericRetry => 'Κάτι πήγε στραβά. Δοκιμάστε ξανά.';
+
+  @override
+  String get errorChecklistLoadFailed =>
+      'Δεν ήταν δυνατή η φόρτωση της λίστας αποσκευών.';
+
+  @override
+  String get activitySaveFailed =>
+      'Δεν ήταν δυνατή η αποθήκευση της δραστηριότητας';
+
+  @override
+  String get worldMapLiveCoverage => 'Ζωντανή εξερεύνηση & κάλυψη';
+
+  @override
+  String worldMapFriendMap(String name) {
+    return 'Χάρτης του/της $name';
+  }
+
+  @override
+  String worldMapFriendWorldMap(String name) {
+    return 'Παγκόσμιος χάρτης του/της $name';
+  }
+
+  @override
+  String get worldMapFriendFallbackName => 'φίλος';
+
+  @override
+  String get worldMapOpenMap => 'Άνοιγμα χάρτη';
+
+  @override
+  String get worldMapInspect => 'Προβολή';
+
+  @override
+  String get worldMapGoToMap => 'Στον χάρτη';
+
+  @override
+  String get worldMapZoomInspect => 'Μεγέθυνση & προβολή';
+
+  @override
+  String get worldMapExplored => 'Κόσμος που εξερευνήθηκε';
+
+  @override
+  String worldMapVisitedOfTotal(int visited, int total) {
+    return '$visited / $total επισκέψεις';
+  }
+
+  @override
+  String get worldMapContinentsChip => 'Ήπειροι';
+
+  @override
+  String worldMapMutualCountries(int count, String countries) {
+    return 'Κοινές χώρες που επισκεφθήκατε ($count): $countries';
+  }
+
+  @override
+  String get worldMapPinchToExplore =>
+      'Τσιμπήστε ή πατήστε δύο φορές για εξερεύνηση';
+
+  @override
+  String get statusPresetPacking => '🧳 Ετοιμάζω βαλίτσες';
+
+  @override
+  String get statusPresetOnTheRoad => '✈️ Στον δρόμο / Στον αέρα';
+
+  @override
+  String get statusPresetVacation => '🏖️ Σε λειτουργία διακοπών';
+
+  @override
+  String get statusPresetPlanning => '🗺️ Σχεδιάζω νέα διαδρομή';
+
+  @override
+  String get statusPresetResting => '🏡 Ξεκουράζομαι στο σπίτι';
+
+  @override
+  String emailGreeting(String name) {
+    return 'Γεια σας $name,';
+  }
+
+  @override
+  String get emailDefaultName => 'ταξιδιώτη';
+
+  @override
+  String get emailContactFooter =>
+      'Για ερωτήσεις ή σχόλια, επικοινωνήστε μαζί μας μέσω της εφαρμογής PackBuddy.';
+
+  @override
+  String get emailSignoff => 'Καλό ταξίδι,';
+
+  @override
+  String get emailTeamSignature => 'Η ομάδα του PackBuddy';
+
+  @override
+  String emailAdminNoticeSubject(String title) {
+    return '⚠️ Ειδοποίηση PackBuddy: $title';
+  }
+
+  @override
+  String get emailAdminNoticeHeading => 'Ειδοποίηση διαχείρισης PackBuddy';
+
+  @override
+  String get emailAdminNoticeFooter =>
+      'Αυτή η ειδοποίηση στάλθηκε από την ομάδα διαχείρισης του PackBuddy.';
+
+  @override
+  String emailInactivitySubject(int days, int count) {
+    return '⚠️ Ο λογαριασμός σας στο PackBuddy θα διαγραφεί σε $days ημέρες (ειδοποίηση #$count)';
+  }
+
+  @override
+  String get emailInactivityHeading =>
+      'Ειδοποίηση αδράνειας λογαριασμού PackBuddy';
+
+  @override
+  String get emailInactivityIntro =>
+      'Παρατηρήσαμε ότι δεν έχετε συνδεθεί στον λογαριασμό σας στο PackBuddy εδώ και περίπου 5 μήνες.';
+
+  @override
+  String get emailInactivityPolicy =>
+      'Σύμφωνα με την πολιτική διατήρησης δεδομένων και απορρήτου μας, οι λογαριασμοί χωρίς σύνδεση για 6 μήνες (180 ημέρες) διαγράφονται οριστικά μαζί με ταξίδια, έξοδα, λίστες αποσκευών και έγγραφα θησαυροφυλακίου.';
+
+  @override
+  String emailInactivityRemaining(int days) {
+    return 'Απομένουν περίπου $days ημέρες μέχρι την οριστική διαγραφή του λογαριασμού και όλων των δεδομένων σας.';
+  }
+
+  @override
+  String get emailInactivityAction =>
+      'Για να διατηρήσετε τον λογαριασμό και όλα τα ταξιδιωτικά σας δεδομένα, απλώς συνδεθείτε στην εφαρμογή PackBuddy. Ο λογαριασμός σας παραμένει ενεργός μόλις συνδεθείτε.';
+
+  @override
+  String emailInactivityNoticeCount(int count) {
+    return '(Αυτόματη εβδομαδιαία υπενθύμιση κατά τον 5ο μήνα: #$count)';
+  }
+
+  @override
+  String get emailInactivityCta =>
+      'Το μόνο που χρειάζεται για να κρατήσετε τον λογαριασμό σας: σύνδεση στην εφαρμογή!';
+
+  @override
+  String get emailInactivityFooter =>
+      'Αυτό το email στάλθηκε από την αυτόματη υπηρεσία προστασίας λογαριασμών του PackBuddy.';
+
+  @override
+  String get emailPurgedSubject =>
+      'Ο λογαριασμός σας στο PackBuddy διαγράφηκε μετά από 6 μήνες αδράνειας';
+
+  @override
+  String get emailPurgedBody =>
+      'Επειδή δεν έγινε σύνδεση στον λογαριασμό σας στο PackBuddy για 6 μήνες (180 ημέρες), ο λογαριασμός και όλα τα δεδομένα του διαγράφηκαν οριστικά σύμφωνα με την πολιτική ασφάλειας και προστασίας δεδομένων μας.';
+
+  @override
+  String get widgetQuickExpenseTitle => 'Γρήγορο έξοδο';
+
+  @override
+  String get widgetQuickExpensePrefix => 'Γρήγορο';
+
+  @override
+  String currencyPickerWorldCount(int count) {
+    return '$count νομίσματα του κόσμου';
+  }
+
+  @override
+  String get currencyPickerSearchHint =>
+      'Αναζήτηση νομίσματος (π.χ. USD, EUR, TRY, JPY)...';
+
+  @override
+  String currencyPickerResetTo(String currency) {
+    return 'Επαναφορά σε $currency';
+  }
+
+  @override
+  String get currencyPickerNoResults => 'Δεν βρέθηκαν νομίσματα';
+
+  @override
+  String get searchTripNotFound => 'Δεν βρέθηκαν τα στοιχεία του ταξιδιού';
+
+  @override
+  String get friendProfileFallbackTitle => 'Προφίλ ταξιδιώτη';
+
+  @override
+  String get legalPrivacyHubTitle => 'PackBuddy Νομικά & απόρρητο';
+
+  @override
+  String consentAcceptedAt(String date) {
+    return 'Αποδοχή στις: $date';
+  }
+
+  @override
+  String get consentBadgeGdpr => 'ΓΚΠΔ (ΕΕ 2016/679)';
+
+  @override
+  String get consentBadgeKvkk => 'KVKK (Νόμος αρ. 6698)';
+
+  @override
+  String get consentBadgeEncryption => 'Κρυπτογράφηση AES-256';
+
+  @override
+  String get consentBadgeZeroPii => 'Τηλεμετρία χωρίς προσωπικά δεδομένα';
+
+  @override
+  String consentArticleNumber(String number) {
+    return 'Άρθρο $number';
+  }
+
+  @override
+  String get shareNotSpecified => 'Δεν ορίστηκε';
+
+  @override
+  String get shareFooterTagline =>
+      'Κοινοποιήθηκε μέσω PackBuddy — ο μινιμαλιστικός ταξιδιωτικός σας σύντροφος.';
+
+  @override
+  String get shareFooterShort => 'Κοινοποιήθηκε μέσω PackBuddy';
+
+  @override
+  String shareTripSubject(String title) {
+    return 'Ταξίδι PackBuddy: $title';
+  }
+
+  @override
+  String shareChecklistSubject(String title) {
+    return 'Λίστα αποσκευών: $title';
+  }
+
+  @override
+  String shareInviteText(String title) {
+    return '✈️ Έλα στο ταξίδι μου «$title» στο PackBuddy!';
+  }
+
+  @override
+  String get shareInviteHowTo => 'PackBuddy → Ταξίδια → Συμμετοχή σε ταξίδι';
+
+  @override
+  String shareInviteSubject(String title) {
+    return 'Πρόσκληση ταξιδιού PackBuddy: $title';
+  }
+
+  @override
+  String get notificationChannelRemindersName => 'Υπενθυμίσεις αποσκευών';
+
+  @override
+  String get notificationChannelRemindersDescription =>
+      'Έξυπνες ειδοποιήσεις και υπενθυμίσεις αποσκευών πριν την αναχώρηση';
+
+  @override
+  String get notificationChannelAlertsName =>
+      'Ειδοποιήσεις συστήματος & διαχείρισης';
+
+  @override
+  String get notificationChannelAlertsDescription =>
+      'Σημαντικές ειδοποιήσεις λογαριασμού, ασφάλειας και διαχείρισης';
+
+  @override
+  String get notificationDefaultTitle => 'Ειδοποίηση PackBuddy';
+
+  @override
+  String get worldMapCardTitle => 'Παγκόσμιος ταξιδιωτικός χάρτης';
+
+  @override
+  String get worldMapChipLived => 'Έζησε';
 }

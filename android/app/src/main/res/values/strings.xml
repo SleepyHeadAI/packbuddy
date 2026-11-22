@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget strings. Generated from lib/core/services/app_widget_localization.dart; keep in sync. -->
+<resources>
+    <string name="widget_brand" translatable="false">PackBuddy</string>
+    <string name="widget_label_trip">PackBuddy: Active Trip</string>
+    <string name="widget_label_trip_medium">PackBuddy: Active Trip (Medium)</string>
+    <string name="widget_label_trip_large">PackBuddy: Active Trip (Large)</string>
+    <string name="widget_label_map">PackBuddy: World Map</string>
+    <string name="widget_label_map_medium">PackBuddy: World Map (Medium)</string>
+    <string name="widget_label_map_large">PackBuddy: World Map (Large)</string>
+    <string name="widget_label_expense">PackBuddy: Quick Expense</string>
+    <string name="widget_label_expense_medium">PackBuddy: Quick Expense (Medium)</string>
+    <string name="widget_label_expense_large">PackBuddy: Quick Expense (Large)</string>
+    <string name="widget_label_currency">PackBuddy: Currency Converter</string>
+    <string name="widget_label_currency_medium">PackBuddy: Currency Converter (Medium)</string>
+    <string name="widget_label_currency_large">PackBuddy: Currency Converter (Large)</string>
+    <string name="widget_trip_app_name">PackBuddy • Trip</string>
+    <string name="widget_world_app_name">PackBuddy • World</string>
+    <string name="widget_rates_app_name">PackBuddy • Rates</string>
+    <string name="widget_budget_app_name">PackBuddy • Budget</string>
+    <string name="widget_add_expense">Add Expense</string>
+    <string name="widget_add_expense_action">+ Add Expense</string>
+    <string name="widget_quick_log">Quick Log</string>
+    <string name="widget_spent">Spent</string>
+    <string name="widget_spent_budget">Spent Budget</string>
+    <string name="widget_remaining_budget">Remaining Budget</string>
+    <string name="widget_last_expense">Last Expense</string>
+    <string name="widget_no_expense_yet">No expenses recorded yet</string>
+    <string name="widget_packing">Packing</string>
+    <string name="widget_packing_zero">Packing: 0/0</string>
+    <string name="widget_countdown_started">Countdown active</string>
+    <string name="widget_plan_next_trip">Plan your next trip</string>
+    <string name="widget_currency">Currency Converter</string>
+    <string name="widget_quick_conversions">Quick Conversions</string>
+    <string name="widget_live_rates">Live Rates</string>
+    <string name="widget_live_rates_dot">● Live Rates</string>
+    <string name="widget_auto_sync">✓ Auto Bidirectional Sync</string>
+    <string name="widget_offline_ready">Offline Ready</string>
+    <string name="widget_exploration_rate">Exploration Rate</string>
+    <string name="widget_countries_visited">%1$d Countries Visited</string>
+    <string name="widget_continents_explored">%1$d Continents Explored</string>
+    <string name="widget_stat_visited">✈️ %1$d Visited</string>
+    <string name="widget_stat_wishlist">🌟 %1$d Wishlist</string>
+    <string name="widget_stat_continents">🌍 %1$d Continents</string>
+    <string name="widget_legend_lived">● Lived (%1$d)</string>
+    <string name="widget_countries_visited_zero">World Map</string>
+    <string name="widget_continents_explored_zero">Mark countries on map</string>
+    <string name="widget_stat_visited_zero">✈️ 0 Visited</string>
+    <string name="widget_stat_wishlist_zero">🌟 0 Wishlist</string>
+    <string name="widget_stat_continents_zero">🌍 0 Continents</string>
+    <string name="widget_legend_lived_zero">● Lived (0)</string>
+    <string name="widget_legend_visited_zero">● Visited (0)</string>
+    <string name="widget_legend_wishlist_zero">● Wishlist (0)</string>
+    <string name="widget_tap_to_open">Tap to open</string>
+    <string name="widget_quick_expense_title">Quick Expense</string>
+    <string name="widget_quick_expense_prefix">Quick</string>
+</resources>

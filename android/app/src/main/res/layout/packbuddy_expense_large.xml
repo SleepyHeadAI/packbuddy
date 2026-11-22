@@ -36,7 +36,7 @@
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="PackBuddy • Bütçe"
+                android:text="@string/widget_budget_app_name"
                 android:textColor="#3B82F6"
                 android:textSize="11.5sp"
                 android:textStyle="bold" />
@@ -50,7 +50,7 @@
                 android:paddingTop="3dp"
                 android:paddingEnd="8dp"
                 android:paddingBottom="3dp"
-                android:text="Hızlı Kayıt"
+                android:text="@string/widget_quick_log"
                 android:textColor="#FFFFFF"
                 android:textSize="10sp"
                 android:textStyle="bold" />
@@ -79,7 +79,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="Harcanan Bütçe"
+                    android:text="@string/widget_spent_budget"
                     android:textColor="#94A3B8"
                     android:textSize="10sp" />
 
@@ -114,7 +114,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="Kalan Bütçe"
+                    android:text="@string/widget_remaining_budget"
                     android:textColor="#94A3B8"
                     android:textSize="10sp" />
 
@@ -148,7 +148,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Son Harcama"
+                android:text="@string/widget_last_expense"
                 android:textColor="#94A3B8"
                 android:textSize="10sp" />
 
@@ -159,7 +159,7 @@
                 android:layout_marginTop="2dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Henüz harcama kaydedilmedi"
+                android:text="@string/widget_no_expense_yet"
                 android:textColor="#FFFFFF"
                 android:textSize="11.5sp"
                 android:textStyle="bold" />
@@ -185,7 +185,7 @@
                 android:id="@+id/widget_large_add_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="+ Harcama Ekle"
+                android:text="@string/widget_add_expense_action"
                 android:textColor="#FFFFFF"
                 android:textSize="13sp"
                 android:textStyle="bold" />

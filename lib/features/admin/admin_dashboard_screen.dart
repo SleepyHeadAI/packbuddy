@@ -8700,11 +8700,15 @@ class _SendWarningBottomSheetState extends ConsumerState<_SendWarningBottomSheet
                     onPressed: () {
                       EmailDispatchService.instance.launchEmailDraft(
                         toEmail: widget.user.email,
-                        subject: '⚠️ PackBuddy Bildirimi: $title',
+                        subject: EmailDispatchService.instance.formatWarningEmailSubject(
+                          title: title,
+                          languageCode: widget.user.appLanguage,
+                        ),
                         body: EmailDispatchService.instance.formatWarningEmailText(
                           displayName: widget.user.displayName,
                           title: title,
                           message: message,
+                          languageCode: widget.user.appLanguage,
                         ),
                       );
                     },
@@ -8735,11 +8739,15 @@ class _SendWarningBottomSheetState extends ConsumerState<_SendWarningBottomSheet
                       Navigator.of(dCtx).pop();
                       EmailDispatchService.instance.launchEmailDraft(
                         toEmail: widget.user.email,
-                        subject: '⚠️ PackBuddy Bildirimi: $title',
+                        subject: EmailDispatchService.instance.formatWarningEmailSubject(
+                          title: title,
+                          languageCode: widget.user.appLanguage,
+                        ),
                         body: EmailDispatchService.instance.formatWarningEmailText(
                           displayName: widget.user.displayName,
                           title: title,
                           message: message,
+                          languageCode: widget.user.appLanguage,
                         ),
                       );
                     },
@@ -8983,11 +8991,15 @@ class _SendWarningBottomSheetState extends ConsumerState<_SendWarningBottomSheet
                             final message = _messageController.text.trim();
                             EmailDispatchService.instance.launchEmailDraft(
                               toEmail: widget.user.email,
-                              subject: '⚠️ PackBuddy Bildirimi: ${title.isNotEmpty ? title : "Önemli Uyarı"}',
+                              subject: EmailDispatchService.instance.formatWarningEmailSubject(
+                                title: title,
+                                languageCode: widget.user.appLanguage,
+                              ),
                               body: EmailDispatchService.instance.formatWarningEmailText(
                                 displayName: widget.user.displayName,
                                 title: title,
                                 message: message,
+                                languageCode: widget.user.appLanguage,
                               ),
                             );
                           },

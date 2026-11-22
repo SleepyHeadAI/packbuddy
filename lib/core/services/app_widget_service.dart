@@ -15,6 +15,7 @@ import '../../features/travel_map/data/travel_map_service.dart';
 import '../../features/travel_map/domain/travel_country.dart';
 import '../../features/travel_map/presentation/screens/travel_map_screen.dart';
 import '../utils/currency_formatter.dart';
+import '../l10n/app_l10n_lookup.dart';
 import 'app_widget_localization.dart';
 import 'currency_service.dart';
 import 'preferences_service.dart';
@@ -536,6 +537,9 @@ class AppWidgetService {
         await HomeWidget.saveWidgetData<String>('quick_expense_no_last', noLastExpenseText);
         await HomeWidget.saveWidgetData<String>('quick_expense_add_action', addExpenseLabel);
         await HomeWidget.saveWidgetData<String>('quick_expense_quick_log', quickLogBadge);
+        final widgetL10n = appL10nFor(lang);
+        await HomeWidget.saveWidgetData<String>('quick_expense_insert_title', widgetL10n.widgetQuickExpenseTitle);
+        await HomeWidget.saveWidgetData<String>('quick_expense_insert_prefix', widgetL10n.widgetQuickExpensePrefix);
         await HomeWidget.saveWidgetData<bool>('quick_expense_show_remaining', showRemaining);
         await HomeWidget.saveWidgetData<bool>('quick_expense_show_last', showLast);
 

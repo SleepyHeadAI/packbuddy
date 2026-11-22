@@ -2663,10 +2663,10 @@ class AppWidgetLocalization {
     }
   }
 
-  /// Resolves "Çevrim Çevrimdışı Hazır" label across 20 languages
+  /// Resolves "Çevrimdışı Hazır" label across 20 languages
   static String getOfflineReadyLabel(String lang) {
     switch (lang) {
-      case 'tr': return 'Çevrim Çevrimdışı Hazır';
+      case 'tr': return 'Çevrimdışı Hazır';
       case 'es': return 'Listo sin conexión';
       case 'fr': return 'Prêt hors ligne';
       case 'de': return 'Offline bereit';

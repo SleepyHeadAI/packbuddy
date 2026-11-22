@@ -4,6 +4,7 @@ import '../../features/budget/domain/trip.dart';
 import '../../features/budget/domain/expense.dart';
 import '../../features/checklist/domain/packing_item.dart';
 import '../../l10n/app_localizations.dart';
+import '../l10n/app_l10n_lookup.dart';
 import '../utils/currency_formatter.dart';
 import 'package:packbuddy/core/constants/app_constants.dart';
 
@@ -18,6 +19,7 @@ class ShareService {
     List<PackingItem> items = const [],
     AppLocalizations? l10n,
   }) async {
+    final t = l10n ?? appL10nFor();
     final title = trip.title.isNotEmpty ? trip.title : trip.destination;
     final totalSpent = expenses.where((e) => !e.isDeleted).fold<double>(
           0.0,
@@ -31,26 +33,26 @@ class ShareService {
     buffer.writeln('📍 ${trip.destination}');
     buffer.writeln('📅 ${trip.startDate.day}/${trip.startDate.month}/${trip.startDate.year} - ${trip.endDate.day}/${trip.endDate.month}/${trip.endDate.year}');
     buffer.writeln('');
-    final budgetLabel = l10n?.budget ?? 'Budget';
-    final spentLabel = l10n?.spent ?? 'Spent';
-    buffer.writeln('💰 $budgetLabel: ${trip.budgetLimit != null ? CurrencyFormatter.format(trip.budgetLimit!, currency: trip.defaultCurrency) : 'Not specified'}');
+    final budgetLabel = t.budget;
+    final spentLabel = t.spent;
+    buffer.writeln('💰 $budgetLabel: ${trip.budgetLimit != null ? CurrencyFormatter.format(trip.budgetLimit!, currency: trip.defaultCurrency) : t.shareNotSpecified}');
     buffer.writeln('💳 $spentLabel: ${CurrencyFormatter.format(totalSpent, currency: trip.defaultCurrency)}');
     if (totalItems > 0) {
-      final checklistLabel = l10n?.shareChecklist ?? 'Packing';
+      final checklistLabel = t.shareChecklist;
       final pct = ((packedCount / totalItems) * 100).toInt();
       buffer.writeln('🎒 $checklistLabel: $packedCount / $totalItems ($pct%)');
     }
 
     if (AppConstants.kInviteCodeJoinEnabled && trip.inviteCode != null && trip.inviteCode!.isNotEmpty) {
       buffer.writeln('');
-      final joinTripLabel = l10n?.joinSharedTrip ?? 'Join this trip on PackBuddy with code';
+      final joinTripLabel = t.joinSharedTrip;
       buffer.writeln('🤝 $joinTripLabel: ${trip.inviteCode}');
     }
 
     buffer.writeln('');
-    buffer.writeln('Shared via PackBuddy — Your minimalist travel companion.');
+    buffer.writeln(t.shareFooterTagline);
 
-    return await _shareText(buffer.toString(), subject: 'PackBuddy Trip: $title');
+    return await _shareText(buffer.toString(), subject: t.shareTripSubject(title));
   }
 
   /// Formats and shares packing checklist
@@ -59,8 +61,9 @@ class ShareService {
     required List<PackingItem> items,
     AppLocalizations? l10n,
   }) async {
+    final t = l10n ?? appL10nFor();
     final buffer = StringBuffer();
-    final checklistTitle = l10n?.shareChecklist ?? 'Packing Checklist';
+    final checklistTitle = t.shareChecklist;
     buffer.writeln('🎒 $checklistTitle: $tripTitle');
     buffer.writeln('');
 
@@ -81,8 +84,8 @@ class ShareService {
       buffer.writeln('');
     }
 
-    buffer.writeln('Shared via PackBuddy');
-    return await _shareText(buffer.toString(), subject: 'Checklist: $tripTitle');
+    buffer.writeln(t.shareFooterShort);
+    return await _shareText(buffer.toString(), subject: t.shareChecklistSubject(tripTitle));
   }
 
   /// Shares collaboration invite code for a trip
@@ -92,12 +95,11 @@ class ShareService {
     AppLocalizations? l10n,
   }) async {
     final title = trip.title.isNotEmpty ? trip.title : trip.destination;
-    final joinLabel = l10n?.joinSharedTrip ?? 'Join my travel list';
-    final inviteCodeLabel = l10n?.inviteCode ?? 'Invite Code';
-    final text = '✈️ $joinLabel "$title" on PackBuddy!\n\n'
-        '$inviteCodeLabel: $inviteCode\n\n'
-        'PackBuddy -> Trips -> Join Trip';
-    return await _shareText(text, subject: 'PackBuddy Trip Invite: $title');
+    final t = l10n ?? appL10nFor();
+    final text = '${t.shareInviteText(title)}\n\n'
+        '${t.inviteCode}: $inviteCode\n\n'
+        '${t.shareInviteHowTo}';
+    return await _shareText(text, subject: t.shareInviteSubject(title));
   }
 
   /// Public helper to share arbitrary text across channels with clipboard fallback

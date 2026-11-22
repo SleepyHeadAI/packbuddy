@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="PackBuddy • World"
+                android:text="@string/widget_world_app_name"
                 android:textColor="#3B82F6"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -50,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="28 Countries Visited"
+                android:text="@string/widget_countries_visited_zero"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -86,7 +86,7 @@
                     android:layout_weight="1"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="✈️ 28 Visited"
+                    android:text="@string/widget_stat_visited_zero"
                     android:textColor="#38BDF8"
                     android:textSize="11sp"
                     android:textStyle="bold" />
@@ -97,7 +97,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="🌟 0 Wishlist"
+                    android:text="@string/widget_stat_wishlist_zero"
                     android:textColor="#34D399"
                     android:textSize="11sp"
                     android:textStyle="bold" />
@@ -178,7 +178,7 @@
                     android:layout_marginTop="4dp"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="Harcama Ekle"
+                    android:text="@string/widget_add_expense"
                     android:textColor="#FFFFFF"
                     android:textSize="10.5sp"
                     android:textStyle="bold" />
@@ -214,7 +214,7 @@
                     android:layout_marginTop="4dp"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="Döviz"
+                    android:text="@string/widget_currency"
                     android:textColor="#FFFFFF"
                     android:textSize="10.5sp"
                     android:textStyle="bold" />

@@ -2216,4 +2216,266 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get subscriptionAutoRenewNotice =>
       '定期購入は、更新の24時間前までに解約しない限り、各期間の終了時に自動更新されます。お支払いは Google Play アカウントに請求されます。Google Play › 定期購入からいつでも解約できます。';
+
+  @override
+  String get restorePurchases => '購入を復元';
+
+  @override
+  String get restorePurchasesSuccess => '購入を復元しました！';
+
+  @override
+  String get restoreNoPurchasesFound => '復元できる有効なサブスクリプションが見つかりません。';
+
+  @override
+  String get errorPurchaseFailed => '購入を完了できませんでした。もう一度お試しください。';
+
+  @override
+  String get errorGenericRetry => '問題が発生しました。もう一度お試しください。';
+
+  @override
+  String get errorChecklistLoadFailed => '持ち物リストを読み込めませんでした。';
+
+  @override
+  String get activitySaveFailed => 'アクティビティを保存できませんでした';
+
+  @override
+  String get worldMapLiveCoverage => 'リアルタイムの探索・塗りつぶし状況';
+
+  @override
+  String worldMapFriendMap(String name) {
+    return '$nameのマップ';
+  }
+
+  @override
+  String worldMapFriendWorldMap(String name) {
+    return '$nameの世界地図';
+  }
+
+  @override
+  String get worldMapFriendFallbackName => '友達';
+
+  @override
+  String get worldMapOpenMap => '地図を開く';
+
+  @override
+  String get worldMapInspect => '見る';
+
+  @override
+  String get worldMapGoToMap => '地図へ';
+
+  @override
+  String get worldMapZoomInspect => '拡大して見る';
+
+  @override
+  String get worldMapExplored => '世界の探索率';
+
+  @override
+  String worldMapVisitedOfTotal(int visited, int total) {
+    return '訪問済み $visited / $total';
+  }
+
+  @override
+  String get worldMapContinentsChip => '大陸';
+
+  @override
+  String worldMapMutualCountries(int count, String countries) {
+    return '共通の訪問国（$count）：$countries';
+  }
+
+  @override
+  String get worldMapPinchToExplore => 'ピンチまたはダブルタップで拡大';
+
+  @override
+  String get statusPresetPacking => '🧳 荷造り中';
+
+  @override
+  String get statusPresetOnTheRoad => '✈️ 移動中 / 機内';
+
+  @override
+  String get statusPresetVacation => '🏖️ バカンス中';
+
+  @override
+  String get statusPresetPlanning => '🗺️ 新しいルートを計画中';
+
+  @override
+  String get statusPresetResting => '🏡 自宅でひと休み';
+
+  @override
+  String emailGreeting(String name) {
+    return '$name 様';
+  }
+
+  @override
+  String get emailDefaultName => '旅行者';
+
+  @override
+  String get emailContactFooter => 'ご質問やご意見は、PackBuddy アプリからお問い合わせください。';
+
+  @override
+  String get emailSignoff => 'よい旅を。';
+
+  @override
+  String get emailTeamSignature => 'PackBuddy チーム';
+
+  @override
+  String emailAdminNoticeSubject(String title) {
+    return '⚠️ PackBuddy からのお知らせ：$title';
+  }
+
+  @override
+  String get emailAdminNoticeHeading => 'PackBuddy 管理者からのお知らせ';
+
+  @override
+  String get emailAdminNoticeFooter => 'このお知らせは PackBuddy 管理チームから送信されました。';
+
+  @override
+  String emailInactivitySubject(int days, int count) {
+    return '⚠️ PackBuddy アカウントは $days 日後に削除されます（通知 #$count）';
+  }
+
+  @override
+  String get emailInactivityHeading => 'PackBuddy アカウント非アクティブのお知らせ';
+
+  @override
+  String get emailInactivityIntro =>
+      'PackBuddy アカウントへのログインが約 5 か月間ないことを確認しました。';
+
+  @override
+  String get emailInactivityPolicy =>
+      'データ保持およびプライバシーポリシーに基づき、6 か月（180 日）間ログインのないアカウントは、旅行・支出・持ち物リスト・保管庫の書類とともに完全に削除されます。';
+
+  @override
+  String emailInactivityRemaining(int days) {
+    return 'アカウントとすべてのデータが完全に削除されるまで、残り約 $days 日です。';
+  }
+
+  @override
+  String get emailInactivityAction =>
+      'アカウントとすべての旅行データを残すには、PackBuddy アプリにログインするだけです。ログインした時点でアカウントは有効なまま維持されます。';
+
+  @override
+  String emailInactivityNoticeCount(int count) {
+    return '（5 か月目に毎週送信される自動リマインダー：#$count）';
+  }
+
+  @override
+  String get emailInactivityCta => 'アカウントを残すために必要なのは、アプリへのログインだけです！';
+
+  @override
+  String get emailInactivityFooter =>
+      'このメールは PackBuddy の自動アカウント保護サービスから送信されました。';
+
+  @override
+  String get emailPurgedSubject => '6 か月間ご利用がなかったため PackBuddy アカウントを削除しました';
+
+  @override
+  String get emailPurgedBody =>
+      'PackBuddy アカウントに 6 か月（180 日）間ログインがなかったため、当社のセキュリティおよびデータ保護ポリシーに基づき、アカウントとすべてのデータを完全に削除しました。';
+
+  @override
+  String get widgetQuickExpenseTitle => 'クイック支出';
+
+  @override
+  String get widgetQuickExpensePrefix => 'クイック';
+
+  @override
+  String currencyPickerWorldCount(int count) {
+    return '世界の通貨 $count 種類';
+  }
+
+  @override
+  String get currencyPickerSearchHint => '通貨を検索（例：USD、EUR、TRY、JPY）...';
+
+  @override
+  String currencyPickerResetTo(String currency) {
+    return '$currency に戻す';
+  }
+
+  @override
+  String get currencyPickerNoResults => '通貨が見つかりません';
+
+  @override
+  String get searchTripNotFound => '旅行の詳細が見つかりません';
+
+  @override
+  String get friendProfileFallbackTitle => '旅行者プロフィール';
+
+  @override
+  String get legalPrivacyHubTitle => 'PackBuddy 法務・プライバシー';
+
+  @override
+  String consentAcceptedAt(String date) {
+    return '同意日時：$date';
+  }
+
+  @override
+  String get consentBadgeGdpr => 'GDPR（EU 2016/679）';
+
+  @override
+  String get consentBadgeKvkk => 'KVKK（法律第 6698 号）';
+
+  @override
+  String get consentBadgeEncryption => 'AES-256 暗号化';
+
+  @override
+  String get consentBadgeZeroPii => '個人情報ゼロのテレメトリー';
+
+  @override
+  String consentArticleNumber(String number) {
+    return '第 $number 条';
+  }
+
+  @override
+  String get shareNotSpecified => '未設定';
+
+  @override
+  String get shareFooterTagline => 'PackBuddy で共有 — ミニマルな旅のパートナー。';
+
+  @override
+  String get shareFooterShort => 'PackBuddy で共有';
+
+  @override
+  String shareTripSubject(String title) {
+    return 'PackBuddy の旅行：$title';
+  }
+
+  @override
+  String shareChecklistSubject(String title) {
+    return '持ち物リスト：$title';
+  }
+
+  @override
+  String shareInviteText(String title) {
+    return '✈️ PackBuddy で旅行「$title」に参加しよう！';
+  }
+
+  @override
+  String get shareInviteHowTo => 'PackBuddy → 旅行 → 旅行に参加';
+
+  @override
+  String shareInviteSubject(String title) {
+    return 'PackBuddy 旅行への招待：$title';
+  }
+
+  @override
+  String get notificationChannelRemindersName => '荷造りリマインダー';
+
+  @override
+  String get notificationChannelRemindersDescription => '出発前のスマート通知と荷造りリマインダー';
+
+  @override
+  String get notificationChannelAlertsName => 'システム・管理者からのお知らせ';
+
+  @override
+  String get notificationChannelAlertsDescription =>
+      'アカウント・セキュリティ・管理に関する重要なお知らせ';
+
+  @override
+  String get notificationDefaultTitle => 'PackBuddy からの通知';
+
+  @override
+  String get worldMapCardTitle => '世界旅行マップ';
+
+  @override
+  String get worldMapChipLived => '居住';
 }

@@ -399,7 +399,7 @@ class _LegalConsentScreenState extends ConsumerState<LegalConsentScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'PackBuddy Legal & Privacy',
+                      AppLocalizations.of(context)!.legalPrivacyHubTitle,
                       style: AppTheme.labelFont(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w800,
@@ -484,7 +484,7 @@ class _LegalConsentScreenState extends ConsumerState<LegalConsentScreen> {
                 if (date != null) ...[
                   const SizedBox(height: 2),
                   Text(
-                    'Kabul Tarihi / Accepted At: $date',
+                    AppLocalizations.of(context)!.consentAcceptedAt(date),
                     style: TextStyle(
                       fontSize: 11,
                       color: isDark
@@ -503,20 +503,21 @@ class _LegalConsentScreenState extends ConsumerState<LegalConsentScreen> {
 
   /// Badges: GDPR, KVKK, AES-256, Zero-PII
   Widget _buildComplianceBadges(bool isDark, bool isSmallScreen) {
+    final l10n = AppLocalizations.of(context)!;
     final badges = [
       (
-        'GDPR (EU 2016/679)',
+        l10n.consentBadgeGdpr,
         Icons.verified_user_outlined,
         const Color(0xFF2563EB),
       ),
-      ('KVKK (6698 Sayılı)', Icons.policy_outlined, const Color(0xFF0D9488)),
+      (l10n.consentBadgeKvkk, Icons.policy_outlined, const Color(0xFF0D9488)),
       (
-        'AES-256 Şifreleme',
+        l10n.consentBadgeEncryption,
         Icons.lock_outline_rounded,
         const Color(0xFFD97706),
       ),
       (
-        'Sıfır PII Telemetri',
+        l10n.consentBadgeZeroPii,
         Icons.visibility_off_outlined,
         const Color(0xFF10B981),
       ),
@@ -822,7 +823,7 @@ class _LegalConsentScreenState extends ConsumerState<LegalConsentScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      'Madde ${article.number}',
+                      AppLocalizations.of(context)!.consentArticleNumber('${article.number}'),
                       style: TextStyle(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w800,

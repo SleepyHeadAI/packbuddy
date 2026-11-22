@@ -2326,4 +2326,282 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get subscriptionAutoRenewNotice =>
       'A assinatura é renovada automaticamente ao fim de cada período, a menos que seja cancelada pelo menos 24 horas antes da renovação. O pagamento é cobrado na sua conta do Google Play. Cancele quando quiser em Google Play › Assinaturas.';
+
+  @override
+  String get restorePurchases => 'Restaurar compras';
+
+  @override
+  String get restorePurchasesSuccess =>
+      'As suas compras foram restauradas com sucesso!';
+
+  @override
+  String get restoreNoPurchasesFound =>
+      'Nenhuma subscrição ativa encontrada para restaurar.';
+
+  @override
+  String get errorPurchaseFailed =>
+      'Não foi possível concluir a compra. Tente novamente.';
+
+  @override
+  String get errorGenericRetry => 'Algo correu mal. Tente novamente.';
+
+  @override
+  String get errorChecklistLoadFailed =>
+      'Não foi possível carregar a sua lista de bagagem.';
+
+  @override
+  String get activitySaveFailed => 'Não foi possível guardar a atividade';
+
+  @override
+  String get worldMapLiveCoverage => 'Exploração e cobertura em tempo real';
+
+  @override
+  String worldMapFriendMap(String name) {
+    return 'Mapa de $name';
+  }
+
+  @override
+  String worldMapFriendWorldMap(String name) {
+    return 'Mapa-múndi de $name';
+  }
+
+  @override
+  String get worldMapFriendFallbackName => 'o seu amigo';
+
+  @override
+  String get worldMapOpenMap => 'Abrir mapa';
+
+  @override
+  String get worldMapInspect => 'Ver';
+
+  @override
+  String get worldMapGoToMap => 'Ir para o mapa';
+
+  @override
+  String get worldMapZoomInspect => 'Ampliar e ver';
+
+  @override
+  String get worldMapExplored => 'Mundo explorado';
+
+  @override
+  String worldMapVisitedOfTotal(int visited, int total) {
+    return '$visited / $total visitados';
+  }
+
+  @override
+  String get worldMapContinentsChip => 'Continentes';
+
+  @override
+  String worldMapMutualCountries(int count, String countries) {
+    return 'Países visitados em comum ($count): $countries';
+  }
+
+  @override
+  String get worldMapPinchToExplore =>
+      'Aperte ou toque duas vezes para explorar';
+
+  @override
+  String get statusPresetPacking => '🧳 A fazer as malas';
+
+  @override
+  String get statusPresetOnTheRoad => '✈️ A caminho / No ar';
+
+  @override
+  String get statusPresetVacation => '🏖️ Em modo férias';
+
+  @override
+  String get statusPresetPlanning => '🗺️ A planear uma nova rota';
+
+  @override
+  String get statusPresetResting => '🏡 A descansar em casa';
+
+  @override
+  String emailGreeting(String name) {
+    return 'Olá $name,';
+  }
+
+  @override
+  String get emailDefaultName => 'viajante';
+
+  @override
+  String get emailContactFooter =>
+      'Se tiver dúvidas ou comentários, contacte-nos através da app PackBuddy.';
+
+  @override
+  String get emailSignoff => 'Boa viagem,';
+
+  @override
+  String get emailTeamSignature => 'A equipa PackBuddy';
+
+  @override
+  String emailAdminNoticeSubject(String title) {
+    return '⚠️ Aviso PackBuddy: $title';
+  }
+
+  @override
+  String get emailAdminNoticeHeading => 'Aviso da administração PackBuddy';
+
+  @override
+  String get emailAdminNoticeFooter =>
+      'Este aviso foi enviado pela equipa de administração da PackBuddy.';
+
+  @override
+  String emailInactivitySubject(int days, int count) {
+    return '⚠️ A sua conta PackBuddy será eliminada dentro de $days dias (Aviso n.º $count)';
+  }
+
+  @override
+  String get emailInactivityHeading =>
+      'Aviso de inatividade da conta PackBuddy';
+
+  @override
+  String get emailInactivityIntro =>
+      'Reparámos que não inicia sessão na sua conta PackBuddy há cerca de 5 meses.';
+
+  @override
+  String get emailInactivityPolicy =>
+      'De acordo com a nossa política de retenção de dados e privacidade, as contas sem início de sessão durante 6 meses (180 dias) são eliminadas permanentemente, juntamente com viagens, despesas, listas de bagagem e documentos do cofre.';
+
+  @override
+  String emailInactivityRemaining(int days) {
+    return 'Faltam cerca de $days dias para a eliminação permanente da sua conta e de todos os seus dados.';
+  }
+
+  @override
+  String get emailInactivityAction =>
+      'Para manter a sua conta e todos os dados de viagem, basta iniciar sessão na app PackBuddy. A sua conta mantém-se ativa assim que iniciar sessão.';
+
+  @override
+  String emailInactivityNoticeCount(int count) {
+    return '(Lembrete semanal automático durante o 5.º mês: n.º $count)';
+  }
+
+  @override
+  String get emailInactivityCta =>
+      'Para manter a sua conta, basta iniciar sessão na app!';
+
+  @override
+  String get emailInactivityFooter =>
+      'Este e-mail foi enviado pelo serviço automático de proteção de contas da PackBuddy.';
+
+  @override
+  String get emailPurgedSubject =>
+      'A sua conta PackBuddy foi eliminada após 6 meses de inatividade';
+
+  @override
+  String get emailPurgedBody =>
+      'Como não foi iniciada sessão na sua conta PackBuddy durante 6 meses (180 dias), a conta e todos os dados foram eliminados permanentemente, de acordo com a nossa política de segurança e proteção de dados.';
+
+  @override
+  String get widgetQuickExpenseTitle => 'Despesa rápida';
+
+  @override
+  String get widgetQuickExpensePrefix => 'Rápida';
+
+  @override
+  String currencyPickerWorldCount(int count) {
+    return '$count moedas do mundo';
+  }
+
+  @override
+  String get currencyPickerSearchHint =>
+      'Pesquisar moeda (ex.: USD, EUR, TRY, JPY)...';
+
+  @override
+  String currencyPickerResetTo(String currency) {
+    return 'Repor para $currency';
+  }
+
+  @override
+  String get currencyPickerNoResults => 'Nenhuma moeda encontrada';
+
+  @override
+  String get searchTripNotFound =>
+      'Não foi possível encontrar os detalhes da viagem';
+
+  @override
+  String get friendProfileFallbackTitle => 'Perfil do viajante';
+
+  @override
+  String get legalPrivacyHubTitle =>
+      'PackBuddy – Informação legal e privacidade';
+
+  @override
+  String consentAcceptedAt(String date) {
+    return 'Aceite em: $date';
+  }
+
+  @override
+  String get consentBadgeGdpr => 'RGPD (UE 2016/679)';
+
+  @override
+  String get consentBadgeKvkk => 'KVKK (Lei n.º 6698)';
+
+  @override
+  String get consentBadgeEncryption => 'Encriptação AES-256';
+
+  @override
+  String get consentBadgeZeroPii => 'Telemetria sem dados pessoais';
+
+  @override
+  String consentArticleNumber(String number) {
+    return 'Artigo $number';
+  }
+
+  @override
+  String get shareNotSpecified => 'Não especificado';
+
+  @override
+  String get shareFooterTagline =>
+      'Partilhado via PackBuddy — o seu companheiro de viagem minimalista.';
+
+  @override
+  String get shareFooterShort => 'Partilhado via PackBuddy';
+
+  @override
+  String shareTripSubject(String title) {
+    return 'Viagem PackBuddy: $title';
+  }
+
+  @override
+  String shareChecklistSubject(String title) {
+    return 'Lista de bagagem: $title';
+  }
+
+  @override
+  String shareInviteText(String title) {
+    return '✈️ Junte-se à minha viagem \"$title\" no PackBuddy!';
+  }
+
+  @override
+  String get shareInviteHowTo => 'PackBuddy → Viagens → Juntar-se a viagem';
+
+  @override
+  String shareInviteSubject(String title) {
+    return 'Convite de viagem PackBuddy: $title';
+  }
+
+  @override
+  String get notificationChannelRemindersName => 'Lembretes de bagagem';
+
+  @override
+  String get notificationChannelRemindersDescription =>
+      'Notificações inteligentes e lembretes de bagagem antes da partida';
+
+  @override
+  String get notificationChannelAlertsName =>
+      'Alertas do sistema e da administração';
+
+  @override
+  String get notificationChannelAlertsDescription =>
+      'Alertas importantes de conta, segurança e administração';
+
+  @override
+  String get notificationDefaultTitle => 'Notificação PackBuddy';
+
+  @override
+  String get worldMapCardTitle => 'Mapa-múndi de viagens';
+
+  @override
+  String get worldMapChipLived => 'Vivido';
 }

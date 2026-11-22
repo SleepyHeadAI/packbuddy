@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget strings. Generated from lib/core/services/app_widget_localization.dart; keep in sync. -->
+<resources>
+    <string name="widget_label_trip">PackBuddy: सक्रिय यात्रा</string>
+    <string name="widget_label_trip_medium">PackBuddy: सक्रिय यात्रा (मध्यम)</string>
+    <string name="widget_label_trip_large">PackBuddy: सक्रिय यात्रा (बड़ा)</string>
+    <string name="widget_label_map">PackBuddy: विश्व मानचित्र</string>
+    <string name="widget_label_map_medium">PackBuddy: विश्व मानचित्र (मध्यम)</string>
+    <string name="widget_label_map_large">PackBuddy: विश्व मानचित्र (बड़ा)</string>
+    <string name="widget_label_expense">PackBuddy: त्वरित व्यय</string>
+    <string name="widget_label_expense_medium">PackBuddy: त्वरित व्यय (मध्यम)</string>
+    <string name="widget_label_expense_large">PackBuddy: त्वरित व्यय (बड़ा)</string>
+    <string name="widget_label_currency">PackBuddy: मुद्रा परिवर्तक</string>
+    <string name="widget_label_currency_medium">PackBuddy: मुद्रा परिवर्तक (मध्यम)</string>
+    <string name="widget_label_currency_large">PackBuddy: मुद्रा परिवर्तक (बड़ा)</string>
+    <string name="widget_trip_app_name">PackBuddy • यात्रा</string>
+    <string name="widget_world_app_name">PackBuddy • विश्व</string>
+    <string name="widget_rates_app_name">PackBuddy • मुद्रा</string>
+    <string name="widget_budget_app_name">PackBuddy • बजट</string>
+    <string name="widget_add_expense">खर्च जोड़ें</string>
+    <string name="widget_add_expense_action">+ खर्च जोड़ें</string>
+    <string name="widget_quick_log">त्वरित प्रविष्टि</string>
+    <string name="widget_spent">खर्च</string>
+    <string name="widget_spent_budget">खर्च किया गया बजट</string>
+    <string name="widget_remaining_budget">शेष बजट</string>
+    <string name="widget_last_expense">अंतिम खर्च</string>
+    <string name="widget_no_expense_yet">अभी तक कोई खर्च दर्ज नहीं हुआ</string>
+    <string name="widget_packing">पैकिंग</string>
+    <string name="widget_packing_zero">पैकिंग: 0/0</string>
+    <string name="widget_countdown_started">उलटी गिनती जारी है</string>
+    <string name="widget_plan_next_trip">अपनी अगली यात्रा की योजना बनाएं</string>
+    <string name="widget_currency">मुद्रा परिवर्तक</string>
+    <string name="widget_quick_conversions">त्वरित रूपांतरण</string>
+    <string name="widget_live_rates">लाइव दरें</string>
+    <string name="widget_live_rates_dot">● लाइव दरें</string>
+    <string name="widget_auto_sync">✓ स्वतः द्विदिशीय समन्वय</string>
+    <string name="widget_offline_ready">ऑफ़लाइन तैयार</string>
+    <string name="widget_exploration_rate">अन्वेषण दर</string>
+    <string name="widget_countries_visited">%1$d देश घूमे</string>
+    <string name="widget_continents_explored">%1$d महाद्वीप खोजे गए</string>
+    <string name="widget_stat_visited">✈️ %1$d घूमे</string>
+    <string name="widget_stat_wishlist">🌟 %1$d इच्छासूची</string>
+    <string name="widget_stat_continents">🌍 %1$d महाद्वीप</string>
+    <string name="widget_legend_lived">● निवास किया (%1$d)</string>
+    <string name="widget_countries_visited_zero">विश्व मानचित्र</string>
+    <string name="widget_continents_explored_zero">मानचित्र पर देशों को चिह्नित करें</string>
+    <string name="widget_stat_visited_zero">✈️ 0 घूमे</string>
+    <string name="widget_stat_wishlist_zero">🌟 0 इच्छासूची</string>
+    <string name="widget_stat_continents_zero">🌍 0 महाद्वीप</string>
+    <string name="widget_legend_lived_zero">● निवास किया (0)</string>
+    <string name="widget_legend_visited_zero">● घूमे (0)</string>
+    <string name="widget_legend_wishlist_zero">● इच्छासूची (0)</string>
+    <string name="widget_tap_to_open">खोलने के लिए टैप करें</string>
+    <string name="widget_quick_expense_title">त्वरित व्यय</string>
+    <string name="widget_quick_expense_prefix">त्वरित</string>
+</resources>

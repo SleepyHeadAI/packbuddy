@@ -230,7 +230,7 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
         onDone: () => _purchaseSubscription?.cancel(),
         onError: (error) {
           debugPrint('[SubscriptionService] purchaseStream error: $error');
-          state = state.copyWith(isLoading: false, errorMessage: error.toString());
+          state = state.copyWith(isLoading: false, errorMessage: 'billing_error');
           _completeRestore(false);
         },
       );
@@ -307,9 +307,10 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
           state = state.copyWith(isLoading: true, errorMessage: null);
           break;
         case PurchaseStatus.error:
+          debugPrint('[SubscriptionService] purchase error: ${purchaseDetails.error?.message}');
           state = state.copyWith(
             isLoading: false,
-            errorMessage: purchaseDetails.error?.message ?? 'Purchase failed',
+            errorMessage: 'purchase_failed',
           );
           TelemetryService.instance.logProStatusChanged(isPro: false, source: 'google_play_error');
           break;
@@ -458,7 +459,7 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
       if (!isTestOrAdminConfirmation && !isStoreBillingConfigured) {
         state = state.copyWith(
           isLoading: false,
-          errorMessage: 'Store billing products ($productMonthly, $productAnnual) are not yet configured.',
+          errorMessage: 'products_not_configured',
         );
         return false;
       }
@@ -499,7 +500,7 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
         return initiated;
       } catch (e) {
         debugPrint('[SubscriptionService] InAppPurchase buy error: $e');
-        state = state.copyWith(isLoading: false, errorMessage: e.toString());
+        state = state.copyWith(isLoading: false, errorMessage: 'billing_error');
         return false;
       }
     }
@@ -534,7 +535,7 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
       if (!isTestOrAdminConfirmation && !isStoreBillingConfigured) {
         state = state.copyWith(
           isLoading: false,
-          errorMessage: 'Store billing products ($productMonthly, $productAnnual) are not yet configured.',
+          errorMessage: 'products_not_configured',
         );
         return false;
       }
@@ -555,7 +556,7 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
     if (!isStoreBillingConfigured && !_allowDebugSandbox(isTestOrAdminConfirmation)) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Store billing products ($productMonthly, $productAnnual) are not yet configured.',
+        errorMessage: 'products_not_configured',
       );
       return false;
     }
@@ -615,7 +616,7 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
 
     state = state.copyWith(
       isLoading: false,
-      errorMessage: 'No active Pro subscription found for this account.',
+      errorMessage: 'no_active_subscription',
     );
     return false;
   }

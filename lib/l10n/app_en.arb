@@ -2601,5 +2601,395 @@
   "subscriptionAutoRenewNotice": "Your subscription renews automatically at the end of each billing period unless cancelled at least 24 hours before renewal. Payment is charged to your Google Play account. You can cancel anytime in Google Play › Subscriptions.",
   "@subscriptionAutoRenewNotice": {
     "description": "Pre-purchase auto-renewal and cancellation disclosure on the paywall"
+  },
+  "restorePurchases": "Restore Purchases",
+  "@restorePurchases": {
+    "description": "Paywall button that restores previous Google Play purchases"
+  },
+  "restorePurchasesSuccess": "Your purchases were restored successfully!",
+  "@restorePurchasesSuccess": {
+    "description": "Snackbar shown after purchases were restored"
+  },
+  "restoreNoPurchasesFound": "No active subscription found to restore.",
+  "@restoreNoPurchasesFound": {
+    "description": "Snackbar shown when no active subscription can be restored"
+  },
+  "errorPurchaseFailed": "The purchase could not be completed. Please try again.",
+  "@errorPurchaseFailed": {
+    "description": "Shown when a Google Play purchase fails"
+  },
+  "errorGenericRetry": "Something went wrong. Please try again.",
+  "@errorGenericRetry": {
+    "description": "Generic user-facing error used instead of raw exception text"
+  },
+  "errorChecklistLoadFailed": "Your packing list could not be loaded.",
+  "@errorChecklistLoadFailed": {
+    "description": "Shown when the packing checklist cannot be loaded"
+  },
+  "activitySaveFailed": "Could not save activity",
+  "@activitySaveFailed": {
+    "description": "Shown when an itinerary activity cannot be saved"
+  },
+  "worldMapLiveCoverage": "Live Exploration & Coverage",
+  "@worldMapLiveCoverage": {
+    "description": "Subtitle of the world map card on the user's own profile"
+  },
+  "worldMapFriendMap": "{name}'s Map",
+  "@worldMapFriendMap": {
+    "description": "Subtitle of a friend's world map card",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "worldMapFriendWorldMap": "{name}'s World Map",
+  "@worldMapFriendWorldMap": {
+    "description": "Title of the zoomable dialog for a friend's world map",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "worldMapFriendFallbackName": "Friend",
+  "@worldMapFriendFallbackName": {
+    "description": "Used in place of a friend's name when it is unknown"
+  },
+  "worldMapOpenMap": "Open Map",
+  "@worldMapOpenMap": {
+    "description": "Button on the profile world map card that opens the full map"
+  },
+  "worldMapInspect": "Inspect",
+  "@worldMapInspect": {
+    "description": "Button on a friend's world map card that opens a zoomable preview"
+  },
+  "worldMapGoToMap": "Go to Map",
+  "@worldMapGoToMap": {
+    "description": "Overlay hint on the own-profile map preview"
+  },
+  "worldMapZoomInspect": "Zoom & Inspect",
+  "@worldMapZoomInspect": {
+    "description": "Overlay hint on a friend's map preview"
+  },
+  "worldMapExplored": "World Explored",
+  "@worldMapExplored": {
+    "description": "Highlight metric title on the world map card"
+  },
+  "worldMapVisitedOfTotal": "{visited} / {total} Visited",
+  "@worldMapVisitedOfTotal": {
+    "description": "Visited countries out of total on the world map card",
+    "placeholders": {
+      "visited": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "worldMapContinentsChip": "Continents",
+  "@worldMapContinentsChip": {
+    "description": "Short chip label for explored continents count"
+  },
+  "worldMapMutualCountries": "{count} Mutual Visited Countries: {countries}",
+  "@worldMapMutualCountries": {
+    "description": "Countries both users visited, shown on a friend's map card",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "countries": {
+        "type": "String"
+      }
+    }
+  },
+  "worldMapPinchToExplore": "Pinch or double-tap to explore",
+  "@worldMapPinchToExplore": {
+    "description": "Hint in the zoomable world map dialog"
+  },
+  "statusPresetPacking": "🧳 Packing my bags",
+  "@statusPresetPacking": {
+    "description": "Profile travel status preset chip"
+  },
+  "statusPresetOnTheRoad": "✈️ On the road / In the air",
+  "@statusPresetOnTheRoad": {
+    "description": "Profile travel status preset chip"
+  },
+  "statusPresetVacation": "🏖️ In vacation mode",
+  "@statusPresetVacation": {
+    "description": "Profile travel status preset chip"
+  },
+  "statusPresetPlanning": "🗺️ Planning a new route",
+  "@statusPresetPlanning": {
+    "description": "Profile travel status preset chip"
+  },
+  "statusPresetResting": "🏡 Resting at home",
+  "@statusPresetResting": {
+    "description": "Profile travel status preset chip"
+  },
+  "emailGreeting": "Hello {name},",
+  "@emailGreeting": {
+    "description": "Email greeting line",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "emailDefaultName": "Traveler",
+  "@emailDefaultName": {
+    "description": "Fallback recipient name in emails"
+  },
+  "emailContactFooter": "If you have any questions or feedback, please contact us through the PackBuddy app.",
+  "@emailContactFooter": {
+    "description": "Email footer inviting the user to reach out through the app"
+  },
+  "emailSignoff": "Safe travels,",
+  "@emailSignoff": {
+    "description": "Email sign-off line"
+  },
+  "emailTeamSignature": "The PackBuddy Team",
+  "@emailTeamSignature": {
+    "description": "Email signature"
+  },
+  "emailAdminNoticeSubject": "⚠️ PackBuddy Notice: {title}",
+  "@emailAdminNoticeSubject": {
+    "description": "Subject of an administrator notice email",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "emailAdminNoticeHeading": "PackBuddy Administrator Notice",
+  "@emailAdminNoticeHeading": {
+    "description": "HTML heading of an administrator notice email"
+  },
+  "emailAdminNoticeFooter": "This notice was sent by the PackBuddy administration team.",
+  "@emailAdminNoticeFooter": {
+    "description": "HTML footer of an administrator notice email"
+  },
+  "emailInactivitySubject": "⚠️ Your PackBuddy account will be deleted in {days} days (Notice #{count})",
+  "@emailInactivitySubject": {
+    "description": "Subject of the inactivity deletion warning email",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "emailInactivityHeading": "PackBuddy Account Inactivity Notice",
+  "@emailInactivityHeading": {
+    "description": "HTML heading of the inactivity warning email"
+  },
+  "emailInactivityIntro": "We noticed that you haven't signed in to your PackBuddy account for about 5 months.",
+  "@emailInactivityIntro": {
+    "description": "Inactivity email: opening sentence"
+  },
+  "emailInactivityPolicy": "Under our data retention and privacy policy, accounts with no sign-in for 6 months (180 days) are permanently deleted, together with their trips, expenses, packing lists and vault documents.",
+  "@emailInactivityPolicy": {
+    "description": "Inactivity email: retention policy explanation"
+  },
+  "emailInactivityRemaining": "About {days} days remain before your account and all your data are permanently deleted.",
+  "@emailInactivityRemaining": {
+    "description": "Inactivity email: days left before deletion",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "emailInactivityAction": "To keep your account and all your travel data, simply sign in to the PackBuddy mobile app. Your account stays active the moment you sign in.",
+  "@emailInactivityAction": {
+    "description": "Inactivity email: what the user must do"
+  },
+  "emailInactivityNoticeCount": "(Automatic weekly reminder sent during the 5th month: #{count})",
+  "@emailInactivityNoticeCount": {
+    "description": "Inactivity email: weekly reminder counter",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "emailInactivityCta": "All you need to do to keep your account: sign in to the app!",
+  "@emailInactivityCta": {
+    "description": "Inactivity email: highlighted call to action"
+  },
+  "emailInactivityFooter": "This email was sent by the PackBuddy automatic account protection service.",
+  "@emailInactivityFooter": {
+    "description": "Inactivity email: HTML footer"
+  },
+  "emailPurgedSubject": "Your PackBuddy account was deleted after 6 months of inactivity",
+  "@emailPurgedSubject": {
+    "description": "Subject of the email sent after an inactive account is deleted"
+  },
+  "emailPurgedBody": "Because your PackBuddy account was not signed in to for 6 months (180 days), your account and all its data have been permanently deleted in line with our security and data protection policy.",
+  "@emailPurgedBody": {
+    "description": "Body of the email sent after an inactive account is deleted"
+  },
+  "widgetQuickExpenseTitle": "Quick Expense",
+  "@widgetQuickExpenseTitle": {
+    "description": "Title saved for an expense logged from the home screen widget"
+  },
+  "widgetQuickExpensePrefix": "Quick",
+  "@widgetQuickExpensePrefix": {
+    "description": "Short prefix on the widget for the last quick expense, e.g. 'Quick: +$10'"
+  },
+  "currencyPickerWorldCount": "{count} world currencies",
+  "@currencyPickerWorldCount": {
+    "description": "Subtitle in the currency picker",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "currencyPickerSearchHint": "Search currency (e.g. USD, EUR, TRY, JPY)...",
+  "@currencyPickerSearchHint": {
+    "description": "Search field hint in the currency picker"
+  },
+  "currencyPickerResetTo": "Reset to {currency}",
+  "@currencyPickerResetTo": {
+    "description": "Button that resets the selection to the default currency",
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "currencyPickerNoResults": "No currencies found",
+  "@currencyPickerNoResults": {
+    "description": "Empty state in the currency picker"
+  },
+  "searchTripNotFound": "Trip details could not be found",
+  "@searchTripNotFound": {
+    "description": "Snackbar when a search result's trip no longer exists"
+  },
+  "friendProfileFallbackTitle": "Traveler Profile",
+  "@friendProfileFallbackTitle": {
+    "description": "App bar title of a friend's profile when the name is unknown"
+  },
+  "legalPrivacyHubTitle": "PackBuddy Legal & Privacy",
+  "@legalPrivacyHubTitle": {
+    "description": "Small label above the legal consent title"
+  },
+  "consentAcceptedAt": "Accepted at: {date}",
+  "@consentAcceptedAt": {
+    "description": "Shows when the user accepted the legal terms",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "consentBadgeGdpr": "GDPR (EU 2016/679)",
+  "@consentBadgeGdpr": {
+    "description": "Compliance badge for the EU General Data Protection Regulation"
+  },
+  "consentBadgeKvkk": "KVKK (Law No. 6698)",
+  "@consentBadgeKvkk": {
+    "description": "Compliance badge for the Turkish Personal Data Protection Law No. 6698"
+  },
+  "consentBadgeEncryption": "AES-256 Encryption",
+  "@consentBadgeEncryption": {
+    "description": "Compliance badge for AES-256 encryption"
+  },
+  "consentBadgeZeroPii": "Zero-PII Telemetry",
+  "@consentBadgeZeroPii": {
+    "description": "Compliance badge: analytics without personally identifiable information"
+  },
+  "consentArticleNumber": "Article {number}",
+  "@consentArticleNumber": {
+    "description": "Label of a numbered article in the legal consent screen",
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "shareNotSpecified": "Not specified",
+  "@shareNotSpecified": {
+    "description": "Shown in shared trip text when no budget is set"
+  },
+  "shareFooterTagline": "Shared via PackBuddy — your minimalist travel companion.",
+  "@shareFooterTagline": {
+    "description": "Footer appended to a shared trip summary"
+  },
+  "shareFooterShort": "Shared via PackBuddy",
+  "@shareFooterShort": {
+    "description": "Short footer appended to a shared packing list"
+  },
+  "shareTripSubject": "PackBuddy Trip: {title}",
+  "@shareTripSubject": {
+    "description": "Share sheet subject for a trip summary",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "shareChecklistSubject": "Packing list: {title}",
+  "@shareChecklistSubject": {
+    "description": "Share sheet subject for a packing list",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "shareInviteText": "✈️ Join my trip \"{title}\" on PackBuddy!",
+  "@shareInviteText": {
+    "description": "First line of a shared trip invite",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "shareInviteHowTo": "PackBuddy → Trips → Join Trip",
+  "@shareInviteHowTo": {
+    "description": "Navigation hint in a shared trip invite"
+  },
+  "shareInviteSubject": "PackBuddy trip invite: {title}",
+  "@shareInviteSubject": {
+    "description": "Share sheet subject for a trip invite",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationChannelRemindersName": "Trip Packing Reminders",
+  "@notificationChannelRemindersName": {
+    "description": "Android notification channel name for packing reminders"
+  },
+  "notificationChannelRemindersDescription": "Smart notifications and packing reminders before trip departure",
+  "@notificationChannelRemindersDescription": {
+    "description": "Android notification channel description for packing reminders"
+  },
+  "notificationChannelAlertsName": "System & Admin Alerts",
+  "@notificationChannelAlertsName": {
+    "description": "Android notification channel name for urgent system alerts"
+  },
+  "notificationChannelAlertsDescription": "Important account, security, and administrative alerts",
+  "@notificationChannelAlertsDescription": {
+    "description": "Android notification channel description for urgent system alerts"
+  },
+  "notificationDefaultTitle": "PackBuddy Notification",
+  "@notificationDefaultTitle": {
+    "description": "Fallback notification title and ticker text"
+  },
+  "worldMapCardTitle": "World Travel Map",
+  "@worldMapCardTitle": {
+    "description": "Neutral title of the world map card (used on own and friends' profiles)"
+  },
+  "worldMapChipLived": "Lived",
+  "@worldMapChipLived": {
+    "description": "Neutral chip label for countries lived in (own and friends' profiles)"
   }
 }

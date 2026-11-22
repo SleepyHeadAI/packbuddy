@@ -52,7 +52,8 @@ class SearchResult {
         return SearchResult(
           id: map['id'] as String? ?? '',
           title: map['title'] as String? ?? map['name'] as String? ?? '',
-          subtitle: '$cat • $qty adet ${isPacked ? "✓ Hazır" : "○ Bekliyor"}',
+          // Language-neutral fallback; SearchResultTile renders the localized form.
+          subtitle: '$cat • x$qty ${isPacked ? "✓" : "○"}',
           type: SearchResultType.packingItem,
           tripId: map['trip_id'] as String?,
           category: cat,

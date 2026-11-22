@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:packbuddy/core/l10n/app_l10n_lookup.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/country_picker_sheet.dart';
 import 'package:packbuddy/features/profile/data/profile_service.dart';
@@ -9,6 +10,7 @@ import 'package:packbuddy/features/profile/domain/travel_style.dart';
 import 'package:packbuddy/features/profile/domain/user_profile.dart';
 import 'package:packbuddy/features/profile/presentation/widgets/avatar_picker_sheet.dart';
 import 'package:packbuddy/features/profile/presentation/widgets/user_avatar.dart';
+import 'package:packbuddy/l10n/app_localizations.dart';
 
 /// Modal bottom sheet allowing users to customize their display name, bio, and home country
 class EditProfileSheet extends ConsumerStatefulWidget {
@@ -52,13 +54,13 @@ class _EditProfileSheetState extends ConsumerState<EditProfileSheet> {
   late List<String> _selectedStyles;
   bool _isSaving = false;
 
-  static const List<String> _statusPresets = [
-    '🧳 Bavul topluyor',
-    '✈️ Yolda / Havada',
-    '🏖️ Tatil modunda',
-    '🗺️ Yeni rota planlıyor',
-    '🏡 Dinleniyor',
-  ];
+  static List<String> _statusPresets(AppLocalizations l10n) => [
+        l10n.statusPresetPacking,
+        l10n.statusPresetOnTheRoad,
+        l10n.statusPresetVacation,
+        l10n.statusPresetPlanning,
+        l10n.statusPresetResting,
+      ];
 
   @override
   void initState() {
@@ -339,7 +341,7 @@ class _EditProfileSheetState extends ConsumerState<EditProfileSheet> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: _statusPresets.map((preset) {
+                children: _statusPresets(AppLocalizations.of(context) ?? appL10nFor(lang)).map((preset) {
                   final isSelected = _statusController.text == preset;
                   return Padding(
                     padding: const EdgeInsets.only(right: 8, bottom: 6),

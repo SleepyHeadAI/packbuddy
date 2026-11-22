@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/features/budget/presentation/screens/trip_detail_screen.dart';
@@ -111,9 +112,9 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
 
   void _showTripNotFoundMessage() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Trip details could not be found'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.searchTripNotFound),
+        duration: const Duration(seconds: 2),
       ),
     );
   }

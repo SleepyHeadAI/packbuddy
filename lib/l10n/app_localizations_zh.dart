@@ -2209,4 +2209,263 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get subscriptionAutoRenewNotice =>
       '除非在续订前至少 24 小时取消，否则订阅将在每个计费周期结束时自动续订。费用将从您的 Google Play 账户中扣除。您可以随时在 Google Play › 订阅中取消。';
+
+  @override
+  String get restorePurchases => '恢复购买';
+
+  @override
+  String get restorePurchasesSuccess => '已成功恢复您的购买！';
+
+  @override
+  String get restoreNoPurchasesFound => '未找到可恢复的有效订阅。';
+
+  @override
+  String get errorPurchaseFailed => '无法完成购买，请重试。';
+
+  @override
+  String get errorGenericRetry => '出了点问题，请重试。';
+
+  @override
+  String get errorChecklistLoadFailed => '无法加载您的行李清单。';
+
+  @override
+  String get activitySaveFailed => '无法保存活动';
+
+  @override
+  String get worldMapLiveCoverage => '实时探索与覆盖情况';
+
+  @override
+  String worldMapFriendMap(String name) {
+    return '$name的地图';
+  }
+
+  @override
+  String worldMapFriendWorldMap(String name) {
+    return '$name的世界地图';
+  }
+
+  @override
+  String get worldMapFriendFallbackName => '好友';
+
+  @override
+  String get worldMapOpenMap => '打开地图';
+
+  @override
+  String get worldMapInspect => '查看';
+
+  @override
+  String get worldMapGoToMap => '前往地图';
+
+  @override
+  String get worldMapZoomInspect => '缩放查看';
+
+  @override
+  String get worldMapExplored => '已探索世界';
+
+  @override
+  String worldMapVisitedOfTotal(int visited, int total) {
+    return '已去过 $visited / $total';
+  }
+
+  @override
+  String get worldMapContinentsChip => '大洲';
+
+  @override
+  String worldMapMutualCountries(int count, String countries) {
+    return '共同去过的国家（$count）：$countries';
+  }
+
+  @override
+  String get worldMapPinchToExplore => '双指缩放或双击以查看';
+
+  @override
+  String get statusPresetPacking => '🧳 正在收拾行李';
+
+  @override
+  String get statusPresetOnTheRoad => '✈️ 在路上 / 在空中';
+
+  @override
+  String get statusPresetVacation => '🏖️ 度假模式';
+
+  @override
+  String get statusPresetPlanning => '🗺️ 正在规划新路线';
+
+  @override
+  String get statusPresetResting => '🏡 在家休息';
+
+  @override
+  String emailGreeting(String name) {
+    return '$name，您好：';
+  }
+
+  @override
+  String get emailDefaultName => '旅行者';
+
+  @override
+  String get emailContactFooter => '如有任何疑问或反馈，请通过 PackBuddy 应用联系我们。';
+
+  @override
+  String get emailSignoff => '祝您旅途愉快，';
+
+  @override
+  String get emailTeamSignature => 'PackBuddy 团队';
+
+  @override
+  String emailAdminNoticeSubject(String title) {
+    return '⚠️ PackBuddy 通知：$title';
+  }
+
+  @override
+  String get emailAdminNoticeHeading => 'PackBuddy 管理员通知';
+
+  @override
+  String get emailAdminNoticeFooter => '此通知由 PackBuddy 管理团队发送。';
+
+  @override
+  String emailInactivitySubject(int days, int count) {
+    return '⚠️ 您的 PackBuddy 账户将在 $days 天后删除（第 $count 次提醒）';
+  }
+
+  @override
+  String get emailInactivityHeading => 'PackBuddy 账户不活跃提醒';
+
+  @override
+  String get emailInactivityIntro => '我们注意到您已约 5 个月未登录 PackBuddy 账户。';
+
+  @override
+  String get emailInactivityPolicy =>
+      '根据我们的数据保留与隐私政策，连续 6 个月（180 天）未登录的账户及其行程、支出、行李清单和保险库文件将被永久删除。';
+
+  @override
+  String emailInactivityRemaining(int days) {
+    return '距离您的账户及所有数据被永久删除还有约 $days 天。';
+  }
+
+  @override
+  String get emailInactivityAction =>
+      '如需保留您的账户和所有旅行数据，只需登录 PackBuddy 移动应用。登录后账户将立即保持有效。';
+
+  @override
+  String emailInactivityNoticeCount(int count) {
+    return '（第 5 个月期间每周自动提醒：第 $count 次）';
+  }
+
+  @override
+  String get emailInactivityCta => '保留账户只需一步：登录应用！';
+
+  @override
+  String get emailInactivityFooter => '此邮件由 PackBuddy 自动账户保护服务发送。';
+
+  @override
+  String get emailPurgedSubject => '您的 PackBuddy 账户因 6 个月未活动已被删除';
+
+  @override
+  String get emailPurgedBody =>
+      '由于您的 PackBuddy 账户已 6 个月（180 天）未登录，根据我们的安全与数据保护政策，您的账户及其所有数据已被永久删除。';
+
+  @override
+  String get widgetQuickExpenseTitle => '快速记账';
+
+  @override
+  String get widgetQuickExpensePrefix => '快速';
+
+  @override
+  String currencyPickerWorldCount(int count) {
+    return '$count 种世界货币';
+  }
+
+  @override
+  String get currencyPickerSearchHint => '搜索货币（如 USD、EUR、TRY、JPY）...';
+
+  @override
+  String currencyPickerResetTo(String currency) {
+    return '重置为 $currency';
+  }
+
+  @override
+  String get currencyPickerNoResults => '未找到货币';
+
+  @override
+  String get searchTripNotFound => '未找到行程详情';
+
+  @override
+  String get friendProfileFallbackTitle => '旅行者资料';
+
+  @override
+  String get legalPrivacyHubTitle => 'PackBuddy 法律与隐私';
+
+  @override
+  String consentAcceptedAt(String date) {
+    return '接受时间：$date';
+  }
+
+  @override
+  String get consentBadgeGdpr => 'GDPR（欧盟 2016/679）';
+
+  @override
+  String get consentBadgeKvkk => 'KVKK（第 6698 号法律）';
+
+  @override
+  String get consentBadgeEncryption => 'AES-256 加密';
+
+  @override
+  String get consentBadgeZeroPii => '零个人信息遥测';
+
+  @override
+  String consentArticleNumber(String number) {
+    return '第 $number 条';
+  }
+
+  @override
+  String get shareNotSpecified => '未设置';
+
+  @override
+  String get shareFooterTagline => '通过 PackBuddy 分享 — 您的极简旅行助手。';
+
+  @override
+  String get shareFooterShort => '通过 PackBuddy 分享';
+
+  @override
+  String shareTripSubject(String title) {
+    return 'PackBuddy 行程：$title';
+  }
+
+  @override
+  String shareChecklistSubject(String title) {
+    return '行李清单：$title';
+  }
+
+  @override
+  String shareInviteText(String title) {
+    return '✈️ 在 PackBuddy 加入我的行程「$title」！';
+  }
+
+  @override
+  String get shareInviteHowTo => 'PackBuddy → 行程 → 加入行程';
+
+  @override
+  String shareInviteSubject(String title) {
+    return 'PackBuddy 行程邀请：$title';
+  }
+
+  @override
+  String get notificationChannelRemindersName => '行李打包提醒';
+
+  @override
+  String get notificationChannelRemindersDescription => '出发前的智能通知与打包提醒';
+
+  @override
+  String get notificationChannelAlertsName => '系统与管理员提醒';
+
+  @override
+  String get notificationChannelAlertsDescription => '重要的账户、安全和管理提醒';
+
+  @override
+  String get notificationDefaultTitle => 'PackBuddy 通知';
+
+  @override
+  String get worldMapCardTitle => '世界旅行地图';
+
+  @override
+  String get worldMapChipLived => '居住过';
 }

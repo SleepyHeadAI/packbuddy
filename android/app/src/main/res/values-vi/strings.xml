@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget strings. Generated from lib/core/services/app_widget_localization.dart; keep in sync. -->
+<resources>
+    <string name="widget_label_trip">PackBuddy: Chuyến đi hiện tại</string>
+    <string name="widget_label_trip_medium">PackBuddy: Chuyến đi hiện tại (Vừa)</string>
+    <string name="widget_label_trip_large">PackBuddy: Chuyến đi hiện tại (Lớn)</string>
+    <string name="widget_label_map">PackBuddy: Bản đồ thế giới</string>
+    <string name="widget_label_map_medium">PackBuddy: Bản đồ thế giới (Vừa)</string>
+    <string name="widget_label_map_large">PackBuddy: Bản đồ thế giới (Lớn)</string>
+    <string name="widget_label_expense">PackBuddy: Thêm chi tiêu nhanh</string>
+    <string name="widget_label_expense_medium">PackBuddy: Thêm chi tiêu nhanh (Vừa)</string>
+    <string name="widget_label_expense_large">PackBuddy: Thêm chi tiêu nhanh (Lớn)</string>
+    <string name="widget_label_currency">PackBuddy: Chuyển đổi tiền tệ</string>
+    <string name="widget_label_currency_medium">PackBuddy: Chuyển đổi tiền tệ (Vừa)</string>
+    <string name="widget_label_currency_large">PackBuddy: Chuyển đổi tiền tệ (Lớn)</string>
+    <string name="widget_trip_app_name">PackBuddy • Chuyến đi</string>
+    <string name="widget_world_app_name">PackBuddy • Thế giới</string>
+    <string name="widget_rates_app_name">PackBuddy • Tỷ giá</string>
+    <string name="widget_budget_app_name">PackBuddy • Ngân sách</string>
+    <string name="widget_add_expense">Thêm chi tiêu</string>
+    <string name="widget_add_expense_action">+ Thêm chi tiêu</string>
+    <string name="widget_quick_log">Ghi nhanh</string>
+    <string name="widget_spent">Đã chi</string>
+    <string name="widget_spent_budget">Ngân sách đã tiêu</string>
+    <string name="widget_remaining_budget">Ngân sách còn lại</string>
+    <string name="widget_last_expense">Chi tiêu gần nhất</string>
+    <string name="widget_no_expense_yet">Chưa có chi tiêu nào được ghi lại</string>
+    <string name="widget_packing">Đóng gói</string>
+    <string name="widget_packing_zero">Đóng gói: 0/0</string>
+    <string name="widget_countdown_started">Đang đếm ngược</string>
+    <string name="widget_plan_next_trip">Lên kế hoạch cho chuyến đi tiếp theo</string>
+    <string name="widget_currency">Chuyển đổi tiền tệ</string>
+    <string name="widget_quick_conversions">Chuyển đổi nhanh</string>
+    <string name="widget_live_rates">Tỷ giá trực tiếp</string>
+    <string name="widget_live_rates_dot">● Tỷ giá trực tiếp</string>
+    <string name="widget_auto_sync">✓ Tự động đồng bộ hai chiều</string>
+    <string name="widget_offline_ready">Sẵn sàng ngoại tuyến</string>
+    <string name="widget_exploration_rate">Tỷ lệ khám phá</string>
+    <string name="widget_countries_visited">Đã đến %1$d quốc gia</string>
+    <string name="widget_continents_explored">Đã khám phá %1$d châu lục</string>
+    <string name="widget_stat_visited">✈️ %1$d Đã đến</string>
+    <string name="widget_stat_wishlist">🌟 %1$d Muốn đến</string>
+    <string name="widget_stat_continents">🌍 %1$d Châu lục</string>
+    <string name="widget_legend_lived">● Đã sống (%1$d)</string>
+    <string name="widget_countries_visited_zero">Bản đồ thế giới</string>
+    <string name="widget_continents_explored_zero">Đánh dấu các quốc gia trên bản đồ</string>
+    <string name="widget_stat_visited_zero">✈️ 0 Đã đến</string>
+    <string name="widget_stat_wishlist_zero">🌟 0 Muốn đến</string>
+    <string name="widget_stat_continents_zero">🌍 0 Châu lục</string>
+    <string name="widget_legend_lived_zero">● Đã sống (0)</string>
+    <string name="widget_legend_visited_zero">● Đã đến (0)</string>
+    <string name="widget_legend_wishlist_zero">● Muốn đến (0)</string>
+    <string name="widget_tap_to_open">Nhấn để mở</string>
+    <string name="widget_quick_expense_title">Thêm chi tiêu nhanh</string>
+    <string name="widget_quick_expense_prefix">Nhanh</string>
+</resources>

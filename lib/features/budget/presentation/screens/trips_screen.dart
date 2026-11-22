@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:packbuddy/core/l10n/app_l10n_lookup.dart';
 import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
@@ -248,7 +249,7 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
                   size: 20,
                 ),
                 const SizedBox(width: 12),
-                Expanded(child: Text(next.errorMessage!)),
+                Expanded(child: Text(localizeUserError(l10n, next.errorMessage))),
               ],
             ),
             backgroundColor: AppColors.errorPastel,

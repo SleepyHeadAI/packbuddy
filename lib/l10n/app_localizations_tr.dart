@@ -2315,4 +2315,279 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get subscriptionAutoRenewNotice =>
       'Abonelik, yenileme tarihinden en az 24 saat önce iptal edilmedikçe her dönemin sonunda otomatik olarak yenilenir. Ödeme Google Play hesabınızdan tahsil edilir. Dilediğiniz zaman Google Play › Abonelikler bölümünden iptal edebilirsiniz.';
+
+  @override
+  String get restorePurchases => 'Satın Alımları Geri Yükle';
+
+  @override
+  String get restorePurchasesSuccess =>
+      'Satın alımlarınız başarıyla geri yüklendi!';
+
+  @override
+  String get restoreNoPurchasesFound =>
+      'Geri yüklenecek aktif bir abonelik bulunamadı.';
+
+  @override
+  String get errorPurchaseFailed =>
+      'Satın alma tamamlanamadı. Lütfen tekrar deneyin.';
+
+  @override
+  String get errorGenericRetry =>
+      'Bir şeyler ters gitti. Lütfen tekrar deneyin.';
+
+  @override
+  String get errorChecklistLoadFailed => 'Bavul listeniz yüklenemedi.';
+
+  @override
+  String get activitySaveFailed => 'Aktivite kaydedilemedi';
+
+  @override
+  String get worldMapLiveCoverage => 'Güncel Keşif & Boyama Durumu';
+
+  @override
+  String worldMapFriendMap(String name) {
+    return '$name\'in Haritası';
+  }
+
+  @override
+  String worldMapFriendWorldMap(String name) {
+    return '$name\'in Dünya Haritası';
+  }
+
+  @override
+  String get worldMapFriendFallbackName => 'Arkadaşınız';
+
+  @override
+  String get worldMapOpenMap => 'Haritayı Aç';
+
+  @override
+  String get worldMapInspect => 'İncele';
+
+  @override
+  String get worldMapGoToMap => 'Haritaya Git';
+
+  @override
+  String get worldMapZoomInspect => 'Yakınlaştır & İncele';
+
+  @override
+  String get worldMapExplored => 'Dünya Keşfedildi';
+
+  @override
+  String worldMapVisitedOfTotal(int visited, int total) {
+    return '$visited / $total Ülke Gezildi';
+  }
+
+  @override
+  String get worldMapContinentsChip => 'Kıta';
+
+  @override
+  String worldMapMutualCountries(int count, String countries) {
+    return '$count Ortak Gezilen Ülke: $countries';
+  }
+
+  @override
+  String get worldMapPinchToExplore =>
+      'Yakınlaştırıp detayları inceleyebilirsiniz';
+
+  @override
+  String get statusPresetPacking => '🧳 Bavul topluyor';
+
+  @override
+  String get statusPresetOnTheRoad => '✈️ Yolda / Havada';
+
+  @override
+  String get statusPresetVacation => '🏖️ Tatil modunda';
+
+  @override
+  String get statusPresetPlanning => '🗺️ Yeni rota planlıyor';
+
+  @override
+  String get statusPresetResting => '🏡 Dinleniyor';
+
+  @override
+  String emailGreeting(String name) {
+    return 'Merhaba $name,';
+  }
+
+  @override
+  String get emailDefaultName => 'Gezgin';
+
+  @override
+  String get emailContactFooter =>
+      'Sorularınız veya geri bildiriminiz için lütfen PackBuddy uygulaması üzerinden bizimle iletişime geçiniz.';
+
+  @override
+  String get emailSignoff => 'İyi yolculuklar,';
+
+  @override
+  String get emailTeamSignature => 'PackBuddy Ekibi';
+
+  @override
+  String emailAdminNoticeSubject(String title) {
+    return '⚠️ PackBuddy Bildirimi: $title';
+  }
+
+  @override
+  String get emailAdminNoticeHeading => 'PackBuddy Yönetici Uyarısı';
+
+  @override
+  String get emailAdminNoticeFooter =>
+      'Bu bildirim PackBuddy yönetim paneli tarafından iletilmiştir.';
+
+  @override
+  String emailInactivitySubject(int days, int count) {
+    return '⚠️ PackBuddy Hesabınız $days Gün İçinde Silinecek (Uyarı #$count)';
+  }
+
+  @override
+  String get emailInactivityHeading => 'PackBuddy Hesap İnaktiflik Uyarısı';
+
+  @override
+  String get emailInactivityIntro =>
+      'PackBuddy hesabınıza yaklaşık 5 aydır giriş yapmadığınızı fark ettik.';
+
+  @override
+  String get emailInactivityPolicy =>
+      'Veri saklama ve gizlilik politikamız gereğince 6 ay (180 gün) boyunca giriş yapılmayan hesaplar ve bu hesaplara ait seyahatler, harcamalar, bavul kontrol listeleri ve kasa belgeleri kalıcı olarak silinmektedir.';
+
+  @override
+  String emailInactivityRemaining(int days) {
+    return 'Hesabınızın ve tüm verilerinizin kalıcı olarak silinmesine yaklaşık $days gün kaldı.';
+  }
+
+  @override
+  String get emailInactivityAction =>
+      'Hesabınızı ve tüm seyahat verilerinizi korumak için lütfen PackBuddy mobil uygulamasına giriş yapınız. Giriş yaptığınız anda hesabınız otomatik olarak aktif kalmaya devam edecektir.';
+
+  @override
+  String emailInactivityNoticeCount(int count) {
+    return '(5. ay boyunca her hafta gönderilen otomatik uyarı e-postası: #$count)';
+  }
+
+  @override
+  String get emailInactivityCta =>
+      'Hesabınızı korumak için tek yapmanız gereken: Uygulamaya giriş yapmak!';
+
+  @override
+  String get emailInactivityFooter =>
+      'Bu e-posta PackBuddy otomatik hesap koruma servisi tarafından gönderilmiştir.';
+
+  @override
+  String get emailPurgedSubject =>
+      'PackBuddy Hesabınız 6 Aylık İnaktiflik Nedeniyle Silindi';
+
+  @override
+  String get emailPurgedBody =>
+      'PackBuddy hesabınıza 6 ay (180 gün) boyunca giriş yapılmadığı için güvenlik ve veri koruma ilkelerimiz uyarınca hesabınız ve tüm verileriniz kalıcı olarak silinmiştir.';
+
+  @override
+  String get widgetQuickExpenseTitle => 'Hızlı Harcama';
+
+  @override
+  String get widgetQuickExpensePrefix => 'Hızlı';
+
+  @override
+  String currencyPickerWorldCount(int count) {
+    return '$count dünya para birimi';
+  }
+
+  @override
+  String get currencyPickerSearchHint =>
+      'Para birimi ara (örn. USD, EUR, TRY, JPY)...';
+
+  @override
+  String currencyPickerResetTo(String currency) {
+    return '$currency birimine sıfırla';
+  }
+
+  @override
+  String get currencyPickerNoResults => 'Para birimi bulunamadı';
+
+  @override
+  String get searchTripNotFound => 'Seyahat detayları bulunamadı';
+
+  @override
+  String get friendProfileFallbackTitle => 'Gezgin Profili';
+
+  @override
+  String get legalPrivacyHubTitle => 'PackBuddy Hukuk & Gizlilik';
+
+  @override
+  String consentAcceptedAt(String date) {
+    return 'Kabul tarihi: $date';
+  }
+
+  @override
+  String get consentBadgeGdpr => 'GDPR (AB 2016/679)';
+
+  @override
+  String get consentBadgeKvkk => 'KVKK (6698 Sayılı)';
+
+  @override
+  String get consentBadgeEncryption => 'AES-256 Şifreleme';
+
+  @override
+  String get consentBadgeZeroPii => 'Sıfır PII Telemetri';
+
+  @override
+  String consentArticleNumber(String number) {
+    return 'Madde $number';
+  }
+
+  @override
+  String get shareNotSpecified => 'Belirtilmedi';
+
+  @override
+  String get shareFooterTagline =>
+      'PackBuddy ile paylaşıldı — minimalist seyahat arkadaşınız.';
+
+  @override
+  String get shareFooterShort => 'PackBuddy ile paylaşıldı';
+
+  @override
+  String shareTripSubject(String title) {
+    return 'PackBuddy Seyahati: $title';
+  }
+
+  @override
+  String shareChecklistSubject(String title) {
+    return 'Bavul listesi: $title';
+  }
+
+  @override
+  String shareInviteText(String title) {
+    return '✈️ PackBuddy\'de \"$title\" seyahatime katıl!';
+  }
+
+  @override
+  String get shareInviteHowTo => 'PackBuddy → Seyahatler → Seyahate Katıl';
+
+  @override
+  String shareInviteSubject(String title) {
+    return 'PackBuddy seyahat daveti: $title';
+  }
+
+  @override
+  String get notificationChannelRemindersName =>
+      'Seyahat ve Bavul Hatırlatıcıları';
+
+  @override
+  String get notificationChannelRemindersDescription =>
+      'Seyahat öncesi akıllı bildirimler ve bavul hatırlatıcıları';
+
+  @override
+  String get notificationChannelAlertsName => 'Sistem ve Yönetici Uyarıları';
+
+  @override
+  String get notificationChannelAlertsDescription =>
+      'Önemli hesap, güvenlik ve yönetim uyarıları';
+
+  @override
+  String get notificationDefaultTitle => 'PackBuddy Bildirimi';
+
+  @override
+  String get worldMapCardTitle => 'Dünya Seyahat Haritası';
+
+  @override
+  String get worldMapChipLived => 'Yaşanan';
 }

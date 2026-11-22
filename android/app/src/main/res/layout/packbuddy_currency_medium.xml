@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="PackBuddy • Kur"
+                android:text="@string/widget_rates_app_name"
                 android:textColor="#3B82F6"
                 android:textSize="10.5sp"
                 android:textStyle="bold" />
@@ -130,7 +130,7 @@
                     android:layout_weight="1"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="● Live Rates"
+                    android:text="@string/widget_live_rates_dot"
                     android:textColor="#10B981"
                     android:textSize="9sp"
                     android:textStyle="bold" />

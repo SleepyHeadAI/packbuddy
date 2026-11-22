@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget strings. Generated from lib/core/services/app_widget_localization.dart; keep in sync. -->
+<resources>
+    <string name="widget_label_trip">PackBuddy: Aktif Seyahat</string>
+    <string name="widget_label_trip_medium">PackBuddy: Aktif Seyahat (Orta)</string>
+    <string name="widget_label_trip_large">PackBuddy: Aktif Seyahat (Geniş)</string>
+    <string name="widget_label_map">PackBuddy: Dünya Haritası</string>
+    <string name="widget_label_map_medium">PackBuddy: Dünya Haritası (Orta)</string>
+    <string name="widget_label_map_large">PackBuddy: Dünya Haritası (Geniş)</string>
+    <string name="widget_label_expense">PackBuddy: Hızlı Harcama</string>
+    <string name="widget_label_expense_medium">PackBuddy: Hızlı Harcama (Orta)</string>
+    <string name="widget_label_expense_large">PackBuddy: Hızlı Harcama (Geniş)</string>
+    <string name="widget_label_currency">PackBuddy: Döviz Çevirici</string>
+    <string name="widget_label_currency_medium">PackBuddy: Döviz Çevirici (Orta)</string>
+    <string name="widget_label_currency_large">PackBuddy: Döviz Çevirici (Geniş)</string>
+    <string name="widget_trip_app_name">PackBuddy • Seyahat</string>
+    <string name="widget_world_app_name">PackBuddy • Dünya</string>
+    <string name="widget_rates_app_name">PackBuddy • Kur</string>
+    <string name="widget_budget_app_name">PackBuddy • Bütçe</string>
+    <string name="widget_add_expense">Harcama Ekle</string>
+    <string name="widget_add_expense_action">+ Harcama Ekle</string>
+    <string name="widget_quick_log">Hızlı Kayıt</string>
+    <string name="widget_spent">Harcanan</string>
+    <string name="widget_spent_budget">Harcanan Bütçe</string>
+    <string name="widget_remaining_budget">Kalan Bütçe</string>
+    <string name="widget_last_expense">Son Harcama</string>
+    <string name="widget_no_expense_yet">Henüz harcama kaydedilmedi</string>
+    <string name="widget_packing">Bavul</string>
+    <string name="widget_packing_zero">Bavul: 0/0</string>
+    <string name="widget_countdown_started">Geri sayım başladı</string>
+    <string name="widget_plan_next_trip">Bir sonraki seyahatini planla</string>
+    <string name="widget_currency">Döviz Çevirici</string>
+    <string name="widget_quick_conversions">Hızlı Çevrimler</string>
+    <string name="widget_live_rates">Canlı Kurlar</string>
+    <string name="widget_live_rates_dot">● Canlı Kurlar</string>
+    <string name="widget_auto_sync">✓ Otomatik Çift Yönlü Senkron</string>
+    <string name="widget_offline_ready">Çevrimdışı Hazır</string>
+    <string name="widget_exploration_rate">Keşif Oranı</string>
+    <string name="widget_countries_visited">%1$d Ülke Gezildi</string>
+    <string name="widget_continents_explored">%1$d Kıta Keşfedildi</string>
+    <string name="widget_stat_visited">✈️ %1$d Gezildi</string>
+    <string name="widget_stat_wishlist">🌟 %1$d Hedef</string>
+    <string name="widget_stat_continents">🌍 %1$d Kıta</string>
+    <string name="widget_legend_lived">● Yaşandı (%1$d)</string>
+    <string name="widget_countries_visited_zero">Dünya Haritası</string>
+    <string name="widget_continents_explored_zero">Ülkeleri haritadan işaretle</string>
+    <string name="widget_stat_visited_zero">✈️ 0 Gezildi</string>
+    <string name="widget_stat_wishlist_zero">🌟 0 Hedef</string>
+    <string name="widget_stat_continents_zero">🌍 0 Kıta</string>
+    <string name="widget_legend_lived_zero">● Yaşandı (0)</string>
+    <string name="widget_legend_visited_zero">● Gezildi (0)</string>
+    <string name="widget_legend_wishlist_zero">● Hedef (0)</string>
+    <string name="widget_tap_to_open">Açmak için dokun</string>
+    <string name="widget_quick_expense_title">Hızlı Harcama</string>
+    <string name="widget_quick_expense_prefix">Hızlı</string>
+</resources>

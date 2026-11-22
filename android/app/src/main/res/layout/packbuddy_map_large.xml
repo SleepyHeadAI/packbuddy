@@ -36,7 +36,7 @@
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="🌐 PackBuddy • Dünya"
+                android:text="@string/widget_world_app_name"
                 android:textColor="#3B82F6"
                 android:textSize="11.5sp"
                 android:textStyle="bold" />
@@ -95,7 +95,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="● Yaşandı (0)"
+                    android:text="@string/widget_legend_lived_zero"
                     android:textColor="#10B981"
                     android:textSize="8.5sp"
                     android:textStyle="bold" />
@@ -107,7 +107,7 @@
                     android:layout_marginStart="6dp"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="● Gezildi (0)"
+                    android:text="@string/widget_legend_visited_zero"
                     android:textColor="#38BDF8"
                     android:textSize="8.5sp"
                     android:textStyle="bold" />
@@ -119,7 +119,7 @@
                     android:layout_marginStart="6dp"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="● Hedef (0)"
+                    android:text="@string/widget_legend_wishlist_zero"
                     android:textColor="#FBBF24"
                     android:textSize="8.5sp"
                     android:textStyle="bold" />
@@ -131,7 +131,7 @@
                     android:layout_marginStart="6dp"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="🌍 0 Kıta"
+                    android:text="@string/widget_stat_continents_zero"
                     android:textColor="#34D399"
                     android:textSize="8.5sp"
                     android:textStyle="bold" />

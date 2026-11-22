@@ -6,6 +6,7 @@ import 'package:packbuddy/features/itinerary/presentation/controllers/itinerary_
 import 'package:packbuddy/core/services/pro_entitlement_service.dart';
 import 'package:packbuddy/features/settings/data/mock_revenuecat_service.dart';
 import 'package:packbuddy/features/settings/presentation/screens/widgets/paywall_sheet.dart';
+import 'package:packbuddy/core/l10n/app_l10n_lookup.dart';
 
 /// Modal bottom sheet for scheduling or editing an activity in the day planner
 class AddActivitySheet extends ConsumerStatefulWidget {
@@ -280,10 +281,10 @@ class _AddActivitySheetState extends ConsumerState<AddActivitySheet> {
           PaywallSheet.show(context, triggerSource: 'itinerary_limit', highlightFeature: 'itinerary_limit');
           return;
         }
-        final fallbackMsg = widget.languageCode == 'tr' ? 'Aktivite kaydedilemedi' : 'Could not save activity';
+        final l10n = appL10nFor(widget.languageCode);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(errorMsg ?? fallbackMsg),
+            content: Text(l10n.activitySaveFailed),
             backgroundColor: Theme.of(context).colorScheme.error,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

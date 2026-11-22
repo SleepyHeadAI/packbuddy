@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget strings. Generated from lib/core/services/app_widget_localization.dart; keep in sync. -->
+<resources>
+    <string name="widget_label_trip">PackBuddy: ทริปที่กำลังเดินทาง</string>
+    <string name="widget_label_trip_medium">PackBuddy: ทริปที่กำลังเดินทาง (กลาง)</string>
+    <string name="widget_label_trip_large">PackBuddy: ทริปที่กำลังเดินทาง (ใหญ่)</string>
+    <string name="widget_label_map">PackBuddy: แผนที่โลก</string>
+    <string name="widget_label_map_medium">PackBuddy: แผนที่โลก (กลาง)</string>
+    <string name="widget_label_map_large">PackBuddy: แผนที่โลก (ใหญ่)</string>
+    <string name="widget_label_expense">PackBuddy: บันทึกค่าใช้จ่ายด่วน</string>
+    <string name="widget_label_expense_medium">PackBuddy: บันทึกค่าใช้จ่ายด่วน (กลาง)</string>
+    <string name="widget_label_expense_large">PackBuddy: บันทึกค่าใช้จ่ายด่วน (ใหญ่)</string>
+    <string name="widget_label_currency">PackBuddy: แปลงสกุลเงิน</string>
+    <string name="widget_label_currency_medium">PackBuddy: แปลงสกุลเงิน (กลาง)</string>
+    <string name="widget_label_currency_large">PackBuddy: แปลงสกุลเงิน (ใหญ่)</string>
+    <string name="widget_trip_app_name">PackBuddy • ทริป</string>
+    <string name="widget_world_app_name">PackBuddy • โลก</string>
+    <string name="widget_rates_app_name">PackBuddy • อัตราแลกเปลี่ยน</string>
+    <string name="widget_budget_app_name">PackBuddy • งบประมาณ</string>
+    <string name="widget_add_expense">เพิ่มค่าใช้จ่าย</string>
+    <string name="widget_add_expense_action">+ เพิ่มค่าใช้จ่าย</string>
+    <string name="widget_quick_log">บันทึกด่วน</string>
+    <string name="widget_spent">ใช้ไปแล้ว</string>
+    <string name="widget_spent_budget">งบประมาณที่ใช้ไป</string>
+    <string name="widget_remaining_budget">งบประมาณที่เหลือ</string>
+    <string name="widget_last_expense">ค่าใช้จ่ายล่าสุด</string>
+    <string name="widget_no_expense_yet">ยังไม่มีการบันทึกค่าใช้จ่าย</string>
+    <string name="widget_packing">จัดกระเป๋า</string>
+    <string name="widget_packing_zero">จัดกระเป๋า: 0/0</string>
+    <string name="widget_countdown_started">เริ่มนับถอยหลังแล้ว</string>
+    <string name="widget_plan_next_trip">วางแผนทริปต่อไปของคุณ</string>
+    <string name="widget_currency">แปลงสกุลเงิน</string>
+    <string name="widget_quick_conversions">แปลงด่วน</string>
+    <string name="widget_live_rates">อัตราแลกเปลี่ยนสด</string>
+    <string name="widget_live_rates_dot">● อัตราแลกเปลี่ยนสด</string>
+    <string name="widget_auto_sync">✓ ซิงค์แบบสองทิศทางอัตโนมัติ</string>
+    <string name="widget_offline_ready">พร้อมใช้งานออฟไลน์</string>
+    <string name="widget_exploration_rate">อัตราการสำรวจ</string>
+    <string name="widget_countries_visited">เที่ยวแล้ว %1$d ประเทศ</string>
+    <string name="widget_continents_explored">สำรวจแล้ว %1$d ทวีป</string>
+    <string name="widget_stat_visited">✈️ %1$d เที่ยวแล้ว</string>
+    <string name="widget_stat_wishlist">🌟 %1$d สิ่งที่อยากไป</string>
+    <string name="widget_stat_continents">🌍 %1$d ทวีป</string>
+    <string name="widget_legend_lived">● เคยอยู่ (%1$d)</string>
+    <string name="widget_countries_visited_zero">แผนที่โลก</string>
+    <string name="widget_continents_explored_zero">ทำเครื่องหมายประเทศบนแผนที่</string>
+    <string name="widget_stat_visited_zero">✈️ 0 เที่ยวแล้ว</string>
+    <string name="widget_stat_wishlist_zero">🌟 0 สิ่งที่อยากไป</string>
+    <string name="widget_stat_continents_zero">🌍 0 ทวีป</string>
+    <string name="widget_legend_lived_zero">● เคยอยู่ (0)</string>
+    <string name="widget_legend_visited_zero">● เที่ยวแล้ว (0)</string>
+    <string name="widget_legend_wishlist_zero">● อยากไป (0)</string>
+    <string name="widget_tap_to_open">แตะเพื่อเปิด</string>
+    <string name="widget_quick_expense_title">บันทึกค่าใช้จ่ายด่วน</string>
+    <string name="widget_quick_expense_prefix">ด่วน</string>
+</resources>

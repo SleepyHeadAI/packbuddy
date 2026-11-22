@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget strings. Generated from lib/core/services/app_widget_localization.dart; keep in sync. -->
+<resources>
+    <string name="widget_label_trip">PackBuddy: 进行中行程</string>
+    <string name="widget_label_trip_medium">PackBuddy: 进行中行程 (中)</string>
+    <string name="widget_label_trip_large">PackBuddy: 进行中行程 (大)</string>
+    <string name="widget_label_map">PackBuddy: 世界地图</string>
+    <string name="widget_label_map_medium">PackBuddy: 世界地图 (中)</string>
+    <string name="widget_label_map_large">PackBuddy: 世界地图 (大)</string>
+    <string name="widget_label_expense">PackBuddy: 快捷记账</string>
+    <string name="widget_label_expense_medium">PackBuddy: 快捷记账 (中)</string>
+    <string name="widget_label_expense_large">PackBuddy: 快捷记账 (大)</string>
+    <string name="widget_label_currency">PackBuddy: 汇率换算器</string>
+    <string name="widget_label_currency_medium">PackBuddy: 汇率换算器 (中)</string>
+    <string name="widget_label_currency_large">PackBuddy: 汇率换算器 (大)</string>
+    <string name="widget_trip_app_name">PackBuddy • 行程</string>
+    <string name="widget_world_app_name">PackBuddy • 世界</string>
+    <string name="widget_rates_app_name">PackBuddy • 汇率</string>
+    <string name="widget_budget_app_name">PackBuddy • 预算</string>
+    <string name="widget_add_expense">添加支出</string>
+    <string name="widget_add_expense_action">+ 添加支出</string>
+    <string name="widget_quick_log">快速记录</string>
+    <string name="widget_spent">已支出</string>
+    <string name="widget_spent_budget">已用预算</string>
+    <string name="widget_remaining_budget">剩余预算</string>
+    <string name="widget_last_expense">最新支出</string>
+    <string name="widget_no_expense_yet">暂无支出记录</string>
+    <string name="widget_packing">行李</string>
+    <string name="widget_packing_zero">行李: 0/0</string>
+    <string name="widget_countdown_started">倒计时进行中</string>
+    <string name="widget_plan_next_trip">规划你的下一次旅行</string>
+    <string name="widget_currency">汇率换算器</string>
+    <string name="widget_quick_conversions">快捷换算</string>
+    <string name="widget_live_rates">实时汇率</string>
+    <string name="widget_live_rates_dot">● 实时汇率</string>
+    <string name="widget_auto_sync">✓ 自动双向同步</string>
+    <string name="widget_offline_ready">支持离线换算</string>
+    <string name="widget_exploration_rate">探索率</string>
+    <string name="widget_countries_visited">已游历 %1$d 个国家</string>
+    <string name="widget_continents_explored">已探索 %1$d 个大洲</string>
+    <string name="widget_stat_visited">✈️ %1$d 已游历</string>
+    <string name="widget_stat_wishlist">🌟 %1$d 愿望单</string>
+    <string name="widget_stat_continents">🌍 %1$d 大洲</string>
+    <string name="widget_legend_lived">● 居住过 (%1$d)</string>
+    <string name="widget_countries_visited_zero">世界地图</string>
+    <string name="widget_continents_explored_zero">在地图上标记国家</string>
+    <string name="widget_stat_visited_zero">✈️ 0 已游历</string>
+    <string name="widget_stat_wishlist_zero">🌟 0 愿望单</string>
+    <string name="widget_stat_continents_zero">🌍 0 大洲</string>
+    <string name="widget_legend_lived_zero">● 居住过 (0)</string>
+    <string name="widget_legend_visited_zero">● 已游历 (0)</string>
+    <string name="widget_legend_wishlist_zero">● 愿望单 (0)</string>
+    <string name="widget_tap_to_open">点按打开</string>
+    <string name="widget_quick_expense_title">快捷记账</string>
+    <string name="widget_quick_expense_prefix">快速</string>
+</resources>

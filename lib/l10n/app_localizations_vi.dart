@@ -2306,4 +2306,278 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get subscriptionAutoRenewNotice =>
       'Gói đăng ký tự động gia hạn vào cuối mỗi kỳ trừ khi được hủy ít nhất 24 giờ trước khi gia hạn. Khoản thanh toán sẽ được tính vào tài khoản Google Play của bạn. Bạn có thể hủy bất cứ lúc nào trong Google Play › Gói đăng ký.';
+
+  @override
+  String get restorePurchases => 'Khôi phục giao dịch mua';
+
+  @override
+  String get restorePurchasesSuccess =>
+      'Đã khôi phục giao dịch mua thành công!';
+
+  @override
+  String get restoreNoPurchasesFound =>
+      'Không tìm thấy gói đăng ký đang hoạt động để khôi phục.';
+
+  @override
+  String get errorPurchaseFailed =>
+      'Không thể hoàn tất giao dịch mua. Vui lòng thử lại.';
+
+  @override
+  String get errorGenericRetry => 'Đã xảy ra lỗi. Vui lòng thử lại.';
+
+  @override
+  String get errorChecklistLoadFailed =>
+      'Không thể tải danh sách hành lý của bạn.';
+
+  @override
+  String get activitySaveFailed => 'Không thể lưu hoạt động';
+
+  @override
+  String get worldMapLiveCoverage => 'Khám phá & độ phủ trực tiếp';
+
+  @override
+  String worldMapFriendMap(String name) {
+    return 'Bản đồ của $name';
+  }
+
+  @override
+  String worldMapFriendWorldMap(String name) {
+    return 'Bản đồ thế giới của $name';
+  }
+
+  @override
+  String get worldMapFriendFallbackName => 'bạn bè';
+
+  @override
+  String get worldMapOpenMap => 'Mở bản đồ';
+
+  @override
+  String get worldMapInspect => 'Xem';
+
+  @override
+  String get worldMapGoToMap => 'Đến bản đồ';
+
+  @override
+  String get worldMapZoomInspect => 'Phóng to & xem';
+
+  @override
+  String get worldMapExplored => 'Thế giới đã khám phá';
+
+  @override
+  String worldMapVisitedOfTotal(int visited, int total) {
+    return 'Đã đến $visited / $total';
+  }
+
+  @override
+  String get worldMapContinentsChip => 'Châu lục';
+
+  @override
+  String worldMapMutualCountries(int count, String countries) {
+    return 'Quốc gia cùng đã đến ($count): $countries';
+  }
+
+  @override
+  String get worldMapPinchToExplore => 'Chụm hoặc chạm hai lần để khám phá';
+
+  @override
+  String get statusPresetPacking => '🧳 Đang xếp hành lý';
+
+  @override
+  String get statusPresetOnTheRoad => '✈️ Đang di chuyển / Trên máy bay';
+
+  @override
+  String get statusPresetVacation => '🏖️ Chế độ nghỉ dưỡng';
+
+  @override
+  String get statusPresetPlanning => '🗺️ Đang lên lộ trình mới';
+
+  @override
+  String get statusPresetResting => '🏡 Nghỉ ngơi ở nhà';
+
+  @override
+  String emailGreeting(String name) {
+    return 'Xin chào $name,';
+  }
+
+  @override
+  String get emailDefaultName => 'du khách';
+
+  @override
+  String get emailContactFooter =>
+      'Nếu có câu hỏi hoặc góp ý, vui lòng liên hệ với chúng tôi qua ứng dụng PackBuddy.';
+
+  @override
+  String get emailSignoff => 'Chúc bạn thượng lộ bình an,';
+
+  @override
+  String get emailTeamSignature => 'Đội ngũ PackBuddy';
+
+  @override
+  String emailAdminNoticeSubject(String title) {
+    return '⚠️ Thông báo PackBuddy: $title';
+  }
+
+  @override
+  String get emailAdminNoticeHeading => 'Thông báo từ quản trị viên PackBuddy';
+
+  @override
+  String get emailAdminNoticeFooter =>
+      'Thông báo này được gửi bởi đội ngũ quản trị PackBuddy.';
+
+  @override
+  String emailInactivitySubject(int days, int count) {
+    return '⚠️ Tài khoản PackBuddy của bạn sẽ bị xóa sau $days ngày (Thông báo #$count)';
+  }
+
+  @override
+  String get emailInactivityHeading =>
+      'Thông báo tài khoản PackBuddy không hoạt động';
+
+  @override
+  String get emailInactivityIntro =>
+      'Chúng tôi nhận thấy bạn chưa đăng nhập vào tài khoản PackBuddy khoảng 5 tháng.';
+
+  @override
+  String get emailInactivityPolicy =>
+      'Theo chính sách lưu giữ dữ liệu và quyền riêng tư, các tài khoản không đăng nhập trong 6 tháng (180 ngày) sẽ bị xóa vĩnh viễn cùng với chuyến đi, chi tiêu, danh sách hành lý và tài liệu trong kho bảo mật.';
+
+  @override
+  String emailInactivityRemaining(int days) {
+    return 'Còn khoảng $days ngày trước khi tài khoản và toàn bộ dữ liệu của bạn bị xóa vĩnh viễn.';
+  }
+
+  @override
+  String get emailInactivityAction =>
+      'Để giữ tài khoản và toàn bộ dữ liệu chuyến đi, bạn chỉ cần đăng nhập vào ứng dụng PackBuddy. Tài khoản sẽ tiếp tục hoạt động ngay khi bạn đăng nhập.';
+
+  @override
+  String emailInactivityNoticeCount(int count) {
+    return '(Nhắc nhở tự động hằng tuần trong tháng thứ 5: #$count)';
+  }
+
+  @override
+  String get emailInactivityCta =>
+      'Để giữ tài khoản, bạn chỉ cần đăng nhập vào ứng dụng!';
+
+  @override
+  String get emailInactivityFooter =>
+      'Email này được gửi bởi dịch vụ bảo vệ tài khoản tự động của PackBuddy.';
+
+  @override
+  String get emailPurgedSubject =>
+      'Tài khoản PackBuddy của bạn đã bị xóa sau 6 tháng không hoạt động';
+
+  @override
+  String get emailPurgedBody =>
+      'Do tài khoản PackBuddy của bạn không được đăng nhập trong 6 tháng (180 ngày), tài khoản và toàn bộ dữ liệu đã bị xóa vĩnh viễn theo chính sách bảo mật và bảo vệ dữ liệu của chúng tôi.';
+
+  @override
+  String get widgetQuickExpenseTitle => 'Chi tiêu nhanh';
+
+  @override
+  String get widgetQuickExpensePrefix => 'Nhanh';
+
+  @override
+  String currencyPickerWorldCount(int count) {
+    return '$count loại tiền tệ thế giới';
+  }
+
+  @override
+  String get currencyPickerSearchHint =>
+      'Tìm tiền tệ (vd. USD, EUR, TRY, JPY)...';
+
+  @override
+  String currencyPickerResetTo(String currency) {
+    return 'Đặt lại về $currency';
+  }
+
+  @override
+  String get currencyPickerNoResults => 'Không tìm thấy tiền tệ';
+
+  @override
+  String get searchTripNotFound => 'Không tìm thấy chi tiết chuyến đi';
+
+  @override
+  String get friendProfileFallbackTitle => 'Hồ sơ du khách';
+
+  @override
+  String get legalPrivacyHubTitle => 'PackBuddy Pháp lý & Quyền riêng tư';
+
+  @override
+  String consentAcceptedAt(String date) {
+    return 'Chấp nhận lúc: $date';
+  }
+
+  @override
+  String get consentBadgeGdpr => 'GDPR (EU 2016/679)';
+
+  @override
+  String get consentBadgeKvkk => 'KVKK (Luật số 6698)';
+
+  @override
+  String get consentBadgeEncryption => 'Mã hóa AES-256';
+
+  @override
+  String get consentBadgeZeroPii => 'Đo lường không dữ liệu cá nhân';
+
+  @override
+  String consentArticleNumber(String number) {
+    return 'Điều $number';
+  }
+
+  @override
+  String get shareNotSpecified => 'Chưa xác định';
+
+  @override
+  String get shareFooterTagline =>
+      'Chia sẻ qua PackBuddy — người bạn đồng hành tối giản của bạn.';
+
+  @override
+  String get shareFooterShort => 'Chia sẻ qua PackBuddy';
+
+  @override
+  String shareTripSubject(String title) {
+    return 'Chuyến đi PackBuddy: $title';
+  }
+
+  @override
+  String shareChecklistSubject(String title) {
+    return 'Danh sách hành lý: $title';
+  }
+
+  @override
+  String shareInviteText(String title) {
+    return '✈️ Tham gia chuyến đi \"$title\" của mình trên PackBuddy!';
+  }
+
+  @override
+  String get shareInviteHowTo => 'PackBuddy → Chuyến đi → Tham gia chuyến đi';
+
+  @override
+  String shareInviteSubject(String title) {
+    return 'Lời mời chuyến đi PackBuddy: $title';
+  }
+
+  @override
+  String get notificationChannelRemindersName => 'Nhắc nhở xếp hành lý';
+
+  @override
+  String get notificationChannelRemindersDescription =>
+      'Thông báo thông minh và nhắc xếp hành lý trước chuyến đi';
+
+  @override
+  String get notificationChannelAlertsName => 'Cảnh báo hệ thống & quản trị';
+
+  @override
+  String get notificationChannelAlertsDescription =>
+      'Cảnh báo quan trọng về tài khoản, bảo mật và quản trị';
+
+  @override
+  String get notificationDefaultTitle => 'Thông báo PackBuddy';
+
+  @override
+  String get worldMapCardTitle => 'Bản đồ du lịch thế giới';
+
+  @override
+  String get worldMapChipLived => 'Đã sống';
 }

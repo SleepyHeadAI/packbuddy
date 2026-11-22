@@ -6,6 +6,7 @@ import 'package:pdfx/pdfx.dart';
 import 'package:packbuddy/core/services/security_service.dart';
 import 'package:packbuddy/core/theme/app_icons.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
+import 'package:packbuddy/l10n/app_localizations.dart';
 
 /// In-memory LRU-like cache for decrypted vault thumbnails and rendered PDF first-page previews
 class _VaultThumbnailCache {
@@ -225,9 +226,9 @@ class _VaultThumbnailWidgetState extends State<VaultThumbnailWidget> {
                     color: const Color(0xFFDC2626).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: const Text(
-                    'PDF BELGESİ',
-                    style: TextStyle(
+                  child: Text(
+                    AppLocalizations.of(context)!.pdfFileBadge,
+                    style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w800,
                       color: Color(0xFFDC2626),

@@ -43,7 +43,7 @@
                     android:layout_weight="1"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="🌐 PackBuddy • Dünya"
+                    android:text="@string/widget_world_app_name"
                     android:textColor="#3B82F6"
                     android:textSize="10sp"
                     android:textStyle="bold" />
@@ -77,7 +77,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="0 Ülke Gezildi"
+                    android:text="@string/widget_countries_visited_zero"
                     android:textColor="#FFFFFF"
                     android:textSize="13.5sp"
                     android:textStyle="bold" />
@@ -90,7 +90,7 @@
                     android:layout_marginTop="3dp"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="Keşif Oranı"
+                    android:text="@string/widget_exploration_rate"
                     android:textColor="#94A3B8"
                     android:textSize="9sp" />
 
@@ -120,7 +120,7 @@
                     android:layout_weight="1"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="✈️ 0 Gezildi"
+                    android:text="@string/widget_stat_visited_zero"
                     android:textColor="#94A3B8"
                     android:textSize="9.5sp" />
 
@@ -130,7 +130,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="🌟 0 Hedef"
+                    android:text="@string/widget_stat_wishlist_zero"
                     android:textColor="#94A3B8"
                     android:textSize="9.5sp" />
             </LinearLayout>
@@ -169,7 +169,7 @@
                 android:paddingTop="2dp"
                 android:paddingEnd="6dp"
                 android:paddingBottom="2dp"
-                android:text="🌍 0 Kıta"
+                android:text="@string/widget_stat_continents_zero"
                 android:textColor="#3B82F6"
                 android:textSize="8.5sp"
                 android:textStyle="bold" />

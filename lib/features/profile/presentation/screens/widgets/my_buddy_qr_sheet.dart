@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:packbuddy/core/services/share_service.dart';
 import 'package:packbuddy/features/profile/domain/friend_localization.dart';
@@ -52,7 +53,7 @@ class MyBuddyQrSheet extends StatelessWidget {
   }
 
   void _shareLink(BuildContext context) {
-    final name = profile.displayName ?? 'PackBuddy Traveler';
+    final name = profile.displayName ?? AppLocalizations.of(context)!.emailDefaultName;
     ShareService.shareText(
       text: FriendLocalization.getShareInviteText(languageCode, name, _inviteUrl),
       subject: FriendLocalization.getShareInviteSubject(languageCode),
@@ -113,7 +114,7 @@ class MyBuddyQrSheet extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              profile.displayName?.isNotEmpty == true ? profile.displayName! : 'PackBuddy Traveler',
+              profile.displayName?.isNotEmpty == true ? profile.displayName! : AppLocalizations.of(context)!.emailDefaultName,
               style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
             ),
             if (profile.username != null && profile.username!.isNotEmpty) ...[

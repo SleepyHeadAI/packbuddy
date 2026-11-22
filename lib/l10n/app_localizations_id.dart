@@ -800,7 +800,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get compartment => 'Kompartemen / Lokasi';
 
   @override
-  String get pieces => 'pcs';
+  String get pieces => 'buah';
 
   @override
   String get addToBaggage => 'Tambah ke Bagasi';
@@ -2310,4 +2310,278 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get subscriptionAutoRenewNotice =>
       'Langganan diperpanjang otomatis di akhir setiap periode kecuali dibatalkan paling lambat 24 jam sebelum perpanjangan. Pembayaran ditagihkan ke akun Google Play Anda. Batalkan kapan saja di Google Play › Langganan.';
+
+  @override
+  String get restorePurchases => 'Pulihkan Pembelian';
+
+  @override
+  String get restorePurchasesSuccess => 'Pembelian Anda berhasil dipulihkan!';
+
+  @override
+  String get restoreNoPurchasesFound =>
+      'Tidak ada langganan aktif untuk dipulihkan.';
+
+  @override
+  String get errorPurchaseFailed =>
+      'Pembelian tidak dapat diselesaikan. Silakan coba lagi.';
+
+  @override
+  String get errorGenericRetry => 'Terjadi kesalahan. Silakan coba lagi.';
+
+  @override
+  String get errorChecklistLoadFailed =>
+      'Daftar barang bawaan Anda tidak dapat dimuat.';
+
+  @override
+  String get activitySaveFailed => 'Aktivitas tidak dapat disimpan';
+
+  @override
+  String get worldMapLiveCoverage => 'Eksplorasi & cakupan langsung';
+
+  @override
+  String worldMapFriendMap(String name) {
+    return 'Peta $name';
+  }
+
+  @override
+  String worldMapFriendWorldMap(String name) {
+    return 'Peta Dunia $name';
+  }
+
+  @override
+  String get worldMapFriendFallbackName => 'teman';
+
+  @override
+  String get worldMapOpenMap => 'Buka Peta';
+
+  @override
+  String get worldMapInspect => 'Lihat';
+
+  @override
+  String get worldMapGoToMap => 'Ke Peta';
+
+  @override
+  String get worldMapZoomInspect => 'Perbesar & lihat';
+
+  @override
+  String get worldMapExplored => 'Dunia Dijelajahi';
+
+  @override
+  String worldMapVisitedOfTotal(int visited, int total) {
+    return '$visited / $total dikunjungi';
+  }
+
+  @override
+  String get worldMapContinentsChip => 'Benua';
+
+  @override
+  String worldMapMutualCountries(int count, String countries) {
+    return 'Negara yang sama-sama dikunjungi ($count): $countries';
+  }
+
+  @override
+  String get worldMapPinchToExplore =>
+      'Cubit atau ketuk dua kali untuk menjelajah';
+
+  @override
+  String get statusPresetPacking => '🧳 Sedang berkemas';
+
+  @override
+  String get statusPresetOnTheRoad => '✈️ Di jalan / Di udara';
+
+  @override
+  String get statusPresetVacation => '🏖️ Mode liburan';
+
+  @override
+  String get statusPresetPlanning => '🗺️ Merencanakan rute baru';
+
+  @override
+  String get statusPresetResting => '🏡 Beristirahat di rumah';
+
+  @override
+  String emailGreeting(String name) {
+    return 'Halo $name,';
+  }
+
+  @override
+  String get emailDefaultName => 'Pelancong';
+
+  @override
+  String get emailContactFooter =>
+      'Jika ada pertanyaan atau masukan, silakan hubungi kami melalui aplikasi PackBuddy.';
+
+  @override
+  String get emailSignoff => 'Selamat jalan,';
+
+  @override
+  String get emailTeamSignature => 'Tim PackBuddy';
+
+  @override
+  String emailAdminNoticeSubject(String title) {
+    return '⚠️ Pemberitahuan PackBuddy: $title';
+  }
+
+  @override
+  String get emailAdminNoticeHeading => 'Pemberitahuan Admin PackBuddy';
+
+  @override
+  String get emailAdminNoticeFooter =>
+      'Pemberitahuan ini dikirim oleh tim admin PackBuddy.';
+
+  @override
+  String emailInactivitySubject(int days, int count) {
+    return '⚠️ Akun PackBuddy Anda akan dihapus dalam $days hari (Pemberitahuan #$count)';
+  }
+
+  @override
+  String get emailInactivityHeading =>
+      'Pemberitahuan Akun PackBuddy Tidak Aktif';
+
+  @override
+  String get emailInactivityIntro =>
+      'Kami melihat Anda belum masuk ke akun PackBuddy selama sekitar 5 bulan.';
+
+  @override
+  String get emailInactivityPolicy =>
+      'Sesuai kebijakan retensi data dan privasi kami, akun yang tidak masuk selama 6 bulan (180 hari) akan dihapus permanen beserta perjalanan, pengeluaran, daftar bawaan, dan dokumen brankas.';
+
+  @override
+  String emailInactivityRemaining(int days) {
+    return 'Sekitar $days hari lagi akun dan semua data Anda akan dihapus permanen.';
+  }
+
+  @override
+  String get emailInactivityAction =>
+      'Untuk mempertahankan akun dan semua data perjalanan, cukup masuk ke aplikasi PackBuddy. Akun Anda tetap aktif begitu Anda masuk.';
+
+  @override
+  String emailInactivityNoticeCount(int count) {
+    return '(Pengingat mingguan otomatis selama bulan ke-5: #$count)';
+  }
+
+  @override
+  String get emailInactivityCta =>
+      'Untuk mempertahankan akun, Anda cukup masuk ke aplikasi!';
+
+  @override
+  String get emailInactivityFooter =>
+      'Email ini dikirim oleh layanan perlindungan akun otomatis PackBuddy.';
+
+  @override
+  String get emailPurgedSubject =>
+      'Akun PackBuddy Anda dihapus setelah 6 bulan tidak aktif';
+
+  @override
+  String get emailPurgedBody =>
+      'Karena akun PackBuddy Anda tidak dimasuki selama 6 bulan (180 hari), akun dan semua datanya telah dihapus permanen sesuai kebijakan keamanan dan perlindungan data kami.';
+
+  @override
+  String get widgetQuickExpenseTitle => 'Pengeluaran Cepat';
+
+  @override
+  String get widgetQuickExpensePrefix => 'Cepat';
+
+  @override
+  String currencyPickerWorldCount(int count) {
+    return '$count mata uang dunia';
+  }
+
+  @override
+  String get currencyPickerSearchHint =>
+      'Cari mata uang (mis. USD, EUR, TRY, JPY)...';
+
+  @override
+  String currencyPickerResetTo(String currency) {
+    return 'Atur ulang ke $currency';
+  }
+
+  @override
+  String get currencyPickerNoResults => 'Mata uang tidak ditemukan';
+
+  @override
+  String get searchTripNotFound => 'Detail perjalanan tidak ditemukan';
+
+  @override
+  String get friendProfileFallbackTitle => 'Profil Pelancong';
+
+  @override
+  String get legalPrivacyHubTitle => 'PackBuddy Hukum & Privasi';
+
+  @override
+  String consentAcceptedAt(String date) {
+    return 'Diterima pada: $date';
+  }
+
+  @override
+  String get consentBadgeGdpr => 'GDPR (UE 2016/679)';
+
+  @override
+  String get consentBadgeKvkk => 'KVKK (UU No. 6698)';
+
+  @override
+  String get consentBadgeEncryption => 'Enkripsi AES-256';
+
+  @override
+  String get consentBadgeZeroPii => 'Telemetri Tanpa PII';
+
+  @override
+  String consentArticleNumber(String number) {
+    return 'Pasal $number';
+  }
+
+  @override
+  String get shareNotSpecified => 'Tidak ditentukan';
+
+  @override
+  String get shareFooterTagline =>
+      'Dibagikan lewat PackBuddy — teman perjalanan minimalis Anda.';
+
+  @override
+  String get shareFooterShort => 'Dibagikan lewat PackBuddy';
+
+  @override
+  String shareTripSubject(String title) {
+    return 'Perjalanan PackBuddy: $title';
+  }
+
+  @override
+  String shareChecklistSubject(String title) {
+    return 'Daftar bawaan: $title';
+  }
+
+  @override
+  String shareInviteText(String title) {
+    return '✈️ Ikuti perjalanan saya \"$title\" di PackBuddy!';
+  }
+
+  @override
+  String get shareInviteHowTo => 'PackBuddy → Perjalanan → Gabung Perjalanan';
+
+  @override
+  String shareInviteSubject(String title) {
+    return 'Undangan perjalanan PackBuddy: $title';
+  }
+
+  @override
+  String get notificationChannelRemindersName => 'Pengingat Berkemas';
+
+  @override
+  String get notificationChannelRemindersDescription =>
+      'Notifikasi pintar dan pengingat berkemas sebelum keberangkatan';
+
+  @override
+  String get notificationChannelAlertsName => 'Peringatan Sistem & Admin';
+
+  @override
+  String get notificationChannelAlertsDescription =>
+      'Peringatan penting terkait akun, keamanan, dan administrasi';
+
+  @override
+  String get notificationDefaultTitle => 'Notifikasi PackBuddy';
+
+  @override
+  String get worldMapCardTitle => 'Peta Perjalanan Dunia';
+
+  @override
+  String get worldMapChipLived => 'Pernah tinggal';
 }

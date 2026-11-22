@@ -76,7 +76,7 @@
 
         <receiver
             android:name=".PackBuddyWidgetProvider"
-            android:label="PackBuddy: Seyahat"
+            android:label="@string/widget_label_trip"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -88,7 +88,7 @@
 
         <receiver
             android:name=".PackBuddyMediumWidgetProvider"
-            android:label="PackBuddy: Seyahat (Orta)"
+            android:label="@string/widget_label_trip_medium"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -100,7 +100,7 @@
 
         <receiver
             android:name=".PackBuddyLargeWidgetProvider"
-            android:label="PackBuddy: Seyahat (Geniş)"
+            android:label="@string/widget_label_trip_large"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -113,7 +113,7 @@
         <!-- Home Screen App Widget - World Travel Map -->
         <receiver
             android:name=".PackBuddyMapWidgetProvider"
-            android:label="PackBuddy: Dünya Haritası"
+            android:label="@string/widget_label_map"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -125,7 +125,7 @@
 
         <receiver
             android:name=".PackBuddyMapMediumWidgetProvider"
-            android:label="PackBuddy: Dünya Haritası (Orta)"
+            android:label="@string/widget_label_map_medium"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -137,7 +137,7 @@
 
         <receiver
             android:name=".PackBuddyMapLargeWidgetProvider"
-            android:label="PackBuddy: Dünya Haritası (Geniş)"
+            android:label="@string/widget_label_map_large"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -150,7 +150,7 @@
         <!-- Home Screen App Widget - Quick Expense -->
         <receiver
             android:name=".PackBuddyExpenseWidgetProvider"
-            android:label="PackBuddy: Hızlı Harcama"
+            android:label="@string/widget_label_expense"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -162,7 +162,7 @@
 
         <receiver
             android:name=".PackBuddyExpenseMediumWidgetProvider"
-            android:label="PackBuddy: Hızlı Harcama (Orta)"
+            android:label="@string/widget_label_expense_medium"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -174,7 +174,7 @@
 
         <receiver
             android:name=".PackBuddyExpenseLargeWidgetProvider"
-            android:label="PackBuddy: Hızlı Harcama (Geniş)"
+            android:label="@string/widget_label_expense_large"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -187,7 +187,7 @@
         <!-- Home Screen App Widget - Currency Converter -->
         <receiver
             android:name=".PackBuddyCurrencyWidgetProvider"
-            android:label="PackBuddy: Döviz Kurları"
+            android:label="@string/widget_label_currency"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -199,7 +199,7 @@
 
         <receiver
             android:name=".PackBuddyCurrencyMediumWidgetProvider"
-            android:label="PackBuddy: Döviz Kurları (Orta)"
+            android:label="@string/widget_label_currency_medium"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -211,7 +211,7 @@
 
         <receiver
             android:name=".PackBuddyCurrencyLargeWidgetProvider"
-            android:label="PackBuddy: Döviz Kurları (Geniş)"
+            android:label="@string/widget_label_currency_large"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

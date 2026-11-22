@@ -851,7 +851,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get checkedBaggage => 'Incheckat bagage';
 
   @override
-  String get standardEconomy => 'Standard Economy';
+  String get standardEconomy => 'Ekonomi Standard';
 
   @override
   String get limitSelected => 'Denna gräns vald';
@@ -1068,7 +1068,7 @@ class AppLocalizationsSv extends AppLocalizations {
       'Få smarta påminnelser 48 timmar och 24 timmar före avgång';
 
   @override
-  String get shopping => 'Shopping';
+  String get shopping => 'Shoppning';
 
   @override
   String get authErrorUserNotFound =>
@@ -2301,4 +2301,275 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get subscriptionAutoRenewNotice =>
       'Prenumerationen förnyas automatiskt i slutet av varje period om den inte avslutas minst 24 timmar före förnyelsen. Betalningen debiteras ditt Google Play-konto. Du kan avsluta när som helst under Google Play › Prenumerationer.';
+
+  @override
+  String get restorePurchases => 'Återställ köp';
+
+  @override
+  String get restorePurchasesSuccess => 'Dina köp har återställts!';
+
+  @override
+  String get restoreNoPurchasesFound =>
+      'Ingen aktiv prenumeration hittades att återställa.';
+
+  @override
+  String get errorPurchaseFailed => 'Köpet kunde inte slutföras. Försök igen.';
+
+  @override
+  String get errorGenericRetry => 'Något gick fel. Försök igen.';
+
+  @override
+  String get errorChecklistLoadFailed => 'Packlistan kunde inte läsas in.';
+
+  @override
+  String get activitySaveFailed => 'Aktiviteten kunde inte sparas';
+
+  @override
+  String get worldMapLiveCoverage => 'Utforskning & täckning i realtid';
+
+  @override
+  String worldMapFriendMap(String name) {
+    return '${name}s karta';
+  }
+
+  @override
+  String worldMapFriendWorldMap(String name) {
+    return '${name}s världskarta';
+  }
+
+  @override
+  String get worldMapFriendFallbackName => 'Vän';
+
+  @override
+  String get worldMapOpenMap => 'Öppna karta';
+
+  @override
+  String get worldMapInspect => 'Visa';
+
+  @override
+  String get worldMapGoToMap => 'Till kartan';
+
+  @override
+  String get worldMapZoomInspect => 'Zooma & visa';
+
+  @override
+  String get worldMapExplored => 'Utforskad värld';
+
+  @override
+  String worldMapVisitedOfTotal(int visited, int total) {
+    return '$visited / $total besökta';
+  }
+
+  @override
+  String get worldMapContinentsChip => 'Kontinenter';
+
+  @override
+  String worldMapMutualCountries(int count, String countries) {
+    return 'Gemensamt besökta länder ($count): $countries';
+  }
+
+  @override
+  String get worldMapPinchToExplore => 'Nyp eller dubbeltryck för att utforska';
+
+  @override
+  String get statusPresetPacking => '🧳 Packar väskan';
+
+  @override
+  String get statusPresetOnTheRoad => '✈️ På väg / I luften';
+
+  @override
+  String get statusPresetVacation => '🏖️ I semesterläge';
+
+  @override
+  String get statusPresetPlanning => '🗺️ Planerar en ny rutt';
+
+  @override
+  String get statusPresetResting => '🏡 Vilar hemma';
+
+  @override
+  String emailGreeting(String name) {
+    return 'Hej $name,';
+  }
+
+  @override
+  String get emailDefaultName => 'resenär';
+
+  @override
+  String get emailContactFooter =>
+      'Har du frågor eller feedback? Kontakta oss via PackBuddy-appen.';
+
+  @override
+  String get emailSignoff => 'Trevlig resa,';
+
+  @override
+  String get emailTeamSignature => 'PackBuddy-teamet';
+
+  @override
+  String emailAdminNoticeSubject(String title) {
+    return '⚠️ Meddelande från PackBuddy: $title';
+  }
+
+  @override
+  String get emailAdminNoticeHeading =>
+      'Meddelande från PackBuddys administratörer';
+
+  @override
+  String get emailAdminNoticeFooter =>
+      'Detta meddelande skickades av PackBuddys administrationsteam.';
+
+  @override
+  String emailInactivitySubject(int days, int count) {
+    return '⚠️ Ditt PackBuddy-konto raderas om $days dagar (meddelande #$count)';
+  }
+
+  @override
+  String get emailInactivityHeading => 'Meddelande om inaktivt PackBuddy-konto';
+
+  @override
+  String get emailInactivityIntro =>
+      'Vi har märkt att du inte har loggat in på ditt PackBuddy-konto på ungefär 5 månader.';
+
+  @override
+  String get emailInactivityPolicy =>
+      'Enligt vår policy för datalagring och integritet raderas konton utan inloggning på 6 månader (180 dagar) permanent, tillsammans med resor, utgifter, packlistor och valvdokument.';
+
+  @override
+  String emailInactivityRemaining(int days) {
+    return 'Om cirka $days dagar raderas ditt konto och alla dina data permanent.';
+  }
+
+  @override
+  String get emailInactivityAction =>
+      'För att behålla ditt konto och alla resedata räcker det att logga in i PackBuddy-appen. Kontot förblir aktivt så fort du loggar in.';
+
+  @override
+  String emailInactivityNoticeCount(int count) {
+    return '(Automatisk veckopåminnelse under den 5:e månaden: #$count)';
+  }
+
+  @override
+  String get emailInactivityCta =>
+      'Allt du behöver göra för att behålla kontot: logga in i appen!';
+
+  @override
+  String get emailInactivityFooter =>
+      'Detta mejl skickades av PackBuddys automatiska kontoskyddstjänst.';
+
+  @override
+  String get emailPurgedSubject =>
+      'Ditt PackBuddy-konto har raderats efter 6 månaders inaktivitet';
+
+  @override
+  String get emailPurgedBody =>
+      'Eftersom ingen har loggat in på ditt PackBuddy-konto på 6 månader (180 dagar) har kontot och alla dess data raderats permanent enligt vår policy för säkerhet och dataskydd.';
+
+  @override
+  String get widgetQuickExpenseTitle => 'Snabbutgift';
+
+  @override
+  String get widgetQuickExpensePrefix => 'Snabb';
+
+  @override
+  String currencyPickerWorldCount(int count) {
+    return '$count världsvalutor';
+  }
+
+  @override
+  String get currencyPickerSearchHint =>
+      'Sök valuta (t.ex. USD, EUR, TRY, JPY)...';
+
+  @override
+  String currencyPickerResetTo(String currency) {
+    return 'Återställ till $currency';
+  }
+
+  @override
+  String get currencyPickerNoResults => 'Inga valutor hittades';
+
+  @override
+  String get searchTripNotFound => 'Resedetaljerna hittades inte';
+
+  @override
+  String get friendProfileFallbackTitle => 'Resenärsprofil';
+
+  @override
+  String get legalPrivacyHubTitle => 'PackBuddy Juridik & integritet';
+
+  @override
+  String consentAcceptedAt(String date) {
+    return 'Godkänt: $date';
+  }
+
+  @override
+  String get consentBadgeGdpr => 'GDPR (EU 2016/679)';
+
+  @override
+  String get consentBadgeKvkk => 'KVKK (lag nr 6698)';
+
+  @override
+  String get consentBadgeEncryption => 'AES-256-kryptering';
+
+  @override
+  String get consentBadgeZeroPii => 'Telemetri utan personuppgifter';
+
+  @override
+  String consentArticleNumber(String number) {
+    return 'Artikel $number';
+  }
+
+  @override
+  String get shareNotSpecified => 'Ej angivet';
+
+  @override
+  String get shareFooterTagline =>
+      'Delat via PackBuddy – din minimalistiska resekompis.';
+
+  @override
+  String get shareFooterShort => 'Delat via PackBuddy';
+
+  @override
+  String shareTripSubject(String title) {
+    return 'PackBuddy-resa: $title';
+  }
+
+  @override
+  String shareChecklistSubject(String title) {
+    return 'Packlista: $title';
+  }
+
+  @override
+  String shareInviteText(String title) {
+    return '✈️ Följ med på min resa \"$title\" i PackBuddy!';
+  }
+
+  @override
+  String get shareInviteHowTo => 'PackBuddy → Resor → Gå med i resa';
+
+  @override
+  String shareInviteSubject(String title) {
+    return 'Inbjudan till PackBuddy-resa: $title';
+  }
+
+  @override
+  String get notificationChannelRemindersName => 'Packpåminnelser';
+
+  @override
+  String get notificationChannelRemindersDescription =>
+      'Smarta aviseringar och packpåminnelser före avresan';
+
+  @override
+  String get notificationChannelAlertsName => 'System- och adminaviseringar';
+
+  @override
+  String get notificationChannelAlertsDescription =>
+      'Viktiga aviseringar om konto, säkerhet och administration';
+
+  @override
+  String get notificationDefaultTitle => 'PackBuddy-avisering';
+
+  @override
+  String get worldMapCardTitle => 'Världsresekarta';
+
+  @override
+  String get worldMapChipLived => 'Bott';
 }

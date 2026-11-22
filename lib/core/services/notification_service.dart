@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
+import 'package:packbuddy/core/l10n/app_l10n_lookup.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -66,6 +67,10 @@ class LocalNotificationService implements INotificationService {
   static const String urgentAlertChannelDescription =
       'Important account, security, and administrative alerts';
 
+  // Channel names/descriptions above are English fallbacks; the user-visible
+  // values shown in Android system settings come from the app language.
+  static AppLocalizations get _l10n => appL10nFor();
+
   /// Generates a deterministic, positive 31-bit integer notification ID
   /// from the trip UUID and the reminder offset in hours.
   @visibleForTesting
@@ -119,19 +124,20 @@ class LocalNotificationService implements INotificationService {
       final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
       if (androidPlugin != null) {
-        const urgentChannel = AndroidNotificationChannel(
+        final l10n = _l10n;
+        final urgentChannel = AndroidNotificationChannel(
           urgentAlertChannelId,
-          urgentAlertChannelName,
-          description: urgentAlertChannelDescription,
+          l10n.notificationChannelAlertsName,
+          description: l10n.notificationChannelAlertsDescription,
           importance: Importance.max,
           playSound: true,
           enableVibration: true,
           enableLights: true,
         );
-        const reminderChannel = AndroidNotificationChannel(
+        final reminderChannel = AndroidNotificationChannel(
           channelId,
-          channelName,
-          description: channelDescription,
+          l10n.notificationChannelRemindersName,
+          description: l10n.notificationChannelRemindersDescription,
           importance: Importance.high,
           playSound: true,
           enableVibration: true,
@@ -264,10 +270,11 @@ class LocalNotificationService implements INotificationService {
     if (!_isInitialized) {
       await initialize();
     }
-    const androidDetails = AndroidNotificationDetails(
+    final l10n = _l10n;
+    final androidDetails = AndroidNotificationDetails(
       urgentAlertChannelId,
-      urgentAlertChannelName,
-      channelDescription: urgentAlertChannelDescription,
+      l10n.notificationChannelAlertsName,
+      channelDescription: l10n.notificationChannelAlertsDescription,
       importance: Importance.max,
       priority: Priority.max,
       fullScreenIntent: false,
@@ -275,7 +282,7 @@ class LocalNotificationService implements INotificationService {
       enableVibration: true,
       enableLights: true,
       visibility: NotificationVisibility.public,
-      ticker: 'PackBuddy Bildirimi',
+      ticker: l10n.notificationDefaultTitle,
       icon: '@mipmap/ic_launcher',
     );
     const darwinDetails = DarwinNotificationDetails(
@@ -283,7 +290,7 @@ class LocalNotificationService implements INotificationService {
       presentBadge: true,
       presentSound: true,
     );
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: androidDetails,
       iOS: darwinDetails,
     );
@@ -308,10 +315,11 @@ class LocalNotificationService implements INotificationService {
     required String payload,
   }) async {
     try {
-      const androidDetails = AndroidNotificationDetails(
+      final l10n = _l10n;
+      final androidDetails = AndroidNotificationDetails(
         channelId,
-        channelName,
-        channelDescription: channelDescription,
+        l10n.notificationChannelRemindersName,
+        channelDescription: l10n.notificationChannelRemindersDescription,
         importance: Importance.high,
         priority: Priority.high,
         icon: '@mipmap/ic_launcher',
@@ -323,7 +331,7 @@ class LocalNotificationService implements INotificationService {
         presentSound: true,
       );
 
-      const notificationDetails = NotificationDetails(
+      final notificationDetails = NotificationDetails(
         android: androidDetails,
         iOS: darwinDetails,
       );

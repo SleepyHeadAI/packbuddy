@@ -25,6 +25,7 @@ import '../../core/services/currency_service.dart';
 import '../../core/services/preferences_service.dart';
 import '../../core/services/security_service.dart';
 import '../../core/services/notification_service.dart';
+import '../../core/l10n/app_l10n_lookup.dart';
 import '../../core/services/pro_entitlement_service.dart';
 import '../../features/auth/auth_controller.dart';
 import '../../features/settings/data/mock_revenuecat_service.dart';
@@ -301,7 +302,7 @@ class SyncEngine extends StateNotifier<SyncState> with WidgetsBindingObserver {
             final warningMap = data['latestAdminWarning'];
             if (warningMap is Map) {
               final wId = warningMap['id']?.toString() ?? 'warn_${warningMap['timestamp'] ?? DateTime.now().millisecondsSinceEpoch}';
-              final wTitle = warningMap['title']?.toString() ?? 'PackBuddy Bildirimi';
+              final wTitle = warningMap['title']?.toString() ?? appL10nFor().notificationDefaultTitle;
               final wBody = warningMap['message']?.toString() ?? '';
               final wTimestamp = (warningMap['timestamp'] as num?)?.toInt() ?? 0;
               final cloudLastSeen = (data['lastSeenAdminWarningAt'] as num?)?.toInt() ?? 0;

@@ -36,7 +36,7 @@
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="✈️ PackBuddy • Seyahat"
+                android:text="@string/widget_trip_app_name"
                 android:textColor="#3B82F6"
                 android:textSize="11.5sp"
                 android:textStyle="bold" />
@@ -72,7 +72,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="PackBuddy"
+                android:text="@string/widget_brand"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -111,7 +111,7 @@
                     android:layout_weight="1"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="Bagaj: 0/0"
+                    android:text="@string/widget_packing_zero"
                     android:textColor="#FFFFFF"
                     android:textSize="10.5sp"
                     android:textStyle="bold" />
@@ -154,7 +154,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Harcanan: ₺0"
+                android:text="@string/widget_spent"
                 android:textColor="#10B981"
                 android:textSize="11.5sp"
                 android:textStyle="bold" />
@@ -173,7 +173,7 @@
             android:ellipsize="end"
             android:gravity="center"
             android:maxLines="1"
-            android:text="Geri sayım başladı"
+            android:text="@string/widget_countdown_started"
             android:textColor="#94A3B8"
             android:textSize="9.5sp"
             android:textStyle="bold" />

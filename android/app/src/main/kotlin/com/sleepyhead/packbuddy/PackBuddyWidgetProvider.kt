@@ -556,19 +556,19 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     setBgRes(views, R.id.widget_container, theme.bgResId)
                     views.setTextColor(R.id.widget_app_name, theme.accentColor)
 
-                    val appName = widgetData.getString("quick_expense_app_name", "PackBuddy • Bütçe") ?: "PackBuddy • Bütçe"
+                    val appName = widgetData.getString("quick_expense_app_name", null) ?: context.getString(R.string.widget_budget_app_name)
                     val spent = widgetData.getString("trip_budget", null)?.takeIf { it.isNotBlank() }
                         ?: widgetData.getString("quick_expense_title", null)?.takeIf { it.isNotBlank() }
                         ?: "₺0.00"
                     val remaining = widgetData.getString("remaining_budget", null)?.takeIf { it.isNotBlank() }
                     val lastExpense = widgetData.getString("last_expense_text", null)?.takeIf { it.isNotBlank() }
-                    val remainingLabel = widgetData.getString("quick_expense_remaining_label", "Kalan Bütçe") ?: "Kalan Bütçe"
-                    val spentLabel = widgetData.getString("quick_expense_spent_label", "Harcanan") ?: "Harcanan"
-                    val spentCardLabel = widgetData.getString("quick_expense_spent_card_label", "Harcanan Bütçe") ?: "Harcanan Bütçe"
-                    val lastLabel = widgetData.getString("quick_expense_last_label", "Son Harcama") ?: "Son Harcama"
-                    val noLast = widgetData.getString("quick_expense_no_last", "Henüz harcama kaydedilmedi") ?: "Henüz harcama kaydedilmedi"
-                    val addAction = widgetData.getString("quick_expense_add_action", "+ Harcama Ekle") ?: "+ Harcama Ekle"
-                    val quickLog = widgetData.getString("quick_expense_quick_log", "Hızlı Kayıt") ?: "Hızlı Kayıt"
+                    val remainingLabel = widgetData.getString("quick_expense_remaining_label", null) ?: context.getString(R.string.widget_remaining_budget)
+                    val spentLabel = widgetData.getString("quick_expense_spent_label", null) ?: context.getString(R.string.widget_spent)
+                    val spentCardLabel = widgetData.getString("quick_expense_spent_card_label", null) ?: context.getString(R.string.widget_spent_budget)
+                    val lastLabel = widgetData.getString("quick_expense_last_label", null) ?: context.getString(R.string.widget_last_expense)
+                    val noLast = widgetData.getString("quick_expense_no_last", null) ?: context.getString(R.string.widget_no_expense_yet)
+                    val addAction = widgetData.getString("quick_expense_add_action", null) ?: context.getString(R.string.widget_add_expense_action)
+                    val quickLog = widgetData.getString("quick_expense_quick_log", null) ?: context.getString(R.string.widget_quick_log)
                     val showRemaining = safeGetBoolean(
                         widgetData,
                         if (widgetId > 0) "widget_${widgetId}_quick_expense_show_remaining" else "pending_pin_quick_expense_show_remaining",
@@ -737,13 +737,13 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     val secondaryLabelText = if (savedFrom != null) "1 $primarySrc" else "$secondarySrcAmt $secondarySrc"
                     val secondaryValText = if (savedFrom != null) CurrencyHelper.format(CurrencyHelper.convert(1.0, primarySrc, targetCurrency, rates), targetCurrency) else CurrencyHelper.format(secondaryConverted, targetCurrency)
 
-                    val appName = widgetData.getString("currency_converter_app_name", "PackBuddy • Rates") ?: "PackBuddy • Rates"
-                    val convTitle = widgetData.getString("currency_converter_conversions_title", "Quick Conversions") ?: "Quick Conversions"
-                    val rawLiveStatus = widgetData.getString("currency_converter_live_status", "Live Rates") ?: "Live Rates"
+                    val appName = widgetData.getString("currency_converter_app_name", null) ?: context.getString(R.string.widget_rates_app_name)
+                    val convTitle = widgetData.getString("currency_converter_conversions_title", null) ?: context.getString(R.string.widget_quick_conversions)
+                    val rawLiveStatus = widgetData.getString("currency_converter_live_status", null) ?: context.getString(R.string.widget_live_rates)
                     val cleanLiveStatus = rawLiveStatus.replace("●", "").trim()
                     val liveStatus = "● $cleanLiveStatus"
-                    val syncStatus = widgetData.getString("currency_converter_sync_status", "✓ Auto-Sync") ?: "✓ Auto-Sync"
-                    val offlineStatus = widgetData.getString("currency_converter_offline_status", "Offline Ready") ?: "Offline Ready"
+                    val syncStatus = widgetData.getString("currency_converter_sync_status", null) ?: context.getString(R.string.widget_auto_sync)
+                    val offlineStatus = widgetData.getString("currency_converter_offline_status", null) ?: context.getString(R.string.widget_offline_ready)
                     val showLiveRate = safeGetBoolean(
                         widgetData,
                         if (widgetId > 0) "widget_${widgetId}_currency_show_live_rate" else "pending_pin_currency_show_live_rate",
@@ -857,16 +857,16 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     views.setTextColor(R.id.widget_app_name, theme.accentColor)
                     views.setTextColor(R.id.widget_badge, theme.badgeTextColor)
 
-                    val appName = widgetData.getString("world_map_app_name", "PackBuddy • Dünya") ?: "PackBuddy • Dünya"
+                    val appName = widgetData.getString("world_map_app_name", null) ?: context.getString(R.string.widget_world_app_name)
                     val percent = widgetData.getString("map_world_percent", "%0.0") ?: "%0.0"
                     val visitedCount = safeGetInt(widgetData, "map_visited_count", 0)
                     val wishlistCount = safeGetInt(widgetData, "map_wishlist_count", 0)
                     val continentsCount = safeGetInt(widgetData, "map_continents_count", 0)
-                    val title = widgetData.getString("world_map_title", "$visitedCount Ülke Gezildi") ?: "$visitedCount Ülke Gezildi"
-                    val subtitle = widgetData.getString("world_map_subtitle", "Keşif Oranı") ?: "Keşif Oranı"
-                    val stat1 = widgetData.getString("world_map_stat1", "✈️ $visitedCount Gezildi") ?: "✈️ $visitedCount Gezildi"
-                    val stat2 = widgetData.getString("world_map_stat2", "🌟 $wishlistCount Hedef") ?: "🌟 $wishlistCount Hedef"
-                    val stat3 = widgetData.getString("world_map_stat3", "🌍 $continentsCount Kıta") ?: "🌍 $continentsCount Kıta"
+                    val title = widgetData.getString("world_map_title", null) ?: context.getString(R.string.widget_countries_visited, visitedCount)
+                    val subtitle = widgetData.getString("world_map_subtitle", null) ?: context.getString(R.string.widget_exploration_rate)
+                    val stat1 = widgetData.getString("world_map_stat1", null) ?: context.getString(R.string.widget_stat_visited, visitedCount)
+                    val stat2 = widgetData.getString("world_map_stat2", null) ?: context.getString(R.string.widget_stat_wishlist, wishlistCount)
+                    val stat3 = widgetData.getString("world_map_stat3", null) ?: context.getString(R.string.widget_stat_continents, continentsCount)
                     val showContinents = safeGetBoolean(
                         widgetData,
                         if (widgetId > 0) "widget_${widgetId}_map_show_continents" else "pending_pin_map_show_continents",
@@ -906,7 +906,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                             views.setTextColor(R.id.widget_stat3, theme.accentColor)
 
                             val livedCount = safeGetInt(widgetData, "map_lived_count", 0)
-                            val livedText = widgetData.getString("world_map_lived_stat", "● Yaşandı ($livedCount)") ?: "● Yaşandı ($livedCount)"
+                            val livedText = widgetData.getString("world_map_lived_stat", null) ?: context.getString(R.string.widget_legend_lived, livedCount)
                             views.setTextViewText(R.id.widget_lived, livedText)
                             views.setTextViewText(R.id.widget_packing, stat1)
                             views.setTextViewText(R.id.widget_budget, stat2)
@@ -1007,7 +1007,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     views.setTextColor(R.id.widget_title, theme.titleTextColor)
                     views.setTextColor(R.id.widget_destination, theme.subtitleTextColor)
 
-                    val appName = widgetData.getString("trip_app_name", "PackBuddy • Seyahat") ?: "PackBuddy • Seyahat"
+                    val appName = widgetData.getString("trip_app_name", null) ?: context.getString(R.string.widget_trip_app_name)
                     val daysVal = safeGetInt(widgetData, "trip_days", 0)
                     val tripMode = safeGetInt(widgetData, "widget_${widgetId}_trip_mode", 0)
                     val daysDisplay = when (tripMode) {
@@ -1020,7 +1020,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                     val destination = widgetData.getString("trip_destination", "") ?: ""
                     val packing = widgetData.getString("trip_packing", "0/0") ?: "0/0"
                     val budget = widgetData.getString("trip_budget", "") ?: ""
-                    val footer = widgetData.getString("trip_footer", "Geri sayım başladı") ?: "Geri sayım başladı"
+                    val footer = widgetData.getString("trip_footer", null) ?: context.getString(R.string.widget_countdown_started)
                     val showCountdown = safeGetBoolean(
                         widgetData,
                         if (widgetId > 0) "widget_${widgetId}_trip_show_countdown" else "pending_pin_trip_show_countdown",
@@ -1040,8 +1040,8 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                         true
                     )
 
-                    val packingLabel = widgetData.getString("trip_packing_label", "Bagaj") ?: "Bagaj"
-                    val spentLabel = widgetData.getString("trip_spent_label", "Harcanan") ?: "Harcanan"
+                    val packingLabel = widgetData.getString("trip_packing_label", null) ?: context.getString(R.string.widget_packing)
+                    val spentLabel = widgetData.getString("trip_spent_label", null) ?: context.getString(R.string.widget_spent)
 
                     val packingParts = packing.replace("🎒", "").trim().split("/")
                     val packedNum = packingParts.getOrNull(0)?.toIntOrNull() ?: 0
@@ -1269,14 +1269,18 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                         "EUR", "USD", "GBP" -> 10.0
                         else -> 50.0
                     }
-                    insertQuickExpense(context, tripId, currency, step, "Hızlı Harcama")
+                    val quickTitle = widgetData.getString("quick_expense_insert_title", null)
+                        ?: context.getString(R.string.widget_quick_expense_title)
+                    val quickPrefix = widgetData.getString("quick_expense_insert_prefix", null)
+                        ?: context.getString(R.string.widget_quick_expense_prefix)
+                    insertQuickExpense(context, tripId, currency, step, quickTitle)
                     val prevSpent = safeGetDouble(widgetData, "trip_budget_spent_num", 0.0)
                     val newSpent = prevSpent + step
                     val limit = safeGetDouble(widgetData, "trip_budget_limit_num", 0.0)
                     val remaining = if (limit > 0) Math.max(0.0, limit - newSpent) else 0.0
                     val formattedSpent = CurrencyHelper.format(newSpent, currency)
                     val formattedRemaining = CurrencyHelper.format(remaining, currency)
-                    val lastText = "Hızlı: +" + CurrencyHelper.format(step, currency)
+                    val lastText = "$quickPrefix: +" + CurrencyHelper.format(step, currency)
 
                     widgetData.edit()
                         .putFloat("trip_budget_spent_num", newSpent.toFloat())
@@ -1436,7 +1440,7 @@ open class PackBuddyWidgetProvider : HomeWidgetProvider() {
                 val fallback = RemoteViews(context.packageName, R.layout.packbuddy_trip_small)
                 fallback.setTextViewText(R.id.widget_app_name, "PackBuddy")
                 fallback.setTextViewText(R.id.widget_title, "PackBuddy")
-                fallback.setTextViewText(R.id.widget_destination, "Tap to open")
+                fallback.setTextViewText(R.id.widget_destination, context.getString(R.string.widget_tap_to_open))
                 appWidgetManager.updateAppWidget(widgetId, fallback)
             } catch (_: Throwable) {}
         }

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget strings. Generated from lib/core/services/app_widget_localization.dart; keep in sync. -->
+<resources>
+    <string name="widget_label_trip">PackBuddy: Voyage Actif</string>
+    <string name="widget_label_trip_medium">PackBuddy: Voyage Actif (Moyen)</string>
+    <string name="widget_label_trip_large">PackBuddy: Voyage Actif (Grand)</string>
+    <string name="widget_label_map">PackBuddy: Carte du Monde</string>
+    <string name="widget_label_map_medium">PackBuddy: Carte du Monde (Moyen)</string>
+    <string name="widget_label_map_large">PackBuddy: Carte du Monde (Grand)</string>
+    <string name="widget_label_expense">PackBuddy: Dépense Rapide</string>
+    <string name="widget_label_expense_medium">PackBuddy: Dépense Rapide (Moyen)</string>
+    <string name="widget_label_expense_large">PackBuddy: Dépense Rapide (Grand)</string>
+    <string name="widget_label_currency">PackBuddy: Convertisseur de Devises</string>
+    <string name="widget_label_currency_medium">PackBuddy: Convertisseur de Devises (Moyen)</string>
+    <string name="widget_label_currency_large">PackBuddy: Convertisseur de Devises (Grand)</string>
+    <string name="widget_trip_app_name">PackBuddy • Voyage</string>
+    <string name="widget_world_app_name">PackBuddy • Monde</string>
+    <string name="widget_rates_app_name">PackBuddy • Devises</string>
+    <string name="widget_budget_app_name">PackBuddy • Budget</string>
+    <string name="widget_add_expense">Ajouter dépense</string>
+    <string name="widget_add_expense_action">+ Ajouter dépense</string>
+    <string name="widget_quick_log">Saisie rapide</string>
+    <string name="widget_spent">Dépensé</string>
+    <string name="widget_spent_budget">Budget dépensé</string>
+    <string name="widget_remaining_budget">Budget restant</string>
+    <string name="widget_last_expense">Dernière dépense</string>
+    <string name="widget_no_expense_yet">Aucune dépense enregistrée</string>
+    <string name="widget_packing">Bagages</string>
+    <string name="widget_packing_zero">Bagages: 0/0</string>
+    <string name="widget_countdown_started">Compte à rebours actif</string>
+    <string name="widget_plan_next_trip">Planifiez votre prochain voyage</string>
+    <string name="widget_currency">Convertisseur de Devises</string>
+    <string name="widget_quick_conversions">Conversions rapides</string>
+    <string name="widget_live_rates">Taux en direct</string>
+    <string name="widget_live_rates_dot">● Taux en direct</string>
+    <string name="widget_auto_sync">✓ Synchro bidirectionnelle auto</string>
+    <string name="widget_offline_ready">Prêt hors ligne</string>
+    <string name="widget_exploration_rate">Taux d\'Exploration</string>
+    <string name="widget_countries_visited">%1$d Pays Visités</string>
+    <string name="widget_continents_explored">%1$d Continents Explorés</string>
+    <string name="widget_stat_visited">✈️ %1$d Visité</string>
+    <string name="widget_stat_wishlist">🌟 %1$d Envie</string>
+    <string name="widget_stat_continents">🌍 %1$d Continents</string>
+    <string name="widget_legend_lived">● Vécu (%1$d)</string>
+    <string name="widget_countries_visited_zero">Carte du Monde</string>
+    <string name="widget_continents_explored_zero">Marquez les pays sur la carte</string>
+    <string name="widget_stat_visited_zero">✈️ 0 Visité</string>
+    <string name="widget_stat_wishlist_zero">🌟 0 Envie</string>
+    <string name="widget_stat_continents_zero">🌍 0 Continents</string>
+    <string name="widget_legend_lived_zero">● Vécu (0)</string>
+    <string name="widget_legend_visited_zero">● Visité (0)</string>
+    <string name="widget_legend_wishlist_zero">● Envie (0)</string>
+    <string name="widget_tap_to_open">Appuyez pour ouvrir</string>
+    <string name="widget_quick_expense_title">Dépense Rapide</string>
+    <string name="widget_quick_expense_prefix">Rapide</string>
+</resources>

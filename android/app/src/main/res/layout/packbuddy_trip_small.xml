@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="PackBuddy"
+                android:text="@string/widget_brand"
                 android:textColor="#FFFFFF"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -105,7 +105,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Bagaj: 0/0"
+                android:text="@string/widget_packing_zero"
                 android:textColor="#38BDF8"
                 android:textSize="9sp"
                 android:textStyle="bold" />

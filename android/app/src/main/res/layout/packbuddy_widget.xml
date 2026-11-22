@@ -36,7 +36,7 @@
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="PackBuddy"
+                android:text="@string/widget_brand"
                 android:textColor="#3B82F6"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -67,7 +67,7 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="PackBuddy"
+            android:text="@string/widget_brand"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -79,7 +79,7 @@
             android:layout_marginTop="2dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="No upcoming trips"
+            android:text="@string/widget_plan_next_trip"
             android:textColor="#94A3B8"
             android:textSize="11sp" />
 
@@ -124,7 +124,7 @@
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="0/0 packed"
+                android:text="@string/widget_packing_zero"
                 android:textColor="#38BDF8"
                 android:textSize="11sp"
                 android:textStyle="bold" />

@@ -2,6 +2,7 @@ import '../../core/services/telemetry_service.dart';
 import '../../core/services/preferences_service.dart';
 import '../../core/services/live_location_service.dart';
 import '../../core/services/email_dispatch_service.dart';
+import '../../core/l10n/app_l10n_lookup.dart';
 import '../../core/services/notification_service.dart';
 import '../../data/local_db/database_helper.dart';
 import '../budget/domain/country.dart';
@@ -30,6 +31,14 @@ import '../../core/services/security_service.dart';
 
 /// Designated Executive Super Admin Email
 const String kAdminEmail = 'sleepyheadaitr@gmail.com';
+
+/// Language for user-facing emails: the user's saved `appLanguage`
+/// (or legacy aliases). Missing values fall back to English.
+String _emailLanguageOf(Map<String, dynamic> data) {
+  final raw = data['appLanguage'] ?? data['app_language'] ?? data['languageCode'] ?? data['language_code'];
+  final code = raw is String ? raw.trim().toLowerCase() : '';
+  return code.isNotEmpty ? code : 'en';
+}
 
 /// Global platform metrics for the Executive Admin Dashboard
 class AdminPlatformMetrics {
@@ -2878,40 +2887,43 @@ class FirebaseAdminService implements AdminService {
     final nowUtc = DateTime.now().toUtc();
 
     if (email.isNotEmpty) {
+      final l10n = appL10nFor(_emailLanguageOf(data));
+      final name = displayName.isNotEmpty ? displayName : l10n.emailDefaultName;
+      final safeName = EmailDispatchService.escapeHtml(name);
       await firestore.collection('mail').add({
         'to': [email],
         'message': {
-          'subject': '⚠️ PackBuddy Hesabınız $remainingDays Gün İçinde Silinecek (Uyarı #$newCount)',
-          'text': 'Merhaba ${displayName.isNotEmpty ? displayName : "Gezgin"},\n\n'
-              'PackBuddy hesabınıza yaklaşık 5 aydır giriş yapmadığınızı fark ettik.\n\n'
-              'Veri saklama ve gizlilik politikamız gereğince 6 ay (180 gün) boyunca giriş yapılmayan hesaplar ve bu hesaplara ait seyahatler, harcamalar, bavul kontrol listeleri ve kasa belgeleri kalıcı olarak silinmektedir.\n\n'
-              'Hesabınızın kalıcı olarak silinmesine yaklaşık $remainingDays gün kaldı.\n\n'
-              'Hesabınızı ve tüm seyahat verilerinizi korumak için lütfen PackBuddy mobil uygulamasına giriş yapınız. Giriş yaptığınız anda hesabınız otomatik olarak aktif kalmaya devam edecektir.\n\n'
-              'İyi yolculuklar,\nPackBuddy Ekibi',
+          'subject': l10n.emailInactivitySubject(remainingDays, newCount),
+          'text': '${l10n.emailGreeting(name)}\n\n'
+              '${l10n.emailInactivityIntro}\n\n'
+              '${l10n.emailInactivityPolicy}\n\n'
+              '${l10n.emailInactivityRemaining(remainingDays)}\n\n'
+              '${l10n.emailInactivityAction}\n\n'
+              '${l10n.emailSignoff}\n${l10n.emailTeamSignature}',
           'html': '''
             <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;">
-              <h2 style="color: #ea580c; margin-top: 0;">PackBuddy Hesap İnaktiflik Uyarısı</h2>
-              <p>Merhaba <strong>${displayName.isNotEmpty ? displayName : "Gezgin"}</strong>,</p>
-              <p>PackBuddy hesabınıza yaklaşık <strong>5 aydır</strong> giriş yapmadığınızı fark ettik.</p>
+              <h2 style="color: #ea580c; margin-top: 0;">${l10n.emailInactivityHeading}</h2>
+              <p>${l10n.emailGreeting('<strong>$safeName</strong>')}</p>
+              <p>${l10n.emailInactivityIntro}</p>
               <div style="background-color: #fff7ed; border-left: 4px solid #ea580c; padding: 14px; margin: 18px 0; border-radius: 8px;">
                 <p style="margin: 0; color: #9a3412; font-weight: bold; font-size: 15px;">
-                  ⏳ Hesabınızın ve tüm verilerinizin kalıcı olarak silinmesine yaklaşık $remainingDays gün kaldı.
+                  ⏳ ${l10n.emailInactivityRemaining(remainingDays)}
                 </p>
                 <p style="margin: 6px 0 0 0; color: #c2410c; font-size: 13px;">
-                  (5. ay boyunca her hafta gönderilen otomatik uyarı e-postası: #$newCount)
+                  ${l10n.emailInactivityNoticeCount(newCount)}
                 </p>
               </div>
               <p style="color: #334155; line-height: 1.5;">
-                Sistemlerimizde 6 ay (180 gün) boyunca giriş yapılmayan hesaplar ve bu hesaplara ait seyahat kayıtları, harcamalar, bavul kontrol listeleri ve kasa belgeleri güvenlik ve veri koruma ilkelerimiz uyarınca kalıcı olarak silinmektedir.
+                ${l10n.emailInactivityPolicy}
               </p>
               <p style="color: #0f172a; font-weight: 600;">
-                Hesabınızı korumak için tek yapmanız gereken: Uygulamaya giriş yapmak!
+                ${l10n.emailInactivityCta}
               </p>
               <p style="color: #64748b; font-size: 13px;">
-                Uygulamayı açıp giriş yaptığınız anda hesabınız otomatik olarak sıfırlanacak ve aktif olarak korunmaya devam edecektir.
+                ${l10n.emailInactivityAction}
               </p>
               <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
-              <p style="font-size: 12px; color: #94a3b8; margin-bottom: 0;">Bu e-posta PackBuddy otomatik hesap koruma servisi tarafından gönderilmiştir.</p>
+              <p style="font-size: 12px; color: #94a3b8; margin-bottom: 0;">${l10n.emailInactivityFooter}</p>
             </div>
           ''',
         },
@@ -3026,16 +3038,22 @@ class FirebaseAdminService implements AdminService {
 
       // 2. Email Delivery (mail collection)
       if (sendEmail && email.isNotEmpty) {
-        final emailSubject = '⚠️ PackBuddy Bildirimi: $title';
+        final emailLang = _emailLanguageOf(data);
+        final emailSubject = EmailDispatchService.instance.formatWarningEmailSubject(
+          title: title,
+          languageCode: emailLang,
+        );
         final emailText = EmailDispatchService.instance.formatWarningEmailText(
           displayName: displayName,
           title: title,
           message: message,
+          languageCode: emailLang,
         );
         final emailHtml = EmailDispatchService.instance.formatWarningEmailHtml(
           displayName: displayName,
           title: title,
           message: message,
+          languageCode: emailLang,
         );
 
         try {
@@ -3376,13 +3394,15 @@ class FirebaseAdminService implements AdminService {
 
           final firestore = _effectiveFirestore;
           if (firestore != null && user.email.isNotEmpty) {
+            final l10n = appL10nFor(user.appLanguage.isNotEmpty ? user.appLanguage : 'en');
+            final name = user.displayName.isNotEmpty ? user.displayName : l10n.emailDefaultName;
             await firestore.collection('mail').add({
               'to': [user.email],
               'message': {
-                'subject': 'PackBuddy Hesabınız 6 Aylık İnaktiflik Nedeniyle Silindi / Account Deleted',
-                'text': 'Merhaba ${user.displayName.isNotEmpty ? user.displayName : "Gezgin"},\n\n'
-                    'PackBuddy hesabınıza 6 ay (180 gün) boyunca giriş yapılmadığı için güvenlik ve veri koruma ilkelerimiz uyarınca hesabınız ve tüm verileriniz kalıcı olarak silinmiştir.\n\n'
-                    'PackBuddy Ekibi',
+                'subject': l10n.emailPurgedSubject,
+                'text': '${l10n.emailGreeting(name)}\n\n'
+                    '${l10n.emailPurgedBody}\n\n'
+                    '${l10n.emailTeamSignature}',
               },
               'type': 'inactivity_purged_6_months',
               'targetUid': user.uid,

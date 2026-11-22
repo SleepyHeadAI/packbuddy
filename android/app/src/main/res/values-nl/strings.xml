@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget strings. Generated from lib/core/services/app_widget_localization.dart; keep in sync. -->
+<resources>
+    <string name="widget_label_trip">PackBuddy: Actieve Reis</string>
+    <string name="widget_label_trip_medium">PackBuddy: Actieve Reis (Middel)</string>
+    <string name="widget_label_trip_large">PackBuddy: Actieve Reis (Groot)</string>
+    <string name="widget_label_map">PackBuddy: Wereldkaart</string>
+    <string name="widget_label_map_medium">PackBuddy: Wereldkaart (Middel)</string>
+    <string name="widget_label_map_large">PackBuddy: Wereldkaart (Groot)</string>
+    <string name="widget_label_expense">PackBuddy: Snelle Uitgave</string>
+    <string name="widget_label_expense_medium">PackBuddy: Snelle Uitgave (Middel)</string>
+    <string name="widget_label_expense_large">PackBuddy: Snelle Uitgave (Groot)</string>
+    <string name="widget_label_currency">PackBuddy: Valutaconverter</string>
+    <string name="widget_label_currency_medium">PackBuddy: Valutaconverter (Middel)</string>
+    <string name="widget_label_currency_large">PackBuddy: Valutaconverter (Groot)</string>
+    <string name="widget_trip_app_name">PackBuddy • Reis</string>
+    <string name="widget_world_app_name">PackBuddy • Wereld</string>
+    <string name="widget_rates_app_name">PackBuddy • Valuta</string>
+    <string name="widget_budget_app_name">PackBuddy • Budget</string>
+    <string name="widget_add_expense">Uitgave toevoegen</string>
+    <string name="widget_add_expense_action">+ Uitgave toevoegen</string>
+    <string name="widget_quick_log">Snelle invoer</string>
+    <string name="widget_spent">Uitgegeven</string>
+    <string name="widget_spent_budget">Besteed budget</string>
+    <string name="widget_remaining_budget">Resterend budget</string>
+    <string name="widget_last_expense">Laatste uitgave</string>
+    <string name="widget_no_expense_yet">Nog geen uitgaven geregistreerd</string>
+    <string name="widget_packing">Inpakken</string>
+    <string name="widget_packing_zero">Inpakken: 0/0</string>
+    <string name="widget_countdown_started">Aftellen gestart</string>
+    <string name="widget_plan_next_trip">Plan je volgende reis</string>
+    <string name="widget_currency">Valutaconverter</string>
+    <string name="widget_quick_conversions">Snelle omrekening</string>
+    <string name="widget_live_rates">Live koersen</string>
+    <string name="widget_live_rates_dot">● Live koersen</string>
+    <string name="widget_auto_sync">✓ Auto bidirectionele synchronisatie</string>
+    <string name="widget_offline_ready">Offline gereed</string>
+    <string name="widget_exploration_rate">Verkenningspercentage</string>
+    <string name="widget_countries_visited">%1$d Landen Bezocht</string>
+    <string name="widget_continents_explored">%1$d Continenten Ontdekt</string>
+    <string name="widget_stat_visited">✈️ %1$d Bezocht</string>
+    <string name="widget_stat_wishlist">🌟 %1$d Verlanglijst</string>
+    <string name="widget_stat_continents">🌍 %1$d Continenten</string>
+    <string name="widget_legend_lived">● Gewoond (%1$d)</string>
+    <string name="widget_countries_visited_zero">Wereldkaart</string>
+    <string name="widget_continents_explored_zero">Markeer landen op de kaart</string>
+    <string name="widget_stat_visited_zero">✈️ 0 Bezocht</string>
+    <string name="widget_stat_wishlist_zero">🌟 0 Verlanglijst</string>
+    <string name="widget_stat_continents_zero">🌍 0 Continenten</string>
+    <string name="widget_legend_lived_zero">● Gewoond (0)</string>
+    <string name="widget_legend_visited_zero">● Bezocht (0)</string>
+    <string name="widget_legend_wishlist_zero">● Wens (0)</string>
+    <string name="widget_tap_to_open">Tik om te openen</string>
+    <string name="widget_quick_expense_title">Snelle Uitgave</string>
+    <string name="widget_quick_expense_prefix">Snel</string>
+</resources>

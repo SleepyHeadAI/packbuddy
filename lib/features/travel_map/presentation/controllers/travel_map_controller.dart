@@ -6,6 +6,7 @@ import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
+import 'package:packbuddy/features/travel_map/data/capital_localization.dart';
 import 'package:packbuddy/features/travel_map/data/travel_map_service.dart';
 import 'package:packbuddy/features/travel_map/data/world_countries_data.dart';
 import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
@@ -86,6 +87,7 @@ class TravelMapState {
             c.nameEn.toLowerCase().contains(q) ||
             localizedName.contains(q) ||
             c.capital.toLowerCase().contains(q) ||
+            CapitalLocalization.getCapitalName(c.code, langCode).toLowerCase().contains(q) ||
             c.code.toLowerCase().contains(q);
         if (!match) return false;
       }

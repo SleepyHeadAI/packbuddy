@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget strings. Generated from lib/core/services/app_widget_localization.dart; keep in sync. -->
+<resources>
+    <string name="widget_label_trip">PackBuddy: 진행 중인 여행</string>
+    <string name="widget_label_trip_medium">PackBuddy: 진행 중인 여행 (중간)</string>
+    <string name="widget_label_trip_large">PackBuddy: 진행 중인 여행 (크게)</string>
+    <string name="widget_label_map">PackBuddy: 세계 지도</string>
+    <string name="widget_label_map_medium">PackBuddy: 세계 지도 (중간)</string>
+    <string name="widget_label_map_large">PackBuddy: 세계 지도 (크게)</string>
+    <string name="widget_label_expense">PackBuddy: 빠른 지출 기록</string>
+    <string name="widget_label_expense_medium">PackBuddy: 빠른 지출 기록 (중간)</string>
+    <string name="widget_label_expense_large">PackBuddy: 빠른 지출 기록 (크게)</string>
+    <string name="widget_label_currency">PackBuddy: 환율 계산기</string>
+    <string name="widget_label_currency_medium">PackBuddy: 환율 계산기 (중간)</string>
+    <string name="widget_label_currency_large">PackBuddy: 환율 계산기 (크게)</string>
+    <string name="widget_trip_app_name">PackBuddy • 여행</string>
+    <string name="widget_world_app_name">PackBuddy • 세계</string>
+    <string name="widget_rates_app_name">PackBuddy • 환율</string>
+    <string name="widget_budget_app_name">PackBuddy • 예산</string>
+    <string name="widget_add_expense">지출 추가</string>
+    <string name="widget_add_expense_action">+ 지출 추가</string>
+    <string name="widget_quick_log">빠른 기록</string>
+    <string name="widget_spent">지출</string>
+    <string name="widget_spent_budget">사용된 예산</string>
+    <string name="widget_remaining_budget">남은 예산</string>
+    <string name="widget_last_expense">최근 지출</string>
+    <string name="widget_no_expense_yet">아직 기록된 지출이 없습니다</string>
+    <string name="widget_packing">짐 싸기</string>
+    <string name="widget_packing_zero">짐 싸기: 0/0</string>
+    <string name="widget_countdown_started">카운트다운 시작</string>
+    <string name="widget_plan_next_trip">다음 여행을 계획해 보세요</string>
+    <string name="widget_currency">환율 계산기</string>
+    <string name="widget_quick_conversions">빠른 환산</string>
+    <string name="widget_live_rates">실시간 환율</string>
+    <string name="widget_live_rates_dot">● 실시간 환율</string>
+    <string name="widget_auto_sync">✓ 자동 양방향 동기화</string>
+    <string name="widget_offline_ready">오프라인 사용 가능</string>
+    <string name="widget_exploration_rate">탐험률</string>
+    <string name="widget_countries_visited">%1$d개국 방문 완료</string>
+    <string name="widget_continents_explored">%1$d개 대륙 탐험</string>
+    <string name="widget_stat_visited">✈️ %1$d 방문</string>
+    <string name="widget_stat_wishlist">🌟 %1$d 위시리스트</string>
+    <string name="widget_stat_continents">🌍 %1$d 대륙</string>
+    <string name="widget_legend_lived">● 거주 (%1$d)</string>
+    <string name="widget_countries_visited_zero">세계 지도</string>
+    <string name="widget_continents_explored_zero">지도에서 국가를 표시하세요</string>
+    <string name="widget_stat_visited_zero">✈️ 0 방문</string>
+    <string name="widget_stat_wishlist_zero">🌟 0 위시리스트</string>
+    <string name="widget_stat_continents_zero">🌍 0 대륙</string>
+    <string name="widget_legend_lived_zero">● 거주 (0)</string>
+    <string name="widget_legend_visited_zero">● 방문 (0)</string>
+    <string name="widget_legend_wishlist_zero">● 위시리스트 (0)</string>
+    <string name="widget_tap_to_open">탭하여 열기</string>
+    <string name="widget_quick_expense_title">빠른 지출 기록</string>
+    <string name="widget_quick_expense_prefix">빠른</string>
+</resources>

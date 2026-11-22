@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget strings. Generated from lib/core/services/app_widget_localization.dart; keep in sync. -->
+<resources>
+    <string name="widget_label_trip">PackBuddy: 旅行中</string>
+    <string name="widget_label_trip_medium">PackBuddy: 旅行中 (中)</string>
+    <string name="widget_label_trip_large">PackBuddy: 旅行中 (大)</string>
+    <string name="widget_label_map">PackBuddy: 世界地図</string>
+    <string name="widget_label_map_medium">PackBuddy: 世界地図 (中)</string>
+    <string name="widget_label_map_large">PackBuddy: 世界地図 (大)</string>
+    <string name="widget_label_expense">PackBuddy: クイック支出</string>
+    <string name="widget_label_expense_medium">PackBuddy: クイック支出 (中)</string>
+    <string name="widget_label_expense_large">PackBuddy: クイック支出 (大)</string>
+    <string name="widget_label_currency">PackBuddy: 為替レート計算機</string>
+    <string name="widget_label_currency_medium">PackBuddy: 為替レート計算機 (中)</string>
+    <string name="widget_label_currency_large">PackBuddy: 為替レート計算機 (大)</string>
+    <string name="widget_trip_app_name">PackBuddy • 旅行</string>
+    <string name="widget_world_app_name">PackBuddy • 世界</string>
+    <string name="widget_rates_app_name">PackBuddy • 為替</string>
+    <string name="widget_budget_app_name">PackBuddy • 予算</string>
+    <string name="widget_add_expense">支出を追加</string>
+    <string name="widget_add_expense_action">+ 支出を追加</string>
+    <string name="widget_quick_log">クイック記録</string>
+    <string name="widget_spent">支出済</string>
+    <string name="widget_spent_budget">使用済み予算</string>
+    <string name="widget_remaining_budget">残りの予算</string>
+    <string name="widget_last_expense">最近の支出</string>
+    <string name="widget_no_expense_yet">支出はまだ記録されていません</string>
+    <string name="widget_packing">荷物</string>
+    <string name="widget_packing_zero">荷物: 0/0</string>
+    <string name="widget_countdown_started">カウントダウン中</string>
+    <string name="widget_plan_next_trip">次の旅行を計画する</string>
+    <string name="widget_currency">為替レート計算機</string>
+    <string name="widget_quick_conversions">クイック換算</string>
+    <string name="widget_live_rates">リアルタイム為替レート</string>
+    <string name="widget_live_rates_dot">● リアルタイム為替レート</string>
+    <string name="widget_auto_sync">✓ 自動双方向同期</string>
+    <string name="widget_offline_ready">オフライン対応</string>
+    <string name="widget_exploration_rate">探検率</string>
+    <string name="widget_countries_visited">%1$d か国を訪問</string>
+    <string name="widget_continents_explored">%1$d 大陸を探検</string>
+    <string name="widget_stat_visited">✈️ %1$d 訪問済</string>
+    <string name="widget_stat_wishlist">🌟 %1$d 行きたい</string>
+    <string name="widget_stat_continents">🌍 %1$d 大陸</string>
+    <string name="widget_legend_lived">● 在住 (%1$d)</string>
+    <string name="widget_countries_visited_zero">世界地図</string>
+    <string name="widget_continents_explored_zero">地図上で国を記録</string>
+    <string name="widget_stat_visited_zero">✈️ 0 訪問済</string>
+    <string name="widget_stat_wishlist_zero">🌟 0 行きたい</string>
+    <string name="widget_stat_continents_zero">🌍 0 大陸</string>
+    <string name="widget_legend_lived_zero">● 在住 (0)</string>
+    <string name="widget_legend_visited_zero">● 訪問 (0)</string>
+    <string name="widget_legend_wishlist_zero">● 行きたい (0)</string>
+    <string name="widget_tap_to_open">タップして開く</string>
+    <string name="widget_quick_expense_title">クイック支出</string>
+    <string name="widget_quick_expense_prefix">クイック</string>
+</resources>

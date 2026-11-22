@@ -6,6 +6,7 @@ import 'package:packbuddy/features/travel_map/data/world_countries_data.dart';
 import 'package:packbuddy/features/travel_map/data/world_map_instructions.dart';
 import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
 import 'package:packbuddy/features/travel_map/presentation/screens/travel_map_screen.dart';
+import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
 
 /// Serene Voyage World Travel Map profile card showing live vector map visualization,
@@ -74,8 +75,8 @@ class WorldMapProfileCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final lang = Localizations.localeOf(context).languageCode;
-    final isTr = lang.startsWith('tr');
+    final l10n = AppLocalizations.of(context)!;
+    final friendLabel = friendName ?? l10n.worldMapFriendFallbackName;
 
     // 1. Calculate statistics
     final effectiveCountries = countries.isNotEmpty ? countries : WorldCountriesData.allCountries;
@@ -137,7 +138,7 @@ class WorldMapProfileCard extends StatelessWidget {
           );
         }
       } else {
-        _showZoomableMapDialog(context, effectiveCountries, colorMap, isDark, isTr);
+        _showZoomableMapDialog(context, effectiveCountries, colorMap, isDark, l10n, friendLabel);
       }
     }
 
@@ -169,7 +170,7 @@ class WorldMapProfileCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isTr ? 'Dünya Seyahat Haritası' : 'World Travel Map',
+                      l10n.worldMapCardTitle,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w800,
                         fontSize: 14.5,
@@ -180,10 +181,8 @@ class WorldMapProfileCard extends StatelessWidget {
                     const SizedBox(height: 1),
                     Text(
                       isOwnProfile
-                          ? (isTr ? 'Güncel Keşif & Boyama Durumu' : 'Live Exploration & Coverage')
-                          : (isTr
-                              ? '${friendName ?? "Arkadaşınız"}\'in Haritası'
-                              : '${friendName ?? "Friend"}\'s Map'),
+                          ? l10n.worldMapLiveCoverage
+                          : l10n.worldMapFriendMap(friendLabel),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                         fontSize: 11.5,
@@ -210,8 +209,8 @@ class WorldMapProfileCard extends StatelessWidget {
                   ),
                   child: Text(
                     isOwnProfile
-                        ? (isTr ? 'Haritayı Aç ↗' : 'Open Map ↗')
-                        : (isTr ? 'İncele 🔍' : 'Inspect 🔍'),
+                        ? '${l10n.worldMapOpenMap} ↗'
+                        : '${l10n.worldMapInspect} 🔍',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
@@ -285,8 +284,8 @@ class WorldMapProfileCard extends StatelessWidget {
                             const SizedBox(width: 4),
                             Text(
                               isOwnProfile
-                                  ? (isTr ? 'Haritaya Git' : 'Go to Map')
-                                  : (isTr ? 'Yakınlaştır & İncele' : 'Zoom & Inspect'),
+                                  ? l10n.worldMapGoToMap
+                                  : l10n.worldMapZoomInspect,
                               style: TextStyle(
                                 fontSize: 10.5,
                                 fontWeight: FontWeight.w700,
@@ -328,7 +327,7 @@ class WorldMapProfileCard extends StatelessWidget {
                           const SizedBox(width: 6),
                           Flexible(
                             child: Text(
-                              isTr ? 'Dünya Keşfedildi' : 'World Explored',
+                              l10n.worldMapExplored,
                               style: TextStyle(
                                 fontSize: 12.5,
                                 fontWeight: FontWeight.w700,
@@ -342,9 +341,7 @@ class WorldMapProfileCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        isTr
-                            ? '$visitedAndLivedCount / $totalCountries Ülke Gezildi'
-                            : '$visitedAndLivedCount / $totalCountries Visited',
+                        l10n.worldMapVisitedOfTotal(visitedAndLivedCount, totalCountries),
                         style: TextStyle(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w600,
@@ -412,7 +409,7 @@ class WorldMapProfileCard extends StatelessWidget {
               Expanded(
                 child: _buildMetricChip(
                   dotColor: const Color(0xFF10B981),
-                  label: isTr ? 'Yaşanan' : 'Lived',
+                  label: l10n.worldMapChipLived,
                   count: livedCount,
                   theme: theme,
                   isDark: isDark,
@@ -422,7 +419,7 @@ class WorldMapProfileCard extends StatelessWidget {
               Expanded(
                 child: _buildMetricChip(
                   dotColor: AppColors.primaryAmber,
-                  label: isTr ? 'Gezilen' : 'Visited',
+                  label: l10n.mapLegendBeen,
                   count: visitedOnlyCount,
                   theme: theme,
                   isDark: isDark,
@@ -432,7 +429,7 @@ class WorldMapProfileCard extends StatelessWidget {
               Expanded(
                 child: _buildMetricChip(
                   dotColor: const Color(0xFFEF4444),
-                  label: isTr ? 'Hedef' : 'Wishlist',
+                  label: l10n.mapLegendWant,
                   count: wishlistCount,
                   theme: theme,
                   isDark: isDark,
@@ -442,7 +439,7 @@ class WorldMapProfileCard extends StatelessWidget {
               Expanded(
                 child: _buildMetricChip(
                   dotColor: const Color(0xFF3B82F6),
-                  label: isTr ? 'Kıta' : 'Continents',
+                  label: l10n.worldMapContinentsChip,
                   count: continentsExplored,
                   suffix: '/5',
                   theme: theme,
@@ -470,9 +467,7 @@ class WorldMapProfileCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      isTr
-                          ? '${mutualVisitedCodes.length} Ortak Gezilen Ülke: ${_formatMutualCodes(mutualVisitedCodes)}'
-                          : '${mutualVisitedCodes.length} Mutual Visited Countries: ${_formatMutualCodes(mutualVisitedCodes)}',
+                      l10n.worldMapMutualCountries(mutualVisitedCodes.length, _formatMutualCodes(mutualVisitedCodes)),
                       style: TextStyle(
                         fontSize: 11.5,
                         fontWeight: FontWeight.w700,
@@ -564,7 +559,8 @@ class WorldMapProfileCard extends StatelessWidget {
     List<TravelCountry> effectiveCountries,
     Map<String, Color> colorMap,
     bool isDark,
-    bool isTr,
+    AppLocalizations l10n,
+    String friendLabel,
   ) {
     final unvisitedLandColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFFFFFFF);
     final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFD6DEE7);
@@ -592,15 +588,13 @@ class WorldMapProfileCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            isTr
-                                ? '${friendName ?? "Arkadaşınız"}\'in Dünya Haritası'
-                                : '${friendName ?? "Friend"}\'s World Map',
+                            l10n.worldMapFriendWorldMap(friendLabel),
                             style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            isTr ? 'Yakınlaştırıp detayları inceleyebilirsiniz' : 'Pinch or double-tap to explore',
+                            l10n.worldMapPinchToExplore,
                             style: TextStyle(
                               fontSize: 12,
                               color: isDark ? Colors.white60 : Colors.black54,
@@ -655,12 +649,12 @@ class WorldMapProfileCard extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildLegendItem(const Color(0xFF10B981), isTr ? 'Yaşanan' : 'Lived', isDark),
-                    _buildLegendItem(AppColors.primaryAmber, isTr ? 'Gezilen' : 'Visited', isDark),
-                    _buildLegendItem(const Color(0xFFEF4444), isTr ? 'Hedef' : 'Wishlist', isDark),
+                    _buildLegendItem(const Color(0xFF10B981), l10n.worldMapChipLived, isDark),
+                    _buildLegendItem(AppColors.primaryAmber, l10n.mapLegendBeen, isDark),
+                    _buildLegendItem(const Color(0xFFEF4444), l10n.mapLegendWant, isDark),
                     _buildLegendItem(
                       isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
-                      isTr ? 'Keşfedilmemiş' : 'Unvisited',
+                      l10n.mapLegendUnvisited,
                       isDark,
                     ),
                   ],

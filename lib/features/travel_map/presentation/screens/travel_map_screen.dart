@@ -13,6 +13,7 @@ import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:packbuddy/core/theme/app_typography.dart';
 import 'package:packbuddy/features/budget/presentation/screens/trips_screen.dart';
+import 'package:packbuddy/features/travel_map/data/capital_localization.dart';
 import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
 import 'package:packbuddy/features/travel_map/presentation/controllers/travel_map_controller.dart';
 import 'package:packbuddy/features/travel_map/presentation/widgets/interactive_world_map.dart';
@@ -721,7 +722,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
                                 const SizedBox(height: 2),
                                 Text(
                                   latestCountry.capital.isNotEmpty
-                                      ? '${_getLocalizedContinentName(latestCountry.continent, l10n)} • ${l10n.mapLegendCapital}: ${latestCountry.capital}'
+                                      ? '${_getLocalizedContinentName(latestCountry.continent, l10n)} • ${l10n.mapLegendCapital}: ${CapitalLocalization.getCapitalName(latestCountry.code, currentLang, fallback: latestCountry.capital)}'
                                       : _getLocalizedContinentName(latestCountry.continent, l10n),
                                   style: AppTypography.caption.copyWith(
                                     color: theme.colorScheme.onSurfaceVariant,

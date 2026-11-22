@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
@@ -201,7 +202,7 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          _summary.displayName?.isNotEmpty == true ? _summary.displayName! : 'Traveler Profile',
+          _summary.displayName?.isNotEmpty == true ? _summary.displayName! : AppLocalizations.of(context)!.friendProfileFallbackTitle,
           style: theme.appBarTheme.titleTextStyle ??
               theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           overflow: TextOverflow.ellipsis,

@@ -334,18 +334,34 @@ void main() {
         displayName: 'Ahmet',
         title: 'Önemli Uyarı',
         message: 'Lütfen seyahat listenizi kontrol ediniz.',
+        languageCode: 'tr',
       );
       expect(text.contains('Merhaba Ahmet'), isTrue);
       expect(text.contains('Önemli Uyarı'), isTrue);
       expect(text.contains('Lütfen seyahat listenizi kontrol ediniz.'), isTrue);
-      expect(text.contains('PackBuddy Yönetim Ekibi'), isTrue);
+      expect(text.contains('PackBuddy Ekibi'), isTrue);
+
+      final textFallback = emailService.formatWarningEmailText(
+        displayName: '',
+        title: 'Notice',
+        message: 'Body',
+        languageCode: 'xx',
+      );
+      expect(textFallback.contains('Hello Traveler,'), isTrue);
+      expect(textFallback.contains('The PackBuddy Team'), isTrue);
+      expect(
+        emailService.formatWarningEmailSubject(title: 'Notice', languageCode: 'tr'),
+        '⚠️ PackBuddy Bildirimi: Notice',
+      );
 
       final html = emailService.formatWarningEmailHtml(
         displayName: 'Ahmet',
         title: 'Önemli Uyarı',
         message: 'Lütfen seyahat listenizi kontrol ediniz.',
+        languageCode: 'tr',
       );
       expect(html.contains('<strong>Ahmet</strong>'), isTrue);
+      expect(html.contains('PackBuddy Yönetici Uyarısı'), isTrue);
       expect(html.contains('Önemli Uyarı'), isTrue);
       expect(html.contains('#ea580c'), isTrue);
     });

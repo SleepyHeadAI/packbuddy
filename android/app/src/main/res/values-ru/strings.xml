@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget strings. Generated from lib/core/services/app_widget_localization.dart; keep in sync. -->
+<resources>
+    <string name="widget_label_trip">PackBuddy: Активная поездка</string>
+    <string name="widget_label_trip_medium">PackBuddy: Активная поездка (Средний)</string>
+    <string name="widget_label_trip_large">PackBuddy: Активная поездка (Большой)</string>
+    <string name="widget_label_map">PackBuddy: Карта мира</string>
+    <string name="widget_label_map_medium">PackBuddy: Карта мира (Средний)</string>
+    <string name="widget_label_map_large">PackBuddy: Карта мира (Большой)</string>
+    <string name="widget_label_expense">PackBuddy: Быстрый расход</string>
+    <string name="widget_label_expense_medium">PackBuddy: Быстрый расход (Средний)</string>
+    <string name="widget_label_expense_large">PackBuddy: Быстрый расход (Большой)</string>
+    <string name="widget_label_currency">PackBuddy: Конвертер валют</string>
+    <string name="widget_label_currency_medium">PackBuddy: Конвертер валют (Средний)</string>
+    <string name="widget_label_currency_large">PackBuddy: Конвертер валют (Большой)</string>
+    <string name="widget_trip_app_name">PackBuddy • Поездка</string>
+    <string name="widget_world_app_name">PackBuddy • Мир</string>
+    <string name="widget_rates_app_name">PackBuddy • Валюты</string>
+    <string name="widget_budget_app_name">PackBuddy • Бюджет</string>
+    <string name="widget_add_expense">Добавить расход</string>
+    <string name="widget_add_expense_action">+ Добавить расход</string>
+    <string name="widget_quick_log">Быстрая запись</string>
+    <string name="widget_spent">Потрачено</string>
+    <string name="widget_spent_budget">Потраченный бюджет</string>
+    <string name="widget_remaining_budget">Оставшийся бюджет</string>
+    <string name="widget_last_expense">Последний расход</string>
+    <string name="widget_no_expense_yet">Расходы пока не записаны</string>
+    <string name="widget_packing">Сборы</string>
+    <string name="widget_packing_zero">Сборы: 0/0</string>
+    <string name="widget_countdown_started">Обратный отсчет активен</string>
+    <string name="widget_plan_next_trip">Запланируйте следующую поездку</string>
+    <string name="widget_currency">Конвертер валют</string>
+    <string name="widget_quick_conversions">Быстрая конвертация</string>
+    <string name="widget_live_rates">Текущие курсы</string>
+    <string name="widget_live_rates_dot">● Текущие курсы</string>
+    <string name="widget_auto_sync">✓ Двусторонняя автосинхронизация</string>
+    <string name="widget_offline_ready">Готово офлайн</string>
+    <string name="widget_exploration_rate">Степень исследования</string>
+    <string name="widget_countries_visited">%1$d Стран Посещено</string>
+    <string name="widget_continents_explored">%1$d Континентов Исследовано</string>
+    <string name="widget_stat_visited">✈️ %1$d Посещено</string>
+    <string name="widget_stat_wishlist">🌟 %1$d В планах</string>
+    <string name="widget_stat_continents">🌍 %1$d Континентов</string>
+    <string name="widget_legend_lived">● Жил (%1$d)</string>
+    <string name="widget_countries_visited_zero">Карта мира</string>
+    <string name="widget_continents_explored_zero">Отметьте страны на карте</string>
+    <string name="widget_stat_visited_zero">✈️ 0 Посещено</string>
+    <string name="widget_stat_wishlist_zero">🌟 0 В планах</string>
+    <string name="widget_stat_continents_zero">🌍 0 Континентов</string>
+    <string name="widget_legend_lived_zero">● Жил (0)</string>
+    <string name="widget_legend_visited_zero">● Посещено (0)</string>
+    <string name="widget_legend_wishlist_zero">● В планах (0)</string>
+    <string name="widget_tap_to_open">Нажмите, чтобы открыть</string>
+    <string name="widget_quick_expense_title">Быстрый расход</string>
+    <string name="widget_quick_expense_prefix">Быстро</string>
+</resources>

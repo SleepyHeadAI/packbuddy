@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home-screen widget strings. Generated from lib/core/services/app_widget_localization.dart; keep in sync. -->
+<resources>
+    <string name="widget_label_trip">PackBuddy: الرحلة النشطة</string>
+    <string name="widget_label_trip_medium">PackBuddy: الرحلة النشطة (متوسط)</string>
+    <string name="widget_label_trip_large">PackBuddy: الرحلة النشطة (كبير)</string>
+    <string name="widget_label_map">PackBuddy: خريطة العالم</string>
+    <string name="widget_label_map_medium">PackBuddy: خريطة العالم (متوسط)</string>
+    <string name="widget_label_map_large">PackBuddy: خريطة العالم (كبير)</string>
+    <string name="widget_label_expense">PackBuddy: تسجيل مصروف</string>
+    <string name="widget_label_expense_medium">PackBuddy: تسجيل مصروف (متوسط)</string>
+    <string name="widget_label_expense_large">PackBuddy: تسجيل مصروف (كبير)</string>
+    <string name="widget_label_currency">PackBuddy: محول العملات</string>
+    <string name="widget_label_currency_medium">PackBuddy: محول العملات (متوسط)</string>
+    <string name="widget_label_currency_large">PackBuddy: محول العملات (كبير)</string>
+    <string name="widget_trip_app_name">PackBuddy • رحلة</string>
+    <string name="widget_world_app_name">PackBuddy • العالم</string>
+    <string name="widget_rates_app_name">PackBuddy • العملات</string>
+    <string name="widget_budget_app_name">PackBuddy • الميزانية</string>
+    <string name="widget_add_expense">إضافة نفقة</string>
+    <string name="widget_add_expense_action">+ إضافة نفقة</string>
+    <string name="widget_quick_log">تسجيل سريع</string>
+    <string name="widget_spent">تم إنفاقه</string>
+    <string name="widget_spent_budget">الميزانية المستهلكة</string>
+    <string name="widget_remaining_budget">الميزانية المتبقية</string>
+    <string name="widget_last_expense">آخر نفقة</string>
+    <string name="widget_no_expense_yet">لم يتم تسجيل أي نفقات بعد</string>
+    <string name="widget_packing">الحقائب</string>
+    <string name="widget_packing_zero">الحقائب: 0/0</string>
+    <string name="widget_countdown_started">بدأ العد التنازلي</string>
+    <string name="widget_plan_next_trip">خطط لرحلتك القادمة</string>
+    <string name="widget_currency">محول العملات</string>
+    <string name="widget_quick_conversions">تحويلات سريعة</string>
+    <string name="widget_live_rates">أسعار مباشرة</string>
+    <string name="widget_live_rates_dot">● أسعار مباشرة</string>
+    <string name="widget_auto_sync">✓ مزامنة ثنائية الاتجاه تلقائية</string>
+    <string name="widget_offline_ready">جاهز بدون إنترنت</string>
+    <string name="widget_exploration_rate">نسبة الاستكشاف</string>
+    <string name="widget_countries_visited">تمت زيارة %1$d دولة</string>
+    <string name="widget_continents_explored">تم استكشاف %1$d قارات</string>
+    <string name="widget_stat_visited">✈️ %1$d تمت زيارتها</string>
+    <string name="widget_stat_wishlist">🌟 %1$d في الأمنيات</string>
+    <string name="widget_stat_continents">🌍 %1$d قارات</string>
+    <string name="widget_legend_lived">● إقامة (%1$d)</string>
+    <string name="widget_countries_visited_zero">خريطة العالم</string>
+    <string name="widget_continents_explored_zero">حدد الدول على الخريطة</string>
+    <string name="widget_stat_visited_zero">✈️ 0 تمت زيارتها</string>
+    <string name="widget_stat_wishlist_zero">🌟 0 في الأمنيات</string>
+    <string name="widget_stat_continents_zero">🌍 0 قارات</string>
+    <string name="widget_legend_lived_zero">● إقامة (0)</string>
+    <string name="widget_legend_visited_zero">● زيارة (0)</string>
+    <string name="widget_legend_wishlist_zero">● في الأمنيات (0)</string>
+    <string name="widget_tap_to_open">اضغط للفتح</string>
+    <string name="widget_quick_expense_title">تسجيل مصروف</string>
+    <string name="widget_quick_expense_prefix">سريع</string>
+</resources>

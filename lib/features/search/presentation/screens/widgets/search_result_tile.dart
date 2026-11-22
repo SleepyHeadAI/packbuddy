@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
 import 'package:packbuddy/features/search/domain/search_result.dart';
+import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
 
 /// Serene Voyage search result item tile with badge icon, title, subtitle, and category pill
@@ -12,6 +14,37 @@ class SearchResultTile extends StatelessWidget {
     required this.result,
     required this.onTap,
   });
+
+  /// Packing items get a localized "category • quantity • status" subtitle.
+  String _localizedSubtitle(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    if (result.type != SearchResultType.packingItem || l10n == null) return result.subtitle;
+    final rawCategory = result.category ?? '';
+    final String category;
+    switch (ChecklistState.normalizeCategoryToken(rawCategory)) {
+      case 'clothing':
+        category = l10n.categoryClothing;
+      case 'electronics':
+        category = l10n.categoryElectronics;
+      case 'toiletries':
+      case 'toilette':
+        category = l10n.categoryToiletries;
+      case 'documents':
+        category = l10n.categoryDocuments;
+      case 'accessories':
+        category = l10n.categoryAccessories;
+      case 'other':
+        category = l10n.other;
+      default:
+        category = rawCategory;
+    }
+    final status = result.isPacked ? '✓ ${l10n.packed}' : '○ ${l10n.notPacked}';
+    return [
+      if (category.isNotEmpty) category,
+      '${result.quantity} ${l10n.pieces}',
+      status,
+    ].join(' • ');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +94,7 @@ class SearchResultTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    result.subtitle,
+                    _localizedSubtitle(context),
                     style: TextStyle(
                       fontSize: 12,
                       color: theme.colorScheme.onSurfaceVariant,

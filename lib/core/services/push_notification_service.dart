@@ -8,6 +8,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/services/notification_service.dart';
+import 'package:packbuddy/core/l10n/app_l10n_lookup.dart';
 import 'package:packbuddy/core/services/app_widget_service.dart';
 import 'package:packbuddy/features/settings/presentation/screens/widgets/paywall_sheet.dart';
 import 'package:packbuddy/features/dashboard/presentation/widgets/notifications_center_sheet.dart';
@@ -229,7 +230,7 @@ class PushNotificationService {
 
     await PreferencesService.instance.markNotificationDelivered(notifId);
 
-    final title = notification?.title ?? data['title']?.toString() ?? 'PackBuddy Bildirimi';
+    final title = notification?.title ?? data['title']?.toString() ?? appL10nFor().notificationDefaultTitle;
     final body = notification?.body ?? data['body']?.toString() ?? data['message']?.toString() ?? '';
     final targetAction = data['targetAction']?.toString() ?? '';
     final type = data['type']?.toString() ?? 'admin_broadcast';

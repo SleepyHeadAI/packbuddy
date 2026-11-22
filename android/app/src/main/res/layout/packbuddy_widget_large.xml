@@ -36,7 +36,7 @@
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="PackBuddy • World Map"
+                android:text="@string/widget_world_app_name"
                 android:textColor="#3B82F6"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -72,7 +72,7 @@
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="28 Countries Visited"
+                android:text="@string/widget_countries_visited_zero"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -144,7 +144,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="Harcama Ekle"
+                    android:text="@string/widget_add_expense"
                     android:textColor="#FFFFFF"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -173,7 +173,7 @@
                 android:paddingTop="3dp"
                 android:paddingEnd="4dp"
                 android:paddingBottom="3dp"
-                android:text="✈️ 28 Visited"
+                android:text="@string/widget_stat_visited_zero"
                 android:textColor="#38BDF8"
                 android:textSize="10.5sp"
                 android:textStyle="bold" />
@@ -195,7 +195,7 @@
                 android:paddingTop="3dp"
                 android:paddingEnd="4dp"
                 android:paddingBottom="3dp"
-                android:text="🌟 0 Wishlist"
+                android:text="@string/widget_stat_wishlist_zero"
                 android:textColor="#FBBF24"
                 android:textSize="10.5sp"
                 android:textStyle="bold" />
@@ -217,7 +217,7 @@
                 android:paddingTop="3dp"
                 android:paddingEnd="4dp"
                 android:paddingBottom="3dp"
-                android:text="🌍 2 Continents"
+                android:text="@string/widget_stat_continents_zero"
                 android:textColor="#34D399"
                 android:textSize="10.5sp"
                 android:textStyle="bold" />

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../data/local_db/database_helper.dart';
 import '../../../../data/sync_engine/sync_engine.dart';
@@ -440,10 +441,11 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
       state = state.copyWith(items: items, isLoading: false);
       AppWidgetService.syncCurrentState();
     } catch (e) {
+      debugPrint('[ChecklistController] operation failed: $e');
       if (!mounted) return;
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Checklist yüklenemedi: $e',
+        errorMessage: 'checklist_load_failed',
       );
     }
   }
@@ -473,9 +475,10 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
         itemCount: 1,
       );
     } catch (e) {
+      debugPrint('[ChecklistController] operation failed: $e');
       // Revert on error
       newItems[index] = current;
-      state = state.copyWith(items: newItems, errorMessage: 'Durum güncellenemedi: $e');
+      state = state.copyWith(items: newItems, errorMessage: 'checklist_status_update_failed');
     }
   }
 
@@ -523,8 +526,9 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
       await _db.updateChecklistItem(updated);
       _triggerSync();
     } catch (e) {
+      debugPrint('[ChecklistController] operation failed: $e');
       newItems[index] = current;
-      state = state.copyWith(items: newItems, errorMessage: 'Adet güncellenemedi: $e');
+      state = state.copyWith(items: newItems, errorMessage: 'checklist_quantity_update_failed');
     }
   }
 
@@ -544,8 +548,9 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
       await _db.updateChecklistItem(itemToSave);
       _triggerSync();
     } catch (e) {
+      debugPrint('[ChecklistController] operation failed: $e');
       newItems[index] = current;
-      state = state.copyWith(items: newItems, errorMessage: 'Eşya güncellenemedi: $e');
+      state = state.copyWith(items: newItems, errorMessage: 'checklist_item_update_failed');
     }
   }
 
@@ -577,9 +582,10 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
       _triggerSync();
       return deleted;
     } catch (e) {
+      debugPrint('[ChecklistController] operation failed: $e');
       // Revert
       newItems.insert(index, deleted);
-      state = state.copyWith(items: newItems, errorMessage: 'Eşya silinemedi: $e');
+      state = state.copyWith(items: newItems, errorMessage: 'checklist_item_delete_failed');
       return null;
     }
   }
@@ -602,7 +608,8 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
       }
       _triggerSync();
     } catch (e) {
-      state = state.copyWith(errorMessage: 'Geri alma başarısız: $e');
+      debugPrint('[ChecklistController] operation failed: $e');
+      state = state.copyWith(errorMessage: 'checklist_undo_failed');
     }
   }
 
@@ -634,8 +641,9 @@ class ChecklistNotifier extends StateNotifier<ChecklistState> {
         itemCount: 1,
       );
     } catch (e) {
+      debugPrint('[ChecklistController] operation failed: $e');
       newItems.removeWhere((i) => i.id == itemToSave.id);
-      state = state.copyWith(items: newItems, errorMessage: 'Eşya eklenemedi: $e');
+      state = state.copyWith(items: newItems, errorMessage: 'checklist_item_add_failed');
     }
   }
 

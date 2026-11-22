@@ -293,6 +293,9 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          locale: const Locale('tr'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: Scaffold(
             body: VaultThumbnailWidget(
               document: pdfDoc,
@@ -304,7 +307,7 @@ void main() {
       );
 
       await tester.pumpAndSettle();
-      expect(find.text('PDF BELGESİ'), findsOneWidget);
+      expect(find.text('PDF DOSYASI'), findsOneWidget);
     });
   });
 
