@@ -793,5 +793,7 @@
   "notificationChannelAlertsDescription": "Peringatan penting terkait akun, keamanan, dan administrasi",
   "notificationDefaultTitle": "Notifikasi PackBuddy",
   "worldMapCardTitle": "Peta Perjalanan Dunia",
-  "worldMapChipLived": "Pernah tinggal"
+  "worldMapChipLived": "Pernah tinggal",
+  "vaultCloudQuotaTitle": "Penyimpanan cloud penuh",
+  "vaultCloudQuotaBody": "{count, plural, =0{Dokumen baru disimpan di perangkat ini sampai ruang cloud tersedia.} =1{1 dokumen tidak dicadangkan dan hanya ada di perangkat ini.} other{{count} dokumen tidak dicadangkan dan hanya ada di perangkat ini.}}"
 }

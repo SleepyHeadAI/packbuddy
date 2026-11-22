@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -503,7 +502,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             AppSpacing.md,
             AppSpacing.xs,
             AppSpacing.md,
-            math.max(140.0, MediaQuery.of(context).padding.bottom + 120.0),
+            fabAwareScrollBottomPadding(context),
           ),
           children: [
             // =========================================================================

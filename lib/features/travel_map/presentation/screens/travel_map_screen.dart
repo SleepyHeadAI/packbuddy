@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:packbuddy/shared/widgets/app_skeleton.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
@@ -1094,8 +1095,10 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
           const SizedBox(width: 4),
         ],
       ),
-      body: mapState.isLoading
-          ? const Center(child: CircularProgressIndicator())
+      body: AppStateSwitcher(
+        stateKey: mapState.isLoading ? 'loading' : 'content',
+        child: mapState.isLoading
+          ? const AppSkeletonList()
           : RefreshIndicator(
               onRefresh: () => ref.read(travelMapControllerProvider.notifier).refreshFromCloud(),
               color: AppColors.brandAccent,
@@ -1559,6 +1562,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
               ],
             ),
           ),
+      ),
     );
   }
 

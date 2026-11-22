@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'dart:async';
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:packbuddy/features/vault/presentation/screens/widgets/vault_cloud_quota_banner.dart';
+import 'package:packbuddy/shared/widgets/app_skeleton.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -1030,13 +1031,19 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
         floatingActionButtonLocation: widget.isTabMode
             ? kFloatingActionButtonAboveFloatingBar
             : FloatingActionButtonLocation.endFloat,
-      body: vaultState.isLocked
+      body: AppStateSwitcher(
+        stateKey: vaultState.isLocked
+            ? 'locked'
+            : (vaultState.isLoading ? 'loading' : 'content'),
+        child: vaultState.isLocked
           ? VaultLockView(isTabMode: widget.isTabMode)
           : vaultState.isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const AppSkeletonList()
               : CustomScrollView(
                   scrollCacheExtent: const ScrollCacheExtent.pixels(600.0),
                   slivers: [
+                // Cloud quota warning band (collapses when quota is fine)
+                const SliverToBoxAdapter(child: VaultCloudQuotaBanner()),
                 // Top Hero Row: Quick Vault Card (Left) & Pinned Passport Window (Right)
                 SliverToBoxAdapter(
                   child: Padding(
@@ -1985,7 +1992,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                       left: 20,
                       right: 20,
                       top: 8,
-                      bottom: math.max(120.0, MediaQuery.paddingOf(context).bottom + 100.0),
+                      bottom: fabAwareScrollBottomPadding(context),
                     ),
                     sliver: SliverGrid(
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -2281,6 +2288,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                   ),
               ],
             ),
+      ),
       ),
     );
   }

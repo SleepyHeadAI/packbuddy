@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/shared/widgets/app_skeleton.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/profile/domain/friend_localization.dart';
@@ -209,7 +210,7 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> with SingleTicker
     final theme = Theme.of(context);
 
     if (state.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const AppSkeletonList(showHeader: false, itemCount: 5);
     }
 
     if (state.friends.isEmpty) {

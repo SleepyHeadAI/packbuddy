@@ -394,7 +394,7 @@ class _AddActivitySheetState extends ConsumerState<AddActivitySheet> {
                               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               selectedColor: theme.colorScheme.primary,
                               labelStyle: TextStyle(
-                                color: isSelected ? Colors.white : theme.colorScheme.onSurface,
+                                color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
                                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                                 fontSize: 12,
                               ),

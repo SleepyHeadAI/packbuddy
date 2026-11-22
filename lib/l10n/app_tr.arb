@@ -793,5 +793,7 @@
   "notificationChannelAlertsDescription": "Önemli hesap, güvenlik ve yönetim uyarıları",
   "notificationDefaultTitle": "PackBuddy Bildirimi",
   "worldMapCardTitle": "Dünya Seyahat Haritası",
-  "worldMapChipLived": "Yaşanan"
+  "worldMapChipLived": "Yaşanan",
+  "vaultCloudQuotaTitle": "Bulut depolama alanı dolu",
+  "vaultCloudQuotaBody": "{count, plural, =0{Bulutta yer açılana kadar yeni belgeler yalnızca bu cihazda saklanır.} =1{1 belge yedeklenemedi, yalnızca bu cihazda saklanıyor.} other{{count} belge yedeklenemedi, yalnızca bu cihazda saklanıyor.}}"
 }

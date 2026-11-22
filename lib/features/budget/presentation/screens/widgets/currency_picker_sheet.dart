@@ -1,5 +1,8 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 
@@ -86,13 +89,23 @@ class _CurrencyPickerSheetState extends State<CurrencyPickerSheet> {
     final title = l10n?.changeCurrency ?? 'Select Currency';
     final filtered = _filteredCurrencies;
 
-    return Material(
+    // Lift the sheet above the software keyboard so the filtered list stays reachable.
+    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final maxSheetHeight = math.max(
+      240.0,
+      math.min(screenHeight * 0.82, screenHeight - keyboardInset - 24.0),
+    );
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: keyboardInset),
+      child: Material(
       color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+      borderRadius: AppRadius.sheetRadius,
       clipBehavior: Clip.antiAlias,
       child: Container(
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.82,
+          maxHeight: maxSheetHeight,
         ),
         child: SafeArea(
           top: false,
@@ -381,6 +394,7 @@ class _CurrencyPickerSheetState extends State<CurrencyPickerSheet> {
         ),
       ),
     ),
+      ),
     );
   }
 }

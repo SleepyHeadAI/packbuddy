@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:packbuddy/core/theme/app_motion.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -63,7 +63,7 @@ class _LegalConsentScreenState extends ConsumerState<LegalConsentScreen> {
       setState(() {
         _showValidationError = true;
       });
-      HapticFeedback.vibrate();
+      AppHaptics.heavy();
       return;
     }
 
@@ -586,7 +586,7 @@ class _LegalConsentScreenState extends ConsumerState<LegalConsentScreen> {
                 setState(() {
                   _selectedTabIndex = 0;
                 });
-                HapticFeedback.selectionClick();
+                AppHaptics.selection();
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
@@ -635,7 +635,7 @@ class _LegalConsentScreenState extends ConsumerState<LegalConsentScreen> {
                 setState(() {
                   _selectedTabIndex = 1;
                 });
-                HapticFeedback.selectionClick();
+                AppHaptics.selection();
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),

@@ -2999,5 +2999,18 @@
   "worldMapChipLived": "Lived",
   "@worldMapChipLived": {
     "description": "Neutral chip label for countries lived in (own and friends' profiles)"
+  },
+  "vaultCloudQuotaTitle": "Cloud storage is full",
+  "@vaultCloudQuotaTitle": {
+    "description": "Title of the Vault banner shown when cloud storage quota is exceeded"
+  },
+  "vaultCloudQuotaBody": "{count, plural, =0{New documents are kept on this device until cloud space is available.} =1{1 document wasn't backed up and is kept on this device only.} other{{count} documents weren't backed up and are kept on this device only.}}",
+  "@vaultCloudQuotaBody": {
+    "description": "Vault quota banner body; count = documents skipped during cloud backup",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

@@ -793,5 +793,7 @@
   "notificationChannelAlertsDescription": "Cảnh báo quan trọng về tài khoản, bảo mật và quản trị",
   "notificationDefaultTitle": "Thông báo PackBuddy",
   "worldMapCardTitle": "Bản đồ du lịch thế giới",
-  "worldMapChipLived": "Đã sống"
+  "worldMapChipLived": "Đã sống",
+  "vaultCloudQuotaTitle": "Bộ nhớ đám mây đã đầy",
+  "vaultCloudQuotaBody": "{count, plural, =0{Tài liệu mới được lưu trên thiết bị này cho đến khi có dung lượng đám mây.} =1{1 tài liệu chưa được sao lưu và chỉ có trên thiết bị này.} other{{count} tài liệu chưa được sao lưu và chỉ có trên thiết bị này.}}"
 }

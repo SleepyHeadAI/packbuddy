@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_motion.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
@@ -140,6 +141,7 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
       );
 
       ref.read(checklistControllerProvider.notifier).updateItem(updatedItem);
+      AppHaptics.light();
       Navigator.of(context).pop();
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -174,6 +176,7 @@ class _AddPackingItemSheetState extends State<AddPackingItemSheet> {
     );
 
     ref.read(checklistControllerProvider.notifier).addItem(newItem);
+    AppHaptics.light();
     Navigator.of(context).pop();
 
     ScaffoldMessenger.of(context).showSnackBar(

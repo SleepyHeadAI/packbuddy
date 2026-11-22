@@ -2590,4 +2590,19 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get worldMapChipLived => 'Yaşanan';
+
+  @override
+  String get vaultCloudQuotaTitle => 'Bulut depolama alanı dolu';
+
+  @override
+  String vaultCloudQuotaBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count belge yedeklenemedi, yalnızca bu cihazda saklanıyor.',
+      one: '1 belge yedeklenemedi, yalnızca bu cihazda saklanıyor.',
+      zero: 'Bulutta yer açılana kadar yeni belgeler yalnızca bu cihazda saklanır.',
+    );
+    return '$_temp0';
+  }
 }

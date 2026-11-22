@@ -2478,4 +2478,19 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get worldMapChipLived => '居住';
+
+  @override
+  String get vaultCloudQuotaTitle => 'クラウドストレージがいっぱいです';
+
+  @override
+  String vaultCloudQuotaBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count件の書類がバックアップされず、この端末にのみ保存されています。',
+      one: '1件の書類がバックアップされず、この端末にのみ保存されています。',
+      zero: 'クラウドに空きができるまで、新しい書類はこの端末に保存されます。',
+    );
+    return '$_temp0';
+  }
 }

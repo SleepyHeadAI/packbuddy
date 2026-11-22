@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_motion.dart';
 import 'package:flutter/services.dart';
 import 'package:packbuddy/core/services/app_widget_service.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
@@ -129,7 +130,7 @@ class _CurrencyConverterCardState extends State<CurrencyConverterCard>
   }
 
   void _swapCurrencies() {
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     _swapAnimController.forward(from: 0.0);
     setState(() {
       final temp = _fromCurrency;

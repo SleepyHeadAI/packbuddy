@@ -247,7 +247,7 @@ class WorldMapProfileCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 child: Stack(
                   children: [
-                    AspectRatio(
+                    RepaintBoundary(child: AspectRatio(
                       aspectRatio: 2000 / 857,
                       child: SimpleMap(
                         instructions: WorldMapInstructions.instructions,
@@ -259,7 +259,7 @@ class WorldMapProfileCard extends StatelessWidget {
                         ),
                         fit: BoxFit.contain,
                       ),
-                    ),
+                    )),
                     Positioned(
                       bottom: 8,
                       right: 8,
@@ -629,7 +629,7 @@ class WorldMapProfileCard extends StatelessWidget {
                       maxScale: 25.0,
                       boundaryMargin: const EdgeInsets.all(80),
                       child: Center(
-                        child: SimpleMap(
+                        child: RepaintBoundary(child: SimpleMap(
                           instructions: WorldMapInstructions.instructions,
                           defaultColor: unvisitedLandColor,
                           colors: colorMap,
@@ -638,7 +638,7 @@ class WorldMapProfileCard extends StatelessWidget {
                             width: 0.5,
                           ),
                           fit: BoxFit.contain,
-                        ),
+                        )),
                       ),
                     ),
                   ),

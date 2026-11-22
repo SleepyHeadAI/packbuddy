@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/shared/widgets/app_skeleton.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
@@ -230,8 +231,12 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
 
           // 3. Activities Timeline List
           Expanded(
-            child: itineraryState.isLoading
-                ? const Center(child: CircularProgressIndicator())
+            child: AppStateSwitcher(
+              stateKey: itineraryState.isLoading
+                  ? 'loading'
+                  : (dayItems.isEmpty ? 'empty' : 'content'),
+              child: itineraryState.isLoading
+                ? const AppSkeletonList(showHeader: false, itemCount: 4)
                 : dayItems.isEmpty
                     ? _buildEmptyState(
                         context: context,
@@ -316,6 +321,7 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                           },
                         ),
                       ),
+            ),
           ),
         ],
       ),

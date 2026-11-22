@@ -2569,4 +2569,19 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get worldMapChipLived => 'रहे';
+
+  @override
+  String get vaultCloudQuotaTitle => 'क्लाउड स्टोरेज भर गया है';
+
+  @override
+  String vaultCloudQuotaBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count दस्तावेज़ों का बैकअप नहीं हुआ, ये केवल इसी डिवाइस पर हैं।',
+      one: '1 दस्तावेज़ का बैकअप नहीं हुआ, यह केवल इसी डिवाइस पर है।',
+      zero: 'क्लाउड में जगह खाली होने तक नए दस्तावेज़ इसी डिवाइस पर रहेंगे।',
+    );
+    return '$_temp0';
+  }
 }

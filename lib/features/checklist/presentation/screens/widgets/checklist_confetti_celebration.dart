@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_motion.dart';
 
 /// High-performance canvas-based confetti celebration particle system
 /// for 100% checklist completion and travel milestones.
@@ -91,6 +92,8 @@ class _ChecklistConfettiCelebrationState
 
   void _triggerBurst() {
     if (!mounted) return;
+    // Reduced motion: skip the particle burst entirely (no ticker, no repaint).
+    if (AppMotion.reduceMotionOf(context)) return;
     _particles.clear();
     final size = MediaQuery.sizeOf(context);
     final originY = size.height * 0.42;
@@ -131,14 +134,14 @@ class _ChecklistConfettiCelebrationState
         widget.child,
         if (_particles.isNotEmpty)
           Positioned.fill(
-            child: IgnorePointer(
+            child: RepaintBoundary(child: IgnorePointer(
               child: CustomPaint(
                 painter: _ConfettiPainter(
                   particles: _particles,
                   progress: _animController.value,
                 ),
               ),
-            ),
+            )),
           ),
       ],
     );

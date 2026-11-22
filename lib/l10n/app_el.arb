@@ -793,5 +793,7 @@
   "notificationChannelAlertsDescription": "Σημαντικές ειδοποιήσεις λογαριασμού, ασφάλειας και διαχείρισης",
   "notificationDefaultTitle": "Ειδοποίηση PackBuddy",
   "worldMapCardTitle": "Παγκόσμιος ταξιδιωτικός χάρτης",
-  "worldMapChipLived": "Έζησε"
+  "worldMapChipLived": "Έζησε",
+  "vaultCloudQuotaTitle": "Ο χώρος στο cloud είναι πλήρης",
+  "vaultCloudQuotaBody": "{count, plural, =0{Τα νέα έγγραφα παραμένουν σε αυτή τη συσκευή μέχρι να ελευθερωθεί χώρος στο cloud.} =1{1 έγγραφο δεν αντιγράφηκε στο cloud και υπάρχει μόνο σε αυτή τη συσκευή.} other{{count} έγγραφα δεν αντιγράφηκαν στο cloud και υπάρχουν μόνο σε αυτή τη συσκευή.}}"
 }

@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:packbuddy/core/theme/app_motion.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/services/email_dispatch_service.dart';
 import 'package:packbuddy/core/services/notification_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/vault/presentation/controllers/vault_controller.dart';
 import 'package:packbuddy/features/dashboard/presentation/dashboard_localization.dart';
@@ -144,12 +145,12 @@ class _VaultPinRecoverySheetState extends ConsumerState<VaultPinRecoverySheet> {
     final entered = _codeController.text.trim();
 
     if (entered.isEmpty || entered.length != 6 || (_generatedCode != null && entered != _generatedCode)) {
-      HapticFeedback.heavyImpact();
+      AppHaptics.heavy();
       setState(() => _errorMessage = l10n.invalidVerificationCode);
       return;
     }
 
-    HapticFeedback.mediumImpact();
+    AppHaptics.medium();
     setState(() {
       _errorMessage = null;
       _currentStep = 2;
@@ -206,11 +207,15 @@ class _VaultPinRecoverySheetState extends ConsumerState<VaultPinRecoverySheet> {
         left: 24,
         right: 24,
         top: 20,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 28,
+        // Keyboard inset + system gesture/nav bar safe area (padding.bottom is
+        // reported as 0 while the keyboard is open, so the two never double up).
+        bottom: MediaQuery.viewInsetsOf(context).bottom +
+            MediaQuery.paddingOf(context).bottom +
+            28,
       ),
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: AppRadius.sheetRadius,
       ),
       child: SingleChildScrollView(
         child: Column(
@@ -406,7 +411,7 @@ class _VaultPinRecoverySheetState extends ConsumerState<VaultPinRecoverySheet> {
                 InkWell(
                   key: const Key('autofill_recovery_code_button'),
                   onTap: () {
-                    HapticFeedback.selectionClick();
+                    AppHaptics.selection();
                     _codeController.text = _generatedCode!;
                     setState(() {});
                   },

@@ -793,5 +793,7 @@
   "notificationChannelAlertsDescription": "महत्वपूर्ण खाता, सुरक्षा और प्रशासनिक अलर्ट",
   "notificationDefaultTitle": "PackBuddy सूचना",
   "worldMapCardTitle": "विश्व यात्रा मानचित्र",
-  "worldMapChipLived": "रहे"
+  "worldMapChipLived": "रहे",
+  "vaultCloudQuotaTitle": "क्लाउड स्टोरेज भर गया है",
+  "vaultCloudQuotaBody": "{count, plural, =0{क्लाउड में जगह खाली होने तक नए दस्तावेज़ इसी डिवाइस पर रहेंगे।} =1{1 दस्तावेज़ का बैकअप नहीं हुआ, यह केवल इसी डिवाइस पर है।} other{{count} दस्तावेज़ों का बैकअप नहीं हुआ, ये केवल इसी डिवाइस पर हैं।}}"
 }

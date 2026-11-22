@@ -2584,4 +2584,20 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get worldMapChipLived => 'Pernah tinggal';
+
+  @override
+  String get vaultCloudQuotaTitle => 'Penyimpanan cloud penuh';
+
+  @override
+  String vaultCloudQuotaBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dokumen tidak dicadangkan dan hanya ada di perangkat ini.',
+      one: '1 dokumen tidak dicadangkan dan hanya ada di perangkat ini.',
+      zero:
+          'Dokumen baru disimpan di perangkat ini sampai ruang cloud tersedia.',
+    );
+    return '$_temp0';
+  }
 }

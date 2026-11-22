@@ -61,12 +61,12 @@ class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
   @override
   void didUpdateWidget(AppCard oldWidget) {
     super.didUpdateWidget(oldWidget);
+    // SingleTickerProviderStateMixin allows only one ticker per State, so the
+    // controller is created lazily once and kept until dispose().
     if (widget.onTap != null && _controller == null) {
       _initController();
-    } else if (widget.onTap == null && _controller != null) {
-      _controller?.dispose();
-      _controller = null;
-      _scaleAnimation = null;
+    } else if (widget.onTap == null) {
+      _controller?.value = 0.0;
     }
   }
 

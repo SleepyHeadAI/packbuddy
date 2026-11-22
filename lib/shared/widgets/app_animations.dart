@@ -1,7 +1,7 @@
-import 'dart:io' show Platform;
 import 'dart:math' as math;
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_motion.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
 export 'bouncy_pressable.dart';
 
@@ -81,6 +81,8 @@ class _AppFadeSlideState extends State<AppFadeSlide>
   late final Animation<double> _fadeAnimation;
   late final Animation<Offset> _slideAnimation;
   var _isAnimationCompleted = false;
+  var _hasStarted = false;
+  Timer? _delayTimer;
 
   @override
   void initState() {
@@ -104,20 +106,28 @@ class _AppFadeSlideState extends State<AppFadeSlide>
     ));
 
     _controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed && mounted) {
+      if (status == AnimationStatus.completed && mounted && !_isAnimationCompleted) {
         setState(() {
           _isAnimationCompleted = true;
         });
       }
     });
+  }
 
-    final isTestEnvironment = (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) ||
-        WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test');
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_hasStarted) return;
+    _hasStarted = true;
 
-    if (widget.delay == Duration.zero || isTestEnvironment) {
+    if (AppMotion.reduceMotionOf(context)) {
+      // Reduced motion: show the final frame immediately, no ticker, no timer.
+      _isAnimationCompleted = true;
+      _controller.value = 1.0;
+    } else if (widget.delay == Duration.zero) {
       _controller.forward();
     } else {
-      Future.delayed(widget.delay, () {
+      _delayTimer = Timer(widget.delay, () {
         if (mounted) {
           _controller.forward();
         }
@@ -127,6 +137,7 @@ class _AppFadeSlideState extends State<AppFadeSlide>
 
   @override
   void dispose() {
+    _delayTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -198,11 +209,20 @@ class _AppPulseState extends State<AppPulse>
       curve: Curves.easeInOutSine,
     ));
 
-    final isTestEnvironment = (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) ||
-        WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test');
-    if (widget.autoRepeat && !isTestEnvironment) {
-      _controller.repeat(reverse: true);
-    } else {
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (AppMotion.reduceMotionOf(context)) {
+      // Reduced motion: rest at neutral scale (midpoint of the symmetric curve).
+      _controller.stop();
+      _controller.value = 0.5;
+    } else if (widget.autoRepeat) {
+      if (!_controller.isAnimating) {
+        _controller.repeat(reverse: true);
+      }
+    } else if (_controller.isDismissed) {
       _controller.forward();
     }
   }
@@ -342,9 +362,8 @@ class _AnimatedStrikethroughTextState extends State<AnimatedStrikethroughText>
   void didUpdateWidget(covariant AnimatedStrikethroughText oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.isCrossed != oldWidget.isCrossed) {
-      final isTest = (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) ||
-          WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test');
-      if (isTest) {
+      final reduceMotion = AppMotion.reduceMotionOf(context);
+      if (reduceMotion) {
         _controller.value = widget.isCrossed ? 1.0 : 0.0;
       } else {
         if (widget.isCrossed) {
@@ -507,13 +526,12 @@ class AnimatedCurrencyCounter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isTest = (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) ||
-        WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test');
+    final reduceMotion = AppMotion.reduceMotionOf(context);
 
     return TweenAnimationBuilder<double>(
       key: ValueKey('currency_anim_${currency}_$value'),
-      tween: Tween<double>(begin: isTest ? value : 0.0, end: value),
-      duration: isTest ? Duration.zero : duration,
+      tween: Tween<double>(begin: reduceMotion ? value : 0.0, end: value),
+      duration: reduceMotion ? Duration.zero : duration,
       curve: curve,
       builder: (context, animatedVal, _) {
         final formatted = CurrencyFormatter.format(animatedVal, currency: currency);
@@ -657,9 +675,16 @@ class _AppFloatingIllustrationState extends State<AppFloatingIllustration>
       curve: Curves.easeInOutSine,
     ));
 
-    final isTest = (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) ||
-        WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test');
-    if (!isTest) {
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (AppMotion.reduceMotionOf(context)) {
+      // Reduced motion: hold the illustration at its neutral resting pose.
+      _controller.stop();
+      _controller.value = 0.5;
+    } else if (!_controller.isAnimating) {
       _controller.repeat(reverse: true);
     }
   }

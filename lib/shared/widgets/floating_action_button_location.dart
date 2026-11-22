@@ -40,8 +40,11 @@ class FloatingActionButtonAboveFloatingBarLocation extends StandardFabLocation
       scaffoldGeometry.minViewPadding.bottom,
     );
 
-    // Resting limit above the floating glass bar
-    final double calculatedOffset = bottomBarHeight + safeAreaBottom + gap;
+    // Resting limit above the floating glass bar. The bar itself floats
+    // `max(14, safeAreaBottom + 8)` above the screen edge (see MainShellScaffold),
+    // so that margin must be included to keep a true [gap] above the bar.
+    final double barBottomMargin = math.max(kFloatingBarMinBottomMargin, safeAreaBottom + 8.0);
+    final double calculatedOffset = barBottomMargin + bottomBarHeight + gap;
     final double restingOffset = math.max(minBottomOffset, calculatedOffset);
 
     // Keyboard / content bottom limit (contentBottom automatically shrinks when keyboard appears)
@@ -57,3 +60,12 @@ class FloatingActionButtonAboveFloatingBarLocation extends StandardFabLocation
 /// Constant instance for convenient usage across tab scaffolds
 const FloatingActionButtonLocation kFloatingActionButtonAboveFloatingBar =
     FloatingActionButtonAboveFloatingBarLocation();
+
+/// Minimum distance between the floating navigation bar and the screen edge.
+const double kFloatingBarMinBottomMargin = 14.0;
+
+/// Bottom scroll padding that keeps the last list item fully clear of both the
+/// floating navigation bar and a FAB resting above it
+/// (bar margin + 64 bar + 12 gap + 56 FAB + 16 breathing room ≈ inset + 156).
+double fabAwareScrollBottomPadding(BuildContext context) =>
+    math.max(170.0, MediaQuery.paddingOf(context).bottom + 156.0);

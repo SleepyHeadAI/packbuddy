@@ -2589,4 +2589,20 @@ class AppLocalizationsPl extends AppLocalizations {
 
   @override
   String get worldMapChipLived => 'Mieszkał(a)';
+
+  @override
+  String get vaultCloudQuotaTitle => 'Brak miejsca w chmurze';
+
+  @override
+  String vaultCloudQuotaBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Niezarchiwizowane dokumenty: $count. Pozostają tylko na tym urządzeniu.',
+      one: '1 dokument nie został zarchiwizowany i pozostaje tylko na tym urządzeniu.',
+      zero: 'Nowe dokumenty pozostaną na tym urządzeniu, dopóki nie zwolni się miejsce w chmurze.',
+    );
+    return '$_temp0';
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_motion.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/theme/app_icons.dart';
@@ -297,6 +298,7 @@ class _SmartTemplatesSheetState extends ConsumerState<SmartTemplatesSheet> {
                                         .read(checklistControllerProvider.notifier)
                                         .importTemplate(template);
                                     if (context.mounted) {
+                                      AppHaptics.medium();
                                       Navigator.pop(context);
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(

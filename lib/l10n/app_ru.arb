@@ -793,5 +793,7 @@
   "notificationChannelAlertsDescription": "Важные уведомления об аккаунте, безопасности и администрировании",
   "notificationDefaultTitle": "Уведомление PackBuddy",
   "worldMapCardTitle": "Карта путешествий",
-  "worldMapChipLived": "Жил(а)"
+  "worldMapChipLived": "Жил(а)",
+  "vaultCloudQuotaTitle": "Облачное хранилище заполнено",
+  "vaultCloudQuotaBody": "{count, plural, =0{Новые документы хранятся на этом устройстве, пока в облаке не освободится место.} =1{1 документ не сохранён в облаке и хранится только на этом устройстве.} other{Не сохранено в облаке документов: {count}. Они хранятся только на этом устройстве.}}"
 }

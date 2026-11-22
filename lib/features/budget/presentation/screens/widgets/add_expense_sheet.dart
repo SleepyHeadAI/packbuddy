@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_motion.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/utils/date_formatter.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
@@ -204,6 +205,7 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
           updatedAt: DateTime.now(),
         );
         await ref.read(expenseControllerProvider(widget.tripId).notifier).updateExpense(updated);
+        AppHaptics.light();
         ref.read(tripControllerProvider.notifier).loadTrips();
         AppWidgetService.syncCurrentState().catchError((_) {});
         if (mounted) {
@@ -222,6 +224,7 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
             notes: notes,
           );
 
+      AppHaptics.light();
       ref.read(tripControllerProvider.notifier).loadTrips();
       AppWidgetService.syncCurrentState().catchError((_) {});
 

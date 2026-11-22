@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:packbuddy/shared/widgets/app_skeleton.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/l10n/app_l10n_lookup.dart';
@@ -393,8 +394,12 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
               QuickActionsSheet.showForTrips(context, fabKey: _fabKey),
           child: const Icon(AppIcons.add, size: 24),
         ),
-        body: tripState.isLoading
-            ? const Center(child: CircularProgressIndicator())
+        body: AppStateSwitcher(
+          stateKey: tripState.isLoading
+              ? 'loading'
+              : (allTrips.isEmpty ? 'empty' : 'content'),
+          child: tripState.isLoading
+            ? const AppSkeletonList()
             : allTrips.isEmpty
             ? Center(
                 child: Padding(
@@ -583,6 +588,7 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
                   ),
                 ],
               ),
+        ),
       ),
     );
   }

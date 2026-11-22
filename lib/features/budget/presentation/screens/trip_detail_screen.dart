@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:packbuddy/shared/widgets/app_skeleton.dart';
+import 'package:packbuddy/core/theme/app_motion.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/l10n/app_l10n_lookup.dart';
@@ -518,10 +520,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
               labelStyle: TextStyle(
                 fontSize: 12,
                 fontWeight: _selectedCategoryFilter == null ? FontWeight.w700 : FontWeight.w500,
-                color: _selectedCategoryFilter == null ? Colors.white : theme.colorScheme.onSurface,
+                color: _selectedCategoryFilter == null ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
               ),
               selectedColor: theme.colorScheme.primary,
               onSelected: (_) {
+                AppHaptics.selection();
                 setState(() {
                   _selectedCategoryFilter = null;
                 });
@@ -562,6 +565,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                 ),
                 selectedColor: color,
                 onSelected: (_) {
+                  AppHaptics.selection();
                   setState(() {
                     _selectedCategoryFilter = isSelected ? null : entry.key;
                   });
@@ -605,10 +609,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
               labelStyle: TextStyle(
                 fontSize: 12,
                 fontWeight: _selectedPaymentMethodFilter == null ? FontWeight.w700 : FontWeight.w500,
-                color: _selectedPaymentMethodFilter == null ? Colors.white : theme.colorScheme.onSurface,
+                color: _selectedPaymentMethodFilter == null ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
               ),
               selectedColor: theme.colorScheme.primary,
               onSelected: (_) {
+                AppHaptics.selection();
                 setState(() {
                   _selectedPaymentMethodFilter = null;
                 });
@@ -649,6 +654,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                 ),
                 selectedColor: color,
                 onSelected: (_) {
+                  AppHaptics.selection();
                   setState(() {
                     _selectedPaymentMethodFilter = isSelected ? null : entry.key;
                   });
@@ -1051,6 +1057,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
         child: const Icon(Icons.delete_outline_rounded, color: Colors.white),
       ),
       onDismissed: (_) {
+        AppHaptics.medium();
         ref
             .read(expenseControllerProvider(currentTrip.id).notifier)
             .deleteExpense(expense.id);
@@ -1252,6 +1259,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
         child: const Icon(Icons.delete_outline_rounded, color: Colors.white),
       ),
       onDismissed: (_) {
+        AppHaptics.medium();
         ref
             .read(expenseControllerProvider(currentTrip.id).notifier)
             .deleteExpense(expense.id);
@@ -1753,7 +1761,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
               // 4. EXPENSES LIST & CATEGORY / PAYMENT BREAKDOWNS
               if (expenseState.isLoading)
                 const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator()),
+                  child: AppSkeletonList(showHeader: false, itemCount: 4),
                 )
               else if (expenseState.expenses.isEmpty)
                 SliverFillRemaining(

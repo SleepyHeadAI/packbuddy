@@ -793,5 +793,7 @@
   "notificationChannelAlertsDescription": "การแจ้งเตือนสำคัญเกี่ยวกับบัญชี ความปลอดภัย และการดูแลระบบ",
   "notificationDefaultTitle": "การแจ้งเตือน PackBuddy",
   "worldMapCardTitle": "แผนที่การเดินทางรอบโลก",
-  "worldMapChipLived": "เคยอาศัย"
+  "worldMapChipLived": "เคยอาศัย",
+  "vaultCloudQuotaTitle": "พื้นที่คลาวด์เต็มแล้ว",
+  "vaultCloudQuotaBody": "{count, plural, =0{เอกสารใหม่จะเก็บไว้ในอุปกรณ์นี้จนกว่าจะมีพื้นที่บนคลาวด์} =1{เอกสาร 1 รายการไม่ได้สำรองข้อมูลและอยู่ในอุปกรณ์นี้เท่านั้น} other{เอกสาร {count} รายการไม่ได้สำรองข้อมูลและอยู่ในอุปกรณ์นี้เท่านั้น}}"
 }

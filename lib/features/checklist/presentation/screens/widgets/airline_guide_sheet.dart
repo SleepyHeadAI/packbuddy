@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
@@ -93,11 +95,21 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
 
     final filteredAirlines = _filteredAirlines;
 
-    return SafeArea(
+    // Lift the sheet above the software keyboard so search results stay reachable.
+    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final maxSheetHeight = math.max(
+      240.0,
+      math.min(screenHeight * 0.88, screenHeight - keyboardInset - 24.0),
+    );
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: keyboardInset),
+      child: SafeArea(
       top: false,
       child: Container(
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.88,
+          maxHeight: maxSheetHeight,
         ),
         decoration: BoxDecoration(
           color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
@@ -875,6 +887,7 @@ class _AirlineGuideSheetState extends ConsumerState<AirlineGuideSheet> {
           ),
         ],
       ),
+    ),
     ),
   );
 }

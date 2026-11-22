@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_motion.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/services/share_service.dart';
@@ -325,7 +326,7 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
                             return InkWell(
                               borderRadius: BorderRadius.circular(14),
                               onTap: () async {
-                                HapticFeedback.lightImpact();
+                                AppHaptics.light();
                                 if (isAdded) {
                                   final toRemove = currentTrip.collaborators
                                       .firstWhere(

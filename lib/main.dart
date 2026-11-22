@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -201,6 +202,13 @@ class _PackBuddyAppState extends ConsumerState<PackBuddyApp>
       navigatorObservers: [
         PosthogObserver(),
       ],
+      // App-wide system bar styling: status bar icons + Android navigation bar
+      // follow the active theme. Screens with an AppBar still override the
+      // status bar region via AppBarTheme.systemOverlayStyle (same values).
+      builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
+        value: AppTheme.systemOverlayStyleFor(Theme.of(context).brightness),
+        child: child ?? const SizedBox.shrink(),
+      ),
       home: const AuthWallGate(),
     );
   }

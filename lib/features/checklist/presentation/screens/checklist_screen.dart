@@ -1,5 +1,5 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:packbuddy/shared/widgets/app_skeleton.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
@@ -982,7 +982,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                 // 5. Checklist Items List with Dismissible Swipe Gestures
                 if (checklistState.isLoading)
                   const SliverFillRemaining(
-                    child: Center(child: CircularProgressIndicator()),
+                    child: AppSkeletonList(showHeader: false, itemCount: 4),
                   )
                 else if (filteredItems.isEmpty)
                   SliverFillRemaining(
@@ -1093,7 +1093,7 @@ class _ChecklistScreenState extends ConsumerState<ChecklistScreen> {
                     padding: EdgeInsets.only(
                       top: 4,
                       // Guaranteed bottom clearance for Floating Navigation Bar Island
-                      bottom: math.max(120.0, MediaQuery.paddingOf(context).bottom + 100.0),
+                      bottom: fabAwareScrollBottomPadding(context),
                     ),
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate(

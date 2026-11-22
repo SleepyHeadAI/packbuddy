@@ -2594,4 +2594,20 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get worldMapChipLived => 'Gelebt';
+
+  @override
+  String get vaultCloudQuotaTitle => 'Cloud-Speicher ist voll';
+
+  @override
+  String vaultCloudQuotaBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count Dokumente wurden nicht gesichert und sind nur auf diesem Gerät gespeichert.',
+      one: '1 Dokument wurde nicht gesichert und ist nur auf diesem Gerät gespeichert.',
+      zero: 'Neue Dokumente bleiben auf diesem Gerät, bis wieder Cloud-Speicher frei ist.',
+    );
+    return '$_temp0';
+  }
 }

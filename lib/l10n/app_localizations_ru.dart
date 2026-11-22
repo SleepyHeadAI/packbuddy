@@ -2585,4 +2585,20 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get worldMapChipLived => 'Жил(а)';
+
+  @override
+  String get vaultCloudQuotaTitle => 'Облачное хранилище заполнено';
+
+  @override
+  String vaultCloudQuotaBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Не сохранено в облаке документов: $count. Они хранятся только на этом устройстве.',
+      one: '1 документ не сохранён в облаке и хранится только на этом устройстве.',
+      zero: 'Новые документы хранятся на этом устройстве, пока в облаке не освободится место.',
+    );
+    return '$_temp0';
+  }
 }

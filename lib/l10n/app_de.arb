@@ -793,5 +793,7 @@
   "notificationChannelAlertsDescription": "Wichtige Konto-, Sicherheits- und Verwaltungshinweise",
   "notificationDefaultTitle": "PackBuddy-Benachrichtigung",
   "worldMapCardTitle": "Weltreisekarte",
-  "worldMapChipLived": "Gelebt"
+  "worldMapChipLived": "Gelebt",
+  "vaultCloudQuotaTitle": "Cloud-Speicher ist voll",
+  "vaultCloudQuotaBody": "{count, plural, =0{Neue Dokumente bleiben auf diesem Gerät, bis wieder Cloud-Speicher frei ist.} =1{1 Dokument wurde nicht gesichert und ist nur auf diesem Gerät gespeichert.} other{{count} Dokumente wurden nicht gesichert und sind nur auf diesem Gerät gespeichert.}}"
 }

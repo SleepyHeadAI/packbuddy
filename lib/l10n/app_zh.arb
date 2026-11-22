@@ -793,5 +793,7 @@
   "notificationChannelAlertsDescription": "重要的账户、安全和管理提醒",
   "notificationDefaultTitle": "PackBuddy 通知",
   "worldMapCardTitle": "世界旅行地图",
-  "worldMapChipLived": "居住过"
+  "worldMapChipLived": "居住过",
+  "vaultCloudQuotaTitle": "云存储空间已满",
+  "vaultCloudQuotaBody": "{count, plural, =0{在云端有可用空间之前，新文档将保存在此设备上。} =1{1 份文档未备份，仅保存在此设备上。} other{{count} 份文档未备份，仅保存在此设备上。}}"
 }

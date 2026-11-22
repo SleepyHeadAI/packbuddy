@@ -793,5 +793,7 @@
   "notificationChannelAlertsDescription": "Alertas importantes de cuenta, seguridad y administración",
   "notificationDefaultTitle": "Notificación de PackBuddy",
   "worldMapCardTitle": "Mapa mundial de viajes",
-  "worldMapChipLived": "Vivido"
+  "worldMapChipLived": "Vivido",
+  "vaultCloudQuotaTitle": "El almacenamiento en la nube está lleno",
+  "vaultCloudQuotaBody": "{count, plural, =0{Los documentos nuevos se guardan en este dispositivo hasta que haya espacio en la nube.} =1{1 documento no se ha respaldado y solo está en este dispositivo.} other{{count} documentos no se han respaldado y solo están en este dispositivo.}}"
 }

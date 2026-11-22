@@ -2572,4 +2572,20 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get worldMapChipLived => 'Bott';
+
+  @override
+  String get vaultCloudQuotaTitle => 'Molnlagringen är full';
+
+  @override
+  String vaultCloudQuotaBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count dokument säkerhetskopierades inte och finns bara på den här enheten.',
+      one: '1 dokument säkerhetskopierades inte och finns bara på den här enheten.',
+      zero: 'Nya dokument sparas på den här enheten tills det finns plats i molnet.',
+    );
+    return '$_temp0';
+  }
 }

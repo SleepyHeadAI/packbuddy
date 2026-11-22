@@ -1,7 +1,6 @@
-import 'dart:io' show Platform;
 import 'dart:math' as math;
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_motion.dart';
 import 'package:packbuddy/features/profile/domain/animal_avatar.dart';
 
 /// Serene Voyage Animated Animal Avatar Widget
@@ -29,38 +28,36 @@ class _AnimalAvatarWidgetState extends State<AnimalAvatarWidget>
     with SingleTickerProviderStateMixin {
   AnimationController? _controller;
   double _scale = 1.0;
-
-  bool get _isTestEnv {
-    return (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) ||
-        WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test');
-  }
+  bool _reduceMotion = false;
 
   @override
-  void initState() {
-    super.initState();
-    if (widget.isAnimated && !_isTestEnv) {
-      _controller = AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 3600),
-      )..repeat();
-    }
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _reduceMotion = AppMotion.reduceMotionOf(context);
+    _syncController();
   }
 
   @override
   void didUpdateWidget(covariant AnimalAvatarWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.isAnimated != oldWidget.isAnimated) {
-      if (widget.isAnimated && !_isTestEnv) {
-        _controller ??= AnimationController(
-          vsync: this,
-          duration: const Duration(milliseconds: 3600),
-        );
-        if (!_controller!.isAnimating) {
-          _controller!.repeat();
-        }
-      } else {
-        _controller?.stop();
+      _syncController();
+    }
+  }
+
+  /// Single controller for the State's lifetime (SingleTickerProviderStateMixin):
+  /// created lazily, stopped — never recreated — when animation is off.
+  void _syncController() {
+    if (widget.isAnimated && !_reduceMotion) {
+      _controller ??= AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 3600),
+      );
+      if (!_controller!.isAnimating) {
+        _controller!.repeat();
       }
+    } else {
+      _controller?.stop();
     }
   }
 
@@ -93,8 +90,10 @@ class _AnimalAvatarWidgetState extends State<AnimalAvatarWidget>
         ],
       ),
       child: ClipOval(
+        // Isolate the continuously repainting face so the 3.6 s loop never
+        // invalidates surrounding layout/paint (profile header, lists, cards).
         child: _controller != null
-            ? AnimatedBuilder(
+            ? RepaintBoundary(child: AnimatedBuilder(
                 animation: _controller!,
                 builder: (context, _) {
                   return CustomPaint(
@@ -106,7 +105,7 @@ class _AnimalAvatarWidgetState extends State<AnimalAvatarWidget>
                     ),
                   );
                 },
-              )
+              ))
             : CustomPaint(
                 size: Size(size, size),
                 painter: AnimalFacePainter(

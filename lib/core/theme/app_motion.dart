@@ -41,6 +41,26 @@ class AppMotion {
 
   /// Standard UI transition curve
   static const Curve curveStandard = enter;
+
+  // --- Reduced Motion ---
+
+  /// Global reduced-motion override.
+  ///
+  /// `test/flutter_test_config.dart` enables this so infinitely repeating
+  /// ambient animations (pulse, floating illustrations, avatar, skeletons)
+  /// never block `pumpAndSettle`. Tests that need real motion can reset it.
+  static bool debugForceReducedMotion = false;
+
+  /// Whether ambient / decorative motion should be suppressed: the platform
+  /// requests it (Android "Remove animations" →
+  /// [MediaQuery.disableAnimationsOf]) or [debugForceReducedMotion] is set.
+  static bool reduceMotionOf(BuildContext context) =>
+      debugForceReducedMotion ||
+      (MediaQuery.maybeDisableAnimationsOf(context) ?? false);
+
+  /// [duration] normally, [Duration.zero] when motion should be reduced.
+  static Duration durationOf(BuildContext context, Duration duration) =>
+      reduceMotionOf(context) ? Duration.zero : duration;
 }
 
 /// Tactile haptic feedback triggers tailored for Apple / modern Android feel.

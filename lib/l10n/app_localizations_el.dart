@@ -2609,4 +2609,20 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get worldMapChipLived => 'Έζησε';
+
+  @override
+  String get vaultCloudQuotaTitle => 'Ο χώρος στο cloud είναι πλήρης';
+
+  @override
+  String vaultCloudQuotaBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count έγγραφα δεν αντιγράφηκαν στο cloud και υπάρχουν μόνο σε αυτή τη συσκευή.',
+      one: '1 έγγραφο δεν αντιγράφηκε στο cloud και υπάρχει μόνο σε αυτή τη συσκευή.',
+      zero: 'Τα νέα έγγραφα παραμένουν σε αυτή τη συσκευή μέχρι να ελευθερωθεί χώρος στο cloud.',
+    );
+    return '$_temp0';
+  }
 }

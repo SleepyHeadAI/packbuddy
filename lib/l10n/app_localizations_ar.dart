@@ -2560,4 +2560,21 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get worldMapChipLived => 'أقام فيها';
+
+  @override
+  String get vaultCloudQuotaTitle => 'مساحة التخزين السحابي ممتلئة';
+
+  @override
+  String vaultCloudQuotaBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'مستندات لم تُنسخ احتياطيًا: $count. وهي محفوظة على هذا الجهاز فقط.',
+      one: 'لم يُنسخ مستند واحد احتياطيًا وهو محفوظ على هذا الجهاز فقط.',
+      zero:
+          'تُحفظ المستندات الجديدة على هذا الجهاز حتى تتوفر مساحة في السحابة.',
+    );
+    return '$_temp0';
+  }
 }

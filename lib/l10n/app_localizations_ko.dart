@@ -2481,4 +2481,19 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get worldMapChipLived => '거주';
+
+  @override
+  String get vaultCloudQuotaTitle => '클라우드 저장 공간이 가득 찼습니다';
+
+  @override
+  String vaultCloudQuotaBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '문서 $count개가 백업되지 않아 이 기기에만 저장되어 있습니다.',
+      one: '문서 1개가 백업되지 않아 이 기기에만 저장되어 있습니다.',
+      zero: '클라우드 공간이 확보될 때까지 새 문서는 이 기기에 보관됩니다.',
+    );
+    return '$_temp0';
+  }
 }

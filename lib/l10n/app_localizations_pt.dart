@@ -2604,4 +2604,22 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get worldMapChipLived => 'Vivido';
+
+  @override
+  String get vaultCloudQuotaTitle => 'Armazenamento na nuvem cheio';
+
+  @override
+  String vaultCloudQuotaBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count documentos não foram salvos na nuvem e estão apenas neste dispositivo.',
+      one:
+          '1 documento não foi salvo na nuvem e está apenas neste dispositivo.',
+      zero:
+          'Novos documentos ficam neste dispositivo até haver espaço na nuvem.',
+    );
+    return '$_temp0';
+  }
 }

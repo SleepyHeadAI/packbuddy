@@ -793,5 +793,7 @@
   "notificationChannelAlertsDescription": "تنبيهات مهمة بشأن الحساب والأمان والإدارة",
   "notificationDefaultTitle": "إشعار PackBuddy",
   "worldMapCardTitle": "خريطة السفر حول العالم",
-  "worldMapChipLived": "أقام فيها"
+  "worldMapChipLived": "أقام فيها",
+  "vaultCloudQuotaTitle": "مساحة التخزين السحابي ممتلئة",
+  "vaultCloudQuotaBody": "{count, plural, =0{تُحفظ المستندات الجديدة على هذا الجهاز حتى تتوفر مساحة في السحابة.} =1{لم يُنسخ مستند واحد احتياطيًا وهو محفوظ على هذا الجهاز فقط.} other{مستندات لم تُنسخ احتياطيًا: {count}. وهي محفوظة على هذا الجهاز فقط.}}"
 }

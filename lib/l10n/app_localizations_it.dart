@@ -2595,4 +2595,20 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get worldMapChipLived => 'Vissuto';
+
+  @override
+  String get vaultCloudQuotaTitle => 'Spazio cloud esaurito';
+
+  @override
+  String vaultCloudQuotaBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count documenti non sono stati salvati nel cloud e sono solo su questo dispositivo.',
+      one: '1 documento non è stato salvato nel cloud ed è solo su questo dispositivo.',
+      zero: 'I nuovi documenti restano su questo dispositivo finché non si libera spazio nel cloud.',
+    );
+    return '$_temp0';
+  }
 }

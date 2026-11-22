@@ -2610,4 +2610,20 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get worldMapChipLived => 'Vécu';
+
+  @override
+  String get vaultCloudQuotaTitle => 'Stockage cloud plein';
+
+  @override
+  String vaultCloudQuotaBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count documents n\'ont pas été sauvegardés et restent uniquement sur cet appareil.',
+      one: '1 document n\'a pas été sauvegardé et reste uniquement sur cet appareil.',
+      zero: 'Les nouveaux documents restent sur cet appareil jusqu\'à ce que de l\'espace se libère dans le cloud.',
+    );
+    return '$_temp0';
+  }
 }

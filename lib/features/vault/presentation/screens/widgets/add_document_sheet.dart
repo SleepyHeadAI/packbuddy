@@ -1064,7 +1064,7 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
                                   avatar: Icon(
                                     _getSubCategoryIcon(sub),
                                     size: 14,
-                                    color: isSubSelected ? Colors.white : theme.colorScheme.primary,
+                                    color: isSubSelected ? theme.colorScheme.onPrimary : theme.colorScheme.primary,
                                   ),
                                   label: Text(_getSubCategoryLabel(sub, l10n)),
                                   selected: isSubSelected,
@@ -1072,7 +1072,7 @@ class _AddDocumentSheetState extends ConsumerState<AddDocumentSheet> {
                                   labelStyle: TextStyle(
                                     fontSize: 11.5,
                                     fontWeight: FontWeight.w700,
-                                    color: isSubSelected ? Colors.white : theme.colorScheme.onSurface,
+                                    color: isSubSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
                                   ),
                                   onSelected: (val) {
                                     setState(() {

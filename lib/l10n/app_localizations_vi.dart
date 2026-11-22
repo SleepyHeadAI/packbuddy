@@ -2580,4 +2580,19 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get worldMapChipLived => 'Đã sống';
+
+  @override
+  String get vaultCloudQuotaTitle => 'Bộ nhớ đám mây đã đầy';
+
+  @override
+  String vaultCloudQuotaBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tài liệu chưa được sao lưu và chỉ có trên thiết bị này.',
+      one: '1 tài liệu chưa được sao lưu và chỉ có trên thiết bị này.',
+      zero: 'Tài liệu mới được lưu trên thiết bị này cho đến khi có dung lượng đám mây.',
+    );
+    return '$_temp0';
+  }
 }

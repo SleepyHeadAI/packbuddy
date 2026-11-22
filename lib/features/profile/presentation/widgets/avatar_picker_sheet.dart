@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_motion.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
@@ -60,7 +60,7 @@ class _AvatarPickerSheetState extends ConsumerState<AvatarPickerSheet> {
   Future<void> _pickFromGallery() async {
     setState(() => _isLoading = true);
     try {
-      HapticFeedback.lightImpact();
+      AppHaptics.light();
       final XFile? pickedFile = await _picker.pickImage(
         source: ImageSource.gallery,
         maxWidth: 800,
@@ -132,7 +132,7 @@ class _AvatarPickerSheetState extends ConsumerState<AvatarPickerSheet> {
   }
 
   Future<void> _selectAnimal(AnimalAvatar animal) async {
-    HapticFeedback.mediumImpact();
+    AppHaptics.medium();
     setState(() => _isLoading = true);
     final uri = AnimalAvatar.toUri(animal.id);
     final success = await ref
@@ -166,7 +166,7 @@ class _AvatarPickerSheetState extends ConsumerState<AvatarPickerSheet> {
   }
 
   Future<void> _removePhoto() async {
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     setState(() => _isLoading = true);
     final success = await ref
         .read(profileControllerProvider.notifier)
@@ -550,7 +550,7 @@ class _AvatarPickerSheetState extends ConsumerState<AvatarPickerSheet> {
     final isSelected = _selectedCategory == category;
     return InkWell(
       onTap: () {
-        HapticFeedback.selectionClick();
+        AppHaptics.selection();
         setState(() => _selectedCategory = category);
       },
       borderRadius: BorderRadius.circular(20),

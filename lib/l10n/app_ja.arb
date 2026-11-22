@@ -793,5 +793,7 @@
   "notificationChannelAlertsDescription": "アカウント・セキュリティ・管理に関する重要なお知らせ",
   "notificationDefaultTitle": "PackBuddy からの通知",
   "worldMapCardTitle": "世界旅行マップ",
-  "worldMapChipLived": "居住"
+  "worldMapChipLived": "居住",
+  "vaultCloudQuotaTitle": "クラウドストレージがいっぱいです",
+  "vaultCloudQuotaBody": "{count, plural, =0{クラウドに空きができるまで、新しい書類はこの端末に保存されます。} =1{1件の書類がバックアップされず、この端末にのみ保存されています。} other{{count}件の書類がバックアップされず、この端末にのみ保存されています。}}"
 }

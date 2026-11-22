@@ -2468,4 +2468,19 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get worldMapChipLived => '居住过';
+
+  @override
+  String get vaultCloudQuotaTitle => '云存储空间已满';
+
+  @override
+  String vaultCloudQuotaBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 份文档未备份，仅保存在此设备上。',
+      one: '1 份文档未备份，仅保存在此设备上。',
+      zero: '在云端有可用空间之前，新文档将保存在此设备上。',
+    );
+    return '$_temp0';
+  }
 }

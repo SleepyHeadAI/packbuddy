@@ -4897,6 +4897,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Lived'**
   String get worldMapChipLived;
+
+  /// Title of the Vault banner shown when cloud storage quota is exceeded
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud storage is full'**
+  String get vaultCloudQuotaTitle;
+
+  /// Vault quota banner body; count = documents skipped during cloud backup
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{New documents are kept on this device until cloud space is available.} =1{1 document wasn\'t backed up and is kept on this device only.} other{{count} documents weren\'t backed up and are kept on this device only.}}'**
+  String vaultCloudQuotaBody(int count);
 }
 
 class _AppLocalizationsDelegate

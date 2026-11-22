@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:packbuddy/core/theme/app_motion.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import '../../data/feedback_service.dart';
@@ -44,7 +44,7 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
 
   Future<void> _pickImage() async {
     try {
-      HapticFeedback.lightImpact();
+      AppHaptics.light();
       final picked = await _picker.pickImage(
         source: ImageSource.gallery,
         maxWidth: 1200,
@@ -75,7 +75,7 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
     }
 
     setState(() => _isSubmitting = true);
-    HapticFeedback.mediumImpact();
+    AppHaptics.medium();
 
     final success = await FeedbackService.instance.submitFeedback(
       message: text,

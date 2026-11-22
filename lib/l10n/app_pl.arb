@@ -793,5 +793,7 @@
   "notificationChannelAlertsDescription": "Ważne alerty dotyczące konta, bezpieczeństwa i administracji",
   "notificationDefaultTitle": "Powiadomienie PackBuddy",
   "worldMapCardTitle": "Mapa podróży",
-  "worldMapChipLived": "Mieszkał(a)"
+  "worldMapChipLived": "Mieszkał(a)",
+  "vaultCloudQuotaTitle": "Brak miejsca w chmurze",
+  "vaultCloudQuotaBody": "{count, plural, =0{Nowe dokumenty pozostaną na tym urządzeniu, dopóki nie zwolni się miejsce w chmurze.} =1{1 dokument nie został zarchiwizowany i pozostaje tylko na tym urządzeniu.} other{Niezarchiwizowane dokumenty: {count}. Pozostają tylko na tym urządzeniu.}}"
 }

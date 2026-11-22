@@ -793,5 +793,7 @@
   "notificationChannelAlertsDescription": "계정, 보안 및 관리 관련 중요 알림",
   "notificationDefaultTitle": "PackBuddy 알림",
   "worldMapCardTitle": "세계 여행 지도",
-  "worldMapChipLived": "거주"
+  "worldMapChipLived": "거주",
+  "vaultCloudQuotaTitle": "클라우드 저장 공간이 가득 찼습니다",
+  "vaultCloudQuotaBody": "{count, plural, =0{클라우드 공간이 확보될 때까지 새 문서는 이 기기에 보관됩니다.} =1{문서 1개가 백업되지 않아 이 기기에만 저장되어 있습니다.} other{문서 {count}개가 백업되지 않아 이 기기에만 저장되어 있습니다.}}"
 }

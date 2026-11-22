@@ -2581,4 +2581,20 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get worldMapChipLived => 'Gewoond';
+
+  @override
+  String get vaultCloudQuotaTitle => 'Cloudopslag is vol';
+
+  @override
+  String vaultCloudQuotaBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count documenten zijn niet geback-upt en staan alleen op dit apparaat.',
+      one: '1 document is niet geback-upt en staat alleen op dit apparaat.',
+      zero: 'Nieuwe documenten blijven op dit apparaat tot er weer cloudruimte vrij is.',
+    );
+    return '$_temp0';
+  }
 }

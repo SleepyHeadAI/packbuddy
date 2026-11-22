@@ -793,5 +793,7 @@
   "notificationChannelAlertsDescription": "Alertes importantes liées au compte, à la sécurité et à l'administration",
   "notificationDefaultTitle": "Notification PackBuddy",
   "worldMapCardTitle": "Carte du monde des voyages",
-  "worldMapChipLived": "Vécu"
+  "worldMapChipLived": "Vécu",
+  "vaultCloudQuotaTitle": "Stockage cloud plein",
+  "vaultCloudQuotaBody": "{count, plural, =0{Les nouveaux documents restent sur cet appareil jusqu'à ce que de l'espace se libère dans le cloud.} =1{1 document n'a pas été sauvegardé et reste uniquement sur cet appareil.} other{{count} documents n'ont pas été sauvegardés et restent uniquement sur cet appareil.}}"
 }

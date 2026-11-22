@@ -2568,4 +2568,19 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get worldMapChipLived => 'เคยอาศัย';
+
+  @override
+  String get vaultCloudQuotaTitle => 'พื้นที่คลาวด์เต็มแล้ว';
+
+  @override
+  String vaultCloudQuotaBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'เอกสาร $count รายการไม่ได้สำรองข้อมูลและอยู่ในอุปกรณ์นี้เท่านั้น',
+      one: 'เอกสาร 1 รายการไม่ได้สำรองข้อมูลและอยู่ในอุปกรณ์นี้เท่านั้น',
+      zero: 'เอกสารใหม่จะเก็บไว้ในอุปกรณ์นี้จนกว่าจะมีพื้นที่บนคลาวด์',
+    );
+    return '$_temp0';
+  }
 }

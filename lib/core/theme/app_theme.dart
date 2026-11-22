@@ -267,6 +267,34 @@ class AppTheme {
     },
   );
 
+  // --- System bar styles (status bar + Android navigation bar) ---
+
+  /// Light theme: dark icons on the warm linen background.
+  static const SystemUiOverlayStyle systemOverlayLight = SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.dark,
+    statusBarBrightness: Brightness.light,
+    systemNavigationBarColor: AppColors.backgroundLight,
+    systemNavigationBarDividerColor: Colors.transparent,
+    systemNavigationBarIconBrightness: Brightness.dark,
+    systemNavigationBarContrastEnforced: false,
+  );
+
+  /// Dark theme: light icons on the obsidian background.
+  static const SystemUiOverlayStyle systemOverlayDark = SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.light,
+    statusBarBrightness: Brightness.dark,
+    systemNavigationBarColor: AppColors.backgroundDark,
+    systemNavigationBarDividerColor: Colors.transparent,
+    systemNavigationBarIconBrightness: Brightness.light,
+    systemNavigationBarContrastEnforced: false,
+  );
+
+  /// Overlay style matching [brightness] of the active theme.
+  static SystemUiOverlayStyle systemOverlayStyleFor(Brightness brightness) =>
+      brightness == Brightness.dark ? systemOverlayDark : systemOverlayLight;
+
   // Light Theme (Cached Singleton for 120 FPS Zero-Allocation)
   static final ThemeData lightTheme = _buildLightTheme();
   static ThemeData _buildLightTheme() {
@@ -305,7 +333,7 @@ class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
+        systemOverlayStyle: systemOverlayLight,
         titleTextStyle: headlineFont(
           color: AppColors.onSurfaceLight,
           fontSize: 18,
@@ -610,7 +638,7 @@ class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
-        systemOverlayStyle: SystemUiOverlayStyle.light,
+        systemOverlayStyle: systemOverlayDark,
         titleTextStyle: headlineFont(
           color: AppColors.onSurfaceDark,
           fontSize: 18,

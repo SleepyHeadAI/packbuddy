@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:open_filex/open_filex.dart';
@@ -456,6 +457,8 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
+        // Always-black viewer: force light system icons in both themes.
+        systemOverlayStyle: AppTheme.systemOverlayDark,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [

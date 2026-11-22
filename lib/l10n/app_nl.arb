@@ -793,5 +793,7 @@
   "notificationChannelAlertsDescription": "Belangrijke meldingen over account, beveiliging en beheer",
   "notificationDefaultTitle": "PackBuddy-melding",
   "worldMapCardTitle": "Wereldreiskaart",
-  "worldMapChipLived": "Gewoond"
+  "worldMapChipLived": "Gewoond",
+  "vaultCloudQuotaTitle": "Cloudopslag is vol",
+  "vaultCloudQuotaBody": "{count, plural, =0{Nieuwe documenten blijven op dit apparaat tot er weer cloudruimte vrij is.} =1{1 document is niet geback-upt en staat alleen op dit apparaat.} other{{count} documenten zijn niet geback-upt en staan alleen op dit apparaat.}}"
 }
