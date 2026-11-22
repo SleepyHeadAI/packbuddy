@@ -162,8 +162,6 @@ void main() {
       // Every TelemetryService call must succeed gracefully and record to testHistory.
       await telemetry.identifyUser(
         uid: 'user-telemetry-123',
-        email: 'traveler@packbuddy.app',
-        displayName: 'Pack Traveler',
         isPro: true,
         totalStorageBytes: 1048576,
         locale: 'tr',
@@ -174,8 +172,9 @@ void main() {
       expect(identifyEvent.name, r'$identify');
       final props = identifyEvent.properties!;
       expect(props['user_id'], 'user-telemetry-123');
-      expect(props['email'], 'traveler@packbuddy.app');
-      expect(props['name'], 'Pack Traveler');
+      // F3: no PII is sent to PostHog
+      expect(props.containsKey('email'), isFalse);
+      expect(props.containsKey('name'), isFalse);
       expect(props['is_pro'], true);
       expect(props['project_id'], anyOf(equals(0), equals(305038)));
       expect(props['total_storage_bytes'], 1048576);

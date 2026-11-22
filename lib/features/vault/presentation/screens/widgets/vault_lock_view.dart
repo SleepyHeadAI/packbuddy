@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/services/biometric_service.dart';
+import 'package:packbuddy/core/services/vault_pin_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/theme/app_motion.dart';
 import 'package:packbuddy/core/theme/app_radius.dart';
@@ -234,7 +235,18 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
     }
   }
 
-  void _showSetPinDialog() {
+  /// Opens "create PIN" directly (no e-mail recovery needed when this device has no PIN).
+  /// Before that, the account's hashed PIN is loaded from secure storage so that a not-yet-loaded
+  /// cache (e.g. right after an account switch) can never let "create" overwrite an existing PIN.
+  Future<void> _showSetPinDialog() async {
+    try {
+      await VaultPinService.instance.ensureLoaded();
+    } catch (_) {}
+    if (!mounted) return;
+    if (VaultPinService.instance.hasPin()) {
+      ref.read(vaultControllerProvider.notifier).refreshSecurityState();
+      return;
+    }
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;

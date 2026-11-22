@@ -715,5 +715,12 @@
   "proThemeLockedSubtitle": "Pasaport, Polaroid, İnfografik ve tüm premium widget renklerine erişin.",
   "proExportLockedTitle": "Bütçe ve Harcama Raporları",
   "proExportLockedSubtitle": "Tüm seyahat harcamalarınızı ve bütçenizi dışa aktarın ve arkadaşlarınızla paylaşın.",
-  "proFeatureHighlightedBadge": "Pro ile Açılır"
+  "proFeatureHighlightedBadge": "Pro ile Açılır",
+  "deleteAccountNowTitle": "Hesabı Kalıcı Olarak Sil",
+  "deleteAccountNowMessage": "Hesabınız ve tüm verileriniz (seyahatler, harcamalar, bavul listeleri, plan, seyahat haritası, kasa belgeleri ve arkadaşlar) hemen ve kalıcı olarak silinecek. Bu işlem geri alınamaz.\n\nAktif bir Google Play aboneliği otomatik olarak iptal edilmez. Lütfen Google Play üzerinden iptal edin.",
+  "deleteAccountNowButton": "Kalıcı Olarak Sil",
+  "deleteAccountPasswordLabel": "Şifrenizle onaylayın",
+  "deleteAccountGoogleReauthHint": "Onaylamak için Google ile yeniden giriş yapmanız istenecek.",
+  "deleteAccountDoneNotice": "Hesabınız ve tüm verileriniz kalıcı olarak silindi.",
+  "deleteAccountFailedNotice": "Hesabınız silinemedi. Şifrenizi ve bağlantınızı kontrol edip tekrar deneyin."
 }

@@ -58,6 +58,12 @@ void main() async {
     await VaultPinService.instance.ensureLoaded();
   } catch (_) {}
   try {
+    // F3: PostHog starts opted out; opt in only if this user explicitly granted analytics consent.
+    await TelemetryService.instance.applyConsent(
+      PreferencesService.instance.isAnalyticsConsentGiven(),
+    );
+  } catch (_) {}
+  try {
     await CurrencyService.init();
     // Non-blocking background sync when online
     CurrencyService.syncRates();

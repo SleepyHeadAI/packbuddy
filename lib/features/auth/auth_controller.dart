@@ -123,10 +123,12 @@ class AuthController extends StateNotifier<AuthState> {
         totalStorage = await DatabaseHelper.instance.getTotalVaultStorageBytes(userId: user.uid);
       } catch (_) {}
 
+      // F3: analytics only with this account's explicit consent; identify by uid only (no PII).
+      await TelemetryService.instance.applyConsent(
+        PreferencesService.instance.isAnalyticsConsentGiven(uid: user.uid),
+      );
       unawaited(TelemetryService.instance.identifyUser(
         uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
         isPro: isPro,
         totalStorageBytes: totalStorage,
       ));
@@ -344,59 +346,11 @@ class AuthController extends StateNotifier<AuthState> {
     }
   }
 
-  /// Requests 15-day grace period account deletion
-  Future<bool> requestAccountDeletion() async {
-    final user = state.user;
-    if (user == null) return false;
-    state = state.copyWith(isLoading: true);
-    try {
-      final r = _ref;
-      if (r != null) {
-        try {
-          await r.read(syncEngineProvider.notifier).performSync();
-        } catch (_) {}
-      }
-
-      await _authService.requestAccountDeletion(user.uid);
-
-      try {
-        await DatabaseHelper.instance.clearAllData();
-      } catch (_) {}
-      try {
-        await PreferencesService.instance.clearDeviceProStatus();
-        await PreferencesService.instance.setProUser(false);
-        await VaultPinService.instance.clearForUser(uid: user.uid);
-        await PreferencesService.instance.setVaultBiometricEnabled(false);
-        await PreferencesService.instance.setVaultLocked(false);
-      } catch (_) {}
-
-      if (r != null) {
-        try {
-          r.read(tripControllerProvider.notifier).resetState();
-          r.read(checklistControllerProvider.notifier).resetState();
-          r.read(vaultControllerProvider.notifier).resetState();
-          r.read(proSubscriptionProvider.notifier).resetProStatus();
-          r.read(currencyProvider.notifier).resetToDefault();
-          r.read(userModerationProvider.notifier).reset();
-          r.read(profileControllerProvider.notifier).resetState();
-        } catch (_) {}
-      }
-
-      await _authService.signOut();
-      state = state.copyWith(
-        clearUser: true,
-        isLoading: false,
-        clearError: true,
-      );
-      return true;
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: _formatAuthError(e),
-      );
-      return false;
-    }
-  }
+  /// Legacy 15-day scheduled deletion entry point. v1.0 has no server-side purge, so this
+  /// now performs the immediate, complete deletion (E1).
+  @Deprecated('Use deleteAccountPermanently(password: ...)')
+  Future<bool> requestAccountDeletion({String? password}) =>
+      deleteAccountPermanently(password: password);
 
   /// Immediately and permanently deletes account, user collections, vault files, archives anonymous analytics, and signs out
   Future<bool> deleteAccountPermanently({String? password}) async {
@@ -495,6 +449,9 @@ class AuthController extends StateNotifier<AuthState> {
   /// for decoupled UI-level localization via AppLocalizations.
   static String _formatAuthError(dynamic error) {
     if (error is FirebaseAuthException) {
+      return error.code;
+    }
+    if (error is AccountDeletionException) {
       return error.code;
     }
     if (error is String) {

@@ -4429,6 +4429,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Included in Pro'**
   String get proFeatureHighlightedBadge;
+
+  /// Title of the immediate account deletion dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account Permanently'**
+  String get deleteAccountNowTitle;
+
+  /// Body of the immediate account deletion dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Your account and all of your data (trips, expenses, packing lists, itinerary, travel map, vault documents and friends) will be deleted immediately and permanently. This cannot be undone.\n\nAn active Google Play subscription is not cancelled automatically. Please cancel it in Google Play.'**
+  String get deleteAccountNowMessage;
+
+  /// Confirm button of the immediate account deletion dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Permanently'**
+  String get deleteAccountNowButton;
+
+  /// Password field label used to re-authenticate before account deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm with your password'**
+  String get deleteAccountPasswordLabel;
+
+  /// Hint shown to Google users before re-authentication for account deletion
+  ///
+  /// In en, this message translates to:
+  /// **'To confirm, you will be asked to sign in with Google again.'**
+  String get deleteAccountGoogleReauthHint;
+
+  /// Snackbar after successful account deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Your account and all of your data have been permanently deleted.'**
+  String get deleteAccountDoneNotice;
+
+  /// Snackbar when account deletion fails
+  ///
+  /// In en, this message translates to:
+  /// **'Your account could not be deleted. Check your password and connection, then try again.'**
+  String get deleteAccountFailedNotice;
 }
 
 class _AppLocalizationsDelegate

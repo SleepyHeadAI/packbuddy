@@ -576,7 +576,8 @@ class PreferencesService {
       final val = _prefs?.getBool('${keyLegalAnalyticsConsent}_$effectiveUid');
       if (val != null) return val;
     }
-    return _prefs?.getBool(keyLegalAnalyticsConsent) ?? true;
+    // F3: no recorded choice means no consent (analytics stays opted out).
+    return _prefs?.getBool(keyLegalAnalyticsConsent) ?? false;
   }
 
   // --- Home Screen Widget Preferences ---

@@ -546,13 +546,14 @@ void main() {
       expect(find.text('Delete Account'), findsOneWidget);
       expect(tester.takeException(), isNull);
 
-      // Tap Delete Account and verify 15-day dialog
+      // Tap Delete Account: v1.0 deletes immediately (no client-side 15-day schedule, E1)
       await tester.tap(find.text('Delete Account'));
       await tester.pumpAndSettle();
 
-      expect(find.text('15-Day Account Deletion Request'), findsOneWidget);
-      expect(find.textContaining('15 days'), findsWidgets);
-      expect(find.text('Request 15-Day Deletion'), findsOneWidget);
+      expect(find.text('Delete Account Permanently'), findsOneWidget);
+      expect(find.textContaining('15 days'), findsNothing);
+      expect(find.text('Request 15-Day Deletion'), findsNothing);
+      expect(find.byKey(const Key('delete_account_confirm_button')), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });

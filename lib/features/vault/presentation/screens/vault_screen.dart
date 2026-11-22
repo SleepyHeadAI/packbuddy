@@ -30,6 +30,7 @@ import 'widgets/vault_thumbnail_widget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:packbuddy/features/dashboard/presentation/navigation_provider.dart';
 import 'package:packbuddy/core/services/biometric_service.dart';
+import 'package:packbuddy/core/services/vault_pin_service.dart';
 import '../../../../core/services/security_service.dart';
 import 'package:packbuddy/shared/widgets/quick_actions_sheet.dart';
 import 'package:packbuddy/shared/widgets/floating_action_button_location.dart';
@@ -617,7 +618,17 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
   );
 }
 
-  void _showSetPinDialog() {
+  /// Create-PIN dialog. Loads the account's hashed PIN first so a not-yet-loaded cache can never
+  /// let "create" silently replace an existing PIN.
+  Future<void> _showSetPinDialog() async {
+    try {
+      await VaultPinService.instance.ensureLoaded();
+    } catch (_) {}
+    if (!mounted) return;
+    if (VaultPinService.instance.hasPin()) {
+      ref.read(vaultControllerProvider.notifier).refreshSecurityState();
+      return;
+    }
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;

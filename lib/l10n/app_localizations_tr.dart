@@ -2300,4 +2300,29 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get proFeatureHighlightedBadge => 'Pro ile Açılır';
+
+  @override
+  String get deleteAccountNowTitle => 'Hesabı Kalıcı Olarak Sil';
+
+  @override
+  String get deleteAccountNowMessage =>
+      'Hesabınız ve tüm verileriniz (seyahatler, harcamalar, bavul listeleri, plan, seyahat haritası, kasa belgeleri ve arkadaşlar) hemen ve kalıcı olarak silinecek. Bu işlem geri alınamaz.\n\nAktif bir Google Play aboneliği otomatik olarak iptal edilmez. Lütfen Google Play üzerinden iptal edin.';
+
+  @override
+  String get deleteAccountNowButton => 'Kalıcı Olarak Sil';
+
+  @override
+  String get deleteAccountPasswordLabel => 'Şifrenizle onaylayın';
+
+  @override
+  String get deleteAccountGoogleReauthHint =>
+      'Onaylamak için Google ile yeniden giriş yapmanız istenecek.';
+
+  @override
+  String get deleteAccountDoneNotice =>
+      'Hesabınız ve tüm verileriniz kalıcı olarak silindi.';
+
+  @override
+  String get deleteAccountFailedNotice =>
+      'Hesabınız silinemedi. Şifrenizi ve bağlantınızı kontrol edip tekrar deneyin.';
 }

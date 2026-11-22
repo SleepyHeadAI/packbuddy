@@ -335,7 +335,9 @@ service cloud.firestore {
           (request.resource.data.image_base64 is string && request.resource.data.image_base64.size() <= 700000)) &&
         (!('local_image_path' in request.resource.data) ||
           (request.resource.data.local_image_path is string && request.resource.data.local_image_path.size() <= 1024))) || isAdmin();
-      allow read, update, delete: if isAdmin();
+      // Owners may read/delete their own entries (account deletion, E1); only admins review/update.
+      allow read, delete: if (isAuthenticated() && resource.data.get('user_id', '') == request.auth.uid) || isAdmin();
+      allow update: if isAdmin();
     }
 
     // Anonymous Admin Analytics Archive for account deletions (Google Play / KVKK compliant)

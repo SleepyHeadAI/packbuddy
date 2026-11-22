@@ -16,6 +16,16 @@ import '../admin/admin_service.dart';
 import '../profile/domain/user_profile.dart';
 import '../travel_map/data/travel_map_service.dart';
 
+/// Thrown when the account data purge did not complete; the Auth user is kept so the
+/// deletion can be retried without leaving orphaned data.
+class AccountDeletionException implements Exception {
+  final String code;
+  final List<String> failures;
+  AccountDeletionException(this.code, [this.failures = const []]);
+  @override
+  String toString() => 'AccountDeletionException($code): ${failures.join('; ')}';
+}
+
 /// Contract defining authentication operations for PackBuddy
 abstract class AuthService {
   /// Stream emitting user authentication changes (sign in, sign out, token refresh)
@@ -56,7 +66,9 @@ abstract class AuthService {
   void Function(String uid)? get onAccountRestoredFromDeletion;
   set onAccountRestoredFromDeletion(void Function(String uid)? callback);
 
-  /// Schedules account for deletion in 15 days
+  /// Legacy 15-day scheduled deletion. Not used in v1.0: without a server-side (Cloud Function)
+  /// purge it never deletes anything. Use [deleteAccountPermanently] instead.
+  @Deprecated('v1.0 uses immediate deletion via deleteAccountPermanently')
   Future<void> requestAccountDeletion(String uid);
 
   /// Immediately and permanently deletes account, user collections, vault files, and archives anonymous telemetry.
@@ -560,7 +572,7 @@ class FirebaseAuthService implements AuthService {
       // LEGAL CONSENT & DATA PRIVACY AGREEMENT RESTORATION:
       if (remoteExists && remoteData != null && remoteData['legalConsentAccepted'] == true) {
         final remoteVersion = remoteData['legalConsentVersion'] as String? ?? PreferencesService.currentLegalConsentVersion;
-        final remoteAnalytics = remoteData['legalAnalyticsConsent'] as bool? ?? true;
+        final remoteAnalytics = remoteData['legalAnalyticsConsent'] as bool? ?? false;
         await PreferencesService.instance.setLegalConsentAccepted(
           true,
           uid: user.uid,
@@ -709,18 +721,45 @@ class FirebaseAuthService implements AuthService {
     }
   }
 
+  /// Collections whose documents carry an owner field (`user_id` and/or `userId`).
+  static const List<String> ownedCollections = [
+    'trips',
+    'expenses',
+    'documents',
+    'checklist_items',
+    'itinerary_items',
+    'travel_map',
+  ];
+
+  /// Immediate, complete account deletion (v1.0, no Cloud Functions).
+  ///
+  /// Order matters (E2):
+  /// 1. Re-authenticate (password or Google provider). Nothing is deleted if this fails.
+  /// 2. Archive anonymous metrics, then delete every owned record: owned collections
+  ///    (queried by both `user_id` and `userId`, incl. `documents/{id}/chunks`), vault keys,
+  ///    usernames, friendships, notifications, sessions, feedback and Storage vault files.
+  /// 3. Delete `users/{uid}`.
+  /// 4. Delete the Firebase Auth user last.
+  ///
+  /// If any data deletion fails, the Auth user is NOT deleted and an
+  /// [AccountDeletionException] is thrown so the user can retry (no orphaned data).
   @override
   Future<void> deleteAccountPermanently(String uid, {String? password}) async {
     final firestore = _firestore ?? (_isFirebaseReady ? FirebaseFirestore.instance : null);
     final user = _auth?.currentUser;
 
-    // 1. Collect anonymized usage metrics before wiping
+    // 1. Re-authentication FIRST
+    if (user != null) {
+      await _reauthenticateForDeletion(user, password: password);
+    }
+
+    // 2a. Collect anonymized usage metrics before wiping
     int tripCount = 0;
     int countryCount = 0;
     int itemCount = 0;
     int expenseCount = 0;
     int accountAgeDays = 0;
-    bool isPro = PreferencesService.instance.isProUser(uid: uid);
+    final bool isPro = PreferencesService.instance.isProUser(uid: uid);
     final locale = PreferencesService.instance.getLocale()?.languageCode ?? 'tr';
 
     try {
@@ -745,8 +784,10 @@ class FirebaseAuthService implements AuthService {
       }
     } catch (_) {}
 
-    // 2. Archive strictly anonymized metrics to deleted_accounts_archive
+    final failures = <String>[];
+
     if (firestore != null) {
+      // 2b. Archive strictly anonymized metrics (best effort; never blocks deletion)
       try {
         await firestore.collection('deleted_accounts_archive').add({
           'tripCount': tripCount,
@@ -763,70 +804,154 @@ class FirebaseAuthService implements AuthService {
         debugPrint('[FirebaseAuthService] Failed to archive deleted account metrics: $e');
       }
 
-      // 3. Purge user collections in Firestore
-      try {
-        final collections = ['trips', 'expenses', 'checklist_items', 'documents', 'itinerary_items'];
-        for (final coll in collections) {
-          final snap = await firestore.collection(coll).where('user_id', isEqualTo: uid).get();
-          for (final doc in snap.docs) {
-            if (coll == 'documents') {
-              try {
-                final chunks = await doc.reference.collection('chunks').get();
-                for (final c in chunks.docs) {
-                  await c.reference.delete();
-                }
-              } catch (_) {}
-            }
-            await doc.reference.delete();
-          }
-        }
-        await firestore.collection('users').doc(uid).delete();
-        await firestore.collection('vault_keys').doc(uid).delete();
-      } catch (e) {
-        debugPrint('[FirebaseAuthService] Error purging Firestore user data: $e');
-      }
-
-      try {
-        await SecurityService.instance.deleteUserEscrowKey(uid);
-      } catch (e) {
-        debugPrint('[FirebaseAuthService] Error deleting local/escrow vault key: $e');
-      }
+      // 2c. Purge all user-owned Firestore data
+      await purgeUserFirestoreData(firestore, uid, failures);
     }
 
-    // 4. Purge Firebase Storage vault files
+    // 2d. Purge Firebase Storage vault files (recursively)
     if (_isFirebaseReady) {
       try {
-        final storage = FirebaseStorage.instance;
-        final vaultRef = storage.ref('users/$uid/vault');
-        final listResult = await vaultRef.listAll();
-        for (final item in listResult.items) {
-          await item.delete();
-        }
+        await _deleteStorageFolder(FirebaseStorage.instance.ref('users/$uid'));
       } catch (e) {
-        debugPrint('[FirebaseAuthService] Error purging Storage vault files: $e');
+        failures.add('storage: $e');
       }
     }
 
-    // 5. Delete Firebase Auth user with reauthentication support
-    if (user != null) {
+    // Local key material (Keystore) for this account
+    try {
+      await SecurityService.instance.deleteUserEscrowKey(uid);
+    } catch (e) {
+      debugPrint('[FirebaseAuthService] Error deleting local/escrow vault key: $e');
+    }
+
+    if (failures.isNotEmpty) {
+      debugPrint('[FirebaseAuthService] Account deletion incomplete: $failures');
+      throw AccountDeletionException('data_purge_incomplete', failures);
+    }
+
+    // 3. Profile document after all owned data is gone
+    if (firestore != null) {
       try {
-        await user.delete();
-      } on FirebaseAuthException catch (authErr) {
-        if (authErr.code == 'requires-recent-login') {
-          if (password != null && password.isNotEmpty && user.email != null) {
-            final credential = EmailAuthProvider.credential(
-              email: user.email!,
-              password: password,
-            );
-            await user.reauthenticateWithCredential(credential);
-            await user.delete();
-          } else {
-            rethrow;
-          }
-        } else {
-          rethrow;
-        }
+        await firestore.collection('users').doc(uid).delete();
+      } catch (e) {
+        throw AccountDeletionException('data_purge_incomplete', ['users/$uid: $e']);
       }
+    }
+
+    // 4. Firebase Auth user LAST
+    if (user != null) {
+      await user.delete();
+    }
+  }
+
+  /// Re-authenticates the current user before destructive operations.
+  /// Email/password accounts need [password]; Google accounts use the provider flow.
+  Future<void> _reauthenticateForDeletion(User user, {String? password}) async {
+    final providers = user.providerData.map((p) => p.providerId).toSet();
+    if (providers.contains('password')) {
+      final email = user.email;
+      if (password == null || password.isEmpty || email == null) {
+        throw FirebaseAuthException(code: 'reauth-password-required');
+      }
+      await user.reauthenticateWithCredential(
+        EmailAuthProvider.credential(email: email, password: password),
+      );
+      return;
+    }
+    if (providers.contains('google.com')) {
+      await user.reauthenticateWithProvider(GoogleAuthProvider());
+      return;
+    }
+    // Unknown/anonymous provider: cannot prove recent login on the client.
+    throw FirebaseAuthException(code: 'reauth-unsupported-provider');
+  }
+
+  /// Deletes every Firestore record owned by [uid]. Failures are collected in [failures].
+  @visibleForTesting
+  static Future<void> purgeUserFirestoreData(
+    FirebaseFirestore firestore,
+    String uid,
+    List<String> failures,
+  ) async {
+    Future<void> guard(String label, Future<void> Function() action) async {
+      try {
+        await action();
+      } catch (e) {
+        failures.add('$label: $e');
+      }
+    }
+
+    // Owned collections, queried by BOTH owner fields
+    for (final coll in ownedCollections) {
+      await guard(coll, () async {
+        final refs = <String, DocumentReference<Map<String, dynamic>>>{};
+        for (final field in const ['user_id', 'userId']) {
+          final snap = await firestore.collection(coll).where(field, isEqualTo: uid).get();
+          for (final d in snap.docs) {
+            refs[d.id] = d.reference;
+          }
+        }
+        for (final ref in refs.values) {
+          if (coll == 'documents') {
+            // Legacy plaintext chunk subcollection must go before its parent
+            // (the chunks rule reads the parent's owner field).
+            await _deleteQueryInBatches(firestore, ref.collection('chunks'));
+          }
+          await ref.delete();
+        }
+      });
+    }
+
+    await guard('vault_keys', () => firestore.collection('vault_keys').doc(uid).delete());
+
+    await guard('usernames', () => _deleteQueryInBatches(
+          firestore,
+          firestore.collection('usernames').where('uid', isEqualTo: uid),
+        ));
+
+    await guard('friendships', () => _deleteQueryInBatches(
+          firestore,
+          firestore.collection('friendships').where('users', arrayContains: uid),
+        ));
+
+    await guard('notifications', () => _deleteQueryInBatches(
+          firestore,
+          firestore.collection('users').doc(uid).collection('notifications'),
+        ));
+
+    await guard('sessions', () => _deleteQueryInBatches(
+          firestore,
+          firestore.collection('users').doc(uid).collection('sessions'),
+        ));
+
+    await guard('user_feedback', () => _deleteQueryInBatches(
+          firestore,
+          firestore.collection('user_feedback').where('user_id', isEqualTo: uid),
+        ));
+  }
+
+  static Future<void> _deleteQueryInBatches(
+    FirebaseFirestore firestore,
+    Query<Map<String, dynamic>> query,
+  ) async {
+    final snap = await query.get();
+    if (snap.docs.isEmpty) return;
+    for (var i = 0; i < snap.docs.length; i += 400) {
+      final batch = firestore.batch();
+      for (final d in snap.docs.skip(i).take(400)) {
+        batch.delete(d.reference);
+      }
+      await batch.commit();
+    }
+  }
+
+  static Future<void> _deleteStorageFolder(Reference folder) async {
+    final listing = await folder.listAll();
+    for (final item in listing.items) {
+      await item.delete();
+    }
+    for (final prefix in listing.prefixes) {
+      await _deleteStorageFolder(prefix);
     }
   }
 

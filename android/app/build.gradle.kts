@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
@@ -6,6 +9,21 @@ plugins {
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
+
+// F1: Release signing is read from android/key.properties (git-ignored, never committed):
+//   storeFile=<path to upload keystore .jks, relative to android/app or absolute>
+//   storePassword=...
+//   keyAlias=...
+//   keyPassword=...
+// Debug builds never need it. Release builds fail with a clear message if it is missing.
+val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = Properties()
+val requiredSigningKeys = listOf("storeFile", "storePassword", "keyAlias", "keyPassword")
+if (keystorePropertiesFile.exists()) {
+    FileInputStream(keystorePropertiesFile).use { keystoreProperties.load(it) }
+}
+val missingSigningKeys = requiredSigningKeys.filter { keystoreProperties.getProperty(it).isNullOrBlank() }
+val hasReleaseSigning = keystorePropertiesFile.exists() && missingSigningKeys.isEmpty()
 
 android {
     namespace = "com.sleepyhead.packbuddy"
@@ -34,11 +52,22 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // Never sign release with debug keys. Without key.properties the release
+            // build is stopped below with an explicit error (no fake keystore is generated).
+            signingConfig = if (hasReleaseSigning) signingConfigs.getByName("release") else null
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -46,6 +75,28 @@ android {
                 "proguard-rules.pro"
             )
         }
+    }
+}
+
+// Fail release packaging (assembleRelease / bundleRelease) loudly when signing is not configured;
+// debug and profile builds are unaffected.
+gradle.taskGraph.whenReady {
+    val releaseTasks = allTasks.filter {
+        it.project == project &&
+            (it.name.startsWith("assemble") || it.name.startsWith("bundle") || it.name.startsWith("package")) &&
+            it.name.endsWith("Release")
+    }
+    if (releaseTasks.isNotEmpty() && !hasReleaseSigning) {
+        val reason = if (!keystorePropertiesFile.exists()) {
+            "android/key.properties was not found"
+        } else {
+            "android/key.properties is missing: ${missingSigningKeys.joinToString()}"
+        }
+        throw GradleException(
+            "Release signing is not configured ($reason). Create android/key.properties with " +
+                "storeFile, storePassword, keyAlias and keyPassword pointing to your Play upload keystore. " +
+                "Debug builds do not need it."
+        )
     }
 }
 

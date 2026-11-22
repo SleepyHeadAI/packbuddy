@@ -1256,91 +1256,102 @@ class _AccountSessionCard extends ConsumerWidget {
     );
   }
 
+  /// Immediate, permanent account deletion (v1.0). Re-authentication happens first:
+  /// email/password users confirm with their password, Google users re-sign in with Google.
   void _confirmAccountDeletion(BuildContext context, WidgetRef ref, AppLocalizations l10n) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final user = ref.read(authUserProvider);
+    final usesPassword = user?.providerData.any((p) => p.providerId == 'password') ?? false;
+    final passwordController = TextEditingController();
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
-        backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
-        title: Row(
-          children: [
-            const Icon(Icons.warning_amber_rounded, color: AppColors.errorPastel, size: 24),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                l10n.deleteAccountConfirmationTitle,
-                style: AppTypography.titleLarge.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
+          backgroundColor: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+          title: Row(
             children: [
-              Text(
-                l10n.deleteAccountConfirmationMessage,
-                style: AppTypography.bodyMedium.copyWith(fontSize: 13, height: 1.45),
+              const Icon(Icons.warning_amber_rounded, color: AppColors.errorPastel, size: 24),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n.deleteAccountNowTitle,
+                  style: AppTypography.titleLarge.copyWith(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
             ],
           ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.deleteAccountNowMessage,
+                  style: AppTypography.bodyMedium.copyWith(fontSize: 13, height: 1.45),
+                ),
+                const SizedBox(height: 14),
+                if (usesPassword)
+                  TextField(
+                    key: const Key('delete_account_password_field'),
+                    controller: passwordController,
+                    obscureText: true,
+                    autofocus: true,
+                    onChanged: (_) => setDialogState(() {}),
+                    decoration: InputDecoration(
+                      labelText: l10n.deleteAccountPasswordLabel,
+                      prefixIcon: const Icon(Icons.lock_outline_rounded),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                    ),
+                  )
+                else
+                  Text(
+                    l10n.deleteAccountGoogleReauthHint,
+                    style: AppTypography.bodySmall.copyWith(height: 1.4),
+                  ),
+              ],
+            ),
+          ),
+          actionsOverflowDirection: VerticalDirection.down,
+          actionsOverflowButtonSpacing: 8,
+          actions: [
+            AppButton.outline(
+              size: AppButtonSize.medium,
+              onPressed: () => Navigator.of(ctx).pop(),
+              label: l10n.cancel,
+            ),
+            AppButton.destructive(
+              key: const Key('delete_account_confirm_button'),
+              size: AppButtonSize.medium,
+              onPressed: (usesPassword && passwordController.text.isEmpty)
+                  ? null
+                  : () async {
+                      final password = usesPassword ? passwordController.text : null;
+                      Navigator.of(ctx).pop();
+                      final success = await ref
+                          .read(authControllerProvider.notifier)
+                          .deleteAccountPermanently(password: password);
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(success ? l10n.deleteAccountDoneNotice : l10n.deleteAccountFailedNotice),
+                          backgroundColor: AppColors.errorPastel,
+                          duration: const Duration(seconds: 6),
+                        ),
+                      );
+                      if (success && Navigator.of(context).canPop()) {
+                        Navigator.of(context).popUntil((route) => route.isFirst);
+                      }
+                    },
+              label: l10n.deleteAccountNowButton,
+            ),
+          ],
         ),
-        actionsOverflowDirection: VerticalDirection.down,
-        actionsOverflowButtonSpacing: 8,
-        actions: [
-          AppButton.outline(
-            size: AppButtonSize.medium,
-            onPressed: () => Navigator.of(ctx).pop(),
-            label: l10n.cancel,
-          ),
-          AppButton.outline(
-            size: AppButtonSize.medium,
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              final success = await ref.read(authControllerProvider.notifier).requestAccountDeletion();
-              if (success && context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.deleteAccountScheduledNotice),
-                    backgroundColor: AppColors.errorPastel,
-                    duration: const Duration(seconds: 6),
-                  ),
-                );
-                if (Navigator.of(context).canPop()) {
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                }
-              }
-            },
-            label: '15 Günlük Planlı Silme',
-          ),
-          AppButton.destructive(
-            size: AppButtonSize.medium,
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              final success = await ref.read(authControllerProvider.notifier).deleteAccountPermanently();
-              if (success && context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Hesabınız ve tüm verileriniz kalıcı olarak silindi.'),
-                    backgroundColor: AppColors.errorPastel,
-                    duration: Duration(seconds: 6),
-                  ),
-                );
-                if (Navigator.of(context).canPop()) {
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                }
-              }
-            },
-            label: l10n.deleteAccountButton,
-          ),
-        ],
       ),
-    );
+    ).whenComplete(passwordController.dispose);
   }
 
   void _confirmSignOut(BuildContext context, WidgetRef ref, AppLocalizations l10n) {

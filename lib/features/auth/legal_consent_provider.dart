@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/services/preferences_service.dart';
+import '../../core/services/telemetry_service.dart';
 import 'auth_controller.dart';
 import 'auth_service.dart';
 
@@ -40,6 +41,8 @@ class LegalConsentNotifier extends StateNotifier<bool> {
       version: version,
       analyticsConsent: analyticsConsent,
     );
+    // F3: PostHog only collects after explicit analytics consent.
+    await TelemetryService.instance.applyConsent(analyticsConsent);
 
     if (user != null) {
       try {
@@ -60,7 +63,9 @@ class LegalConsentNotifier extends StateNotifier<bool> {
     await PreferencesService.instance.setLegalConsentAccepted(
       false,
       uid: user?.uid,
+      analyticsConsent: false,
     );
+    await TelemetryService.instance.applyConsent(false);
     state = false;
   }
 }

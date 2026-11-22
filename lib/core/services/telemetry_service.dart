@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -64,13 +65,41 @@ class TelemetryService {
       final config = PostHogConfig(effectiveApiKey);
       config.host = posthogHost;
       config.captureApplicationLifecycleEvents = true;
-      config.sessionReplay = true;
+      // F3: privacy by default — no session replay / touch capture, and nothing is sent
+      // until the user explicitly grants analytics consent (see applyConsent).
+      config.sessionReplay = false;
       config.sessionReplayConfig.maskAllTexts = true;
       config.sessionReplayConfig.maskAllImages = true;
-      config.sessionReplayConfig.captureTouches = true;
+      config.sessionReplayConfig.captureTouches = false;
+      config.optOut = true;
       await Posthog().setup(config);
     } catch (e) {
       debugPrint('[TelemetryService] Initialization notice: $e');
+    }
+  }
+
+  /// Whether the user has explicitly granted analytics consent in this session.
+  bool _consentGranted = false;
+  bool get isConsentGranted => _consentGranted;
+
+  /// Opts PostHog in only after explicit analytics consent; opts out otherwise.
+  /// The consent flag is applied immediately; the native SDK call runs in the background
+  /// so UI flows (e.g. the consent screen) never block on the platform channel.
+  Future<void> applyConsent(bool granted) async {
+    _consentGranted = granted;
+    _record(granted ? '\$opt_in' : '\$opt_out', null);
+    unawaited(_applyNativeConsent(granted));
+  }
+
+  Future<void> _applyNativeConsent(bool granted) async {
+    try {
+      if (granted) {
+        await Posthog().optIn();
+      } else {
+        await Posthog().optOut();
+      }
+    } catch (e) {
+      debugPrint('[TelemetryService] applyConsent notice: $e');
     }
   }
 
@@ -89,11 +118,9 @@ class TelemetryService {
     }
   }
 
-  /// Identifies the user in PostHog and attaches user properties
+  /// Identifies the user in PostHog by uid only. No PII (e-mail, name) is ever sent (F3).
   Future<void> identifyUser({
     required String uid,
-    String? email,
-    String? displayName,
     required bool isPro,
     int? totalStorageBytes,
     String? locale,
@@ -102,8 +129,6 @@ class TelemetryService {
       'is_pro': isPro,
       'project_id': posthogProjectId,
       'total_storage_bytes': totalStorageBytes ?? 0,
-      if (email != null && email.isNotEmpty) 'email': email,
-      if (displayName != null && displayName.isNotEmpty) 'name': displayName,
       if (locale != null && locale.isNotEmpty) 'locale': locale,
     };
 

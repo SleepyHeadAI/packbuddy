@@ -2304,4 +2304,29 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get proFeatureHighlightedBadge => 'Incluso in Pro';
+
+  @override
+  String get deleteAccountNowTitle => 'Delete Account Permanently';
+
+  @override
+  String get deleteAccountNowMessage =>
+      'Your account and all of your data (trips, expenses, packing lists, itinerary, travel map, vault documents and friends) will be deleted immediately and permanently. This cannot be undone.\n\nAn active Google Play subscription is not cancelled automatically. Please cancel it in Google Play.';
+
+  @override
+  String get deleteAccountNowButton => 'Delete Permanently';
+
+  @override
+  String get deleteAccountPasswordLabel => 'Confirm with your password';
+
+  @override
+  String get deleteAccountGoogleReauthHint =>
+      'To confirm, you will be asked to sign in with Google again.';
+
+  @override
+  String get deleteAccountDoneNotice =>
+      'Your account and all of your data have been permanently deleted.';
+
+  @override
+  String get deleteAccountFailedNotice =>
+      'Your account could not be deleted. Check your password and connection, then try again.';
 }
