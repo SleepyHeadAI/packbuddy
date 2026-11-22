@@ -367,7 +367,11 @@ void main() {
               return controller;
             }),
           ],
+          // WorldMapProfileCard resolves its labels via AppLocalizations, so the
+          // app must register the same delegates as production (main.dart).
           child: const MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: ProfileScreen(),
           ),
         ),
@@ -375,6 +379,7 @@ void main() {
 
       await tester.pumpAndSettle();
 
+      expect(tester.takeException(), isNull);
       expect(find.text('Selin Yıldız'), findsOneWidget);
       expect(find.textContaining('Solo backpacker'), findsOneWidget);
       expect(find.byIcon(Icons.workspace_premium_rounded), findsOneWidget);
