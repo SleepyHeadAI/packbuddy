@@ -49,3 +49,9 @@ app.*.map.json
 
 # Claude Code personal settings
 .claude/settings.local.json
+
+# Graphify (knowledge graph outputs/cache)
+graphify-out/
+.graphify_labels.json.sig
+.graphify_root
+.claude/settings.json.graphify-bak
