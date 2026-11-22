@@ -260,31 +260,34 @@ class _VaultLockViewState extends ConsumerState<VaultLockView> with WidgetsBindi
           l10n.setVaultPin,
           style: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.w800),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.createPinToProtect,
-              style: AppTypography.bodyMedium.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+        // Scrollable so long translations + the on-screen keyboard never overflow small screens.
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.createPinToProtect,
+                style: AppTypography.bodyMedium.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: pinController,
-              keyboardType: TextInputType.number,
-              maxLength: 4,
-              obscureText: true,
-              autofocus: true,
-              style: AppTypography.mono(fontSize: 18, fontWeight: FontWeight.bold, tabularFigures: true),
-              decoration: InputDecoration(
-                labelText: l10n.fourDigitPin,
-                prefixIcon: const Icon(Icons.pin_rounded),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+              const SizedBox(height: 16),
+              TextField(
+                controller: pinController,
+                keyboardType: TextInputType.number,
+                maxLength: 4,
+                obscureText: true,
+                autofocus: true,
+                style: AppTypography.mono(fontSize: 18, fontWeight: FontWeight.bold, tabularFigures: true),
+                decoration: InputDecoration(
+                  labelText: l10n.fourDigitPin,
+                  prefixIcon: const Icon(Icons.pin_rounded),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           AppButton.outline(

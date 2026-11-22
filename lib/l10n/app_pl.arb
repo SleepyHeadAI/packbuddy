@@ -441,10 +441,6 @@
   "templateCityDesc": "Lekki i kompaktowy plecak na 2-3 dniowy wypad do miasta",
   "vaultCloudBackupNotice": "Dokumenty są szyfrowane i zapisywane w chmurze w celu synchronizacji, 15-dniowego odzyskiwania konta i bezpieczeństwa.",
   "deleteAccountTitle": "Usuń konto",
-  "deleteAccountConfirmationTitle": "Wniosek o usunięcie konta w ciągu 15 dni",
-  "deleteAccountConfirmationMessage": "Twoje konto, podróże, wydatki i dokumenty ze schowka zostaną trwale usunięte za 15 dni.\n\n• Nie loguj się przez 15 dni, aby dokończyć usuwanie.\n• Jeśli zalogujesz się w ciągu 15 dni, konto i pliki zostaną przywrócone.\n\nCzy chcesz kontynuować?",
-  "deleteAccountButton": "Złóż wniosek o 15-dniowe usunięcie",
-  "deleteAccountScheduledNotice": "Twoje konto zostało zaplanowane do usunięcia za 15 dni. Nie loguj się, jeśli chcesz je trwale usunąć.",
   "accountRestoredNotice": "Witaj ponownie! Usunięcie konta zostało anulowane, a dane przywrócone.",
   "adminPendingDeletionBadge": "Zaplanowano usunięcie (pozostało {days} dni)",
   "adminCancelDeletion": "Anuluj usuwanie",
@@ -715,5 +711,13 @@
   "proThemeLockedSubtitle": "Odblokuj wszystkie palety premium, układ paszportowy i style widżetów.",
   "proExportLockedTitle": "Eksport budżetu i raportów",
   "proExportLockedSubtitle": "Eksportuj i udostępniaj raporty wydatków towarzyszom podróży.",
-  "proFeatureHighlightedBadge": "W pakiecie Pro"
+  "proFeatureHighlightedBadge": "W pakiecie Pro",
+  "deleteAccountNowTitle": "Usuń konto na stałe",
+  "deleteAccountNowMessage": "Twoje konto i wszystkie dane (podróże, wydatki, listy pakowania, plan podróży, mapa podróży, dokumenty ze skarbca i znajomi) zostaną natychmiast i trwale usunięte. Tej operacji nie można cofnąć.\n\nAktywna subskrypcja Google Play nie jest anulowana automatycznie. Anuluj ją w Google Play.",
+  "deleteAccountNowButton": "Usuń na stałe",
+  "deleteAccountPasswordLabel": "Potwierdź hasłem",
+  "deleteAccountGoogleReauthHint": "Aby potwierdzić, zostaniesz poproszony o ponowne zalogowanie się przez Google.",
+  "deleteAccountDoneNotice": "Twoje konto i wszystkie dane zostały trwale usunięte.",
+  "deleteAccountFailedNotice": "Nie udało się usunąć konta. Sprawdź hasło i połączenie, a następnie spróbuj ponownie.",
+  "subscriptionAutoRenewNotice": "Subskrypcja odnawia się automatycznie na koniec każdego okresu, chyba że zostanie anulowana co najmniej 24 godziny przed odnowieniem. Płatność jest pobierana z Twojego konta Google Play. Możesz ją anulować w dowolnym momencie w Google Play › Subskrypcje."
 }

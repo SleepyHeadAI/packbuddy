@@ -1349,20 +1349,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get deleteAccountTitle => 'アカウントを削除';
 
   @override
-  String get deleteAccountConfirmationTitle => '15日間のアカウント削除申請';
-
-  @override
-  String get deleteAccountConfirmationMessage =>
-      'アカウント、旅行、経費、および保管庫のドキュメントは15日後に完全削除されるようスケジュールされます。\n\n• 削除を完了するには15日間ログインしないでください。\n• 15日以内に再ログインするとアカウントとデータは自動復元されます。\n\n続行しますか？';
-
-  @override
-  String get deleteAccountButton => '15日間の削除を申請';
-
-  @override
-  String get deleteAccountScheduledNotice =>
-      'アカウントは15日後に削除されるようスケジュールされました。完全に削除したい場合はログインしないでください。';
-
-  @override
   String get accountRestoredNotice =>
       'お帰りなさい！アカウント削除申請はキャンセルされ、すべてのデータが復元されました。';
 
@@ -2205,27 +2191,29 @@ class AppLocalizationsJa extends AppLocalizations {
   String get proFeatureHighlightedBadge => 'Proに含まれる機能';
 
   @override
-  String get deleteAccountNowTitle => 'Delete Account Permanently';
+  String get deleteAccountNowTitle => 'アカウントを完全に削除';
 
   @override
   String get deleteAccountNowMessage =>
-      'Your account and all of your data (trips, expenses, packing lists, itinerary, travel map, vault documents and friends) will be deleted immediately and permanently. This cannot be undone.\n\nAn active Google Play subscription is not cancelled automatically. Please cancel it in Google Play.';
+      'アカウントとすべてのデータ（旅行、支出、持ち物リスト、旅程、旅行マップ、保管庫の書類、友達）は直ちに完全に削除されます。この操作は元に戻せません。\n\n有効な Google Play の定期購入は自動的には解約されません。Google Play で解約してください。';
 
   @override
-  String get deleteAccountNowButton => 'Delete Permanently';
+  String get deleteAccountNowButton => '完全に削除';
 
   @override
-  String get deleteAccountPasswordLabel => 'Confirm with your password';
+  String get deleteAccountPasswordLabel => 'パスワードで確認';
 
   @override
-  String get deleteAccountGoogleReauthHint =>
-      'To confirm, you will be asked to sign in with Google again.';
+  String get deleteAccountGoogleReauthHint => '確認のため、Google で再度ログインするよう求められます。';
 
   @override
-  String get deleteAccountDoneNotice =>
-      'Your account and all of your data have been permanently deleted.';
+  String get deleteAccountDoneNotice => 'アカウントとすべてのデータは完全に削除されました。';
 
   @override
   String get deleteAccountFailedNotice =>
-      'Your account could not be deleted. Check your password and connection, then try again.';
+      'アカウントを削除できませんでした。パスワードと接続を確認して、もう一度お試しください。';
+
+  @override
+  String get subscriptionAutoRenewNotice =>
+      '定期購入は、更新の24時間前までに解約しない限り、各期間の終了時に自動更新されます。お支払いは Google Play アカウントに請求されます。Google Play › 定期購入からいつでも解約できます。';
 }

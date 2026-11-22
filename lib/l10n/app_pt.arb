@@ -441,10 +441,6 @@
   "templateCityDesc": "Mochila leve e compacta para um passeio de 2 a 3 dias na cidade",
   "vaultCloudBackupNotice": "Os documentos são criptografados e salvos na nuvem para sincronização entre dispositivos, recuperação em 15 dias e segurança.",
   "deleteAccountTitle": "Excluir conta",
-  "deleteAccountConfirmationTitle": "Solicitação de exclusão de conta em 15 dias",
-  "deleteAccountConfirmationMessage": "Sua conta, viagens, despesas e documentos do cofre serão agendados para exclusão permanente em 15 dias.\n\n• Não faça login por 15 dias para concluir a exclusão.\n• Se fizer login em até 15 dias, sua conta e dados serão restaurados.\n\nDeseja prosseguir?",
-  "deleteAccountButton": "Solicitar exclusão em 15 dias",
-  "deleteAccountScheduledNotice": "Sua conta foi agendada para exclusão em 15 dias. Não faça login se desejar excluí-la definitivamente.",
   "accountRestoredNotice": "Bem-vindo de volta! A exclusão da sua conta foi cancelada e seus dados foram restaurados.",
   "adminPendingDeletionBadge": "Agendado para exclusão ({days}d restantes)",
   "adminCancelDeletion": "Cancelar exclusão",
@@ -715,5 +711,13 @@
   "proThemeLockedSubtitle": "Desbloqueie todas as paletas premium, edição passaporte e estilos de widget.",
   "proExportLockedTitle": "Exportar orçamento e relatórios",
   "proExportLockedSubtitle": "Exporte e compartilhe relatórios de despesas com seus companheiros de viagem.",
-  "proFeatureHighlightedBadge": "Incluído no Pro"
+  "proFeatureHighlightedBadge": "Incluído no Pro",
+  "deleteAccountNowTitle": "Excluir conta permanentemente",
+  "deleteAccountNowMessage": "Sua conta e todos os seus dados (viagens, despesas, listas de bagagem, roteiro, mapa de viagens, documentos do cofre e amigos) serão excluídos imediata e permanentemente. Esta ação não pode ser desfeita.\n\nUma assinatura ativa do Google Play não é cancelada automaticamente. Cancele-a no Google Play.",
+  "deleteAccountNowButton": "Excluir permanentemente",
+  "deleteAccountPasswordLabel": "Confirme com sua senha",
+  "deleteAccountGoogleReauthHint": "Para confirmar, você precisará entrar novamente com o Google.",
+  "deleteAccountDoneNotice": "Sua conta e todos os seus dados foram excluídos permanentemente.",
+  "deleteAccountFailedNotice": "Não foi possível excluir sua conta. Verifique sua senha e sua conexão e tente novamente.",
+  "subscriptionAutoRenewNotice": "A assinatura é renovada automaticamente ao fim de cada período, a menos que seja cancelada pelo menos 24 horas antes da renovação. O pagamento é cobrado na sua conta do Google Play. Cancele quando quiser em Google Play › Assinaturas."
 }

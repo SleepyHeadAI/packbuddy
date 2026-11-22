@@ -441,10 +441,6 @@
   "templateCityDesc": "Balo gọn nhẹ và tiện lợi cho chuyến du lịch thành phố 2-3 ngày",
   "vaultCloudBackupNotice": "Tài liệu được mã hóa và sao lưu lên đám mây để đồng bộ đa thiết bị, khôi phục tài khoản trong 15 ngày và đảm bảo an toàn.",
   "deleteAccountTitle": "Xóa tài khoản",
-  "deleteAccountConfirmationTitle": "Yêu cầu xóa tài khoản trong 15 ngày",
-  "deleteAccountConfirmationMessage": "Tài khoản, chuyến đi, chi phí và tài liệu trong két an toàn của bạn sẽ được lên lịch xóa vĩnh viễn sau 15 ngày.\n\n• Không đăng nhập trong 15 ngày để quá trình xóa hoàn tất.\n• Nếu bạn đăng nhập lại trong vòng 15 ngày, tài khoản và toàn bộ dữ liệu sẽ tự động được khôi phục.\n\nBạn có muốn tiếp tục không?",
-  "deleteAccountButton": "Yêu cầu xóa trong 15 ngày",
-  "deleteAccountScheduledNotice": "Tài khoản của bạn đã được lên lịch xóa sau 15 ngày. Vui lòng không đăng nhập nếu bạn muốn xóa vĩnh viễn.",
   "accountRestoredNotice": "Chào mừng bạn quay lại! Yêu cầu xóa tài khoản đã được hủy và toàn bộ dữ liệu đã được khôi phục.",
   "adminPendingDeletionBadge": "Lên lịch xóa (còn {days} ngày)",
   "adminCancelDeletion": "Hủy xóa tài khoản",
@@ -715,5 +711,13 @@
   "proThemeLockedSubtitle": "Mở khóa toàn bộ bảng màu cao cấp, phiên bản hộ chiếu và widget.",
   "proExportLockedTitle": "Xuất ngân sách & báo cáo",
   "proExportLockedSubtitle": "Xuất và chia sẻ báo cáo chi tiêu với bạn đồng hành của bạn.",
-  "proFeatureHighlightedBadge": "Bao gồm trong Pro"
+  "proFeatureHighlightedBadge": "Bao gồm trong Pro",
+  "deleteAccountNowTitle": "Xóa vĩnh viễn tài khoản",
+  "deleteAccountNowMessage": "Tài khoản và toàn bộ dữ liệu của bạn (chuyến đi, chi phí, danh sách hành lý, lịch trình, bản đồ du lịch, tài liệu trong két và bạn bè) sẽ bị xóa ngay lập tức và vĩnh viễn. Không thể hoàn tác thao tác này.\n\nGói đăng ký Google Play đang hoạt động sẽ không tự động bị hủy. Vui lòng hủy trong Google Play.",
+  "deleteAccountNowButton": "Xóa vĩnh viễn",
+  "deleteAccountPasswordLabel": "Xác nhận bằng mật khẩu của bạn",
+  "deleteAccountGoogleReauthHint": "Để xác nhận, bạn sẽ được yêu cầu đăng nhập lại bằng Google.",
+  "deleteAccountDoneNotice": "Tài khoản và toàn bộ dữ liệu của bạn đã bị xóa vĩnh viễn.",
+  "deleteAccountFailedNotice": "Không thể xóa tài khoản của bạn. Hãy kiểm tra mật khẩu và kết nối rồi thử lại.",
+  "subscriptionAutoRenewNotice": "Gói đăng ký tự động gia hạn vào cuối mỗi kỳ trừ khi được hủy ít nhất 24 giờ trước khi gia hạn. Khoản thanh toán sẽ được tính vào tài khoản Google Play của bạn. Bạn có thể hủy bất cứ lúc nào trong Google Play › Gói đăng ký."
 }

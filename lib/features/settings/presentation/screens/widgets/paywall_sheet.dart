@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
+import 'package:packbuddy/core/services/legal_consent_localization.dart';
 import 'package:packbuddy/core/services/telemetry_service.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/core/theme/app_motion.dart';
@@ -348,7 +350,8 @@ class PaywallSheet extends ConsumerWidget {
                   : () async {
                       final authState = ref.read(authControllerProvider);
                       final userEmail = authState.user?.email?.trim().toLowerCase();
-                      final isSuperAdmin = userEmail == kAdminEmail.toLowerCase();
+                      // Sandbox/test purchase dialog only in debug builds (release always uses Google Play).
+                      final isSuperAdmin = kDebugMode && userEmail == kAdminEmail.toLowerCase();
 
                       if (isSuperAdmin) {
                         // Dedicated Admin / Sandbox Test Purchase Confirmation Dialog
@@ -467,7 +470,23 @@ class PaywallSheet extends ConsumerWidget {
               isExpanded: true,
               size: AppButtonSize.large,
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
+
+            // Pre-purchase subscription disclosure (auto-renewal & cancellation via Google Play)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                l10n.subscriptionAutoRenewNotice,
+                key: const Key('paywall_auto_renew_notice'),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: theme.colorScheme.onSurfaceVariant,
+                  height: 1.35,
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
 
             // Restore Purchases Action (Required by Apple App Store & Google Play Store)
             TextButton(
@@ -517,27 +536,15 @@ class PaywallSheet extends ConsumerWidget {
             ),
             const SizedBox(height: 4),
 
-            // Legal & Terms Disclaimer
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                l10n.authTermsNotice,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.75),
-                  height: 1.35,
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
+            // Legal links (Terms of Service & Privacy Policy)
             Wrap(
               alignment: WrapAlignment.center,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 GestureDetector(
+                  key: const Key('paywall_terms_link'),
                   onTap: () async {
-                    final uri = Uri.parse('https://packbuddy.app/terms');
+                    final uri = Uri.parse(LegalConsentLocalization.termsOfServiceUrl);
                     try {
                       if (await canLaunchUrl(uri)) {
                         await launchUrl(uri, mode: LaunchMode.externalApplication);
@@ -545,7 +552,7 @@ class PaywallSheet extends ConsumerWidget {
                     } catch (_) {}
                   },
                   child: Text(
-                    Localizations.localeOf(context).languageCode == 'tr' ? 'Kullanım Koşulları (EULA)' : 'Terms of Service',
+                    LegalConsentLocalization.getTermsLink(Localizations.localeOf(context).languageCode),
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -562,8 +569,9 @@ class PaywallSheet extends ConsumerWidget {
                   ),
                 ),
                 GestureDetector(
+                  key: const Key('paywall_privacy_link'),
                   onTap: () async {
-                    final uri = Uri.parse('https://packbuddy.app/privacy');
+                    final uri = Uri.parse(LegalConsentLocalization.privacyPolicyUrl);
                     try {
                       if (await canLaunchUrl(uri)) {
                         await launchUrl(uri, mode: LaunchMode.externalApplication);
@@ -571,7 +579,7 @@ class PaywallSheet extends ConsumerWidget {
                     } catch (_) {}
                   },
                   child: Text(
-                    Localizations.localeOf(context).languageCode == 'tr' ? 'Gizlilik Politikası' : 'Privacy Policy',
+                    LegalConsentLocalization.getPrivacyPolicyLink(Localizations.localeOf(context).languageCode),
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,

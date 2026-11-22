@@ -441,10 +441,6 @@
   "templateCityDesc": "Leichte und kompakte Basics für einen 2-3-tägigen Städtetrip",
   "vaultCloudBackupNotice": "Dokumente werden für die geräteübergreifende Synchronisierung, 15-tägige Kontowiederherstellung und Sicherheitskonformität sicher verschlüsselt und in der Cloud gesichert.",
   "deleteAccountTitle": "Konto löschen",
-  "deleteAccountConfirmationTitle": "Antrag auf 15-tägige Kontolöschung",
-  "deleteAccountConfirmationMessage": "Ihr Konto, Ihre Reisen, Ausgaben und Tresordokumente werden für eine dauerhafte Löschung in 15 Tagen vorgemerkt.\n\n• Melden Sie sich 15 Tage lang nicht an, um die Löschung abzuschließen.\n• Wenn Sie sich innerhalb von 15 Tagen anmelden, werden Ihr Konto und alle Daten automatisch wiederhergestellt.\n\nMöchten Sie fortfahren?",
-  "deleteAccountButton": "15-tägige Löschung beantragen",
-  "deleteAccountScheduledNotice": "Ihr Konto wurde für die Löschung in 15 Tagen vorgemerkt. Melden Sie sich nicht an, wenn Sie das Konto dauerhaft löschen möchten.",
   "accountRestoredNotice": "Willkommen zurück! Ihre Kontolöschung wurde abgebrochen und alle Daten wurden wiederhergestellt.",
   "adminPendingDeletionBadge": "Zur Löschung vorgemerkt (noch {days} T.)",
   "adminCancelDeletion": "Löschung abbrechen",
@@ -715,5 +711,13 @@
   "proThemeLockedSubtitle": "Schalten Sie alle Premium-Farbpaletten und Reisepass-Layouts frei.",
   "proExportLockedTitle": "Budget & Berichte exportieren",
   "proExportLockedSubtitle": "Exportieren und teilen Sie Ausgabenberichte mit Ihren Mitreisenden.",
-  "proFeatureHighlightedBadge": "In Pro enthalten"
+  "proFeatureHighlightedBadge": "In Pro enthalten",
+  "deleteAccountNowTitle": "Konto endgültig löschen",
+  "deleteAccountNowMessage": "Ihr Konto und alle Ihre Daten (Reisen, Ausgaben, Packlisten, Reiseplan, Reisekarte, Tresor-Dokumente und Freunde) werden sofort und endgültig gelöscht. Dies kann nicht rückgängig gemacht werden.\n\nEin aktives Google Play-Abo wird nicht automatisch gekündigt. Bitte kündigen Sie es in Google Play.",
+  "deleteAccountNowButton": "Endgültig löschen",
+  "deleteAccountPasswordLabel": "Mit Ihrem Passwort bestätigen",
+  "deleteAccountGoogleReauthHint": "Zur Bestätigung werden Sie gebeten, sich erneut mit Google anzumelden.",
+  "deleteAccountDoneNotice": "Ihr Konto und alle Ihre Daten wurden endgültig gelöscht.",
+  "deleteAccountFailedNotice": "Ihr Konto konnte nicht gelöscht werden. Prüfen Sie Ihr Passwort und Ihre Verbindung und versuchen Sie es erneut.",
+  "subscriptionAutoRenewNotice": "Das Abo verlängert sich am Ende jedes Zeitraums automatisch, sofern es nicht mindestens 24 Stunden vor der Verlängerung gekündigt wird. Die Zahlung erfolgt über Ihr Google Play-Konto. Sie können jederzeit unter Google Play › Abos kündigen."
 }

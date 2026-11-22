@@ -441,10 +441,6 @@
   "templateCityDesc": "Esenciales ligeros y prácticos para una escapada urbana de 2 o 3 días",
   "vaultCloudBackupNotice": "Los documentos se cifran y respaldan en la nube para sincronización entre dispositivos, recuperación de cuenta en 15 días y cumplimiento de seguridad.",
   "deleteAccountTitle": "Eliminar cuenta",
-  "deleteAccountConfirmationTitle": "Solicitud de eliminación de cuenta en 15 días",
-  "deleteAccountConfirmationMessage": "Su cuenta, viajes, gastos y documentos de la bóveda se programarán para eliminación permanente en 15 días.\n\n• No inicie sesión durante 15 días para completar la eliminación.\n• Si inicia sesión dentro de los 15 días, su cuenta y datos se restaurarán automáticamente.\n\n¿Desea continuar?",
-  "deleteAccountButton": "Solicitar eliminación en 15 días",
-  "deleteAccountScheduledNotice": "Su cuenta ha sido programada para eliminarse en 15 días. No inicie sesión si desea eliminarla permanentemente.",
   "accountRestoredNotice": "¡Bienvenido de nuevo! La eliminación de su cuenta fue cancelada y sus datos han sido restaurados.",
   "adminPendingDeletionBadge": "Programado para eliminación ({days}d restantes)",
   "adminCancelDeletion": "Cancelar eliminación",
@@ -715,5 +711,13 @@
   "proThemeLockedSubtitle": "Desbloquea todas las paletas premium, pasaporte y estilos de widget.",
   "proExportLockedTitle": "Exportar presupuesto e informes",
   "proExportLockedSubtitle": "Exporta y comparte resúmenes de gastos con tus compañeros de viaje.",
-  "proFeatureHighlightedBadge": "Incluido en Pro"
+  "proFeatureHighlightedBadge": "Incluido en Pro",
+  "deleteAccountNowTitle": "Eliminar cuenta definitivamente",
+  "deleteAccountNowMessage": "Tu cuenta y todos tus datos (viajes, gastos, listas de equipaje, itinerario, mapa de viajes, documentos de la bóveda y amigos) se eliminarán de inmediato y de forma permanente. Esta acción no se puede deshacer.\n\nUna suscripción activa de Google Play no se cancela automáticamente. Cancélala en Google Play.",
+  "deleteAccountNowButton": "Eliminar definitivamente",
+  "deleteAccountPasswordLabel": "Confirma con tu contraseña",
+  "deleteAccountGoogleReauthHint": "Para confirmar, se te pedirá que vuelvas a iniciar sesión con Google.",
+  "deleteAccountDoneNotice": "Tu cuenta y todos tus datos se han eliminado definitivamente.",
+  "deleteAccountFailedNotice": "No se pudo eliminar tu cuenta. Comprueba tu contraseña y tu conexión e inténtalo de nuevo.",
+  "subscriptionAutoRenewNotice": "La suscripción se renueva automáticamente al final de cada periodo, salvo que la canceles al menos 24 horas antes de la renovación. El pago se carga a tu cuenta de Google Play. Puedes cancelarla en cualquier momento en Google Play › Suscripciones."
 }

@@ -441,10 +441,6 @@
   "templateCityDesc": "Lätt och kompakt packning för en 2-3 dagars storstadshelg",
   "vaultCloudBackupNotice": "Dokument krypteras och säkerhetskopieras till molnet för synkronisering mellan enheter, 15 dagars kontoåterställning och säkerhet.",
   "deleteAccountTitle": "Radera konto",
-  "deleteAccountConfirmationTitle": "Begäran om kontoradering inom 15 dagar",
-  "deleteAccountConfirmationMessage": "Ditt konto, dina resor, utgifter och valvdokument schemaläggs för permanent radering om 15 dagar.\n\n• Logga inte in under 15 dagar för att slutföra raderingen.\n• Om du loggar in inom 15 dagar återställs ditt konto och alla data automatiskt.\n\nVill du fortsätta?",
-  "deleteAccountButton": "Begär 15 dagars radering",
-  "deleteAccountScheduledNotice": "Ditt konto har schemalagts för radering om 15 dagar. Logga inte in om du vill radera kontot permanent.",
   "accountRestoredNotice": "Välkommen tillbaka! Din kontoradering avbröts och alla data har återställts.",
   "adminPendingDeletionBadge": "Schemalagt för radering ({days}d kvar)",
   "adminCancelDeletion": "Avbryt radering",
@@ -715,5 +711,13 @@
   "proThemeLockedSubtitle": "Lås upp alla premiumpaletter, passversionen och widgetstilar.",
   "proExportLockedTitle": "Exportera budget och rapporter",
   "proExportLockedSubtitle": "Exportera och dela utgiftsrapporter med dina reskamrater.",
-  "proFeatureHighlightedBadge": "Ingår i Pro"
+  "proFeatureHighlightedBadge": "Ingår i Pro",
+  "deleteAccountNowTitle": "Radera konto permanent",
+  "deleteAccountNowMessage": "Ditt konto och all din data (resor, utgifter, packlistor, resplan, resekarta, valvdokument och vänner) raderas omedelbart och permanent. Detta kan inte ångras.\n\nEn aktiv Google Play-prenumeration avslutas inte automatiskt. Avsluta den i Google Play.",
+  "deleteAccountNowButton": "Radera permanent",
+  "deleteAccountPasswordLabel": "Bekräfta med ditt lösenord",
+  "deleteAccountGoogleReauthHint": "För att bekräfta ombeds du logga in med Google igen.",
+  "deleteAccountDoneNotice": "Ditt konto och all din data har raderats permanent.",
+  "deleteAccountFailedNotice": "Det gick inte att radera ditt konto. Kontrollera lösenordet och anslutningen och försök igen.",
+  "subscriptionAutoRenewNotice": "Prenumerationen förnyas automatiskt i slutet av varje period om den inte avslutas minst 24 timmar före förnyelsen. Betalningen debiteras ditt Google Play-konto. Du kan avsluta när som helst under Google Play › Prenumerationer."
 }

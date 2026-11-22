@@ -1409,21 +1409,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get deleteAccountTitle => 'Elimina account';
 
   @override
-  String get deleteAccountConfirmationTitle =>
-      'Richiesta eliminazione account in 15 giorni';
-
-  @override
-  String get deleteAccountConfirmationMessage =>
-      'Il tuo account, viaggi, spese e documenti della cassaforte saranno pianificati per l\'eliminazione permanente tra 15 giorni.\n\n• Non effettuare l\'accesso per 15 giorni per completare l\'eliminazione.\n• Se effettui l\'accesso entro 15 giorni, l\'account e tutti i dati saranno ripristinati.\n\nVuoi procedere?';
-
-  @override
-  String get deleteAccountButton => 'Richiedi eliminazione in 15 giorni';
-
-  @override
-  String get deleteAccountScheduledNotice =>
-      'Il tuo account è programmato per l\'eliminazione tra 15 giorni. Non effettuare l\'accesso se desideri eliminarlo definitivamente.';
-
-  @override
   String get accountRestoredNotice =>
       'Bentornato! L\'eliminazione dell\'account è stata annullata e tutti i tuoi dati sono stati ripristinati.';
 
@@ -2306,27 +2291,31 @@ class AppLocalizationsIt extends AppLocalizations {
   String get proFeatureHighlightedBadge => 'Incluso in Pro';
 
   @override
-  String get deleteAccountNowTitle => 'Delete Account Permanently';
+  String get deleteAccountNowTitle => 'Elimina account definitivamente';
 
   @override
   String get deleteAccountNowMessage =>
-      'Your account and all of your data (trips, expenses, packing lists, itinerary, travel map, vault documents and friends) will be deleted immediately and permanently. This cannot be undone.\n\nAn active Google Play subscription is not cancelled automatically. Please cancel it in Google Play.';
+      'Il tuo account e tutti i tuoi dati (viaggi, spese, liste bagagli, itinerario, mappa dei viaggi, documenti della cassaforte e amici) verranno eliminati immediatamente e in modo permanente. L\'operazione non può essere annullata.\n\nUn abbonamento Google Play attivo non viene annullato automaticamente. Annullalo da Google Play.';
 
   @override
-  String get deleteAccountNowButton => 'Delete Permanently';
+  String get deleteAccountNowButton => 'Elimina definitivamente';
 
   @override
-  String get deleteAccountPasswordLabel => 'Confirm with your password';
+  String get deleteAccountPasswordLabel => 'Conferma con la tua password';
 
   @override
   String get deleteAccountGoogleReauthHint =>
-      'To confirm, you will be asked to sign in with Google again.';
+      'Per confermare, ti verrà chiesto di accedere di nuovo con Google.';
 
   @override
   String get deleteAccountDoneNotice =>
-      'Your account and all of your data have been permanently deleted.';
+      'Il tuo account e tutti i tuoi dati sono stati eliminati definitivamente.';
 
   @override
   String get deleteAccountFailedNotice =>
-      'Your account could not be deleted. Check your password and connection, then try again.';
+      'Impossibile eliminare l\'account. Controlla la password e la connessione, poi riprova.';
+
+  @override
+  String get subscriptionAutoRenewNotice =>
+      'L\'abbonamento si rinnova automaticamente alla fine di ogni periodo, salvo disdetta almeno 24 ore prima del rinnovo. Il pagamento viene addebitato sul tuo account Google Play. Puoi annullarlo in qualsiasi momento da Google Play › Abbonamenti.';
 }

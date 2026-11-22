@@ -250,32 +250,26 @@ void main() {
       // Validation error message should be visible
       expect(find.text(LegalConsentLocalization.getValidationMustAccept('tr')), findsOneWidget);
 
-      // Now verify that all 3 checkboxes are mandatory and progress is blocked until all 3 are ticked
+      // 2 mandatory checkboxes (terms, data processing) + 1 OPTIONAL analytics checkbox (KVKK/GDPR)
       final checkboxes = find.byType(Checkbox);
-      expect(checkboxes, findsNWidgets(3)); // All 3 checkboxes mandatory
+      expect(checkboxes, findsNWidgets(3));
 
+      // Only one mandatory box ticked -> still blocked
       await tester.tap(checkboxes.at(0));
       await tester.pumpAndSettle();
-
-      await tester.tap(checkboxes.at(1));
-      await tester.pumpAndSettle();
-
-      // Tap Accept before ticking the 3rd checkbox -> MUST still block and show validation error
       await tester.tap(acceptBtn);
       await tester.pumpAndSettle();
       expect(PreferencesService.instance.hasAcceptedLegalConsent(), isFalse);
       expect(find.text(LegalConsentLocalization.getValidationMustAccept('tr')), findsOneWidget);
 
-      // Now tick the 3rd mandatory checkbox
-      await tester.tap(checkboxes.at(2));
+      // Both mandatory boxes ticked, analytics left unticked -> accepted without analytics
+      await tester.tap(checkboxes.at(1));
       await tester.pumpAndSettle();
-
-      // Tap Accept now -> must succeed
       await tester.tap(acceptBtn);
       await tester.pumpAndSettle();
 
-      // Validation error should disappear and consent should be accepted
       expect(PreferencesService.instance.hasAcceptedLegalConsent(), isTrue);
+      expect(PreferencesService.instance.isAnalyticsConsentGiven(), isFalse);
     });
 
     testWidgets('Review mode renders verification banner and close button', (tester) async {

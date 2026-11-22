@@ -441,10 +441,6 @@
   "templateCityDesc": "Compacte en lichte rugzak voor een 2-3 daagse stedentrip",
   "vaultCloudBackupNotice": "Documenten worden versleuteld en opgeslagen in de cloud voor synchronisatie tussen apparaten, 15 dagen accountherstel en beveiliging.",
   "deleteAccountTitle": "Account verwijderen",
-  "deleteAccountConfirmationTitle": "Verzoek om account binnen 15 dagen te verwijderen",
-  "deleteAccountConfirmationMessage": "Uw account, reizen, uitgaven en kluisdocumenten worden over 15 dagen definitief verwijderd.\n\n• Log 15 dagen niet in om de verwijdering te voltooien.\n• Als u binnen 15 dagen inlogt, worden uw account en bestanden automatisch hersteld.\n\nWilt u doorgaan?",
-  "deleteAccountButton": "15-daagse verwijdering aanvragen",
-  "deleteAccountScheduledNotice": "Uw account wordt over 15 dagen verwijderd. Log niet in als u uw account definitief wilt verwijderen.",
   "accountRestoredNotice": "Welkom terug! Uw accountverwijdering is geannuleerd en al uw gegevens zijn hersteld.",
   "adminPendingDeletionBadge": "Gepland voor verwijdering (nog {days}d)",
   "adminCancelDeletion": "Verwijdering annuleren",
@@ -715,5 +711,13 @@
   "proThemeLockedSubtitle": "Ontgrendel alle premiumpaletten, paspoorteditie en widgetstijlen.",
   "proExportLockedTitle": "Budget en rapporten exporteren",
   "proExportLockedSubtitle": "Exporteer en deel uitgavenrapporten met je reisgenoten.",
-  "proFeatureHighlightedBadge": "Inbegrepen in Pro"
+  "proFeatureHighlightedBadge": "Inbegrepen in Pro",
+  "deleteAccountNowTitle": "Account definitief verwijderen",
+  "deleteAccountNowMessage": "Je account en al je gegevens (reizen, uitgaven, paklijsten, reisplan, reiskaart, kluisdocumenten en vrienden) worden direct en definitief verwijderd. Dit kan niet ongedaan worden gemaakt.\n\nEen actief Google Play-abonnement wordt niet automatisch opgezegd. Zeg het op via Google Play.",
+  "deleteAccountNowButton": "Definitief verwijderen",
+  "deleteAccountPasswordLabel": "Bevestig met je wachtwoord",
+  "deleteAccountGoogleReauthHint": "Ter bevestiging wordt je gevraagd opnieuw in te loggen met Google.",
+  "deleteAccountDoneNotice": "Je account en al je gegevens zijn definitief verwijderd.",
+  "deleteAccountFailedNotice": "Je account kon niet worden verwijderd. Controleer je wachtwoord en verbinding en probeer het opnieuw.",
+  "subscriptionAutoRenewNotice": "Het abonnement wordt aan het einde van elke periode automatisch verlengd, tenzij je het minstens 24 uur vóór de verlenging opzegt. De betaling wordt via je Google Play-account afgeschreven. Je kunt op elk moment opzeggen via Google Play › Abonnementen."
 }

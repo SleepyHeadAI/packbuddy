@@ -441,10 +441,6 @@
   "templateCityDesc": "Pratik sırt çantasıyla 2-3 günlük rahat ve kompakt şehir kaçamağı",
   "vaultCloudBackupNotice": "Belgeler; cihazlar arası eşitleme, 15 günlük hesap kurtarma ve güvenlik uyumluluğu için buluta güvenle yedeklenir.",
   "deleteAccountTitle": "Hesabı Sil",
-  "deleteAccountConfirmationTitle": "15 Günlük Hesap Silme Talebi",
-  "deleteAccountConfirmationMessage": "Hesabınız, seyahatleriniz, harcamalarınız ve kasa belgeleriniz 15 gün sonra kalıcı olarak silinmek üzere planlanacaktır.\n\n• Silmenin tamamlanması için 15 gün boyunca giriş yapmayın.\n• 15 gün içinde giriş yaparsanız hesabınız ve tüm verileriniz otomatik olarak geri yüklenir.\n\nDevam etmek istiyor musunuz?",
-  "deleteAccountButton": "15 Günlük Silme Talebi Gönder",
-  "deleteAccountScheduledNotice": "Hesabınız 15 gün içinde silinmek üzere planlandı. Kalıcı olarak silinmesini istiyorsanız bu süre boyunca giriş yapmayın.",
   "accountRestoredNotice": "Tekrar hoş geldiniz! Hesap silme talebiniz iptal edildi ve tüm verileriniz geri yüklendi.",
   "adminPendingDeletionBadge": "Silinmesi planlandı ({days} gün kaldı)",
   "adminCancelDeletion": "Silme Talebini İptal Et",
@@ -722,5 +718,6 @@
   "deleteAccountPasswordLabel": "Şifrenizle onaylayın",
   "deleteAccountGoogleReauthHint": "Onaylamak için Google ile yeniden giriş yapmanız istenecek.",
   "deleteAccountDoneNotice": "Hesabınız ve tüm verileriniz kalıcı olarak silindi.",
-  "deleteAccountFailedNotice": "Hesabınız silinemedi. Şifrenizi ve bağlantınızı kontrol edip tekrar deneyin."
+  "deleteAccountFailedNotice": "Hesabınız silinemedi. Şifrenizi ve bağlantınızı kontrol edip tekrar deneyin.",
+  "subscriptionAutoRenewNotice": "Abonelik, yenileme tarihinden en az 24 saat önce iptal edilmedikçe her dönemin sonunda otomatik olarak yenilenir. Ödeme Google Play hesabınızdan tahsil edilir. Dilediğiniz zaman Google Play › Abonelikler bölümünden iptal edebilirsiniz."
 }

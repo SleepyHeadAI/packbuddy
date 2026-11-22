@@ -441,10 +441,6 @@
   "templateCityDesc": "2~3일간의 가볍고 편리한 도심 여행을 위한 콤팩트 배낭",
   "vaultCloudBackupNotice": "문서는 기기 간 동기화, 15일간의 계정 복구 및 안전 규정 준수를 위해 암호화되어 클라우드에 백업됩니다.",
   "deleteAccountTitle": "계정 삭제",
-  "deleteAccountConfirmationTitle": "15일 계정 삭제 요청",
-  "deleteAccountConfirmationMessage": "계정, 여행, 경비 및 보관함 문서가 15일 후 영구 삭제되도록 예약됩니다.\n\n• 삭제를 완료하려면 15일 동안 로그인하지 마세요.\n• 15일 이내에 다시 로그인하면 계정과 모든 데이터가 자동으로 복원됩니다.\n\n계속하시겠습니까?",
-  "deleteAccountButton": "15일 삭제 요청",
-  "deleteAccountScheduledNotice": "계정이 15일 후 삭제되도록 예약되었습니다. 완전히 삭제하려면 로그인하지 마세요.",
   "accountRestoredNotice": "다시 오신 것을 환영합니다! 계정 삭제가 취소되고 모든 데이터가 복원되었습니다.",
   "adminPendingDeletionBadge": "삭제 예정 (남은 기간 {days}일)",
   "adminCancelDeletion": "삭제 취소",
@@ -715,5 +711,13 @@
   "proThemeLockedSubtitle": "여권 에디션, 폴라로이드 및 모든 프리미엄 위젯 테마를 잠금 해제하세요.",
   "proExportLockedTitle": "예산 및 지출 보고서 내보내기",
   "proExportLockedSubtitle": "동행자와 전체 지출 내역을 내보내고 손쉽게 공유하세요.",
-  "proFeatureHighlightedBadge": "Pro 포함 기능"
+  "proFeatureHighlightedBadge": "Pro 포함 기능",
+  "deleteAccountNowTitle": "계정 영구 삭제",
+  "deleteAccountNowMessage": "계정과 모든 데이터(여행, 지출, 짐 목록, 일정, 여행 지도, 보관함 문서, 친구)가 즉시 영구적으로 삭제됩니다. 이 작업은 되돌릴 수 없습니다.\n\n활성 Google Play 구독은 자동으로 취소되지 않습니다. Google Play에서 취소해 주세요.",
+  "deleteAccountNowButton": "영구 삭제",
+  "deleteAccountPasswordLabel": "비밀번호로 확인",
+  "deleteAccountGoogleReauthHint": "확인을 위해 Google로 다시 로그인하라는 메시지가 표시됩니다.",
+  "deleteAccountDoneNotice": "계정과 모든 데이터가 영구적으로 삭제되었습니다.",
+  "deleteAccountFailedNotice": "계정을 삭제하지 못했습니다. 비밀번호와 연결 상태를 확인한 후 다시 시도해 주세요.",
+  "subscriptionAutoRenewNotice": "구독은 갱신 최소 24시간 전에 취소하지 않으면 각 기간이 끝날 때 자동으로 갱신됩니다. 결제는 Google Play 계정으로 청구됩니다. 언제든지 Google Play › 구독에서 취소할 수 있습니다."
 }

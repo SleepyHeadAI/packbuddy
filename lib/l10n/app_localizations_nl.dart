@@ -1403,21 +1403,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get deleteAccountTitle => 'Account verwijderen';
 
   @override
-  String get deleteAccountConfirmationTitle =>
-      'Verzoek om account binnen 15 dagen te verwijderen';
-
-  @override
-  String get deleteAccountConfirmationMessage =>
-      'Uw account, reizen, uitgaven en kluisdocumenten worden over 15 dagen definitief verwijderd.\n\n• Log 15 dagen niet in om de verwijdering te voltooien.\n• Als u binnen 15 dagen inlogt, worden uw account en bestanden automatisch hersteld.\n\nWilt u doorgaan?';
-
-  @override
-  String get deleteAccountButton => '15-daagse verwijdering aanvragen';
-
-  @override
-  String get deleteAccountScheduledNotice =>
-      'Uw account wordt over 15 dagen verwijderd. Log niet in als u uw account definitief wilt verwijderen.';
-
-  @override
   String get accountRestoredNotice =>
       'Welkom terug! Uw accountverwijdering is geannuleerd en al uw gegevens zijn hersteld.';
 
@@ -2298,27 +2283,31 @@ class AppLocalizationsNl extends AppLocalizations {
   String get proFeatureHighlightedBadge => 'Inbegrepen in Pro';
 
   @override
-  String get deleteAccountNowTitle => 'Delete Account Permanently';
+  String get deleteAccountNowTitle => 'Account definitief verwijderen';
 
   @override
   String get deleteAccountNowMessage =>
-      'Your account and all of your data (trips, expenses, packing lists, itinerary, travel map, vault documents and friends) will be deleted immediately and permanently. This cannot be undone.\n\nAn active Google Play subscription is not cancelled automatically. Please cancel it in Google Play.';
+      'Je account en al je gegevens (reizen, uitgaven, paklijsten, reisplan, reiskaart, kluisdocumenten en vrienden) worden direct en definitief verwijderd. Dit kan niet ongedaan worden gemaakt.\n\nEen actief Google Play-abonnement wordt niet automatisch opgezegd. Zeg het op via Google Play.';
 
   @override
-  String get deleteAccountNowButton => 'Delete Permanently';
+  String get deleteAccountNowButton => 'Definitief verwijderen';
 
   @override
-  String get deleteAccountPasswordLabel => 'Confirm with your password';
+  String get deleteAccountPasswordLabel => 'Bevestig met je wachtwoord';
 
   @override
   String get deleteAccountGoogleReauthHint =>
-      'To confirm, you will be asked to sign in with Google again.';
+      'Ter bevestiging wordt je gevraagd opnieuw in te loggen met Google.';
 
   @override
   String get deleteAccountDoneNotice =>
-      'Your account and all of your data have been permanently deleted.';
+      'Je account en al je gegevens zijn definitief verwijderd.';
 
   @override
   String get deleteAccountFailedNotice =>
-      'Your account could not be deleted. Check your password and connection, then try again.';
+      'Je account kon niet worden verwijderd. Controleer je wachtwoord en verbinding en probeer het opnieuw.';
+
+  @override
+  String get subscriptionAutoRenewNotice =>
+      'Het abonnement wordt aan het einde van elke periode automatisch verlengd, tenzij je het minstens 24 uur vóór de verlenging opzegt. De betaling wordt via je Google Play-account afgeschreven. Je kunt op elk moment opzeggen via Google Play › Abonnementen.';
 }

@@ -2780,30 +2780,6 @@ abstract class AppLocalizations {
   /// **'Delete Account'**
   String get deleteAccountTitle;
 
-  /// Title for 15-day deletion dialog
-  ///
-  /// In en, this message translates to:
-  /// **'15-Day Account Deletion Request'**
-  String get deleteAccountConfirmationTitle;
-
-  /// Message explaining 15-day grace period for deletion
-  ///
-  /// In en, this message translates to:
-  /// **'Your account, trips, expenses, and vault documents will be scheduled for permanent deletion in 15 days.\n\n• Do not log in for 15 days to allow deletion to complete.\n• If you log in within 15 days, your account and all data will be automatically restored.\n\nDo you want to proceed?'**
-  String get deleteAccountConfirmationMessage;
-
-  /// Button confirming deletion request
-  ///
-  /// In en, this message translates to:
-  /// **'Request 15-Day Deletion'**
-  String get deleteAccountButton;
-
-  /// Notice after requesting deletion
-  ///
-  /// In en, this message translates to:
-  /// **'Your account has been scheduled for deletion in 15 days. Do not log in if you wish to permanently delete your account.'**
-  String get deleteAccountScheduledNotice;
-
   /// Notice when account is auto-recovered upon login
   ///
   /// In en, this message translates to:
@@ -4471,6 +4447,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your account could not be deleted. Check your password and connection, then try again.'**
   String get deleteAccountFailedNotice;
+
+  /// Pre-purchase auto-renewal and cancellation disclosure on the paywall
+  ///
+  /// In en, this message translates to:
+  /// **'Your subscription renews automatically at the end of each billing period unless cancelled at least 24 hours before renewal. Payment is charged to your Google Play account. You can cancel anytime in Google Play › Subscriptions.'**
+  String get subscriptionAutoRenewNotice;
 }
 
 class _AppLocalizationsDelegate

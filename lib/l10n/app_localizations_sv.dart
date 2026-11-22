@@ -1400,21 +1400,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get deleteAccountTitle => 'Radera konto';
 
   @override
-  String get deleteAccountConfirmationTitle =>
-      'Begäran om kontoradering inom 15 dagar';
-
-  @override
-  String get deleteAccountConfirmationMessage =>
-      'Ditt konto, dina resor, utgifter och valvdokument schemaläggs för permanent radering om 15 dagar.\n\n• Logga inte in under 15 dagar för att slutföra raderingen.\n• Om du loggar in inom 15 dagar återställs ditt konto och alla data automatiskt.\n\nVill du fortsätta?';
-
-  @override
-  String get deleteAccountButton => 'Begär 15 dagars radering';
-
-  @override
-  String get deleteAccountScheduledNotice =>
-      'Ditt konto har schemalagts för radering om 15 dagar. Logga inte in om du vill radera kontot permanent.';
-
-  @override
   String get accountRestoredNotice =>
       'Välkommen tillbaka! Din kontoradering avbröts och alla data har återställts.';
 
@@ -2289,27 +2274,31 @@ class AppLocalizationsSv extends AppLocalizations {
   String get proFeatureHighlightedBadge => 'Ingår i Pro';
 
   @override
-  String get deleteAccountNowTitle => 'Delete Account Permanently';
+  String get deleteAccountNowTitle => 'Radera konto permanent';
 
   @override
   String get deleteAccountNowMessage =>
-      'Your account and all of your data (trips, expenses, packing lists, itinerary, travel map, vault documents and friends) will be deleted immediately and permanently. This cannot be undone.\n\nAn active Google Play subscription is not cancelled automatically. Please cancel it in Google Play.';
+      'Ditt konto och all din data (resor, utgifter, packlistor, resplan, resekarta, valvdokument och vänner) raderas omedelbart och permanent. Detta kan inte ångras.\n\nEn aktiv Google Play-prenumeration avslutas inte automatiskt. Avsluta den i Google Play.';
 
   @override
-  String get deleteAccountNowButton => 'Delete Permanently';
+  String get deleteAccountNowButton => 'Radera permanent';
 
   @override
-  String get deleteAccountPasswordLabel => 'Confirm with your password';
+  String get deleteAccountPasswordLabel => 'Bekräfta med ditt lösenord';
 
   @override
   String get deleteAccountGoogleReauthHint =>
-      'To confirm, you will be asked to sign in with Google again.';
+      'För att bekräfta ombeds du logga in med Google igen.';
 
   @override
   String get deleteAccountDoneNotice =>
-      'Your account and all of your data have been permanently deleted.';
+      'Ditt konto och all din data har raderats permanent.';
 
   @override
   String get deleteAccountFailedNotice =>
-      'Your account could not be deleted. Check your password and connection, then try again.';
+      'Det gick inte att radera ditt konto. Kontrollera lösenordet och anslutningen och försök igen.';
+
+  @override
+  String get subscriptionAutoRenewNotice =>
+      'Prenumerationen förnyas automatiskt i slutet av varje period om den inte avslutas minst 24 timmar före förnyelsen. Betalningen debiteras ditt Google Play-konto. Du kan avsluta när som helst under Google Play › Prenumerationer.';
 }

@@ -1395,20 +1395,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get deleteAccountTitle => 'ลบบัญชี';
 
   @override
-  String get deleteAccountConfirmationTitle => 'คำขอลบบัญชีภายใน 15 วัน';
-
-  @override
-  String get deleteAccountConfirmationMessage =>
-      'บัญชี ทริป ค่าใช้จ่าย และเอกสารในตู้นิรภัยของคุณจะถูกกำหนดให้ลบอย่างถาวรใน 15 วัน\n\n• ห้ามเข้าสู่ระบบเป็นเวลา 15 วันเพื่อให้การลบเสร็จสมบูรณ์\n• หากคุณเข้าสู่ระบบภายใน 15 วัน บัญชีและข้อมูลทั้งหมดจะได้รับการกู้คืนโดยอัตโนมัติ\n\nคุณต้องการดำเนินการต่อหรือไม่?';
-
-  @override
-  String get deleteAccountButton => 'ส่งคำขอลบใน 15 วัน';
-
-  @override
-  String get deleteAccountScheduledNotice =>
-      'บัญชีของคุณถูกกำหนดให้ลบในอีก 15 วัน อย่าเข้าสู่ระบบหากคุณต้องการลบบัญชีอย่างถาวร';
-
-  @override
   String get accountRestoredNotice =>
       'ยินดีต้อนรับกลับมา! การขอลบบัญชีของคุณถูกยกเลิกแล้ว และข้อมูลทั้งหมดได้รับการกู้คืนแล้ว';
 
@@ -2284,27 +2270,31 @@ class AppLocalizationsTh extends AppLocalizations {
   String get proFeatureHighlightedBadge => 'รวมอยู่ใน Pro';
 
   @override
-  String get deleteAccountNowTitle => 'Delete Account Permanently';
+  String get deleteAccountNowTitle => 'ลบบัญชีถาวร';
 
   @override
   String get deleteAccountNowMessage =>
-      'Your account and all of your data (trips, expenses, packing lists, itinerary, travel map, vault documents and friends) will be deleted immediately and permanently. This cannot be undone.\n\nAn active Google Play subscription is not cancelled automatically. Please cancel it in Google Play.';
+      'บัญชีและข้อมูลทั้งหมดของคุณ (ทริป ค่าใช้จ่าย รายการจัดกระเป๋า แผนการเดินทาง แผนที่การเดินทาง เอกสารในตู้นิรภัย และเพื่อน) จะถูกลบทันทีอย่างถาวร และไม่สามารถย้อนกลับได้\n\nการสมัครสมาชิก Google Play ที่ใช้งานอยู่จะไม่ถูกยกเลิกโดยอัตโนมัติ โปรดยกเลิกใน Google Play';
 
   @override
-  String get deleteAccountNowButton => 'Delete Permanently';
+  String get deleteAccountNowButton => 'ลบถาวร';
 
   @override
-  String get deleteAccountPasswordLabel => 'Confirm with your password';
+  String get deleteAccountPasswordLabel => 'ยืนยันด้วยรหัสผ่านของคุณ';
 
   @override
   String get deleteAccountGoogleReauthHint =>
-      'To confirm, you will be asked to sign in with Google again.';
+      'เพื่อยืนยัน ระบบจะขอให้คุณลงชื่อเข้าใช้ด้วย Google อีกครั้ง';
 
   @override
   String get deleteAccountDoneNotice =>
-      'Your account and all of your data have been permanently deleted.';
+      'บัญชีและข้อมูลทั้งหมดของคุณถูกลบถาวรแล้ว';
 
   @override
   String get deleteAccountFailedNotice =>
-      'Your account could not be deleted. Check your password and connection, then try again.';
+      'ไม่สามารถลบบัญชีของคุณได้ โปรดตรวจสอบรหัสผ่านและการเชื่อมต่อ แล้วลองอีกครั้ง';
+
+  @override
+  String get subscriptionAutoRenewNotice =>
+      'การสมัครสมาชิกจะต่ออายุโดยอัตโนมัติเมื่อสิ้นสุดแต่ละรอบ เว้นแต่จะยกเลิกอย่างน้อย 24 ชั่วโมงก่อนการต่ออายุ ระบบจะเรียกเก็บเงินจากบัญชี Google Play ของคุณ ยกเลิกได้ทุกเมื่อที่ Google Play › การสมัครใช้บริการ';
 }

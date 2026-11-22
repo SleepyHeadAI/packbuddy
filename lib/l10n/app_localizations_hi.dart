@@ -1391,20 +1391,6 @@ class AppLocalizationsHi extends AppLocalizations {
   String get deleteAccountTitle => 'खाता हटाएं';
 
   @override
-  String get deleteAccountConfirmationTitle => '15-दिवसीय खाता हटाने का अनुरोध';
-
-  @override
-  String get deleteAccountConfirmationMessage =>
-      'आपका खाता, यात्राएं, खर्च और वॉल्ट दस्तावेज़ 15 दिनों में स्थायी रूप से हटा दिए जाएंगे।\n\n• हटाने की प्रक्रिया पूरी होने के लिए 15 दिनों तक लॉगिन न करें।\n• यदि आप 15 दिनों के भीतर लॉगिन करते हैं, तो आपका खाता और डेटा स्वतः पुनर्स्थापित हो जाएगा।\n\nक्या आप आगे बढ़ना चाहते हैं?';
-
-  @override
-  String get deleteAccountButton => '15-दिन हटाने का अनुरोध करें';
-
-  @override
-  String get deleteAccountScheduledNotice =>
-      'आपका खाता 15 दिनों में हटाने के लिए निर्धारित किया गया है। यदि आप इसे स्थायी रूप से हटाना चाहते हैं तो लॉगिन न करें।';
-
-  @override
   String get accountRestoredNotice =>
       'वापसी पर स्वागत है! आपका खाता हटाने का अनुरोध रद्द कर दिया गया है और डेटा पुनर्स्थापित हो गया है।';
 
@@ -2283,27 +2269,31 @@ class AppLocalizationsHi extends AppLocalizations {
   String get proFeatureHighlightedBadge => 'Pro में शामिल';
 
   @override
-  String get deleteAccountNowTitle => 'Delete Account Permanently';
+  String get deleteAccountNowTitle => 'खाता स्थायी रूप से हटाएँ';
 
   @override
   String get deleteAccountNowMessage =>
-      'Your account and all of your data (trips, expenses, packing lists, itinerary, travel map, vault documents and friends) will be deleted immediately and permanently. This cannot be undone.\n\nAn active Google Play subscription is not cancelled automatically. Please cancel it in Google Play.';
+      'आपका खाता और आपका सारा डेटा (यात्राएँ, खर्च, पैकिंग सूचियाँ, यात्रा कार्यक्रम, यात्रा मानचित्र, वॉल्ट दस्तावेज़ और मित्र) तुरंत और स्थायी रूप से हटा दिया जाएगा। इसे पूर्ववत नहीं किया जा सकता।\n\nसक्रिय Google Play सदस्यता अपने आप रद्द नहीं होती। कृपया इसे Google Play में रद्द करें।';
 
   @override
-  String get deleteAccountNowButton => 'Delete Permanently';
+  String get deleteAccountNowButton => 'स्थायी रूप से हटाएँ';
 
   @override
-  String get deleteAccountPasswordLabel => 'Confirm with your password';
+  String get deleteAccountPasswordLabel => 'अपने पासवर्ड से पुष्टि करें';
 
   @override
   String get deleteAccountGoogleReauthHint =>
-      'To confirm, you will be asked to sign in with Google again.';
+      'पुष्टि करने के लिए आपसे Google से फिर से साइन इन करने को कहा जाएगा।';
 
   @override
   String get deleteAccountDoneNotice =>
-      'Your account and all of your data have been permanently deleted.';
+      'आपका खाता और आपका सारा डेटा स्थायी रूप से हटा दिया गया है।';
 
   @override
   String get deleteAccountFailedNotice =>
-      'Your account could not be deleted. Check your password and connection, then try again.';
+      'आपका खाता हटाया नहीं जा सका। अपना पासवर्ड और कनेक्शन जाँचें, फिर दोबारा कोशिश करें।';
+
+  @override
+  String get subscriptionAutoRenewNotice =>
+      'सदस्यता हर अवधि के अंत में अपने आप नवीनीकृत होती है, जब तक कि नवीनीकरण से कम से कम 24 घंटे पहले रद्द न की जाए। भुगतान आपके Google Play खाते से लिया जाता है। आप Google Play › सदस्यताएँ में कभी भी रद्द कर सकते हैं।';
 }

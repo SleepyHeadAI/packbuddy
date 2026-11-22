@@ -556,5 +556,45 @@ void main() {
       expect(find.byKey(const Key('delete_account_confirm_button')), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
+
+    for (final lang in const ['tr', 'de', 'ru', 'ar', 'el', 'hi']) {
+      testWidgets('Account deletion dialog has no overflow on 320x568 ($lang)', (tester) async {
+        tester.view.physicalSize = const Size(320, 568);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() => tester.view.resetPhysicalSize());
+
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              authUserProvider.overrideWithValue(
+                FakeUser(uid: 'user-settings-$lang', email: 'traveler@packbuddy.com', emailVerified: true),
+              ),
+            ],
+            child: MaterialApp(
+              theme: AppTheme.lightTheme,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: Locale(lang),
+              home: const SettingsScreen(),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        final l10n = await AppLocalizations.delegate.load(Locale(lang));
+        await tester.scrollUntilVisible(
+          find.text(l10n.deleteAccountTitle),
+          300.0,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(l10n.deleteAccountTitle));
+        await tester.pumpAndSettle();
+
+        expect(find.text(l10n.deleteAccountNowTitle), findsOneWidget);
+        expect(find.byKey(const Key('delete_account_confirm_button')), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+    }
   });
 }

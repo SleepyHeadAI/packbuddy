@@ -1406,21 +1406,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get deleteAccountTitle => 'Удалить аккаунт';
 
   @override
-  String get deleteAccountConfirmationTitle =>
-      'Запрос на удаление аккаунта через 15 дней';
-
-  @override
-  String get deleteAccountConfirmationMessage =>
-      'Ваш аккаунт, поездки, расходы и документы сейфа будут запланированы к окончательному удалению через 15 дней.\n\n• Не входите в аккаунт в течение 15 дней для завершения удаления.\n• При входе в течение 15 дней ваш аккаунт и данные будут автоматически восстановлены.\n\nПродолжить?';
-
-  @override
-  String get deleteAccountButton => 'Запросить удаление через 15 дней';
-
-  @override
-  String get deleteAccountScheduledNotice =>
-      'Ваш аккаунт запланирован к удалению через 15 дней. Не входите в аккаунт, если хотите удалить его навсегда.';
-
-  @override
   String get accountRestoredNotice =>
       'С возвращением! Запрос на удаление аккаунта отменен, а все данные восстановлены.';
 
@@ -2300,27 +2285,31 @@ class AppLocalizationsRu extends AppLocalizations {
   String get proFeatureHighlightedBadge => 'Включено в Pro';
 
   @override
-  String get deleteAccountNowTitle => 'Delete Account Permanently';
+  String get deleteAccountNowTitle => 'Удалить аккаунт навсегда';
 
   @override
   String get deleteAccountNowMessage =>
-      'Your account and all of your data (trips, expenses, packing lists, itinerary, travel map, vault documents and friends) will be deleted immediately and permanently. This cannot be undone.\n\nAn active Google Play subscription is not cancelled automatically. Please cancel it in Google Play.';
+      'Ваш аккаунт и все данные (поездки, расходы, списки вещей, маршрут, карта путешествий, документы из сейфа и друзья) будут удалены немедленно и безвозвратно. Это действие нельзя отменить.\n\nАктивная подписка Google Play не отменяется автоматически. Отмените её в Google Play.';
 
   @override
-  String get deleteAccountNowButton => 'Delete Permanently';
+  String get deleteAccountNowButton => 'Удалить навсегда';
 
   @override
-  String get deleteAccountPasswordLabel => 'Confirm with your password';
+  String get deleteAccountPasswordLabel => 'Подтвердите паролем';
 
   @override
   String get deleteAccountGoogleReauthHint =>
-      'To confirm, you will be asked to sign in with Google again.';
+      'Для подтверждения потребуется снова войти через Google.';
 
   @override
   String get deleteAccountDoneNotice =>
-      'Your account and all of your data have been permanently deleted.';
+      'Ваш аккаунт и все данные удалены безвозвратно.';
 
   @override
   String get deleteAccountFailedNotice =>
-      'Your account could not be deleted. Check your password and connection, then try again.';
+      'Не удалось удалить аккаунт. Проверьте пароль и подключение и повторите попытку.';
+
+  @override
+  String get subscriptionAutoRenewNotice =>
+      'Подписка продлевается автоматически в конце каждого периода, если не отменить её минимум за 24 часа до продления. Оплата списывается с вашего аккаунта Google Play. Отменить подписку можно в любое время в Google Play › Подписки.';
 }

@@ -5,6 +5,7 @@ import '../../features/budget/domain/expense.dart';
 import '../../features/checklist/domain/packing_item.dart';
 import '../../l10n/app_localizations.dart';
 import '../utils/currency_formatter.dart';
+import 'package:packbuddy/core/constants/app_constants.dart';
 
 /// Social & Itinerary Sharing Service (Feature F-8 & F-1)
 class ShareService {
@@ -40,7 +41,7 @@ class ShareService {
       buffer.writeln('🎒 $checklistLabel: $packedCount / $totalItems ($pct%)');
     }
 
-    if (trip.inviteCode != null && trip.inviteCode!.isNotEmpty) {
+    if (AppConstants.kInviteCodeJoinEnabled && trip.inviteCode != null && trip.inviteCode!.isNotEmpty) {
       buffer.writeln('');
       final joinTripLabel = l10n?.joinSharedTrip ?? 'Join this trip on PackBuddy with code';
       buffer.writeln('🤝 $joinTripLabel: ${trip.inviteCode}');

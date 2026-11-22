@@ -38,8 +38,26 @@ class LegalConsentLocalization {
   LegalConsentLocalization._();
 
   static const List<String> supportedLanguages = [
-    'tr', 'en', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'zh', 'ja',
-    'ko', 'hi', 'ar', 'nl', 'el', 'sv', 'pl', 'id', 'th', 'vi',
+    'tr',
+    'en',
+    'es',
+    'fr',
+    'de',
+    'it',
+    'pt',
+    'ru',
+    'zh',
+    'ja',
+    'ko',
+    'hi',
+    'ar',
+    'nl',
+    'el',
+    'sv',
+    'pl',
+    'id',
+    'th',
+    'vi',
   ];
 
   static String _cleanLang(String? lang) {
@@ -373,54 +391,152 @@ class LegalConsentLocalization {
     }
   }
 
+  /// Optional (never required) analytics consent. Analytics stay off unless this box is ticked.
   static String getOptionalAnalyticsCheckbox(String? lang) {
     switch (_cleanLang(lang)) {
       case 'tr':
-        return 'Uygulama deneyimini geliştirmek amacıyla anonim telemetri ve hata raporlarının toplanmasını onaylıyorum. (Zorunlu)';
+        return 'Uygulamayı geliştirmek için kullanım istatistiklerinin ve hata raporlarının (PostHog EU) toplanmasına izin veriyorum. (İsteğe bağlı)';
       case 'de':
-        return 'Ich willige in anonymisierte Telemetrie und Fehlerberichte zur Verbesserung der App-Stabilität ein. (Erforderlich)';
+        return 'Ich erlaube die Erfassung von Nutzungsstatistiken und Fehlerberichten (PostHog EU) zur Verbesserung der App. (Optional)';
       case 'fr':
-        return 'J\'accepte les rapports de télémétrie et d\'erreurs anonymes pour améliorer la stabilité. (Obligatoire)';
+        return 'J\'autorise la collecte de statistiques d\'utilisation et de rapports d\'erreurs (PostHog EU) pour améliorer l\'app. (Facultatif)';
       case 'es':
-        return 'Acepto compartir telemetría anónima e informes de errores para mejorar la aplicación. (Obligatorio)';
+        return 'Permito la recopilación de estadísticas de uso e informes de errores (PostHog EU) para mejorar la app. (Opcional)';
       case 'it':
-        return 'Accetto la condivisione di dati anonimi di telemetria e crash per migliorare l\'app. (Obbligatorio)';
+        return 'Consento la raccolta di statistiche d\'uso e report sugli errori (PostHog EU) per migliorare l\'app. (Facoltativo)';
       case 'pt':
-        return 'Concordo com a telemetria anônima e relatórios de falhas para aprimorar a estabilidade. (Obrigatório)';
+        return 'Permito a coleta de estatísticas de uso e relatórios de falhas (PostHog EU) para melhorar o app. (Opcional)';
       case 'ru':
-        return 'Я согласен(-на) на сбор анонимной телеметрии и отчетов об ошибках для улучшения приложения. (Обязательно)';
+        return 'Я разрешаю сбор статистики использования и отчетов об ошибках (PostHog EU) для улучшения приложения. (Необязательно)';
       case 'zh':
-        return '我同意收集匿名遥测与崩溃报告以优化应用性能与稳定性。（必选）';
+        return '我允许收集使用统计与崩溃报告（PostHog EU）以改进应用。（可选）';
       case 'ja':
-        return 'アプリの安定性向上のため、匿名のテレメトリおよびクラッシュレポートの収集に同意します。（必須）';
+        return 'アプリ改善のため、利用統計とクラッシュレポート（PostHog EU）の収集を許可します。（任意）';
       case 'ko':
-        return '앱 품질 개선을 위해 익명 진단 및 충돌 보고서 수집에 동의합니다. (필수)';
+        return '앱 개선을 위해 사용 통계 및 오류 보고서(PostHog EU) 수집을 허용합니다. (선택)';
       case 'ar':
-        return 'أوافق على جمع تقارير القياس والأخطاء المجهولة لتحسين استقرار التطبيق. (إلزامي)';
+        return 'أسمح بجمع إحصاءات الاستخدام وتقارير الأخطاء (PostHog EU) لتحسين التطبيق. (اختياري)';
       case 'hi':
-        return 'मैं ऐप अनुभव को बेहतर बनाने के लिए अनाम टेलीमेट्री और त्रुटि रिपोर्ट के संग्रह की अनुमति देता हूं। (अनिवार्य)';
+        return 'मैं ऐप को बेहतर बनाने के लिए उपयोग आँकड़ों और त्रुटि रिपोर्ट (PostHog EU) के संग्रह की अनुमति देता/देती हूँ। (वैकल्पिक)';
       case 'nl':
-        return 'Ik ga akkoord met anonieme telemetrie en foutrapporten om de app te verbeteren. (Verplicht)';
+        return 'Ik sta het verzamelen van gebruiksstatistieken en foutrapporten (PostHog EU) toe om de app te verbeteren. (Optioneel)';
       case 'el':
-        return 'Συμφωνώ με τη συλλογή ανώνυμων αναφορών σφαλμάτων για τη βελτίωση της εφαρμογής. (Υποχρεωτικό)';
+        return 'Επιτρέπω τη συλλογή στατιστικών χρήσης και αναφορών σφαλμάτων (PostHog EU) για τη βελτίωση της εφαρμογής. (Προαιρετικό)';
       case 'sv':
-        return 'Jag godkänner anonym telemetri och felrapporter för att förbättra appens stabilitet. (Obligatoriskt)';
+        return 'Jag tillåter insamling av användningsstatistik och felrapporter (PostHog EU) för att förbättra appen. (Valfritt)';
       case 'pl':
-        return 'Zgadzam się na anonimowe raporty o błędach w celu poprawy stabilności aplikacji. (Wymagane)';
+        return 'Zezwalam na zbieranie statystyk użytkowania i raportów o błędach (PostHog EU) w celu ulepszenia aplikacji. (Opcjonalne)';
       case 'id':
-        return 'Saya menyetujui pengumpulan telemetri anonim untuk meningkatkan stabilitas aplikasi. (Wajib)';
+        return 'Saya mengizinkan pengumpulan statistik penggunaan dan laporan kerusakan (PostHog EU) untuk meningkatkan aplikasi. (Opsional)';
       case 'th':
-        return 'ฉันยินยอมให้รวบรวมข้อมูลการทำงานและรายงานข้อผิดพลาดแบบไม่ระบุตัวตน (จำเป็น)';
+        return 'ฉันอนุญาตให้เก็บสถิติการใช้งานและรายงานข้อผิดพลาด (PostHog EU) เพื่อปรับปรุงแอป (ไม่บังคับ)';
       case 'vi':
-        return 'Tôi đồng ý gửi dữ liệu ẩn danh và báo cáo sự cố để nâng cao trải nghiệm ứng dụng. (Bắt buộc)';
+        return 'Tôi cho phép thu thập thống kê sử dụng và báo cáo lỗi (PostHog EU) để cải thiện ứng dụng. (Không bắt buộc)';
       case 'en':
       default:
-        return 'I agree to anonymous telemetry and crash reports (PostHog EU) to improve app stability. (Required)';
+        return 'I allow the collection of usage statistics and crash reports (PostHog EU) to improve the app. (Optional)';
     }
   }
 
+  /// Kept for backwards compatibility; analytics consent is optional.
   static String getMandatoryAnalyticsCheckbox(String? lang) =>
       getOptionalAnalyticsCheckbox(lang);
+
+  // --- External legal document links ---
+  static const String privacyPolicyUrl = 'https://packbuddy.app/privacy';
+  static const String termsOfServiceUrl = 'https://packbuddy.app/terms';
+
+  static String getPrivacyPolicyLink(String? lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'Aydınlatma Metni ve Gizlilik Politikası';
+      case 'de':
+        return 'Datenschutzerklärung';
+      case 'fr':
+        return 'Politique de confidentialité';
+      case 'es':
+        return 'Política de privacidad';
+      case 'it':
+        return 'Informativa sulla privacy';
+      case 'pt':
+        return 'Política de Privacidade';
+      case 'ru':
+        return 'Политика конфиденциальности';
+      case 'zh':
+        return '隐私政策';
+      case 'ja':
+        return 'プライバシーポリシー';
+      case 'ko':
+        return '개인정보 처리방침';
+      case 'ar':
+        return 'سياسة الخصوصية';
+      case 'hi':
+        return 'गोपनीयता नीति';
+      case 'nl':
+        return 'Privacybeleid';
+      case 'el':
+        return 'Πολιτική απορρήτου';
+      case 'sv':
+        return 'Integritetspolicy';
+      case 'pl':
+        return 'Polityka prywatności';
+      case 'id':
+        return 'Kebijakan Privasi';
+      case 'th':
+        return 'นโยบายความเป็นส่วนตัว';
+      case 'vi':
+        return 'Chính sách quyền riêng tư';
+      case 'en':
+      default:
+        return 'Privacy Policy';
+    }
+  }
+
+  static String getTermsLink(String? lang) {
+    switch (_cleanLang(lang)) {
+      case 'tr':
+        return 'Kullanım Koşulları';
+      case 'de':
+        return 'Nutzungsbedingungen';
+      case 'fr':
+        return 'Conditions d\'utilisation';
+      case 'es':
+        return 'Términos de uso';
+      case 'it':
+        return 'Termini di servizio';
+      case 'pt':
+        return 'Termos de Uso';
+      case 'ru':
+        return 'Условия использования';
+      case 'zh':
+        return '使用条款';
+      case 'ja':
+        return '利用規約';
+      case 'ko':
+        return '이용약관';
+      case 'ar':
+        return 'شروط الاستخدام';
+      case 'hi':
+        return 'उपयोग की शर्तें';
+      case 'nl':
+        return 'Gebruiksvoorwaarden';
+      case 'el':
+        return 'Όροι χρήσης';
+      case 'sv':
+        return 'Användarvillkor';
+      case 'pl':
+        return 'Warunki korzystania';
+      case 'id':
+        return 'Ketentuan Penggunaan';
+      case 'th':
+        return 'ข้อกำหนดการใช้งาน';
+      case 'vi':
+        return 'Điều khoản sử dụng';
+      case 'en':
+      default:
+        return 'Terms of Service';
+    }
+  }
 
   // --- Buttons ---
   static String getAcceptButton(String? lang) {
@@ -653,30 +769,54 @@ class LegalConsentLocalization {
     }
   }
 
-  static String getAcceptedStatus(String? lang, String version, String? dateStr) {
+  static String getAcceptedStatus(
+    String? lang,
+    String version,
+    String? dateStr,
+  ) {
     final clean = _cleanLang(lang);
     switch (clean) {
-      case 'tr': return 'Sözleşme Onaylandı: Sürüm $version';
-      case 'es': return 'Acuerdo aceptado: Versión $version';
-      case 'fr': return 'Contrat accepté : Version $version';
-      case 'de': return 'Vereinbarung akzeptiert: Version $version';
-      case 'it': return 'Accordo accettato: Versione $version';
-      case 'pt': return 'Termo aceito: Versão $version';
-      case 'ru': return 'Соглашение принято: Версия $version';
-      case 'zh': return '协议已同意：版本 $version';
-      case 'ja': return '規約に同意済み: バージョン $version';
-      case 'ko': return '약관 동의 완료: 버전 $version';
-      case 'hi': return 'अनुबंध स्वीकृत: संस्करण $version';
-      case 'ar': return 'تمت الموافقة على الاتفاقية: الإصدار $version';
-      case 'nl': return 'Overeenkomst geaccepteerd: Versie $version';
-      case 'el': return 'Η συμφωνία έγινε αποδεκτή: Έκδοση $version';
-      case 'sv': return 'Avtal godkänt: Version $version';
-      case 'pl': return 'Umowa zaakceptowana: Wersja $version';
-      case 'id': return 'Perjanjian Disetujui: Versi $version';
-      case 'th': return 'ยอมรับข้อตกลงแล้ว: เวอร์ชัน $version';
-      case 'vi': return 'Đã chấp nhận thỏa thuận: Phiên bản $version';
+      case 'tr':
+        return 'Sözleşme Onaylandı: Sürüm $version';
+      case 'es':
+        return 'Acuerdo aceptado: Versión $version';
+      case 'fr':
+        return 'Contrat accepté : Version $version';
+      case 'de':
+        return 'Vereinbarung akzeptiert: Version $version';
+      case 'it':
+        return 'Accordo accettato: Versione $version';
+      case 'pt':
+        return 'Termo aceito: Versão $version';
+      case 'ru':
+        return 'Соглашение принято: Версия $version';
+      case 'zh':
+        return '协议已同意：版本 $version';
+      case 'ja':
+        return '規約に同意済み: バージョン $version';
+      case 'ko':
+        return '약관 동의 완료: 버전 $version';
+      case 'hi':
+        return 'अनुबंध स्वीकृत: संस्करण $version';
+      case 'ar':
+        return 'تمت الموافقة على الاتفاقية: الإصدار $version';
+      case 'nl':
+        return 'Overeenkomst geaccepteerd: Versie $version';
+      case 'el':
+        return 'Η συμφωνία έγινε αποδεκτή: Έκδοση $version';
+      case 'sv':
+        return 'Avtal godkänt: Version $version';
+      case 'pl':
+        return 'Umowa zaakceptowana: Wersja $version';
+      case 'id':
+        return 'Perjanjian Disetujui: Versi $version';
+      case 'th':
+        return 'ยอมรับข้อตกลงแล้ว: เวอร์ชัน $version';
+      case 'vi':
+        return 'Đã chấp nhận thỏa thuận: Phiên bản $version';
       case 'en':
-      default: return 'Agreement Accepted: Version $version';
+      default:
+        return 'Agreement Accepted: Version $version';
     }
   }
 
@@ -932,7 +1072,8 @@ class LegalConsentLocalization {
         LegalArticle(
           number: 2,
           title: 'Toplanan, İşlenen ve Saklanan Veri Kategorileri',
-          content: 'PackBuddy aşağıdaki veri kategorilerini toplamakta, şifrelemekte ve saklamaktadır:\n\n'
+          content:
+              'PackBuddy aşağıdaki veri kategorilerini toplamakta, şifrelemekte ve saklamaktadır:\n\n'
               'a) Hesap ve Kimlik Bilgileri: E-posta adresi, ad-soyad, kullanıcı takma adı, Firebase Authentication benzersiz kullanıcı kimliği (UID), profil avatar bağlantısı, kayıt tarihi, son oturum açma zamanı, aktif oturum süresi ve oturum geçmişi.\n\n'
               'b) Seyahat ve Organizasyon Bilgileri: Gezi adları, hedef ülkeler ve şehirler, kalkış/varış tarihleri, gezi notları, ziyaret edilen ülkeler harita kayıtları.\n\n'
               'c) Bagaj ve Eşya Listeleri: Bagaj modelleri, fiziksel ebatlar, dara (boş) ağırlıkları, havayolu limitleri, bagaj fotoğrafları, paketleme kontrol listeleri, eşya isimleri, miktarları, kategorileri ve özel ağırlıkları.\n\n'
@@ -943,7 +1084,8 @@ class LegalConsentLocalization {
         LegalArticle(
           number: 3,
           title: 'Verilerin İşlenme Amaçları ve Hukuki Dayanakları',
-          content: 'Toplanan veriler aşağıdaki meşru amaçlarla işlenir (GDPR Md. 6, KVKK Md. 5):\n\n'
+          content:
+              'Toplanan veriler aşağıdaki meşru amaçlarla işlenir (GDPR Md. 6, KVKK Md. 5):\n\n'
               '• Kullanıcı hesabının oluşturulması, kimlik doğrulaması ve güvenliğinin sağlanması,\n'
               '• Seyahat, bagaj ve paketleme listelerinin cihazlar arasında senkronize edilmesi,\n'
               '• Havayolu ağırlık limitlerine göre fazla bagaj uyarılarının hesaplanması,\n'
@@ -954,13 +1096,15 @@ class LegalConsentLocalization {
         LegalArticle(
           number: 4,
           title: 'Biyometrik Verilerin Yerel İşlenmesi ve Yasal Güvence',
-          content: 'Kullanıcı, Gizli Kasa kilidini açmak için Parmak İzi (Touch ID / Fingerprint) veya Yüz Tanıma (Face ID / Biometric Prompt) özelliklerini etkinleştirebilir.\n\n'
+          content:
+              'Kullanıcı, Gizli Kasa kilidini açmak için Parmak İzi (Touch ID / Fingerprint) veya Yüz Tanıma (Face ID / Biometric Prompt) özelliklerini etkinleştirebilir.\n\n'
               'ÖNEMLİ YASAL TAAHHÜT: Biyometrik veriler hiçbir koşulda PackBuddy sunucularına, Firebase\'e veya herhangi bir üçüncü tarafa iletilmez, kopyalanmaz veya saklanmaz. Biyometrik eşleştirme işlemi tamamen kullanıcının kendi cihazının donanımsal güvenlik çipinde (Apple Secure Enclave veya Android Hardware Keystore) yerel olarak yürütülür. PackBuddy işletim sisteminden yalnızca doğrulamanın başarılı veya başarısız olduğuna dair kriptografik bir bayrak alır.',
         ),
         LegalArticle(
           number: 5,
           title: 'Cihaz Donanımı ve Sistem İzinleri',
-          content: 'Uygulama aşağıdaki sistem izinlerini yalnızca belirtilen meşru ihtiyaçlar için talep eder:\n\n'
+          content:
+              'Uygulama aşağıdaki sistem izinlerini yalnızca belirtilen meşru ihtiyaçlar için talep eder:\n\n'
               '• Kamera İzni (android.permission.CAMERA): Yalnızca bagaj fotoğrafı ekleme ve Kasa için seyahat belgelerini fotoğraflama anında kullanıcının açık eylemiyle kullanılır. Arka planda gizli çekim yapılmaz.\n\n'
               '• Fotoğraf ve Depolama İzni (READ_MEDIA_IMAGES / READ_EXTERNAL_STORAGE): Kullanıcının seçtiği bilet PDF\'lerini veya seyahat fotoğraflarını yüklemek için kullanılır. Cihazdaki diğer kişisel dosyalara erişilmez.\n\n'
               '• Bildirim İzni (POST_NOTIFICATIONS): Kalkış geri sayımları, paketleme alarmları ve kritik hesap bildirimlerinin iletilmesi için yerel ve FCM bildirimleri kullanılır.\n\n'
@@ -970,13 +1114,15 @@ class LegalConsentLocalization {
         LegalArticle(
           number: 6,
           title: 'Konum Verileri, IP Geolocation ve Saat Dilimi',
-          content: 'PackBuddy, kullanıcının kesin GPS konumunu arka planda sürekli olarak İZLEMEZ veya hareket geçmişi kaydetmez.\n\n'
+          content:
+              'PackBuddy, kullanıcının kesin GPS konumunu arka planda sürekli olarak İZLEMEZ veya hareket geçmişi kaydetmez.\n\n'
               'Yalnızca seyahat anında otomatik yerel para birimi tespiti ve ilgili hava durumu/şehir önerileri sunmak amacıyla, kullanıcının internet bağlantı IP adresi üzerinden kaba (şehir/ülke düzeyinde) konum çözümlemesi (HTTPS IP sorgusu ve sistem saat dilimi) yapılır.',
         ),
         LegalArticle(
           number: 7,
           title: 'Analitik, Telemetri ve PostHog (EU Cloud) Güvencesi',
-          content: 'Uygulama performansını ölçmek, çökme (crash) ve hataları gidermek amacıyla PostHog analiz platformu (sunucuları Almanya/Frankfurt, Avrupa Birliği sınırları içerisindedir) kullanılır.\n\n'
+          content:
+              'Uygulama performansını ölçmek, çökme (crash) ve hataları gidermek amacıyla PostHog analiz platformu (sunucuları Almanya/Frankfurt, Avrupa Birliği sınırları içerisindedir) kullanılır.\n\n'
               'SIKI PII (Kişisel Tanımlanabilir Bilgi) MASKELEME GÜVENCESİ:\n'
               'PackBuddy PostHog SDK yapılandırmasında maskAllTexts = true ve maskAllImages = true bayrakları varsayılan olarak aktiftir. Bu sayede kullanıcının yazdığı hiçbir özel not, eşya ismi, seyahat planı veya kasa fotoğrafı ekran kayıtlarına veya analitik kayıtlarına yansımaz; tüm metinler ve görseller istemci tarafında sansürlenir.\n\n'
               'Kullanıcı, dilediği zaman ayarlar veya onay ekranından isteğe bağlı analitik veri paylaşımını kapatma hakkına sahiptir.',
@@ -984,13 +1130,15 @@ class LegalConsentLocalization {
         LegalArticle(
           number: 8,
           title: 'Satın Alma, Abonelik ve Finansal Bilgilerin Güvenliği',
-          content: 'PackBuddy Pro abonelikleri ve lisansları resmi Google Play Store ve Apple App Store mağaza altyapıları üzerinden satın alınır.\n\n'
+          content:
+              'PackBuddy Pro abonelikleri ve lisansları resmi Google Play Store ve Apple App Store mağaza altyapıları üzerinden satın alınır.\n\n'
               'Kredi kartı numarası, son kullanma tarihi, CVC kodu, banka hesap bilgileri veya fatura ödeme detayları PackBuddy tarafından ASLA talep edilmez, görüntülenemez, sunucularımızda saklanamaz. Tüm finansal işlemler doğrudan Google LLC veya Apple Inc. PCI-DSS uyumlu ödeme ağ geçitleri tarafından korunur. PackBuddy yalnızca satın alma işleminin doğrulanma makbuzunu (purchase token) ve yetkilendirme durumunu işler.',
         ),
         LegalArticle(
           number: 9,
           title: 'Kullanıcının Yasal Hakları ve Veri Silme Güvencesi (GDPR & KVKK)',
-          content: 'Kullanıcı, GDPR Md. 15-22 ve KVKK Md. 11 uyarınca;\n\n'
+          content:
+              'Kullanıcı, GDPR Md. 15-22 ve KVKK Md. 11 uyarınca;\n\n'
               'a) Kişisel verilerinin işlenip işlenmediğini öğrenme ve bilgi talep etme,\n'
               'b) İşlenen verilerini kopyalama ve dışa aktarma (Veri Taşınabilirliği),\n'
               'c) Eksik veya yanlış işlenen verilerin düzeltilmesini isteme,\n'
@@ -1000,7 +1148,8 @@ class LegalConsentLocalization {
         LegalArticle(
           number: 10,
           title: 'Yürürlük, Değişiklikler ve Yasal İletişim',
-          content: 'İşbu sözleşme, Kullanıcı tarafından dijital onay kutuları işaretlenerek "Onayla ve Devam Et" butonuna basıldığı anda yürürlüğe girer.\n\n'
+          content:
+              'İşbu sözleşme, Kullanıcı tarafından dijital onay kutuları işaretlenerek "Onayla ve Devam Et" butonuna basıldığı anda yürürlüğe girer.\n\n'
               'Sözleşmenin onaylandığı tarih ve saat, sözleşme sürümü (v1.0.0) ve kullanıcı ID\'si yasal uyumluluk ve delil güvenliği amacıyla kayıt altına alınır. Sözleşme şartlarında esaslı bir değişiklik yapılması halinde, kullanıcılardan güncel sürüm için yeniden onay talep edilecektir.\n\n'
               'Her türlü yasal bildirim ve veri koruma talepleriniz için uygulama içi geri bildirim veya resmi destek kanalları üzerinden veri sorumlusuna başvurabilirsiniz.',
         ),
@@ -1017,7 +1166,8 @@ class LegalConsentLocalization {
       LegalArticle(
         number: 2,
         title: 'Categories of Personal Data Collected and Processed',
-        content: 'PackBuddy collects, encrypts, and stores the following categories of data:\n\n'
+        content:
+            'PackBuddy collects, encrypts, and stores the following categories of data:\n\n'
             'a) Identity & Authentication Data: Email address, display name, Firebase Authentication UID, avatar URL, registration timestamp, last active timestamp, session duration, and session count.\n\n'
             'b) Travel & Itinerary Data: Trip names, destinations, departure/return dates, travel notes, visited countries, and world travel map markings.\n\n'
             'c) Luggage & Packing Data: Luggage profiles (brand, dimensions, tare weight, airline allowances, luggage photos), packing checklists, item descriptions, categories, quantities, and custom weights.\n\n'
@@ -1028,7 +1178,8 @@ class LegalConsentLocalization {
       LegalArticle(
         number: 3,
         title: 'Purposes and Legal Grounds for Processing',
-        content: 'Data is processed under GDPR Article 6 and applicable privacy laws for the following legitimate purposes:\n\n'
+        content:
+            'Data is processed under GDPR Article 6 and applicable privacy laws for the following legitimate purposes:\n\n'
             '• User identity verification, authentication, and platform security;\n'
             '• Synchronizing itineraries, luggage, and packing checklists across user devices;\n'
             '• Computing luggage allowances and overweight warnings;\n'
@@ -1039,13 +1190,15 @@ class LegalConsentLocalization {
       LegalArticle(
         number: 4,
         title: 'Biometric Data Processing & Local Security Guarantee',
-        content: 'The User may elect to enable Fingerprint (Touch ID) or Facial Recognition (Face ID / Biometric Prompt) to unlock the Document Vault.\n\n'
+        content:
+            'The User may elect to enable Fingerprint (Touch ID) or Facial Recognition (Face ID / Biometric Prompt) to unlock the Document Vault.\n\n'
             'STATUTORY GUARANTEE: Biometric identifiers are NEVER transmitted to, stored on, or processed by PackBuddy servers, Google Firebase, or third parties. Biometric matching is handled exclusively by the local hardware security chip of your device (Apple Secure Enclave or Android Hardware Keystore). PackBuddy receives solely a cryptographic boolean pass/fail status token.',
       ),
       LegalArticle(
         number: 5,
         title: 'Hardware & System Permissions',
-        content: 'The Application requests system permissions solely when needed for specific user actions:\n\n'
+        content:
+            'The Application requests system permissions solely when needed for specific user actions:\n\n'
             '• Camera (android.permission.CAMERA): Invoked only upon explicit user action to capture luggage photos or scan documents. Never operates in the background.\n\n'
             '• Media & Storage (READ_MEDIA_IMAGES / READ_EXTERNAL_STORAGE): Used exclusively to import user-selected tickets or photos. Unrelated personal files are never accessed.\n\n'
             '• Notifications (POST_NOTIFICATIONS): Used for departure countdowns, packing reminders, and security alerts via local/FCM channels.\n\n'
@@ -1055,13 +1208,15 @@ class LegalConsentLocalization {
       LegalArticle(
         number: 6,
         title: 'Location, IP Geolocation & Timezone',
-        content: 'PackBuddy DOES NOT continuously track your precise GPS coordinates in the background.\n\n'
+        content:
+            'PackBuddy DOES NOT continuously track your precise GPS coordinates in the background.\n\n'
             'Coarse IP lookup (city/country level via HTTPS) and system timezone are queried solely to determine appropriate local currencies and travel recommendations at the time of use.',
       ),
       LegalArticle(
         number: 7,
         title: 'Analytics, Telemetry & PostHog (EU Cloud) Safeguards',
-        content: 'To maintain application stability and address crashes, PackBuddy utilizes PostHog EU Cloud (Frankfurt, Germany).\n\n'
+        content:
+            'To maintain application stability and address crashes, PackBuddy utilizes PostHog EU Cloud (Frankfurt, Germany).\n\n'
             'STRICT PII MASKING SAFEGUARD:\n'
             'The PostHog SDK is configured with maskAllTexts = true and maskAllImages = true by default. Private travel notes, checklist items, vault documents, and photos are completely masked on the client side and are never transmitted to analytics servers.\n\n'
             'Users may opt out of non-essential analytics at any time via the consent toggles.',
@@ -1069,13 +1224,15 @@ class LegalConsentLocalization {
       LegalArticle(
         number: 8,
         title: 'Billing, In-App Purchases & Financial Security',
-        content: 'PackBuddy Pro subscriptions are processed exclusively through Google Play Billing and Apple App Store in-app purchases.\n\n'
+        content:
+            'PackBuddy Pro subscriptions are processed exclusively through Google Play Billing and Apple App Store in-app purchases.\n\n'
             'Credit card numbers, bank account details, and billing information are NEVER collected, stored, or processed by PackBuddy. All financial transactions are managed under PCI-DSS standards by Google LLC and Apple Inc. PackBuddy handles only receipt tokens and entitlement flags.',
       ),
       LegalArticle(
         number: 9,
         title: 'User Rights & Permanent Data Deletion (GDPR & KVKK)',
-        content: 'Under GDPR Articles 15-22 and KVKK Article 11, users possess the right to:\n\n'
+        content:
+            'Under GDPR Articles 15-22 and KVKK Article 11, users possess the right to:\n\n'
             'a) Request information and confirmation regarding their processed personal data;\n'
             'b) Request data portability and export of checklists and trips;\n'
             'c) Rectify incomplete or inaccurate personal data;\n'
@@ -1085,11 +1242,11 @@ class LegalConsentLocalization {
       LegalArticle(
         number: 10,
         title: 'Effective Date, Amendments & Legal Contact',
-        content: 'This Agreement becomes legally binding upon the User checking the mandatory checkboxes and clicking "Accept & Continue".\n\n'
+        content:
+            'This Agreement becomes legally binding upon the User checking the mandatory checkboxes and clicking "Accept & Continue".\n\n'
             'The timestamp of acceptance, agreement version (v1.0.0), and User UID are securely recorded for compliance auditing. In the event of material revisions, renewed consent will be requested.\n\n'
             'For data privacy inquiries or exercising statutory rights, users may contact the Data Controller via in-app feedback or official support channels.',
       ),
     ];
   }
 }
-

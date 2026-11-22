@@ -1388,20 +1388,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get deleteAccountTitle => 'حذف الحساب';
 
   @override
-  String get deleteAccountConfirmationTitle => 'طلب حذف الحساب خلال 15 يومًا';
-
-  @override
-  String get deleteAccountConfirmationMessage =>
-      'سيتم جدولة حذف حسابك ورحلاتك ومصاريفك ومستندات الخزنة نهائيًا خلال 15 يومًا.\n\n• لا تقم بتسجيل الدخول لمدة 15 يومًا لإتمام الحذف.\n• إذا قمت بتسجيل الدخول خلال 15 يومًا، فستتم استعادة حسابك وجميع بياناتك تلقائيًا.\n\nهل تريد المتابعة؟';
-
-  @override
-  String get deleteAccountButton => 'طلب الحذف خلال 15 يومًا';
-
-  @override
-  String get deleteAccountScheduledNotice =>
-      'تمت جدولة حذف حسابك خلال 15 يومًا. لا تسجل الدخول إذا كنت ترغب في حذفه نهائيًا.';
-
-  @override
   String get accountRestoredNotice =>
       'مرحبًا بعودتك! تم إلغاء طلب حذف حسابك واستعادة جميع بياناتك.';
 
@@ -2276,27 +2262,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get proFeatureHighlightedBadge => 'مضمن في Pro';
 
   @override
-  String get deleteAccountNowTitle => 'Delete Account Permanently';
+  String get deleteAccountNowTitle => 'حذف الحساب نهائيًا';
 
   @override
   String get deleteAccountNowMessage =>
-      'Your account and all of your data (trips, expenses, packing lists, itinerary, travel map, vault documents and friends) will be deleted immediately and permanently. This cannot be undone.\n\nAn active Google Play subscription is not cancelled automatically. Please cancel it in Google Play.';
+      'سيتم حذف حسابك وجميع بياناتك (الرحلات والنفقات وقوائم الأمتعة وخطة الرحلة وخريطة السفر ومستندات الخزنة والأصدقاء) فورًا وبشكل نهائي. لا يمكن التراجع عن هذا الإجراء.\n\nلا يُلغى اشتراك Google Play النشط تلقائيًا. يُرجى إلغاؤه من Google Play.';
 
   @override
-  String get deleteAccountNowButton => 'Delete Permanently';
+  String get deleteAccountNowButton => 'حذف نهائيًا';
 
   @override
-  String get deleteAccountPasswordLabel => 'Confirm with your password';
+  String get deleteAccountPasswordLabel => 'أكّد باستخدام كلمة المرور';
 
   @override
   String get deleteAccountGoogleReauthHint =>
-      'To confirm, you will be asked to sign in with Google again.';
+      'للتأكيد، سيُطلب منك تسجيل الدخول باستخدام Google مرة أخرى.';
 
   @override
-  String get deleteAccountDoneNotice =>
-      'Your account and all of your data have been permanently deleted.';
+  String get deleteAccountDoneNotice => 'تم حذف حسابك وجميع بياناتك نهائيًا.';
 
   @override
   String get deleteAccountFailedNotice =>
-      'Your account could not be deleted. Check your password and connection, then try again.';
+      'تعذّر حذف حسابك. تحقّق من كلمة المرور والاتصال، ثم حاول مرة أخرى.';
+
+  @override
+  String get subscriptionAutoRenewNotice =>
+      'يتجدد الاشتراك تلقائيًا في نهاية كل فترة ما لم يُلغَ قبل التجديد بـ 24 ساعة على الأقل. يتم تحصيل الدفع من حساب Google Play الخاص بك. يمكنك الإلغاء في أي وقت من Google Play › الاشتراكات.';
 }

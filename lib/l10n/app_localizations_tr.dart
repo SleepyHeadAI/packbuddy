@@ -1407,20 +1407,6 @@ class AppLocalizationsTr extends AppLocalizations {
   String get deleteAccountTitle => 'Hesabı Sil';
 
   @override
-  String get deleteAccountConfirmationTitle => '15 Günlük Hesap Silme Talebi';
-
-  @override
-  String get deleteAccountConfirmationMessage =>
-      'Hesabınız, seyahatleriniz, harcamalarınız ve kasa belgeleriniz 15 gün sonra kalıcı olarak silinmek üzere planlanacaktır.\n\n• Silmenin tamamlanması için 15 gün boyunca giriş yapmayın.\n• 15 gün içinde giriş yaparsanız hesabınız ve tüm verileriniz otomatik olarak geri yüklenir.\n\nDevam etmek istiyor musunuz?';
-
-  @override
-  String get deleteAccountButton => '15 Günlük Silme Talebi Gönder';
-
-  @override
-  String get deleteAccountScheduledNotice =>
-      'Hesabınız 15 gün içinde silinmek üzere planlandı. Kalıcı olarak silinmesini istiyorsanız bu süre boyunca giriş yapmayın.';
-
-  @override
   String get accountRestoredNotice =>
       'Tekrar hoş geldiniz! Hesap silme talebiniz iptal edildi ve tüm verileriniz geri yüklendi.';
 
@@ -2325,4 +2311,8 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get deleteAccountFailedNotice =>
       'Hesabınız silinemedi. Şifrenizi ve bağlantınızı kontrol edip tekrar deneyin.';
+
+  @override
+  String get subscriptionAutoRenewNotice =>
+      'Abonelik, yenileme tarihinden en az 24 saat önce iptal edilmedikçe her dönemin sonunda otomatik olarak yenilenir. Ödeme Google Play hesabınızdan tahsil edilir. Dilediğiniz zaman Google Play › Abonelikler bölümünden iptal edebilirsiniz.';
 }

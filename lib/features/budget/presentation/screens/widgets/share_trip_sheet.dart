@@ -16,6 +16,7 @@ import 'package:packbuddy/features/profile/domain/friend_localization.dart';
 import 'package:packbuddy/features/profile/presentation/controllers/friends_controller.dart';
 import 'package:packbuddy/features/profile/presentation/widgets/user_avatar.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
+import 'package:packbuddy/core/constants/app_constants.dart';
 
 /// Interactive Sheet for Collaborative Trip Sharing (F-1) & Social Sharing (F-8)
 class ShareTripSheet extends ConsumerStatefulWidget {
@@ -30,9 +31,7 @@ class ShareTripSheet extends ConsumerStatefulWidget {
       useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(ctx).viewInsets.bottom,
-        ),
+        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
         child: ShareTripSheet(trip: trip),
       ),
     );
@@ -51,7 +50,8 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
   void initState() {
     super.initState();
     _inviteCode = widget.trip.inviteCode;
-    if (_inviteCode == null || _inviteCode!.isEmpty) {
+    if (AppConstants.kInviteCodeJoinEnabled &&
+        (_inviteCode == null || _inviteCode!.isEmpty)) {
       _initInviteCode();
     }
   }
@@ -64,7 +64,9 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
 
   Future<void> _initInviteCode() async {
     setState(() => _isLoading = true);
-    final code = await ref.read(tripControllerProvider.notifier).generateInviteCode(widget.trip.id);
+    final code = await ref
+        .read(tripControllerProvider.notifier)
+        .generateInviteCode(widget.trip.id);
     if (mounted) {
       setState(() {
         _inviteCode = code;
@@ -77,13 +79,17 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
     final text = _collabController.text.trim();
     if (text.isEmpty) return;
 
-    await ref.read(tripControllerProvider.notifier).addCollaborator(widget.trip.id, text);
+    await ref
+        .read(tripControllerProvider.notifier)
+        .addCollaborator(widget.trip.id, text);
     _collabController.clear();
     setState(() {});
   }
 
   Future<void> _removeCollaborator(String email) async {
-    await ref.read(tripControllerProvider.notifier).removeCollaborator(widget.trip.id, email);
+    await ref
+        .read(tripControllerProvider.notifier)
+        .removeCollaborator(widget.trip.id, email);
     setState(() {});
   }
 
@@ -95,7 +101,10 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
 
     // Watch updated trip from provider
     final trips = ref.watch(tripControllerProvider).trips;
-    final currentTrip = trips.firstWhere((t) => t.id == widget.trip.id, orElse: () => widget.trip);
+    final currentTrip = trips.firstWhere(
+      (t) => t.id == widget.trip.id,
+      orElse: () => widget.trip,
+    );
     final code = _inviteCode ?? currentTrip.inviteCode ?? '...';
 
     return Container(
@@ -117,7 +126,9 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
                   width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    color: theme.colorScheme.outlineVariant.withValues(
+                      alpha: 0.5,
+                    ),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -155,7 +166,9 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
                           ),
                         ),
                         Text(
-                          currentTrip.title.isNotEmpty ? currentTrip.title : currentTrip.destination,
+                          currentTrip.title.isNotEmpty
+                              ? currentTrip.title
+                              : currentTrip.destination,
                           style: TextStyle(
                             fontSize: 12,
                             color: theme.colorScheme.onSurfaceVariant,
@@ -170,211 +183,256 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
               ),
               const SizedBox(height: 18),
 
-              // Feature F-1: Invite Code Card
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.25),
+              // Feature F-1: Invite Code Card (hidden in v1.0: invite-code join is disabled)
+              if (AppConstants.kInviteCodeJoinEnabled) ...[
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF1E293B)
+                        : const Color(0xFFF1F5F9),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            l10n?.inviteCode ?? 'Collaborator Invite Code',
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w700,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                          if (_isLoading)
+                            const SizedBox(
+                              width: 14,
+                              height: 14,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: SelectableText(
+                              code,
+                              style: theme.textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 2,
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ),
+                          ),
+                          IconButton.filledTonal(
+                            icon: const Icon(Icons.copy_rounded, size: 18),
+                            tooltip: l10n?.copyCode ?? 'Copy Code',
+                            onPressed: () {
+                              Clipboard.setData(ClipboardData(text: code));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    l10n?.codeCopied ??
+                                        'Invite code copied to clipboard',
+                                  ),
+                                  duration: const Duration(seconds: 2),
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            },
+                          ),
+                          const SizedBox(width: 6),
+                          IconButton.filled(
+                            icon: const Icon(Icons.send_rounded, size: 18),
+                            tooltip: l10n?.shareTripInvite ?? 'Send Invite',
+                            onPressed: () {
+                              ShareService.shareInviteCode(
+                                trip: currentTrip,
+                                inviteCode: code,
+                                l10n: l10n,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          l10n?.inviteCode ?? 'Collaborator Invite Code',
-                          style: TextStyle(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w700,
-                            color: theme.colorScheme.primary,
-                          ),
-                        ),
-                        if (_isLoading)
-                          const SizedBox(
-                            width: 14,
-                            height: 14,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: SelectableText(
-                            code,
-                            style: theme.textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 2,
-                              color: theme.colorScheme.onSurface,
-                            ),
-                          ),
-                        ),
-                        IconButton.filledTonal(
-                          icon: const Icon(Icons.copy_rounded, size: 18),
-                          tooltip: l10n?.copyCode ?? 'Copy Code',
-                          onPressed: () {
-                            Clipboard.setData(ClipboardData(text: code));
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  l10n?.codeCopied ?? 'Invite code copied to clipboard',
-                                ),
-                                duration: const Duration(seconds: 2),
-                                behavior: SnackBarBehavior.floating,
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(width: 6),
-                        IconButton.filled(
-                          icon: const Icon(Icons.send_rounded, size: 18),
-                          tooltip: l10n?.shareTripInvite ?? 'Send Invite',
-                          onPressed: () {
-                            ShareService.shareInviteCode(
-                              trip: currentTrip,
-                              inviteCode: code,
-                              l10n: l10n,
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
+              ],
 
               // Feature: Quick Add from Friends
-              Builder(builder: (context) {
-                final friends = ref.watch(friendsControllerProvider).friends;
-                if (friends.isEmpty) return const SizedBox.shrink();
-                final lang = Localizations.localeOf(context).languageCode;
+              Builder(
+                builder: (context) {
+                  final friends = ref.watch(friendsControllerProvider).friends;
+                  if (friends.isEmpty) return const SizedBox.shrink();
+                  final lang = Localizations.localeOf(context).languageCode;
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          FriendLocalization.getAddFromFriends(lang),
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: theme.colorScheme.onSurfaceVariant,
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            FriendLocalization.getAddFromFriends(lang),
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
                           ),
-                        ),
-                        Text(
-                          '${friends.length}',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: theme.colorScheme.primary,
+                          Text(
+                            '${friends.length}',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: theme.colorScheme.primary,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      height: 52,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        physics: const BouncingScrollPhysics(),
-                        itemCount: friends.length,
-                        separatorBuilder: (_, _) => const SizedBox(width: 8),
-                        itemBuilder: (context, index) {
-                          final friend = friends[index];
-                          final handle = friend.username != null && friend.username!.isNotEmpty
-                              ? '@${friend.username}'
-                              : (friend.displayName ?? friend.uid);
-                          final isAdded = currentTrip.collaborators.any((c) =>
-                              c.toLowerCase() == handle.toLowerCase() ||
-                              (friend.username != null && c.toLowerCase() == friend.username!.toLowerCase()) ||
-                              c == friend.uid);
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: 52,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: friends.length,
+                          separatorBuilder: (_, _) => const SizedBox(width: 8),
+                          itemBuilder: (context, index) {
+                            final friend = friends[index];
+                            final handle =
+                                friend.username != null &&
+                                    friend.username!.isNotEmpty
+                                ? '@${friend.username}'
+                                : (friend.displayName ?? friend.uid);
+                            final isAdded = currentTrip.collaborators.any(
+                              (c) =>
+                                  c.toLowerCase() == handle.toLowerCase() ||
+                                  (friend.username != null &&
+                                      c.toLowerCase() ==
+                                          friend.username!.toLowerCase()) ||
+                                  c == friend.uid,
+                            );
 
-                          return InkWell(
-                            borderRadius: BorderRadius.circular(14),
-                            onTap: () async {
-                              HapticFeedback.lightImpact();
-                              if (isAdded) {
-                                final toRemove = currentTrip.collaborators.firstWhere((c) =>
-                                    c.toLowerCase() == handle.toLowerCase() ||
-                                    (friend.username != null && c.toLowerCase() == friend.username!.toLowerCase()) ||
-                                    c == friend.uid);
-                                await _removeCollaborator(toRemove);
-                              } else {
-                                await ref.read(tripControllerProvider.notifier).addCollaborator(widget.trip.id, handle);
-                                if (mounted) setState(() {});
-                              }
-                            },
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: isAdded
-                                    ? theme.colorScheme.primaryContainer.withValues(alpha: 0.5)
-                                    : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(
+                            return InkWell(
+                              borderRadius: BorderRadius.circular(14),
+                              onTap: () async {
+                                HapticFeedback.lightImpact();
+                                if (isAdded) {
+                                  final toRemove = currentTrip.collaborators
+                                      .firstWhere(
+                                        (c) =>
+                                            c.toLowerCase() ==
+                                                handle.toLowerCase() ||
+                                            (friend.username != null &&
+                                                c.toLowerCase() ==
+                                                    friend.username!
+                                                        .toLowerCase()) ||
+                                            c == friend.uid,
+                                      );
+                                  await _removeCollaborator(toRemove);
+                                } else {
+                                  await ref
+                                      .read(tripControllerProvider.notifier)
+                                      .addCollaborator(widget.trip.id, handle);
+                                  if (mounted) setState(() {});
+                                }
+                              },
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
                                   color: isAdded
-                                      ? theme.colorScheme.primary
-                                      : theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
-                                  width: isAdded ? 1.5 : 1,
+                                      ? theme.colorScheme.primaryContainer
+                                            .withValues(alpha: 0.5)
+                                      : theme
+                                            .colorScheme
+                                            .surfaceContainerHighest
+                                            .withValues(alpha: 0.4),
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(
+                                    color: isAdded
+                                        ? theme.colorScheme.primary
+                                        : theme.colorScheme.outlineVariant
+                                              .withValues(alpha: 0.4),
+                                    width: isAdded ? 1.5 : 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    UserAvatar(
+                                      photoUrl: friend.photoUrl,
+                                      displayName: friend.displayName,
+                                      size: 28,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          friend.displayName?.isNotEmpty == true
+                                              ? friend.displayName!
+                                              : (friend.username ?? 'Friend'),
+                                          style: const TextStyle(
+                                            fontSize: 11.5,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          handle,
+                                          style: TextStyle(
+                                            fontSize: 9.5,
+                                            color: isAdded
+                                                ? theme.colorScheme.primary
+                                                : theme
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
+                                            fontWeight: isAdded
+                                                ? FontWeight.w700
+                                                : FontWeight.normal,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Icon(
+                                      isAdded
+                                          ? Icons.check_circle_rounded
+                                          : Icons.add_circle_outline_rounded,
+                                      size: 16,
+                                      color: isAdded
+                                          ? theme.colorScheme.primary
+                                          : theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                  ],
                                 ),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  UserAvatar(
-                                    photoUrl: friend.photoUrl,
-                                    displayName: friend.displayName,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        friend.displayName?.isNotEmpty == true
-                                            ? friend.displayName!
-                                            : (friend.username ?? 'Friend'),
-                                        style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      Text(
-                                        handle,
-                                        style: TextStyle(
-                                          fontSize: 9.5,
-                                          color: isAdded ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
-                                          fontWeight: isAdded ? FontWeight.w700 : FontWeight.normal,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Icon(
-                                    isAdded ? Icons.check_circle_rounded : Icons.add_circle_outline_rounded,
-                                    size: 16,
-                                    color: isAdded ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 14),
-                  ],
-                );
-              }),
+                      const SizedBox(height: 14),
+                    ],
+                  );
+                },
+              ),
 
               // Collaborators List
               Text(
@@ -393,9 +451,14 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
                     child: TextField(
                       controller: _collabController,
                       decoration: InputDecoration(
-                        hintText: l10n?.collaboratorEmailOrNameHint ?? 'alex@example.com / Name',
+                        hintText:
+                            l10n?.collaboratorEmailOrNameHint ??
+                            'alex@example.com / Name',
                         isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -410,7 +473,10 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
                     ),
                     child: const Icon(Icons.person_add_rounded, size: 18),
                   ),
@@ -426,7 +492,9 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
                   children: currentTrip.collaborators.map((email) {
                     return Chip(
                       avatar: CircleAvatar(
-                        backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.2),
+                        backgroundColor: theme.colorScheme.primary.withValues(
+                          alpha: 0.2,
+                        ),
                         child: Text(
                           email.isNotEmpty ? email[0].toUpperCase() : '?',
                           style: TextStyle(
@@ -436,10 +504,7 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
                           ),
                         ),
                       ),
-                      label: Text(
-                        email,
-                        style: const TextStyle(fontSize: 11),
-                      ),
+                      label: Text(email, style: const TextStyle(fontSize: 11)),
                       deleteIcon: const Icon(Icons.close_rounded, size: 14),
                       onDeleted: () => _removeCollaborator(email),
                       shape: RoundedRectangleBorder(
@@ -452,7 +517,9 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
               const SizedBox(height: 18),
 
               // Social Sharing Options (F-8)
-              Divider(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3)),
+              Divider(
+                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+              ),
               const SizedBox(height: 12),
               Text(
                 l10n?.shareTrip ?? 'Share Itinerary & Checklist',
@@ -473,12 +540,18 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
                         alignment: Alignment.center,
                         child: Text(
                           l10n?.shareTrip ?? 'Itinerary',
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 12,
+                        ),
                         alignment: Alignment.center,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -498,12 +571,20 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
                           );
                           return;
                         }
-                        final expenses = ref.read(expenseControllerProvider(currentTrip.id)).expenses;
-                        final items = ref.read(checklistControllerProvider).items;
+                        final expenses = ref
+                            .read(expenseControllerProvider(currentTrip.id))
+                            .expenses;
+                        final items = ref
+                            .read(checklistControllerProvider)
+                            .items;
                         ShareService.shareTripSummary(
                           trip: currentTrip,
-                          expenses: expenses.where((e) => e.tripId == currentTrip.id).toList(),
-                          items: items.where((i) => i.tripId == currentTrip.id).toList(),
+                          expenses: expenses
+                              .where((e) => e.tripId == currentTrip.id)
+                              .toList(),
+                          items: items
+                              .where((i) => i.tripId == currentTrip.id)
+                              .toList(),
                           l10n: l10n,
                         );
                       },
@@ -518,22 +599,34 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
                         alignment: Alignment.center,
                         child: Text(
                           l10n?.shareChecklist ?? 'Checklist',
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 12,
+                        ),
                         alignment: Alignment.center,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                       onPressed: () {
-                        final items = ref.read(checklistControllerProvider).items;
+                        final items = ref
+                            .read(checklistControllerProvider)
+                            .items;
                         ShareService.shareChecklist(
-                          tripTitle: currentTrip.title.isNotEmpty ? currentTrip.title : currentTrip.destination,
-                          items: items.where((i) => i.tripId == currentTrip.id).toList(),
+                          tripTitle: currentTrip.title.isNotEmpty
+                              ? currentTrip.title
+                              : currentTrip.destination,
+                          items: items
+                              .where((i) => i.tripId == currentTrip.id)
+                              .toList(),
                           l10n: l10n,
                         );
                       },
@@ -583,7 +676,9 @@ class _JoinTripDialogState extends State<JoinTripDialog> {
     return Consumer(
       builder: (context, ref, child) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.card),
+          ),
           title: Row(
             children: [
               Icon(Icons.group_add_rounded, color: theme.colorScheme.primary),
@@ -603,7 +698,8 @@ class _JoinTripDialogState extends State<JoinTripDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                l10n?.enterInviteCode ?? 'Enter the 6-character code shared by the trip organizer:',
+                l10n?.enterInviteCode ??
+                    'Enter the 6-character code shared by the trip organizer:',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -616,7 +712,9 @@ class _JoinTripDialogState extends State<JoinTripDialog> {
                   hintText: l10n?.tripCodePlaceholder ?? 'e.g. PB-A1B2C',
                   errorText: _error,
                   prefixIcon: const Icon(Icons.vpn_key_rounded, size: 20),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ],
@@ -661,7 +759,9 @@ class _JoinTripDialogState extends State<JoinTripDialog> {
                       } else {
                         setState(() {
                           _isLoading = false;
-                          _error = l10n?.invalidInviteCode ?? 'Invalid or expired invite code';
+                          _error =
+                              l10n?.invalidInviteCode ??
+                              'Invalid or expired invite code';
                         });
                       }
                     },

@@ -1421,21 +1421,6 @@ class AppLocalizationsEl extends AppLocalizations {
   String get deleteAccountTitle => 'Διαγραφή λογαριασμού';
 
   @override
-  String get deleteAccountConfirmationTitle =>
-      'Αίτημα διαγραφής λογαριασμού 15 ημερών';
-
-  @override
-  String get deleteAccountConfirmationMessage =>
-      'Ο λογαριασμός, τα ταξίδια, τα έξοδα και τα έγγραφα του θησαυροφυλακίου σας θα προγραμματιστούν για οριστική διαγραφή σε 15 ημέρες.\n\n• Μην συνδεθείτε για 15 ημέρες ώστε να ολοκληρωθεί η διαγραφή.\n• Εάν συνδεθείτε εντός 15 ημερών, ο λογαριασμός και όλα τα δεδομένα θα αποκατασταθούν αυτόματα.\n\nΘέλετε να συνεχίσετε;';
-
-  @override
-  String get deleteAccountButton => 'Αίτημα διαγραφής 15 ημερών';
-
-  @override
-  String get deleteAccountScheduledNotice =>
-      'Ο λογαριασμός σας έχει προγραμματιστεί για διαγραφή σε 15 ημέρες. Μην συνδεθείτε εάν επιθυμείτε την οριστική διαγραφή του.';
-
-  @override
   String get accountRestoredNotice =>
       'Καλώς ήρθατε πίσω! Η διαγραφή του λογαριασμού σας ακυρώθηκε και όλα τα δεδομένα σας αποκαταστάθηκαν.';
 
@@ -2321,27 +2306,31 @@ class AppLocalizationsEl extends AppLocalizations {
   String get proFeatureHighlightedBadge => 'Περιλαμβάνεται στο Pro';
 
   @override
-  String get deleteAccountNowTitle => 'Delete Account Permanently';
+  String get deleteAccountNowTitle => 'Οριστική διαγραφή λογαριασμού';
 
   @override
   String get deleteAccountNowMessage =>
-      'Your account and all of your data (trips, expenses, packing lists, itinerary, travel map, vault documents and friends) will be deleted immediately and permanently. This cannot be undone.\n\nAn active Google Play subscription is not cancelled automatically. Please cancel it in Google Play.';
+      'Ο λογαριασμός σας και όλα τα δεδομένα σας (ταξίδια, έξοδα, λίστες αποσκευών, πρόγραμμα, ταξιδιωτικός χάρτης, έγγραφα θησαυροφυλακίου και φίλοι) θα διαγραφούν αμέσως και οριστικά. Η ενέργεια δεν αναιρείται.\n\nΜια ενεργή συνδρομή Google Play δεν ακυρώνεται αυτόματα. Ακυρώστε την από το Google Play.';
 
   @override
-  String get deleteAccountNowButton => 'Delete Permanently';
+  String get deleteAccountNowButton => 'Οριστική διαγραφή';
 
   @override
-  String get deleteAccountPasswordLabel => 'Confirm with your password';
+  String get deleteAccountPasswordLabel => 'Επιβεβαιώστε με τον κωδικό σας';
 
   @override
   String get deleteAccountGoogleReauthHint =>
-      'To confirm, you will be asked to sign in with Google again.';
+      'Για επιβεβαίωση, θα σας ζητηθεί να συνδεθείτε ξανά με το Google.';
 
   @override
   String get deleteAccountDoneNotice =>
-      'Your account and all of your data have been permanently deleted.';
+      'Ο λογαριασμός σας και όλα τα δεδομένα σας διαγράφηκαν οριστικά.';
 
   @override
   String get deleteAccountFailedNotice =>
-      'Your account could not be deleted. Check your password and connection, then try again.';
+      'Δεν ήταν δυνατή η διαγραφή του λογαριασμού σας. Ελέγξτε τον κωδικό και τη σύνδεσή σας και δοκιμάστε ξανά.';
+
+  @override
+  String get subscriptionAutoRenewNotice =>
+      'Η συνδρομή ανανεώνεται αυτόματα στο τέλος κάθε περιόδου, εκτός αν ακυρωθεί τουλάχιστον 24 ώρες πριν από την ανανέωση. Η χρέωση γίνεται στον λογαριασμό σας Google Play. Μπορείτε να την ακυρώσετε οποιαδήποτε στιγμή από το Google Play › Συνδρομές.';
 }

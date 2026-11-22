@@ -1804,22 +1804,6 @@
   "@deleteAccountTitle": {
     "description": "Delete account button title"
   },
-  "deleteAccountConfirmationTitle": "15-Day Account Deletion Request",
-  "@deleteAccountConfirmationTitle": {
-    "description": "Title for 15-day deletion dialog"
-  },
-  "deleteAccountConfirmationMessage": "Your account, trips, expenses, and vault documents will be scheduled for permanent deletion in 15 days.\n\n• Do not log in for 15 days to allow deletion to complete.\n• If you log in within 15 days, your account and all data will be automatically restored.\n\nDo you want to proceed?",
-  "@deleteAccountConfirmationMessage": {
-    "description": "Message explaining 15-day grace period for deletion"
-  },
-  "deleteAccountButton": "Request 15-Day Deletion",
-  "@deleteAccountButton": {
-    "description": "Button confirming deletion request"
-  },
-  "deleteAccountScheduledNotice": "Your account has been scheduled for deletion in 15 days. Do not log in if you wish to permanently delete your account.",
-  "@deleteAccountScheduledNotice": {
-    "description": "Notice after requesting deletion"
-  },
   "accountRestoredNotice": "Welcome back! Your account deletion was cancelled and all your data has been restored.",
   "@accountRestoredNotice": {
     "description": "Notice when account is auto-recovered upon login"
@@ -2613,5 +2597,9 @@
   "deleteAccountFailedNotice": "Your account could not be deleted. Check your password and connection, then try again.",
   "@deleteAccountFailedNotice": {
     "description": "Snackbar when account deletion fails"
+  },
+  "subscriptionAutoRenewNotice": "Your subscription renews automatically at the end of each billing period unless cancelled at least 24 hours before renewal. Payment is charged to your Google Play account. You can cancel anytime in Google Play › Subscriptions.",
+  "@subscriptionAutoRenewNotice": {
+    "description": "Pre-purchase auto-renewal and cancellation disclosure on the paywall"
   }
 }

@@ -1,6 +1,11 @@
 /// Application-wide constants for PackBuddy
 class AppConstants {
   static const String appName = 'PackBuddy';
+
+  /// v1.0: joining a trip by invite code (self-join) is disabled. Firestore rules (B1) only let
+  /// the trip owner change `collaborators`; a secure server-side join needs a Cloud Function.
+  /// Owners add collaborators from the share sheet instead.
+  static const bool kInviteCodeJoinEnabled = false;
   static const String appPackage = 'com.sleepyhead.packbuddy';
   static const String appVersion = '1.0.0';
 

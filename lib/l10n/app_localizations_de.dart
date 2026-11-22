@@ -1413,21 +1413,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get deleteAccountTitle => 'Konto löschen';
 
   @override
-  String get deleteAccountConfirmationTitle =>
-      'Antrag auf 15-tägige Kontolöschung';
-
-  @override
-  String get deleteAccountConfirmationMessage =>
-      'Ihr Konto, Ihre Reisen, Ausgaben und Tresordokumente werden für eine dauerhafte Löschung in 15 Tagen vorgemerkt.\n\n• Melden Sie sich 15 Tage lang nicht an, um die Löschung abzuschließen.\n• Wenn Sie sich innerhalb von 15 Tagen anmelden, werden Ihr Konto und alle Daten automatisch wiederhergestellt.\n\nMöchten Sie fortfahren?';
-
-  @override
-  String get deleteAccountButton => '15-tägige Löschung beantragen';
-
-  @override
-  String get deleteAccountScheduledNotice =>
-      'Ihr Konto wurde für die Löschung in 15 Tagen vorgemerkt. Melden Sie sich nicht an, wenn Sie das Konto dauerhaft löschen möchten.';
-
-  @override
   String get accountRestoredNotice =>
       'Willkommen zurück! Ihre Kontolöschung wurde abgebrochen und alle Daten wurden wiederhergestellt.';
 
@@ -2307,27 +2292,31 @@ class AppLocalizationsDe extends AppLocalizations {
   String get proFeatureHighlightedBadge => 'In Pro enthalten';
 
   @override
-  String get deleteAccountNowTitle => 'Delete Account Permanently';
+  String get deleteAccountNowTitle => 'Konto endgültig löschen';
 
   @override
   String get deleteAccountNowMessage =>
-      'Your account and all of your data (trips, expenses, packing lists, itinerary, travel map, vault documents and friends) will be deleted immediately and permanently. This cannot be undone.\n\nAn active Google Play subscription is not cancelled automatically. Please cancel it in Google Play.';
+      'Ihr Konto und alle Ihre Daten (Reisen, Ausgaben, Packlisten, Reiseplan, Reisekarte, Tresor-Dokumente und Freunde) werden sofort und endgültig gelöscht. Dies kann nicht rückgängig gemacht werden.\n\nEin aktives Google Play-Abo wird nicht automatisch gekündigt. Bitte kündigen Sie es in Google Play.';
 
   @override
-  String get deleteAccountNowButton => 'Delete Permanently';
+  String get deleteAccountNowButton => 'Endgültig löschen';
 
   @override
-  String get deleteAccountPasswordLabel => 'Confirm with your password';
+  String get deleteAccountPasswordLabel => 'Mit Ihrem Passwort bestätigen';
 
   @override
   String get deleteAccountGoogleReauthHint =>
-      'To confirm, you will be asked to sign in with Google again.';
+      'Zur Bestätigung werden Sie gebeten, sich erneut mit Google anzumelden.';
 
   @override
   String get deleteAccountDoneNotice =>
-      'Your account and all of your data have been permanently deleted.';
+      'Ihr Konto und alle Ihre Daten wurden endgültig gelöscht.';
 
   @override
   String get deleteAccountFailedNotice =>
-      'Your account could not be deleted. Check your password and connection, then try again.';
+      'Ihr Konto konnte nicht gelöscht werden. Prüfen Sie Ihr Passwort und Ihre Verbindung und versuchen Sie es erneut.';
+
+  @override
+  String get subscriptionAutoRenewNotice =>
+      'Das Abo verlängert sich am Ende jedes Zeitraums automatisch, sofern es nicht mindestens 24 Stunden vor der Verlängerung gekündigt wird. Die Zahlung erfolgt über Ihr Google Play-Konto. Sie können jederzeit unter Google Play › Abos kündigen.';
 }

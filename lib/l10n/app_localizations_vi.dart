@@ -1402,21 +1402,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get deleteAccountTitle => 'Xóa tài khoản';
 
   @override
-  String get deleteAccountConfirmationTitle =>
-      'Yêu cầu xóa tài khoản trong 15 ngày';
-
-  @override
-  String get deleteAccountConfirmationMessage =>
-      'Tài khoản, chuyến đi, chi phí và tài liệu trong két an toàn của bạn sẽ được lên lịch xóa vĩnh viễn sau 15 ngày.\n\n• Không đăng nhập trong 15 ngày để quá trình xóa hoàn tất.\n• Nếu bạn đăng nhập lại trong vòng 15 ngày, tài khoản và toàn bộ dữ liệu sẽ tự động được khôi phục.\n\nBạn có muốn tiếp tục không?';
-
-  @override
-  String get deleteAccountButton => 'Yêu cầu xóa trong 15 ngày';
-
-  @override
-  String get deleteAccountScheduledNotice =>
-      'Tài khoản của bạn đã được lên lịch xóa sau 15 ngày. Vui lòng không đăng nhập nếu bạn muốn xóa vĩnh viễn.';
-
-  @override
   String get accountRestoredNotice =>
       'Chào mừng bạn quay lại! Yêu cầu xóa tài khoản đã được hủy và toàn bộ dữ liệu đã được khôi phục.';
 
@@ -2294,27 +2279,31 @@ class AppLocalizationsVi extends AppLocalizations {
   String get proFeatureHighlightedBadge => 'Bao gồm trong Pro';
 
   @override
-  String get deleteAccountNowTitle => 'Delete Account Permanently';
+  String get deleteAccountNowTitle => 'Xóa vĩnh viễn tài khoản';
 
   @override
   String get deleteAccountNowMessage =>
-      'Your account and all of your data (trips, expenses, packing lists, itinerary, travel map, vault documents and friends) will be deleted immediately and permanently. This cannot be undone.\n\nAn active Google Play subscription is not cancelled automatically. Please cancel it in Google Play.';
+      'Tài khoản và toàn bộ dữ liệu của bạn (chuyến đi, chi phí, danh sách hành lý, lịch trình, bản đồ du lịch, tài liệu trong két và bạn bè) sẽ bị xóa ngay lập tức và vĩnh viễn. Không thể hoàn tác thao tác này.\n\nGói đăng ký Google Play đang hoạt động sẽ không tự động bị hủy. Vui lòng hủy trong Google Play.';
 
   @override
-  String get deleteAccountNowButton => 'Delete Permanently';
+  String get deleteAccountNowButton => 'Xóa vĩnh viễn';
 
   @override
-  String get deleteAccountPasswordLabel => 'Confirm with your password';
+  String get deleteAccountPasswordLabel => 'Xác nhận bằng mật khẩu của bạn';
 
   @override
   String get deleteAccountGoogleReauthHint =>
-      'To confirm, you will be asked to sign in with Google again.';
+      'Để xác nhận, bạn sẽ được yêu cầu đăng nhập lại bằng Google.';
 
   @override
   String get deleteAccountDoneNotice =>
-      'Your account and all of your data have been permanently deleted.';
+      'Tài khoản và toàn bộ dữ liệu của bạn đã bị xóa vĩnh viễn.';
 
   @override
   String get deleteAccountFailedNotice =>
-      'Your account could not be deleted. Check your password and connection, then try again.';
+      'Không thể xóa tài khoản của bạn. Hãy kiểm tra mật khẩu và kết nối rồi thử lại.';
+
+  @override
+  String get subscriptionAutoRenewNotice =>
+      'Gói đăng ký tự động gia hạn vào cuối mỗi kỳ trừ khi được hủy ít nhất 24 giờ trước khi gia hạn. Khoản thanh toán sẽ được tính vào tài khoản Google Play của bạn. Bạn có thể hủy bất cứ lúc nào trong Google Play › Gói đăng ký.';
 }

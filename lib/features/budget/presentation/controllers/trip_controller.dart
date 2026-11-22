@@ -18,6 +18,7 @@ import '../../../itinerary/domain/itinerary_item.dart';
 import '../../../itinerary/presentation/controllers/itinerary_controller.dart';
 import '../../../checklist/domain/packing_item.dart';
 import '../../../auth/auth_controller.dart';
+import 'package:packbuddy/core/constants/app_constants.dart';
 
 /// State representation for trips list
 class TripState {
@@ -286,6 +287,8 @@ class TripController extends StateNotifier<TripState> {
 
   /// Joins a shared trip by 6-character invite code (Feature F-1)
   Future<Trip?> joinTripByInviteCode(String rawCode, {String? userIdentifier}) async {
+    // v1.0: self-join is rejected by Firestore rules (B1); never attempt it (no PERMISSION_DENIED).
+    if (!AppConstants.kInviteCodeJoinEnabled) return null;
     final code = rawCode.trim().toUpperCase();
     if (code.isEmpty) return null;
 

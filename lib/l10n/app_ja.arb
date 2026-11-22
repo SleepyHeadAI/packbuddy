@@ -441,10 +441,6 @@
   "templateCityDesc": "2〜3日の都市旅行にぴったりの身軽でコンパクトなバックパック",
   "vaultCloudBackupNotice": "ドキュメントは端末間の同期、15日間のアカウント復元、および安全性確保のために暗号化されクラウドにバックアップされます。",
   "deleteAccountTitle": "アカウントを削除",
-  "deleteAccountConfirmationTitle": "15日間のアカウント削除申請",
-  "deleteAccountConfirmationMessage": "アカウント、旅行、経費、および保管庫のドキュメントは15日後に完全削除されるようスケジュールされます。\n\n• 削除を完了するには15日間ログインしないでください。\n• 15日以内に再ログインするとアカウントとデータは自動復元されます。\n\n続行しますか？",
-  "deleteAccountButton": "15日間の削除を申請",
-  "deleteAccountScheduledNotice": "アカウントは15日後に削除されるようスケジュールされました。完全に削除したい場合はログインしないでください。",
   "accountRestoredNotice": "お帰りなさい！アカウント削除申請はキャンセルされ、すべてのデータが復元されました。",
   "adminPendingDeletionBadge": "削除予定（残り{days}日）",
   "adminCancelDeletion": "削除をキャンセル",
@@ -715,5 +711,13 @@
   "proThemeLockedSubtitle": "パスポート版、ポラロイド、全プレミアムカラーパレットをアンロック。",
   "proExportLockedTitle": "予算とレポートのエクスポート",
   "proExportLockedSubtitle": "旅行の支出レポートを旅仲間と手軽に共有・エクスポートできます。",
-  "proFeatureHighlightedBadge": "Proに含まれる機能"
+  "proFeatureHighlightedBadge": "Proに含まれる機能",
+  "deleteAccountNowTitle": "アカウントを完全に削除",
+  "deleteAccountNowMessage": "アカウントとすべてのデータ（旅行、支出、持ち物リスト、旅程、旅行マップ、保管庫の書類、友達）は直ちに完全に削除されます。この操作は元に戻せません。\n\n有効な Google Play の定期購入は自動的には解約されません。Google Play で解約してください。",
+  "deleteAccountNowButton": "完全に削除",
+  "deleteAccountPasswordLabel": "パスワードで確認",
+  "deleteAccountGoogleReauthHint": "確認のため、Google で再度ログインするよう求められます。",
+  "deleteAccountDoneNotice": "アカウントとすべてのデータは完全に削除されました。",
+  "deleteAccountFailedNotice": "アカウントを削除できませんでした。パスワードと接続を確認して、もう一度お試しください。",
+  "subscriptionAutoRenewNotice": "定期購入は、更新の24時間前までに解約しない限り、各期間の終了時に自動更新されます。お支払いは Google Play アカウントに請求されます。Google Play › 定期購入からいつでも解約できます。"
 }

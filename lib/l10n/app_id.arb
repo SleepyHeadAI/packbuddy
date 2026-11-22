@@ -441,10 +441,6 @@
   "templateCityDesc": "Ransel ringkas dan praktis untuk liburan kota selama 2-3 hari",
   "vaultCloudBackupNotice": "Dokumen dienkripsi & dicadangkan ke penyimpanan cloud untuk sinkronisasi antar perangkat, pemulihan 15 hari, dan kepatuhan keamanan.",
   "deleteAccountTitle": "Hapus Akun",
-  "deleteAccountConfirmationTitle": "Permintaan Penghapusan Akun 15 Hari",
-  "deleteAccountConfirmationMessage": "Akun, perjalanan, pengeluaran, dan dokumen brankas Anda akan dijadwalkan untuk dihapus permanen dalam 15 hari.\n\n• Jangan masuk selama 15 hari agar penghapusan selesai.\n• Jika Anda masuk kembali dalam 15 hari, akun dan seluruh data akan dipulihkan otomatis.\n\nApakah Anda ingin melanjutkan?",
-  "deleteAccountButton": "Minta Penghapusan 15 Hari",
-  "deleteAccountScheduledNotice": "Akun Anda dijadwalkan untuk dihapus dalam 15 hari. Jangan masuk jika Anda ingin menghapusnya secara permanen.",
   "accountRestoredNotice": "Selamat datang kembali! Penghapusan akun dibatalkan dan seluruh data Anda telah dipulihkan.",
   "adminPendingDeletionBadge": "Dijadwalkan untuk dihapus (sisa {days} hari)",
   "adminCancelDeletion": "Batalkan Penghapusan",
@@ -715,5 +711,13 @@
   "proThemeLockedSubtitle": "Buka kunci semua palet premium, edisi paspor, dan gaya widget.",
   "proExportLockedTitle": "Ekspor anggaran & laporan",
   "proExportLockedSubtitle": "Ekspor dan bagikan laporan pengeluaran bersama teman perjalananmu.",
-  "proFeatureHighlightedBadge": "Termasuk di Pro"
+  "proFeatureHighlightedBadge": "Termasuk di Pro",
+  "deleteAccountNowTitle": "Hapus Akun Secara Permanen",
+  "deleteAccountNowMessage": "Akun Anda dan semua data Anda (perjalanan, pengeluaran, daftar barang bawaan, rencana perjalanan, peta perjalanan, dokumen brankas, dan teman) akan langsung dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.\n\nLangganan Google Play yang aktif tidak dibatalkan secara otomatis. Batalkan melalui Google Play.",
+  "deleteAccountNowButton": "Hapus Permanen",
+  "deleteAccountPasswordLabel": "Konfirmasi dengan kata sandi Anda",
+  "deleteAccountGoogleReauthHint": "Untuk konfirmasi, Anda akan diminta masuk kembali dengan Google.",
+  "deleteAccountDoneNotice": "Akun dan semua data Anda telah dihapus secara permanen.",
+  "deleteAccountFailedNotice": "Akun Anda tidak dapat dihapus. Periksa kata sandi dan koneksi Anda, lalu coba lagi.",
+  "subscriptionAutoRenewNotice": "Langganan diperpanjang otomatis di akhir setiap periode kecuali dibatalkan paling lambat 24 jam sebelum perpanjangan. Pembayaran ditagihkan ke akun Google Play Anda. Batalkan kapan saja di Google Play › Langganan."
 }

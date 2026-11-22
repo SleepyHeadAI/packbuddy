@@ -1407,21 +1407,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get deleteAccountTitle => 'Hapus Akun';
 
   @override
-  String get deleteAccountConfirmationTitle =>
-      'Permintaan Penghapusan Akun 15 Hari';
-
-  @override
-  String get deleteAccountConfirmationMessage =>
-      'Akun, perjalanan, pengeluaran, dan dokumen brankas Anda akan dijadwalkan untuk dihapus permanen dalam 15 hari.\n\n• Jangan masuk selama 15 hari agar penghapusan selesai.\n• Jika Anda masuk kembali dalam 15 hari, akun dan seluruh data akan dipulihkan otomatis.\n\nApakah Anda ingin melanjutkan?';
-
-  @override
-  String get deleteAccountButton => 'Minta Penghapusan 15 Hari';
-
-  @override
-  String get deleteAccountScheduledNotice =>
-      'Akun Anda dijadwalkan untuk dihapus dalam 15 hari. Jangan masuk jika Anda ingin menghapusnya secara permanen.';
-
-  @override
   String get accountRestoredNotice =>
       'Selamat datang kembali! Penghapusan akun dibatalkan dan seluruh data Anda telah dipulihkan.';
 
@@ -2298,27 +2283,31 @@ class AppLocalizationsId extends AppLocalizations {
   String get proFeatureHighlightedBadge => 'Termasuk di Pro';
 
   @override
-  String get deleteAccountNowTitle => 'Delete Account Permanently';
+  String get deleteAccountNowTitle => 'Hapus Akun Secara Permanen';
 
   @override
   String get deleteAccountNowMessage =>
-      'Your account and all of your data (trips, expenses, packing lists, itinerary, travel map, vault documents and friends) will be deleted immediately and permanently. This cannot be undone.\n\nAn active Google Play subscription is not cancelled automatically. Please cancel it in Google Play.';
+      'Akun Anda dan semua data Anda (perjalanan, pengeluaran, daftar barang bawaan, rencana perjalanan, peta perjalanan, dokumen brankas, dan teman) akan langsung dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.\n\nLangganan Google Play yang aktif tidak dibatalkan secara otomatis. Batalkan melalui Google Play.';
 
   @override
-  String get deleteAccountNowButton => 'Delete Permanently';
+  String get deleteAccountNowButton => 'Hapus Permanen';
 
   @override
-  String get deleteAccountPasswordLabel => 'Confirm with your password';
+  String get deleteAccountPasswordLabel => 'Konfirmasi dengan kata sandi Anda';
 
   @override
   String get deleteAccountGoogleReauthHint =>
-      'To confirm, you will be asked to sign in with Google again.';
+      'Untuk konfirmasi, Anda akan diminta masuk kembali dengan Google.';
 
   @override
   String get deleteAccountDoneNotice =>
-      'Your account and all of your data have been permanently deleted.';
+      'Akun dan semua data Anda telah dihapus secara permanen.';
 
   @override
   String get deleteAccountFailedNotice =>
-      'Your account could not be deleted. Check your password and connection, then try again.';
+      'Akun Anda tidak dapat dihapus. Periksa kata sandi dan koneksi Anda, lalu coba lagi.';
+
+  @override
+  String get subscriptionAutoRenewNotice =>
+      'Langganan diperpanjang otomatis di akhir setiap periode kecuali dibatalkan paling lambat 24 jam sebelum perpanjangan. Pembayaran ditagihkan ke akun Google Play Anda. Batalkan kapan saja di Google Play › Langganan.';
 }

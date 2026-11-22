@@ -1347,19 +1347,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get deleteAccountTitle => '删除账户';
 
   @override
-  String get deleteAccountConfirmationTitle => '15天账户删除申请';
-
-  @override
-  String get deleteAccountConfirmationMessage =>
-      '您的账户、旅行、开支及保险箱文件将安排在15天后永久删除。\n\n• 15天内请勿登录以完成删除。\n• 若在15天内重新登录，您的账户及所有数据将自动恢复。\n\n是否继续？';
-
-  @override
-  String get deleteAccountButton => '申请15天删除';
-
-  @override
-  String get deleteAccountScheduledNotice => '您的账户已安排在15天后删除。如欲彻底注销，请勿在期间登录。';
-
-  @override
   String get accountRestoredNotice => '欢迎回来！您的账户删除已取消，所有数据已完全恢复。';
 
   @override
@@ -2198,27 +2185,28 @@ class AppLocalizationsZh extends AppLocalizations {
   String get proFeatureHighlightedBadge => 'Pro 尊享功能';
 
   @override
-  String get deleteAccountNowTitle => 'Delete Account Permanently';
+  String get deleteAccountNowTitle => '永久删除账户';
 
   @override
   String get deleteAccountNowMessage =>
-      'Your account and all of your data (trips, expenses, packing lists, itinerary, travel map, vault documents and friends) will be deleted immediately and permanently. This cannot be undone.\n\nAn active Google Play subscription is not cancelled automatically. Please cancel it in Google Play.';
+      '您的账户及所有数据（行程、支出、行李清单、行程安排、旅行地图、保险库文件和好友）将被立即永久删除。此操作无法撤销。\n\n有效的 Google Play 订阅不会自动取消，请在 Google Play 中取消。';
 
   @override
-  String get deleteAccountNowButton => 'Delete Permanently';
+  String get deleteAccountNowButton => '永久删除';
 
   @override
-  String get deleteAccountPasswordLabel => 'Confirm with your password';
+  String get deleteAccountPasswordLabel => '请输入密码以确认';
 
   @override
-  String get deleteAccountGoogleReauthHint =>
-      'To confirm, you will be asked to sign in with Google again.';
+  String get deleteAccountGoogleReauthHint => '为确认操作，系统将要求您重新使用 Google 登录。';
 
   @override
-  String get deleteAccountDoneNotice =>
-      'Your account and all of your data have been permanently deleted.';
+  String get deleteAccountDoneNotice => '您的账户及所有数据已被永久删除。';
 
   @override
-  String get deleteAccountFailedNotice =>
-      'Your account could not be deleted. Check your password and connection, then try again.';
+  String get deleteAccountFailedNotice => '无法删除您的账户。请检查密码和网络连接后重试。';
+
+  @override
+  String get subscriptionAutoRenewNotice =>
+      '除非在续订前至少 24 小时取消，否则订阅将在每个计费周期结束时自动续订。费用将从您的 Google Play 账户中扣除。您可以随时在 Google Play › 订阅中取消。';
 }

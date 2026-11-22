@@ -441,10 +441,6 @@
   "templateCityDesc": "Bagage léger et pratique pour une escapade citadine de 2 à 3 jours",
   "vaultCloudBackupNotice": "Les documents sont chiffrés et sauvegardés dans le cloud pour la synchronisation multi-appareils, la récupération sous 15 jours et la sécurité.",
   "deleteAccountTitle": "Supprimer le compte",
-  "deleteAccountConfirmationTitle": "Demande de suppression de compte sous 15 jours",
-  "deleteAccountConfirmationMessage": "Votre compte, vos voyages, dépenses et documents du coffre seront programmés pour suppression définitive dans 15 jours.\n\n• Ne vous connectez pas pendant 15 jours pour terminer la suppression.\n• Si vous vous reconnectez sous 15 jours, votre compte et vos fichiers seront restaurés.\n\nSouhaitez-vous continuer ?",
-  "deleteAccountButton": "Demander la suppression sous 15 jours",
-  "deleteAccountScheduledNotice": "Votre compte a été programmé pour être supprimé dans 15 jours. Ne vous reconnectez pas si vous souhaitez le supprimer définitivement.",
   "accountRestoredNotice": "Bon retour ! La suppression de votre compte a été annulée et vos données ont été restaurées.",
   "adminPendingDeletionBadge": "Prévu pour suppression ({days}j restants)",
   "adminCancelDeletion": "Annuler la suppression",
@@ -715,5 +711,13 @@
   "proThemeLockedSubtitle": "Débloquez toutes les palettes premium, l'édition passeport et les widgets.",
   "proExportLockedTitle": "Exporter le budget et rapports",
   "proExportLockedSubtitle": "Exportez et partagez vos rapports de dépenses avec vos compagnons de route.",
-  "proFeatureHighlightedBadge": "Inclus dans Pro"
+  "proFeatureHighlightedBadge": "Inclus dans Pro",
+  "deleteAccountNowTitle": "Supprimer définitivement le compte",
+  "deleteAccountNowMessage": "Votre compte et toutes vos données (voyages, dépenses, listes de bagages, itinéraire, carte de voyage, documents du coffre et amis) seront supprimés immédiatement et définitivement. Cette action est irréversible.\n\nUn abonnement Google Play actif n'est pas résilié automatiquement. Veuillez le résilier dans Google Play.",
+  "deleteAccountNowButton": "Supprimer définitivement",
+  "deleteAccountPasswordLabel": "Confirmez avec votre mot de passe",
+  "deleteAccountGoogleReauthHint": "Pour confirmer, vous devrez vous reconnecter avec Google.",
+  "deleteAccountDoneNotice": "Votre compte et toutes vos données ont été définitivement supprimés.",
+  "deleteAccountFailedNotice": "Impossible de supprimer votre compte. Vérifiez votre mot de passe et votre connexion, puis réessayez.",
+  "subscriptionAutoRenewNotice": "L'abonnement se renouvelle automatiquement à la fin de chaque période, sauf résiliation au moins 24 heures avant le renouvellement. Le paiement est débité de votre compte Google Play. Vous pouvez résilier à tout moment dans Google Play › Abonnements."
 }

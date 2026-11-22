@@ -1398,21 +1398,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteAccountTitle => 'Delete Account';
 
   @override
-  String get deleteAccountConfirmationTitle =>
-      '15-Day Account Deletion Request';
-
-  @override
-  String get deleteAccountConfirmationMessage =>
-      'Your account, trips, expenses, and vault documents will be scheduled for permanent deletion in 15 days.\n\n• Do not log in for 15 days to allow deletion to complete.\n• If you log in within 15 days, your account and all data will be automatically restored.\n\nDo you want to proceed?';
-
-  @override
-  String get deleteAccountButton => 'Request 15-Day Deletion';
-
-  @override
-  String get deleteAccountScheduledNotice =>
-      'Your account has been scheduled for deletion in 15 days. Do not log in if you wish to permanently delete your account.';
-
-  @override
   String get accountRestoredNotice =>
       'Welcome back! Your account deletion was cancelled and all your data has been restored.';
 
@@ -2312,4 +2297,8 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get deleteAccountFailedNotice =>
       'Your account could not be deleted. Check your password and connection, then try again.';
+
+  @override
+  String get subscriptionAutoRenewNotice =>
+      'Your subscription renews automatically at the end of each billing period unless cancelled at least 24 hours before renewal. Payment is charged to your Google Play account. You can cancel anytime in Google Play › Subscriptions.';
 }

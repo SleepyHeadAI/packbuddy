@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,6 +24,7 @@ import 'package:packbuddy/features/travel_map/presentation/screens/travel_map_sc
 import 'package:packbuddy/features/profile/presentation/screens/widgets/collaborator_avatar_stack.dart';
 import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:packbuddy/shared/widgets/quick_actions_sheet.dart';
+import 'package:packbuddy/core/constants/app_constants.dart';
 
 /// Modern, intuitive Trips Overview Screen listing upcoming, active, and past trips
 class TripsScreen extends ConsumerStatefulWidget {
@@ -31,27 +33,48 @@ class TripsScreen extends ConsumerStatefulWidget {
   static IconData getTransportIcon(String? mode) {
     if (mode == null || mode.isEmpty) return AppIcons.luggage;
     final lower = mode.toLowerCase();
-    if (lower.contains('uçak') || lower.contains('flight') || lower.contains('plane')) {
+    if (lower.contains('uçak') ||
+        lower.contains('flight') ||
+        lower.contains('plane')) {
       return AppIcons.flight;
-    } else if (lower.contains('hızlı tren') || lower.contains('yht') || lower.contains('bullet')) {
+    } else if (lower.contains('hızlı tren') ||
+        lower.contains('yht') ||
+        lower.contains('bullet')) {
       return AppIcons.train;
     } else if (lower.contains('tren') || lower.contains('train')) {
       return AppIcons.train;
-    } else if (lower.contains('araba') || lower.contains('car') || lower.contains('kiralık') || lower.contains('jeep') || lower.contains('safari')) {
+    } else if (lower.contains('araba') ||
+        lower.contains('car') ||
+        lower.contains('kiralık') ||
+        lower.contains('jeep') ||
+        lower.contains('safari')) {
       return AppIcons.car;
-    } else if (lower.contains('gemi') || lower.contains('ship') || lower.contains('feribot') || lower.contains('ferry') || lower.contains('boat')) {
+    } else if (lower.contains('gemi') ||
+        lower.contains('ship') ||
+        lower.contains('feribot') ||
+        lower.contains('ferry') ||
+        lower.contains('boat')) {
       return AppIcons.boat;
     } else if (lower.contains('otobüs') || lower.contains('bus')) {
       return AppIcons.car;
     } else if (lower.contains('moto') || lower.contains('motor')) {
       return AppIcons.car;
-    } else if (lower.contains('karavan') || lower.contains('camper') || lower.contains('rv')) {
+    } else if (lower.contains('karavan') ||
+        lower.contains('camper') ||
+        lower.contains('rv')) {
       return AppIcons.car;
-    } else if (lower.contains('bisiklet') || lower.contains('bike') || lower.contains('bicycle')) {
+    } else if (lower.contains('bisiklet') ||
+        lower.contains('bike') ||
+        lower.contains('bicycle')) {
       return AppIcons.car;
-    } else if (lower.contains('metro') || lower.contains('tram') || lower.contains('subway')) {
+    } else if (lower.contains('metro') ||
+        lower.contains('tram') ||
+        lower.contains('subway')) {
       return AppIcons.train;
-    } else if (lower.contains('yürüyüş') || lower.contains('trekking') || lower.contains('hike') || lower.contains('walk')) {
+    } else if (lower.contains('yürüyüş') ||
+        lower.contains('trekking') ||
+        lower.contains('hike') ||
+        lower.contains('walk')) {
       return AppIcons.backpack;
     } else if (lower.contains('heli') || lower.contains('helikopter')) {
       return AppIcons.flightTakeoff;
@@ -64,27 +87,48 @@ class TripsScreen extends ConsumerStatefulWidget {
   static String formatTransportMode(String? mode, AppLocalizations l10n) {
     if (mode == null || mode.isEmpty) return '';
     final lower = mode.toLowerCase();
-    if (lower.contains('uçak') || lower.contains('flight') || lower.contains('plane')) {
+    if (lower.contains('uçak') ||
+        lower.contains('flight') ||
+        lower.contains('plane')) {
       return l10n.flight;
-    } else if (lower.contains('hızlı tren') || lower.contains('yht') || lower.contains('bullet')) {
+    } else if (lower.contains('hızlı tren') ||
+        lower.contains('yht') ||
+        lower.contains('bullet')) {
       return l10n.bulletTrain;
     } else if (lower.contains('tren') || lower.contains('train')) {
       return l10n.train;
-    } else if (lower.contains('araba') || lower.contains('car') || lower.contains('kiralık') || lower.contains('jeep') || lower.contains('safari')) {
+    } else if (lower.contains('araba') ||
+        lower.contains('car') ||
+        lower.contains('kiralık') ||
+        lower.contains('jeep') ||
+        lower.contains('safari')) {
       return l10n.car;
-    } else if (lower.contains('gemi') || lower.contains('ship') || lower.contains('feribot') || lower.contains('ferry') || lower.contains('boat')) {
+    } else if (lower.contains('gemi') ||
+        lower.contains('ship') ||
+        lower.contains('feribot') ||
+        lower.contains('ferry') ||
+        lower.contains('boat')) {
       return l10n.ferry;
     } else if (lower.contains('otobüs') || lower.contains('bus')) {
       return l10n.bus;
     } else if (lower.contains('moto') || lower.contains('motor')) {
       return l10n.motorcycle;
-    } else if (lower.contains('karavan') || lower.contains('camper') || lower.contains('rv')) {
+    } else if (lower.contains('karavan') ||
+        lower.contains('camper') ||
+        lower.contains('rv')) {
       return l10n.camper;
-    } else if (lower.contains('bisiklet') || lower.contains('bike') || lower.contains('bicycle')) {
+    } else if (lower.contains('bisiklet') ||
+        lower.contains('bike') ||
+        lower.contains('bicycle')) {
       return l10n.bicycle;
-    } else if (lower.contains('metro') || lower.contains('tram') || lower.contains('subway')) {
+    } else if (lower.contains('metro') ||
+        lower.contains('tram') ||
+        lower.contains('subway')) {
       return l10n.subway;
-    } else if (lower.contains('yürüyüş') || lower.contains('trekking') || lower.contains('hike') || lower.contains('walk')) {
+    } else if (lower.contains('yürüyüş') ||
+        lower.contains('trekking') ||
+        lower.contains('hike') ||
+        lower.contains('walk')) {
       return l10n.hiking;
     }
     return mode;
@@ -107,8 +151,12 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.card),
+        ),
+        backgroundColor: isDark
+            ? AppColors.surfaceDark
+            : AppColors.surfaceLight,
         insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
         child: Padding(
           padding: const EdgeInsets.all(22),
@@ -124,7 +172,11 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Center(
-                  child: Icon(Icons.delete_outline_rounded, color: AppColors.errorPastel, size: 24),
+                  child: Icon(
+                    Icons.delete_outline_rounded,
+                    color: AppColors.errorPastel,
+                    size: 24,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -160,7 +212,9 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
                       label: l10n.deleteTrip,
                       size: AppButtonSize.medium,
                       onPressed: () {
-                        ref.read(tripControllerProvider.notifier).deleteTrip(trip.id);
+                        ref
+                            .read(tripControllerProvider.notifier)
+                            .deleteTrip(trip.id);
                         Navigator.of(ctx).pop();
                       },
                     ),
@@ -182,52 +236,61 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
 
     // Listen for database or network errors and notify user cleanly
     ref.listen<TripState>(tripControllerProvider, (previous, next) {
-      if (next.errorMessage != null && next.errorMessage != previous?.errorMessage) {
+      if (next.errorMessage != null &&
+          next.errorMessage != previous?.errorMessage) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.info_outline_rounded, color: Colors.white, size: 20),
+                const Icon(
+                  Icons.info_outline_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
                 const SizedBox(width: 12),
                 Expanded(child: Text(next.errorMessage!)),
               ],
             ),
             backgroundColor: AppColors.errorPastel,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         );
       }
     });
 
     final allTrips = tripState.trips;
-    final activeCount = allTrips.where((t) => t.isOngoing || t.isUpcoming).length;
+    final activeCount = allTrips
+        .where((t) => t.isOngoing || t.isUpcoming)
+        .length;
     final pastCount = allTrips.where((t) => t.isPast).length;
 
     // Filter and sort trips intelligently
-    final filteredTrips = allTrips.where((t) {
-      if (_selectedFilter == 'active') {
-        return t.isOngoing || t.isUpcoming;
-      } else if (_selectedFilter == 'past') {
-        return t.isPast;
-      }
-      return true;
-    }).toList()
-      ..sort((a, b) {
-        // Priority 1: Ongoing trips first
-        if (a.isOngoing && !b.isOngoing) return -1;
-        if (!a.isOngoing && b.isOngoing) return 1;
+    final filteredTrips =
+        allTrips.where((t) {
+          if (_selectedFilter == 'active') {
+            return t.isOngoing || t.isUpcoming;
+          } else if (_selectedFilter == 'past') {
+            return t.isPast;
+          }
+          return true;
+        }).toList()..sort((a, b) {
+          // Priority 1: Ongoing trips first
+          if (a.isOngoing && !b.isOngoing) return -1;
+          if (!a.isOngoing && b.isOngoing) return 1;
 
-        // Priority 2: Upcoming trips in chronological order
-        if (a.isUpcoming && b.isUpcoming) {
-          return a.startDate.compareTo(b.startDate);
-        }
-        if (a.isUpcoming && !b.isUpcoming) return -1;
-        if (!a.isUpcoming && b.isUpcoming) return 1;
+          // Priority 2: Upcoming trips in chronological order
+          if (a.isUpcoming && b.isUpcoming) {
+            return a.startDate.compareTo(b.startDate);
+          }
+          if (a.isUpcoming && !b.isUpcoming) return -1;
+          if (!a.isUpcoming && b.isUpcoming) return 1;
 
-        // Priority 3: Past trips in reverse chronological order (most recent first)
-        return b.endDate.compareTo(a.endDate);
-      });
+          // Priority 3: Past trips in reverse chronological order (most recent first)
+          return b.endDate.compareTo(a.endDate);
+        });
 
     return PopScope(
       canPop: true,
@@ -267,8 +330,11 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
                     type: MaterialType.transparency,
                     child: Text(
                       l10n.trips,
-                      style: theme.appBarTheme.titleTextStyle ??
-                          theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                      style:
+                          theme.appBarTheme.titleTextStyle ??
+                          theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
                     ),
                   ),
                 ),
@@ -299,15 +365,18 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
               tooltip: l10n.compareTrips,
               onPressed: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const TripComparisonScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => const TripComparisonScreen(),
+                  ),
                 );
               },
             ),
-            IconButton(
-              icon: const Icon(Icons.group_add_rounded),
-              tooltip: l10n.joinSharedTrip,
-              onPressed: () => JoinTripDialog.show(context),
-            ),
+            if (AppConstants.kInviteCodeJoinEnabled)
+              IconButton(
+                icon: const Icon(Icons.group_add_rounded),
+                tooltip: l10n.joinSharedTrip,
+                onPressed: () => JoinTripDialog.show(context),
+              ),
           ],
         ),
         floatingActionButton: FloatingActionButton(
@@ -319,178 +388,200 @@ class _TripsScreenState extends ConsumerState<TripsScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
-          onPressed: () => QuickActionsSheet.showForTrips(context, fabKey: _fabKey),
+          onPressed: () =>
+              QuickActionsSheet.showForTrips(context, fabKey: _fabKey),
           child: const Icon(AppIcons.add, size: 24),
         ),
         body: tripState.isLoading
             ? const Center(child: CircularProgressIndicator())
             : allTrips.isEmpty
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(32),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+            ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AppFloatingIllustration(
+                        floatDistance: 7.0,
+                        duration: const Duration(milliseconds: 2800),
+                        child: Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primaryContainer
+                                .withValues(alpha: 0.5),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.flight_takeoff_rounded,
+                            size: 44,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        l10n.noTripsYet,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.4,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.noTripsSubtitle,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      AppButton.primary(
+                        label: l10n.addTrip,
+                        leadingIcon: Icons.add_rounded,
+                        onPressed: () => AddTripSheet.show(context),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : Column(
+                children: [
+                  // Modern Segmented Filter Bar: Tümü • Aktif • Tamamlandı
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 10),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest
+                            .withValues(
+                              alpha:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? 0.35
+                                  : 0.55,
+                            ),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: theme.colorScheme.outlineVariant.withValues(
+                            alpha: 0.2,
+                          ),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
                         children: [
-                          AppFloatingIllustration(
-                            floatDistance: 7.0,
-                            duration: const Duration(milliseconds: 2800),
-                            child: Container(
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.flight_takeoff_rounded,
-                                size: 44,
-                                color: theme.colorScheme.primary,
-                              ),
-                            ),
+                          _buildSegmentItem(
+                            key: 'all',
+                            label: l10n.allTrips,
+                            count: allTrips.length,
+                            isSelected: _selectedFilter == 'all',
+                            theme: theme,
                           ),
-                          const SizedBox(height: 20),
-                          Text(
-                            l10n.noTripsYet,
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.4,
-                            ),
+                          const SizedBox(width: 4),
+                          _buildSegmentItem(
+                            key: 'active',
+                            label: l10n.ongoingTrip,
+                            count: activeCount,
+                            isSelected: _selectedFilter == 'active',
+                            theme: theme,
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            l10n.noTripsSubtitle,
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          AppButton.primary(
-                            label: l10n.addTrip,
-                            leadingIcon: Icons.add_rounded,
-                            onPressed: () => AddTripSheet.show(context),
+                          const SizedBox(width: 4),
+                          _buildSegmentItem(
+                            key: 'past',
+                            label: l10n.completed,
+                            count: pastCount,
+                            isSelected: _selectedFilter == 'past',
+                            theme: theme,
                           ),
                         ],
                       ),
                     ),
-                  )
-                : Column(
-                    children: [
-                      // Modern Segmented Filter Bar: Tümü • Aktif • Tamamlandı
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 8, 20, 10),
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceContainerHighest.withValues(
-                              alpha: Theme.of(context).brightness == Brightness.dark ? 0.35 : 0.55,
-                            ),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
-                              width: 1,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              _buildSegmentItem(
-                                key: 'all',
-                                label: l10n.allTrips,
-                                count: allTrips.length,
-                                isSelected: _selectedFilter == 'all',
-                                theme: theme,
-                              ),
-                              const SizedBox(width: 4),
-                              _buildSegmentItem(
-                                key: 'active',
-                                label: l10n.ongoingTrip,
-                                count: activeCount,
-                                isSelected: _selectedFilter == 'active',
-                                theme: theme,
-                              ),
-                              const SizedBox(width: 4),
-                              _buildSegmentItem(
-                                key: 'past',
-                                label: l10n.completed,
-                                count: pastCount,
-                                isSelected: _selectedFilter == 'past',
-                                theme: theme,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      // Trips List
-                      Expanded(
-                        child: filteredTrips.isEmpty
-                            ? Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(32),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.filter_list_off_rounded,
-                                        size: 40,
-                                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Text(
-                                        l10n.noTripsSubtitle,
-                                        textAlign: TextAlign.center,
-                                        style: theme.textTheme.bodyMedium?.copyWith(
-                                          color: theme.colorScheme.onSurfaceVariant,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      TextButton(
-                                        onPressed: () => setState(() => _selectedFilter = 'all'),
-                                        child: Text(l10n.allTrips),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              )
-                            : ListView.builder(
-                                scrollCacheExtent: const ScrollCacheExtent.pixels(600.0),
-                                padding: EdgeInsets.only(
-                                  left: 20,
-                                  right: 20,
-                                  top: 4,
-                                  bottom: math.max(120.0, MediaQuery.paddingOf(context).bottom + 100.0),
-                                ),
-                                itemCount: filteredTrips.length,
-                                itemBuilder: (context, index) {
-                                  final trip = filteredTrips[index];
-                                  final cardWidget = Padding(
-                                    padding: const EdgeInsets.only(bottom: 14),
-                                    child: _ModernTripCard(
-                                      trip: trip,
-                                      onTap: () {
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (_) => TripDetailScreen(trip: trip),
-                                          ),
-                                        );
-                                      },
-                                      onEdit: () => AddTripSheet.show(context, tripToEdit: trip),
-                                      onShare: () => ShareTripSheet.show(context, trip),
-                                      onDelete: () => _showDeleteDialog(context, trip),
-                                    ),
-                                  );
-
-                                  if (index < 6) {
-                                    return AppFadeSlide(
-                                      delay: Duration(milliseconds: 30 * index),
-                                      child: cardWidget,
-                                    );
-                                  }
-                                  return cardWidget;
-                                },
-                              ),
-                      ),
-                    ],
                   ),
+
+                  // Trips List
+                  Expanded(
+                    child: filteredTrips.isEmpty
+                        ? Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(32),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.filter_list_off_rounded,
+                                    size: 40,
+                                    color: theme.colorScheme.onSurfaceVariant
+                                        .withValues(alpha: 0.5),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    l10n.noTripsSubtitle,
+                                    textAlign: TextAlign.center,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  TextButton(
+                                    onPressed: () =>
+                                        setState(() => _selectedFilter = 'all'),
+                                    child: Text(l10n.allTrips),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            scrollCacheExtent: const ScrollCacheExtent.pixels(
+                              600.0,
+                            ),
+                            padding: EdgeInsets.only(
+                              left: 20,
+                              right: 20,
+                              top: 4,
+                              bottom: math.max(
+                                120.0,
+                                MediaQuery.paddingOf(context).bottom + 100.0,
+                              ),
+                            ),
+                            itemCount: filteredTrips.length,
+                            itemBuilder: (context, index) {
+                              final trip = filteredTrips[index];
+                              final cardWidget = Padding(
+                                padding: const EdgeInsets.only(bottom: 14),
+                                child: _ModernTripCard(
+                                  trip: trip,
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            TripDetailScreen(trip: trip),
+                                      ),
+                                    );
+                                  },
+                                  onEdit: () => AddTripSheet.show(
+                                    context,
+                                    tripToEdit: trip,
+                                  ),
+                                  onShare: () =>
+                                      ShareTripSheet.show(context, trip),
+                                  onDelete: () =>
+                                      _showDeleteDialog(context, trip),
+                                ),
+                              );
+
+                              if (index < 6) {
+                                return AppFadeSlide(
+                                  delay: Duration(milliseconds: 30 * index),
+                                  child: cardWidget,
+                                );
+                              }
+                              return cardWidget;
+                            },
+                          ),
+                  ),
+                ],
+              ),
       ),
     );
   }
@@ -606,11 +697,15 @@ class _ModernTripCard extends ConsumerWidget {
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
+                  color: isDark
+                      ? AppColors.outlineDark
+                      : AppColors.outlineLight,
                   width: 1,
                 ),
               ),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
             ),
             child: Row(
               children: [
@@ -619,12 +714,21 @@ class _ModernTripCard extends ConsumerWidget {
                     spacing: 3,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: trip.countries
-                        .map((c) => Text(c.flag, style: const TextStyle(fontSize: 15)))
+                        .map(
+                          (c) => Text(
+                            c.flag,
+                            style: const TextStyle(fontSize: 15),
+                          ),
+                        )
                         .toList(),
                   ),
                   const SizedBox(width: 6),
                 ] else ...[
-                  Icon(Icons.place_outlined, size: 15, color: theme.colorScheme.primary),
+                  Icon(
+                    Icons.place_outlined,
+                    size: 15,
+                    color: theme.colorScheme.primary,
+                  ),
                   const SizedBox(width: 4),
                 ],
                 Expanded(
@@ -677,7 +781,9 @@ class _ModernTripCard extends ConsumerWidget {
                         child: Center(
                           child: Icon(
                             transportIcon,
-                            color: isDark ? AppColors.primaryAmber : AppColors.primaryLight,
+                            color: isDark
+                                ? AppColors.primaryAmber
+                                : AppColors.primaryLight,
                             size: 21,
                           ),
                         ),
@@ -704,15 +810,24 @@ class _ModernTripCard extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          if (trip.transportMode != null && trip.transportMode!.isNotEmpty) ...[
+                          if (trip.transportMode != null &&
+                              trip.transportMode!.isNotEmpty) ...[
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 7,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
-                                color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                                color: theme.colorScheme.primary.withValues(
+                                  alpha: 0.1,
+                                ),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
-                                TripsScreen.formatTransportMode(trip.transportMode, l10n),
+                                TripsScreen.formatTransportMode(
+                                  trip.transportMode,
+                                  l10n,
+                                ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -754,76 +869,90 @@ class _ModernTripCard extends ConsumerWidget {
                 // Mini Budget Progress Indicator (if budget set)
                 if (trip.budgetLimit != null && trip.budgetLimit! > 0) ...[
                   const SizedBox(height: 12),
-                  Builder(builder: (context) {
-                    final spent = expenseState.totalSpent;
-                    final limit = trip.budgetLimit!;
-                    final ratio = (spent / limit).clamp(0.0, 1.0);
-                    final isOverBudget = spent > limit;
+                  Builder(
+                    builder: (context) {
+                      final spent = expenseState.totalSpent;
+                      final limit = trip.budgetLimit!;
+                      final ratio = (spent / limit).clamp(0.0, 1.0);
+                      final isOverBudget = spent > limit;
 
-                    Color progressColor;
-                    if (isOverBudget) {
-                      progressColor = isDark ? const Color(0xFFEF4444) : const Color(0xFFDC2626);
-                    } else if (ratio >= 0.8) {
-                      progressColor = const Color(0xFFD97706);
-                    } else {
-                      progressColor = isDark ? const Color(0xFF10B981) : const Color(0xFF059669);
-                    }
+                      Color progressColor;
+                      if (isOverBudget) {
+                        progressColor = isDark
+                            ? const Color(0xFFEF4444)
+                            : const Color(0xFFDC2626);
+                      } else if (ratio >= 0.8) {
+                        progressColor = const Color(0xFFD97706);
+                      } else {
+                        progressColor = isDark
+                            ? const Color(0xFF10B981)
+                            : const Color(0xFF059669);
+                      }
 
-                    return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: isDark ? 0.35 : 0.45),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  '${CurrencyFormatter.format(spent, currency: trip.defaultCurrency)} / ${CurrencyFormatter.format(limit, currency: trip.defaultCurrency)}',
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHighest
+                              .withValues(alpha: isDark ? 0.35 : 0.45),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    '${CurrencyFormatter.format(spent, currency: trip.defaultCurrency)} / ${CurrencyFormatter.format(limit, currency: trip.defaultCurrency)}',
+                                    style: AppTypography.mono(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      color: isOverBudget
+                                          ? (isDark
+                                                ? const Color(0xFFEF4444)
+                                                : const Color(0xFFDC2626))
+                                          : theme.colorScheme.onSurface,
+                                      tabularFigures: true,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  '${(spent / limit * 100).toInt()}%',
                                   style: AppTypography.mono(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    color: isOverBudget
-                                        ? (isDark ? const Color(0xFFEF4444) : const Color(0xFFDC2626))
-                                        : theme.colorScheme.onSurface,
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w800,
+                                    color: progressColor,
                                     tabularFigures: true,
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                '${(spent / limit * 100).toInt()}%',
-                                style: AppTypography.mono(
-                                  fontSize: 10.5,
-                                  fontWeight: FontWeight.w800,
-                                  color: progressColor,
-                                  tabularFigures: true,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 5),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(4),
-                            child: LinearProgressIndicator(
-                              value: ratio,
-                              minHeight: 4.5,
-                              backgroundColor: isDark
-                                  ? const Color(0xFF1E293B)
-                                  : const Color(0xFFE2E8F0),
-                              valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
+                            const SizedBox(height: 5),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: ratio,
+                                minHeight: 4.5,
+                                backgroundColor: isDark
+                                    ? const Color(0xFF1E293B)
+                                    : const Color(0xFFE2E8F0),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  progressColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ],
 
                 // Trip Notes preview snippet (if available)
@@ -834,7 +963,9 @@ class _ModernTripCard extends ConsumerWidget {
                       Icon(
                         Icons.sticky_note_2_outlined,
                         size: 13,
-                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                        color: theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.7,
+                        ),
                       ),
                       const SizedBox(width: 5),
                       Expanded(
@@ -843,7 +974,8 @@ class _ModernTripCard extends ConsumerWidget {
                           style: TextStyle(
                             fontSize: 11,
                             fontStyle: FontStyle.italic,
-                            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.85),
+                            color: theme.colorScheme.onSurfaceVariant
+                                .withValues(alpha: 0.85),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -856,7 +988,9 @@ class _ModernTripCard extends ConsumerWidget {
                 const SizedBox(height: 10),
                 Divider(
                   height: 1,
-                  color: theme.colorScheme.outlineVariant.withValues(alpha: 0.25),
+                  color: theme.colorScheme.outlineVariant.withValues(
+                    alpha: 0.25,
+                  ),
                 ),
                 const SizedBox(height: 6),
 
@@ -869,15 +1003,24 @@ class _ModernTripCard extends ConsumerWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 7,
+                              vertical: 2.5,
+                            ),
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                              color: theme.colorScheme.primary.withValues(
+                                alpha: 0.12,
+                              ),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.people_alt_rounded, size: 12, color: theme.colorScheme.primary),
+                                Icon(
+                                  Icons.people_alt_rounded,
+                                  size: 12,
+                                  color: theme.colorScheme.primary,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   l10n.sharedTrip,
@@ -910,13 +1053,19 @@ class _ModernTripCard extends ConsumerWidget {
                           tooltip: l10n.shareTrip,
                           visualDensity: VisualDensity.compact,
                           padding: const EdgeInsets.all(4),
-                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
                           onPressed: onShare,
                         ),
                         PopupMenuButton<String>(
                           icon: const Icon(Icons.more_horiz_rounded, size: 19),
                           padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                          constraints: const BoxConstraints(
+                            minWidth: 32,
+                            minHeight: 32,
+                          ),
                           onSelected: (val) {
                             if (val == 'edit') onEdit();
                             if (val == 'delete') onDelete();
@@ -936,9 +1085,18 @@ class _ModernTripCard extends ConsumerWidget {
                               value: 'delete',
                               child: Row(
                                 children: [
-                                  const Icon(Icons.delete_outline_rounded, color: AppColors.errorPastel, size: 18),
+                                  const Icon(
+                                    Icons.delete_outline_rounded,
+                                    color: AppColors.errorPastel,
+                                    size: 18,
+                                  ),
                                   const SizedBox(width: 8),
-                                  Text(l10n.deleteTrip, style: const TextStyle(color: AppColors.errorPastel)),
+                                  Text(
+                                    l10n.deleteTrip,
+                                    style: const TextStyle(
+                                      color: AppColors.errorPastel,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -948,7 +1106,9 @@ class _ModernTripCard extends ConsumerWidget {
                         Icon(
                           Icons.arrow_forward_ios_rounded,
                           size: 12,
-                          color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                          color: theme.colorScheme.onSurfaceVariant.withValues(
+                            alpha: 0.5,
+                          ),
                         ),
                       ],
                     ),
@@ -1006,7 +1166,9 @@ class _ModernTripCard extends ConsumerWidget {
       );
     } else if (trip.isUpcoming) {
       final days = trip.daysUntilStart;
-      final label = days == 0 ? l10n.today.toUpperCase() : l10n.daysRemaining(days).toUpperCase();
+      final label = days == 0
+          ? l10n.today.toUpperCase()
+          : l10n.daysRemaining(days).toUpperCase();
 
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -1022,7 +1184,11 @@ class _ModernTripCard extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(Icons.schedule_rounded, size: 10, color: theme.colorScheme.primary),
+            Icon(
+              Icons.schedule_rounded,
+              size: 10,
+              color: theme.colorScheme.primary,
+            ),
             const SizedBox(width: 4),
             Text(
               label,
@@ -1041,14 +1207,20 @@ class _ModernTripCard extends ConsumerWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+          color: theme.colorScheme.surfaceContainerHighest.withValues(
+            alpha: 0.6,
+          ),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(Icons.check_circle_outline_rounded, size: 10, color: theme.colorScheme.onSurfaceVariant),
+            Icon(
+              Icons.check_circle_outline_rounded,
+              size: 10,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
             const SizedBox(width: 4),
             Text(
               l10n.completed.toUpperCase(),
