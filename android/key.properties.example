@@ -1,0 +1,9 @@
+# PackBuddy Android Release Signing Configuration Example
+# Copy this file to `android/key.properties` and fill in your keystore values.
+# NOTE: `key.properties` is git-ignored and must never be committed.
+
+# Path relative to `android/app` or an absolute path (e.g. upload-keystore.jks or ../upload-keystore.jks)
+storeFile=upload-keystore.jks
+storePassword=your_keystore_password
+keyAlias=upload
+keyPassword=your_key_password
