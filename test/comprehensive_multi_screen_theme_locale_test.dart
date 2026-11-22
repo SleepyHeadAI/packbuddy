@@ -27,6 +27,7 @@ import 'package:packbuddy/features/search/domain/search_result.dart';
 import 'package:packbuddy/features/search/presentation/controllers/search_controller.dart';
 import 'package:packbuddy/features/search/presentation/screens/global_search_screen.dart';
 import 'package:packbuddy/features/search/presentation/screens/widgets/search_result_tile.dart';
+import 'package:packbuddy/l10n/app_localizations.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -188,8 +189,12 @@ void main() {
                   return controller;
                 }),
               ],
+              // WorldMapProfileCard resolves labels via AppLocalizations, so
+              // register the same delegates as production (main.dart).
               child: MaterialApp(
                 theme: theme,
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
                 home: const ProfileScreen(),
               ),
             ),
@@ -433,6 +438,8 @@ void main() {
           ],
           child: const MaterialApp(
             locale: Locale('ar'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             home: ProfileScreen(),
           ),
         ),

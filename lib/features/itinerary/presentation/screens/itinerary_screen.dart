@@ -255,11 +255,14 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
                           buildDefaultDragHandles: false,
                           padding: const EdgeInsets.only(top: 4, bottom: 96),
                           itemCount: dayItems.length,
-                          onReorder: (oldIndex, newIndex) {
+                          onReorderItem: (oldIndex, newIndex) {
+                            // onReorderItem already compensates for the removed
+                            // item; the controller expects legacy onReorder
+                            // indices (it applies the -1 itself), so map back.
                             itineraryNotifier.reorderActivities(
                               selectedDay,
                               oldIndex,
-                              newIndex,
+                              newIndex > oldIndex ? newIndex + 1 : newIndex,
                             );
                           },
                           proxyDecorator: (child, index, animation) {

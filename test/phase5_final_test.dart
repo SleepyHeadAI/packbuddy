@@ -164,9 +164,16 @@ void main() {
     });
 
     testWidgets('PaywallSheet displays Pro features and plan options', (tester) async {
+      // Earlier tests in this file purchase Pro and persist it to prefs; pin a
+      // free user so the sheet shows the plan picker instead of the Pro state.
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
+        ProviderScope(
+          overrides: [
+            proSubscriptionProvider.overrideWith(
+              (ref) => FakeProNotifier(const ProSubscriptionState(isPro: false)),
+            ),
+          ],
+          child: const MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             locale: Locale('en'),

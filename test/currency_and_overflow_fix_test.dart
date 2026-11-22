@@ -14,6 +14,7 @@ import 'package:packbuddy/features/dashboard/presentation/dashboard_screen.dart'
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
+import 'package:packbuddy/features/settings/data/mock_revenuecat_service.dart';
 
 void main() {
   setUpAll(() async {
@@ -245,12 +246,19 @@ void main() {
     testWidgets('DashboardScreen renders cleanly with PRO badge and all actions on 320px width without overflow',
         (tester) async {
       await tester.binding.setSurfaceSize(const Size(320, 600));
-      SharedPreferences.setMockInitialValues({'packbuddy_is_pro_member': true});
+      SharedPreferences.setMockInitialValues({});
       await PreferencesService.init();
 
+      // Pro is resolved from the uid-scoped secure entitlement (Keystore), not
+      // the legacy device-global prefs flag, so pin the Pro state explicitly.
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
+        ProviderScope(
+          overrides: [
+            proSubscriptionProvider.overrideWith(
+              (ref) => _FakeProNotifier(const ProSubscriptionState(isPro: true)),
+            ),
+          ],
+          child: const MaterialApp(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             locale: Locale('tr'),
@@ -264,4 +272,11 @@ void main() {
       expect(find.text('PRO'), findsOneWidget);
     });
   });
+}
+
+class _FakeProNotifier extends StateNotifier<ProSubscriptionState> implements MockRevenueCatNotifier {
+  _FakeProNotifier(super.state);
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => Future.value();
 }

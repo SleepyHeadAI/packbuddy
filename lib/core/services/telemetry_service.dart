@@ -271,7 +271,7 @@ class TelemetryService {
   }) async {
     final props = <String, Object>{
       'trigger_source': triggerSource,
-      if (highlightFeature != null) 'highlight_feature': highlightFeature,
+      'highlight_feature': ?highlightFeature,
     };
     _record('paywall_viewed', props);
 
@@ -292,7 +292,7 @@ class TelemetryService {
   }) async {
     final props = <String, Object>{
       'feature_key': featureKey,
-      if (context != null) 'context': context,
+      'context': ?context,
     };
     _record('pro_gate_hit', props);
 
@@ -336,7 +336,7 @@ class TelemetryService {
     final props = <String, Object>{
       'product_id': productId,
       'plan': plan,
-      if (purchaseId != null) 'purchase_id': purchaseId,
+      'purchase_id': ?purchaseId,
     };
     _record('purchase_completed', props);
 
