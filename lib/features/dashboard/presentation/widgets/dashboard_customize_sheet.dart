@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import '../../../../core/services/preferences_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../dashboard_localization.dart';
@@ -41,7 +42,7 @@ class DashboardCustomizeSheet extends StatefulWidget {
         child: Container(
           decoration: BoxDecoration(
             color: Theme.of(ctx).scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            borderRadius: AppRadius.sheetRadius,
           ),
           padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
           child: SafeArea(

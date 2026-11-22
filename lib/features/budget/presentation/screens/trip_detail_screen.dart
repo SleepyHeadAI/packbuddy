@@ -354,7 +354,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return AppCard(
-      borderRadius: 18,
+      borderRadius: AppRadius.lg,
       padding: const EdgeInsets.all(16),
       onTap: () {
         Navigator.of(context).push(

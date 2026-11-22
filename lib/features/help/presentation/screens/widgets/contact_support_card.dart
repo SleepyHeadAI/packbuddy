@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/core/constants/app_constants.dart';
 import 'package:packbuddy/core/services/email_dispatch_service.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
@@ -40,7 +41,7 @@ class ContactSupportCard extends StatelessWidget {
       children: [
         AppCard(
           padding: const EdgeInsets.all(18),
-          borderRadius: 22,
+          borderRadius: AppRadius.card,
           backgroundColor: isDark
               ? theme.colorScheme.surfaceContainer
               : theme.colorScheme.primaryContainer.withValues(alpha: 0.25),

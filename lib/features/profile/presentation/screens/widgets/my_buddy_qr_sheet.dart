@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:packbuddy/core/services/share_service.dart';
@@ -74,7 +75,7 @@ class MyBuddyQrSheet extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: AppRadius.sheetRadius,
       ),
       child: SafeArea(
         child: Column(

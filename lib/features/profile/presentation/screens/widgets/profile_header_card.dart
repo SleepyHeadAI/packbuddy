@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
 import 'package:packbuddy/features/profile/domain/friend_localization.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
@@ -44,7 +45,7 @@ class ProfileHeaderCard extends StatelessWidget {
 
     return AppCard(
       padding: const EdgeInsets.all(20),
-      borderRadius: 24,
+      borderRadius: AppRadius.card,
       child: Column(
         children: [
           // Avatar + Pro Badge + Camera Badge

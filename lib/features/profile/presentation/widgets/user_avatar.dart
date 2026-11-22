@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/features/profile/domain/animal_avatar.dart';
 import 'package:packbuddy/features/profile/presentation/widgets/animal_avatar_widget.dart';
@@ -80,6 +81,8 @@ class UserAvatar extends StatelessWidget {
               width: size,
               height: size,
               fit: BoxFit.cover,
+              gaplessPlayback: true,
+              frameBuilder: appImageFadeInFrameBuilder,
               errorBuilder: (context, error, stackTrace) => _buildFallback(theme, isDark),
             ),
           );
@@ -94,6 +97,8 @@ class UserAvatar extends StatelessWidget {
             width: size,
             height: size,
             fit: BoxFit.cover,
+            gaplessPlayback: true,
+            frameBuilder: appImageFadeInFrameBuilder,
             errorBuilder: (context, error, stackTrace) => _buildFallback(theme, isDark),
           ),
         );
@@ -109,6 +114,8 @@ class UserAvatar extends StatelessWidget {
                 width: size,
                 height: size,
                 fit: BoxFit.cover,
+                gaplessPlayback: true,
+                frameBuilder: appImageFadeInFrameBuilder,
                 errorBuilder: (context, error, stackTrace) => _buildFallback(theme, isDark),
               ),
             );

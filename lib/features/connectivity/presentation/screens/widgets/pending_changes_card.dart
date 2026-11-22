@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
 import 'package:packbuddy/features/connectivity/domain/connectivity_localization.dart';
 
@@ -27,7 +28,7 @@ class PendingChangesCard extends StatelessWidget {
 
     return AppCard(
       padding: const EdgeInsets.all(16),
-      borderRadius: 18,
+      borderRadius: AppRadius.lg,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

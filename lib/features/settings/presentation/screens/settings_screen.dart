@@ -210,12 +210,12 @@ class SettingsScreen extends ConsumerWidget {
                   // PackBuddy Pro Tile
                   _SettingsTile(
                     icon: proState.isPro ? AppIcons.verified : AppIcons.crown,
-                    iconColor: proState.isPro ? const Color(0xFF10B981) : AppColors.brandAccent,
-                    iconBgColor: (proState.isPro ? const Color(0xFF10B981) : AppColors.brandAccent)
+                    iconColor: proState.isPro ? AppColors.successPastel : AppColors.brandAccent,
+                    iconBgColor: (proState.isPro ? AppColors.successPastel : AppColors.brandAccent)
                         .withValues(alpha: 0.12),
                     title: l10n.proTitle,
                     badge: proState.isPro ? l10n.activeStatus : l10n.proBadge,
-                    badgeColor: proState.isPro ? const Color(0xFF10B981) : AppColors.brandAccent,
+                    badgeColor: proState.isPro ? AppColors.successPastel : AppColors.brandAccent,
                     subtitle: proState.isPro ? l10n.purchaseSuccess : l10n.upgradeToPro,
                     onTap: () => PaywallSheet.show(context),
                   ),
@@ -464,13 +464,13 @@ class SettingsScreen extends ConsumerWidget {
                         height: 34,
                         decoration: BoxDecoration(
                           color: vaultState.hasPin
-                              ? const Color(0xFF10B981).withValues(alpha: 0.12)
+                              ? AppColors.successPastel.withValues(alpha: 0.12)
                               : (isDark ? Colors.white10 : const Color(0xFFF1F5F9)),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
                           vaultState.hasPin ? AppIcons.lock : AppIcons.lockOpen,
-                          color: vaultState.hasPin ? const Color(0xFF10B981) : theme.colorScheme.onSurfaceVariant,
+                          color: vaultState.hasPin ? AppColors.successPastel : theme.colorScheme.onSurfaceVariant,
                           size: 17,
                         ),
                       ),
@@ -784,7 +784,7 @@ class SettingsScreen extends ConsumerWidget {
       case SyncStatus.syncing:
         return AppColors.brandAccent.withValues(alpha: 0.15);
       case SyncStatus.upToDate:
-        return const Color(0xFF10B981).withValues(alpha: 0.15);
+        return AppColors.successPastel.withValues(alpha: 0.15);
       case SyncStatus.failed:
         return AppColors.errorPastel.withValues(alpha: 0.15);
       case SyncStatus.noInternet:
@@ -798,7 +798,7 @@ class SettingsScreen extends ConsumerWidget {
       case SyncStatus.syncing:
         return AppColors.brandAccent;
       case SyncStatus.upToDate:
-        return const Color(0xFF10B981);
+        return AppColors.successPastel;
       case SyncStatus.failed:
         return AppColors.errorPastel;
       case SyncStatus.noInternet:
@@ -1209,7 +1209,7 @@ class _AccountSessionCard extends ConsumerWidget {
                           width: 7,
                           height: 7,
                           decoration: const BoxDecoration(
-                            color: Color(0xFF10B981),
+                            color: AppColors.successPastel,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -1218,7 +1218,7 @@ class _AccountSessionCard extends ConsumerWidget {
                           child: Text(
                             l10n.cloudSessionActive,
                             style: AppTypography.caption.copyWith(
-                              color: const Color(0xFF10B981),
+                              color: AppColors.successPastel,
                               fontWeight: FontWeight.w600,
                               fontSize: 11,
                             ),

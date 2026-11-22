@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:packbuddy/data/sync_engine/sync_engine.dart';
@@ -105,7 +106,7 @@ class _SyncStatusScreenState extends ConsumerState<SyncStatusScreen> {
           // 1. Connection & Last Sync Card
           AppCard(
             padding: const EdgeInsets.all(16),
-            borderRadius: 18,
+            borderRadius: AppRadius.lg,
             child: Column(
               children: [
                 Row(

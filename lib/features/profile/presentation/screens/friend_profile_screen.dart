@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
@@ -125,7 +126,7 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: AppRadius.sheetRadius,
         ),
         child: SafeArea(
           child: Column(
@@ -315,7 +316,7 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
 
     return AppCard(
       padding: const EdgeInsets.all(20),
-      borderRadius: 24,
+      borderRadius: AppRadius.card,
       child: Column(
         children: [
           UserAvatar(
@@ -452,7 +453,7 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
 
     return AppCard(
       padding: const EdgeInsets.all(18),
-      borderRadius: 20,
+      borderRadius: AppRadius.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -527,7 +528,7 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
   Widget _buildTravelStatsCard(BuildContext context, ThemeData theme, String lang) {
     return AppCard(
       padding: const EdgeInsets.all(18),
-      borderRadius: 20,
+      borderRadius: AppRadius.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -631,7 +632,7 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
   Widget _buildStylesCard(BuildContext context, ThemeData theme, List<TravelStyle> styles, String lang) {
     return AppCard(
       padding: const EdgeInsets.all(18),
-      borderRadius: 20,
+      borderRadius: AppRadius.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -685,7 +686,7 @@ class _FriendProfileScreenState extends ConsumerState<FriendProfileScreen> {
   Widget _buildBadgesCard(BuildContext context, ThemeData theme, List<TravelBadge> badges, String lang) {
     return AppCard(
       padding: const EdgeInsets.all(18),
-      borderRadius: 20,
+      borderRadius: AppRadius.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

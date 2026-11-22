@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
@@ -387,7 +388,7 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
 
           // Guidance card
           AppCard(
-            borderRadius: 18,
+            borderRadius: AppRadius.lg,
             padding: const EdgeInsets.all(20),
             child: Row(
               children: [

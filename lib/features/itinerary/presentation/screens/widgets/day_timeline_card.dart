@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/core/theme/app_typography.dart';
 import 'package:packbuddy/features/budget/domain/collaboration_localization.dart';
 import 'package:packbuddy/features/itinerary/domain/itinerary_item.dart';
@@ -87,7 +88,7 @@ class DayTimelineCard extends StatelessWidget {
           // 2. Activity Content Card
           Expanded(
             child: AppCard(
-              borderRadius: 16,
+              borderRadius: AppRadius.lg,
               padding: const EdgeInsets.all(12),
               onTap: onEdit,
               child: Column(

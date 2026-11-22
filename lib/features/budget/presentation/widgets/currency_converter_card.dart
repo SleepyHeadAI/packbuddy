@@ -46,7 +46,7 @@ class CurrencyConverterCard extends StatefulWidget {
         child: Container(
           decoration: BoxDecoration(
             color: Theme.of(ctx).scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            borderRadius: AppRadius.sheetRadius,
           ),
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
           child: SafeArea(

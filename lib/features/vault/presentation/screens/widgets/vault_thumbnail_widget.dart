@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:packbuddy/core/services/security_service.dart';
 import 'package:packbuddy/core/theme/app_icons.dart';
@@ -280,6 +281,8 @@ class _VaultThumbnailWidgetState extends State<VaultThumbnailWidget> {
     return Image.memory(
       _thumbnailBytes!,
       fit: widget.fit,
+      gaplessPlayback: true,
+      frameBuilder: appImageFadeInFrameBuilder,
       width: double.infinity,
       height: double.infinity,
       errorBuilder: (context, error, stackTrace) {

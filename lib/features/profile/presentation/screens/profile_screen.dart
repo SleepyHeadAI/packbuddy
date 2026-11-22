@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
@@ -191,7 +192,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             const SizedBox(height: 8),
             AppCard(
               padding: const EdgeInsets.all(16),
-              borderRadius: 18,
+              borderRadius: AppRadius.lg,
               child: Column(
                 children: [
                   _buildAccountRow(

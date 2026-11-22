@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/features/itinerary/domain/itinerary_item.dart';
 import 'package:packbuddy/features/itinerary/domain/itinerary_localization.dart';
@@ -310,7 +311,7 @@ class _AddActivitySheetState extends ConsumerState<AddActivitySheet> {
       ),
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: AppRadius.sheetRadius,
       ),
       child: SafeArea(
         top: false,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/shared/widgets/app_card.dart';
 import 'package:packbuddy/features/profile/domain/profile_localization.dart';
 
@@ -112,7 +113,7 @@ class TravelStatsCard extends StatelessWidget {
   }) {
     return AppCard(
       padding: const EdgeInsets.all(14),
-      borderRadius: 18,
+      borderRadius: AppRadius.lg,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

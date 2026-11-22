@@ -5,35 +5,6 @@ import 'package:packbuddy/core/theme/app_motion.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
 export 'bouncy_pressable.dart';
 
-/// Standard smooth cubic page route transition with subtle slide and fade
-class AppPageRoute<T> extends PageRouteBuilder<T> {
-  final Widget page;
-
-  AppPageRoute({required this.page, super.settings})
-      : super(
-          pageBuilder: (context, animation, secondaryAnimation) => page,
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            final curvedAnimation = CurvedAnimation(
-              parent: animation,
-              curve: Curves.easeOutCubic,
-              reverseCurve: Curves.easeInCubic,
-            );
-            return FadeTransition(
-              opacity: curvedAnimation,
-              child: SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0.04, 0),
-                  end: Offset.zero,
-                ).animate(curvedAnimation),
-                child: child,
-              ),
-            );
-          },
-          transitionDuration: const Duration(milliseconds: 280),
-          reverseTransitionDuration: const Duration(milliseconds: 220),
-        );
-}
-
 /// Staggered Fade & Slide-up entrance animation for cards and list items
 class AppFadeSlide extends StatefulWidget {
   final Widget child;
@@ -715,4 +686,22 @@ class _AppFloatingIllustrationState extends State<AppFloatingIllustration>
       ),
     );
   }
+}
+
+/// Shared [Image.frameBuilder]: soft fade-in once the first frame decodes.
+/// Synchronously available images (memory cache) and reduced motion show
+/// instantly. Pair with `gaplessPlayback: true` to avoid flicker on rebuilds.
+Widget appImageFadeInFrameBuilder(
+  BuildContext context,
+  Widget child,
+  int? frame,
+  bool wasSynchronouslyLoaded,
+) {
+  if (wasSynchronouslyLoaded) return child;
+  return AnimatedOpacity(
+    opacity: frame == null ? 0.0 : 1.0,
+    duration: AppMotion.durationOf(context, AppMotion.normal),
+    curve: AppMotion.enter,
+    child: child,
+  );
 }

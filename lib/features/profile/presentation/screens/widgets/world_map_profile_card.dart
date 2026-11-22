@@ -1,5 +1,6 @@
 import 'package:countries_world_map/countries_world_map.dart';
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
 import 'package:packbuddy/features/travel_map/data/world_countries_data.dart';
@@ -144,7 +145,7 @@ class WorldMapProfileCard extends StatelessWidget {
 
     return AppCard(
       padding: const EdgeInsets.all(18),
-      borderRadius: 22,
+      borderRadius: AppRadius.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

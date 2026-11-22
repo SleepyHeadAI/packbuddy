@@ -111,7 +111,7 @@ class _ShareTripSheetState extends ConsumerState<ShareTripSheet> {
     return Container(
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: AppRadius.sheetRadius,
       ),
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
       child: SafeArea(

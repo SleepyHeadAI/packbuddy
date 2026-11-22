@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:packbuddy/shared/widgets/app_skeleton.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
@@ -220,16 +221,18 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> with SingleTicker
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer.withValues(alpha: 0.4),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.group_add_rounded,
-                  size: 48,
-                  color: theme.colorScheme.primary,
+              AppFloatingIllustration(
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer.withValues(alpha: 0.4),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.group_add_rounded,
+                    size: 48,
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
               ),
               const SizedBox(height: 18),
@@ -321,20 +324,32 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> with SingleTicker
     final theme = Theme.of(context);
 
     if (state.incomingRequests.isEmpty && state.outgoingRequests.isEmpty) {
+      // Matches the friends-tab empty state: soft circular badge, centred copy,
+      // scroll-safe on compact screens.
       return Center(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(32),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.mark_email_read_rounded,
-                size: 48,
-                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+              AppFloatingIllustration(
+                child: Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.mark_email_read_rounded,
+                    size: 40,
+                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                  ),
+                ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
               Text(
                 FriendLocalization.getNoRequests(lang),
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,

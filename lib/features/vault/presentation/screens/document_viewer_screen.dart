@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:packbuddy/core/theme/app_theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -225,10 +226,10 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFEF4444).withValues(alpha: 0.15),
+                color: AppColors.errorPastel.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.delete_outline_rounded, color: Color(0xFFEF4444), size: 20),
+              child: const Icon(Icons.delete_outline_rounded, color: AppColors.errorPastel, size: 20),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -581,6 +582,8 @@ class _DocumentViewerScreenState extends ConsumerState<DocumentViewerScreen> {
                         child: Image.memory(
                           _decryptedBytes!,
                           fit: BoxFit.contain,
+                          gaplessPlayback: true,
+                          frameBuilder: appImageFadeInFrameBuilder,
                           errorBuilder: (ctx, err, stack) => Container(
                             padding: const EdgeInsets.all(24),
                             alignment: Alignment.center,

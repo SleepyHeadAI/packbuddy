@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/features/checklist/presentation/controllers/checklist_controller.dart';
 import 'package:packbuddy/features/search/domain/search_result.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
@@ -54,7 +55,7 @@ class SearchResultTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
       child: AppCard(
-        borderRadius: 16,
+        borderRadius: AppRadius.lg,
         padding: const EdgeInsets.all(12),
         onTap: onTap,
         child: Row(

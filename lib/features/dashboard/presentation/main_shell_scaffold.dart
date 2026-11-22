@@ -16,6 +16,7 @@ import '../../vault/presentation/screens/vault_screen.dart';
 import '../../vault/presentation/controllers/vault_controller.dart';
 import '../../connectivity/presentation/widgets/connectivity_banner.dart';
 import 'dashboard_screen.dart';
+import '../../../shared/widgets/floating_action_button_location.dart';
 import 'navigation_provider.dart';
 export '../../../shared/widgets/floating_action_button_location.dart';
 
@@ -66,7 +67,7 @@ class _MainShellScaffoldState extends ConsumerState<MainShellScaffold> {
     final isKeyboardVisible = mediaQuery.viewInsets.bottom > 0;
     // Calculate generous floating clearance above physical bottom system insets
     final bottomInset = mediaQuery.padding.bottom;
-    final floatingBottomMargin = math.max(14.0, bottomInset + 8.0);
+    final floatingBottomMargin = math.max(kFloatingBarMinBottomMargin, bottomInset + 8.0);
     final screenWidth = mediaQuery.size.width;
     final horizontalMargin = screenWidth > 600 ? 32.0 : 20.0;
 
@@ -101,13 +102,13 @@ class _MainShellScaffoldState extends ConsumerState<MainShellScaffold> {
 
             // 2. True Floating Frosted Glass Island Capsule Navigation Bar
             AnimatedPositioned(
-              duration: const Duration(milliseconds: 220),
-              curve: Curves.easeOutCubic,
+              duration: AppMotion.durationOf(context, AppMotion.normal),
+              curve: AppMotion.enter,
               left: 0,
               right: 0,
               bottom: isKeyboardVisible ? -100.0 : floatingBottomMargin,
               child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 180),
+                duration: AppMotion.durationOf(context, AppMotion.fast),
                 opacity: isKeyboardVisible ? 0.0 : 1.0,
                 child: Center(
                   child: ConstrainedBox(
@@ -341,7 +342,7 @@ class _FloatingNavItem extends StatelessWidget {
                 AnimatedScale(
                   scale: isSelected ? 1.08 : 1.0,
                   duration: AppMotion.fast,
-                  curve: Curves.easeOutBack,
+                  curve: AppMotion.spring,
                   child: Icon(
                     isSelected ? item.selectedIcon : item.icon,
                     size: 20,
@@ -404,7 +405,7 @@ class _FadeIndexedStackState extends State<FadeIndexedStack>
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this, duration: widget.duration);
-    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
+    _animation = CurvedAnimation(parent: _controller, curve: AppMotion.enter);
     _controller.forward();
   }
 
@@ -412,7 +413,11 @@ class _FadeIndexedStackState extends State<FadeIndexedStack>
   void didUpdateWidget(FadeIndexedStack oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.index != oldWidget.index) {
-      _controller.forward(from: 0.0);
+      if (AppMotion.reduceMotionOf(context)) {
+        _controller.value = 1.0;
+      } else {
+        _controller.forward(from: 0.0);
+      }
     }
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/features/profile/presentation/controllers/friends_controller.dart';
 
@@ -143,6 +144,8 @@ class CollaboratorAvatarStack extends ConsumerWidget {
               width: size,
               height: size,
               fit: BoxFit.cover,
+              gaplessPlayback: true,
+              frameBuilder: appImageFadeInFrameBuilder,
               errorBuilder: (_, _, _) => _buildInitial(initial, color),
             )
           : _buildInitial(initial, color),

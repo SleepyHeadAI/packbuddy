@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
+import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:packbuddy/core/theme/app_motion.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:packbuddy/core/theme/app_colors.dart';
@@ -124,7 +126,7 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
       padding: EdgeInsets.only(bottom: bottomInset),
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: AppRadius.sheetRadius,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.08),
@@ -263,14 +265,26 @@ class _FeedbackSheetState extends State<FeedbackSheet> {
                     Container(
                       width: double.infinity,
                       height: 140,
+                      clipBehavior: Clip.antiAlias,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: AppRadius.mdRadius,
+                        color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
                         border: Border.all(
                           color: isDark ? AppColors.outlineDark : AppColors.outlineLight,
                         ),
-                        image: DecorationImage(
-                          image: FileImage(_selectedImage!),
-                          fit: BoxFit.cover,
+                      ),
+                      child: Image.file(
+                        _selectedImage!,
+                        fit: BoxFit.cover,
+                        gaplessPlayback: true,
+                        frameBuilder: appImageFadeInFrameBuilder,
+                        // Unreadable / deleted file: neutral placeholder instead of a red error box.
+                        errorBuilder: (context, error, stackTrace) => Center(
+                          child: Icon(
+                            Icons.broken_image_outlined,
+                            size: 32,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
                         ),
                       ),
                     ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:packbuddy/shared/widgets/app_skeleton.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/theme/app_radius.dart';
@@ -368,25 +369,29 @@ class _ItineraryScreenState extends ConsumerState<ItineraryScreen> {
     required int selectedDay,
     required int totalDays,
   }) {
+    // Scroll-safe so short viewports (320x568, keyboard, large font scale)
+    // never overflow; bottom padding keeps the card clear of the extended FAB.
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(32, 16, 32, 96),
         child: AppCard(
-          borderRadius: 20,
+          borderRadius: AppRadius.card,
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.map_rounded,
-                  size: 36,
-                  color: theme.colorScheme.primary,
+              AppFloatingIllustration(
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.map_rounded,
+                    size: 36,
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
               ),
               const SizedBox(height: 14),

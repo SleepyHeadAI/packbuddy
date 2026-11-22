@@ -523,7 +523,7 @@ class _AddTripSheetState extends ConsumerState<AddTripSheet> {
       ),
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: AppRadius.sheetRadius,
       ),
       padding: EdgeInsets.only(
         left: 20,

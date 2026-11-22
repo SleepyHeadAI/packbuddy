@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:packbuddy/features/profile/domain/profile_localization.dart';
 import 'package:packbuddy/features/profile/domain/travel_badge.dart';
 import 'package:packbuddy/features/profile/domain/travel_style.dart';
@@ -39,7 +40,7 @@ class TravelBadgesCard extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: theme.scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: AppRadius.sheetRadius,
         ),
         child: SafeArea(
           child: Column(
@@ -230,7 +231,7 @@ class TravelBadgesCard extends StatelessWidget {
               height: mediaQuery.size.height * 0.88,
               decoration: BoxDecoration(
                 color: theme.scaffoldBackgroundColor,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                borderRadius: AppRadius.sheetRadius,
               ),
               child: SafeArea(
                 top: false,
@@ -604,7 +605,7 @@ class TravelBadgesCard extends StatelessWidget {
 
     return AppCard(
       padding: const EdgeInsets.all(18),
-      borderRadius: 20,
+      borderRadius: AppRadius.card,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

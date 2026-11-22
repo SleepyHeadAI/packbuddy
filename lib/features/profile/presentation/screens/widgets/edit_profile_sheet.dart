@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/theme/app_radius.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/l10n/app_l10n_lookup.dart';
 import 'package:packbuddy/features/budget/domain/country.dart';
@@ -189,7 +190,7 @@ class _EditProfileSheetState extends ConsumerState<EditProfileSheet> {
       ),
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: AppRadius.sheetRadius,
       ),
       child: SingleChildScrollView(
         child: Column(

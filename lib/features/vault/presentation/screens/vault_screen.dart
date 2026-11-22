@@ -176,7 +176,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
   Color _getCategoryColor(String category, {bool isDark = false}) {
     final cat = category.toLowerCase();
     if (cat.contains('özel') || cat.contains('private')) {
-      return isDark ? const Color(0xFFFB7185) : const Color(0xFFE11D48); // Rose / Crimson
+      return isDark ? const Color(0xFFFB7185) : AppColors.errorPastel; // Rose / Crimson
     } else if (cat.contains('pasaport') || cat.contains('passport') || cat.contains('kimlik') || cat.contains('vize')) {
       return AppColors.brandAccent; // Terracotta / Identity
     } else if (cat.contains('bilet') || cat.contains('ticket') || cat.contains('transit')) {
@@ -385,10 +385,10 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFEF4444).withValues(alpha: 0.15),
+                color: AppColors.errorPastel.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(AppIcons.delete, color: Color(0xFFEF4444), size: 20),
+              child: const Icon(AppIcons.delete, color: AppColors.errorPastel, size: 20),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -441,7 +441,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
         top: false,
         child: Material(
           color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: AppRadius.sheetRadius,
           clipBehavior: Clip.antiAlias,
           child: Padding(
             padding: EdgeInsets.only(
@@ -756,10 +756,10 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFE11D48).withValues(alpha: 0.15),
+                color: AppColors.errorPastel.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.lock_rounded, color: Color(0xFFE11D48), size: 20),
+              child: const Icon(Icons.lock_rounded, color: AppColors.errorPastel, size: 20),
             ),
             const SizedBox(width: 8),
             Text(
@@ -1014,12 +1014,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                   selectedCategory: _selectedCategoryFilter,
                   fabKey: _fabKey,
                   fabColor: _selectedCategoryFilter == 'Özel Resimler'
-                      ? const Color(0xFFE11D48)
+                      ? AppColors.errorPastel
                       : AppColors.brandAccent,
                   fabIconColor: Colors.white,
                 ),
                 backgroundColor: _selectedCategoryFilter == 'Özel Resimler'
-                    ? const Color(0xFFE11D48)
+                    ? AppColors.errorPastel
                     : AppColors.brandAccent,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
@@ -1082,21 +1082,21 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                                   decoration: BoxDecoration(
                                     color: _selectedCategoryFilter == 'Özel Resimler'
-                                        ? const Color(0xFFE11D48).withValues(alpha: isDark ? 0.2 : 0.08)
+                                        ? AppColors.errorPastel.withValues(alpha: isDark ? 0.2 : 0.08)
                                         : (isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceLight),
                                     borderRadius: BorderRadius.circular(18),
                                     border: Border.all(
                                       color: _selectedCategoryFilter == 'Özel Resimler'
-                                          ? const Color(0xFFE11D48)
+                                          ? AppColors.errorPastel
                                           : (_isPrivatePhotosUnlocked
-                                              ? const Color(0xFFE11D48).withValues(alpha: 0.5)
+                                              ? AppColors.errorPastel.withValues(alpha: 0.5)
                                               : (isDark ? AppColors.outlineDark : AppColors.outlineLight)),
                                       width: _selectedCategoryFilter == 'Özel Resimler' ? 1.0 : 0.5,
                                     ),
                                     boxShadow: _selectedCategoryFilter == 'Özel Resimler'
                                         ? [
                                             BoxShadow(
-                                              color: const Color(0xFFE11D48).withValues(alpha: 0.15),
+                                              color: AppColors.errorPastel.withValues(alpha: 0.15),
                                               blurRadius: 8,
                                               offset: const Offset(0, 3),
                                             ),
@@ -1112,13 +1112,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                           Container(
                                             padding: const EdgeInsets.all(7),
                                             decoration: BoxDecoration(
-                                              color: const Color(0xFFE11D48).withValues(alpha: 0.15),
+                                              color: AppColors.errorPastel.withValues(alpha: 0.15),
                                               shape: BoxShape.circle,
                                             ),
                                             child: Icon(
                                               _isPrivatePhotosUnlocked ? AppIcons.lockOpen : AppIcons.lock,
                                               size: 15,
-                                              color: const Color(0xFFE11D48),
+                                              color: AppColors.errorPastel,
                                             ),
                                           ),
                                           const SizedBox(width: 4),
@@ -1130,7 +1130,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                                 decoration: BoxDecoration(
                                                   color: _isPrivatePhotosUnlocked
                                                       ? AppColors.successPastel.withValues(alpha: 0.2)
-                                                      : const Color(0xFFE11D48).withValues(alpha: 0.12),
+                                                      : AppColors.errorPastel.withValues(alpha: 0.12),
                                                   borderRadius: BorderRadius.circular(6),
                                                 ),
                                                 child: Text(
@@ -1142,7 +1142,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                                     fontWeight: FontWeight.bold,
                                                     color: _isPrivatePhotosUnlocked
                                                         ? AppColors.successPastel
-                                                        : const Color(0xFFE11D48),
+                                                        : AppColors.errorPastel,
                                                   ),
                                                 ),
                                               ),
@@ -1159,7 +1159,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                           fontWeight: FontWeight.bold,
                                           fontSize: 13,
                                           color: _selectedCategoryFilter == 'Özel Resimler'
-                                              ? const Color(0xFFE11D48)
+                                              ? AppColors.errorPastel
                                               : theme.colorScheme.onSurface,
                                         ),
                                       ),
@@ -1170,7 +1170,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                             _isPrivatePhotosUnlocked ? AppIcons.photo : AppIcons.shield,
                                             size: 11,
                                             color: _selectedCategoryFilter == 'Özel Resimler'
-                                                ? const Color(0xFFE11D48)
+                                                ? AppColors.errorPastel
                                                 : theme.colorScheme.onSurfaceVariant,
                                           ),
                                           const SizedBox(width: 4),
@@ -1185,7 +1185,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                                 fontSize: 10,
                                                 fontWeight: FontWeight.w500,
                                                 color: _selectedCategoryFilter == 'Özel Resimler'
-                                                    ? const Color(0xFFE11D48)
+                                                    ? AppColors.errorPastel
                                                     : theme.colorScheme.onSurfaceVariant,
                                               ),
                                             ),
@@ -1845,13 +1845,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE11D48).withValues(alpha: 0.08),
+                          color: AppColors.errorPastel.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0xFFE11D48).withValues(alpha: 0.2)),
+                          border: Border.all(color: AppColors.errorPastel.withValues(alpha: 0.2)),
                         ),
                         child: Row(
                           children: [
-                            const Icon(AppIcons.shield, color: Color(0xFFE11D48), size: 18),
+                            const Icon(AppIcons.shield, color: AppColors.errorPastel, size: 18),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -1878,13 +1878,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFE11D48).withValues(alpha: 0.15),
+                                  color: AppColors.errorPastel.withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(AppIcons.lock, size: 13, color: Color(0xFFE11D48)),
+                                    const Icon(AppIcons.lock, size: 13, color: AppColors.errorPastel),
                                     const SizedBox(width: 4),
                                     ConstrainedBox(
                                       constraints: const BoxConstraints(maxWidth: 90),
@@ -1894,7 +1894,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
                                           fontSize: 11,
-                                          color: Color(0xFFE11D48),
+                                          color: AppColors.errorPastel,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -1928,7 +1928,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                   padding: const EdgeInsets.all(22),
                                   decoration: BoxDecoration(
                                     color: (_selectedCategoryFilter == 'Özel Resimler'
-                                            ? const Color(0xFFE11D48)
+                                            ? AppColors.errorPastel
                                             : theme.colorScheme.secondaryContainer)
                                         .withValues(alpha: 0.15),
                                     shape: BoxShape.circle,
@@ -1939,7 +1939,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                                         : AppIcons.shield,
                                     size: 40,
                                     color: _selectedCategoryFilter == 'Özel Resimler'
-                                        ? const Color(0xFFE11D48)
+                                        ? AppColors.errorPastel
                                         : theme.colorScheme.secondary,
                                   ),
                                 ),
@@ -2025,7 +2025,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> with WidgetsBindingOb
                               alignment: Alignment.centerLeft,
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFEF4444),
+                                color: AppColors.errorPastel,
                                 borderRadius: BorderRadius.circular(AppRadius.card),
                               ),
                               child: const Icon(AppIcons.deleteSweep, color: Colors.white, size: 24),
@@ -2517,10 +2517,10 @@ class _PrivatePhotosPinSheetState extends ConsumerState<_PrivatePhotosPinSheet> 
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE11D48).withValues(alpha: 0.12),
+                  color: AppColors.errorPastel.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.lock_rounded, color: Color(0xFFE11D48), size: 28),
+                child: const Icon(Icons.lock_rounded, color: AppColors.errorPastel, size: 28),
               ),
               const SizedBox(height: 12),
               Text(
@@ -2592,10 +2592,10 @@ class _PrivatePhotosPinSheetState extends ConsumerState<_PrivatePhotosPinSheet> 
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: isFilled
-                          ? (_isError ? AppColors.errorPastel : const Color(0xFFE11D48))
+                          ? (_isError ? AppColors.errorPastel : AppColors.errorPastel)
                           : Colors.transparent,
                       border: Border.all(
-                        color: _isError ? AppColors.errorPastel : const Color(0xFFE11D48),
+                        color: _isError ? AppColors.errorPastel : AppColors.errorPastel,
                         width: 2,
                       ),
                     ),
@@ -2610,10 +2610,10 @@ class _PrivatePhotosPinSheetState extends ConsumerState<_PrivatePhotosPinSheet> 
                   duration: const Duration(milliseconds: 250),
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE11D48).withValues(alpha: 0.12),
+                    color: AppColors.errorPastel.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: const Color(0xFFE11D48).withValues(alpha: 0.35),
+                      color: AppColors.errorPastel.withValues(alpha: 0.35),
                       width: 1,
                     ),
                   ),
@@ -2622,14 +2622,14 @@ class _PrivatePhotosPinSheetState extends ConsumerState<_PrivatePhotosPinSheet> 
                     children: [
                       const Icon(
                         Icons.error_outline_rounded,
-                        color: Color(0xFFE11D48),
+                        color: AppColors.errorPastel,
                         size: 16,
                       ),
                       const SizedBox(width: 8),
                       Text(
                         DashboardLocalization.vaultIncorrectPinBanner(lang, _remainingAttempts, 5),
                         style: const TextStyle(
-                          color: Color(0xFFE11D48),
+                          color: AppColors.errorPastel,
                           fontWeight: FontWeight.w700,
                           fontSize: 12.5,
                         ),

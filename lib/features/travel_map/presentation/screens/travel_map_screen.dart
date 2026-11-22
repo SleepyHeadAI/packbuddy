@@ -155,7 +155,7 @@ class _TravelMapScreenState extends ConsumerState<TravelMapScreen> {
               height: MediaQuery.of(ctx).size.height * 0.92,
               decoration: BoxDecoration(
                 color: isDark ? const Color(0xFF0F172A) : Colors.white,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                borderRadius: AppRadius.sheetRadius,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: isDark ? 0.6 : 0.2),
