@@ -54,6 +54,9 @@ class AdminPlatformMetrics {
   final int totalPendingFriendRequests;
   final int totalUsernamesClaimed;
 
+  /// Users with `lastActiveAt` within the last 24 hours (count() aggregation).
+  final int dailyActiveUsers;
+
   const AdminPlatformMetrics({
     this.totalUsers = 0,
     this.verifiedUsers = 0,
@@ -66,6 +69,7 @@ class AdminPlatformMetrics {
     this.totalFriendships = 0,
     this.totalPendingFriendRequests = 0,
     this.totalUsernamesClaimed = 0,
+    this.dailyActiveUsers = 0,
   });
 
   AdminPlatformMetrics copyWith({
@@ -80,6 +84,7 @@ class AdminPlatformMetrics {
     int? totalFriendships,
     int? totalPendingFriendRequests,
     int? totalUsernamesClaimed,
+    int? dailyActiveUsers,
   }) {
     return AdminPlatformMetrics(
       totalUsers: totalUsers ?? this.totalUsers,
@@ -93,6 +98,7 @@ class AdminPlatformMetrics {
       totalFriendships: totalFriendships ?? this.totalFriendships,
       totalPendingFriendRequests: totalPendingFriendRequests ?? this.totalPendingFriendRequests,
       totalUsernamesClaimed: totalUsernamesClaimed ?? this.totalUsernamesClaimed,
+      dailyActiveUsers: dailyActiveUsers ?? this.dailyActiveUsers,
     );
   }
 }
@@ -948,9 +954,10 @@ class FirebaseAdminService implements AdminService {
   }
 
   /// Legacy full scan, used only when aggregation queries are unsupported (test fakes).
-  Future<(int, int, int, int, int, int, int)> _legacyUserMetricsScan(FirebaseFirestore firestore) async {
+  Future<(int, int, int, int, int, int, int, int)> _legacyUserMetricsScan(FirebaseFirestore firestore) async {
     final usersSnapshot = await firestore.collection('users').get();
-    int verified = 0, pro = 0, storage = 0, usernames = 0, accepted = 0, pending = 0;
+    int verified = 0, pro = 0, storage = 0, usernames = 0, accepted = 0, pending = 0, activeToday = 0;
+    final activeCutoff = DateTime.now().subtract(const Duration(hours: 24));
     for (final doc in usersSnapshot.docs) {
       final data = doc.data();
       if (data['emailVerified'] == true || data['email_verified'] == true) verified++;
@@ -959,6 +966,8 @@ class FirebaseAdminService implements AdminService {
       }
       storage += ((data['totalVaultStorageBytes'] ?? data['total_vault_storage_bytes']) as num?)?.toInt() ?? 0;
       if ((data['username'] ?? data['userName'] ?? '').toString().trim().isNotEmpty) usernames++;
+      final lastActive = AdminUserModel.fromMap(doc.id, data).lastActiveAt;
+      if (lastActive != null && !lastActive.isBefore(activeCutoff)) activeToday++;
     }
     try {
       final friendshipsSnap = await firestore.collection('friendships').get();
@@ -968,7 +977,7 @@ class FirebaseAdminService implements AdminService {
         if (st == 'pending') pending++;
       }
     } catch (_) {}
-    return (usersSnapshot.docs.length, verified, pro, storage, usernames, accepted, pending);
+    return (usersSnapshot.docs.length, verified, pro, storage, usernames, accepted, pending, activeToday);
   }
 
   Future<AdminPlatformMetrics> _fetchLocalMetrics() async {
@@ -1139,6 +1148,9 @@ class FirebaseAdminService implements AdminService {
       int usernamesClaimed = 0;
       int totalFriendships = 0;
       int pendingFriendRequests = 0;
+      int dailyActiveUsers = 0;
+      // users.lastActiveAt is written as an ISO-8601 string (auth_service, sync_engine, profile).
+      final activeCutoffIso = DateTime.now().subtract(const Duration(hours: 24)).toIso8601String();
       try {
         final users = firestore.collection('users');
         final usersAgg = await users.aggregate(count(), sum('totalVaultStorageBytes')).get();
@@ -1150,6 +1162,12 @@ class FirebaseAdminService implements AdminService {
         final friendships = firestore.collection('friendships');
         totalFriendships = (await friendships.where('status', isEqualTo: 'accepted').count().get()).count ?? 0;
         pendingFriendRequests = (await friendships.where('status', isEqualTo: 'pending').count().get()).count ?? 0;
+        dailyActiveUsers = (await users
+                    .where('lastActiveAt', isGreaterThanOrEqualTo: activeCutoffIso)
+                    .count()
+                    .get())
+                .count ??
+            0;
       } on UnimplementedError {
         // Aggregations unsupported (in-memory test fakes): legacy client-side tally.
         final legacy = await _legacyUserMetricsScan(firestore);
@@ -1160,6 +1178,7 @@ class FirebaseAdminService implements AdminService {
         usernamesClaimed = legacy.$5;
         totalFriendships = legacy.$6;
         pendingFriendRequests = legacy.$7;
+        dailyActiveUsers = legacy.$8;
       }
 
       final totalTrips = await _getCollectionCount('trips');
@@ -1186,6 +1205,7 @@ class FirebaseAdminService implements AdminService {
         totalFriendships: totalFriendships,
         totalPendingFriendRequests: pendingFriendRequests,
         totalUsernamesClaimed: usernamesClaimed,
+        dailyActiveUsers: dailyActiveUsers,
       );
     } catch (e) {
       debugPrint('[AdminService] fetchMetrics error: $e');

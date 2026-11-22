@@ -40,6 +40,9 @@ class FakeAdminController extends StateNotifier<AdminState>
   Future<void> refreshData() async {}
 
   @override
+  Future<void> loadInsights({bool force = false}) async {}
+
+  @override
   Future<void> loadUsers() async {}
 
   @override
@@ -367,7 +370,7 @@ void main() {
     }
 
     testWidgets(
-        'AdminDashboardScreen renders Total Storage and per-user storage badges with zero overflows on 320x568 (German & Dark)',
+        'AdminDashboardScreen renders 4 summary KPIs and per-user storage badges with zero overflows on 320x568 (German & Dark)',
         (tester) async {
       tester.view.physicalSize = const Size(320, 568);
       tester.view.devicePixelRatio = 1.0;
@@ -388,8 +391,10 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.byType(AdminDashboardScreen), findsOneWidget);
 
-      // Verify that total storage metric is present in the metrics grid
-      expect(find.text(formatStorageBytes(testMetrics.totalStorageBytes)), findsOneWidget);
+      // Total storage moved to AdminAnalyticsScreen (Kasa tab); the simplified dashboard
+      // keeps only 4 summary KPIs plus the analytics entry card.
+      expect(find.text(formatStorageBytes(testMetrics.totalStorageBytes)), findsNothing);
+      expect(find.byKey(const ValueKey('admin_analytics_entry_card')), findsOneWidget);
 
       // Scroll down in the ListView to reveal user cards on 320x568 screen
       await tester.scrollUntilVisible(

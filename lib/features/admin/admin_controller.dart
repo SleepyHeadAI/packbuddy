@@ -88,6 +88,11 @@ class AdminState {
   final String? errorMessage;
   final DateTime? lastRefreshedAt;
 
+  /// True once [detailedAnalytics] / [deletedAccountsSummary] were loaded on demand
+  /// (they are no longer fetched when the dashboard opens).
+  final bool insightsLoaded;
+  final bool isInsightsLoading;
+
   const AdminState({
     this.isLoading = false,
     this.isActionLoading = false,
@@ -103,6 +108,8 @@ class AdminState {
     this.deletedAccountsSummary = const DeletedAccountsSummary(),
     this.errorMessage,
     this.lastRefreshedAt,
+    this.insightsLoaded = false,
+    this.isInsightsLoading = false,
   });
 
   /// Filtered audit logs based on selected audit filter category
@@ -278,6 +285,8 @@ class AdminState {
     DeletedAccountsSummary? deletedAccountsSummary,
     String? errorMessage,
     DateTime? lastRefreshedAt,
+    bool? insightsLoaded,
+    bool? isInsightsLoading,
     bool clearError = false,
   }) {
     return AdminState(
@@ -295,6 +304,8 @@ class AdminState {
       deletedAccountsSummary: deletedAccountsSummary ?? this.deletedAccountsSummary,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
       lastRefreshedAt: lastRefreshedAt ?? this.lastRefreshedAt,
+      insightsLoaded: insightsLoaded ?? this.insightsLoaded,
+      isInsightsLoading: isInsightsLoading ?? this.isInsightsLoading,
     );
   }
 }
@@ -308,31 +319,27 @@ class AdminController extends StateNotifier<AdminState> {
     refreshData();
   }
 
-  /// Reloads platform metrics, user profiles, and detailed travel analytics from Cloud Firestore
+  /// Reloads the operational dashboard data: lightweight count() metrics, the user directory
+  /// and audit logs. Heavy analytics are NOT loaded here (see [loadInsights] and
+  /// [AdminAnalyticsService]) so opening the dashboard stays cheap.
   Future<void> refreshData() async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final results = await Future.wait([
         _adminService.fetchMetrics(),
         _adminService.fetchUsers(),
-        _adminService.fetchDetailedAnalytics(),
         _adminService.fetchAuditLogs(),
-        _adminService.fetchDeletedAccountsArchive(),
       ]);
 
       final metrics = results[0] as AdminPlatformMetrics;
       final users = results[1] as List<AdminUserModel>;
-      final analytics = results[2] as AdminDetailedAnalytics;
-      final auditLogs = results[3] as List<AdminAuditLog>;
-      final deletedSummary = results[4] as DeletedAccountsSummary;
+      final auditLogs = results[2] as List<AdminAuditLog>;
 
       state = state.copyWith(
         isLoading: false,
         metrics: metrics,
         allUsers: users,
-        detailedAnalytics: analytics,
         auditLogs: auditLogs,
-        deletedAccountsSummary: deletedSummary,
         lastRefreshedAt: DateTime.now(),
       );
     } catch (e) {
@@ -340,6 +347,30 @@ class AdminController extends StateNotifier<AdminState> {
         isLoading: false,
         errorMessage: e.toString(),
       );
+    }
+  }
+
+  /// Loads the extended travel-intelligence insights (sampled detailed analytics + deleted
+  /// accounts archive) on demand. Results stay in memory; pass [force] to re-read.
+  Future<void> loadInsights({bool force = false}) async {
+    if (state.isInsightsLoading) return;
+    if (state.insightsLoaded && !force) return;
+    state = state.copyWith(isInsightsLoading: true);
+    try {
+      final results = await Future.wait([
+        _adminService.fetchDetailedAnalytics(),
+        _adminService.fetchDeletedAccountsArchive(),
+      ]);
+      if (!mounted) return;
+      state = state.copyWith(
+        isInsightsLoading: false,
+        insightsLoaded: true,
+        detailedAnalytics: results[0] as AdminDetailedAnalytics,
+        deletedAccountsSummary: results[1] as DeletedAccountsSummary,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      state = state.copyWith(isInsightsLoading: false, errorMessage: e.toString());
     }
   }
 

@@ -417,6 +417,8 @@ void main() {
       expect(find.text('Toplam kullanıcı'), findsOneWidget);
       expect(find.text('Son güncelleme: 12:00'), findsOneWidget);
       expect(find.byKey(const ValueKey('admin_analytics_signup_chart')), findsOneWidget);
+      // Extended insights moved from the main dashboard live in their own tab.
+      expect(find.widgetWithText(Tab, 'Ek Analizler'), findsOneWidget);
     });
 
     testWidgets('range chips refetch; returning to a cached range does not re-read', (tester) async {

@@ -8,6 +8,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../shared/widgets/app_card.dart';
 import 'admin_analytics_service.dart';
+import 'admin_dashboard_screen.dart' show AdminLegacyInsightsView;
 
 /// Detailed admin statistics & analytics, opened on demand from the admin dashboard.
 ///
@@ -22,7 +23,15 @@ class AdminAnalyticsScreen extends ConsumerStatefulWidget {
 }
 
 class _AdminAnalyticsScreenState extends ConsumerState<AdminAnalyticsScreen> {
-  static const List<String> _tabs = ['Büyüme', 'Pro', 'İçerik', 'Kasa', 'Tercihler', 'Moderasyon'];
+  static const List<String> _tabs = [
+    'Büyüme',
+    'Pro',
+    'İçerik',
+    'Kasa',
+    'Tercihler',
+    'Moderasyon',
+    'Ek Analizler',
+  ];
 
   AdminAnalyticsRange _range = AdminAnalyticsRange.days30;
   AdminAnalyticsReport? _report;
@@ -101,6 +110,10 @@ class _AdminAnalyticsScreenState extends ConsumerState<AdminAnalyticsScreen> {
           _VaultTab(report: report),
           _PreferencesTab(report: report),
           _ModerationTab(report: report),
+          // Session engagement, world map demand, trip intelligence, user geography,
+          // social graph, travel personas and the KVKK deletion archive (moved from the
+          // main dashboard; loaded only when this tab is opened).
+          const AdminLegacyInsightsView(),
         ],
       );
     }

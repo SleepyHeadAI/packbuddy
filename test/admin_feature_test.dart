@@ -44,6 +44,7 @@ class MockAdminService implements AdminService {
     totalExpenses: 210,
     totalDocuments: 35,
     totalChecklistItems: 340,
+    dailyActiveUsers: 9,
   );
 
   List<AdminUserModel> usersToReturn = [
@@ -813,12 +814,21 @@ void main() {
       expect(find.text('Admin Dashboard'), findsOneWidget);
       expect(find.text('Platform Metrics'), findsOneWidget);
 
-      // Metric values from MockAdminService
+      // Simplified dashboard: exactly 4 lightweight KPIs from MockAdminService
       expect(find.text('42'), findsOneWidget); // Total Users
       expect(find.text('15'), findsOneWidget); // Pro Subscribers
+      expect(find.text('Active Today'), findsOneWidget);
+      expect(find.text('9'), findsOneWidget); // Active today
       expect(find.text('88'), findsOneWidget); // Trips
-      expect(find.text('35'), findsOneWidget); // Total Docs
-      expect(find.textContaining('340'), findsOneWidget); // Total Items
+      // Vault docs / storage / checklist cards moved to the analytics screen
+      expect(find.text('35'), findsNothing);
+      expect(find.textContaining('340'), findsNothing);
+
+      // Entry point to the on-demand analytics screen; heavy analytics not loaded on open
+      expect(find.byKey(const ValueKey('admin_analytics_entry_card')), findsOneWidget);
+      expect(find.text('Detailed Statistics & Analytics'), findsOneWidget);
+      expect(controller.state.insightsLoaded, isFalse);
+      expect(find.textContaining('Session Analytics'), findsNothing);
 
       // User cards
       expect(find.text('SleepyHead Admin'), findsOneWidget);
@@ -861,7 +871,7 @@ void main() {
       expect(find.byIcon(Icons.admin_panel_settings_rounded), findsWidgets);
     });
 
-    testWidgets('Admin dashboard renders Detailed Analytics Hub & Country Demand tabs',
+    testWidgets('Extended insights view (Ek Analizler) renders Analytics Hub & Country Demand tabs',
         (tester) async {
       tester.view.physicalSize = const Size(800, 4800);
       tester.view.devicePixelRatio = 1.0;
@@ -872,12 +882,15 @@ void main() {
 
       await tester.pumpWidget(
         buildTestApp(
-          child: const AdminDashboardScreen(),
+          child: const Scaffold(body: AdminLegacyInsightsView()),
           isAdmin: true,
           customController: controller,
         ),
       );
+      // Insights load lazily when the view is first shown.
+      await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
+      expect(controller.state.insightsLoaded, isTrue);
 
       // Usage & Session Analytics card
       expect(find.textContaining('Session Analytics'), findsOneWidget);

@@ -10,6 +10,7 @@ import 'package:packbuddy/core/services/notification_service.dart';
 import 'package:packbuddy/features/admin/admin_service.dart';
 import 'package:packbuddy/features/admin/admin_controller.dart';
 import 'package:packbuddy/features/admin/admin_dashboard_screen.dart';
+import 'package:packbuddy/features/admin/admin_analytics_screen.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
@@ -398,7 +399,7 @@ void main() {
       expect(LocalNotificationService.channelId, 'packbuddy_trip_reminders');
     });
 
-    testWidgets('AdminDashboardScreen renders both World Map and Trip sections separately',
+    testWidgets('Extended insights view renders both World Map and Trip sections separately',
         (tester) async {
       tester.view.physicalSize = const Size(800, 2400);
       tester.view.devicePixelRatio = 1.0;
@@ -425,11 +426,13 @@ void main() {
             supportedLocales: AppLocalizations.supportedLocales,
             locale: Locale('tr'),
             home: Scaffold(
-              body: AdminDashboardScreen(),
+              body: AdminLegacyInsightsView(),
             ),
           ),
         ),
       );
+      // Insights load lazily when the view is first shown.
+      await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
 
       // 1. World Travel Map Analytics Section
@@ -501,12 +504,21 @@ void main() {
       );
       await tester.pump(const Duration(milliseconds: 100));
 
-      // Metric titles
+      // Exactly 4 lightweight KPI titles
       expect(find.text('Toplam Kullanıcı'), findsOneWidget);
       expect(find.text('Pro Üyeler'), findsOneWidget);
+      expect(find.text('Bugün Aktif'), findsOneWidget);
       expect(find.text('Toplam Seyahat'), findsOneWidget);
-      expect(find.text('Kasa Belgeleri'), findsOneWidget);
-      expect(find.text('Kasa Depolama'), findsOneWidget);
+      expect(find.text('Kasa Belgeleri'), findsNothing);
+      expect(find.text('Kasa Depolama'), findsNothing);
+
+      // Detailed analytics entry card opens AdminAnalyticsScreen
+      expect(find.text('Detaylı İstatistikler & Analitik'), findsOneWidget);
+      expect(controller.state.insightsLoaded, isFalse);
+      await tester.tap(find.byKey(const ValueKey('admin_analytics_entry_card')));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(find.byType(AdminAnalyticsScreen), findsOneWidget);
     });
   });
 }

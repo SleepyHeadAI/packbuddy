@@ -642,6 +642,29 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // Simplified dashboard (KPIs + analytics entry + directory) fits 320x568.
+      expect(tester.takeException(), isNull);
+      expect(find.text('Detailed Statistics & Analytics'), findsOneWidget);
+
+      // Geo-Analytics moved to the extended insights view ("Ek Analizler" tab).
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            isAdminProvider.overrideWithValue(true),
+            authUserProvider.overrideWithValue(FakeUser(uid: 'admin-1', email: 'sleepyheadaitr@gmail.com')),
+            adminControllerProvider.overrideWith((ref) => controller),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.darkTheme,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('en'),
+            home: const Scaffold(body: AdminLegacyInsightsView()),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
       expect(tester.takeException(), isNull);
       await tester.scrollUntilVisible(
         find.text('Geographic & Activity Analytics'),
