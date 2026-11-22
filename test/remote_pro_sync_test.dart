@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/features/auth/auth_service.dart';
 import 'package:packbuddy/features/settings/data/mock_revenuecat_service.dart';
@@ -142,6 +143,7 @@ void main() {
 
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
+    FlutterSecureStorage.setMockInitialValues({});
     await PreferencesService.init();
     fakeFirestore = FakeFirebaseFirestore();
     testUser = FakeUser(uid: 'user-vip-101');
@@ -172,7 +174,7 @@ void main() {
       // a) Return value is true
       expect(isPro, isTrue);
       // b) Local PreferencesService is immediately updated to true (unlocked)
-      expect(PreferencesService.instance.isProUser(), isTrue);
+      expect(PreferencesService.instance.isProUser(uid: testUser.uid), isTrue);
       // c) Remote Firestore document keeps isPremium: true (never overwritten to false)
       expect(userDocRef.storedData!['isPremium'], isTrue);
     });
@@ -280,7 +282,7 @@ void main() {
 
       // 3. Assert:
       expect(proCallbackValue, isTrue);
-      expect(PreferencesService.instance.isProUser(), isTrue);
+      expect(PreferencesService.instance.isProUser(uid: testUser.uid), isTrue);
 
       // 4. Admin revokes Pro status remotely
       userDocRef.emitSnapshot({
@@ -291,7 +293,7 @@ void main() {
       await Future.delayed(const Duration(milliseconds: 50));
 
       expect(proCallbackValue, isFalse);
-      expect(PreferencesService.instance.isProUser(), isFalse);
+      expect(PreferencesService.instance.isProUser(uid: testUser.uid), isFalse);
     });
   });
 }

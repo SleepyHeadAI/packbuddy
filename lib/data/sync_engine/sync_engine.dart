@@ -199,20 +199,19 @@ class SyncEngine extends StateNotifier<SyncState> {
       (snapshot) async {
         if (snapshot.exists && snapshot.data() != null) {
           final data = snapshot.data()!;
-          final bool hasProKey = data.containsKey('isPremium') ||
-              data.containsKey('is_premium') ||
-              data.containsKey('isPro') ||
-              data.containsKey('pro');
-          if (hasProKey) {
-            final isPro = (data['isPremium'] == true) ||
-                (data['is_premium'] == true) ||
-                (data['isPro'] == true) ||
-                (data['pro'] == true);
-            PreferencesService.instance.setProUser(isPro, uid: uid);
+          // A1: only react when a Pro entitlement field is actually present; a false remote
+          // flag never revokes a store (Google Play) purchase.
+          if (ProEntitlementService.hasRemoteProKey(data)) {
+            final isPro = await ProEntitlementService.instance.applyRemoteEntitlement(
+              remoteIsPro: ProEntitlementService.remoteProValue(data),
+              expiresAt: ProEntitlementService.remoteExpiresAt(data),
+              source: data['adminGrantedPro'] == true ? 'admin_live_grant' : 'firestore_live_sync',
+              uid: uid,
+            );
             onProStatusSynced?.call(isPro);
             final r = ref;
             if (r != null) {
-              r.read(proSubscriptionProvider.notifier).updateProStatus(isPro, uid: uid);
+              r.read(proSubscriptionProvider.notifier).setResolvedProStatus(isPro);
             }
           }
           if (data.containsKey('restrictedFeatures')) {
@@ -775,24 +774,21 @@ class SyncEngine extends StateNotifier<SyncState> {
         }, SetOptions(merge: true));
       } catch (_) {}
 
-      // Remote Pro Status Sync: Fetch users/{uid} and synchronize isPremium without demoting active local Pro
+      // Remote Pro Status Sync (A3): server data is applied through the Keystore-backed
+      // entitlement service. Plaintext SharedPreferences is never an input, and
+      // `lastVerifiedAt` is only refreshed when the server actually grants Pro.
       try {
         final userDoc = await firestore.collection('users').doc(uid).get();
-        final localIsPro = PreferencesService.instance.isProUser(uid: uid) ||
-            PreferencesService.instance.isProUser();
-        bool effectiveIsPro = localIsPro;
+        bool? resolvedIsPro;
         if (userDoc.exists && userDoc.data() != null) {
           final userData = userDoc.data()!;
-          final bool hasRemotePro = userData.containsKey('isPremium') ||
-              userData.containsKey('is_premium') ||
-              userData.containsKey('isPro') ||
-              userData.containsKey('pro');
-          if (hasRemotePro) {
-            final remoteIsPro = (userData['isPremium'] == true) ||
-                (userData['is_premium'] == true) ||
-                (userData['isPro'] == true) ||
-                (userData['pro'] == true);
-            effectiveIsPro = remoteIsPro || localIsPro;
+          if (ProEntitlementService.hasRemoteProKey(userData)) {
+            resolvedIsPro = await ProEntitlementService.instance.applyRemoteEntitlement(
+              remoteIsPro: ProEntitlementService.remoteProValue(userData),
+              expiresAt: ProEntitlementService.remoteExpiresAt(userData),
+              source: 'firestore_sync',
+              uid: uid,
+            );
           }
           if (userData.containsKey('vaultPin')) {
             final remotePin = userData['vaultPin'] as String?;
@@ -803,11 +799,12 @@ class SyncEngine extends StateNotifier<SyncState> {
             await PreferencesService.instance.setVaultBiometricEnabled(remoteBio, uid: uid);
           }
         }
-        await PreferencesService.instance.setProUser(effectiveIsPro, uid: uid);
+        final effectiveIsPro =
+            resolvedIsPro ?? await ProEntitlementService.instance.resolveEffectivePro(uid: uid);
         onProStatusSynced?.call(effectiveIsPro);
         final r = ref;
         if (r != null) {
-          r.read(proSubscriptionProvider.notifier).updateProStatus(effectiveIsPro, uid: uid);
+          r.read(proSubscriptionProvider.notifier).setResolvedProStatus(effectiveIsPro);
           r.read(vaultControllerProvider.notifier).refreshSecurityState();
         }
       } catch (e) {

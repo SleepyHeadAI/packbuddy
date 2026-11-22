@@ -128,7 +128,7 @@ class ProEntitlementService {
       );
 
   @visibleForTesting
-  void setMockStorage(FlutterSecureStorage storage) {
+  void setMockStorage(FlutterSecureStorage? storage) {
     _customStorage = storage;
   }
 
@@ -138,6 +138,31 @@ class ProEntitlementService {
   static const String _keyMaxMonotonicTs = 'secure_max_monotonic_ts';
   static const String _keyProSource = 'secure_pro_source';
 
+  /// Scope used only when no Firebase user exists (unit tests / signed-out).
+  /// It is never consulted for a signed-in uid, so Pro can't leak across accounts.
+  static const String _guestScope = 'guest';
+
+  /// Store-originated entitlement sources. Remote (Firestore) sync may never
+  /// revoke these; only the store (expiry / restore) governs them.
+  static bool isStoreSource(String? source) {
+    if (source == null) return false;
+    return source.startsWith('google_play') ||
+        source == 'unit_test_purchase' ||
+        source == 'debug_sandbox_purchase';
+  }
+
+  /// Billing period lengths used to compute a local `expiresAt` for store purchases.
+  /// A small grace window covers Play's renewal processing delay.
+  static const Duration monthlyPeriod = Duration(days: 31);
+  static const Duration annualPeriod = Duration(days: 366);
+  static const Duration renewalGrace = Duration(days: 3);
+
+  static DateTime expiryForProduct(String productId, {DateTime? from}) {
+    final base = from ?? DateTime.now();
+    final period = productId.contains('monthly') ? monthlyPeriod : annualPeriod;
+    return base.add(period).add(renewalGrace);
+  }
+
   String? _safeCurrentUid() {
     try {
       return FirebaseAuth.instance.currentUser?.uid;
@@ -146,21 +171,26 @@ class ProEntitlementService {
     }
   }
 
+  String _prefixFor(String? uid) {
+    final scope = (uid != null && uid.isNotEmpty) ? uid : _guestScope;
+    return '${scope}_';
+  }
+
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _firestoreLiveSubscription;
 
-  /// Resolves effective Pro status considering offline grace period (72h) and clock rollback protection
+  /// Resolves effective Pro status considering offline grace period (72h) and clock rollback protection.
+  /// Reads only the uid-scoped key; there is no device-global fallback.
   Future<bool> resolveEffectivePro({String? uid}) async {
     final effectiveUid = uid ?? _safeCurrentUid();
-    final prefix = effectiveUid != null && effectiveUid.isNotEmpty ? '${effectiveUid}_' : '';
+    final prefix = _prefixFor(effectiveUid);
 
     try {
+      // Remove the legacy device-global flag (pre-v1.0) so it can never be read again.
+      await _storage.delete(key: _keyIsPro);
+
       final rawIsPro = await _storage.read(key: '$prefix$_keyIsPro');
       if (rawIsPro != 'true') {
-        // Fallback check to un-prefixed key or PreferencesService
-        final rawGlobal = await _storage.read(key: _keyIsPro);
-        if (rawGlobal != 'true') {
-          return false;
-        }
+        return false;
       }
 
       final now = DateTime.now().millisecondsSinceEpoch;
@@ -205,12 +235,24 @@ class ProEntitlementService {
 
       return true;
     } catch (e) {
+      // Keystore failure: fail closed. Never fall back to plaintext SharedPreferences.
       debugPrint('[ProEntitlement] Error resolving secure Pro status: $e');
-      return PreferencesService.instance.isProUser(uid: effectiveUid);
+      return false;
     }
   }
 
-  /// Sets or updates Pro entitlement securely
+  /// Returns the source tag of the currently stored entitlement (uid-scoped).
+  Future<String?> currentSource({String? uid}) async {
+    try {
+      return await _storage.read(key: '${_prefixFor(uid ?? _safeCurrentUid())}$_keyProSource');
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Sets or updates Pro entitlement securely (uid-scoped only).
+  /// This counts as an online verification and refreshes `lastVerifiedAt`, so it must
+  /// only be called with a verified source (store event or server-side data).
   Future<void> setProEntitlement({
     required bool isPro,
     DateTime? expiresAt,
@@ -218,12 +260,11 @@ class ProEntitlementService {
     String? uid,
   }) async {
     final effectiveUid = uid ?? _safeCurrentUid();
-    final prefix = effectiveUid != null && effectiveUid.isNotEmpty ? '${effectiveUid}_' : '';
+    final prefix = _prefixFor(effectiveUid);
     final now = DateTime.now().millisecondsSinceEpoch;
 
     try {
       await _storage.write(key: '$prefix$_keyIsPro', value: isPro ? 'true' : 'false');
-      await _storage.write(key: _keyIsPro, value: isPro ? 'true' : 'false');
       await _storage.write(key: '$prefix$_keyLastVerifiedAt', value: now.toString());
       await _storage.write(key: '$prefix$_keyMaxMonotonicTs', value: now.toString());
       await _storage.write(key: '$prefix$_keyProSource', value: source);
@@ -233,33 +274,78 @@ class ProEntitlementService {
           key: '$prefix$_keyProExpiresAt',
           value: expiresAt.millisecondsSinceEpoch.toString(),
         );
-      } else if (!isPro) {
+      } else {
         await _storage.delete(key: '$prefix$_keyProExpiresAt');
       }
-
-      // Sync to PreferencesService for instant synchronous fallback
-      await PreferencesService.instance.setProUser(isPro, uid: effectiveUid);
     } catch (e) {
       debugPrint('[ProEntitlement] Error saving secure Pro entitlement: $e');
+    }
+
+    // Mirror for synchronous UI reads (uid-scoped only, never device-global).
+    if (effectiveUid != null && effectiveUid.isNotEmpty) {
       await PreferencesService.instance.setProUser(isPro, uid: effectiveUid);
     }
+  }
+
+  /// Applies Pro state coming from the server (Firestore users/{uid}).
+  ///
+  /// * `remoteIsPro == true`  → grant (admin grant / server-verified).
+  /// * `remoteIsPro == false` → revoke only if the local entitlement did NOT come from the store.
+  ///   The client can't write Pro=true to Firestore (rules block self-elevation), so a
+  ///   `false` remote flag says nothing about a Google Play purchase.
+  ///
+  /// Returns the effective Pro status after applying.
+  Future<bool> applyRemoteEntitlement({
+    required bool remoteIsPro,
+    DateTime? expiresAt,
+    required String source,
+    String? uid,
+  }) async {
+    final effectiveUid = uid ?? _safeCurrentUid();
+    if (remoteIsPro) {
+      await setProEntitlement(isPro: true, expiresAt: expiresAt, source: source, uid: effectiveUid);
+      return resolveEffectivePro(uid: effectiveUid);
+    }
+    final existingSource = await currentSource(uid: effectiveUid);
+    if (isStoreSource(existingSource)) {
+      return resolveEffectivePro(uid: effectiveUid);
+    }
+    final currentlyPro = await resolveEffectivePro(uid: effectiveUid);
+    if (currentlyPro) {
+      await setProEntitlement(isPro: false, source: source, uid: effectiveUid);
+    }
+    return false;
   }
 
   /// Clears secure entitlement on logout
   Future<void> clearProEntitlement({String? uid}) async {
     final effectiveUid = uid ?? _safeCurrentUid();
-    final prefix = effectiveUid != null && effectiveUid.isNotEmpty ? '${effectiveUid}_' : '';
+    final prefix = _prefixFor(effectiveUid);
     try {
       await _storage.delete(key: '$prefix$_keyIsPro');
       await _storage.delete(key: '$prefix$_keyProExpiresAt');
       await _storage.delete(key: '$prefix$_keyLastVerifiedAt');
       await _storage.delete(key: '$prefix$_keyProSource');
-      await _storage.delete(key: _keyIsPro);
-      await PreferencesService.instance.setProUser(false, uid: effectiveUid);
-      await PreferencesService.instance.clearDeviceProStatus();
+      await _storage.delete(key: _keyIsPro); // legacy device-global key
     } catch (e) {
       debugPrint('[ProEntitlement] Error clearing secure entitlement: $e');
     }
+    await PreferencesService.instance.setProUser(false, uid: effectiveUid);
+    await PreferencesService.instance.clearDeviceProStatus();
+  }
+
+  /// Fields on users/{uid} that actually carry a Pro entitlement.
+  static const List<String> remoteProKeys = ['isPremium', 'is_premium', 'isPro', 'pro', 'adminGrantedPro'];
+
+  static bool hasRemoteProKey(Map<String, dynamic> data) => remoteProKeys.any(data.containsKey);
+
+  static bool remoteProValue(Map<String, dynamic> data) => remoteProKeys.any((k) => data[k] == true);
+
+  static DateTime? remoteExpiresAt(Map<String, dynamic> data) {
+    final raw = data['proExpiresAt'];
+    if (raw is Timestamp) return raw.toDate();
+    if (raw is String) return DateTime.tryParse(raw);
+    return null;
   }
 
   /// Listens to live Firestore user document for real-time Admin Pro grant/revocation
@@ -277,30 +363,18 @@ class ProEntitlementService {
         (doc) async {
           if (!doc.exists || doc.data() == null) return;
           final data = doc.data()!;
-          final bool isRemotePro = (data['isPremium'] == true) ||
-              (data['is_premium'] == true) ||
-              (data['isPro'] == true) ||
-              (data['pro'] == true) ||
-              (data['adminGrantedPro'] == true);
-
-          DateTime? expiresAt;
-          if (data['proExpiresAt'] != null) {
-            if (data['proExpiresAt'] is Timestamp) {
-              expiresAt = (data['proExpiresAt'] as Timestamp).toDate();
-            } else if (data['proExpiresAt'] is String) {
-              expiresAt = DateTime.tryParse(data['proExpiresAt']);
-            }
-          }
+          // Writes that only touch subscription/sync metadata must not change Pro state.
+          if (!hasRemoteProKey(data)) return;
 
           final source = data['adminGrantedPro'] == true ? 'admin_live_grant' : 'firestore_live_sync';
-          await setProEntitlement(
-            isPro: isRemotePro,
-            expiresAt: expiresAt,
+          final effective = await applyRemoteEntitlement(
+            remoteIsPro: remoteProValue(data),
+            expiresAt: remoteExpiresAt(data),
             source: source,
             uid: uid,
           );
 
-          onStatusUpdated(isRemotePro);
+          onStatusUpdated(effective);
         },
         onError: (err) {
           debugPrint('[ProEntitlement] Firestore live entitlement stream error: $err');

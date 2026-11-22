@@ -122,25 +122,24 @@ class PreferencesService {
     await _prefs?.setString(keyLocale, locale.languageCode);
   }
 
-  // --- Pro Status & Plan (Strictly Scoped Per User with Device Purchase Protection) ---
-  bool isProUser({String? uid}) {
+  // --- Pro Status & Plan (strictly uid-scoped; no device-global fallback) ---
+  // This is only a synchronous UI mirror of ProEntitlementService (Keystore).
+  // Without a signed-in uid a separate 'guest' scope is used, which is never
+  // read for a signed-in account, so Pro cannot leak between accounts.
+  String _proKeyFor(String? uid) {
     final effectiveUid = _resolveEffectiveUid(uid);
-    if (effectiveUid != null) {
-      return _prefs?.getBool('${keyIsPro}_$effectiveUid') ?? false;
-    }
-    // Guaranteed fallback: Check device-level Google Play purchase flag
-    return _prefs?.getBool(keyIsPro) ?? false;
+    return '${keyIsPro}_${effectiveUid ?? 'guest'}';
+  }
+
+  bool isProUser({String? uid}) {
+    return _prefs?.getBool(_proKeyFor(uid)) ?? false;
   }
 
   Future<void> setProUser(bool isPro, {String? uid}) async {
-    final effectiveUid = _resolveEffectiveUid(uid);
-    if (effectiveUid != null) {
-      await _prefs?.setBool('${keyIsPro}_$effectiveUid', isPro);
-    }
-    await _prefs?.setBool(keyIsPro, isPro);
+    await _prefs?.setBool(_proKeyFor(uid), isPro);
   }
 
-  /// Clears device-level Pro status flag to prevent account contagion
+  /// Removes the legacy device-level Pro flag (pre-v1.0) to prevent account contagion
   Future<void> clearDeviceProStatus() async {
     await _prefs?.remove(keyIsPro);
   }

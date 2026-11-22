@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:packbuddy/core/services/currency_service.dart';
 import 'package:packbuddy/core/utils/currency_formatter.dart';
@@ -374,6 +375,17 @@ class _FakeProNotifier extends StateNotifier<ProSubscriptionState> implements Mo
   Future<void> updateProStatus(bool isPro, {String? uid}) async {
     state = state.copyWith(isPro: isPro);
   }
+
+  @override
+  void setResolvedProStatus(bool isPro) {
+    state = state.copyWith(isPro: isPro);
+  }
+
+  @override
+  Future<void> handlePurchaseUpdates(List<PurchaseDetails> purchaseDetailsList) async {}
+
+  @override
+  PurchaseParam buildPurchaseParam(ProductDetails details) => PurchaseParam(productDetails: details);
 }
 
 class _FakeDatabaseHelper implements DatabaseHelper {

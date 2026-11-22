@@ -378,14 +378,14 @@ class FirebaseAuthService implements AuthService {
               (remoteData['is_premium'] == true) ||
               (remoteData['isPro'] == true) ||
               (remoteData['pro'] == true));
+      // Pro is resolved strictly per uid. A device-level flag from another account
+      // must never transfer Pro to this account (A2).
       final bool localScopedPro = PreferencesService.instance.isProUser(uid: user.uid);
-      final bool localDevicePro = PreferencesService.instance.isProUser();
       final bool isSuperAdmin = user.email?.trim().toLowerCase() == kAdminEmail;
 
       final bool effectiveIsPremium = isSuperAdmin ||
           remoteIsPremium ||
-          localScopedPro ||
-          (!remoteHasIsPremium && localDevicePro);
+          localScopedPro;
 
       await PreferencesService.instance.setProUser(effectiveIsPremium, uid: user.uid);
 
