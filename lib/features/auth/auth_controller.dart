@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/local_db/database_helper.dart';
 import '../../core/services/telemetry_service.dart';
 import '../../core/services/preferences_service.dart';
+import '../../core/services/vault_pin_service.dart';
 import '../../core/services/currency_service.dart';
 import 'auth_service.dart';
 import '../settings/data/mock_revenuecat_service.dart';
@@ -364,7 +365,7 @@ class AuthController extends StateNotifier<AuthState> {
       try {
         await PreferencesService.instance.clearDeviceProStatus();
         await PreferencesService.instance.setProUser(false);
-        await PreferencesService.instance.setVaultPin(null);
+        await VaultPinService.instance.clearForUser(uid: user.uid);
         await PreferencesService.instance.setVaultBiometricEnabled(false);
         await PreferencesService.instance.setVaultLocked(false);
       } catch (_) {}
@@ -412,7 +413,7 @@ class AuthController extends StateNotifier<AuthState> {
       try {
         await PreferencesService.instance.clearDeviceProStatus();
         await PreferencesService.instance.setProUser(false);
-        await PreferencesService.instance.setVaultPin(null);
+        await VaultPinService.instance.clearForUser(uid: user.uid);
         await PreferencesService.instance.setVaultBiometricEnabled(false);
         await PreferencesService.instance.setVaultLocked(false);
       } catch (_) {}

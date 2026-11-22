@@ -16,12 +16,9 @@ import '../profile/domain/travel_style.dart';
 import '../profile/domain/travel_badge.dart';
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:path/path.dart' as p;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../auth/auth_controller.dart';
@@ -2157,104 +2154,9 @@ class FirebaseAdminService implements AdminService {
       );
     } catch (_) {}
 
-    // 2. Fetch user escrow key as Super Admin
-    final userKey = await SecurityService.instance.fetchUserEscrowKeyAsAdmin(targetUserId);
-
-    Uint8List? rawBytes;
-
-    // 3. Download encrypted binary from Firebase Storage
-    final effectiveDocId = doc.id.isNotEmpty ? doc.id : p.basenameWithoutExtension(doc.localImagePath);
-    final storagePath = (doc.storagePath != null && doc.storagePath!.isNotEmpty)
-        ? doc.storagePath!
-        : 'users/$targetUserId/vault/$effectiveDocId.bin';
-
-    if (_isFirebaseReady) {
-      try {
-        final storage = FirebaseStorage.instance;
-        final ref = storage.ref(storagePath);
-        rawBytes = await ref.getData(35 * 1024 * 1024); // max 35MB
-      } catch (storageErr) {
-        debugPrint('[AdminService] Storage download notice for $storagePath: $storageErr');
-      }
-    }
-
-    // 4. Fallback: cloudDataBase64 directly on doc
-    if (rawBytes == null || rawBytes.isEmpty) {
-      if (doc.cloudDataBase64 != null && doc.cloudDataBase64!.isNotEmpty) {
-        try {
-          var cleanB64 = doc.cloudDataBase64!.trim();
-          if (cleanB64.contains(',')) cleanB64 = cleanB64.split(',').last;
-          rawBytes = base64Decode(cleanB64);
-        } catch (_) {}
-      }
-    }
-
-    // 5. Fallback: remote Firestore document
-    if ((rawBytes == null || rawBytes.isEmpty) && effectiveDocId.isNotEmpty && _effectiveFirestore != null) {
-      try {
-        final snap = await _effectiveFirestore!.collection('documents').doc(effectiveDocId).get();
-        if (snap.exists && snap.data() != null) {
-          final data = snap.data()!;
-          final b64 = (data['cloudDataBase64'] ?? data['cloud_data_base64']) as String?;
-          if (b64 != null && b64.isNotEmpty) {
-            var cleanB64 = b64.trim();
-            if (cleanB64.contains(',')) cleanB64 = cleanB64.split(',').last;
-            rawBytes = base64Decode(cleanB64);
-          }
-        }
-      } catch (_) {}
-    }
-
-    // 6. Fallback: Firestore chunks subcollection
-    if ((rawBytes == null || rawBytes.isEmpty) && effectiveDocId.isNotEmpty && _effectiveFirestore != null) {
-      try {
-        final chunksSnap = await _effectiveFirestore!
-            .collection('documents')
-            .doc(effectiveDocId)
-            .collection('chunks')
-            .get();
-        if (chunksSnap.docs.isNotEmpty) {
-          final sorted = chunksSnap.docs.toList()
-            ..sort((a, b) {
-              final idxA = (a.data()['index'] as num?)?.toInt() ?? 0;
-              final idxB = (b.data()['index'] as num?)?.toInt() ?? 0;
-              return idxA.compareTo(idxB);
-            });
-          final buf = StringBuffer();
-          for (final c in sorted) {
-            final part = c.data()['chunk'] as String?;
-            if (part != null) buf.write(part);
-          }
-          final str = buf.toString().trim();
-          if (str.isNotEmpty) {
-            var clean = str;
-            if (clean.contains(',')) clean = clean.split(',').last;
-            rawBytes = base64Decode(clean);
-          }
-        }
-      } catch (_) {}
-    }
-
-    // 7. Fallback: local file if inspecting on the same test/device host
-    if ((rawBytes == null || rawBytes.isEmpty) && doc.localImagePath.isNotEmpty) {
-      try {
-        final f = File(doc.localImagePath);
-        if (await f.exists()) {
-          rawBytes = await f.readAsBytes();
-        }
-      } catch (_) {}
-    }
-
-    if (rawBytes == null || rawBytes.isEmpty) {
-      return null;
-    }
-
-    // 8. Decrypt bytes via compute isolate in SecurityService
-    return await SecurityService.instance.decryptBytes(
-      rawBytes,
-      userId: targetUserId,
-      candidateKey: userKey,
-    );
+    // C2: user vault content is end-to-end private. Admins can neither read the escrowed
+    // key (Firestore rules deny it) nor download/decrypt vault blobs, so nothing is returned.
+    return null;
   }
 
   @override

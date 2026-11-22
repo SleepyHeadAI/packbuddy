@@ -520,26 +520,18 @@ class FirebaseAuthService implements AuthService {
       await PreferencesService.instance.setBanReason(banReason, uid: user.uid);
       await PreferencesService.instance.setRestrictedFeatures(restrictedFeatures, uid: user.uid);
 
-      // VAULT SECURITY (PIN & BIOMETRICS) CLOUD SYNCHRONIZATION:
-      // Link security credentials directly to the logged-in user's account in Firestore
-      final remoteVaultPin = remoteData?['vaultPin'] as String?;
+      // VAULT SECURITY: the vault PIN is device-local only (salted hash in secure storage, C3).
+      // It is never read from Firestore; legacy plaintext copies are deleted from the profile.
       final remoteVaultBiometric = remoteData?['vaultBiometricEnabled'] as bool?;
-
-      if (remoteVaultPin != null && remoteVaultPin.isNotEmpty) {
-        await PreferencesService.instance.setVaultPin(remoteVaultPin, uid: user.uid);
-      } else if (remoteData != null && remoteData.containsKey('vaultPin') && remoteVaultPin == null) {
-        // Explicitly removed in cloud
-        await PreferencesService.instance.setVaultPin(null, uid: user.uid);
-      } else {
-        // Adopt local/device PIN into account and sync to cloud if user had set one offline
-        final localPin = PreferencesService.instance.getVaultPin(uid: user.uid) ??
-            PreferencesService.instance.getVaultPin();
-        if (localPin != null && localPin.isNotEmpty) {
-          await PreferencesService.instance.setVaultPin(localPin, uid: user.uid);
-          await userDocRef.set({
-            'vaultPin': localPin,
-            'vaultPinUpdatedAt': now,
-          }, SetOptions(merge: true));
+      if (remoteData != null &&
+          (remoteData.containsKey('vaultPin') || remoteData.containsKey('vaultPinUpdatedAt'))) {
+        try {
+          await userDocRef.update({
+            'vaultPin': FieldValue.delete(),
+            'vaultPinUpdatedAt': FieldValue.delete(),
+          });
+        } catch (e) {
+          debugPrint('[FirebaseAuthService] legacy vaultPin cleanup notice: $e');
         }
       }
 

@@ -426,11 +426,6 @@ class PreferencesService {
   }
 
 
-  String _vaultPinKey(String? uid) {
-    final effective = _resolveEffectiveUid(uid);
-    return effective != null ? '${keyVaultPin}_$effective' : keyVaultPin;
-  }
-
   String _vaultBiometricKey(String? uid) {
     final effective = _resolveEffectiveUid(uid);
     return effective != null ? '${keyVaultBiometricEnabled}_$effective' : keyVaultBiometricEnabled;
@@ -441,26 +436,23 @@ class PreferencesService {
     return effective != null ? '${keyVaultLocked}_$effective' : keyVaultLocked;
   }
 
-  // --- Vault Security & PIN ---
-  String? getVaultPin({String? uid}) {
-    final key = _vaultPinKey(uid);
-    final val = _prefs?.getString(key);
-    if (val != null && val.isNotEmpty) return val;
-    // Fallback to legacy/guest device-level pin
-    final legacy = _prefs?.getString(keyVaultPin);
-    if (legacy != null && legacy.isNotEmpty) return legacy;
-    return null;
+  // --- Vault PIN (legacy plaintext storage, migration only) ---
+  // The PIN now lives exclusively in VaultPinService (salted hash in secure storage).
+  // These helpers exist only to migrate and wipe pre-v1.0 plaintext values.
+
+  /// Returns the legacy plaintext PIN stored for [uid] (uid-scoped key only; the
+  /// device-global key is never trusted for an account).
+  String? legacyVaultPinForMigration({required String uid}) {
+    final val = _prefs?.getString('${keyVaultPin}_$uid');
+    return (val != null && val.isNotEmpty) ? val : null;
   }
 
-  Future<void> setVaultPin(String? pin, {String? uid}) async {
-    final key = _vaultPinKey(uid);
-    if (pin == null) {
-      await _prefs?.remove(key);
-      await _prefs?.remove(keyVaultPin);
-    } else {
-      await _prefs?.setString(key, pin);
-      await _prefs?.setString(keyVaultPin, pin);
-    }
+  /// Deletes every legacy plaintext PIN and attempt counter for [uid] plus the device-global copies.
+  Future<void> purgeLegacyVaultPinData({required String uid}) async {
+    await _prefs?.remove('${keyVaultPin}_$uid');
+    await _prefs?.remove(keyVaultPin);
+    await _prefs?.remove('${_legacyKeyVaultFailedPinAttempts}_$uid');
+    await _prefs?.remove(_legacyKeyVaultFailedPinAttempts);
   }
 
   bool isVaultBiometricEnabled({String? uid}) {
@@ -493,67 +485,9 @@ class PreferencesService {
     }
   }
 
-  // --- Vault PIN Security: 5 Failed Attempts in 10 Minutes Lockout ---
-  static const String keyVaultFailedPinAttempts = 'packbuddy_vault_failed_pin_attempts';
-  static const int vaultMaxFailedPinAttempts = 5;
-  static const int vaultLockoutWindowMs = 10 * 60 * 1000; // 10 minutes in ms
-
-  String _vaultFailedAttemptsKey(String? uid) {
-    final effectiveUid = _resolveEffectiveUid(uid);
-    if (effectiveUid != null) {
-      return '${keyVaultFailedPinAttempts}_$effectiveUid';
-    }
-    return keyVaultFailedPinAttempts;
-  }
-
-  List<int> getRecentVaultFailedPinAttempts({String? uid}) {
-    final key = _vaultFailedAttemptsKey(uid);
-    final rawList = _prefs?.getStringList(key) ?? [];
-    final now = DateTime.now().millisecondsSinceEpoch;
-    final validAttempts = <int>[];
-
-    for (final item in rawList) {
-      final ts = int.tryParse(item);
-      if (ts != null && (now - ts) < vaultLockoutWindowMs && ts <= now) {
-        validAttempts.add(ts);
-      }
-    }
-    return validAttempts;
-  }
-
-  Future<void> recordVaultFailedPinAttempt({String? uid}) async {
-    final key = _vaultFailedAttemptsKey(uid);
-    final attempts = getRecentVaultFailedPinAttempts(uid: uid);
-    attempts.add(DateTime.now().millisecondsSinceEpoch);
-    await _prefs?.setStringList(key, attempts.map((t) => t.toString()).toList());
-  }
-
-  int getRecentVaultFailedPinAttemptsCount({String? uid}) {
-    return getRecentVaultFailedPinAttempts(uid: uid).length;
-  }
-
-  bool isVaultPinLockedOut({String? uid}) {
-    return getRecentVaultFailedPinAttempts(uid: uid).length >= vaultMaxFailedPinAttempts;
-  }
-
-  int getVaultPinLockoutRemainingSeconds({String? uid}) {
-    final attempts = getRecentVaultFailedPinAttempts(uid: uid);
-    if (attempts.length < vaultMaxFailedPinAttempts) {
-      return 0;
-    }
-    attempts.sort();
-    final triggerAttempt = attempts[attempts.length - vaultMaxFailedPinAttempts];
-    final now = DateTime.now().millisecondsSinceEpoch;
-    final expiresAt = triggerAttempt + vaultLockoutWindowMs;
-    final remainingMs = expiresAt - now;
-    if (remainingMs <= 0) return 0;
-    return (remainingMs / 1000).ceil();
-  }
-
-  Future<void> resetVaultFailedPinAttempts({String? uid}) async {
-    final key = _vaultFailedAttemptsKey(uid);
-    await _prefs?.remove(key);
-  }
+  // Legacy (pre-v1.0) plaintext failed-attempt counter key; the counter now lives in
+  // VaultPinService (secure storage, uid-scoped). Kept only for purging.
+  static const String _legacyKeyVaultFailedPinAttempts = 'packbuddy_vault_failed_pin_attempts';
 
   // --- Vault AES-256 At-Rest Encryption ---
   static const String keyVaultAesKey = 'packbuddy_vault_aes_key';

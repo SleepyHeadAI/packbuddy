@@ -7902,9 +7902,17 @@ class _AdminVaultInspectDialogState extends ConsumerState<_AdminVaultInspectDial
   int _pdfCurrentPage = 1;
   bool _isDeleting = false;
 
+  /// C2: vault document content is never shown to admins (metadata/delete only).
+  static final bool _adminVaultContentAccessEnabled = false;
+
   @override
   void initState() {
     super.initState();
+    if (!_adminVaultContentAccessEnabled) {
+      _isLoading = false;
+      _errorMessage = 'Kasa belgeleri uçtan uca şifrelidir; içerik admin panelinde görüntülenemez.';
+      return;
+    }
     if (widget.doc.cloudDataBase64 != null && widget.doc.cloudDataBase64!.isNotEmpty) {
       try {
         var cleanB64 = widget.doc.cloudDataBase64!.trim();
@@ -7927,6 +7935,13 @@ class _AdminVaultInspectDialogState extends ConsumerState<_AdminVaultInspectDial
   }
 
   Future<void> _loadDocumentBytes({bool forceCloud = false}) async {
+    if (!_adminVaultContentAccessEnabled) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Kasa belgeleri uçtan uca şifrelidir; içerik admin panelinde görüntülenemez.';
+      });
+      return;
+    }
     final isTr = mounted ? (Localizations.maybeLocaleOf(context)?.languageCode == 'tr') : false;
     setState(() {
       _isLoading = true;

@@ -790,10 +790,7 @@ class SyncEngine extends StateNotifier<SyncState> {
               uid: uid,
             );
           }
-          if (userData.containsKey('vaultPin')) {
-            final remotePin = userData['vaultPin'] as String?;
-            await PreferencesService.instance.setVaultPin(remotePin, uid: uid);
-          }
+          // The vault PIN is device-local only (C3); never read it from Firestore.
           if (userData.containsKey('vaultBiometricEnabled')) {
             final remoteBio = userData['vaultBiometricEnabled'] == true;
             await PreferencesService.instance.setVaultBiometricEnabled(remoteBio, uid: uid);
@@ -827,13 +824,17 @@ class SyncEngine extends StateNotifier<SyncState> {
       // Firestore WriteBatch: Queue all remote mutations into batches
       WriteBatch batch = firestore.batch();
       int batchOpCount = 0;
+      // D1: any failed batch means remote state is incomplete, so last_synced_at must not advance
+      // (otherwise the failed local changes would be skipped by the next delta sync forever).
+      bool batchCommitFailed = false;
 
       Future<void> commitPendingBatch() async {
         if (batchOpCount == 0) return;
         try {
           await batch.commit();
         } catch (e) {
-          debugPrint('[SyncEngine] Batch commit notice: $e');
+          batchCommitFailed = true;
+          debugPrint('[SyncEngine] Batch commit FAILED (last_synced_at will not advance): $e');
         } finally {
           batch = firestore.batch();
           batchOpCount = 0;
@@ -1298,9 +1299,12 @@ class SyncEngine extends StateNotifier<SyncState> {
 
       for (final localDoc in localDocs) {
         var docToPush = localDoc;
-        // Upload to Firebase Storage with AES-256 binary encryption (or preserve local offline)
+        var uploadedThisSync = false;
+        // Upload to Firebase Storage with AES-256 binary encryption. If the upload can't happen
+        // now, the document is left for the next sync: file bytes are never written to Firestore (C4).
         if ((docToPush.storagePath == null || docToPush.storagePath!.isEmpty) &&
             docToPush.localImagePath.isNotEmpty) {
+          if (!isFirebaseReady) continue;
           try {
             final f = File(docToPush.localImagePath);
             if (f.existsSync()) {
@@ -1321,62 +1325,52 @@ class SyncEngine extends StateNotifier<SyncState> {
               final ext = p.extension(docToPush.localImagePath).replaceAll('.', '').toLowerCase();
               final storagePath = 'users/$uid/vault/${docToPush.id}.bin';
 
-              if (isFirebaseReady) {
-                try {
-                  final storage = _storageInstance ?? FirebaseStorage.instance;
-                  await storage.ref(storagePath).putData(
-                    encryptedBytes,
-                    SettableMetadata(contentType: 'application/octet-stream'),
-                  );
-                  docToPush = docToPush.copyWith(
-                    storagePath: storagePath,
-                    fileSizeBytes: rawBytes.length,
-                    fileExtension: ext.isNotEmpty ? ext : (docToPush.isPdf ? 'pdf' : 'jpg'),
-                    clearCloudData: true,
-                  );
-                  docsToUpsertLocal.add(docToPush);
-                } catch (storageErr) {
-                  debugPrint('[SyncEngine] Firebase Storage upload notice: $storageErr');
-                  // Legacy fallback for tests or offline networks: direct payload if small
-                  if (rawBytes.length <= 500 * 1024) {
-                    final payload = base64Encode(rawBytes);
-                    docToPush = docToPush.copyWith(
-                      cloudDataBase64: payload,
-                      fileSizeBytes: rawBytes.length,
-                      fileExtension: ext.isNotEmpty ? ext : (docToPush.isPdf ? 'pdf' : 'jpg'),
-                    );
-                    docsToUpsertLocal.add(docToPush);
-                  }
-                }
-              } else {
-                // Offline / unit test fallback: direct payload if small
-                if (rawBytes.length <= 500 * 1024) {
-                  final payload = base64Encode(rawBytes);
-                  docToPush = docToPush.copyWith(
-                    cloudDataBase64: payload,
-                    fileSizeBytes: rawBytes.length,
-                    fileExtension: ext.isNotEmpty ? ext : (docToPush.isPdf ? 'pdf' : 'jpg'),
-                  );
-                  docsToUpsertLocal.add(docToPush);
-                }
+              try {
+                final storage = _storageInstance ?? FirebaseStorage.instance;
+                await storage.ref(storagePath).putData(
+                  encryptedBytes,
+                  SettableMetadata(contentType: 'application/octet-stream'),
+                );
+              } catch (storageErr) {
+                debugPrint('[SyncEngine] Storage upload failed for ${docToPush.id}; retry on next sync: $storageErr');
+                runningVaultBytes -= rawBytes.length;
+                continue;
               }
+              docToPush = docToPush.copyWith(
+                storagePath: storagePath,
+                fileSizeBytes: rawBytes.length,
+                fileExtension: ext.isNotEmpty ? ext : (docToPush.isPdf ? 'pdf' : 'jpg'),
+                clearCloudData: true,
+              );
+              docsToUpsertLocal.add(docToPush);
+              uploadedThisSync = true;
             }
-          } catch (_) {}
+          } catch (e) {
+            debugPrint('[SyncEngine] Vault upload preparation failed for ${docToPush.id}; retry on next sync: $e');
+            continue;
+          }
         }
 
-        final remoteDoc = remoteDocsMap[docToPush.id];
-        final bool remoteMissingPayload = remoteDoc != null &&
-            (remoteDoc.cloudDataBase64 == null || remoteDoc.cloudDataBase64!.isEmpty) &&
-            ((docToPush.cloudDataBase64 != null && docToPush.cloudDataBase64!.isNotEmpty) ||
-                docToPush.localImagePath.isNotEmpty);
+        // Metadata only: any legacy plaintext payload is stripped (and cleared remotely via merge).
+        final docJson = docToPush.copyWith(userId: uid, clearCloudData: true).toJson();
 
-        if (remoteDoc == null || remoteMissingPayload) {
+        final remoteDoc = remoteDocsMap[docToPush.id];
+        final bool remoteMissingStorage = remoteDoc != null &&
+            (remoteDoc.storagePath == null || remoteDoc.storagePath!.isEmpty) &&
+            (docToPush.storagePath != null && docToPush.storagePath!.isNotEmpty);
+        final bool remoteHasPlaintext = remoteDoc != null &&
+            remoteDoc.cloudDataBase64 != null &&
+            remoteDoc.cloudDataBase64!.isNotEmpty;
+
+        if (remoteDoc == null || remoteMissingStorage || remoteHasPlaintext || uploadedThisSync) {
           if (lastSyncedAt == 0 ||
               docToPush.updatedAt.millisecondsSinceEpoch > lastSyncedAt ||
-              remoteMissingPayload) {
+              remoteMissingStorage ||
+              remoteHasPlaintext ||
+              uploadedThisSync) {
             batch.set(
               firestore.collection('documents').doc(docToPush.id),
-              docToPush.copyWith(userId: uid).toJson(),
+              docJson,
               SetOptions(merge: true),
             );
             await queueBatchOp();
@@ -1386,7 +1380,7 @@ class SyncEngine extends StateNotifier<SyncState> {
           // LWW: Local modification is newer -> Overwrite Firestore
           batch.set(
             firestore.collection('documents').doc(docToPush.id),
-            docToPush.copyWith(userId: uid).toJson(),
+            docJson,
             SetOptions(merge: true),
           );
           await queueBatchOp();
@@ -1859,16 +1853,20 @@ class SyncEngine extends StateNotifier<SyncState> {
         // Deduplicate checklist items atomically in SQLite after sync upsert
         await _dbHelper.deduplicateChecklistItems(executor: txn, userId: uid);
 
-        // 3. Update last_synced_at metadata in SQLite upon successful sync
-        await txn.insert(
-          AppConstants.tableSyncMetadata,
-          {
-            'key': 'sync_engine_last_synced_at',
-            'value': DateTime.fromMillisecondsSinceEpoch(syncStartTime).toIso8601String(),
-            'last_synced_at': syncStartTime,
-          },
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
+        // 3. Advance last_synced_at only when every Firestore batch committed (D1)
+        if (!batchCommitFailed) {
+          await txn.insert(
+            AppConstants.tableSyncMetadata,
+            {
+              'key': 'sync_engine_last_synced_at',
+              'value': DateTime.fromMillisecondsSinceEpoch(syncStartTime).toIso8601String(),
+              'last_synced_at': syncStartTime,
+            },
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          );
+        } else {
+          debugPrint('[SyncEngine] Skipping last_synced_at update: at least one batch failed.');
+        }
       });
 
       // 4. Meter and sync aggregate vault storage to users/{uid} profile in Firestore

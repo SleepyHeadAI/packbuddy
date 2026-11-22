@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/services/vault_pin_service.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -429,32 +431,42 @@ void main() {
       SharedPreferences.setMockInitialValues({});
     });
 
-    test('PreferencesService isolates and persists vault PIN and biometric settings per user UID', () async {
+    test('Vault PIN (hashed, secure storage) and biometric settings are isolated per user UID', () async {
       final prefs = await PreferencesService.init();
+      FlutterSecureStorage.setMockInitialValues({});
+      final pins = VaultPinService.instance..setMockStorage(null);
+      await pins.ensureLoaded(uid: 'user_A');
+      await pins.ensureLoaded(uid: 'user_B');
+      await pins.ensureLoaded();
 
       // User A
-      await prefs.setVaultPin('1234', uid: 'user_A');
+      await pins.setPin('1234', uid: 'user_A');
       await prefs.setVaultBiometricEnabled(true, uid: 'user_A');
 
       // User B
-      await prefs.setVaultPin('9876', uid: 'user_B');
+      await pins.setPin('9876', uid: 'user_B');
       await prefs.setVaultBiometricEnabled(false, uid: 'user_B');
 
       // Guest / Fallback
-      await prefs.setVaultPin('0000');
+      await pins.setPin('0000');
 
-      expect(prefs.getVaultPin(uid: 'user_A'), '1234');
+      expect(pins.verifyPin('1234', uid: 'user_A'), isTrue);
+      expect(pins.verifyPin('9876', uid: 'user_A'), isFalse);
       expect(prefs.isVaultBiometricEnabled(uid: 'user_A'), true);
 
-      expect(prefs.getVaultPin(uid: 'user_B'), '9876');
+      expect(pins.verifyPin('9876', uid: 'user_B'), isTrue);
       expect(prefs.isVaultBiometricEnabled(uid: 'user_B'), false);
 
-      expect(prefs.getVaultPin(), '0000');
+      expect(pins.verifyPin('0000'), isTrue);
 
       // Clearing PIN for User A does not affect User B
-      await prefs.setVaultPin(null, uid: 'user_A');
-      expect(prefs.getVaultPin(uid: 'user_A'), isNull);
-      expect(prefs.getVaultPin(uid: 'user_B'), '9876');
+      await pins.setPin(null, uid: 'user_A');
+      expect(pins.hasPin(uid: 'user_A'), isFalse);
+      expect(pins.verifyPin('9876', uid: 'user_B'), isTrue);
+
+      // Nothing PIN-related is stored in plaintext SharedPreferences
+      final raw = await SharedPreferences.getInstance();
+      expect(raw.getKeys().where((k) => k.contains('vault_pin')), isEmpty);
     });
   });
 }

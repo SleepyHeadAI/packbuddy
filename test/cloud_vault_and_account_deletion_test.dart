@@ -459,8 +459,10 @@ void main() {
       await tester.tap(inspectButtons.first);
       await tester.pumpAndSettle();
 
-      // Verify pinch-to-zoom InteractiveViewer preview dialog
-      expect(find.byType(InteractiveViewer), findsOneWidget);
+      // C2: content is never rendered for admins (even legacy plaintext payloads); only
+      // moderation actions (delete) remain available.
+      expect(find.byType(InteractiveViewer), findsNothing);
+      expect(find.textContaining('uçtan uca şifrelidir'), findsOneWidget);
       expect(find.text('Delete Document'), findsOneWidget);
 
       // Cancel dialog

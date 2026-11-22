@@ -10,6 +10,7 @@ import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/services/currency_service.dart';
 import 'core/services/preferences_service.dart';
+import 'core/services/vault_pin_service.dart';
 import 'features/auth/auth_service.dart';
 import 'features/auth/auth_controller.dart';
 import 'features/auth/auth_screen.dart';
@@ -51,6 +52,10 @@ void main() async {
   } catch (_) {}
   try {
     await PreferencesService.init();
+  } catch (_) {}
+  try {
+    // Load the signed-in user's hashed vault PIN (and migrate legacy plaintext) before UI starts.
+    await VaultPinService.instance.ensureLoaded();
   } catch (_) {}
   try {
     await CurrencyService.init();

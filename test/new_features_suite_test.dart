@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/services/vault_pin_service.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
@@ -49,18 +51,23 @@ void main() {
       expect(prefs.isProUser(), true);
     });
 
-    test('Vault PIN & Biometrics persistence works correctly', () async {
+    test('Vault PIN (salted hash in secure storage) & Biometrics persistence works correctly', () async {
+      FlutterSecureStorage.setMockInitialValues({});
+      final pins = VaultPinService.instance..setMockStorage(null);
+      await pins.ensureLoaded();
       final prefs = PreferencesService.instance;
-      expect(prefs.getVaultPin(), isNull);
+      expect(pins.hasPin(), isFalse);
 
-      await prefs.setVaultPin('1234');
-      expect(prefs.getVaultPin(), '1234');
+      await pins.setPin('1234');
+      expect(pins.hasPin(), isTrue);
+      expect(pins.verifyPin('1234'), isTrue);
+      expect(pins.verifyPin('0000'), isFalse);
 
       await prefs.setVaultBiometricEnabled(true);
       expect(prefs.isVaultBiometricEnabled(), true);
 
-      await prefs.setVaultPin(null);
-      expect(prefs.getVaultPin(), isNull);
+      await pins.setPin(null);
+      expect(pins.hasPin(), isFalse);
     });
   });
 

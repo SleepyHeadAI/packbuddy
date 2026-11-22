@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:packbuddy/core/services/vault_pin_service.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
@@ -257,8 +259,10 @@ void main() {
     });
 
     test('5. VaultController Unit: PIN is strictly required to unlock', () async {
-      final prefs = PreferencesService.instance;
-      await prefs.setVaultPin(null);
+      FlutterSecureStorage.setMockInitialValues({});
+      VaultPinService.instance.setMockStorage(null);
+      await VaultPinService.instance.ensureLoaded();
+      await VaultPinService.instance.setPin(null);
 
       // Fake Ref mock
       final container = ProviderContainer();

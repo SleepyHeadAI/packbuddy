@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
@@ -17,6 +16,7 @@ import 'package:packbuddy/core/services/biometric_service.dart';
 import 'package:packbuddy/core/services/preferences_service.dart';
 import 'package:packbuddy/core/services/telemetry_service.dart';
 import 'package:packbuddy/core/services/security_service.dart';
+import 'package:packbuddy/core/services/vault_pin_service.dart';
 import 'package:packbuddy/core/services/pro_entitlement_service.dart';
 import 'package:packbuddy/features/settings/data/mock_revenuecat_service.dart';
 import 'package:packbuddy/features/vault/domain/document.dart';
@@ -76,78 +76,41 @@ class VaultController extends StateNotifier<VaultState> {
         _prefs = prefs ?? PreferencesService.instance,
         super(VaultState(
           isLocked: (prefs ?? PreferencesService.instance).isVaultLocked(),
-          hasPin: (prefs ?? PreferencesService.instance).getVaultPin() != null,
+          hasPin: VaultPinService.instance.hasPin(),
           isBiometricEnabled: (prefs ?? PreferencesService.instance).isVaultBiometricEnabled(),
         )) {
+    _loadPinState();
     loadDocuments();
   }
 
-  /// Encodes file bytes into base64 payload safely for cloud sync without byte truncation
-  Future<String?> encodeFileForCloud(String filePath, {String? userId}) async {
+  VaultPinService get _pins => VaultPinService.instance;
+
+  /// Loads the hashed PIN record from secure storage for the current user, then refreshes state.
+  Future<void> _loadPinState() async {
     try {
-      final file = File(filePath);
-      if (!await file.exists()) return null;
-      var bytes = await file.readAsBytes();
-      if (SecurityService.instance.isEncrypted(bytes)) {
-        bytes = await SecurityService.instance.decryptBytes(bytes, userId: userId);
-      }
-      const maxCloudBytes = 750 * 1024;
-      if (bytes.length <= maxCloudBytes) {
-        return base64Encode(bytes);
-      } else {
-        // Never corrupt binary files by byte-slicing!
-        // Large files are safely preserved in local offline storage and chunked by sync engine.
-        return null;
-      }
-    } catch (_) {
-      return null;
+      await _pins.ensureLoaded();
+    } catch (e) {
+      debugPrint('[VaultController] PIN state load notice: $e');
     }
+    if (mounted) refreshSecurityState();
   }
 
-  /// Eagerly writes document metadata and raw bytes/chunks directly to Firestore
-  /// so Admin and other devices immediately have access without waiting for full sync loop
-  Future<void> _eagerCloudSyncDocument(Document doc, Uint8List rawBytes) async {
+  /// Formerly produced a PLAINTEXT base64 copy of the file for Firestore. Vault bytes now only
+  /// leave the device AES-encrypted via Firebase Storage (C4), so no cloud payload is produced.
+  Future<String?> encodeFileForCloud(String filePath, {String? userId}) async => null;
+
+  /// Eagerly writes document METADATA ONLY to Firestore so other devices see the entry quickly.
+  /// File bytes are never written to Firestore (no plaintext base64 / chunks): the sync engine
+  /// uploads them AES-encrypted to Firebase Storage (C4).
+  Future<void> _eagerCloudSyncDocument(Document doc) async {
     try {
       if (Firebase.apps.isEmpty) return;
       final uid = FirebaseAuth.instance.currentUser?.uid;
       if (uid == null || uid.isEmpty) return;
-      final firestore = FirebaseFirestore.instance;
-
-      const maxDirectBytes = 750 * 1024;
-      if (rawBytes.length <= maxDirectBytes) {
-        final payload = base64Encode(rawBytes);
-        await firestore.collection('documents').doc(doc.id).set(
-          doc.copyWith(userId: uid, cloudDataBase64: payload).toJson(),
-          SetOptions(merge: true),
-        );
-      } else {
-        // Large document (>750KB e.g. 1.3MB camera photo): upload doc metadata with empty cloudDataBase64
-        // and immediately upload chunked subcollection into documents/{id}/chunks
-        await firestore.collection('documents').doc(doc.id).set(
-          doc.copyWith(userId: uid, cloudDataBase64: '').toJson(),
-          SetOptions(merge: true),
-        );
-        final payload = base64Encode(rawBytes);
-        const chunkSize = 400 * 1024;
-        final totalChunks = (payload.length / chunkSize).ceil();
-        final batch = firestore.batch();
-        for (int i = 0; i < totalChunks; i++) {
-          final start = i * chunkSize;
-          final end = (start + chunkSize < payload.length) ? start + chunkSize : payload.length;
-          final chunkStr = payload.substring(start, end);
-          batch.set(
-            firestore.collection('documents').doc(doc.id).collection('chunks').doc('chunk_$i'),
-            {
-              'index': i,
-              'total': totalChunks,
-              'chunk': chunkStr,
-              'updated_at': doc.updatedAt.millisecondsSinceEpoch,
-            },
-            SetOptions(merge: true),
-          );
-        }
-        await batch.commit();
-      }
+      await FirebaseFirestore.instance.collection('documents').doc(doc.id).set(
+        doc.copyWith(userId: uid, clearCloudData: true).toJson(),
+        SetOptions(merge: true),
+      );
     } catch (e) {
       debugPrint('[VaultController] eager cloud sync notice: $e');
     }
@@ -161,33 +124,33 @@ class VaultController extends StateNotifier<VaultState> {
       return false;
     }
 
-    final savedPin = _prefs.getVaultPin();
-    if (savedPin != null && savedPin == pin) {
+    // Salted PBKDF2 hash comparison (C3); the plaintext PIN is never stored.
+    if (_pins.verifyPin(pin)) {
       _prefs.setVaultLocked(false);
-      _prefs.resetVaultFailedPinAttempts();
+      unawaited(_pins.resetFailedAttempts());
       state = state.copyWith(isLocked: false);
       return true;
     }
 
-    _prefs.recordVaultFailedPinAttempt();
+    unawaited(_pins.recordFailedAttempt());
     return false;
   }
 
   /// Checks if vault PIN entry is temporarily locked out due to >= 5 failed attempts in 10 mins
-  bool isPinLockedOut() => _prefs.isVaultPinLockedOut();
+  bool isPinLockedOut() => _pins.isLockedOut();
 
   /// Gets remaining lockout seconds (0 if not locked out)
-  int getPinLockoutRemainingSeconds() => _prefs.getVaultPinLockoutRemainingSeconds();
+  int getPinLockoutRemainingSeconds() => _pins.lockoutRemainingSeconds();
 
   /// Gets remaining allowed attempts before lockout (from 5 down to 0)
   int getRemainingPinAttempts() {
-    final count = _prefs.getRecentVaultFailedPinAttemptsCount();
-    return (PreferencesService.vaultMaxFailedPinAttempts - count).clamp(0, PreferencesService.vaultMaxFailedPinAttempts);
+    final count = _pins.failedAttemptsCount();
+    return (VaultPinService.maxFailedAttempts - count).clamp(0, VaultPinService.maxFailedAttempts);
   }
 
   /// Clears failed attempt history
   Future<void> resetFailedPinAttempts() async {
-    await _prefs.resetVaultFailedPinAttempts();
+    await _pins.resetFailedAttempts();
   }
 
   /// Manually locks the vault immediately
@@ -196,20 +159,19 @@ class VaultController extends StateNotifier<VaultState> {
     state = state.copyWith(isLocked: true);
   }
 
-  /// Sets a new PIN code for vault protection and syncs to cloud
+  /// Sets a new PIN code for vault protection. The PIN stays on this device only
+  /// (salted hash in secure storage) and is never written to Firestore (C3).
   Future<void> setPin(String pin) async {
-    await _prefs.setVaultPin(pin);
-    await _prefs.resetVaultFailedPinAttempts();
+    await _pins.setPin(pin);
+    await _pins.resetFailedAttempts();
     state = state.copyWith(hasPin: true);
-    await _syncSecuritySettingsToCloud(pin: pin, updatePin: true);
   }
 
   /// Removes the vault PIN code and locks the vault until a new PIN is set
   Future<void> removePin() async {
-    await _prefs.setVaultPin(null);
+    await _pins.setPin(null);
     await _prefs.setVaultLocked(true);
     state = state.copyWith(hasPin: false, isLocked: true);
-    await _syncSecuritySettingsToCloud(pin: null, updatePin: true);
   }
 
   /// Unlocks the vault via real biometric verification (Fingerprint / Face ID)
@@ -232,10 +194,8 @@ class VaultController extends StateNotifier<VaultState> {
     await _syncSecuritySettingsToCloud(biometricEnabled: enabled);
   }
 
-  /// Synchronizes security settings (PIN code and biometric enablement) to Firestore cloud
+  /// Synchronizes the biometric preference to Firestore. The vault PIN is never synced.
   Future<void> _syncSecuritySettingsToCloud({
-    String? pin,
-    bool updatePin = false,
     bool? biometricEnabled,
   }) async {
     try {
@@ -244,10 +204,6 @@ class VaultController extends StateNotifier<VaultState> {
       final data = <String, dynamic>{
         'updatedAt': DateTime.now().toUtc().toIso8601String(),
       };
-      if (updatePin) {
-        data['vaultPin'] = pin;
-        data['vaultPinUpdatedAt'] = DateTime.now().toUtc().toIso8601String();
-      }
       if (biometricEnabled != null) {
         data['vaultBiometricEnabled'] = biometricEnabled;
         data['vaultBiometricUpdatedAt'] = DateTime.now().toUtc().toIso8601String();
@@ -263,17 +219,22 @@ class VaultController extends StateNotifier<VaultState> {
 
   /// Refreshes PIN and biometric availability without altering the active session lock state
   void refreshSecurityState() {
+    if (!_pins.isLoaded()) {
+      // Account switched or first access: load this user's hashed PIN, then refresh again.
+      unawaited(_loadPinState());
+    }
     state = state.copyWith(
-      hasPin: _prefs.getVaultPin() != null,
+      hasPin: _pins.hasPin(),
       isBiometricEnabled: _prefs.isVaultBiometricEnabled(),
     );
   }
 
   /// Resets controller state on logout or account switch
   void resetState() {
+    if (!_pins.isLoaded()) unawaited(_loadPinState());
     state = VaultState(
       isLocked: _prefs.isVaultLocked(),
-      hasPin: _prefs.getVaultPin() != null,
+      hasPin: _pins.hasPin(),
       isBiometricEnabled: _prefs.isVaultBiometricEnabled(),
       documents: const [],
     );
@@ -333,14 +294,14 @@ class VaultController extends StateNotifier<VaultState> {
       }
 
       final originalFile = File(pickedFile.path);
-      final rawBytes = await originalFile.readAsBytes();
-      final fileBytes = rawBytes.length;
 
-      // Strict Single File 10 MB Limit Enforcement (RAM/OOM and abuse protection)
+      // Strict Single File 10 MB Limit Enforcement, checked BEFORE loading bytes (OOM protection)
+      final fileBytes = await originalFile.length();
       if (fileBytes > ProFeatureGate.kMaxSingleFileBytes) {
         state = state.copyWith(errorMessage: 'file_too_large_10mb');
         return null;
       }
+      final rawBytes = await originalFile.readAsBytes();
 
       // Pro Feature Gate check (Free: max 5 docs, 50MB total; Pro: unlimited docs, 5GB total)
       final isPro = _ref.read(proSubscriptionProvider).isPro;
@@ -379,7 +340,6 @@ class VaultController extends StateNotifier<VaultState> {
 
       // 3. Create Document entity with cloud payload
       final cleanExt = ext.replaceAll('.', '').toLowerCase();
-      final cloudData = await encodeFileForCloud(targetPath, userId: currentUid);
       final now = DateTime.now();
       final newDoc = Document(
         id: _uuid.v4(),
@@ -392,7 +352,6 @@ class VaultController extends StateNotifier<VaultState> {
         fileType: 'image',
         notes: notes,
         fileSizeBytes: fileBytes,
-        cloudDataBase64: cloudData,
         fileExtension: cleanExt,
         createdAt: now,
         updatedAt: now,
@@ -415,7 +374,7 @@ class VaultController extends StateNotifier<VaultState> {
       );
 
       // 7. Eager cloud push & trigger background two-way sync
-      unawaited(_eagerCloudSyncDocument(newDoc, rawBytes));
+      unawaited(_eagerCloudSyncDocument(newDoc));
       try {
         _ref.read(syncEngineProvider.notifier).performSync();
       } catch (_) {}
@@ -459,14 +418,13 @@ class VaultController extends StateNotifier<VaultState> {
 
       final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
       final originalFile = File(pickedPath);
-      final rawBytes = await originalFile.readAsBytes();
-      final fileBytes = rawBytes.length;
-
-      // Strict Single File 10 MB Limit Enforcement (RAM/OOM and abuse protection)
+      // Strict Single File 10 MB Limit Enforcement, checked BEFORE loading bytes (OOM protection)
+      final fileBytes = await originalFile.length();
       if (fileBytes > ProFeatureGate.kMaxSingleFileBytes) {
         state = state.copyWith(errorMessage: 'file_too_large_10mb');
         return null;
       }
+      final rawBytes = await originalFile.readAsBytes();
 
       // Pro Feature Gate check (Free: max 5 docs, 50MB total; Pro: unlimited docs, 5GB total)
       final isPro = _ref.read(proSubscriptionProvider).isPro;
@@ -492,7 +450,6 @@ class VaultController extends StateNotifier<VaultState> {
       await targetFile.writeAsBytes(encryptedBytes);
 
       final cleanExt = ext.replaceAll('.', '').toLowerCase();
-      final cloudData = await encodeFileForCloud(targetPath, userId: currentUid);
       final now = DateTime.now();
       final newDoc = Document(
         id: _uuid.v4(),
@@ -505,7 +462,6 @@ class VaultController extends StateNotifier<VaultState> {
         fileType: isPdf ? 'pdf' : 'image',
         notes: notes,
         fileSizeBytes: fileBytes,
-        cloudDataBase64: cloudData,
         fileExtension: cleanExt,
         createdAt: now,
         updatedAt: now,
@@ -524,7 +480,7 @@ class VaultController extends StateNotifier<VaultState> {
       );
 
       // Eager cloud push & trigger background two-way sync
-      unawaited(_eagerCloudSyncDocument(newDoc, rawBytes));
+      unawaited(_eagerCloudSyncDocument(newDoc));
       try {
         _ref.read(syncEngineProvider.notifier).performSync();
       } catch (_) {}
@@ -574,13 +530,9 @@ class VaultController extends StateNotifier<VaultState> {
         return null;
       }
 
-      var cloudData = doc.cloudDataBase64;
       var ext = doc.fileExtension;
       final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
       final effectiveUid = (doc.userId.isEmpty && currentUid.isNotEmpty) ? currentUid : doc.userId;
-      if ((cloudData == null || cloudData.isEmpty) && doc.localImagePath.isNotEmpty) {
-        cloudData = await encodeFileForCloud(doc.localImagePath, userId: effectiveUid);
-      }
       if (ext == null || ext.isEmpty) {
         ext = p.extension(doc.localImagePath).replaceAll('.', '').toLowerCase();
         if (ext.isEmpty) ext = doc.isPdf ? 'pdf' : 'jpg';
@@ -588,7 +540,6 @@ class VaultController extends StateNotifier<VaultState> {
       final docToSave = doc.copyWith(
         userId: effectiveUid,
         fileSizeBytes: fileBytes,
-        cloudDataBase64: cloudData,
         fileExtension: ext,
       );
       await _dbHelper.insertDocument(docToSave);
@@ -600,22 +551,7 @@ class VaultController extends StateNotifier<VaultState> {
         fileSizeBytes: fileBytes,
         fileExtension: p.extension(docToSave.localImagePath),
       );
-      if (docToSave.cloudDataBase64 != null && docToSave.cloudDataBase64!.isNotEmpty) {
-        try {
-          unawaited(_eagerCloudSyncDocument(docToSave, base64Decode(docToSave.cloudDataBase64!)));
-        } catch (_) {}
-      } else if (docToSave.localImagePath.isNotEmpty) {
-        try {
-          final f = File(docToSave.localImagePath);
-          if (f.existsSync()) {
-            final rawBytes = f.readAsBytesSync();
-            final bytesToSync = SecurityService.instance.isEncrypted(rawBytes)
-                ? await SecurityService.instance.decryptBytes(rawBytes, userId: docToSave.userId)
-                : rawBytes;
-            unawaited(_eagerCloudSyncDocument(docToSave, bytesToSync));
-          }
-        } catch (_) {}
-      }
+      unawaited(_eagerCloudSyncDocument(docToSave));
       try {
         _ref.read(syncEngineProvider.notifier).performSync();
       } catch (_) {}

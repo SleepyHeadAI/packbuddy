@@ -120,9 +120,12 @@ class FakeDocSnapshot extends Fake implements DocumentSnapshot<Map<String, dynam
 
 class FakeDocRef extends Fake implements DocumentReference<Map<String, dynamic>> {
   Map<String, dynamic>? storedData;
+  bool failReads = false;
+  int setCalls = 0;
 
   @override
   Future<void> set(Map<String, dynamic> data, [SetOptions? options]) async {
+    setCalls++;
     if (options?.merge == true && storedData != null) {
       storedData = {...storedData!, ...data};
     } else {
@@ -132,6 +135,7 @@ class FakeDocRef extends Fake implements DocumentReference<Map<String, dynamic>>
 
   @override
   Future<DocumentSnapshot<Map<String, dynamic>>> get([GetOptions? options]) async {
+    if (failReads) throw Exception('unavailable: network error');
     return FakeDocSnapshot(storedData, storedData != null);
   }
 
@@ -151,12 +155,37 @@ class FakeCollectionRef extends Fake implements CollectionReference<Map<String, 
   }
 }
 
+class FakeTransaction extends Fake implements Transaction {
+  @override
+  Future<DocumentSnapshot<T>> get<T extends Object?>(DocumentReference<T> documentReference) async {
+    final snap = await (documentReference as FakeDocRef).get();
+    return snap as DocumentSnapshot<T>;
+  }
+
+  @override
+  Transaction set<T>(DocumentReference<T> documentReference, T data, [SetOptions? options]) {
+    final ref = documentReference as FakeDocRef;
+    ref.setCalls++;
+    ref.storedData = Map<String, dynamic>.from(data as Map<String, dynamic>);
+    return this;
+  }
+}
+
 class FakeFirestoreInstance extends Fake implements FirebaseFirestore {
   final Map<String, FakeCollectionRef> collections = {};
 
   @override
   CollectionReference<Map<String, dynamic>> collection(String collectionPath) {
     return collections.putIfAbsent(collectionPath, () => FakeCollectionRef());
+  }
+
+  @override
+  Future<T> runTransaction<T>(
+    TransactionHandler<T> transactionHandler, {
+    Duration timeout = const Duration(seconds: 30),
+    int maxAttempts = 5,
+  }) {
+    return transactionHandler(FakeTransaction());
   }
 }
 
@@ -363,18 +392,69 @@ void main() {
       expect(newDeviceStorage.storage['pb_vault_aes_key_$testUserId'], equals(initialKeyB64));
     });
 
-    test('Super Admin Escrow Access: Super Admin can safely resolve target user key', () async {
-      const targetUserId = 'client-user-99';
+    test('C1: escrow network error never generates a new key nor overwrites the escrow', () async {
+      const testUserId = 'user-escrow-outage';
 
-      // User creates their key
-      final userKey = await SecurityService.instance.getOrCreateUserVaultKey(userId: targetUserId);
+      // Existing escrow from another device
+      final original = await SecurityService.instance.getOrCreateUserVaultKey(userId: testUserId);
+      final escrowRef = fakeFirestore.collections['vault_keys']!.docs[testUserId]!;
+      final escrowB64 = escrowRef.storedData!['key'];
+      final writesBefore = escrowRef.setCalls;
 
-      // Admin on separate session resolves user key from escrow
+      // New device (empty Keystore) while Firestore is unreachable
+      SecurityService.instance.setSecureStorageForTesting(MockFlutterSecureStorage());
       SecurityService.instance.clearKeyCacheForTesting();
-      final adminResolvedKey = await SecurityService.instance.fetchUserEscrowKeyAsAdmin(targetUserId);
+      escrowRef.failReads = true;
 
-      expect(adminResolvedKey, isNotNull);
-      expect(adminResolvedKey!.bytes, equals(userKey.bytes));
+      await expectLater(
+        SecurityService.instance.getOrCreateUserVaultKey(userId: testUserId),
+        throwsA(isA<VaultKeyUnavailableException>()),
+      );
+      expect(escrowRef.storedData!['key'], equals(escrowB64));
+      expect(escrowRef.setCalls, writesBefore);
+
+      // Once online again the original key is recovered
+      escrowRef.failReads = false;
+      final recovered = await SecurityService.instance.getOrCreateUserVaultKey(userId: testUserId);
+      expect(recovered.bytes, equals(original.bytes));
+    });
+
+    test('C1: escrow is written once; an existing escrow wins over a locally generated key', () async {
+      const testUserId = 'user-escrow-race';
+      // Another device escrowed first
+      final ref = fakeFirestore.collection('vault_keys').doc(testUserId) as FakeDocRef;
+      final otherDeviceKey = base64Encode(List<int>.generate(32, (i) => i));
+      ref.storedData = {'userId': testUserId, 'key': otherDeviceKey};
+
+      final key = await SecurityService.instance.getOrCreateUserVaultKey(userId: testUserId);
+      expect(base64Encode(key.bytes), otherDeviceKey);
+      expect(ref.setCalls, 0);
+    });
+
+    test('C1: legacy device-wide key is never adopted as another account\'s vault key', () async {
+      const testUserId = 'user-fresh-account';
+      final legacyDeviceKey = base64Encode(List<int>.filled(32, 7));
+      mockSecureStorage.storage['pb_vault_aes_key'] = legacyDeviceKey;
+
+      final key = await SecurityService.instance.getOrCreateUserVaultKey(userId: testUserId);
+      expect(base64Encode(key.bytes), isNot(legacyDeviceKey));
+    });
+
+    test('C2: admin vault viewer returns no content (no key fetch, no decryption)', () async {
+      final service = FirebaseAdminService();
+      final bytes = await service.viewUserDocumentDecrypted(
+        targetUserId: 'client-user-99',
+        doc: Document(
+          id: 'doc-1',
+          userId: 'client-user-99',
+          title: 'Passport',
+          category: 'passport',
+          localImagePath: '',
+          createdAt: DateTime(2026, 1, 1),
+          updatedAt: DateTime(2026, 1, 1),
+        ),
+      );
+      expect(bytes, isNull);
     });
 
     test('Encryption & Decryption using User Escrow Key preserves data integrity', () async {
@@ -555,10 +635,10 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 200));
 
-      // Verify viewUserDocumentDecrypted was called with audit logging
-      expect(mockAdmin.loggedAudits.length, equals(1));
-      expect(mockAdmin.loggedAudits.first['action'], equals('view_vault_document'));
-      expect(mockAdmin.loggedAudits.first['targetUserId'], equals('user-inspect-1'));
+      // C2: admins can never fetch/decrypt vault content — no decryption call is made and the
+      // inspect dialog explains that the content is end-to-end encrypted.
+      expect(mockAdmin.loggedAudits, isEmpty);
+      expect(find.textContaining('uçtan uca şifrelidir'), findsOneWidget);
     });
   });
 }

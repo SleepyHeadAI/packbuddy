@@ -17,6 +17,10 @@ class FakeVaultController extends VaultController {
     state = state.copyWith(isLocked: true);
   }
 
+  // Keep the injected security state; the real controller refreshes it from VaultPinService.
+  @override
+  void refreshSecurityState() {}
+
   @override
   bool unlockVault(String pin) {
     state = state.copyWith(isLocked: false);

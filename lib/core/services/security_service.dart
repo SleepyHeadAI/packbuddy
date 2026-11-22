@@ -36,6 +36,15 @@ Uint8List _isolateDecryptBytes(_CryptParams params) {
   return Uint8List.fromList(decrypted);
 }
 
+/// Thrown when the vault key escrow can't be read/written. Callers must retry later instead of
+/// generating a new key (which would make existing encrypted files unreadable).
+class VaultKeyUnavailableException implements Exception {
+  final String message;
+  VaultKeyUnavailableException(this.message);
+  @override
+  String toString() => 'VaultKeyUnavailableException: $message';
+}
+
 /// Vault privacy & anti-spyware screen protection service with AES-256 at-rest file encryption.
 /// Interfaces with Android Keystore via [FlutterSecureStorage], supports Isolate/compute offloading
 /// for 120 FPS performance, and enforces zero hardcoded static keys in the binary.
@@ -103,10 +112,16 @@ class SecurityService {
 
   /// Resolves or generates the persistent 256-bit AES key for a specific user.
   /// 1. Reads from Android Keystore via [FlutterSecureStorage] (_userKeyStorageKey(userId)).
-  /// 2. If missing from Keystore, attempts multi-device recovery from Firestore `vault_keys/{userId}`.
-  /// 3. If missing from Firestore too, generates a cryptographically secure random 256-bit AES key,
-  ///    writes it to Android Keystore, and escrows it to Firestore `vault_keys/{userId}`.
-  /// Enforces zero hardcoded static keys in the binary.
+  /// 2. If missing from Keystore, recovers it from the Firestore escrow `vault_keys/{userId}`.
+  /// 3. Only when the escrow is confirmed absent, generates a fresh random key and writes the
+  ///    escrow exactly once inside a transaction (`!exists`). If another device won the race,
+  ///    the already-escrowed key is adopted instead.
+  ///
+  /// There is no fallback to the device-wide legacy key (`pb_vault_aes_key`): that key may
+  /// belong to another account on this device (C1).
+  ///
+  /// Throws [VaultKeyUnavailableException] when the escrow can't be read or written (e.g. network
+  /// failure). A new key is never generated in that case, so an existing escrow is never overwritten.
   Future<enc.Key> getOrCreateUserVaultKey({required String userId, bool syncToCloud = true}) async {
     final cleanUid = userId.trim();
     if (cleanUid.isEmpty) {
@@ -127,53 +142,26 @@ class SecurityService {
       debugPrint('[SecurityService] Secure storage read notice for user $cleanUid: $e');
     }
 
-    // Migration fallback: check legacy device key or SharedPreferences if this user was using previous single-key vault
     if (base64Key == null || base64Key.isEmpty) {
-      try {
-        final legacyDeviceKey = await _secureStorage.read(key: 'pb_vault_aes_key');
-        if (legacyDeviceKey != null && legacyDeviceKey.isNotEmpty) {
-          base64Key = legacyDeviceKey;
-          try {
-            await _secureStorage.write(key: storageKey, value: base64Key);
-          } catch (_) {}
-        }
-      } catch (_) {}
-    }
-
-    // 2. Multi-device recovery: if Keystore is empty, fetch escrow key from Firestore `vault_keys/{userId}`
-    if (base64Key == null || base64Key.isEmpty) {
-      final escrowKey = await _fetchEscrowKeyFromFirestore(cleanUid);
-      if (escrowKey != null && escrowKey.isNotEmpty) {
-        base64Key = escrowKey;
-        try {
-          await _secureStorage.write(key: storageKey, value: base64Key);
-          debugPrint('[SecurityService] Multi-device vault key successfully recovered from Firestore for $cleanUid');
-        } catch (e) {
-          debugPrint('[SecurityService] Error caching recovered key to Keystore: $e');
-        }
+      // 2. Multi-device recovery from the escrow. Network errors propagate (no new key!).
+      final escrow = await _readEscrow(cleanUid);
+      if (escrow != null) {
+        base64Key = escrow;
+      } else {
+        // 3. Escrow confirmed absent: create a key and escrow it exactly once.
+        final candidate = _generateRandomKeyB64();
+        base64Key = syncToCloud ? await _createEscrowIfAbsent(cleanUid, candidate) : candidate;
       }
-    }
 
-    // 3. New user generation: if still missing, generate fresh random 256-bit AES key
-    if (base64Key == null || base64Key.isEmpty) {
-      final random = Random.secure();
-      final keyBytes = Uint8List(32);
-      for (var i = 0; i < 32; i++) {
-        keyBytes[i] = random.nextInt(256);
-      }
-      base64Key = base64Encode(keyBytes);
       try {
         await _secureStorage.write(key: storageKey, value: base64Key);
       } catch (e) {
+        // Never persist key material in plaintext SharedPreferences.
         debugPrint('[SecurityService] Secure storage write notice: $e');
-        await PreferencesService.instance.setVaultEncryptionKey(base64Key);
-      }
-      if (syncToCloud) {
-        await _backupKeyToFirestore(cleanUid, base64Key);
       }
     } else if (syncToCloud) {
-      // Ensure escrow backup exists in Firestore in background
-      unawaited(_backupKeyToFirestore(cleanUid, base64Key));
+      // Make sure an escrow exists; never overwrite an existing one.
+      unawaited(_ensureEscrowForExistingKey(cleanUid, base64Key));
     }
 
     final resolvedKey = enc.Key(base64Decode(base64Key));
@@ -181,62 +169,78 @@ class SecurityService {
     return resolvedKey;
   }
 
-  /// Backs up a user's vault AES key to Firestore `vault_keys/{userId}` with server timestamp
-  Future<void> _backupKeyToFirestore(String userId, String base64Key) async {
-    final firestore = _effectiveFirestore;
-    if (firestore == null) return;
-    try {
-      await firestore.collection('vault_keys').doc(userId).set({
-        'userId': userId,
-        'key': base64Key,
-        'algorithm': 'AES-256-CBC',
-        'version': 1,
-        'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
-    } catch (e) {
-      debugPrint('[SecurityService] Error backing up key to Firestore: $e');
+  String _generateRandomKeyB64() {
+    final random = Random.secure();
+    final keyBytes = Uint8List(32);
+    for (var i = 0; i < 32; i++) {
+      keyBytes[i] = random.nextInt(256);
     }
+    return base64Encode(keyBytes);
   }
 
-  /// Fetches escrow key from Firestore `vault_keys/{userId}`
-  Future<String?> _fetchEscrowKeyFromFirestore(String userId) async {
+  /// Reads the escrowed key. Returns null only when the escrow document is confirmed absent
+  /// (or Firebase isn't configured at all). Any read error throws [VaultKeyUnavailableException].
+  Future<String?> _readEscrow(String userId) async {
     final firestore = _effectiveFirestore;
     if (firestore == null) return null;
+    final DocumentSnapshot<Map<String, dynamic>> doc;
     try {
-      final doc = await firestore.collection('vault_keys').doc(userId).get();
-      if (doc.exists && doc.data() != null) {
-        final keyStr = doc.data()!['key'] as String?;
-        if (keyStr != null && keyStr.isNotEmpty) {
-          return keyStr.trim();
-        }
-      }
+      doc = await firestore.collection('vault_keys').doc(userId).get();
     } catch (e) {
-      debugPrint('[SecurityService] Error fetching escrow key from Firestore for $userId: $e');
+      throw VaultKeyUnavailableException('escrow read failed: $e');
     }
-    return null;
+    if (!doc.exists) return null;
+    final keyStr = doc.data()?['key'] as String?;
+    if (keyStr == null || keyStr.trim().isEmpty) {
+      // A document without key material is corrupt; don't mint a key that would diverge.
+      throw VaultKeyUnavailableException('escrow document has no key');
+    }
+    return keyStr.trim();
   }
 
-  /// Super Admin Key Escrow resolution: allows Super Admin to safely resolve a target user's
-  /// AES key from Firestore `vault_keys/{targetUserId}` to inspect vault documents
-  Future<enc.Key?> fetchUserEscrowKeyAsAdmin(String targetUserId) async {
-    final cleanUid = targetUserId.trim();
-    if (cleanUid.isEmpty) return null;
-
-    if (_cachedUserKeys.containsKey(cleanUid)) {
-      return _cachedUserKeys[cleanUid];
+  /// Writes the escrow only if it doesn't exist yet (Firestore transaction). Returns the key
+  /// that is authoritative afterwards: ours, or the one another device escrowed first.
+  Future<String> _createEscrowIfAbsent(String userId, String base64Key) async {
+    final firestore = _effectiveFirestore;
+    if (firestore == null) return base64Key;
+    try {
+      return await firestore.runTransaction<String>((tx) async {
+        final ref = firestore.collection('vault_keys').doc(userId);
+        final snap = await tx.get(ref);
+        if (snap.exists) {
+          final existing = snap.data()?['key'] as String?;
+          if (existing != null && existing.trim().isNotEmpty) {
+            return existing.trim();
+          }
+          throw VaultKeyUnavailableException('escrow document has no key');
+        }
+        tx.set(ref, {
+          'userId': userId,
+          'key': base64Key,
+          'algorithm': 'AES-256-CBC',
+          'version': 1,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+        return base64Key;
+      });
+    } on VaultKeyUnavailableException {
+      rethrow;
+    } catch (e) {
+      throw VaultKeyUnavailableException('escrow create failed: $e');
     }
+  }
 
-    final escrowKeyB64 = await _fetchEscrowKeyFromFirestore(cleanUid);
-    if (escrowKeyB64 != null && escrowKeyB64.isNotEmpty) {
-      try {
-        final key = enc.Key(base64Decode(escrowKeyB64));
-        _cachedUserKeys[cleanUid] = key;
-        return key;
-      } catch (e) {
-        debugPrint('[SecurityService] Error decoding escrow key: $e');
+  /// Background check for keys that already live in the Keystore: creates the escrow if it is
+  /// missing, and only logs (never overwrites) if a different key is already escrowed.
+  Future<void> _ensureEscrowForExistingKey(String userId, String base64Key) async {
+    try {
+      final authoritative = await _createEscrowIfAbsent(userId, base64Key);
+      if (authoritative != base64Key) {
+        debugPrint('[SecurityService] Escrow key differs from local Keystore key for $userId; escrow left untouched.');
       }
+    } catch (e) {
+      debugPrint('[SecurityService] Escrow ensure notice: $e');
     }
-    return null;
   }
 
   /// Cleans up a user's encryption key from Keystore, memory cache, and Firestore (for GDPR / deletion)
@@ -329,30 +333,26 @@ class SecurityService {
       }
     }
 
-    // 0. Explicit candidate key (e.g. from Super Admin fetchUserEscrowKeyAsAdmin)
+    // 0. Explicit candidate key supplied by the caller
     if (candidateKey != null) {
       addKey(candidateKey, 'explicit_candidate_key');
     }
 
-    // 1. User-specific Key Escrow / Keystore key
+    // 1. User-specific Keystore / own escrow key. Read-only here: decryption must never
+    //    mint or escrow a key (syncToCloud: false).
     if (userId != null && userId.isNotEmpty) {
       try {
         final userKey = await getOrCreateUserVaultKey(userId: userId, syncToCloud: false);
         addKey(userKey, 'user_keystore_or_escrow_key');
       } catch (_) {}
+    } else {
+      // 2. Device-bound key only for data that was never bound to an account (C1):
+      //    it may belong to another account on this device.
       try {
-        final adminKey = await fetchUserEscrowKeyAsAdmin(userId);
-        if (adminKey != null) {
-          addKey(adminKey, 'admin_escrow_key');
-        }
+        final primary = await _getOrCreateKey();
+        addKey(primary, 'keystore_device_key');
       } catch (_) {}
     }
-
-    // 2. Primary device-bound key from Android Keystore / Secure Storage
-    try {
-      final primary = await _getOrCreateKey();
-      addKey(primary, 'keystore_device_key');
-    } catch (_) {}
 
     // 3. Collect user identity seeds for authenticated device synchronization
     final seeds = <String>{};
