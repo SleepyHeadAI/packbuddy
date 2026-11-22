@@ -2105,7 +2105,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get customLocationTooltip => 'Thêm địa điểm tùy chỉnh (vd: Làng quê)';
 
   @override
-  String notACountryOrCityPrompt(Object query) {
+  String notACountryOrCityPrompt(String query) {
     return 'Không tìm thấy \"$query\" trong danh mục quốc gia hoặc thành phố. Bạn có muốn thêm dưới dạng địa điểm tùy chỉnh?';
   }
 

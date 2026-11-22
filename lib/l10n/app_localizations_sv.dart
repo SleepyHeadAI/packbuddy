@@ -2101,7 +2101,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get customLocationTooltip => 'Lägg till anpassad plats (t.ex. Vår by)';
 
   @override
-  String notACountryOrCityPrompt(Object query) {
+  String notACountryOrCityPrompt(String query) {
     return '\"$query\" hittades inte i katalog över länder eller städer. Vill du lägga till den som anpassad plats?';
   }
 

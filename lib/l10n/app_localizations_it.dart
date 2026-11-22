@@ -2117,7 +2117,7 @@ class AppLocalizationsIt extends AppLocalizations {
       'Aggiungi luogo personalizzato (es. Il mio paese)';
 
   @override
-  String notACountryOrCityPrompt(Object query) {
+  String notACountryOrCityPrompt(String query) {
     return '\"$query\" non è stato trovato nel catalogo dei paesi o delle città. Vuoi aggiungerlo come luogo personalizzato?';
   }
 

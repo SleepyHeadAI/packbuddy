@@ -2396,6 +2396,14 @@
   "addAsCustomLocation": "Add as custom location",
   "customLocationTooltip": "Add custom location (e.g. My Village)",
   "notACountryOrCityPrompt": "\"{query}\" was not found in the verified country or city catalog. Would you like to add it as a custom location?",
+  "@notACountryOrCityPrompt": {
+    "description": "Prompt shown when a typed destination is not in the country/city catalog",
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
   "cityLabel": "City",
   "countryLabel": "Country",
   "privatePhotos": "Private Photos",

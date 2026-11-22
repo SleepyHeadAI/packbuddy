@@ -2097,7 +2097,7 @@ class AppLocalizationsTh extends AppLocalizations {
       'เพิ่มสถานที่กำหนดเอง (เช่น หมู่บ้านของเรา)';
 
   @override
-  String notACountryOrCityPrompt(Object query) {
+  String notACountryOrCityPrompt(String query) {
     return 'ไม่พบ \"$query\" ในรายชื่อประเทศหรือเมือง คุณต้องการเพิ่มเป็นสถานที่กำหนดเองหรือไม่?';
   }
 

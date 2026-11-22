@@ -2110,7 +2110,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Добавить свое место (напр.: Родная деревня)';
 
   @override
-  String notACountryOrCityPrompt(Object query) {
+  String notACountryOrCityPrompt(String query) {
     return 'Место «$query» не найдено в списке стран и городов. Добавить его как особое место?';
   }
 

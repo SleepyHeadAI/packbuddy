@@ -2031,7 +2031,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get customLocationTooltip => '맞춤 위치 추가 (예: 우리 마을)';
 
   @override
-  String notACountryOrCityPrompt(Object query) {
+  String notACountryOrCityPrompt(String query) {
     return '\"$query\"이(가) 등록된 국가 또는 도시 목록에 없습니다. 맞춤 위치로 추가하시겠습니까?';
   }
 

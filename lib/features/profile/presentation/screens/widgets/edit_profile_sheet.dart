@@ -200,11 +200,15 @@ class _EditProfileSheetState extends ConsumerState<EditProfileSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  ProfileLocalization.getEditProfile(lang),
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 17,
+                Expanded(
+                  child: Text(
+                    ProfileLocalization.getEditProfile(lang),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 17,
+                    ),
                   ),
                 ),
                 IconButton(
@@ -287,16 +291,26 @@ class _EditProfileSheetState extends ConsumerState<EditProfileSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  ProfileLocalization.getUsername(lang),
-                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                Flexible(
+                  child: Text(
+                    ProfileLocalization.getUsername(lang),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                  ),
                 ),
-                Text(
-                  '@${_usernameController.text.trim().toLowerCase()}',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.primary,
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    '@${_usernameController.text.trim().toLowerCase()}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.end,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.primary,
+                    ),
                   ),
                 ),
               ],
@@ -466,10 +480,15 @@ class _EditProfileSheetState extends ConsumerState<EditProfileSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  ProfileLocalization.getTravelStyles(lang),
-                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                Expanded(
+                  child: Text(
+                    ProfileLocalization.getTravelStyles(lang),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                  ),
                 ),
+                const SizedBox(width: 8),
                 Text(
                   '${_selectedStyles.length} / 3',
                   style: TextStyle(
@@ -515,12 +534,16 @@ class _EditProfileSheetState extends ConsumerState<EditProfileSheet> {
                       children: [
                         Text(style.emoji, style: const TextStyle(fontSize: 14)),
                         const SizedBox(width: 6),
-                        Text(
-                          style.getLocalizedName(lang),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                            color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface,
+                        Flexible(
+                          child: Text(
+                            style.getLocalizedName(lang),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                              color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface,
+                            ),
                           ),
                         ),
                       ],

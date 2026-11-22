@@ -2095,7 +2095,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get customLocationTooltip => 'कस्टम स्थान जोड़ें (उदा. मेरा गाँव)';
 
   @override
-  String notACountryOrCityPrompt(Object query) {
+  String notACountryOrCityPrompt(String query) {
     return '\"$query\" सत्यापित देश या शहर सूची में नहीं मिला। क्या आप इसे कस्टम स्थान के रूप में जोड़ना चाहते हैं?';
   }
 

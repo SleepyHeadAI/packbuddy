@@ -2030,7 +2030,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get customLocationTooltip => 'カスタム場所を追加（例: 私の故郷）';
 
   @override
-  String notACountryOrCityPrompt(Object query) {
+  String notACountryOrCityPrompt(String query) {
     return '「$query」は国や都市のカタログに見つかりませんでした。カスタム場所として追加しますか？';
   }
 

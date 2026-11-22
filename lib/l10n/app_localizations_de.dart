@@ -2118,7 +2118,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Benutzerdefinierten Ort hinzufügen (z.B. Unser Dorf)';
 
   @override
-  String notACountryOrCityPrompt(Object query) {
+  String notACountryOrCityPrompt(String query) {
     return '\"$query\" wurde nicht im Länder- oder Städtekatalog gefunden. Als benutzerdefinierten Ort hinzufügen?';
   }
 

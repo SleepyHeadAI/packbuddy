@@ -214,7 +214,7 @@ class _CurrencyPickerSheetState extends State<CurrencyPickerSheet> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Align(
-                  alignment: Alignment.centerLeft,
+                  alignment: AlignmentDirectional.centerStart,
                   child: InkWell(
                     onTap: () => Navigator.of(context).pop(widget.defaultCurrency),
                     borderRadius: BorderRadius.circular(10),
@@ -236,12 +236,16 @@ class _CurrencyPickerSheetState extends State<CurrencyPickerSheet> {
                             color: theme.colorScheme.primary,
                           ),
                           const SizedBox(width: 5),
-                          Text(
-                            AppLocalizations.of(context)!.currencyPickerResetTo('${widget.defaultCurrency!} (${CurrencyFormatter.getSymbol(widget.defaultCurrency!)})'),
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: theme.colorScheme.primary,
+                          Flexible(
+                            child: Text(
+                              AppLocalizations.of(context)!.currencyPickerResetTo('${widget.defaultCurrency!} (${CurrencyFormatter.getSymbol(widget.defaultCurrency!)})'),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: theme.colorScheme.primary,
+                              ),
                             ),
                           ),
                         ],

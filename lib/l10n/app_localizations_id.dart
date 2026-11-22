@@ -2109,7 +2109,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get customLocationTooltip => 'Tambah lokasi kustom (mis. Desaku)';
 
   @override
-  String notACountryOrCityPrompt(Object query) {
+  String notACountryOrCityPrompt(String query) {
     return '\"$query\" tidak ditemukan dalam daftar negara atau kota terverifikasi. Ingin menambahkannya sebagai lokasi kustom?';
   }
 

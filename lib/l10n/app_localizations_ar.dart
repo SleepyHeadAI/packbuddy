@@ -2088,7 +2088,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get customLocationTooltip => 'إضافة موقع مخصص (مثال: قريتي)';
 
   @override
-  String notACountryOrCityPrompt(Object query) {
+  String notACountryOrCityPrompt(String query) {
     return 'لم يتم العثور على \"$query\" في دليل البلدان أو المدن. هل ترغب في إضافته كموقع مخصص؟';
   }
 

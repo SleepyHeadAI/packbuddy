@@ -2132,7 +2132,7 @@ class AppLocalizationsEl extends AppLocalizations {
       'Προσθήκη προσαρμοσμένης τοποθεσίας (π.χ. Το χωριό μου)';
 
   @override
-  String notACountryOrCityPrompt(Object query) {
+  String notACountryOrCityPrompt(String query) {
     return 'Το \"$query\" δεν βρέθηκε στον κατάλογο χωρών ή πόλεων. Θέλετε να το προσθέσετε ως προσαρμοσμένη τοποθεσία;';
   }
 

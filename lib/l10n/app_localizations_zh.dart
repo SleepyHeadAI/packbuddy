@@ -2025,7 +2025,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get customLocationTooltip => '添加自定义地点（例如：老家村庄）';
 
   @override
-  String notACountryOrCityPrompt(Object query) {
+  String notACountryOrCityPrompt(String query) {
     return '在国家和城市列表中未找到“$query”。是否要将其添加为自定义地点？';
   }
 

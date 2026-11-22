@@ -2112,7 +2112,7 @@ class AppLocalizationsPl extends AppLocalizations {
       'Dodaj własną lokalizację (np. Moja wieś)';
 
   @override
-  String notACountryOrCityPrompt(Object query) {
+  String notACountryOrCityPrompt(String query) {
     return 'Nie znaleziono \"$query\" w katalogu państw ani miast. Czy chcesz dodać to jako własną lokalizację?';
   }
 

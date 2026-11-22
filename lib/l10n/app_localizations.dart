@@ -4094,11 +4094,11 @@ abstract class AppLocalizations {
   /// **'Add custom location (e.g. My Village)'**
   String get customLocationTooltip;
 
-  /// No description provided for @notACountryOrCityPrompt.
+  /// Prompt shown when a typed destination is not in the country/city catalog
   ///
   /// In en, this message translates to:
   /// **'\"{query}\" was not found in the verified country or city catalog. Would you like to add it as a custom location?'**
-  String notACountryOrCityPrompt(Object query);
+  String notACountryOrCityPrompt(String query);
 
   /// No description provided for @cityLabel.
   ///

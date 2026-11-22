@@ -82,6 +82,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  # Used by test/l10n_full_20_languages_audit_test.dart to validate Android strings.xml.
+  xml: ^7.1.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

@@ -2100,7 +2100,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customLocationTooltip => 'Add custom location (e.g. My Village)';
 
   @override
-  String notACountryOrCityPrompt(Object query) {
+  String notACountryOrCityPrompt(String query) {
     return '\"$query\" was not found in the verified country or city catalog. Would you like to add it as a custom location?';
   }
 

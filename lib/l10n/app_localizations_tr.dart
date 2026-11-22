@@ -2114,7 +2114,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get customLocationTooltip => 'Özel konum ekle (örn: Bizim Köy)';
 
   @override
-  String notACountryOrCityPrompt(Object query) {
+  String notACountryOrCityPrompt(String query) {
     return '\"$query\" ülke veya şehir listesinde bulunamadı. Özel konum olarak eklemek ister misiniz?';
   }
 

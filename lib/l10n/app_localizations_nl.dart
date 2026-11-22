@@ -2109,7 +2109,7 @@ class AppLocalizationsNl extends AppLocalizations {
       'Aangepaste locatie toevoegen (bijv. Ons dorp)';
 
   @override
-  String notACountryOrCityPrompt(Object query) {
+  String notACountryOrCityPrompt(String query) {
     return '\"$query\" is niet gevonden in de landen- of stedenlijst. Wilt u deze toevoegen als aangepaste locatie?';
   }
 

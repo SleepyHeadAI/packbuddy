@@ -1088,8 +1088,11 @@ class _HorizontalGreetingBar extends StatelessWidget {
               ),
               const SizedBox(width: 8),
 
-              // Formatted Date Badge (Flush with right edge of card)
-              Container(
+              // Formatted Date Badge (Flush with right edge of card).
+              // Flexible so long localized dates (de/ru/el) ellipsize instead
+              // of squeezing the user name row into an overflow.
+              Flexible(
+                child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
                 decoration: BoxDecoration(
                   color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
@@ -1109,19 +1112,22 @@ class _HorizontalGreetingBar extends StatelessWidget {
                       color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
                     ),
                     const SizedBox(width: 4),
-                    Text(
-                      subtitle,
-                      style: AppTypography.caption.copyWith(
-                        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 10.5,
-                        height: 1.15,
+                    Flexible(
+                      child: Text(
+                        subtitle,
+                        style: AppTypography.caption.copyWith(
+                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 10.5,
+                          height: 1.15,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
+              ),
               ),
             ],
           ),

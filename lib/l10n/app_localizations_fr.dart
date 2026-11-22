@@ -2132,7 +2132,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Ajouter un lieu personnalisé (ex. Mon village)';
 
   @override
-  String notACountryOrCityPrompt(Object query) {
+  String notACountryOrCityPrompt(String query) {
     return '\"$query\" n\'a pas été trouvé dans le catalogue des pays ou villes. Souhaitez-vous l\'ajouter comme lieu personnalisé ?';
   }
 
