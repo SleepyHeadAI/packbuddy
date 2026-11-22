@@ -98,6 +98,18 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
   /// How long [restorePurchases] waits for the store to answer on the purchase stream.
   static Duration restoreTimeout = const Duration(seconds: 7);
 
+  /// Online check before trusting a store "no subscription" answer: Play answers from its
+  /// local cache when offline, so only an answer given while online may revoke Pro.
+  @visibleForTesting
+  static Future<bool> Function() isOnline = () async {
+    try {
+      final result = await InternetAddress.lookup('play.googleapis.com').timeout(const Duration(seconds: 5));
+      return result.isNotEmpty && result.first.rawAddress.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  };
+
   /// Whether store billing backend is currently active on this build.
   static bool isStoreBillingConfigured = true;
 
@@ -297,6 +309,7 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
     // Android emits an empty list when a restore finds no purchases.
     if (purchaseDetailsList.isEmpty) {
       _completeRestore(false);
+      await _onStoreReportedNoSubscription();
       return;
     }
 
@@ -398,7 +411,25 @@ class BillingSubscriptionNotifier extends StateNotifier<ProSubscriptionState>
         p.status == PurchaseStatus.restored || p.status == PurchaseStatus.error)) {
       // A restore answered, but nothing usable for this account was found.
       _completeRestore(false);
+      if (purchaseDetailsList.every((p) => p.status == PurchaseStatus.restored)) {
+        await _onStoreReportedNoSubscription();
+      }
     }
+  }
+
+  /// A store query finished without error and found no active subscription for this account.
+  /// Restore failures (network / billing service) throw instead and never reach here.
+  Future<void> _onStoreReportedNoSubscription() async {
+    final uid = _auth?.currentUser?.uid;
+    final service = ProEntitlementService.instance;
+    // Only store-sourced Pro is revocable here; skip the network probe for everyone else.
+    if (!ProEntitlementService.isStoreSource(await service.currentSource(uid: uid))) return;
+    if (!await isOnline()) return;
+    final isPro = await service.recordStoreNoActiveSubscription(uid: uid);
+    if (isPro || !mounted) return;
+    setResolvedProStatus(false);
+    // A server-side grant (adminGrantedPro) still applies after the store entitlement is gone.
+    _checkRemoteEntitlementOnStartup();
   }
 
   /// Select a plan before purchasing

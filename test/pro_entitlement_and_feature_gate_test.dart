@@ -236,21 +236,34 @@ void main() {
   });
 
   group('ProEntitlementService Offline & Anti-Abuse Hardening', () {
-    test('Offline grace period: valid within 72h, expires after 72h without online verification', () async {
+    test('Offline for 10 days (> old 72h limit) with an unexpired subscription stays Pro', () async {
       final nowMs = DateTime.now().millisecondsSinceEpoch;
-      final seventyThreeHoursAgoMs = nowMs - (73 * 3600 * 1000);
+      final tenDaysAgoMs = nowMs - const Duration(days: 10).inMilliseconds;
 
       FlutterSecureStorage.setMockInitialValues({
         'test_uid_secure_is_pro_member': 'true',
         'test_uid_secure_pro_source': 'google_play',
-        'test_uid_secure_pro_expires_at': '${nowMs + (30 * 24 * 3600 * 1000)}',
-        'test_uid_secure_last_verified_at': '$seventyThreeHoursAgoMs',
-        'test_uid_secure_max_monotonic_ts': '$seventyThreeHoursAgoMs',
+        'test_uid_secure_pro_expires_at': '${nowMs + const Duration(days: 20).inMilliseconds}',
+        'test_uid_secure_last_verified_at': '$tenDaysAgoMs',
+        'test_uid_secure_max_monotonic_ts': '$tenDaysAgoMs',
       });
 
-      final isPro = await ProEntitlementService.instance.resolveEffectivePro(uid: 'test_uid');
-      // Should be false because 73 hours > 72 hours max offline grace period
-      expect(isPro, isFalse);
+      expect(await ProEntitlementService.instance.resolveEffectivePro(uid: 'test_uid'), isTrue);
+    });
+
+    test('Offline with an expired subscription turns Pro off', () async {
+      final nowMs = DateTime.now().millisecondsSinceEpoch;
+      final fortyDaysAgoMs = nowMs - const Duration(days: 40).inMilliseconds;
+
+      FlutterSecureStorage.setMockInitialValues({
+        'test_uid_secure_is_pro_member': 'true',
+        'test_uid_secure_pro_source': 'google_play',
+        'test_uid_secure_pro_expires_at': '${nowMs - const Duration(days: 1).inMilliseconds}',
+        'test_uid_secure_last_verified_at': '$fortyDaysAgoMs',
+        'test_uid_secure_max_monotonic_ts': '$fortyDaysAgoMs',
+      });
+
+      expect(await ProEntitlementService.instance.resolveEffectivePro(uid: 'test_uid'), isFalse);
     });
 
     test('Clock rollback detection: pauses Pro if device clock is set backwards > 5 minutes', () async {

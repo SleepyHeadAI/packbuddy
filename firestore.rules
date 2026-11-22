@@ -365,9 +365,17 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Fallback rule for any other path: admin only — vault key material is never admin-readable (C2)
+    // Admin audit trail is append-only: admins create and read; nobody (admins included) edits or deletes.
+    match /admin_audit_logs/{logId} {
+      allow read, create: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    // Fallback rule for any other path: admin only. vault_keys (owner + audited admin `get`,
+    // see above) and admin_audit_logs are excluded so their own rules stay authoritative (C2).
     match /{document=**} {
-      allow read, write: if isAdmin() && document[0] != 'vault_keys';
+      allow read, create: if isAdmin() && document[0] != 'vault_keys';
+      allow update, delete: if isAdmin() && !(document[0] in ['vault_keys', 'admin_audit_logs']);
     }
   }
 }

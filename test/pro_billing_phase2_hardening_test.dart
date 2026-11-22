@@ -100,11 +100,11 @@ void main() {
       final from = DateTime(2026, 1, 1);
       expect(
         ProEntitlementService.expiryForProduct('packbuddy_pro_monthly', from: from),
-        from.add(const Duration(days: 31 + 3)),
+        from.add(const Duration(days: 30 + 3)),
       );
       expect(
         ProEntitlementService.expiryForProduct('packbuddy_pro_annual', from: from),
-        from.add(const Duration(days: 366 + 3)),
+        from.add(const Duration(days: 365 + 3)),
       );
     });
 
@@ -150,7 +150,7 @@ void main() {
       expect(rawExpiry, isNotNull);
       final expiry = DateTime.fromMillisecondsSinceEpoch(int.parse(rawExpiry!));
       final days = expiry.difference(DateTime.now()).inDays;
-      expect(days, inInclusiveRange(32, 34));
+      expect(days, inInclusiveRange(31, 33));
     });
   });
 
@@ -181,6 +181,76 @@ void main() {
       addTearDown(notifier.dispose);
       await notifier.handlePurchaseUpdates(const []);
       expect(notifier.state.isPro, isFalse);
+    });
+  });
+
+  group('Paket A - online refund/cancel detection', () {
+    final defaultIsOnline = BillingSubscriptionNotifier.isOnline;
+    setUp(() => BillingSubscriptionNotifier.isOnline = () async => true);
+    tearDown(() => BillingSubscriptionNotifier.isOnline = defaultIsOnline);
+
+    Future<void> grantStorePro() => service.setProEntitlement(
+          isPro: true,
+          expiresAt: ProEntitlementService.expiryForProduct(BillingSubscriptionNotifier.productMonthly),
+          source: 'google_play_packbuddy_pro_monthly',
+        );
+
+    PurchaseDetails storeError() => PurchaseDetails(
+          productID: '',
+          verificationData: PurchaseVerificationData(
+            localVerificationData: '',
+            serverVerificationData: '',
+            source: 'google_play',
+          ),
+          transactionDate: null,
+          status: PurchaseStatus.error,
+        );
+
+    test('one clean "no subscription" keeps Pro; the 2nd consecutive one revokes it at once', () async {
+      await grantStorePro();
+      final notifier = BillingSubscriptionNotifier();
+      addTearDown(notifier.dispose);
+
+      await notifier.handlePurchaseUpdates(const []);
+      expect(await service.resolveEffectivePro(), isTrue);
+
+      await notifier.handlePurchaseUpdates(const []);
+      expect(await service.resolveEffectivePro(), isFalse);
+      expect(notifier.state.isPro, isFalse);
+    });
+
+    test('offline answers and store/network errors never count', () async {
+      await grantStorePro();
+      final notifier = BillingSubscriptionNotifier();
+      addTearDown(notifier.dispose);
+
+      BillingSubscriptionNotifier.isOnline = () async => false;
+      await notifier.handlePurchaseUpdates(const []);
+      await notifier.handlePurchaseUpdates(const []);
+      expect(await service.resolveEffectivePro(), isTrue);
+
+      BillingSubscriptionNotifier.isOnline = () async => true;
+      await notifier.handlePurchaseUpdates([storeError()]);
+      await notifier.handlePurchaseUpdates([storeError()]);
+      expect(await service.resolveEffectivePro(), isTrue);
+
+      // First clean online answer only starts the streak.
+      await notifier.handlePurchaseUpdates(const []);
+      expect(await service.resolveEffectivePro(), isTrue);
+    });
+
+    test('a store re-verification between two "none" answers resets the streak', () async {
+      await grantStorePro();
+      expect(await service.recordStoreNoActiveSubscription(), isTrue);
+      await grantStorePro();
+      expect(await service.recordStoreNoActiveSubscription(), isTrue);
+    });
+
+    test('admin-granted Pro is never revoked by store answers', () async {
+      await service.setProEntitlement(isPro: true, source: 'admin_live_grant');
+      for (var i = 0; i < 3; i++) {
+        expect(await service.recordStoreNoActiveSubscription(), isTrue);
+      }
     });
   });
 }

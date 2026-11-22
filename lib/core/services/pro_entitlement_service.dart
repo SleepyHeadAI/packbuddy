@@ -18,7 +18,6 @@ class ProFeatureGate {
   static const int kFreeMaxCloudBytes = 50 * 1024 * 1024; // 50 MB
   static const int kProMaxCloudBytes = 5 * 1024 * 1024 * 1024; // 5 GB
   static const int kFreeMaxItineraryActivitiesPerDay = 3;
-  static const int kOfflineGracePeriodHours = 72; // 3 days max offline validity
 
   static const Set<StoryCardTheme> kFreeStoryCardThemes = {
     StoryCardTheme.midnight,
@@ -117,7 +116,8 @@ class ProFeatureGate {
 }
 
 /// Secure Entitlement Service backed by Android Keystore (flutter_secure_storage)
-/// with High-Water Mark clock rollback detection & 72-hour offline grace protection.
+/// with High-Water Mark clock rollback detection. Offline, Pro stays valid until the stored
+/// `proExpiresAt`; online refunds/cancellations are caught by [recordStoreNoActiveSubscription].
 class ProEntitlementService {
   ProEntitlementService._();
   static final ProEntitlementService instance = ProEntitlementService._();
@@ -137,6 +137,10 @@ class ProEntitlementService {
   static const String _keyLastVerifiedAt = 'secure_last_verified_at';
   static const String _keyMaxMonotonicTs = 'secure_max_monotonic_ts';
   static const String _keyProSource = 'secure_pro_source';
+  static const String _keyStoreMisses = 'secure_store_no_sub_count';
+
+  /// Consecutive clean "no active subscription" store answers that revoke store-sourced Pro.
+  static const int storeRevokeThreshold = 2;
 
   /// Scope used only when no Firebase user exists (unit tests / signed-out).
   /// It is never consulted for a signed-in uid, so Pro can't leak across accounts.
@@ -153,8 +157,8 @@ class ProEntitlementService {
 
   /// Billing period lengths used to compute a local `expiresAt` for store purchases.
   /// A small grace window covers Play's renewal processing delay.
-  static const Duration monthlyPeriod = Duration(days: 31);
-  static const Duration annualPeriod = Duration(days: 366);
+  static const Duration monthlyPeriod = Duration(days: 30);
+  static const Duration annualPeriod = Duration(days: 365);
   static const Duration renewalGrace = Duration(days: 3);
 
   static DateTime expiryForProduct(String productId, {DateTime? from}) {
@@ -178,7 +182,8 @@ class ProEntitlementService {
 
   StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _firestoreLiveSubscription;
 
-  /// Resolves effective Pro status considering offline grace period (72h) and clock rollback protection.
+  /// Resolves effective Pro status from the stored expiry and clock rollback protection.
+  /// There is no offline time limit: a paid user stays Pro offline until `proExpiresAt`.
   /// Reads only the uid-scoped key; there is no device-global fallback.
   Future<bool> resolveEffectivePro({String? uid}) async {
     final effectiveUid = uid ?? _safeCurrentUid();
@@ -222,17 +227,6 @@ class ProEntitlementService {
         }
       }
 
-      // 3. Offline Grace Period check: max 72 hours without online verification
-      final rawLastVerified = await _storage.read(key: '$prefix$_keyLastVerifiedAt');
-      if (rawLastVerified != null) {
-        final lastVerified = int.tryParse(rawLastVerified) ?? 0;
-        const maxOfflineMs = ProFeatureGate.kOfflineGracePeriodHours * 3600 * 1000;
-        if (now - lastVerified > maxOfflineMs) {
-          debugPrint('[ProEntitlement] Offline grace period (72h) expired. Online verification required.');
-          return false;
-        }
-      }
-
       return true;
     } catch (e) {
       // Keystore failure: fail closed. Never fall back to plaintext SharedPreferences.
@@ -268,6 +262,7 @@ class ProEntitlementService {
       await _storage.write(key: '$prefix$_keyLastVerifiedAt', value: now.toString());
       await _storage.write(key: '$prefix$_keyMaxMonotonicTs', value: now.toString());
       await _storage.write(key: '$prefix$_keyProSource', value: source);
+      await _storage.delete(key: '$prefix$_keyStoreMisses');
 
       if (expiresAt != null) {
         await _storage.write(
@@ -317,6 +312,30 @@ class ProEntitlementService {
     return false;
   }
 
+  /// Call only for a clean store answer (no network/billing-service error) saying this account
+  /// owns no active subscription. The [storeRevokeThreshold]-th consecutive answer revokes
+  /// store-sourced Pro at once (refund / cancellation); admin or server grants are never touched.
+  /// Any [setProEntitlement] call resets the streak. Returns the effective Pro status.
+  Future<bool> recordStoreNoActiveSubscription({String? uid}) async {
+    final effectiveUid = uid ?? _safeCurrentUid();
+    if (!isStoreSource(await currentSource(uid: effectiveUid))) {
+      return resolveEffectivePro(uid: effectiveUid);
+    }
+    final key = '${_prefixFor(effectiveUid)}$_keyStoreMisses';
+    var misses = 0; // stays 0 on a storage failure, so an unrecorded streak never revokes
+    try {
+      misses = (int.tryParse(await _storage.read(key: key) ?? '') ?? 0) + 1;
+      if (misses < storeRevokeThreshold) await _storage.write(key: key, value: '$misses');
+    } catch (e) {
+      debugPrint('[ProEntitlement] Error recording store answer: $e');
+    }
+    if (misses < storeRevokeThreshold) return resolveEffectivePro(uid: effectiveUid);
+    debugPrint('[ProEntitlement] Store reports no active subscription twice. Revoking store Pro.');
+    await setProEntitlement(isPro: false, source: 'store_no_active_subscription', uid: effectiveUid);
+    TelemetryService.instance.logProStatusChanged(isPro: false, source: 'store_no_active_subscription');
+    return false;
+  }
+
   /// Clears secure entitlement on logout
   Future<void> clearProEntitlement({String? uid}) async {
     final effectiveUid = uid ?? _safeCurrentUid();
@@ -326,6 +345,7 @@ class ProEntitlementService {
       await _storage.delete(key: '$prefix$_keyProExpiresAt');
       await _storage.delete(key: '$prefix$_keyLastVerifiedAt');
       await _storage.delete(key: '$prefix$_keyProSource');
+      await _storage.delete(key: '$prefix$_keyStoreMisses');
       await _storage.delete(key: _keyIsPro); // legacy device-global key
     } catch (e) {
       debugPrint('[ProEntitlement] Error clearing secure entitlement: $e');

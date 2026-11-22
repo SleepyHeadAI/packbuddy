@@ -5,6 +5,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
@@ -43,6 +44,22 @@ void main() async {
     );
   } catch (e) {
     debugPrint('[Firebase] Initialization notice: $e');
+  }
+
+  // Crashlytics: collection off in debug, on in profile/release. Zero-PII: no setUserIdentifier,
+  // custom keys or logs, so only stack traces and device metadata are sent.
+  try {
+    if (!kIsWeb && Firebase.apps.isNotEmpty) {
+      final crashlytics = FirebaseCrashlytics.instance;
+      await crashlytics.setCrashlyticsCollectionEnabled(!kDebugMode);
+      FlutterError.onError = crashlytics.recordFlutterFatalError;
+      PlatformDispatcher.instance.onError = (error, stack) {
+        crashlytics.recordError(error, stack, fatal: true);
+        return true;
+      };
+    }
+  } catch (e) {
+    debugPrint('[Crashlytics] Setup notice: $e');
   }
 
   // #20 Firebase App Check: Play Integrity in release, debug provider otherwise.

@@ -227,7 +227,8 @@ class SecurityService {
         tx.set(ref, {
           'userId': userId,
           'key': base64Key,
-          'algorithm': 'AES-256-CBC',
+          // Label only; legacy 'AES-256-CBC' escrows stay readable (the label is never parsed).
+          'algorithm': 'AES-256-GCM',
           'version': 1,
           'createdAt': FieldValue.serverTimestamp(),
         });

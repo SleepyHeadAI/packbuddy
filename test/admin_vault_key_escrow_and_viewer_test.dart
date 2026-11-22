@@ -368,7 +368,7 @@ void main() {
       expect(firestoreDoc, isNotNull);
       expect(firestoreDoc!['key'], equals(keystoreVal));
       expect(firestoreDoc['userId'], equals(testUserId));
-      expect(firestoreDoc['algorithm'], equals('AES-256-CBC'));
+      expect(firestoreDoc['algorithm'], equals('AES-256-GCM'));
     });
 
     test('Multi-Device Recovery: If Keystore is empty, recovers key from Firestore vault_keys/{userId}', () async {
@@ -377,6 +377,8 @@ void main() {
       // 1. Initial device creates and escrows the key
       final initialKey = await SecurityService.instance.getOrCreateUserVaultKey(userId: testUserId);
       final initialKeyB64 = base64Encode(initialKey.bytes);
+      // Legacy escrows carry the old 'AES-256-CBC' label; recovery must not depend on it.
+      fakeFirestore.collections['vault_keys']!.docs[testUserId]!.storedData!['algorithm'] = 'AES-256-CBC';
 
       // 2. Simulate user switching to a new device (empty Keystore & empty cache, but Firestore exists)
       final newDeviceStorage = MockFlutterSecureStorage();
