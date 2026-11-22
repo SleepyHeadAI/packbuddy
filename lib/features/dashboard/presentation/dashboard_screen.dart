@@ -1031,104 +1031,107 @@ class _HorizontalGreetingBar extends StatelessWidget {
           ),
           const SizedBox(height: 8),
 
-          // Row 2: User Avatar + User Name (Left) + Formatted Date Pill (Right, optically aligned flush to right edge)
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: BouncyPressable(
-                  scaleFactor: 0.98,
-                  onTap: onProfileTap != null
-                      ? () {
-                          AppHaptics.light();
-                          onProfileTap!();
-                        }
-                      : null,
-                  child: Row(
-                    children: [
-                      Hero(
-                        tag: 'dashboard-profile-avatar',
-                        child: UserAvatar(
-                          photoUrl: photoUrl,
-                          displayName: displayName,
-                          size: 28,
-                          isAnimated: true,
+          // Row 2: User Avatar + User Name (start) + Formatted Date Pill (end).
+          // The pill is a non-flex child capped at 48% of the row width, so the
+          // name side's Expanded absorbs all remaining space and the pill sits
+          // flush with the trailing edge (right in LTR, left in RTL). Long
+          // localized dates (de/ru/el) still ellipsize inside the cap.
+          LayoutBuilder(
+            builder: (context, constraints) => Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: BouncyPressable(
+                    scaleFactor: 0.98,
+                    onTap: onProfileTap != null
+                        ? () {
+                            AppHaptics.light();
+                            onProfileTap!();
+                          }
+                        : null,
+                    child: Row(
+                      children: [
+                        Hero(
+                          tag: 'dashboard-profile-avatar',
+                          child: UserAvatar(
+                            photoUrl: photoUrl,
+                            displayName: displayName,
+                            size: 28,
+                            isAnimated: true,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Flexible(
-                              child: Text(
-                                displayName,
-                                style: AppTypography.titleMedium.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: -0.3,
-                                  fontSize: 16,
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  displayName,
+                                  style: AppTypography.titleMedium.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -0.3,
+                                    fontSize: 16,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                            const SizedBox(width: 4),
-                            Icon(
-                              AppIcons.chevronRight,
-                              size: 16,
-                              color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
-                            ),
-                          ],
+                              const SizedBox(width: 4),
+                              Icon(
+                                AppIcons.chevronRight,
+                                size: 16,
+                                color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-
-              // Formatted Date Badge (Flush with right edge of card).
-              // Flexible so long localized dates (de/ru/el) ellipsize instead
-              // of squeezing the user name row into an overflow.
-              Flexible(
-                child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
-                  borderRadius: BorderRadius.circular(AppRadius.sm),
-                  border: Border.all(
-                    color: isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight,
-                    width: 0.8,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      AppIcons.calendar,
-                      size: 11,
-                      color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
-                    ),
-                    const SizedBox(width: 4),
-                    Flexible(
-                      child: Text(
-                        subtitle,
-                        style: AppTypography.caption.copyWith(
-                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 10.5,
-                          height: 1.15,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                const SizedBox(width: 8),
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.48),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.surfaceRaisedDark : AppColors.surfaceRaisedLight,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                      border: Border.all(
+                        color: isDark ? AppColors.borderSubtleDark : AppColors.borderSubtleLight,
+                        width: 0.8,
                       ),
                     ),
-                  ],
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(
+                          AppIcons.calendar,
+                          size: 11,
+                          color: isDark ? AppColors.textMutedDark : AppColors.textMutedLight,
+                        ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            subtitle,
+                            style: AppTypography.caption.copyWith(
+                              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 10.5,
+                              height: 1.15,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
