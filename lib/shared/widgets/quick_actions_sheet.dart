@@ -1142,14 +1142,20 @@ class _FloatingActionBubbleState extends State<_FloatingActionBubble> {
                         ),
                       ),
                       const SizedBox(width: 10),
-                      Text(
-                        widget.item.title,
-                        style: AppTypography.bodyMedium.copyWith(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13.5,
-                          letterSpacing: -0.2,
-                          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-                          decoration: TextDecoration.none,
+                      // Flexible + ellipsis: long localized titles (pl/nl/el/es)
+                      // must not push the bubble past the screen edge.
+                      Flexible(
+                        child: Text(
+                          widget.item.title,
+                          style: AppTypography.bodyMedium.copyWith(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13.5,
+                            letterSpacing: -0.2,
+                            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                            decoration: TextDecoration.none,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],

@@ -5,8 +5,8 @@
 // 2. Android home-widget strings.xml integrity across values/ + 19 locales.
 // 3. Geo data coverage: capitals for every country, 7 non-Latin scripts for
 //    every popular city.
-// 4. Small-screen (320x568) overflow + RTL (ar) rendering of critical screens
-//    and the components that show the longest labels.
+// 4. Overflow sweep (all 20 languages x overflowAuditSizes) + RTL (ar) rendering
+//    of critical screens and the components that show the longest labels.
 import 'dart:convert';
 import 'dart:io';
 
@@ -60,8 +60,9 @@ const all20Languages = [
   'ko', 'nl', 'pl', 'pt', 'ru', 'sv', 'th', 'tr', 'vi', 'zh',
 ];
 
-/// Longest-text languages plus the RTL language.
-const stressLanguages = ['de', 'ru', 'el', 'tr', 'fr', 'ar'];
+/// Every critical screen is swept in all 20 languages at each of these sizes:
+/// smallest phone, the `< 360` small-screen breakpoint, large phone, tablet.
+const overflowAuditSizes = [Size(320, 568), Size(360, 640), Size(412, 915), Size(800, 1280)];
 
 /// Android resource folder per app language (Indonesian uses legacy `in`).
 String androidValuesFolder(String lang) {
@@ -140,6 +141,30 @@ class FakeRevenueCatNotifier extends StateNotifier<ProSubscriptionState> impleme
 
   @override
   dynamic noSuchMethod(Invocation invocation) => Future.value();
+}
+
+/// Opens a real quick-actions overlay (the floating bubbles users actually see)
+/// right after the first frame, so the overflow sweep measures it.
+class _QuickActionsOpener extends ConsumerStatefulWidget {
+  const _QuickActionsOpener(this.open);
+
+  final Future<void> Function(BuildContext context, WidgetRef ref) open;
+
+  @override
+  ConsumerState<_QuickActionsOpener> createState() => _QuickActionsOpenerState();
+}
+
+class _QuickActionsOpenerState extends ConsumerState<_QuickActionsOpener> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) widget.open(context, ref);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => const Scaffold(body: SizedBox.expand());
 }
 
 class FakePackingRemindersNotifier extends StateNotifier<bool> implements PackingRemindersNotifier {
@@ -409,9 +434,9 @@ void main() {
   });
 
   // ---------------------------------------------------------------------------
-  // 4. 320x568 overflow + RTL
+  // 4. Overflow (all 20 languages x overflowAuditSizes) + RTL
   // ---------------------------------------------------------------------------
-  group('4. 320x568 overflow & RTL (de, ru, el, tr, fr, ar)', () {
+  group('4. Overflow & RTL in all 20 languages', () {
     setUp(() async {
       SharedPreferences.setMockInitialValues({
         'packbuddy_is_pro_member': false,
@@ -581,6 +606,25 @@ void main() {
           ),
       // Long label: emailVerifyResendCooldown
       'EmailVerificationScreen': (l) => scope(lang: l, home: const EmailVerificationScreen()),
+      // Real quick-actions overlays (floating bubbles): every preset label.
+      'QuickActions overlay (dashboard)': (l) => scope(
+            lang: l,
+            home: _QuickActionsOpener((c, ref) => QuickActionsSheet.showForDashboard(c, ref: ref)),
+          ),
+      'QuickActions overlay (trips)': (l) => scope(
+            lang: l,
+            home: _QuickActionsOpener((c, _) => QuickActionsSheet.showForTrips(c)),
+          ),
+      'QuickActions overlay (vault)': (l) => scope(
+            lang: l,
+            home: _QuickActionsOpener((c, _) => QuickActionsSheet.showForVault(c)),
+          ),
+      'QuickActions overlay (checklist)': (l) => scope(
+            lang: l,
+            home: _QuickActionsOpener(
+              (c, _) => QuickActionsSheet.showForChecklist(c, tripId: 'trip-1', tripTitle: 'European Grand Tour'),
+            ),
+          ),
       // Long labels: addTrip, addItem inside quick-action rows
       'QuickActionsSheet': (l) {
         final t = lookupAppLocalizations(Locale(l));
@@ -608,40 +652,51 @@ void main() {
     };
 
     for (final entry in cases.entries) {
-      testWidgets('${entry.key} renders on 320x568 without overflow in ${stressLanguages.join('/')}', (tester) async {
-        tester.view.physicalSize = const Size(320, 568);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(() {
-          tester.view.resetPhysicalSize();
-          tester.view.resetDevicePixelRatio();
-        });
-
-        final failures = <String>[];
-        for (final lang in stressLanguages) {
-          final overflows = await captureOverflows(() async {
-            await tester.pumpWidget(entry.value(lang));
-            await tester.pump();
-            await tester.pump(const Duration(milliseconds: 300));
+      for (final size in overflowAuditSizes) {
+        final sizeLabel = '${size.width.toInt()}x${size.height.toInt()}';
+        testWidgets('${entry.key} renders on $sizeLabel without overflow in all 20 languages', (tester) async {
+          tester.view.physicalSize = size;
+          tester.view.devicePixelRatio = 1.0;
+          addTearDown(() {
+            tester.view.resetPhysicalSize();
+            tester.view.resetDevicePixelRatio();
           });
-          for (final o in overflows) {
-            failures.add('[$lang] $o');
+
+          final failures = <String>[];
+          for (final lang in all20Languages) {
+            final overflows = await captureOverflows(() async {
+              // Unique key per language: re-pumping an unkeyed ProviderScope
+              // reuses its container, so `localeProvider.overrideWith` (like every
+              // other `overrideWith` notifier) would stay on the first language.
+              await tester.pumpWidget(KeyedSubtree(key: ValueKey(lang), child: entry.value(lang)));
+              await tester.pump();
+              await tester.pump(const Duration(milliseconds: 300));
+            });
+            for (final o in overflows) {
+              failures.add('[$lang] $o');
+            }
+
+            // Harness guard: the fresh scope must really run in this language.
+            final container = ProviderScope.containerOf(tester.element(find.byType(MaterialApp)), listen: false);
+            final providerLang = container.read(localeProvider).languageCode;
+            if (providerLang != lang) failures.add('[$lang] localeProvider is still $providerLang');
+
+            // RTL: Arabic must lay out right-to-left inside the rendered tree.
+            final scaffoldFinder = find.byType(Scaffold);
+            if (scaffoldFinder.evaluate().isNotEmpty) {
+              final dir = Directionality.of(tester.element(scaffoldFinder.first));
+              final expected = lang == 'ar' ? TextDirection.rtl : TextDirection.ltr;
+              if (dir != expected) failures.add('[$lang] text direction is $dir, expected $expected');
+            }
           }
 
-          // RTL: Arabic must lay out right-to-left inside the rendered tree.
-          final scaffoldFinder = find.byType(Scaffold);
-          if (scaffoldFinder.evaluate().isNotEmpty) {
-            final dir = Directionality.of(tester.element(scaffoldFinder.first));
-            final expected = lang == 'ar' ? TextDirection.rtl : TextDirection.ltr;
-            if (dir != expected) failures.add('[$lang] text direction is $dir, expected $expected');
-          }
-        }
+          // Dispose timers/animations before the next case.
+          await tester.pumpWidget(const SizedBox.shrink());
+          await tester.pump(const Duration(seconds: 1));
 
-        // Dispose timers/animations before the next case.
-        await tester.pumpWidget(const SizedBox.shrink());
-        await tester.pump(const Duration(seconds: 1));
-
-        expect(failures, isEmpty, reason: '${entry.key}:\n${failures.join('\n')}');
-      });
+          expect(failures, isEmpty, reason: '${entry.key} @ $sizeLabel:\n${failures.join('\n')}');
+        });
+      }
     }
   });
 }
