@@ -2011,44 +2011,51 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Top Row: Destination + Status Badge
-          Row(
-            children: [
-              if (currentTrip.countries.isNotEmpty) ...[
-                Wrap(
-                  spacing: 4,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: currentTrip.countries
-                      .map((c) => Text(c.flag, style: const TextStyle(fontSize: 16)))
-                      .toList(),
-                ),
-                const SizedBox(width: 6),
-              ] else ...[
-                Icon(Icons.place_outlined, size: 16, color: theme.colorScheme.primary),
-                const SizedBox(width: 4),
-              ],
-              Expanded(
-                child: Hero(
-                  tag: 'trip-destination-${currentTrip.id}',
-                  child: Material(
-                    type: MaterialType.transparency,
-                    child: Text(
-                      CityLocalization.localizeDestination(
-                        currentTrip.destination,
-                        Localizations.localeOf(context).languageCode,
+          LayoutBuilder(
+            builder: (context, constraints) => Row(
+              children: [
+                if (currentTrip.countries.isNotEmpty) ...[
+                  Wrap(
+                    spacing: 4,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: currentTrip.countries
+                        .map((c) => Text(c.flag, style: const TextStyle(fontSize: 16)))
+                        .toList(),
+                  ),
+                  const SizedBox(width: 6),
+                ] else ...[
+                  Icon(Icons.place_outlined, size: 16, color: theme.colorScheme.primary),
+                  const SizedBox(width: 4),
+                ],
+                Expanded(
+                  child: Hero(
+                    tag: 'trip-destination-${currentTrip.id}',
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: Text(
+                        CityLocalization.localizeDestination(
+                          currentTrip.destination,
+                          Localizations.localeOf(context).languageCode,
+                        ),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              _buildTripStatusBadge(currentTrip, l10n, theme),
-            ],
+                const SizedBox(width: 8),
+                // Capped at half the row so long labels (e.g. "ongoing" in id/pt/th/tr/vi) ellipsize
+                // on 320px screens instead of overflowing; short badges keep their natural width.
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: constraints.maxWidth / 2),
+                  child: _buildTripStatusBadge(currentTrip, l10n, theme),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 12),
 

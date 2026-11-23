@@ -28,6 +28,7 @@ import 'package:packbuddy/features/auth/presentation/screens/legal_consent_scree
 import 'package:packbuddy/features/budget/domain/city_localization.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
+import 'package:packbuddy/features/budget/presentation/screens/trip_detail_screen.dart';
 import 'package:packbuddy/features/budget/presentation/screens/trips_screen.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/currency_picker_sheet.dart';
 import 'package:packbuddy/features/checklist/domain/packing_item.dart';
@@ -461,6 +462,14 @@ void main() {
       createdAt: now,
       updatedAt: now,
     );
+    // Trip status follows the real clock: these dates always show the "ongoing" badge, the
+    // longest header label (it overflowed 320px in id/pt/th/tr/vi before it was width-capped).
+    final today = DateTime.now();
+    final ongoingTrip = trip.copyWith(
+      id: 'trip-ongoing',
+      startDate: today.subtract(const Duration(days: 1)),
+      endDate: today.add(const Duration(days: 3)),
+    );
     final item = PackingItem(
       id: 'item-1',
       tripId: 'trip-1',
@@ -590,6 +599,8 @@ void main() {
       'DashboardScreen (sync failed)': (l) => scope(lang: l, home: const DashboardScreen()),
       // Long labels: addTrip, flight
       'TripsScreen': (l) => scope(lang: l, home: const TripsScreen()),
+      // Long label: ongoingTrip status badge next to the destination
+      'TripDetailScreen (ongoing trip)': (l) => scope(lang: l, home: TripDetailScreen(trip: ongoingTrip)),
       // Long label: addItem
       'ChecklistScreen': (l) => scope(lang: l, home: const ChecklistScreen(tripId: 'trip-1', tripTitle: 'European Grand Tour')),
       'AddPackingItemSheet (add)': (l) => scope(lang: l, home: const Scaffold(body: AddPackingItemSheet(tripId: 'trip-1'))),
