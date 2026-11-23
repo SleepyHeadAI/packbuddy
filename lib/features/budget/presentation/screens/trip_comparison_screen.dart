@@ -264,11 +264,7 @@ class _TripComparisonScreenState extends ConsumerState<TripComparisonScreen> {
       final tripExpenses = expenses.where((e) => e.tripId == trip.id && !e.isDeleted);
       double totalSpentInActive = 0.0;
       for (final exp in tripExpenses) {
-        totalSpentInActive += CurrencyService.convert(
-          amount: exp.amount,
-          fromCurrency: exp.currency,
-          toCurrency: activeCurrency,
-        );
+        totalSpentInActive += exp.amountIn(activeCurrency);
       }
 
       final duration = math.max(1, trip.endDate.difference(trip.startDate).inDays + 1);
@@ -419,11 +415,7 @@ class _TripComparisonScreenState extends ConsumerState<TripComparisonScreen> {
   }) {
     double totalSpent = 0.0;
     for (final exp in expenses.where((e) => !e.isDeleted)) {
-      totalSpent += CurrencyService.convert(
-        amount: exp.amount,
-        fromCurrency: exp.currency,
-        toCurrency: trip.defaultCurrency,
-      );
+      totalSpent += exp.amountIn(trip.defaultCurrency);
     }
 
     final duration = math.max(1, trip.endDate.difference(trip.startDate).inDays + 1);

@@ -59,6 +59,9 @@ class MockTripNotifier extends StateNotifier<TripState> implements TripControlle
 
   @override
   Future<bool> removeCollaborator(String tripId, String collaboratorEmail) async => true;
+
+  @override
+  Future<bool> leaveTrip(String tripId) async => false;
 }
 
 void main() {

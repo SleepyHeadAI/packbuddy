@@ -795,5 +795,17 @@
   "worldMapCardTitle": "世界旅行地图",
   "worldMapChipLived": "居住过",
   "vaultCloudQuotaTitle": "云存储空间已满",
-  "vaultCloudQuotaBody": "{count, plural, =0{在云端有可用空间之前，新文档将保存在此设备上。} =1{1 份文档未备份，仅保存在此设备上。} other{{count} 份文档未备份，仅保存在此设备上。}}"
+  "vaultCloudQuotaBody": "{count, plural, =0{在云端有可用空间之前，新文档将保存在此设备上。} =1{1 份文档未备份，仅保存在此设备上。} other{{count} 份文档未备份，仅保存在此设备上。}}",
+  "tripCrew": "旅行团队",
+  "leaveTrip": "退出行程",
+  "leaveTripConfirm": "确定退出此行程？行程将从此设备移除，已记录的支出会保留在预算中。",
+  "leftTripSuccess": "你已退出行程",
+  "removeMember": "移除成员",
+  "removeMemberConfirm": "确定将此成员移出行程？其已记录的支出会保留在预算中。",
+  "memberRemoved": "成员已移除",
+  "paidByLabel": "付款人",
+  "paidByName": "付款人：{name}",
+  "paidByAndAddedBy": "付款人：{payer} • 添加者：{creator}",
+  "payerBreakdown": "按付款人",
+  "lockedExchangeRate": "录入时汇率：1 {from} = {rate} {to}"
 }

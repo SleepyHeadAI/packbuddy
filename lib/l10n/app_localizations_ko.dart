@@ -2496,4 +2496,47 @@ class AppLocalizationsKo extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get tripCrew => '여행 멤버';
+
+  @override
+  String get leaveTrip => '여행 나가기';
+
+  @override
+  String get leaveTripConfirm =>
+      '이 여행에서 나가시겠습니까? 이 기기에서 삭제됩니다. 이미 기록된 지출은 예산에 남습니다.';
+
+  @override
+  String get leftTripSuccess => '여행에서 나갔습니다';
+
+  @override
+  String get removeMember => '멤버 내보내기';
+
+  @override
+  String get removeMemberConfirm => '이 멤버를 여행에서 내보내시겠습니까? 기록된 지출은 예산에 남습니다.';
+
+  @override
+  String get memberRemoved => '멤버를 내보냈습니다';
+
+  @override
+  String get paidByLabel => '결제자';
+
+  @override
+  String paidByName(String name) {
+    return '결제자: $name';
+  }
+
+  @override
+  String paidByAndAddedBy(String payer, String creator) {
+    return '결제자: $payer • 추가: $creator';
+  }
+
+  @override
+  String get payerBreakdown => '결제자별';
+
+  @override
+  String lockedExchangeRate(String from, String rate, String to) {
+    return '입력 시 환율: 1 $from = $rate $to';
+  }
 }

@@ -2583,4 +2583,48 @@ class AppLocalizationsTh extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get tripCrew => 'ทีมทริป';
+
+  @override
+  String get leaveTrip => 'ออกจากทริป';
+
+  @override
+  String get leaveTripConfirm =>
+      'ออกจากทริปนี้หรือไม่? ทริปจะถูกลบออกจากอุปกรณ์นี้ ค่าใช้จ่ายที่บันทึกไว้จะยังอยู่ในงบประมาณ';
+
+  @override
+  String get leftTripSuccess => 'คุณออกจากทริปแล้ว';
+
+  @override
+  String get removeMember => 'นำสมาชิกออก';
+
+  @override
+  String get removeMemberConfirm =>
+      'นำสมาชิกคนนี้ออกจากทริปหรือไม่? ค่าใช้จ่ายที่บันทึกไว้จะยังอยู่ในงบประมาณ';
+
+  @override
+  String get memberRemoved => 'นำสมาชิกออกแล้ว';
+
+  @override
+  String get paidByLabel => 'ผู้จ่าย';
+
+  @override
+  String paidByName(String name) {
+    return 'ผู้จ่าย: $name';
+  }
+
+  @override
+  String paidByAndAddedBy(String payer, String creator) {
+    return 'ผู้จ่าย: $payer • ผู้เพิ่ม: $creator';
+  }
+
+  @override
+  String get payerBreakdown => 'ตามผู้จ่าย';
+
+  @override
+  String lockedExchangeRate(String from, String rate, String to) {
+    return 'อัตราแลกเปลี่ยนตอนบันทึก: 1 $from = $rate $to';
+  }
 }

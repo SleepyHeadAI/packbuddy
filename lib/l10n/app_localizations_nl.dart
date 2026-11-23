@@ -2597,4 +2597,48 @@ class AppLocalizationsNl extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get tripCrew => 'Reisgezelschap';
+
+  @override
+  String get leaveTrip => 'Reis verlaten';
+
+  @override
+  String get leaveTripConfirm =>
+      'Deze reis verlaten? Hij wordt van dit apparaat verwijderd. Al geregistreerde uitgaven blijven in het budget.';
+
+  @override
+  String get leftTripSuccess => 'Je hebt de reis verlaten';
+
+  @override
+  String get removeMember => 'Lid verwijderen';
+
+  @override
+  String get removeMemberConfirm =>
+      'Dit lid uit de reis verwijderen? Geregistreerde uitgaven blijven in het budget.';
+
+  @override
+  String get memberRemoved => 'Lid verwijderd';
+
+  @override
+  String get paidByLabel => 'Betaald door';
+
+  @override
+  String paidByName(String name) {
+    return 'Betaald door $name';
+  }
+
+  @override
+  String paidByAndAddedBy(String payer, String creator) {
+    return 'Betaald door $payer • Toegevoegd door $creator';
+  }
+
+  @override
+  String get payerBreakdown => 'Per betaler';
+
+  @override
+  String lockedExchangeRate(String from, String rate, String to) {
+    return 'Koers bij invoer: 1 $from = $rate $to';
+  }
 }

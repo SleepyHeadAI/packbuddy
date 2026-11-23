@@ -2584,4 +2584,48 @@ class AppLocalizationsHi extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get tripCrew => 'यात्रा टीम';
+
+  @override
+  String get leaveTrip => 'यात्रा छोड़ें';
+
+  @override
+  String get leaveTripConfirm =>
+      'क्या आप यह यात्रा छोड़ना चाहते हैं? इसे इस डिवाइस से हटा दिया जाएगा। दर्ज किए गए खर्च बजट में बने रहेंगे।';
+
+  @override
+  String get leftTripSuccess => 'आपने यात्रा छोड़ दी';
+
+  @override
+  String get removeMember => 'सदस्य हटाएँ';
+
+  @override
+  String get removeMemberConfirm =>
+      'क्या इस सदस्य को यात्रा से हटाना है? उनके दर्ज किए गए खर्च बजट में बने रहेंगे।';
+
+  @override
+  String get memberRemoved => 'सदस्य हटाया गया';
+
+  @override
+  String get paidByLabel => 'भुगतानकर्ता';
+
+  @override
+  String paidByName(String name) {
+    return 'भुगतान: $name';
+  }
+
+  @override
+  String paidByAndAddedBy(String payer, String creator) {
+    return 'भुगतान: $payer • जोड़ा: $creator';
+  }
+
+  @override
+  String get payerBreakdown => 'भुगतानकर्ता अनुसार';
+
+  @override
+  String lockedExchangeRate(String from, String rate, String to) {
+    return 'दर्ज करते समय की दर: 1 $from = $rate $to';
+  }
 }

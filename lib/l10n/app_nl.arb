@@ -795,5 +795,17 @@
   "worldMapCardTitle": "Wereldreiskaart",
   "worldMapChipLived": "Gewoond",
   "vaultCloudQuotaTitle": "Cloudopslag is vol",
-  "vaultCloudQuotaBody": "{count, plural, =0{Nieuwe documenten blijven op dit apparaat tot er weer cloudruimte vrij is.} =1{1 document is niet geback-upt en staat alleen op dit apparaat.} other{{count} documenten zijn niet geback-upt en staan alleen op dit apparaat.}}"
+  "vaultCloudQuotaBody": "{count, plural, =0{Nieuwe documenten blijven op dit apparaat tot er weer cloudruimte vrij is.} =1{1 document is niet geback-upt en staat alleen op dit apparaat.} other{{count} documenten zijn niet geback-upt en staan alleen op dit apparaat.}}",
+  "tripCrew": "Reisgezelschap",
+  "leaveTrip": "Reis verlaten",
+  "leaveTripConfirm": "Deze reis verlaten? Hij wordt van dit apparaat verwijderd. Al geregistreerde uitgaven blijven in het budget.",
+  "leftTripSuccess": "Je hebt de reis verlaten",
+  "removeMember": "Lid verwijderen",
+  "removeMemberConfirm": "Dit lid uit de reis verwijderen? Geregistreerde uitgaven blijven in het budget.",
+  "memberRemoved": "Lid verwijderd",
+  "paidByLabel": "Betaald door",
+  "paidByName": "Betaald door {name}",
+  "paidByAndAddedBy": "Betaald door {payer} • Toegevoegd door {creator}",
+  "payerBreakdown": "Per betaler",
+  "lockedExchangeRate": "Koers bij invoer: 1 {from} = {rate} {to}"
 }

@@ -2588,4 +2588,48 @@ class AppLocalizationsSv extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get tripCrew => 'Resesällskap';
+
+  @override
+  String get leaveTrip => 'Lämna resan';
+
+  @override
+  String get leaveTripConfirm =>
+      'Lämna den här resan? Den tas bort från den här enheten. Redan registrerade utgifter finns kvar i budgeten.';
+
+  @override
+  String get leftTripSuccess => 'Du har lämnat resan';
+
+  @override
+  String get removeMember => 'Ta bort medlem';
+
+  @override
+  String get removeMemberConfirm =>
+      'Ta bort den här medlemmen från resan? Registrerade utgifter finns kvar i budgeten.';
+
+  @override
+  String get memberRemoved => 'Medlem borttagen';
+
+  @override
+  String get paidByLabel => 'Betald av';
+
+  @override
+  String paidByName(String name) {
+    return 'Betald av $name';
+  }
+
+  @override
+  String paidByAndAddedBy(String payer, String creator) {
+    return 'Betald av $payer • Tillagd av $creator';
+  }
+
+  @override
+  String get payerBreakdown => 'Per betalare';
+
+  @override
+  String lockedExchangeRate(String from, String rate, String to) {
+    return 'Kurs vid registrering: 1 $from = $rate $to';
+  }
 }

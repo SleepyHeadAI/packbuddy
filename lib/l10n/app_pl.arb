@@ -795,5 +795,17 @@
   "worldMapCardTitle": "Mapa podróży",
   "worldMapChipLived": "Mieszkał(a)",
   "vaultCloudQuotaTitle": "Brak miejsca w chmurze",
-  "vaultCloudQuotaBody": "{count, plural, =0{Nowe dokumenty pozostaną na tym urządzeniu, dopóki nie zwolni się miejsce w chmurze.} =1{1 dokument nie został zarchiwizowany i pozostaje tylko na tym urządzeniu.} other{Niezarchiwizowane dokumenty: {count}. Pozostają tylko na tym urządzeniu.}}"
+  "vaultCloudQuotaBody": "{count, plural, =0{Nowe dokumenty pozostaną na tym urządzeniu, dopóki nie zwolni się miejsce w chmurze.} =1{1 dokument nie został zarchiwizowany i pozostaje tylko na tym urządzeniu.} other{Niezarchiwizowane dokumenty: {count}. Pozostają tylko na tym urządzeniu.}}",
+  "tripCrew": "Ekipa podróży",
+  "leaveTrip": "Opuść podróż",
+  "leaveTripConfirm": "Opuścić tę podróż? Zostanie usunięta z tego urządzenia. Zapisane wydatki pozostaną w budżecie.",
+  "leftTripSuccess": "Opuszczono podróż",
+  "removeMember": "Usuń członka",
+  "removeMemberConfirm": "Usunąć tego członka z podróży? Zapisane przez niego wydatki pozostaną w budżecie.",
+  "memberRemoved": "Członek usunięty",
+  "paidByLabel": "Zapłacił(a)",
+  "paidByName": "Zapłacił(a): {name}",
+  "paidByAndAddedBy": "Zapłacił(a): {payer} • Dodał(a): {creator}",
+  "payerBreakdown": "Według płacącego",
+  "lockedExchangeRate": "Kurs z dnia wpisu: 1 {from} = {rate} {to}"
 }

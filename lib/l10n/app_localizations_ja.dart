@@ -2493,4 +2493,46 @@ class AppLocalizationsJa extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get tripCrew => '旅のメンバー';
+
+  @override
+  String get leaveTrip => '旅行から退出';
+
+  @override
+  String get leaveTripConfirm => 'この旅行から退出しますか？この端末から削除されます。記録済みの支出は予算に残ります。';
+
+  @override
+  String get leftTripSuccess => '旅行から退出しました';
+
+  @override
+  String get removeMember => 'メンバーを削除';
+
+  @override
+  String get removeMemberConfirm => 'このメンバーを旅行から削除しますか？記録済みの支出は予算に残ります。';
+
+  @override
+  String get memberRemoved => 'メンバーを削除しました';
+
+  @override
+  String get paidByLabel => '支払者';
+
+  @override
+  String paidByName(String name) {
+    return '支払者：$name';
+  }
+
+  @override
+  String paidByAndAddedBy(String payer, String creator) {
+    return '支払者：$payer • 追加者：$creator';
+  }
+
+  @override
+  String get payerBreakdown => '支払者別';
+
+  @override
+  String lockedExchangeRate(String from, String rate, String to) {
+    return '入力時のレート：1 $from = $rate $to';
+  }
 }

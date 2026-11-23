@@ -13,6 +13,11 @@ import 'package:packbuddy/features/budget/presentation/controllers/expense_contr
 import 'package:packbuddy/features/budget/presentation/controllers/trip_controller.dart';
 import 'package:packbuddy/core/services/app_widget_service.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
+import 'package:packbuddy/features/budget/domain/collaboration_localization.dart';
+import 'package:packbuddy/features/auth/auth_controller.dart';
+import 'package:packbuddy/features/profile/presentation/controllers/friends_controller.dart';
+import 'package:packbuddy/features/profile/presentation/controllers/profile_controller.dart';
+import 'package:packbuddy/features/profile/presentation/screens/widgets/collaborator_avatar_stack.dart';
 import 'package:packbuddy/shared/widgets/app_button.dart';
 import 'currency_picker_sheet.dart';
 
@@ -86,6 +91,13 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
   String _selectedPaymentMethod = 'CreditCard';
   late String _selectedCurrency;
 
+  /// Payer picked by the trip owner on shared trips; '' means the owner themself.
+  String _selectedPayer = '';
+
+  /// Set on build: whether the owner-only payer picker is shown, and the owner's own name.
+  bool _payerPickerVisible = false;
+  String? _myName;
+
   static const List<Map<String, dynamic>> _paymentMethods = [
     {'key': 'CreditCard', 'icon': Icons.credit_card_rounded},
     {'key': 'Online', 'icon': Icons.language_rounded},
@@ -117,6 +129,7 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
     if (widget.expenseToEdit != null) {
       final exp = widget.expenseToEdit!;
       _selectedCurrency = exp.currency;
+      _selectedPayer = exp.effectivePayer;
       _amountController.text = exp.amount.toString();
       _titleController.text = exp.title;
       _selectedDate = exp.date;
@@ -194,6 +207,11 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
           ? _customCategoryController.text.trim()
           : _selectedCategory;
 
+      // Only the owner assigns payers; everyone else keeps the default / existing payer.
+      final pickedPayer = !_payerPickerVisible
+          ? null
+          : (_isMe(_selectedPayer) ? _myName : _selectedPayer);
+
       if (widget.expenseToEdit != null) {
         final updated = widget.expenseToEdit!.copyWith(
           title: _titleController.text.trim(),
@@ -204,6 +222,7 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
           paymentMethod: _selectedPaymentMethod,
           notes: notes,
           updatedAt: DateTime.now(),
+          paidByName: pickedPayer,
         );
         await ref.read(expenseControllerProvider(widget.tripId).notifier).updateExpense(updated);
         AppHaptics.light();
@@ -223,6 +242,8 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
             date: _selectedDate,
             paymentMethod: _selectedPaymentMethod,
             notes: notes,
+            // "me" on a new expense = creator, which effectivePayer already falls back to
+            paidByName: _isMe(_selectedPayer) ? null : pickedPayer,
           );
 
       AppHaptics.light();
@@ -235,11 +256,86 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
     }
   }
 
+  bool _isMe(String payer) =>
+      payer.trim().isEmpty || (_myName != null && payer.trim().toLowerCase() == _myName!.toLowerCase());
+
+  /// Owner-only payer picker for shared trips: "You (Owner)" + resolvable members.
+  /// Raw uid entries without a friend match are skipped (no readable name to store).
+  Widget? _buildPayerPicker(ThemeData theme, AppLocalizations l10n) {
+    final trip = ref.watch(tripControllerProvider).trips.where((t) => t.id == widget.tripId).firstOrNull;
+    final authUser = ref.watch(authUserProvider);
+    _payerPickerVisible = trip != null && trip.isCollaborative && trip.isOwnedBy(authUser?.uid);
+    if (!_payerPickerVisible) return null;
+
+    _myName = ExpenseController.displayNameFor(ref.watch(profileControllerProvider).profile?.displayName, authUser);
+    final friends = ref.watch(friendsControllerProvider).friends;
+    final lang = Localizations.localeOf(context).languageCode;
+
+    final options = <String>[];
+    void addOption(String name) {
+      final clean = name.trim();
+      if (_isMe(clean) || options.any((o) => o.toLowerCase() == clean.toLowerCase())) return;
+      options.add(clean);
+    }
+
+    for (final c in trip!.collaborators) {
+      if (CollaboratorAvatarStack.matchFriend(c, friends) == null && CollaboratorAvatarStack.looksLikeUid(c)) continue;
+      addOption(CollaboratorAvatarStack.labelFor(c, friends));
+    }
+    addOption(_selectedPayer); // keep a historical payer selectable when editing
+    final selected = _isMe(_selectedPayer)
+        ? ''
+        : options.firstWhere((o) => o.toLowerCase() == _selectedPayer.trim().toLowerCase());
+
+    return DropdownButtonFormField<String>(
+      initialValue: selected,
+      isExpanded: true,
+      decoration: InputDecoration(
+        labelText: l10n.paidByLabel,
+        prefixIcon: const Icon(Icons.account_balance_wallet_outlined, size: 20),
+      ),
+      items: [
+        DropdownMenuItem(
+          value: '',
+          child: Row(
+            children: [
+              Icon(Icons.person_rounded, size: 18, color: theme.colorScheme.primary),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  '${CollaborationLocalization.getYou(lang)} (${CollaborationLocalization.getOwner(lang)})',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+        for (final name in options)
+          DropdownMenuItem(
+            value: name,
+            child: Row(
+              children: [
+                Icon(Icons.person_outline_rounded, size: 18, color: theme.colorScheme.onSurfaceVariant),
+                const SizedBox(width: 8),
+                Flexible(child: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis)),
+              ],
+            ),
+          ),
+      ],
+      onChanged: (value) {
+        AppHaptics.selection();
+        setState(() => _selectedPayer = value ?? '');
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     ref.watch(expenseControllerProvider(widget.tripId));
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final payerPicker = _buildPayerPicker(theme, l10n);
 
     final categories = [
       {'key': 'Food', 'label': l10n.food, 'icon': Icons.restaurant_rounded, 'color': AppColors.primaryAmber},
@@ -552,6 +648,11 @@ class _AddExpenseSheetState extends ConsumerState<AddExpenseSheet> {
                 ),
               ),
               const SizedBox(height: 14),
+
+              if (payerPicker != null) ...[
+                payerPicker,
+                const SizedBox(height: 14),
+              ],
 
               // Date Picker Button
               InkWell(

@@ -795,5 +795,17 @@
   "worldMapCardTitle": "Carte du monde des voyages",
   "worldMapChipLived": "Vécu",
   "vaultCloudQuotaTitle": "Stockage cloud plein",
-  "vaultCloudQuotaBody": "{count, plural, =0{Les nouveaux documents restent sur cet appareil jusqu'à ce que de l'espace se libère dans le cloud.} =1{1 document n'a pas été sauvegardé et reste uniquement sur cet appareil.} other{{count} documents n'ont pas été sauvegardés et restent uniquement sur cet appareil.}}"
+  "vaultCloudQuotaBody": "{count, plural, =0{Les nouveaux documents restent sur cet appareil jusqu'à ce que de l'espace se libère dans le cloud.} =1{1 document n'a pas été sauvegardé et reste uniquement sur cet appareil.} other{{count} documents n'ont pas été sauvegardés et restent uniquement sur cet appareil.}}",
+  "tripCrew": "Équipe du voyage",
+  "leaveTrip": "Quitter le voyage",
+  "leaveTripConfirm": "Quitter ce voyage ? Il sera supprimé de cet appareil. Les dépenses déjà enregistrées restent dans le budget.",
+  "leftTripSuccess": "Vous avez quitté le voyage",
+  "removeMember": "Retirer le membre",
+  "removeMemberConfirm": "Retirer ce membre du voyage ? Ses dépenses enregistrées restent dans le budget.",
+  "memberRemoved": "Membre retiré",
+  "paidByLabel": "Payé par",
+  "paidByName": "Payé par {name}",
+  "paidByAndAddedBy": "Payé par {payer} • Ajouté par {creator}",
+  "payerBreakdown": "Par payeur",
+  "lockedExchangeRate": "Taux à la saisie : 1 {from} = {rate} {to}"
 }

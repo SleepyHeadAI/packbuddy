@@ -2625,4 +2625,48 @@ class AppLocalizationsEl extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get tripCrew => 'Ομάδα ταξιδιού';
+
+  @override
+  String get leaveTrip => 'Αποχώρηση από το ταξίδι';
+
+  @override
+  String get leaveTripConfirm =>
+      'Αποχώρηση από αυτό το ταξίδι; Θα αφαιρεθεί από αυτή τη συσκευή. Τα καταχωρισμένα έξοδα παραμένουν στον προϋπολογισμό.';
+
+  @override
+  String get leftTripSuccess => 'Αποχωρήσατε από το ταξίδι';
+
+  @override
+  String get removeMember => 'Αφαίρεση μέλους';
+
+  @override
+  String get removeMemberConfirm =>
+      'Αφαίρεση αυτού του μέλους από το ταξίδι; Τα καταχωρισμένα έξοδά του παραμένουν στον προϋπολογισμό.';
+
+  @override
+  String get memberRemoved => 'Το μέλος αφαιρέθηκε';
+
+  @override
+  String get paidByLabel => 'Πληρωτής';
+
+  @override
+  String paidByName(String name) {
+    return 'Πλήρωσε: $name';
+  }
+
+  @override
+  String paidByAndAddedBy(String payer, String creator) {
+    return 'Πλήρωσε: $payer • Πρόσθεσε: $creator';
+  }
+
+  @override
+  String get payerBreakdown => 'Ανά πληρωτή';
+
+  @override
+  String lockedExchangeRate(String from, String rate, String to) {
+    return 'Ισοτιμία καταχώρισης: 1 $from = $rate $to';
+  }
 }

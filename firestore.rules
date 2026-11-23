@@ -90,6 +90,24 @@ service cloud.firestore {
       );
     }
 
+    // A collaborator may leave a trip: the update only removes (never adds) collaborator
+    // entries, and every removed entry is one of the caller's own identities as accepted by
+    // isTripCollaborator() (uid; verified token e-mail and its lowercase form).
+    // Mirrors TripController.leaveIdentities() / SyncEngine.leaveSharedTrip().
+    function isSelfLeave() {
+      let before = resource.data.get('collaborators', []).toSet();
+      let after = request.resource.data.get('collaborators', []).toSet();
+      let removed = before.difference(after);
+      let self = hasVerifiedEmail()
+        ? [request.auth.uid, request.auth.token.email, request.auth.token.email.lower()]
+        : [request.auth.uid];
+      return isTripCollaborator(resource.data) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['collaborators', 'updated_at', 'updatedAt']) &&
+        after.difference(before).size() == 0 &&
+        removed.size() > 0 &&
+        removed.hasOnly(self);
+    }
+
     // ---------------------------------------------------------------------
     // Users profile helpers (B5)
     // ---------------------------------------------------------------------
@@ -217,7 +235,8 @@ service cloud.firestore {
       allow update: if (isAuthenticated() && !isUserBanned(request.auth.uid) && ownerFieldsImmutable() && (
         isDocOwner(resource.data) ||
         (isTripCollaborator(resource.data) &&
-          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['collaborators']))
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['collaborators'])) ||
+        isSelfLeave()
       )) || isAdmin();
       allow delete: if (isAuthenticated() && (
         resource == null ||

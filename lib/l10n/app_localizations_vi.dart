@@ -2595,4 +2595,48 @@ class AppLocalizationsVi extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get tripCrew => 'Nhóm chuyến đi';
+
+  @override
+  String get leaveTrip => 'Rời chuyến đi';
+
+  @override
+  String get leaveTripConfirm =>
+      'Rời chuyến đi này? Chuyến đi sẽ bị xóa khỏi thiết bị này. Các khoản chi đã ghi vẫn được giữ trong ngân sách.';
+
+  @override
+  String get leftTripSuccess => 'Bạn đã rời chuyến đi';
+
+  @override
+  String get removeMember => 'Xóa thành viên';
+
+  @override
+  String get removeMemberConfirm =>
+      'Xóa thành viên này khỏi chuyến đi? Các khoản chi họ đã ghi vẫn được giữ trong ngân sách.';
+
+  @override
+  String get memberRemoved => 'Đã xóa thành viên';
+
+  @override
+  String get paidByLabel => 'Người trả';
+
+  @override
+  String paidByName(String name) {
+    return 'Người trả: $name';
+  }
+
+  @override
+  String paidByAndAddedBy(String payer, String creator) {
+    return 'Người trả: $payer • Người thêm: $creator';
+  }
+
+  @override
+  String get payerBreakdown => 'Theo người trả';
+
+  @override
+  String lockedExchangeRate(String from, String rate, String to) {
+    return 'Tỷ giá lúc nhập: 1 $from = $rate $to';
+  }
 }

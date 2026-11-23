@@ -4909,6 +4909,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =0{New documents are kept on this device until cloud space is available.} =1{1 document wasn\'t backed up and is kept on this device only.} other{{count} documents weren\'t backed up and are kept on this device only.}}'**
   String vaultCloudQuotaBody(int count);
+
+  /// Title of the trip crew row and members sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Trip Crew'**
+  String get tripCrew;
+
+  /// Button for a collaborator to leave a shared trip
+  ///
+  /// In en, this message translates to:
+  /// **'Leave Trip'**
+  String get leaveTrip;
+
+  /// Confirmation body before leaving a shared trip
+  ///
+  /// In en, this message translates to:
+  /// **'Leave this trip? It will be removed from this device. Expenses already recorded stay in the trip budget.'**
+  String get leaveTripConfirm;
+
+  /// Snackbar after leaving a shared trip
+  ///
+  /// In en, this message translates to:
+  /// **'You left the trip'**
+  String get leftTripSuccess;
+
+  /// Owner action to remove a member from the trip
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Member'**
+  String get removeMember;
+
+  /// Confirmation body before removing a member
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this member from the trip? Expenses they recorded stay in the budget.'**
+  String get removeMemberConfirm;
+
+  /// Snackbar after a member was removed
+  ///
+  /// In en, this message translates to:
+  /// **'Member removed'**
+  String get memberRemoved;
+
+  /// Label of the payer selector in the expense sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Paid by'**
+  String get paidByLabel;
+
+  /// Expense attribution when payer and creator are the same
+  ///
+  /// In en, this message translates to:
+  /// **'Paid by {name}'**
+  String paidByName(String name);
+
+  /// Expense attribution when someone else recorded the expense
+  ///
+  /// In en, this message translates to:
+  /// **'Paid by {payer} • Added by {creator}'**
+  String paidByAndAddedBy(String payer, String creator);
+
+  /// Analytics tab: spending grouped by payer
+  ///
+  /// In en, this message translates to:
+  /// **'Payer Breakdown'**
+  String get payerBreakdown;
+
+  /// Tooltip: exchange rate frozen when the expense was entered
+  ///
+  /// In en, this message translates to:
+  /// **'Entry-time rate: 1 {from} = {rate} {to}'**
+  String lockedExchangeRate(String from, String rate, String to);
 }
 
 class _AppLocalizationsDelegate

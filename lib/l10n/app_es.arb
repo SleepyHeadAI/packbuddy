@@ -795,5 +795,17 @@
   "worldMapCardTitle": "Mapa mundial de viajes",
   "worldMapChipLived": "Vivido",
   "vaultCloudQuotaTitle": "El almacenamiento en la nube está lleno",
-  "vaultCloudQuotaBody": "{count, plural, =0{Los documentos nuevos se guardan en este dispositivo hasta que haya espacio en la nube.} =1{1 documento no se ha respaldado y solo está en este dispositivo.} other{{count} documentos no se han respaldado y solo están en este dispositivo.}}"
+  "vaultCloudQuotaBody": "{count, plural, =0{Los documentos nuevos se guardan en este dispositivo hasta que haya espacio en la nube.} =1{1 documento no se ha respaldado y solo está en este dispositivo.} other{{count} documentos no se han respaldado y solo están en este dispositivo.}}",
+  "tripCrew": "Equipo de viaje",
+  "leaveTrip": "Salir del viaje",
+  "leaveTripConfirm": "¿Salir de este viaje? Se eliminará de este dispositivo. Los gastos ya registrados se mantienen en el presupuesto.",
+  "leftTripSuccess": "Has salido del viaje",
+  "removeMember": "Quitar miembro",
+  "removeMemberConfirm": "¿Quitar a este miembro del viaje? Sus gastos registrados se mantienen en el presupuesto.",
+  "memberRemoved": "Miembro eliminado",
+  "paidByLabel": "Pagado por",
+  "paidByName": "Pagado por {name}",
+  "paidByAndAddedBy": "Pagado por {payer} • Añadido por {creator}",
+  "payerBreakdown": "Por pagador",
+  "lockedExchangeRate": "Tipo al registrar: 1 {from} = {rate} {to}"
 }

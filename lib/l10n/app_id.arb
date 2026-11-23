@@ -795,5 +795,17 @@
   "worldMapCardTitle": "Peta Perjalanan Dunia",
   "worldMapChipLived": "Pernah tinggal",
   "vaultCloudQuotaTitle": "Penyimpanan cloud penuh",
-  "vaultCloudQuotaBody": "{count, plural, =0{Dokumen baru disimpan di perangkat ini sampai ruang cloud tersedia.} =1{1 dokumen tidak dicadangkan dan hanya ada di perangkat ini.} other{{count} dokumen tidak dicadangkan dan hanya ada di perangkat ini.}}"
+  "vaultCloudQuotaBody": "{count, plural, =0{Dokumen baru disimpan di perangkat ini sampai ruang cloud tersedia.} =1{1 dokumen tidak dicadangkan dan hanya ada di perangkat ini.} other{{count} dokumen tidak dicadangkan dan hanya ada di perangkat ini.}}",
+  "tripCrew": "Tim Perjalanan",
+  "leaveTrip": "Keluar dari Perjalanan",
+  "leaveTripConfirm": "Keluar dari perjalanan ini? Perjalanan akan dihapus dari perangkat ini. Pengeluaran yang tercatat tetap ada di anggaran.",
+  "leftTripSuccess": "Anda telah keluar dari perjalanan",
+  "removeMember": "Keluarkan Anggota",
+  "removeMemberConfirm": "Keluarkan anggota ini dari perjalanan? Pengeluaran yang dicatatnya tetap ada di anggaran.",
+  "memberRemoved": "Anggota dikeluarkan",
+  "paidByLabel": "Dibayar oleh",
+  "paidByName": "Dibayar oleh {name}",
+  "paidByAndAddedBy": "Dibayar oleh {payer} • Ditambahkan oleh {creator}",
+  "payerBreakdown": "Per Pembayar",
+  "lockedExchangeRate": "Kurs saat dicatat: 1 {from} = {rate} {to}"
 }

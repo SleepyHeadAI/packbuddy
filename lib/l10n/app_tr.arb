@@ -795,5 +795,17 @@
   "worldMapCardTitle": "Dünya Seyahat Haritası",
   "worldMapChipLived": "Yaşanan",
   "vaultCloudQuotaTitle": "Bulut depolama alanı dolu",
-  "vaultCloudQuotaBody": "{count, plural, =0{Bulutta yer açılana kadar yeni belgeler yalnızca bu cihazda saklanır.} =1{1 belge yedeklenemedi, yalnızca bu cihazda saklanıyor.} other{{count} belge yedeklenemedi, yalnızca bu cihazda saklanıyor.}}"
+  "vaultCloudQuotaBody": "{count, plural, =0{Bulutta yer açılana kadar yeni belgeler yalnızca bu cihazda saklanır.} =1{1 belge yedeklenemedi, yalnızca bu cihazda saklanıyor.} other{{count} belge yedeklenemedi, yalnızca bu cihazda saklanıyor.}}",
+  "tripCrew": "Seyahat Ekibi",
+  "leaveTrip": "Seyahatten Ayrıl",
+  "leaveTripConfirm": "Bu seyahatten ayrılmak istediğinize emin misiniz? Seyahat bu cihazdan kaldırılır; girilen harcamalar bütçede korunur.",
+  "leftTripSuccess": "Seyahatten ayrıldınız",
+  "removeMember": "Üyeyi Çıkar",
+  "removeMemberConfirm": "Bu üyeyi seyahatten çıkarmak istediğinize emin misiniz? Önceden girilen harcamaları bütçede korunacaktır.",
+  "memberRemoved": "Üye çıkarıldı",
+  "paidByLabel": "Harcamayı Yapan (Ödeyen)",
+  "paidByName": "Ödeyen: {name}",
+  "paidByAndAddedBy": "Ödeyen: {payer} • Ekleyen: {creator}",
+  "payerBreakdown": "Harcayan Kişi",
+  "lockedExchangeRate": "Giriş anındaki sabit kur: 1 {from} = {rate} {to}"
 }

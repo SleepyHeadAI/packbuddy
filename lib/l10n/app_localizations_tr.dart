@@ -2605,4 +2605,48 @@ class AppLocalizationsTr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get tripCrew => 'Seyahat Ekibi';
+
+  @override
+  String get leaveTrip => 'Seyahatten Ayrıl';
+
+  @override
+  String get leaveTripConfirm =>
+      'Bu seyahatten ayrılmak istediğinize emin misiniz? Seyahat bu cihazdan kaldırılır; girilen harcamalar bütçede korunur.';
+
+  @override
+  String get leftTripSuccess => 'Seyahatten ayrıldınız';
+
+  @override
+  String get removeMember => 'Üyeyi Çıkar';
+
+  @override
+  String get removeMemberConfirm =>
+      'Bu üyeyi seyahatten çıkarmak istediğinize emin misiniz? Önceden girilen harcamaları bütçede korunacaktır.';
+
+  @override
+  String get memberRemoved => 'Üye çıkarıldı';
+
+  @override
+  String get paidByLabel => 'Harcamayı Yapan (Ödeyen)';
+
+  @override
+  String paidByName(String name) {
+    return 'Ödeyen: $name';
+  }
+
+  @override
+  String paidByAndAddedBy(String payer, String creator) {
+    return 'Ödeyen: $payer • Ekleyen: $creator';
+  }
+
+  @override
+  String get payerBreakdown => 'Harcayan Kişi';
+
+  @override
+  String lockedExchangeRate(String from, String rate, String to) {
+    return 'Giriş anındaki sabit kur: 1 $from = $rate $to';
+  }
 }

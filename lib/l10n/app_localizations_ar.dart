@@ -2577,4 +2577,48 @@ class AppLocalizationsAr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get tripCrew => 'فريق الرحلة';
+
+  @override
+  String get leaveTrip => 'مغادرة الرحلة';
+
+  @override
+  String get leaveTripConfirm =>
+      'هل تريد مغادرة هذه الرحلة؟ ستتم إزالتها من هذا الجهاز، وتبقى المصروفات المسجلة في الميزانية.';
+
+  @override
+  String get leftTripSuccess => 'لقد غادرت الرحلة';
+
+  @override
+  String get removeMember => 'إزالة العضو';
+
+  @override
+  String get removeMemberConfirm =>
+      'هل تريد إزالة هذا العضو من الرحلة؟ تبقى مصروفاته المسجلة في الميزانية.';
+
+  @override
+  String get memberRemoved => 'تمت إزالة العضو';
+
+  @override
+  String get paidByLabel => 'الدافع';
+
+  @override
+  String paidByName(String name) {
+    return 'دفع: $name';
+  }
+
+  @override
+  String paidByAndAddedBy(String payer, String creator) {
+    return 'دفع: $payer • أضاف: $creator';
+  }
+
+  @override
+  String get payerBreakdown => 'حسب الدافع';
+
+  @override
+  String lockedExchangeRate(String from, String rate, String to) {
+    return 'سعر الصرف عند الإدخال: 1 $from = $rate $to';
+  }
 }

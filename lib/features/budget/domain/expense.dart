@@ -1,3 +1,5 @@
+import '../../../core/services/currency_service.dart';
+
 /// Domain entity representing a travel Expense with soft-delete and two-way sync support
 class Expense {
   final String id;
@@ -15,6 +17,14 @@ class Expense {
   final bool isDeleted;
   final String? createdByName;
 
+  /// Member who paid (v16). NULL on legacy rows → falls back to [createdByName].
+  final String? paidByName;
+
+  /// Rate frozen at entry time: 1 [currency] = [exchangeRateToTrip] [tripCurrencySnapshot] (v16).
+  /// NULL on legacy rows → conversions keep using the live rate.
+  final double? exchangeRateToTrip;
+  final String? tripCurrencySnapshot;
+
   const Expense({
     required this.id,
     this.userId = '',
@@ -30,9 +40,54 @@ class Expense {
     required this.updatedAt,
     this.isDeleted = false,
     this.createdByName,
+    this.paidByName,
+    this.exchangeRateToTrip,
+    this.tripCurrencySnapshot,
   });
 
-  /// Creates a copy with optionally modified fields
+  /// Payer shown in the UI: explicit payer, else the creator, else empty.
+  String get effectivePayer {
+    final payer = paidByName?.trim() ?? '';
+    if (payer.isNotEmpty) return payer;
+    return createdByName?.trim() ?? '';
+  }
+
+  /// True when this expense carries a usable rate frozen at entry time.
+  bool get hasLockedRate => _validRate(exchangeRateToTrip) != null && (tripCurrencySnapshot?.trim().isNotEmpty ?? false);
+
+  /// Amount expressed in [target]. Uses the rate frozen at entry; only the leg from the trip
+  /// currency snapshot to a different [target] (and legacy NULL-rate rows) use live rates.
+  double amountIn(String target) {
+    if (currency.toUpperCase().trim() == target.toUpperCase().trim()) return amount;
+    if (hasLockedRate) {
+      return CurrencyService.convert(
+        amount: amount * exchangeRateToTrip!,
+        fromCurrency: tripCurrencySnapshot!,
+        toCurrency: target,
+      );
+    }
+    return CurrencyService.convert(amount: amount, fromCurrency: currency, toCurrency: target);
+  }
+
+  /// Current rate for 1 [currency] in [tripCurrency], or null when it is not trustworthy
+  /// (unknown currency, non-positive or non-finite), so the expense stays on live rates.
+  static double? rateAtEntry(String currency, String tripCurrency) {
+    final from = currency.toUpperCase().trim();
+    final to = tripCurrency.toUpperCase().trim();
+    if (from.isEmpty || to.isEmpty) return null;
+    if (from == to) return 1.0;
+    final rates = CurrencyService.ratesAgainstUsd;
+    if ((rates[from] ?? 0) <= 0 || (rates[to] ?? 0) <= 0) return null;
+    return _validRate(CurrencyService.convert(amount: 1.0, fromCurrency: from, toCurrency: to));
+  }
+
+  static double? _validRate(dynamic value) =>
+      (value is num && value > 0 && value.isFinite) ? value.toDouble() : null;
+
+  static String? _str(dynamic value) => value is String ? value : null;
+
+  /// Creates a copy with optionally modified fields.
+  /// [clearExchangeRate] drops the frozen rate (e.g. currency changed and no new rate is available).
   Expense copyWith({
     String? id,
     String? userId,
@@ -48,6 +103,10 @@ class Expense {
     DateTime? updatedAt,
     bool? isDeleted,
     String? createdByName,
+    String? paidByName,
+    double? exchangeRateToTrip,
+    String? tripCurrencySnapshot,
+    bool clearExchangeRate = false,
   }) {
     return Expense(
       id: id ?? this.id,
@@ -64,6 +123,9 @@ class Expense {
       updatedAt: updatedAt ?? this.updatedAt,
       isDeleted: isDeleted ?? this.isDeleted,
       createdByName: createdByName ?? this.createdByName,
+      paidByName: paidByName ?? this.paidByName,
+      exchangeRateToTrip: clearExchangeRate ? null : (exchangeRateToTrip ?? this.exchangeRateToTrip),
+      tripCurrencySnapshot: clearExchangeRate ? null : (tripCurrencySnapshot ?? this.tripCurrencySnapshot),
     );
   }
 
@@ -91,6 +153,12 @@ class Expense {
       'is_deleted': isDeleted ? 1 : 0,
       'createdByName': createdByName,
       'created_by_name': createdByName,
+      'paidByName': paidByName,
+      'paid_by_name': paidByName,
+      'exchangeRateToTrip': exchangeRateToTrip,
+      'exchange_rate_to_trip': exchangeRateToTrip,
+      'tripCurrencySnapshot': tripCurrencySnapshot,
+      'trip_currency_snapshot': tripCurrencySnapshot,
     };
   }
 
@@ -124,6 +192,9 @@ class Expense {
           : DateTime.now(),
       isDeleted: json['isDeleted'] as bool? ?? json['is_deleted'] == true || json['is_deleted'] == 1,
       createdByName: (json['createdByName'] ?? json['created_by_name']) as String?,
+      paidByName: _str(json['paidByName'] ?? json['paid_by_name']),
+      exchangeRateToTrip: _validRate(json['exchangeRateToTrip'] ?? json['exchange_rate_to_trip']),
+      tripCurrencySnapshot: _str(json['tripCurrencySnapshot'] ?? json['trip_currency_snapshot']),
     );
   }
 
@@ -144,6 +215,9 @@ class Expense {
       'updated_at': updatedAt.millisecondsSinceEpoch,
       'is_deleted': isDeleted ? 1 : 0,
       'created_by_name': createdByName,
+      'paid_by_name': paidByName,
+      'exchange_rate_to_trip': exchangeRateToTrip,
+      'trip_currency_snapshot': tripCurrencySnapshot,
     };
   }
 
@@ -170,6 +244,9 @@ class Expense {
       updatedAt: parseDate(map['updated_at'] ?? map['updatedAt']),
       isDeleted: map['is_deleted'] == 1 || map['isDeleted'] == 1 || map['isDeleted'] == true,
       createdByName: (map['created_by_name'] ?? map['createdByName']) as String?,
+      paidByName: _str(map['paid_by_name'] ?? map['paidByName']),
+      exchangeRateToTrip: _validRate(map['exchange_rate_to_trip'] ?? map['exchangeRateToTrip']),
+      tripCurrencySnapshot: _str(map['trip_currency_snapshot'] ?? map['tripCurrencySnapshot']),
     );
   }
 }

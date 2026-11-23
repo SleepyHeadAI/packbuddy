@@ -795,5 +795,17 @@
   "worldMapCardTitle": "世界旅行マップ",
   "worldMapChipLived": "居住",
   "vaultCloudQuotaTitle": "クラウドストレージがいっぱいです",
-  "vaultCloudQuotaBody": "{count, plural, =0{クラウドに空きができるまで、新しい書類はこの端末に保存されます。} =1{1件の書類がバックアップされず、この端末にのみ保存されています。} other{{count}件の書類がバックアップされず、この端末にのみ保存されています。}}"
+  "vaultCloudQuotaBody": "{count, plural, =0{クラウドに空きができるまで、新しい書類はこの端末に保存されます。} =1{1件の書類がバックアップされず、この端末にのみ保存されています。} other{{count}件の書類がバックアップされず、この端末にのみ保存されています。}}",
+  "tripCrew": "旅のメンバー",
+  "leaveTrip": "旅行から退出",
+  "leaveTripConfirm": "この旅行から退出しますか？この端末から削除されます。記録済みの支出は予算に残ります。",
+  "leftTripSuccess": "旅行から退出しました",
+  "removeMember": "メンバーを削除",
+  "removeMemberConfirm": "このメンバーを旅行から削除しますか？記録済みの支出は予算に残ります。",
+  "memberRemoved": "メンバーを削除しました",
+  "paidByLabel": "支払者",
+  "paidByName": "支払者：{name}",
+  "paidByAndAddedBy": "支払者：{payer} • 追加者：{creator}",
+  "payerBreakdown": "支払者別",
+  "lockedExchangeRate": "入力時のレート：1 {from} = {rate} {to}"
 }

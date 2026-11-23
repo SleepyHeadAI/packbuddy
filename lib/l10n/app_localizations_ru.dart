@@ -2601,4 +2601,48 @@ class AppLocalizationsRu extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get tripCrew => 'Команда поездки';
+
+  @override
+  String get leaveTrip => 'Покинуть поездку';
+
+  @override
+  String get leaveTripConfirm =>
+      'Покинуть эту поездку? Она будет удалена с этого устройства. Уже внесённые расходы останутся в бюджете.';
+
+  @override
+  String get leftTripSuccess => 'Вы покинули поездку';
+
+  @override
+  String get removeMember => 'Удалить участника';
+
+  @override
+  String get removeMemberConfirm =>
+      'Удалить этого участника из поездки? Внесённые им расходы останутся в бюджете.';
+
+  @override
+  String get memberRemoved => 'Участник удалён';
+
+  @override
+  String get paidByLabel => 'Оплатил(а)';
+
+  @override
+  String paidByName(String name) {
+    return 'Оплатил(а): $name';
+  }
+
+  @override
+  String paidByAndAddedBy(String payer, String creator) {
+    return 'Оплатил(а): $payer • Добавил(а): $creator';
+  }
+
+  @override
+  String get payerBreakdown => 'По плательщикам';
+
+  @override
+  String lockedExchangeRate(String from, String rate, String to) {
+    return 'Курс при вводе: 1 $from = $rate $to';
+  }
 }

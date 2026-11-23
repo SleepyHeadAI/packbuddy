@@ -2590,4 +2590,48 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get tripCrew => 'Trip Crew';
+
+  @override
+  String get leaveTrip => 'Leave Trip';
+
+  @override
+  String get leaveTripConfirm =>
+      'Leave this trip? It will be removed from this device. Expenses already recorded stay in the trip budget.';
+
+  @override
+  String get leftTripSuccess => 'You left the trip';
+
+  @override
+  String get removeMember => 'Remove Member';
+
+  @override
+  String get removeMemberConfirm =>
+      'Remove this member from the trip? Expenses they recorded stay in the budget.';
+
+  @override
+  String get memberRemoved => 'Member removed';
+
+  @override
+  String get paidByLabel => 'Paid by';
+
+  @override
+  String paidByName(String name) {
+    return 'Paid by $name';
+  }
+
+  @override
+  String paidByAndAddedBy(String payer, String creator) {
+    return 'Paid by $payer • Added by $creator';
+  }
+
+  @override
+  String get payerBreakdown => 'Payer Breakdown';
+
+  @override
+  String lockedExchangeRate(String from, String rate, String to) {
+    return 'Entry-time rate: 1 $from = $rate $to';
+  }
 }

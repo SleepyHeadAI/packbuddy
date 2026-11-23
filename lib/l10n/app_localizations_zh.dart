@@ -2483,4 +2483,46 @@ class AppLocalizationsZh extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get tripCrew => '旅行团队';
+
+  @override
+  String get leaveTrip => '退出行程';
+
+  @override
+  String get leaveTripConfirm => '确定退出此行程？行程将从此设备移除，已记录的支出会保留在预算中。';
+
+  @override
+  String get leftTripSuccess => '你已退出行程';
+
+  @override
+  String get removeMember => '移除成员';
+
+  @override
+  String get removeMemberConfirm => '确定将此成员移出行程？其已记录的支出会保留在预算中。';
+
+  @override
+  String get memberRemoved => '成员已移除';
+
+  @override
+  String get paidByLabel => '付款人';
+
+  @override
+  String paidByName(String name) {
+    return '付款人：$name';
+  }
+
+  @override
+  String paidByAndAddedBy(String payer, String creator) {
+    return '付款人：$payer • 添加者：$creator';
+  }
+
+  @override
+  String get payerBreakdown => '按付款人';
+
+  @override
+  String lockedExchangeRate(String from, String rate, String to) {
+    return '录入时汇率：1 $from = $rate $to';
+  }
 }

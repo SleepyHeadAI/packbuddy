@@ -3012,5 +3012,83 @@
         "type": "int"
       }
     }
+  },
+  "tripCrew": "Trip Crew",
+  "@tripCrew": {
+    "description": "Title of the trip crew row and members sheet"
+  },
+  "leaveTrip": "Leave Trip",
+  "@leaveTrip": {
+    "description": "Button for a collaborator to leave a shared trip"
+  },
+  "leaveTripConfirm": "Leave this trip? It will be removed from this device. Expenses already recorded stay in the trip budget.",
+  "@leaveTripConfirm": {
+    "description": "Confirmation body before leaving a shared trip"
+  },
+  "leftTripSuccess": "You left the trip",
+  "@leftTripSuccess": {
+    "description": "Snackbar after leaving a shared trip"
+  },
+  "removeMember": "Remove Member",
+  "@removeMember": {
+    "description": "Owner action to remove a member from the trip"
+  },
+  "removeMemberConfirm": "Remove this member from the trip? Expenses they recorded stay in the budget.",
+  "@removeMemberConfirm": {
+    "description": "Confirmation body before removing a member"
+  },
+  "memberRemoved": "Member removed",
+  "@memberRemoved": {
+    "description": "Snackbar after a member was removed"
+  },
+  "paidByLabel": "Paid by",
+  "@paidByLabel": {
+    "description": "Label of the payer selector in the expense sheet"
+  },
+  "paidByName": "Paid by {name}",
+  "@paidByName": {
+    "description": "Expense attribution when payer and creator are the same",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Ahmet"
+      }
+    }
+  },
+  "paidByAndAddedBy": "Paid by {payer} • Added by {creator}",
+  "@paidByAndAddedBy": {
+    "description": "Expense attribution when someone else recorded the expense",
+    "placeholders": {
+      "payer": {
+        "type": "String",
+        "example": "Ahmet"
+      },
+      "creator": {
+        "type": "String",
+        "example": "Ayşe"
+      }
+    }
+  },
+  "payerBreakdown": "Payer Breakdown",
+  "@payerBreakdown": {
+    "description": "Analytics tab: spending grouped by payer"
+  },
+  "lockedExchangeRate": "Entry-time rate: 1 {from} = {rate} {to}",
+  "@lockedExchangeRate": {
+    "description": "Tooltip: exchange rate frozen when the expense was entered",
+    "placeholders": {
+      "from": {
+        "type": "String",
+        "example": "EUR"
+      },
+      "rate": {
+        "type": "String",
+        "example": "35.12"
+      },
+      "to": {
+        "type": "String",
+        "example": "TRY"
+      }
+    }
   }
 }

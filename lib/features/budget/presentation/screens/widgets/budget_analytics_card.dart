@@ -8,6 +8,7 @@ import 'package:packbuddy/core/services/currency_service.dart';
 import 'package:packbuddy/features/budget/domain/expense.dart';
 import 'package:packbuddy/features/budget/domain/trip.dart';
 import 'package:packbuddy/features/budget/domain/budget_localization.dart';
+import 'package:packbuddy/features/budget/domain/collaboration_localization.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
 import 'currency_picker_sheet.dart';
 
@@ -16,6 +17,7 @@ enum AnalyticsChartType {
   category,
   paymentMethod,
   dailyTrend,
+  payer,
 }
 
 /// Donut Chart Painter for category & payment spending distribution
@@ -278,11 +280,7 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
 
     for (final exp in widget.expenses) {
       final key = BudgetAnalyticsCard.getCategoryDisplayName(exp.category, l10n);
-      final converted = CurrencyService.convert(
-        amount: exp.amount,
-        fromCurrency: exp.currency,
-        toCurrency: activeCurrency,
-      );
+      final converted = exp.amountIn(activeCurrency);
       convertedTotalSpent += converted;
       categoryTotals[key] = (categoryTotals[key] ?? 0.0) + converted;
       categoryCounts[key] = (categoryCounts[key] ?? 0) + 1;
@@ -306,11 +304,7 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
 
     for (final exp in widget.expenses) {
       final key = BudgetAnalyticsCard.canonicalPaymentMethodKey(exp.paymentMethod);
-      final converted = CurrencyService.convert(
-        amount: exp.amount,
-        fromCurrency: exp.currency,
-        toCurrency: activeCurrency,
-      );
+      final converted = exp.amountIn(activeCurrency);
       paymentTotals[key] = (paymentTotals[key] ?? 0.0) + converted;
       paymentCounts[key] = (paymentCounts[key] ?? 0) + 1;
       if (key == 'Cash') {
@@ -336,15 +330,37 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
     final cashPct = convertedTotalSpent > 0 ? ((cashTotal / convertedTotalSpent) * 100).round() : 0;
     final cardPct = 100 - cashPct;
 
+    // Payer breakdown: collaborative trips only; names grouped trimmed + case-insensitively
+    final showPayerTab = widget.trip?.isCollaborative ?? false;
+    if (!showPayerTab && _chartType == AnalyticsChartType.payer) {
+      _chartType = AnalyticsChartType.category;
+    }
+    final payerTotals = <String, double>{};
+    final payerCounts = <String, int>{};
+    final payerNames = <String, String>{};
+    if (showPayerTab) {
+      for (final exp in widget.expenses) {
+        final name = exp.effectivePayer.isNotEmpty
+            ? exp.effectivePayer
+            : CollaborationLocalization.getCollaborator(lang);
+        final key = name.toLowerCase();
+        payerNames.putIfAbsent(key, () => name);
+        payerTotals[key] = (payerTotals[key] ?? 0.0) + exp.amountIn(activeCurrency);
+        payerCounts[key] = (payerCounts[key] ?? 0) + 1;
+      }
+    }
+    final sortedPayerEntries = payerTotals.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    final topPayer = sortedPayerEntries.isNotEmpty ? sortedPayerEntries.first : null;
+    final topPayerPercentage = (topPayer != null && convertedTotalSpent > 0)
+        ? ((topPayer.value / convertedTotalSpent) * 100).toStringAsFixed(0)
+        : '0';
+
     // 3. Group expenses by date for Daily Timeline Trend
     final dailySpends = <DateTime, double>{};
     for (final exp in widget.expenses) {
       final dateKey = DateTime(exp.date.year, exp.date.month, exp.date.day);
-      final converted = CurrencyService.convert(
-        amount: exp.amount,
-        fromCurrency: exp.currency,
-        toCurrency: activeCurrency,
-      );
+      final converted = exp.amountIn(activeCurrency);
       dailySpends[dateKey] = (dailySpends[dateKey] ?? 0.0) + converted;
     }
 
@@ -460,19 +476,11 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
     }
 
     final highestExpConverted = highestExp != null
-        ? CurrencyService.convert(
-            amount: highestExp.amount,
-            fromCurrency: highestExp.currency,
-            toCurrency: activeCurrency,
-          )
+        ? highestExp.amountIn(activeCurrency)
         : 0.0;
 
     final lowestExpConverted = lowestExp != null
-        ? CurrencyService.convert(
-            amount: lowestExp.amount,
-            fromCurrency: lowestExp.currency,
-            toCurrency: activeCurrency,
-          )
+        ? lowestExp.amountIn(activeCurrency)
         : 0.0;
 
     // Safe remaining daily budget calculation
@@ -521,11 +529,12 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                   ),
                   child: Center(
                     child: Icon(
-                      _chartType == AnalyticsChartType.category
-                          ? Icons.pie_chart_rounded
-                          : (_chartType == AnalyticsChartType.paymentMethod
-                              ? Icons.credit_card_rounded
-                              : Icons.bar_chart_rounded),
+                      switch (_chartType) {
+                        AnalyticsChartType.category => Icons.pie_chart_rounded,
+                        AnalyticsChartType.paymentMethod => Icons.credit_card_rounded,
+                        AnalyticsChartType.dailyTrend => Icons.bar_chart_rounded,
+                        AnalyticsChartType.payer => Icons.groups_rounded,
+                      },
                       size: 22,
                       color: theme.colorScheme.primary,
                     ),
@@ -569,11 +578,15 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                       ),
                       if (topCategory != null && convertedTotalSpent > 0) ...[
                         Text(
-                          _chartType == AnalyticsChartType.category
-                              ? (l10n?.topSpendingCategory(topCategory.key, topCategoryPercentage) ?? 'Top: ${topCategory.key} (%$topCategoryPercentage)')
-                              : (_chartType == AnalyticsChartType.paymentMethod
-                                  ? '$topPaymentName (%$topPaymentPercentage)'
-                                  : '${BudgetLocalization.peakSpendDay(lang)}: ${peakDay != null ? AppDateFormatter.formatMMMd(peakDay, locale: lang) : ''}'),
+                          switch (_chartType) {
+                            AnalyticsChartType.category =>
+                              l10n?.topSpendingCategory(topCategory.key, topCategoryPercentage) ?? 'Top: ${topCategory.key} (%$topCategoryPercentage)',
+                            AnalyticsChartType.paymentMethod => '$topPaymentName (%$topPaymentPercentage)',
+                            AnalyticsChartType.dailyTrend =>
+                              '${BudgetLocalization.peakSpendDay(lang)}: ${peakDay != null ? AppDateFormatter.formatMMMd(peakDay, locale: lang) : ''}',
+                            AnalyticsChartType.payer =>
+                              topPayer != null ? '${payerNames[topPayer.key]} (%$topPayerPercentage)' : '',
+                          },
                           style: TextStyle(
                             fontSize: 11,
                             color: theme.colorScheme.onSurfaceVariant,
@@ -721,6 +734,14 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                     theme: theme,
                     isDark: isDark,
                   ),
+                  if (showPayerTab)
+                    _buildChartTabItem(
+                      type: AnalyticsChartType.payer,
+                      icon: Icons.groups_rounded,
+                      label: l10n?.payerBreakdown ?? 'Payer Breakdown',
+                      theme: theme,
+                      isDark: isDark,
+                    ),
                 ],
               ),
             ),
@@ -766,6 +787,15 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
                 cardPct,
                 cashTotal,
                 cardAndDigitalTotal,
+              ),
+            ] else if (_chartType == AnalyticsChartType.payer) ...[
+              _buildPayerChartView(
+                theme,
+                activeCurrency,
+                convertedTotalSpent,
+                sortedPayerEntries,
+                payerNames,
+                payerCounts,
               ),
             ] else ...[
               _buildDailyTimelineChartView(
@@ -1378,6 +1408,170 @@ class _BudgetAnalyticsCardState extends State<BudgetAnalyticsCard> {
             ),
           );
         }),
+      ],
+    );
+  }
+
+  static const List<Color> _payerPalette = [
+    Color(0xFF6366F1),
+    Color(0xFF0EA5E9),
+    Color(0xFF10B981),
+    Color(0xFFF59E0B),
+    Color(0xFFEC4899),
+    Color(0xFF8B5CF6),
+  ];
+
+  /// 4. Payer Breakdown View (collaborative trips): who paid how much, in the active currency
+  Widget _buildPayerChartView(
+    ThemeData theme,
+    String activeCurrency,
+    double convertedTotalSpent,
+    List<MapEntry<String, double>> sortedEntries,
+    Map<String, String> names,
+    Map<String, int> counts,
+  ) {
+    Color colorAt(int i) => _payerPalette[i % _payerPalette.length];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Center(
+          child: SizedBox(
+            width: 140,
+            height: 140,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0.0, end: 1.0),
+                  duration: const Duration(milliseconds: 650),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, progress, child) => CustomPaint(
+                    size: const Size(140, 140),
+                    painter: DonutChartPainter(
+                      values: sortedEntries.map((e) => e.value).toList(),
+                      colors: [for (var i = 0; i < sortedEntries.length; i++) colorAt(i)],
+                      strokeWidth: 14,
+                      progress: progress,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 22),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.groups_rounded, size: 16, color: theme.colorScheme.primary),
+                      const SizedBox(height: 2),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          CurrencyFormatter.format(convertedTotalSpent, currency: activeCurrency),
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w900,
+                            color: theme.colorScheme.onSurface,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        for (var i = 0; i < sortedEntries.length; i++)
+          Builder(builder: (context) {
+            final entry = sortedEntries[i];
+            final name = names[entry.key] ?? entry.key;
+            final color = colorAt(i);
+            final ratio = convertedTotalSpent > 0 ? (entry.value / convertedTotalSpent).clamp(0.0, 1.0) : 0.0;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(color: color.withValues(alpha: 0.15), shape: BoxShape.circle),
+                        alignment: Alignment.center,
+                        child: Text(
+                          name.isNotEmpty ? name.characters.first.toUpperCase() : '?',
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: color),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                name,
+                                style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, fontSize: 13),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              '(${counts[entry.key] ?? 0})',
+                              style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            CurrencyFormatter.format(entry.value, currency: activeCurrency),
+                            style: AppTypography.mono(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: theme.colorScheme.onSurface,
+                              tabularFigures: true,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 36,
+                        child: Text(
+                          '%${(ratio * 100).toStringAsFixed(0)}',
+                          textAlign: TextAlign.right,
+                          style: AppTypography.mono(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: color,
+                            tabularFigures: true,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(3),
+                    child: LinearProgressIndicator(
+                      value: ratio,
+                      backgroundColor: theme.colorScheme.outlineVariant.withValues(alpha: 0.25),
+                      valueColor: AlwaysStoppedAnimation<Color>(color),
+                      minHeight: 4,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
       ],
     );
   }

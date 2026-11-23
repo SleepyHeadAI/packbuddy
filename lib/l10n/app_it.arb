@@ -795,5 +795,17 @@
   "worldMapCardTitle": "Mappa dei viaggi nel mondo",
   "worldMapChipLived": "Vissuto",
   "vaultCloudQuotaTitle": "Spazio cloud esaurito",
-  "vaultCloudQuotaBody": "{count, plural, =0{I nuovi documenti restano su questo dispositivo finché non si libera spazio nel cloud.} =1{1 documento non è stato salvato nel cloud ed è solo su questo dispositivo.} other{{count} documenti non sono stati salvati nel cloud e sono solo su questo dispositivo.}}"
+  "vaultCloudQuotaBody": "{count, plural, =0{I nuovi documenti restano su questo dispositivo finché non si libera spazio nel cloud.} =1{1 documento non è stato salvato nel cloud ed è solo su questo dispositivo.} other{{count} documenti non sono stati salvati nel cloud e sono solo su questo dispositivo.}}",
+  "tripCrew": "Gruppo di viaggio",
+  "leaveTrip": "Abbandona viaggio",
+  "leaveTripConfirm": "Abbandonare questo viaggio? Verrà rimosso da questo dispositivo. Le spese già registrate restano nel budget.",
+  "leftTripSuccess": "Hai abbandonato il viaggio",
+  "removeMember": "Rimuovi membro",
+  "removeMemberConfirm": "Rimuovere questo membro dal viaggio? Le sue spese registrate restano nel budget.",
+  "memberRemoved": "Membro rimosso",
+  "paidByLabel": "Pagato da",
+  "paidByName": "Pagato da {name}",
+  "paidByAndAddedBy": "Pagato da {payer} • Aggiunto da {creator}",
+  "payerBreakdown": "Per pagante",
+  "lockedExchangeRate": "Cambio all'inserimento: 1 {from} = {rate} {to}"
 }

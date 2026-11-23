@@ -125,6 +125,7 @@ class SyncEngine extends StateNotifier<SyncState> with WidgetsBindingObserver {
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _broadcastSubscription;
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
   final Map<String, List<StreamSubscription>> _sharedTripSubscriptions = {};
+  final Set<String> _leavingTripIds = {};
   Timer? _debounceTimer;
   Timer? _heartbeatTimer;
   Timer? _retryTimer;
@@ -430,7 +431,7 @@ class SyncEngine extends StateNotifier<SyncState> with WidgetsBindingObserver {
 
   /// Subscribes to real-time changes for a shared trip and its items & expenses (Phase 2)
   void listenToSharedTrip(String tripId) {
-    if (_sharedTripSubscriptions.containsKey(tripId)) return;
+    if (_sharedTripSubscriptions.containsKey(tripId) || _leavingTripIds.contains(tripId)) return;
     bool isFirebaseReady = false;
     try {
       isFirebaseReady = Firebase.apps.isNotEmpty;
@@ -461,7 +462,12 @@ class SyncEngine extends StateNotifier<SyncState> with WidgetsBindingObserver {
       } catch (e) {
         debugPrint('[SyncEngine] Real-time trip update error: $e');
       }
-    }, onError: (e) => debugPrint('[SyncEngine] Trip snapshot error: $e'));
+    }, onError: (e) {
+      debugPrint('[SyncEngine] Trip snapshot error: $e');
+      if (e is FirebaseException && e.code == 'permission-denied') {
+        purgeIfRemovedFromSharedTrip(tripId);
+      }
+    });
     subs.add(tripSub);
 
     // 2. Listen to checklist items for this trip
@@ -680,6 +686,85 @@ class SyncEngine extends StateNotifier<SyncState> with WidgetsBindingObserver {
             'updated_at': DateTime.now().millisecondsSinceEpoch,
           }, SetOptions(merge: true));
     } catch (_) {}
+  }
+
+  /// Removes the caller from `trips/{tripId}.collaborators` (allowed by `isSelfLeave()` in
+  /// firestore.rules), then hard-deletes the local copy. Returns false and keeps local data
+  /// when offline or when the write is rejected.
+  Future<bool> leaveSharedTrip(String tripId, List<String> identities) async {
+    bool isFirebaseReady = false;
+    try {
+      isFirebaseReady = Firebase.apps.isNotEmpty;
+    } catch (_) {}
+    if ((!isFirebaseReady && _firestoreInstance == null) || identities.isEmpty) return false;
+    // Firestore queues offline writes and would apply the leave later; fail fast instead.
+    if (!_isTestEnvironment && !await hasInternetConnection()) return false;
+    final firestore = _firestoreInstance ?? FirebaseFirestore.instance;
+
+    _leavingTripIds.add(tripId);
+    try {
+      // Stop the listener first so a snapshot cannot re-insert the trip during the purge.
+      cancelSharedTripListener(tripId);
+      final now = DateTime.now();
+      try {
+        // Keys must stay within isSelfLeave()'s affectedKeys().hasOnly([...]).
+        await firestore.collection('trips').doc(tripId).update({
+          'collaborators': FieldValue.arrayRemove(identities),
+          'updated_at': now.millisecondsSinceEpoch,
+          'updatedAt': now.toIso8601String(),
+        }).timeout(const Duration(seconds: 15));
+      } catch (e) {
+        debugPrint('[SyncEngine] leaveSharedTrip failed: $e');
+        _leavingTripIds.remove(tripId);
+        listenToSharedTrip(tripId);
+        return false;
+      }
+      await _dbHelper.purgeLocalSharedTrip(tripId);
+      return true;
+    } finally {
+      _leavingTripIds.remove(tripId);
+    }
+  }
+
+  /// Called when the live trip listener loses read access: if someone else owns the trip and a
+  /// server read confirms the access loss, this user was removed, so the local copy is dropped.
+  /// Never touches a trip the current user owns (a transient token / App Check failure must not
+  /// wipe it), nor runs while signed out or while a leave is in progress.
+  @visibleForTesting
+  Future<void> purgeIfRemovedFromSharedTrip(String tripId) async {
+    String? currentUid() {
+      try {
+        return _authInstance?.currentUser?.uid ?? FirebaseAuth.instance.currentUser?.uid;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    final uid = currentUid();
+    if (uid == null || _leavingTripIds.contains(tripId)) return;
+    try {
+      final trip = await _dbHelper.getTripById(tripId, userId: uid);
+      if (trip == null || trip.isOwnedBy(uid)) return;
+
+      final firestore = _firestoreInstance ?? FirebaseFirestore.instance;
+      try {
+        final snap = await firestore
+            .collection('trips')
+            .doc(tripId)
+            .get(const GetOptions(source: Source.server));
+        if (snap.exists) return; // still readable → transient error, keep local data
+      } on FirebaseException catch (e) {
+        if (e.code != 'permission-denied') return;
+      }
+      if (currentUid() != uid || _leavingTripIds.contains(tripId)) return;
+
+      cancelSharedTripListener(tripId);
+      await _dbHelper.purgeLocalSharedTrip(tripId);
+      debugPrint('[SyncEngine] Removed from shared trip $tripId; local copy purged');
+      ref?.read(tripControllerProvider.notifier).loadTrips(userId: uid);
+    } catch (e) {
+      debugPrint('[SyncEngine] purgeIfRemovedFromSharedTrip error: $e');
+    }
   }
 
   /// Cancels live listeners for a specific shared trip

@@ -169,6 +169,11 @@ class DatabaseHelper {
       if (!expCols.contains('created_by_name')) {
         await db.execute('ALTER TABLE ${AppConstants.tableExpenses} ADD COLUMN created_by_name TEXT');
       }
+      for (final col in _v16ExpenseColumns.entries) {
+        if (!expCols.contains(col.key)) {
+          await db.execute('ALTER TABLE ${AppConstants.tableExpenses} ADD COLUMN ${col.key} ${col.value}');
+        }
+      }
     } catch (_) {}
 
     // 5. Itinerary Items table integrity
@@ -246,6 +251,9 @@ class DatabaseHelper {
         is_deleted INTEGER NOT NULL DEFAULT 0,
         created_by_name TEXT,
         order_index INTEGER NOT NULL DEFAULT 0,
+        paid_by_name TEXT,
+        exchange_rate_to_trip REAL,
+        trip_currency_snapshot TEXT,
         FOREIGN KEY (trip_id) REFERENCES ${AppConstants.tableTrips}(id) ON DELETE CASCADE
       )
     ''');
@@ -510,6 +518,50 @@ class DatabaseHelper {
         await db.execute('ALTER TABLE ${AppConstants.tableItineraryItems} ADD COLUMN order_index INTEGER NOT NULL DEFAULT 0');
       } catch (_) {}
     }
+
+    // Version 16: payer attribution + exchange rate frozen at entry time (NULL on legacy rows = live rate)
+    if (oldVersion < 16) {
+      for (final col in _v16ExpenseColumns.entries) {
+        try {
+          await db.execute('ALTER TABLE ${AppConstants.tableExpenses} ADD COLUMN ${col.key} ${col.value}');
+        } catch (_) {}
+      }
+    }
+  }
+
+  static const Map<String, String> _v16ExpenseColumns = {
+    'paid_by_name': 'TEXT',
+    'exchange_rate_to_trip': 'REAL',
+    'trip_currency_snapshot': 'TEXT',
+  };
+
+  @visibleForTesting
+  Future<void> createSchemaForTesting(Database db) => _createDB(db, AppConstants.databaseVersion);
+
+  @visibleForTesting
+  Future<void> upgradeSchemaForTesting(Database db, int oldVersion, int newVersion) =>
+      _onUpgradeDB(db, oldVersion, newVersion);
+
+  /// Points the singleton at an already-open database (in-memory FFI database in tests).
+  @visibleForTesting
+  static void setDatabaseForTesting(Database? db) => _database = db;
+
+  /// Hard-deletes a shared trip and all of its child rows from this device only.
+  /// Used when the user leaves (or is removed from) a trip someone else owns: no `is_deleted`
+  /// tombstone is written, so nothing is queued for cloud deletion.
+  Future<void> purgeLocalSharedTrip(String tripId) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      // checklist_items uses ON DELETE SET NULL, so children are removed explicitly.
+      for (final table in [
+        AppConstants.tableExpenses,
+        AppConstants.tableChecklistItems,
+        AppConstants.tableItineraryItems,
+      ]) {
+        await txn.delete(table, where: 'trip_id = ?', whereArgs: [tripId]);
+      }
+      await txn.delete(AppConstants.tableTrips, where: 'id = ?', whereArgs: [tripId]);
+    });
   }
 
   /// Completely wipes all local SQLite tables (useful for sign-outs)

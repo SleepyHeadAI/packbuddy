@@ -2600,4 +2600,48 @@ class AppLocalizationsId extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get tripCrew => 'Tim Perjalanan';
+
+  @override
+  String get leaveTrip => 'Keluar dari Perjalanan';
+
+  @override
+  String get leaveTripConfirm =>
+      'Keluar dari perjalanan ini? Perjalanan akan dihapus dari perangkat ini. Pengeluaran yang tercatat tetap ada di anggaran.';
+
+  @override
+  String get leftTripSuccess => 'Anda telah keluar dari perjalanan';
+
+  @override
+  String get removeMember => 'Keluarkan Anggota';
+
+  @override
+  String get removeMemberConfirm =>
+      'Keluarkan anggota ini dari perjalanan? Pengeluaran yang dicatatnya tetap ada di anggaran.';
+
+  @override
+  String get memberRemoved => 'Anggota dikeluarkan';
+
+  @override
+  String get paidByLabel => 'Dibayar oleh';
+
+  @override
+  String paidByName(String name) {
+    return 'Dibayar oleh $name';
+  }
+
+  @override
+  String paidByAndAddedBy(String payer, String creator) {
+    return 'Dibayar oleh $payer • Ditambahkan oleh $creator';
+  }
+
+  @override
+  String get payerBreakdown => 'Per Pembayar';
+
+  @override
+  String lockedExchangeRate(String from, String rate, String to) {
+    return 'Kurs saat dicatat: 1 $from = $rate $to';
+  }
 }

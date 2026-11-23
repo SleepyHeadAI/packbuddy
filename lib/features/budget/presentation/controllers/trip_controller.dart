@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../core/services/notification_service.dart';
@@ -463,6 +464,61 @@ class TripController extends StateNotifier<TripState> {
       return true;
     }
     return false;
+  }
+
+  /// Lets a collaborator leave a trip someone else owns: removes their rule identities from the
+  /// cloud member list, then drops the local copy. The owner can never leave (delete instead).
+  Future<bool> leaveTrip(String tripId) async {
+    final user = _ref.read(authUserProvider);
+    final trip = state.trips.where((t) => t.id == tripId).firstOrNull;
+    if (user == null || trip == null || trip.isOwnedBy(user.uid)) return false;
+
+    try {
+      final left = await _ref
+          .read(syncEngineProvider.notifier)
+          .leaveSharedTrip(tripId, await _ruleIdentities(user));
+      if (!left) return false;
+    } catch (e) {
+      if (mounted) state = state.copyWith(errorMessage: e.toString());
+      return false;
+    }
+
+    if (mounted) {
+      state = state.copyWith(trips: state.trips.where((t) => t.id != tripId).toList());
+    }
+    try {
+      await _notifications.cancelReminder(tripId);
+    } catch (_) {}
+    AppWidgetService.syncCurrentState();
+    return true;
+  }
+
+  /// Reads e-mail + verification from a freshly refreshed ID token (the one Firestore sends),
+  /// so the identities match what the rules see; falls back to the cached user fields.
+  Future<List<String>> _ruleIdentities(User user) async {
+    var email = user.email;
+    var verified = user.emailVerified;
+    try {
+      final claims = (await user.getIdTokenResult(true)).claims;
+      if (claims != null) {
+        email = claims['email'] as String? ?? email;
+        verified = claims['email_verified'] == true;
+      }
+    } catch (_) {}
+    return leaveIdentities(uid: user.uid, email: email, emailVerified: verified);
+  }
+
+  /// Exactly the identities `isTripCollaborator()` grants access by: the uid, plus the token
+  /// e-mail (and its lowercase form) only when verified. An unverified e-mail is left out, since
+  /// `isSelfLeave()` would reject the whole write if it were removed.
+  @visibleForTesting
+  static List<String> leaveIdentities({
+    required String uid,
+    String? email,
+    required bool emailVerified,
+  }) {
+    final hasEmail = emailVerified && email != null && email.isNotEmpty;
+    return {uid, if (hasEmail) ...[email, email.toLowerCase()]}.toList();
   }
 
   /// Removes a collaborator from the trip (Feature F-1)

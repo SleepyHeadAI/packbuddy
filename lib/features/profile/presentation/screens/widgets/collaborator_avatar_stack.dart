@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:packbuddy/shared/widgets/app_animations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:packbuddy/features/profile/domain/friendship.dart';
 import 'package:packbuddy/features/profile/presentation/controllers/friends_controller.dart';
 
 /// Compact, overlapping avatar stack representing trip collaborators
@@ -88,28 +89,36 @@ class CollaboratorAvatarStack extends ConsumerWidget {
     return content;
   }
 
+  /// Friend behind a collaborator entry (@username, display name or uid), if any.
+  static FriendUserSummary? matchFriend(String collaborator, List<FriendUserSummary> friends) {
+    final clean = (collaborator.startsWith('@') ? collaborator.substring(1) : collaborator).toLowerCase();
+    for (final f in friends) {
+      if (f.username?.toLowerCase() == clean || f.displayName?.toLowerCase() == clean || f.uid == collaborator) {
+        return f;
+      }
+    }
+    return null;
+  }
+
+  /// Readable name for a collaborator entry: the friend's name, else the stored handle / e-mail.
+  static String labelFor(String collaborator, List<FriendUserSummary> friends) {
+    final friend = matchFriend(collaborator, friends);
+    return friend?.displayName ??
+        friend?.username ??
+        (collaborator.startsWith('@') ? collaborator.substring(1) : collaborator);
+  }
+
+  /// Raw Firebase uid entries (28 alphanumerics) are not meaningful to show as names.
+  static bool looksLikeUid(String collaborator) => RegExp(r'^[A-Za-z0-9]{28}$').hasMatch(collaborator);
+
   Widget _buildAvatar({
     required BuildContext context,
     required String collaborator,
-    required List<dynamic> friends,
+    required List<FriendUserSummary> friends,
     required ThemeData theme,
   }) {
-    // Check if collaborator matches a friend by @username or uid
-    final clean = collaborator.startsWith('@') ? collaborator.substring(1).toLowerCase() : collaborator.toLowerCase();
-    dynamic matchedFriend;
-    for (final f in friends) {
-      if ((f.username != null && f.username.toLowerCase() == clean) ||
-          (f.displayName != null && f.displayName.toLowerCase() == clean) ||
-          f.uid == collaborator) {
-        matchedFriend = f;
-        break;
-      }
-    }
-
-    final photoUrl = matchedFriend?.photoUrl as String?;
-    final label = (matchedFriend?.displayName as String?) ??
-        (matchedFriend?.username as String?) ??
-        (collaborator.startsWith('@') ? collaborator.substring(1) : collaborator);
+    final photoUrl = matchFriend(collaborator, friends)?.photoUrl;
+    final label = labelFor(collaborator, friends);
 
     final initial = label.isNotEmpty ? label[0].toUpperCase() : '?';
 

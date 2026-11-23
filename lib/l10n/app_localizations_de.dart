@@ -2610,4 +2610,48 @@ class AppLocalizationsDe extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get tripCrew => 'Reiseteam';
+
+  @override
+  String get leaveTrip => 'Reise verlassen';
+
+  @override
+  String get leaveTripConfirm =>
+      'Diese Reise verlassen? Sie wird von diesem Gerät entfernt. Bereits erfasste Ausgaben bleiben im Reisebudget.';
+
+  @override
+  String get leftTripSuccess => 'Du hast die Reise verlassen';
+
+  @override
+  String get removeMember => 'Mitglied entfernen';
+
+  @override
+  String get removeMemberConfirm =>
+      'Dieses Mitglied aus der Reise entfernen? Bereits erfasste Ausgaben bleiben im Budget.';
+
+  @override
+  String get memberRemoved => 'Mitglied entfernt';
+
+  @override
+  String get paidByLabel => 'Bezahlt von';
+
+  @override
+  String paidByName(String name) {
+    return 'Bezahlt von $name';
+  }
+
+  @override
+  String paidByAndAddedBy(String payer, String creator) {
+    return 'Bezahlt von $payer • Hinzugefügt von $creator';
+  }
+
+  @override
+  String get payerBreakdown => 'Nach Zahler';
+
+  @override
+  String lockedExchangeRate(String from, String rate, String to) {
+    return 'Kurs bei Erfassung: 1 $from = $rate $to';
+  }
 }

@@ -1,10 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../data/local_db/database_helper.dart';
 import '../../../../data/sync_engine/sync_engine.dart';
 import '../../../../core/services/telemetry_service.dart';
 import '../../domain/expense.dart';
-import '../../../../core/services/currency_service.dart';
 import '../../../../core/services/preferences_service.dart';
 import '../../../../core/services/app_widget_service.dart';
 import '../../../auth/auth_controller.dart';
@@ -55,6 +55,20 @@ class ExpenseController extends StateNotifier<ExpenseState> {
     loadExpenses();
   }
 
+  static double _sumIn(List<Expense> expenses, String currency) =>
+      expenses.fold<double>(0.0, (sum, e) => sum + e.amountIn(currency));
+
+  /// Name stamped as creator (and offered as "me" in the payer picker):
+  /// profile name → auth display name → e-mail prefix.
+  static String? displayNameFor(String? profileName, User? authUser) {
+    for (final name in [profileName, authUser?.displayName]) {
+      final trimmed = name?.trim();
+      if (trimmed != null && trimmed.isNotEmpty) return trimmed;
+    }
+    final email = authUser?.email?.trim();
+    return (email != null && email.isNotEmpty) ? email.split('@').first : null;
+  }
+
   /// Loads non-deleted expenses for the trip from SQLite
   Future<void> loadExpenses() async {
     state = state.copyWith(isLoading: true);
@@ -65,14 +79,7 @@ class ExpenseController extends StateNotifier<ExpenseState> {
         tripId: _tripId,
         includeDeleted: false,
       );
-      final total = expenses.fold<double>(0.0, (sum, item) {
-        final converted = CurrencyService.convert(
-          amount: item.amount,
-          fromCurrency: item.currency,
-          toCurrency: tripCurrency,
-        );
-        return sum + converted;
-      });
+      final total = _sumIn(expenses, tripCurrency);
       if (!mounted) return;
       state = state.copyWith(
         isLoading: false,
@@ -97,6 +104,7 @@ class ExpenseController extends StateNotifier<ExpenseState> {
     required DateTime date,
     String? paymentMethod,
     String? notes,
+    String? paidByName,
   }) async {
     // Feature restriction guard (Phase 3)
     if (PreferencesService.instance.getRestrictedFeatures().contains('expense_add')) {
@@ -109,16 +117,13 @@ class ExpenseController extends StateNotifier<ExpenseState> {
       final tripCurrency = trip?.defaultCurrency ?? currency;
       final now = DateTime.now();
       final currentUid = _ref.read(authUserProvider)?.uid ?? '';
-      final profile = _ref.read(profileControllerProvider).profile;
-      final authUser = _ref.read(authUserProvider);
-      final authorName = (profile?.displayName != null && profile!.displayName!.trim().isNotEmpty)
-          ? profile.displayName!.trim()
-          : (authUser?.displayName != null && authUser!.displayName!.trim().isNotEmpty)
-              ? authUser.displayName!.trim()
-              : (authUser?.email != null && authUser!.email!.trim().isNotEmpty)
-                  ? authUser.email!.trim().split('@').first
-                  : null;
+      final authorName = displayNameFor(
+        _ref.read(profileControllerProvider).profile?.displayName,
+        _ref.read(authUserProvider),
+      );
 
+      final payer = paidByName?.trim();
+      final lockedRate = Expense.rateAtEntry(currency, tripCurrency);
       final newExpense = Expense(
         id: _uuid.v4(),
         userId: currentUid,
@@ -134,6 +139,9 @@ class ExpenseController extends StateNotifier<ExpenseState> {
         updatedAt: now,
         isDeleted: false,
         createdByName: authorName,
+        paidByName: (payer == null || payer.isEmpty) ? null : payer,
+        exchangeRateToTrip: lockedRate,
+        tripCurrencySnapshot: lockedRate == null ? null : tripCurrency,
       );
 
       await _dbHelper.insertExpense(newExpense);
@@ -146,14 +154,7 @@ class ExpenseController extends StateNotifier<ExpenseState> {
       }
 
       final updatedList = [newExpense, ...state.expenses];
-      final newTotal = updatedList.fold<double>(0.0, (sum, item) {
-        final converted = CurrencyService.convert(
-          amount: item.amount,
-          fromCurrency: item.currency,
-          toCurrency: tripCurrency,
-        );
-        return sum + converted;
-      });
+      final newTotal = _sumIn(updatedList, tripCurrency);
 
       if (!mounted) return newExpense;
       state = state.copyWith(
@@ -190,20 +191,20 @@ class ExpenseController extends StateNotifier<ExpenseState> {
     try {
       final trip = await _dbHelper.getTripById(_tripId);
       final tripCurrency = trip?.defaultCurrency ?? updated.currency;
-      final profile = _ref.read(profileControllerProvider).profile;
-      final authUser = _ref.read(authUserProvider);
-      final updaterName = (profile?.displayName != null && profile!.displayName!.trim().isNotEmpty)
-          ? profile.displayName!.trim()
-          : (authUser?.displayName != null && authUser!.displayName!.trim().isNotEmpty)
-              ? authUser.displayName!.trim()
-              : (authUser?.email != null && authUser!.email!.trim().isNotEmpty)
-                  ? authUser.email!.trim().split('@').first
-                  : null;
 
-      final expenseToSave = updated.copyWith(
-        updatedAt: DateTime.now(),
-        createdByName: updaterName ?? updated.createdByName,
-      );
+      // createdByName stays the original creator (spec 4.3). The frozen rate belongs to the
+      // original currency, so it is re-captured only when the currency changed; legacy NULL
+      // rows that keep their currency stay on live rates.
+      var expenseToSave = updated.copyWith(updatedAt: DateTime.now());
+      final original = state.expenses.where((e) => e.id == updated.id).firstOrNull;
+      if (original != null && original.currency != updated.currency) {
+        final lockedRate = Expense.rateAtEntry(updated.currency, tripCurrency);
+        expenseToSave = expenseToSave.copyWith(
+          exchangeRateToTrip: lockedRate,
+          tripCurrencySnapshot: tripCurrency,
+          clearExchangeRate: lockedRate == null,
+        );
+      }
 
       await _dbHelper.updateExpense(expenseToSave);
 
@@ -221,14 +222,7 @@ class ExpenseController extends StateNotifier<ExpenseState> {
         updatedList.insert(0, expenseToSave);
       }
 
-      final newTotal = updatedList.fold<double>(0.0, (sum, item) {
-        final converted = CurrencyService.convert(
-          amount: item.amount,
-          fromCurrency: item.currency,
-          toCurrency: tripCurrency,
-        );
-        return sum + converted;
-      });
+      final newTotal = _sumIn(updatedList, tripCurrency);
 
       if (!mounted) return expenseToSave;
       state = state.copyWith(
@@ -261,14 +255,7 @@ class ExpenseController extends StateNotifier<ExpenseState> {
       final tripCurrency = trip?.defaultCurrency ?? expense.currency;
 
       final updatedList = [expense, ...state.expenses.where((e) => e.id != expense.id)];
-      final newTotal = updatedList.fold<double>(0.0, (sum, item) {
-        final converted = CurrencyService.convert(
-          amount: item.amount,
-          fromCurrency: item.currency,
-          toCurrency: tripCurrency,
-        );
-        return sum + converted;
-      });
+      final newTotal = _sumIn(updatedList, tripCurrency);
 
       state = state.copyWith(
         expenses: updatedList,
@@ -298,14 +285,7 @@ class ExpenseController extends StateNotifier<ExpenseState> {
       final tripCurrency = trip?.defaultCurrency ?? 'USD';
 
       final updatedList = state.expenses.where((e) => e.id != expenseId).toList();
-      final newTotal = updatedList.fold<double>(0.0, (sum, item) {
-        final converted = CurrencyService.convert(
-          amount: item.amount,
-          fromCurrency: item.currency,
-          toCurrency: tripCurrency,
-        );
-        return sum + converted;
-      });
+      final newTotal = _sumIn(updatedList, tripCurrency);
 
       if (!mounted) return true;
       state = state.copyWith(

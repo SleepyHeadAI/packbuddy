@@ -795,5 +795,17 @@
   "worldMapCardTitle": "Världsresekarta",
   "worldMapChipLived": "Bott",
   "vaultCloudQuotaTitle": "Molnlagringen är full",
-  "vaultCloudQuotaBody": "{count, plural, =0{Nya dokument sparas på den här enheten tills det finns plats i molnet.} =1{1 dokument säkerhetskopierades inte och finns bara på den här enheten.} other{{count} dokument säkerhetskopierades inte och finns bara på den här enheten.}}"
+  "vaultCloudQuotaBody": "{count, plural, =0{Nya dokument sparas på den här enheten tills det finns plats i molnet.} =1{1 dokument säkerhetskopierades inte och finns bara på den här enheten.} other{{count} dokument säkerhetskopierades inte och finns bara på den här enheten.}}",
+  "tripCrew": "Resesällskap",
+  "leaveTrip": "Lämna resan",
+  "leaveTripConfirm": "Lämna den här resan? Den tas bort från den här enheten. Redan registrerade utgifter finns kvar i budgeten.",
+  "leftTripSuccess": "Du har lämnat resan",
+  "removeMember": "Ta bort medlem",
+  "removeMemberConfirm": "Ta bort den här medlemmen från resan? Registrerade utgifter finns kvar i budgeten.",
+  "memberRemoved": "Medlem borttagen",
+  "paidByLabel": "Betald av",
+  "paidByName": "Betald av {name}",
+  "paidByAndAddedBy": "Betald av {payer} • Tillagd av {creator}",
+  "payerBreakdown": "Per betalare",
+  "lockedExchangeRate": "Kurs vid registrering: 1 {from} = {rate} {to}"
 }

@@ -29,6 +29,8 @@ import 'package:packbuddy/features/budget/presentation/screens/widgets/add_trip_
 import 'package:packbuddy/features/budget/presentation/screens/widgets/add_expense_sheet.dart';
 import 'package:packbuddy/features/budget/presentation/screens/trips_screen.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/share_trip_sheet.dart';
+import 'package:packbuddy/features/budget/presentation/screens/widgets/trip_members_sheet.dart';
+import 'package:packbuddy/features/profile/presentation/screens/widgets/collaborator_avatar_stack.dart';
 import 'package:packbuddy/features/budget/presentation/screens/widgets/emergency_guide_sheet.dart';
 import 'package:packbuddy/features/auth/auth_controller.dart';
 import 'package:packbuddy/features/budget/domain/collaboration_localization.dart';
@@ -693,11 +695,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
 
     final categoryTotal = expenses.fold<double>(
       0.0,
-      (sum, e) => sum + CurrencyService.convert(
-        amount: e.amount,
-        fromCurrency: e.currency,
-        toCurrency: targetCurrency,
-      ),
+      (sum, e) => sum + e.amountIn(targetCurrency),
     );
 
     final percentage = totalSpent > 0
@@ -865,11 +863,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
 
     final methodTotal = expenses.fold<double>(
       0.0,
-      (sum, e) => sum + CurrencyService.convert(
-        amount: e.amount,
-        fromCurrency: e.currency,
-        toCurrency: targetCurrency,
-      ),
+      (sum, e) => sum + e.amountIn(targetCurrency),
     );
 
     final percentage = totalSpent > 0
@@ -1041,11 +1035,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
         (authState.user?.email != null ? authState.user!.email!.split('@').first : null);
     final isMe = (currentUserId != null && expense.userId == currentUserId) ||
         (currentUserName != null && expense.createdByName != null && expense.createdByName!.trim().toLowerCase() == currentUserName.trim().toLowerCase());
-    final authorText = CollaborationLocalization.formatAddedBy(
-      expense.createdByName,
-      isMe: isMe,
-      languageCode: Localizations.localeOf(context).languageCode,
-    );
+    final authorText = _attributionText(expense, isMe: isMe, currentUserName: currentUserName);
 
     return Dismissible(
       key: Key('exp-tile-${expense.id}'),
@@ -1160,8 +1150,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                                   color: isMe ? const Color(0xFF6366F1) : const Color(0xFF0EA5E9),
                                 ),
                                 const SizedBox(width: 3),
-                                ConstrainedBox(
-                                  constraints: const BoxConstraints(maxWidth: 90),
+                                Flexible(
                                   child: Text(
                                     authorText,
                                     style: TextStyle(
@@ -1201,15 +1190,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                   ),
                   if (expense.currency.toUpperCase() != targetCurrency.toUpperCase()) ...[
                     const SizedBox(height: 2),
-                    Text(
-                      '≈ ${CurrencyFormatter.format(CurrencyService.convert(amount: expense.amount, fromCurrency: expense.currency, toCurrency: targetCurrency), currency: targetCurrency)}',
-                      style: AppTypography.mono(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                        color: theme.colorScheme.onSurfaceVariant,
-                        tabularFigures: true,
-                      ),
-                    ),
+                    _convertedAmountLine(expense, targetCurrency, theme),
                   ],
                 ],
               ),
@@ -1240,11 +1221,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
         (authState.user?.email != null ? authState.user!.email!.split('@').first : null);
     final isMe = (currentUserId != null && expense.userId == currentUserId) ||
         (currentUserName != null && expense.createdByName != null && expense.createdByName!.trim().toLowerCase() == currentUserName.trim().toLowerCase());
-    final authorText = CollaborationLocalization.formatAddedBy(
-      expense.createdByName,
-      isMe: isMe,
-      languageCode: Localizations.localeOf(context).languageCode,
-    );
+    final authorText = _attributionText(expense, isMe: isMe, currentUserName: currentUserName);
 
     return Dismissible(
       key: Key(expense.id),
@@ -1366,8 +1343,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                         color: isMe ? const Color(0xFF6366F1) : const Color(0xFF0EA5E9),
                       ),
                       const SizedBox(width: 3),
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 100),
+                      Flexible(
                         child: Text(
                           authorText,
                           style: TextStyle(
@@ -1403,15 +1379,7 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
               ),
               if (expense.currency.toUpperCase() != targetCurrency.toUpperCase()) ...[
                 const SizedBox(height: 2),
-                Text(
-                  '≈ ${CurrencyFormatter.format(CurrencyService.convert(amount: expense.amount, fromCurrency: expense.currency, toCurrency: targetCurrency), currency: targetCurrency)}',
-                  style: AppTypography.mono(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                    color: theme.colorScheme.onSurfaceVariant,
-                    tabularFigures: true,
-                  ),
-                ),
+                _convertedAmountLine(expense, targetCurrency, theme),
               ],
             ],
           ),
@@ -1421,6 +1389,65 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
   ),
 );
 }
+
+  /// Spec 5.4: "Paid by X", or "Paid by X • Added by Y" when someone else recorded it.
+  /// Legacy rows without any name keep the previous "added by" badge.
+  String _attributionText(Expense expense, {required bool isMe, required String? currentUserName}) {
+    final lang = Localizations.localeOf(context).languageCode;
+    final payer = expense.effectivePayer;
+    if (payer.isEmpty) {
+      return CollaborationLocalization.formatAddedBy(expense.createdByName, isMe: isMe, languageCode: lang);
+    }
+    final l10n = AppLocalizations.of(context)!;
+    final you = CollaborationLocalization.getYou(lang);
+    final creator = expense.createdByName?.trim() ?? '';
+    final payerIsCreator = creator.isEmpty || creator.toLowerCase() == payer.toLowerCase();
+    final payerIsMe = payer.toLowerCase() == currentUserName?.trim().toLowerCase() || (isMe && payerIsCreator);
+    final payerLabel = payerIsMe ? you : payer;
+    return payerIsCreator ? l10n.paidByName(payerLabel) : l10n.paidByAndAddedBy(payerLabel, isMe ? you : creator);
+  }
+
+  /// "≈ converted" line; a lock (with the rate as tooltip) marks the rate frozen at entry.
+  Widget _convertedAmountLine(Expense expense, String targetCurrency, ThemeData theme) {
+    final text = Text(
+      '≈ ${CurrencyFormatter.format(expense.amountIn(targetCurrency), currency: targetCurrency)}',
+      style: AppTypography.mono(
+        fontSize: 10,
+        fontWeight: FontWeight.w500,
+        color: theme.colorScheme.onSurfaceVariant,
+        tabularFigures: true,
+      ),
+    );
+    if (!expense.hasLockedRate) return text;
+    final rate = expense.exchangeRateToTrip!;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Tooltip(
+          message: AppLocalizations.of(context)!.lockedExchangeRate(
+            expense.currency,
+            rate.toStringAsFixed(rate >= 1 ? 2 : 4),
+            expense.tripCurrencySnapshot!,
+          ),
+          child: Icon(Icons.lock_outline_rounded, size: 10, color: theme.colorScheme.onSurfaceVariant),
+        ),
+        const SizedBox(width: 2),
+        text,
+      ],
+    );
+  }
+
+  /// Opens the crew sheet; when the user left the trip, closes this screen and confirms it.
+  Future<void> _openTripCrew(Trip trip) async {
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final leftMessage = AppLocalizations.of(context)!.leftTripSuccess;
+    AppHaptics.light();
+    final left = await TripMembersSheet.show(context, trip);
+    if (left != true) return;
+    await navigator.maybePop();
+    messenger.showSnackBar(SnackBar(content: Text(leftMessage), behavior: SnackBarBehavior.floating));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1465,19 +1492,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
       ..sort((a, b) {
         final totalA = a.value.fold<double>(
           0.0,
-          (sum, e) => sum + CurrencyService.convert(
-            amount: e.amount,
-            fromCurrency: e.currency,
-            toCurrency: currentTrip.defaultCurrency,
-          ),
+          (sum, e) => sum + e.amountIn(currentTrip.defaultCurrency),
         );
         final totalB = b.value.fold<double>(
           0.0,
-          (sum, e) => sum + CurrencyService.convert(
-            amount: e.amount,
-            fromCurrency: e.currency,
-            toCurrency: currentTrip.defaultCurrency,
-          ),
+          (sum, e) => sum + e.amountIn(currentTrip.defaultCurrency),
         );
         return totalB.compareTo(totalA);
       });
@@ -1492,19 +1511,11 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
       ..sort((a, b) {
         final totalA = a.value.fold<double>(
           0.0,
-          (sum, e) => sum + CurrencyService.convert(
-            amount: e.amount,
-            fromCurrency: e.currency,
-            toCurrency: currentTrip.defaultCurrency,
-          ),
+          (sum, e) => sum + e.amountIn(currentTrip.defaultCurrency),
         );
         final totalB = b.value.fold<double>(
           0.0,
-          (sum, e) => sum + CurrencyService.convert(
-            amount: e.amount,
-            fromCurrency: e.currency,
-            toCurrency: currentTrip.defaultCurrency,
-          ),
+          (sum, e) => sum + e.amountIn(currentTrip.defaultCurrency),
         );
         return totalB.compareTo(totalA);
       });
@@ -2102,44 +2113,54 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
             ],
           ),
 
-          // Collaborative Live Badge (ONLY when currentTrip.isCollaborative is true)
+          // Trip crew row (ONLY when currentTrip.isCollaborative is true) → members sheet
           if (currentTrip.isCollaborative) ...[
             const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withValues(alpha: 0.1),
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _openTripCrew(currentTrip),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.3),
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 7,
-                    height: 7,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF10B981),
-                      shape: BoxShape.circle,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color(0xFF10B981).withValues(alpha: 0.3),
+                      width: 1,
                     ),
                   ),
-                  const SizedBox(width: 6),
-                  Flexible(
-                    child: Text(
-                      '${CollaborationLocalization.getLiveSharedTrip(Localizations.localeOf(context).languageCode)} • ${CollaborationLocalization.getCollaboratorsCount(Localizations.localeOf(context).languageCode, currentTrip.collaborators.length + 1)}',
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF059669),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 7,
+                        height: 7,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF10B981),
+                          shape: BoxShape.circle,
+                        ),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          '${l10n.tripCrew} • ${CollaborationLocalization.getCollaboratorsCount(Localizations.localeOf(context).languageCode, currentTrip.collaborators.length + 1)}',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF059669),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      CollaboratorAvatarStack(collaborators: currentTrip.collaborators, size: 16),
+                      const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0xFF059669)),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ],
