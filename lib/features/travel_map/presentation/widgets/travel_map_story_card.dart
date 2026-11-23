@@ -5,6 +5,7 @@ import 'package:packbuddy/features/travel_map/data/world_map_instructions.dart';
 import 'package:packbuddy/features/travel_map/domain/travel_country.dart';
 import 'package:packbuddy/features/travel_map/presentation/widgets/country_flag.dart';
 import 'package:packbuddy/l10n/app_localizations.dart';
+import 'package:packbuddy/shared/widgets/app_logo.dart';
 
 /// Available story layout templates
 enum StoryCardLayout {
@@ -907,7 +908,8 @@ class TravelMapStoryCard extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: Image.asset(
-              'assets/images/logo_transparent.png',
+              // The story's own background decides, not the app theme
+              palette.isLight ? AppLogo.forLightAsset : AppLogo.forDarkAsset,
               width: 14,
               height: 14,
               fit: BoxFit.contain,
