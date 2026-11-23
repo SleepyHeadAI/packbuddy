@@ -3,70 +3,56 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:packbuddy/shared/widgets/app_logo.dart';
 
+String _assetOf(WidgetTester tester) =>
+    (tester.widget<Image>(find.byType(Image)).image as AssetImage).assetName;
+
 void main() {
   group('AppLogo Asset Existence & Verification Tests', () {
-    test('Logo asset files exist in assets/images/ with non-zero size', () {
-      final normalFile = File(AppLogo.normalAsset);
-      final transparentFile = File(AppLogo.transparentAsset);
-
-      expect(normalFile.existsSync(), isTrue, reason: 'assets/images/logo_normal.png must exist');
-      expect(normalFile.lengthSync(), greaterThan(1000), reason: 'Normal logo file must not be empty');
-
-      expect(transparentFile.existsSync(), isTrue, reason: 'assets/images/logo_transparent.png must exist');
-      expect(transparentFile.lengthSync(), greaterThan(1000), reason: 'Transparent logo file must not be empty');
+    test('Brand logo assets exist in assets/images/ with non-zero size', () {
+      for (final path in [AppLogo.forDarkAsset, AppLogo.forLightAsset]) {
+        final file = File(path);
+        expect(file.existsSync(), isTrue, reason: '$path must exist');
+        expect(file.lengthSync(), greaterThan(1000), reason: '$path must not be empty');
+      }
     });
 
-    testWidgets('AppLogo.normal renders Image widget with normal asset', (tester) async {
+    testWidgets('AppLogo uses the terracotta mark on light themes', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: AppLogo.normal(size: 64),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: AppLogo(size: 64))),
       );
 
-      final imageFinder = find.byType(Image);
-      expect(imageFinder, findsOneWidget);
-
-      final imageWidget = tester.widget<Image>(imageFinder);
-      expect((imageWidget.image as AssetImage).assetName, equals(AppLogo.normalAsset));
+      expect(find.byType(Image), findsOneWidget);
+      expect(_assetOf(tester), equals(AppLogo.forLightAsset));
+      final imageWidget = tester.widget<Image>(find.byType(Image));
       expect(imageWidget.width, equals(64));
       expect(imageWidget.height, equals(64));
     });
 
-    testWidgets('AppLogo.transparent renders Image widget with transparent asset', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: AppLogo.transparent(size: 48),
-          ),
-        ),
-      );
-
-      final imageFinder = find.byType(Image);
-      expect(imageFinder, findsOneWidget);
-
-      final imageWidget = tester.widget<Image>(imageFinder);
-      expect((imageWidget.image as AssetImage).assetName, equals(AppLogo.transparentAsset));
-      expect(imageWidget.width, equals(48));
-      expect(imageWidget.height, equals(48));
-    });
-
-    testWidgets('AppLogo defaults to transparent in dark mode', (tester) async {
+    testWidgets('AppLogo uses the off-white mark on dark themes', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.dark(),
-          home: const Scaffold(
-            body: AppLogo(size: 32),
-          ),
+          home: const Scaffold(body: AppLogo(size: 32)),
         ),
       );
 
-      final imageFinder = find.byType(Image);
-      expect(imageFinder, findsOneWidget);
+      expect(_assetOf(tester), equals(AppLogo.forDarkAsset));
+    });
 
-      final imageWidget = tester.widget<Image>(imageFinder);
-      expect((imageWidget.image as AssetImage).assetName, equals(AppLogo.transparentAsset));
+    testWidgets('AppLogo.transparent follows the theme like AppLogo', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(home: Scaffold(body: AppLogo.transparent(size: 48))),
+      );
+      expect(_assetOf(tester), equals(AppLogo.forLightAsset));
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData.dark(),
+          home: const Scaffold(body: AppLogo.transparent(size: 48)),
+        ),
+      );
+      await tester.pumpAndSettle(); // MaterialApp animates theme changes
+      expect(_assetOf(tester), equals(AppLogo.forDarkAsset));
     });
 
     testWidgets('AppLogo supports hero animations', (tester) async {
@@ -82,4 +68,3 @@ void main() {
     });
   });
 }
-

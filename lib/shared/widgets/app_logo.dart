@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 
-/// PackBuddy official branded logo widget.
+/// PackBuddy brand mark (P + compass needle) on a transparent background.
 ///
-/// Features two variants:
-/// - [AppLogo.normal]: The vintage brand logo with the warm cream background (#F8F0DF),
-///   ideal for standalone display, app launcher representation, and clean cards.
-/// - [AppLogo.transparent]: The transparent logo without background color,
-///   essential when overlaid on colored surfaces, dark mode scaffolds, or headers.
+/// The variant follows the ambient theme brightness: the off-white mark on
+/// dark surfaces, the terracotta mark on light ones.
 class AppLogo extends StatelessWidget {
-  /// Asset path to the normal vintage-styled logo with cream background
-  static const String normalAsset = 'assets/images/logo_normal.png';
+  /// Off-white P + amber needle, for dark surfaces.
+  static const String forDarkAsset = 'assets/images/logo_transparent_for_dark.png';
 
-  /// Asset path to the transparent emblem logo
-  static const String transparentAsset = 'assets/images/logo_transparent.png';
+  /// Terracotta P + amber needle, for light surfaces.
+  static const String forLightAsset = 'assets/images/logo_transparent_for_light.png';
 
   /// Explicit width & height if square
   final double? size;
@@ -22,10 +19,6 @@ class AppLogo extends StatelessWidget {
 
   /// Custom height
   final double? height;
-
-  /// Explicitly choose transparent variant if true, normal if false.
-  /// If null, automatically resolves to transparent on dark themes or colored contexts.
-  final bool? isTransparent;
 
   /// Image box fit (defaults to [BoxFit.contain])
   final BoxFit fit;
@@ -38,22 +31,12 @@ class AppLogo extends StatelessWidget {
     this.size,
     this.width,
     this.height,
-    this.isTransparent,
     this.fit = BoxFit.contain,
     this.heroTag,
   });
 
-  /// Explicitly use the normal logo (cream background)
-  const AppLogo.normal({
-    super.key,
-    this.size,
-    this.width,
-    this.height,
-    this.fit = BoxFit.contain,
-    this.heroTag,
-  }) : isTransparent = false;
-
-  /// Explicitly use the transparent logo (blends into any background color)
+  /// Same as [AppLogo]; every brand mark is transparent now. Kept so existing
+  /// call sites stay unchanged.
   const AppLogo.transparent({
     super.key,
     this.size,
@@ -61,24 +44,15 @@ class AppLogo extends StatelessWidget {
     this.height,
     this.fit = BoxFit.contain,
     this.heroTag,
-  }) : isTransparent = true;
+  });
 
   @override
   Widget build(BuildContext context) {
-    final effectiveWidth = width ?? size;
-    final effectiveHeight = height ?? size;
-
-    // If transparent is not explicitly specified, use transparent on dark mode
-    // or when background color is present.
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final useTransparent = isTransparent ?? isDark;
-
-    final assetPath = useTransparent ? transparentAsset : normalAsset;
-
-    Widget imageWidget = Image.asset(
-      assetPath,
-      width: effectiveWidth,
-      height: effectiveHeight,
+    final theme = Theme.of(context);
+    final Widget imageWidget = Image.asset(
+      theme.brightness == Brightness.dark ? forDarkAsset : forLightAsset,
+      width: width ?? size,
+      height: height ?? size,
       fit: fit,
       errorBuilder: (context, error, stackTrace) {
         // Safe fallback in headless test environments
@@ -86,19 +60,14 @@ class AppLogo extends StatelessWidget {
         return Icon(
           Icons.luggage_rounded,
           size: iconSize,
-          color: Theme.of(context).colorScheme.primary,
+          color: theme.colorScheme.primary,
         );
       },
     );
 
     if (heroTag != null) {
-      return Hero(
-        tag: heroTag!,
-        child: imageWidget,
-      );
+      return Hero(tag: heroTag!, child: imageWidget);
     }
-
     return imageWidget;
   }
 }
-

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 13+ themed icon layer, same 72/108 framing as the foreground. Generated from packbuddy_logos/out/ic_launcher_monochrome.svg -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="1024">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M380.13 357.3A18.03 18.03 0 0 1 398.15 339.27L532.06 339.27C603.62 339.27 649.76 389 649.76 465.16C649.76 540.31 601.29 590.41 527.67 590.41L462.71 590.41A6.29 6.29 0 0 0 456.43 596.7L456.43 676.69A18.12 18.12 0 0 1 438.31 694.81L397.98 694.81A17.85 17.85 0 0 1 380.13 676.95ZM588.07 469.08A75.73 75.73 0 0 0 512.33 393.35A75.73 75.73 0 0 0 436.6 469.08A75.73 75.73 0 0 0 512.33 544.81A75.73 75.73 0 0 0 588.07 469.08ZM555.9 424.32L527.47 484.29L468.3 513.42L496.85 453.45Z" />
+</vector>

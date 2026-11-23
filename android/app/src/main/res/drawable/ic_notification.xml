@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Status bar icon (white, alpha only). Generated from packbuddy_logos/out/ic_notification.svg -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="1024">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M170.3 107.13A45.69 45.69 0 0 1 215.99 61.44L555.38 61.44C736.76 61.44 853.7 187.48 853.7 380.51C853.7 570.99 730.84 697.97 544.25 697.97L379.62 697.97A15.93 15.93 0 0 0 363.69 713.9L363.69 916.63A45.93 45.93 0 0 1 317.76 962.56L215.55 962.56A45.25 45.25 0 0 1 170.3 917.31ZM697.34 390.44A191.95 191.95 0 0 0 505.38 198.49A191.95 191.95 0 0 0 313.43 390.44A191.95 191.95 0 0 0 505.38 582.39A191.95 191.95 0 0 0 697.34 390.44ZM615.81 277L543.74 429L393.78 502.82L466.13 350.82Z" />
+</vector>

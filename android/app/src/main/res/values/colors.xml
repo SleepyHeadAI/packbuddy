@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand colours mirrored from lib/core/theme/app_colors.dart -->
+    <color name="ic_launcher_background">#101010</color> <!-- deepObsidian -->
+    <color name="splash_background">#FBFAF8</color> <!-- alabasterLinen -->
+    <color name="notification_accent">#785148</color> <!-- terracottaCedar -->
+</resources>

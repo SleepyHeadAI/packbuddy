@@ -189,7 +189,7 @@ class _NotificationsCenterSheetState extends ConsumerState<NotificationsCenterSh
         channelDescription: 'Smart notifications and packing reminders',
         importance: Importance.high,
         priority: Priority.high,
-        icon: '@mipmap/ic_launcher',
+        icon: '@drawable/ic_notification',
       );
       const darwinDetails = DarwinNotificationDetails();
       const details = NotificationDetails(android: androidDetails, iOS: darwinDetails);

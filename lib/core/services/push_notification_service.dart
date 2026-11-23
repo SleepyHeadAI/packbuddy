@@ -78,7 +78,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
         priority: Priority.max,
         playSound: true,
         enableVibration: true,
-        icon: '@mipmap/ic_launcher',
+        icon: '@drawable/ic_notification',
       );
       const darwinDetails = DarwinNotificationDetails(
         presentAlert: true,

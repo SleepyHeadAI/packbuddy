@@ -100,7 +100,7 @@ class LocalNotificationService implements INotificationService {
       }
 
       // 2. Platform initialization settings
-      const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+      const androidSettings = AndroidInitializationSettings('@drawable/ic_notification');
       const darwinSettings = DarwinInitializationSettings(
         requestAlertPermission: true,
         requestBadgePermission: true,
@@ -283,7 +283,7 @@ class LocalNotificationService implements INotificationService {
       enableLights: true,
       visibility: NotificationVisibility.public,
       ticker: l10n.notificationDefaultTitle,
-      icon: '@mipmap/ic_launcher',
+      icon: '@drawable/ic_notification',
     );
     const darwinDetails = DarwinNotificationDetails(
       presentAlert: true,
@@ -322,7 +322,7 @@ class LocalNotificationService implements INotificationService {
         channelDescription: l10n.notificationChannelRemindersDescription,
         importance: Importance.high,
         priority: Priority.high,
-        icon: '@mipmap/ic_launcher',
+        icon: '@drawable/ic_notification',
       );
 
       const darwinDetails = DarwinNotificationDetails(
